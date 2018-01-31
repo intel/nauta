@@ -1,0 +1,27 @@
+extends: default
+
+ignore: |
+  /.venv
+
+rules:
+  braces:
+    max-spaces-inside: 1
+  brackets:
+    max-spaces-inside: 1
+  comments:
+    require-starting-space: false
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  document-start:
+    # Ignore all files with vaults and symlink
+    ignore: |
+      /toolbox/scm/group_vars/all/github.yml
+      /toolbox/scm/group_vars/all/github-ff.yml
+  empty-lines:
+    max-end: 1
+  line-length:
+    max: 160
+    level: warning
+    ignore: |
+      /jenkins/group_vars/all/dev-users.yml
+  truthy: disable
