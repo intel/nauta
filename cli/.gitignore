@@ -1,0 +1,23 @@
+# PyCharm
+.idea
+
+# Python things
+.venv
+*.pyc
+__pycache__
+.pytest_cache
+
+# PyInstaller artifacts
+build
+dist
+main.spec
+
+# draft artifacts
+example-python/charts
+example-python/draft.toml
+example-python/Dockerfile
+example-python/.draftignore
+charts
+draft.toml
+Dockerfile
+.draftignore
