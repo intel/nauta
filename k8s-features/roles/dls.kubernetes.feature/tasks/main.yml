@@ -11,10 +11,6 @@
   set_fact:
     k8s_features_names: "{{ k8s_features.split(',') }}"
 
-- name: "Config file"
-  debug:
-    msg: "{{ playbook_dir }}"
-
 #- name: "Ensure, that tiller is installed and ready"
 #  environment: "{{ proxy_env }}"
 #  k8s_raw:
@@ -28,7 +24,7 @@
 #    - tiller-002.yml
 #    - tiller-003.yml
 
-- name: "Ensure, that tiller is installed and ready"
+- name: "Ensure, that tiller is installed"
   environment: "{{ proxy_env }}"
   shell: "KUBECONFIG={{ kube_config }} kubectl create -f {{ playbook_dir }}/charts/{{ tiller_part }}"
   loop_control:
@@ -40,10 +36,13 @@
   register: tiller_app
   failed_when: tiller_app.rc not in [0, 1]
 
-- name: "Install tiller log"
-  debug:
-    msg: "{{ tiller_app }}"
-  when: False
+- name: "Ensure, that tiller is ready"
+  environment: "{{ proxy_env }}"
+  shell: "KUBECONFIG={{ kube_config }} kubectl get pods --all-namespaces | grep tiller | grep Running"
+  register: tiller_readiness
+  until: tiller_readiness.rc == 0
+  retries: 20
+  delay: 3
 
 - include_tasks: k8s_feature.yml
   loop_control:
