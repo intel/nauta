@@ -1,0 +1,51 @@
+---
+
+- name: load a variable file based on the OS type.
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: "Config file"
+  debug:
+    msg: "{{ kube_config }}"
+
+- name: "Parse features names"
+  set_fact:
+    k8s_features_names: "{{ k8s_features.split(',') }}"
+
+- name: "Config file"
+  debug:
+    msg: "{{ playbook_dir }}"
+
+#- name: "Ensure, that tiller is installed and ready"
+#  environment: "{{ proxy_env }}"
+#  k8s_raw:
+#    state: present
+#    src: "{{ playbook_dir }}/charts/{{ tiller_part }}"
+#    kubeconfig: "{{ kube_config }}"
+#  loop_control:
+#    loop_var: tiller_part
+#  with_items:
+#    - tiller-001.yml
+#    - tiller-002.yml
+#    - tiller-003.yml
+
+- name: "Ensure, that tiller is installed and ready"
+  environment: "{{ proxy_env }}"
+  shell: "KUBECONFIG={{ kube_config }} kubectl create -f {{ playbook_dir }}/charts/{{ tiller_part }}"
+  loop_control:
+    loop_var: tiller_part
+  with_items:
+    - tiller-001.yml
+    - tiller-002.yml
+    - tiller-003.yml
+  register: tiller_app
+  failed_when: tiller_app.rc not in [0, 1]
+
+- name: "Install tiller log"
+  debug:
+    msg: "{{ tiller_app }}"
+  when: False
+
+- include_tasks: k8s_feature.yml
+  loop_control:
+    loop_var: k8s_feature
+  with_items: "{{ k8s_features_names }}"

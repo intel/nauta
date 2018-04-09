@@ -1,0 +1,63 @@
+---
+
+- name: "Create helm templates directory for {{ name }}"
+  file:
+    path: "{{ helm_templates_directory }}/{{ name }}"
+    state: directory
+    recurse: True
+
+- name: "Copy {{ name }} template into {{ helm_templates_directory }}/{{ name }}"
+  copy:
+    src: "{{ playbook_dir }}/charts/{{ name }}/"
+    dest: "{{ helm_templates_directory }}/{{ name }}"
+
+- name: "Render yaml values file for {{ name }}"
+  copy:
+    content: "{{ helm_values | default({}) | combine({'local_release':'DLS-Lite'}) | to_nice_yaml }}"
+    dest: "{{ helm_templates_directory }}/{{ name }}.yaml"
+
+- name: "Check if release exists for {{ name }}"
+  environment: "{{ proxy_env }}"
+  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} get {{ kind }}"
+  register: helm_app
+  changed_when: helm_app.rc == 1
+  failed_when: helm_app.rc not in [0, 1]
+  when:
+    - operation == "install"
+
+- name: "Install upgrade release for {{ name }}"
+  environment: "{{ proxy_env }}"
+  shell: >
+    KUBECONFIG={{ kube_config }} {{ helm_bin }} install --name {{ kind }}
+    "{{ helm_templates_directory }}/{{ name }}" --namespace {{ namespace }}
+    -f "{{ helm_templates_directory }}/{{ name }}.yaml" --wait
+  changed_when: False
+  when:
+    - operation == "install"
+    - helm_app is changed
+
+- name: "Upgrade release for {{ name }}"
+  environment: "{{ proxy_env }}"
+  shell: >
+    KUBECONFIG={{ kube_config }} {{ helm_bin }} upgrade {{ kind }}
+    "{{ helm_templates_directory }}/{{ name }}" --namespace {{ namespace }}
+    -f "{{ helm_templates_directory }}/{{ name }}.yaml" --wait
+  changed_when: False
+  when:
+    - operation == "install"
+    - helm_app is not changed
+
+- name: "Check if release exists for {{ name }}"
+  environment: "{{ proxy_env }}"
+  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} get {{ kind }}"
+  register: helm_app
+  changed_when: helm_app.rc == 1
+  failed_when: helm_app.rc not in [0, 1]
+  when: operation == "uninstall"
+
+- name: "Remove release if it is not required for {{ name }}"
+  environment: "{{ proxy_env }}"
+  shell: "{{ helm_bin }} del --purge {{ kind }}"
+  when:
+    - operation == "uninstall"
+    - not helm_app is changed

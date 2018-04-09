@@ -1,0 +1,4 @@
+---
+
+helm_bin: "/usr/local/bin/helm"
+helm_templates_directory: "/tmp/helm-templates"

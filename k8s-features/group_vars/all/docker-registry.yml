@@ -1,0 +1,6 @@
+---
+
+# Please put feature configuration
+
+feature_docker_registry:
+  kind: "networking"

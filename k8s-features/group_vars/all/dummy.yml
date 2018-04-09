@@ -1,0 +1,6 @@
+---
+
+# Please put feature configuration
+
+feature_dummy:
+  kind: "dummy"

@@ -1,0 +1,16 @@
+---
+
+intel_proxy_env:
+  http_proxy: http://proxy-mu.intel.com:911
+  https_proxy: http://proxy-mu.intel.com:912
+  no_proxy: "127.0.0.1,localhost,10.10.0.0/24,10.91.115.0/24,192.168.0.0/16,.intel.com,intel.com"
+
+internet_proxy_env:
+  http_proxy: ""
+  https_proxy: ""
+  # yamllint disable-line rule:line-length
+  no_proxy: ""
+
+proxy_env: "{{ internet_proxy_env if (lookup('env', 'CIRCLECI') | default('') == 'true') else intel_proxy_env }}"
+
+proxy: "{{ proxy_env }}"

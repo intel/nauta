@@ -1,0 +1,5 @@
+---
+
+#helm_bin: "/opt/helm/linux-amd64/helm"
+helm_bin: "helm"
+helm_templates_directory: "/tmp/helm-templates"
