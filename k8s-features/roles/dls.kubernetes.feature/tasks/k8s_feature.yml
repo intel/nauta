@@ -1,23 +1,9 @@
 ---
 
-- name: "Set chart variable name for {{ k8s_feature }}"
-  set_fact:
-    chart_variable_name: "feature_{{ k8s_feature.replace('-','_') }}"
-
-
-- name: "Set chart variables"
-  set_fact:
-    chart_variables: "{{ hostvars[inventory_hostname][chart_variable_name] }}"
-
-- name: "Show chart variables for {{ k8s_feature }}"
-  debug:
-    msg: "{{ chart_variables }}"
-
 - name: "Run helm tasks for {{ k8s_feature }}"
   vars:
     name: "{{ k8s_feature }}"
-    helm_values: "{{ chart_variables }}"
-    kind: "{{ chart_variables.kind }}"
+    kind: "{{ k8s_feature }}"
     namespace: kube-system
     operation: "{{ k8s_operation }}"
   include_tasks: helm.yml

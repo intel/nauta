@@ -1,5 +1,10 @@
 ---
 
+- name: "Delete helm templates directory for {{ name }}"
+  file:
+    path: "{{ helm_templates_directory }}/{{ name }}"
+    state: absent
+
 - name: "Create helm templates directory for {{ name }}"
   file:
     path: "{{ helm_templates_directory }}/{{ name }}"
@@ -57,7 +62,7 @@
 
 - name: "Remove release if it is not required for {{ name }}"
   environment: "{{ proxy_env }}"
-  shell: "{{ helm_bin }} del --purge {{ kind }}"
+  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} del --purge {{ kind }}"
   when:
     - operation == "uninstall"
     - not helm_app is changed

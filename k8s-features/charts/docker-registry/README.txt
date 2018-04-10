@@ -1,0 +1,1 @@
+Docker-registry chart is taken form https://github.com/kubernetes/charts under Apache license.

@@ -7,6 +7,10 @@
   debug:
     msg: "{{ kube_config }}"
 
+- name: "Proxy settings for k8s related operations"
+  debug:
+    msg: "{{ proxy_env }}"
+
 - name: "Parse features names"
   set_fact:
     k8s_features_names: "{{ k8s_features.split(',') }}"
@@ -14,9 +18,9 @@
 #- name: "Ensure, that tiller is installed and ready"
 #  environment: "{{ proxy_env }}"
 #  k8s_raw:
+#    kubeconfig: "{{ kube_config }}"
 #    state: present
 #    src: "{{ playbook_dir }}/charts/{{ tiller_part }}"
-#    kubeconfig: "{{ kube_config }}"
 #  loop_control:
 #    loop_var: tiller_part
 #  with_items:
@@ -37,7 +41,7 @@
   failed_when: tiller_app.rc not in [0, 1]
 
 # TOREFACTOR: Find proper way to check if tiller is really online
-- name: "Sleep after tiller installation"
+- name: "Sleep 20 seconds after tiller installation (TO REFACTOR)"
   shell: "sleep 20"
 
 - name: "Ensure, that tiller is ready"
