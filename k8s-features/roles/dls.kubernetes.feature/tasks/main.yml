@@ -36,6 +36,10 @@
   register: tiller_app
   failed_when: tiller_app.rc not in [0, 1]
 
+# TOREFACTOR: Find proper way to check if tiller is really online
+- name: "Sleep after tiller installation"
+  shell: "sleep 20"
+
 - name: "Ensure, that tiller is ready"
   environment: "{{ proxy_env }}"
   shell: "KUBECONFIG={{ kube_config }} kubectl get pods --all-namespaces | grep tiller | grep Running"
@@ -43,6 +47,10 @@
   until: tiller_readiness.rc == 0
   retries: 20
   delay: 3
+
+- name: "Show tiller status"
+  debug:
+    msg: "{{ tiller_readiness }}"
 
 - include_tasks: k8s_feature.yml
   loop_control:

@@ -18,14 +18,14 @@
 
 - name: "Check if release exists for {{ name }}"
   environment: "{{ proxy_env }}"
-  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} get {{ kind }}"
+  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} list | grep {{ kind }}"
   register: helm_app
   changed_when: helm_app.rc == 1
   failed_when: helm_app.rc not in [0, 1]
   when:
     - operation == "install"
 
-- name: "Install upgrade release for {{ name }}"
+- name: "Install release for {{ name }}"
   environment: "{{ proxy_env }}"
   shell: >
     KUBECONFIG={{ kube_config }} {{ helm_bin }} install --name {{ kind }}
@@ -49,7 +49,7 @@
 
 - name: "Check if release exists for {{ name }}"
   environment: "{{ proxy_env }}"
-  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} get {{ kind }}"
+  shell: "KUBECONFIG={{ kube_config }} {{ helm_bin }} list | grep {{ kind }}"
   register: helm_app
   changed_when: helm_app.rc == 1
   failed_when: helm_app.rc not in [0, 1]
