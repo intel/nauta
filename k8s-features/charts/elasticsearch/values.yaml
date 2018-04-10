@@ -1,0 +1,10 @@
+image:
+  tag: "latest"
+  repository: "elasticsearch"
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  externalPort: 9200
+  internalPort: 9200

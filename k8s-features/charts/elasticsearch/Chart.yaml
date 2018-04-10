@@ -1,0 +1,4 @@
+name: elasticsearch
+version: 0.0.1
+sources:
+- https://github.com/elastic/elasticsearch

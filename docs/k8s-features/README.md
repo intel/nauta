@@ -33,7 +33,7 @@ the same file as user uses with `kubectl` tool
 ## Feature uninstallation
 To install kubernetes feature user has to call:
 ```aidl
-make k8s-features-install K8S_FEATURES_LIST=[comma separated features list] K8S_CONFIG_LOCATION=[path to k8s config file] 
+make k8s-features-uninstall K8S_FEATURES_LIST=[comma separated features list] K8S_CONFIG_LOCATION=[path to k8s config file] 
 ```
 
 - `K8S_CONFIG_LOCATION` - parameter has to privide path to kubernetes cluster admin user config. This has to be
@@ -45,6 +45,8 @@ the same file as user uses with `kubectl` tool
 - `dummy` - Dummy feature to provide ability to check if all kubernetes components on client and server
 are properly installed (i.e. `tiller` on )
 - `docker-registry` - Private docker registry
+- `elasticsearch` - distributed RESTful search engine built for the cloud 
+- `fluentd` - open-source log collector
 
 ## Features parametrization
 Each feature can be parametrized using `values.yml` file present in specific feature directory. All

@@ -1,0 +1,4 @@
+name: fluentd
+version: 0.0.1
+sources:
+- https://github.com/fluent/fluentd-docker-image

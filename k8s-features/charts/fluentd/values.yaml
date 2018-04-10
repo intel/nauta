@@ -1,0 +1,7 @@
+image:
+  repository: "fluent/fluentd"
+  tag: "latest"
+
+elaticsearch:
+   host: "elasticsearch.default"
+   port: 9200
