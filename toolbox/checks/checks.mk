@@ -1,19 +1,18 @@
-ansible-syntax-check: $(ACTIVATE) .vault_pass.txt
+ansible-syntax-check: $(ACTIVATE)
 #	===============================================================================
 #	                Please add ansible playbooks here"
 #	===============================================================================
-#	@. $(ACTIVATE); ansible-playbook toolbox/scm/scm.yml -e @./toolbox/config.yml --vault-password-file ./.vault_pass.txt --syntax-check
+	@. $(ACTIVATE); ansible-playbook k8s-features/dls.kubernetes.feature.yml -e @./config.yml --syntax-check
 
 
-yamllint: $(ACTIVATE)
+code-yamllint: $(ACTIVATE)
 	@. $(ACTIVATE); yamllint .
 
-check-syntax:
+code-check-syntax:
 	@$(MAKE) ansible-syntax-check
-	@$(MAKE) yamllint
+	@$(MAKE) code-yamllint
 
-check-license:
-	mvn -f toolbox/checks/license_check.xml license:check
+code-check-license:
+	mvn -f toolbox/checks/license_check.xml license:check -Dorg.slf4j.simpleLogger.defaultLogLevel=warning
 
-check-all: check-license check-syntax
-
+code-check-all: code-check-license code-check-syntax

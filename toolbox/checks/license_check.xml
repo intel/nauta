@@ -10,8 +10,8 @@
             <artifactId>license-maven-plugin</artifactId>
             <version>3.0</version>
             <configuration>
-                <header>${project.basedir}/license_header_2017.txt</header>
-                <basedir>..</basedir>
+                <header>${project.basedir}/license_header_2018.txt</header>
+                <basedir>../..</basedir>
                 <includes>
                     <include>**/*.js</include>
                     <include>**/*.css</include>
@@ -19,16 +19,7 @@
                     <include>**/*.py</include>
                 </includes>
                 <excludes>
-                    <exclude>**/libs/python-consul-0.7.0/**/*.*</exclude>
-                    <exclude>**/libs/duplicity-0.7.14.tpm/**/*.*</exclude>
-                    <exclude>**/node_modules/**/*.*</exclude>
-                    <exclude>**/coverage/**/*.*</exclude>
-                    <exclude>**/htmlcov/**/*.*</exclude>
                     <exclude>**/.venv/**/*.*</exclude>
-		    <exclude>**/roles/**/*.*</exclude>
-		    <exclude>**/.titanium/**/*.*</exclude>
-                    <exclude>**/management_service/nauth/**/*.*</exclude>
-                    <exclude>**/docker/**/*.*</exclude>
                 </excludes>
                 <mapping>
                     <js>JAVADOC_STYLE</js>
