@@ -19,28 +19,43 @@
 # and approved by Intel in writing.
 #
 
-from typing import List
+import subprocess
+
+import pytest
 
 from util.system import execute_system_command
-from util.logger import initialize_logger
-
-log = initialize_logger('draft.cmd')
-
-DRAFT_BIN = 'draft'
 
 
-def call_draft(args: List[str]) -> (str, int):
-    full_command = [DRAFT_BIN]
-    full_command.extend(args)
+def test_execute_system_command(mocker):
+    mocker.patch('subprocess.check_output')
+    output, exit_code = execute_system_command(['ls'])
 
-    return execute_system_command(full_command)
-
-
-def create():
-    output, exit_code = call_draft(['create'])
-    print(output)
+    # noinspection PyUnresolvedReferences
+    assert subprocess.check_output.call_count == 1
 
 
-def up():
-    output, exit_code = call_draft(['up'])
-    print(output)
+def test_execute_system_command_known_error(mocker):
+
+    bad_exit_code = 1
+
+    # noinspection PyUnusedLocal
+    def raise_command_exception(*args, **kwargs):
+        raise subprocess.CalledProcessError(returncode=bad_exit_code, cmd='ls')
+
+    mocker.patch('subprocess.check_output', new=raise_command_exception)
+
+    output, exit_code = execute_system_command(['ls'])
+
+    assert exit_code == bad_exit_code
+
+
+def test_execute_system_command_unknown_error(mocker):
+
+    # noinspection PyUnusedLocal
+    def raise_command_exception(*args, **kwargs):
+        raise subprocess.SubprocessError()
+
+    mocker.patch('subprocess.check_output', new=raise_command_exception)
+
+    with pytest.raises(subprocess.SubprocessError):
+        execute_system_command(['ls'])

@@ -28,7 +28,7 @@ clean:
 
 venv: $(ACTIVATE)
 $(ACTIVATE): requirements.txt
-	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
+	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
 	@. $(ACTIVATE); pip install -r requirements.txt;
 

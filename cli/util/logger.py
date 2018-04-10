@@ -19,28 +19,16 @@
 # and approved by Intel in writing.
 #
 
-from typing import List
-
-from util.system import execute_system_command
-from util.logger import initialize_logger
-
-log = initialize_logger('draft.cmd')
-
-DRAFT_BIN = 'draft'
+import os
+import logging
 
 
-def call_draft(args: List[str]) -> (str, int):
-    full_command = [DRAFT_BIN]
-    full_command.extend(args)
+def initialize_logger(package_name) -> logging.Logger:
+    logging_level = os.getenv("LOG_LEVEL", "INFO")
 
-    return execute_system_command(full_command)
+    logger = logging.getLogger(package_name)
+    logger.setLevel(logging_level)
 
+    logging.basicConfig(level=logging_level)
 
-def create():
-    output, exit_code = call_draft(['create'])
-    print(output)
-
-
-def up():
-    output, exit_code = call_draft(['up'])
-    print(output)
+    return logger

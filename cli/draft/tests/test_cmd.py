@@ -1,6 +1,6 @@
 #
 # INTEL CONFIDENTIAL
-# Copyright (c) 2017 Intel Corporation
+# Copyright (c) 2018 Intel Corporation
 #
 # The source code contained or described herein and all documents related to
 # the source code ("Material") are owned by Intel Corporation or its suppliers
@@ -20,14 +20,15 @@
 #
 
 import pytest
+from unittest.mock import call
 
 from draft import cmd
 
 
 @pytest.fixture
 def draft_mock(mocker):
-    call_draft_mocked = mocker.patch.object(cmd, 'call_draft')
-    call_draft_mocked.return_value = ('some return', 0)
+    exe_mock = mocker.patch.object(cmd, 'execute_system_command')
+    exe_mock.return_value = ('some return', 0)
 
     return cmd
 
@@ -36,4 +37,13 @@ def draft_mock(mocker):
 def test_create(draft_mock):
     draft_mock.create()
 
-    assert draft_mock.call_draft.call_count == 1
+    assert draft_mock.execute_system_command.call_count == 1
+    assert draft_mock.execute_system_command.call_args == call(['draft', 'create'])
+
+
+# noinspection PyShadowingNames
+def test_up(draft_mock):
+    draft_mock.up()
+
+    assert draft_mock.execute_system_command.call_count == 1
+    assert draft_mock.execute_system_command.call_args == call(['draft', 'up'])
