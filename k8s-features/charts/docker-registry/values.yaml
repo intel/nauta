@@ -15,7 +15,7 @@ image:
   pullPolicy: IfNotPresent
 service:
   name: registry
-  type: ClusterIP
+  type: NodePort
   port: 5000
   # nodePort:
   annotations: {}
@@ -46,8 +46,8 @@ resources: {}
   #  memory: 128Mi
 persistence:
   accessMode: 'ReadWriteOnce'
-  enabled: false
-  size: 10Gi
+  enabled: true
+  size: 100Gi
   # storageClass: '-'
 
 # set the type of filesystem to use: filesystem, s3
