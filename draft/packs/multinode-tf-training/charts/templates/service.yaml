@@ -1,0 +1,47 @@
+{{- range $i, $e := until (.Values.multinode.ps_count|int) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ps-service-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+  labels:
+    app: ps-service-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ $.Values.multinode.port }}
+      targetPort: {{ $.Values.multinode.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: training-pod-ps-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
+    release: "{{ $.Release.Revision }}"
+{{- end -}}
+{{ printf "\n---\n" }}
+{{- range $i, $e := until (.Values.multinode.workers_count|int) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-service-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+  labels:
+    app: worker-service-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ $.Values.multinode.port }}
+      targetPort: {{ $.Values.multinode.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: training-pod-worker-{{ $i }}-{{ $.Release.Name }}-{{ $.Values.user.name }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
+    release: "{{ $.Release.Revision }}"
+{{ if ne ($.Values.multinode.workers_count|int) (add $i 1) }}{{ printf "---\n" }}
+{{- end -}}
+{{- end -}}

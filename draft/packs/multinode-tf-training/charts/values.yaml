@@ -1,0 +1,61 @@
+# Values needed by multinode training tf pack
+service:
+  type: ClusterIP
+
+# definition of resources for workers. If one doesn't want to
+# limit or request resources - definition of resources should be
+# commented out and replaces with {} (curly braces)
+# i.e. worker_resources: {}
+worker_resources: {}
+#resources:
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 100m
+#    memory: 128Mi
+
+# definition of resources for paramater servers. This is an example
+# of a definition where resources are not defined.
+ps_resources: {}
+# resources:
+#   limits:
+#     cpu: 101m
+#     memory: 128Mi
+#   requests:
+#     cpu: 101m
+#     memory: 128Mi
+
+# parameters describing training settings
+# - workers_count - number of worker used duirng a training
+# - ps_count - number of parameter servers used during a training
+# - port - port under which script's services are exposed
+multinode:
+  workers_count: 3
+  ps_count: 1
+  port: 2222
+
+# training related parameters
+# - args - list of additional script parameters. This list shouldn't
+#          contain any of paramaters named explicitly in other params
+#          of this section
+# - script_name - name of a training script
+# - workers_list_param_name - name of a parameter with a list of workers
+# - ps_list_param_name - name of a parameter with a list of parameter servers
+# - task_id_param_name - name of a parameter with an id of a task
+# - job_name_param - name of a paramater with a job name
+# Default values of all these paramaters are typical for example ts scripts.
+training:
+  args:
+  - "--data_dir=/data"
+  - "--num_gpus=0"
+  - "--train_steps=10000"
+  script_name: "/app/distributed_training.py"
+  workers_list_param_name: "--worker_hosts"
+  ps_list_param_name: "--ps_hosts"
+  task_id_param_name: "--task_index"
+  job_name_param: "--job_name"
+
+# name of a user used to differentiate pods between users
+user:
+  name: username
