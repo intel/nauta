@@ -1,0 +1,25 @@
+# Default values for charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+TensorBoardPort: 6006
+TensorIPythonPort: 8888
+
+commandline:
+  args:
+    - "/app/training.py"
+    - "--data_dir=/temp"
+
+image:
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+
+resources: {}
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  #requests: #TODO CHECK Tenserflow minimal requirements
+  #  cpu: 100m
+  #  memory: 128Mi

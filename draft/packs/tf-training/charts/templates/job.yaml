@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart_version" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python"]
+          args:
+          {{- range .Values.commandline.args }}
+            - {{ . }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.TensorBoardPort }}
+              name: "tensorboard"
+            - containerPort: {{ .Values.TensorIPythonPort }}
+              name: "ipython"
+          securityContext:
+            privileged: true
+          resources:
+          {{ toYaml .Values.resources | indent 10 }}
+      restartPolicy: Never
+  backoffLimit: 5

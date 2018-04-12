@@ -3,6 +3,7 @@ extends: default
 ignore: |
   /.venv
   /k8s-features/charts
+  /draft/packs/*/charts/
 
 rules:
   braces:
