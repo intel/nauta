@@ -23,6 +23,9 @@
 build: $(ACTIVATE)
 	@. $(ACTIVATE); pip install pyinstaller;
 	@. $(ACTIVATE); pyinstaller -F main.py;
+	@wget https://ftp.nervana.sclab.intel.com/public/draft-ef24e1c6af938e5109319c4e1b69f304504aa288-linux-amd64.tar.gz --no-check-certificate -O draft-linux-amd64.tar.gz
+	@tar -zxf draft-linux-amd64.tar.gz -C dist
+	@rm -f draft-linux-amd64.tar.gz
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ main.py
@@ -31,3 +34,4 @@ test: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); py.test
 
 cli-check: venv-dev test style
+

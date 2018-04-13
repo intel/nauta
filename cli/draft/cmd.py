@@ -19,12 +19,16 @@
 # and approved by Intel in writing.
 #
 
+import os
+import sys
 from typing import List
 
 from util.system import execute_system_command
 from util.logger import initialize_logger
 
 log = initialize_logger('draft.cmd')
+
+draft_path = os.path.dirname(sys.executable)
 
 DRAFT_BIN = 'draft'
 
@@ -33,7 +37,12 @@ def call_draft(args: List[str]) -> (str, int):
     full_command = [DRAFT_BIN]
     full_command.extend(args)
 
-    return execute_system_command(full_command)
+    current_path = os.getenv('PATH')
+    current_user_home_directory_path = os.path.expanduser('~')
+
+    return execute_system_command(full_command, env={'PATH': current_path + ':' + draft_path,
+                                                     'DRAFT_HOME': os.path.join(draft_path, ".draft"),
+                                                     'HOME': current_user_home_directory_path})
 
 
 def create():

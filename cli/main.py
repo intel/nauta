@@ -22,7 +22,8 @@
 import click
 
 import draft.cmd as draft
-from draft import dependenies_checker
+from draft import dependencies_checker
+
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -43,7 +44,7 @@ def train():
 
 @click.command()
 def verify():
-    dependenies_checker.check()
+    dependencies_checker.check()
 
 
 cli.add_command(train)

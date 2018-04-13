@@ -23,7 +23,7 @@ from copy import deepcopy
 
 from pytest import fixture, raises
 
-from draft import dependenies_checker
+from draft import dependencies_checker
 
 version_returns = {
     'kubectl': ('Client Version: version.Info{Major:"1", Minor:"10", GitVersion:"v1.10.0", '
@@ -66,11 +66,11 @@ def revert_version_returns():
 
 @fixture
 def dependencies_checker_mocked(mocker):
-    mocker.patch.object(dependenies_checker, 'execute_system_command',
+    mocker.patch.object(dependencies_checker, 'execute_system_command',
                         new=lambda cmd, *args, **kwargs: version_returns[cmd[0]])
-    mocker.patch.object(dependenies_checker, 'call_draft', new=lambda cmd, *args, **kwargs: version_returns['draft'])
+    mocker.patch.object(dependencies_checker, 'call_draft', new=lambda cmd, *args, **kwargs: version_returns['draft'])
 
-    return dependenies_checker
+    return dependencies_checker
 
 
 # noinspection PyShadowingNames
@@ -90,7 +90,7 @@ def test_check_bad_version(dependencies_checker_mocked):
 
 
 # noinspection PyShadowingNames
-def test_check_no_command(dependencies_checker_mocked: dependenies_checker):
+def test_check_no_command(dependencies_checker_mocked: dependencies_checker):
     version_returns['docker'] = ('command not found', 127)
 
     dependencies_checker_mocked.check()
