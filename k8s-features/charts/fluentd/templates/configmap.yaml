@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+Metadata:
+  name: {{ .Chart.Name }}-config
+
+data:
+{{ (.Files.Glob "config/fluent.conf").AsConfig  | indent 2 }}

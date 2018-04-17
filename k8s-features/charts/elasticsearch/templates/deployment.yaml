@@ -21,10 +21,12 @@ spec:
         imagePullPolicy: "IfNotPresent"
         env:
         - name: ES_JAVA_OPTS
-          value: "-Xmx256m -Xms256m"
+          value: "-Xmx512m -Xms512m"
         resources:
+          requests:
+            memory: 640Mi
           limits:
-            memory: 264Mi
+            memory: 640Mi
         ports:
         - containerPort: {{ .Values.service.internalPort }}
           protocol: TCP
