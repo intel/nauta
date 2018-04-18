@@ -37,16 +37,15 @@ def call_draft(args: List[str]) -> (str, int):
     full_command = [DRAFT_BIN]
     full_command.extend(args)
 
-    current_path = os.getenv('PATH')
-    current_user_home_directory_path = os.path.expanduser('~')
+    envs = os.environ.copy()
+    envs['DRAFT_HOME'] = os.path.join(draft_path, ".draft")
+    envs['PATH'] = os.getenv('PATH') + ':' + draft_path
 
-    return execute_system_command(full_command, env={'PATH': current_path + ':' + draft_path,
-                                                     'DRAFT_HOME': os.path.join(draft_path, ".draft"),
-                                                     'HOME': current_user_home_directory_path})
+    return execute_system_command(full_command, env=envs)
 
 
 def create():
-    output, exit_code = call_draft(['create'])
+    output, exit_code = call_draft(['create', '--pack=tf-training'])
     print(output)
 
 

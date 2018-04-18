@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-TensorBoardPort: 6006
-TensorIPythonPort: 8888
+TensorBoardPort: 8888
+TensorIPythonPort: 6006
 
 commandline:
   args:

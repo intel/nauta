@@ -7,11 +7,15 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    draft: {{ .Values.draft }}
 spec:
   template:
     metadata:
+      annotations:
+        buildID: {{ .Values.buildID }}
       labels:
         app: {{ template "name" . }}
+        draft: {{ .Values.draft }}
         release: {{ .Release.Name }}
     spec:
       containers:

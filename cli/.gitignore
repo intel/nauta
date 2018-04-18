@@ -17,7 +17,5 @@ example-python/charts
 example-python/draft.toml
 example-python/Dockerfile
 example-python/.draftignore
-charts
 draft.toml
-Dockerfile
 .draftignore

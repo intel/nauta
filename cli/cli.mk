@@ -26,6 +26,7 @@ build: $(ACTIVATE)
 	@wget https://ftp.nervana.sclab.intel.com/public/draft-ef24e1c6af938e5109319c4e1b69f304504aa288-linux-amd64.tar.gz --no-check-certificate -O draft-linux-amd64.tar.gz
 	@tar -zxf draft-linux-amd64.tar.gz -C dist
 	@rm -f draft-linux-amd64.tar.gz
+	@cp -Rf draft/packs/* dist/.draft/packs/
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ main.py
