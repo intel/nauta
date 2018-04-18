@@ -16,10 +16,10 @@ image:
 service:
   type: ClusterIP
 
-resources: {}
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  #requests: #TODO CHECK Tenserflow minimal requirements
-  #  cpu: 100m
-  #  memory: 128Mi
+resources:
+  requests:
+    cpu: 1
+    memory: 1Gi
+  #limits:
+  #  cpu: 2
+  #  memory: 4Gi

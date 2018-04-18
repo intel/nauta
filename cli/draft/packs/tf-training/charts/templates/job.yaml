@@ -35,6 +35,6 @@ spec:
           securityContext:
             privileged: true
           resources:
-          {{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.resources | indent 12 }}
       restartPolicy: Never
   backoffLimit: 5
