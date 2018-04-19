@@ -1,0 +1,44 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Create http configuration path
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Create docker configuration path
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: Render proxy configuration
+  template:
+    src: proxy.conf.j2
+    dest: /etc/systemd/system/docker.service.d/proxy.conf
+  notify:
+    - Reload Systemd
+    - Restart Docker
+
+- name: Render docker configuration
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  notify:
+    - Restart Docker
+
+- meta: flush_handlers
+
+- name: Start and enable docker
+  service:
+    name: docker
+    state: started
+    enabled: True

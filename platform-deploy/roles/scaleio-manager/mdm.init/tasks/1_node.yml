@@ -1,0 +1,68 @@
+---
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_MDM_0_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-0'] | default({}) }}"
+
+- name: Set mdm-0 node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "MDM-0"
+    option: "{{ item.name }}"
+    no_extra_spaces: True
+    value: "{{ item.value }}"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when: item.name not in SCALEIO_MDM_0_FACTS
+  with_items:
+    - name: ip
+      value: "{{ hostvars[inventory_hostname].dls_configuration.data_interface.ipv4_address }}"
+    - name: name
+      value: "{{ hostvars[inventory_hostname].dls_configuration.network.instance_name }}"
+
+- include: synchronize-facts.yml
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_MDM_0_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-0'] | default({}) }}"
+
+- name: Create 1 node installation
+  shell: scli --create_mdm_cluster --master_mdm_ip "{{ SCALEIO_MDM_0_FACTS.ip }}" --master_mdm_name MDM-0 --accept_license --approve_certificate
+
+- name: Set mdm-0 node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "cluster"
+    option: "1_node_init"
+    no_extra_spaces: True
+    value: "True"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+
+- include: synchronize-facts.yml
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_CLUSTER_FACTS: "{{ (ansible_local.scaleio | default({})).cluster | default({}) }}"

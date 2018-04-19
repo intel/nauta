@@ -1,0 +1,19 @@
+[kubernetes-all:children]
+kubernetes-master
+kubernetes-worker
+
+[kubernetes-master]
+bm-000 ansible_ssh_host=10.91.115.68 ansible_ssh_user=centos internal_interface=enp4s0f0 data_interface=enp4s0f0 external_interface=enp4s0f1 scaleio_sds_multi=True scaleio_sds_multi_count=3 scaleio_sds_disk_1=/dev/sdc scaleio_sds_disk_2=/dev/sdd scaleio_sds_disk_3=/dev/sde
+
+[kubernetes-worker]
+knm-000-0 ansible_ssh_host=10.91.120.94 ansible_ssh_user=centos internal_interface=eno1 data_interface=eno1 external_interface=eno2
+knm-000-1 ansible_ssh_host=10.91.120.91 ansible_ssh_user=centos internal_interface=eno1 data_interface=eno1 external_interface=eno2
+
+[scaleio-all:children]
+scaleio-manager
+scaleio-server
+
+[scaleio-manager:children]
+kubernetes-master
+
+[scaleio-server]

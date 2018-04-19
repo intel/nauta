@@ -1,0 +1,6 @@
+---
+
+# Internal interface used for communication - by default external_interface is used
+internal_interface: "{{ external_interface }}"
+# Internal interface used for data transmission - by default data_interface is used
+data_interface: "{{ internal_interface }}"

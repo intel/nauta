@@ -1,0 +1,47 @@
+---
+
+- hosts: scaleio-manager
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: scaleio-manager/mdm.pre
+      tags:
+        - install
+    - role: scaleio-manager/mdm.define
+      tags:
+        - install
+    - role: scaleio-manager/mdm.install
+      tags:
+        - install
+
+- hosts: scaleio-manager[0]
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: scaleio-manager/mdm.init
+      tags:
+        - install
+
+- hosts: scaleio-all
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: scaleio-manager/sds.install
+      when: scaleio_sds | default(False)
+      tags:
+        - install
+    - role: scaleio-manager/sds-multi.install
+      when: scaleio_sds_multi | default(False)
+      tags:
+        - install
+
+- hosts: scaleio-manager[0]
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: scaleio-manager/mdm.post
+      tags:
+        - install
+    - role: scaleio-manager/sds.join
+      tags:
+        - install

@@ -1,0 +1,31 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Create registry directory
+  file:
+    path: /opt/carbon/registry
+    state: directory
+
+- name: Replace configuration
+  template:
+    src: registry.yml.j2
+    dest: /etc/docker-distribution/registry/config.yml
+  notify:
+    - Restart Docker Distribution
+
+- meta: flush_handlers
+
+- name: Start and enable docker distribution
+  service:
+    name: docker-distribution
+    state: started
+    enabled: True

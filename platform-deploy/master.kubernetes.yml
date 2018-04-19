@@ -1,0 +1,59 @@
+---
+
+- hosts: kubernetes-master
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Reload Systemd
+      shell: systemctl daemon-reload
+    - name: Restart Kubernetes Apiserver
+      service:
+        name: kubernetes-apiserver
+        state: restarted
+    - name: Restart Kubernetes Apiserver Check
+      service:
+        name: kubernetes-apiserver-check
+        state: restarted
+    - name: Restart Kubernetes Apiserver Target
+      service:
+        name: kubernetes-apiserver.target
+        state: restarted
+    - name: Restart Kubernetes Scheduler
+      service:
+        name: kubernetes-scheduler
+        state: restarted
+    - name: Restart Kubernetes Scheduler Check
+      service:
+        name: kubernetes-scheduler-check
+        state: restarted
+    - name: Restart Kubernetes Scheduler Target
+      service:
+        name: kubernetes-scheduler.target
+        state: restarted
+    - name: Restart Kubernetes Controller
+      service:
+        name: kubernetes-controller
+        state: restarted
+    - name: Restart Kubernetes Controller Check
+      service:
+        name: kubernetes-controller-check
+        state: restarted
+    - name: Restart Kubernetes Controller Target
+      service:
+        name: kubernetes-controller.target
+        state: restarted
+    - name: Restart Kubernetes Server Target
+      service:
+        name: kubernetes-server.target
+        state: restarted
+  serial: # keep always more than half masters in active mode
+    - 1
+    - 1
+    - 2
+    - 3
+    - 5
+    - 100%
+  roles:
+    - role: master/kubernetes
+      tags:
+        - install

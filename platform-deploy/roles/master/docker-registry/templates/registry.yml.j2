@@ -1,0 +1,17 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+    cache:
+        layerinfo: inmemory
+    filesystem:
+        rootdirectory: /opt/carbon/registry
+    maintenance:
+        readonly:
+            enabled: false
+http:
+    addr: {{ dls_configuration.internal_interface.ipv4_address }}:5000
+    secret: REDACTED
+    debug:
+        addr: 127.0.0.1:5001

@@ -1,0 +1,13 @@
+[Unit]
+Description=Kubernetes apiservice check
+After=kubernetes-apiserver.service
+Requires=kubernetes-apiserver.service
+
+[Service]
+TimeoutStartSec=0
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/opt/carbon/kubernetes/check.sh http://127.0.0.1:8080/healthz
+
+[Install]
+WantedBy=multi-user.target

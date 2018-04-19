@@ -1,0 +1,35 @@
+---
+
+- name: List all rpms
+  delegate_to: localhost
+  become: False
+  find:
+    path: "{{ build_dir }}"
+    patterns: '*.rpm'
+  register: files
+
+- name: Ensure that remote archive dir exists
+  file:
+    path: /opt/repository/releases/{{ build_id }}/packages
+    state: directory
+
+- name: Copy all files to remote src
+  copy:
+    src: "{{ item.path }}"
+    dest: "/opt/repository/releases/{{ build_id }}/packages/{{ item.path | basename }}"
+  with_items: "{{ files.files }}"
+
+- name: Get sha of each item
+  changed_when: False
+  shell: sha256sum /opt/repository/releases/{{ build_id }}/packages/{{ item.path | basename }} > /opt/repository/releases/{{ build_id }}/packages/{{ item.path | basename }}.sha256sum
+  with_items: "{{ files.files }}"
+
+- name: Create repo
+  shell: createrepo .
+  args:
+    chdir: "/opt/repository/releases/{{ build_id }}/"
+
+- name: Render repo
+  template:
+    src: carbon.repo.j2
+    dest: "/opt/repository/releases/{{ build_id }}/carbon.repo"

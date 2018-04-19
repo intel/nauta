@@ -1,0 +1,7 @@
+---
+
+- name: Join all multi sds in cluster iterate
+  include_tasks: multi-join.yml
+  with_sequence: count={{ SCALEIO[hostvars[host].dls_configuration.data_interface.ipv4_address].count }} start=1
+  loop_control:
+    loop_var: SDS_NO

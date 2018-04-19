@@ -1,0 +1,63 @@
+---
+
+- name: Set fact about count
+  set_fact:
+    SDS_COUNT: '{{ scaleio_sds_multi_count | default(2) | int }}'
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- set_fact:
+    NODE_SDS: "{{ ((ansible_local.scaleio | default({}))[dls_configuration.data_interface.ipv4_address] | default({})) }}"
+
+- name: Fail if mode does not match
+  fail:
+    msg: Node is not in multi SDS mode
+  when:
+    - "'sds' in NODE_SDS"
+    - NODE_SDS.sds != 'multi'
+
+- name: Fail if mode does not match
+  fail:
+    msg: Node is not in multi SDS mode
+  when:
+    - "'count' in NODE_SDS"
+    - NODE_SDS.count | int != SDS_COUNT | int
+
+- name: Set ScaleIO facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "{{ dls_configuration.data_interface.ipv4_address }}"
+    option: "{{ item.name }}"
+    no_extra_spaces: True
+    value: "{{ item.value }}"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  with_items:
+    - name: sds
+      value: multi
+    - name: count
+      value: "{{ SDS_COUNT }}"
+
+- include: synchronize-facts.yml
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"

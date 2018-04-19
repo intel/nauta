@@ -1,0 +1,66 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Prepare sysctl configuration
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.ip_forward
+      value: 1
+    - name: net.ipv4.ip_nonlocal_bind
+      value: 1
+
+- name: Render nginx config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - Restart Nginx
+
+- name: Create nginx config dirs
+  file:
+    path: "/etc/nginx/{{ item }}.d"
+    state: directory
+  with_items:
+    - http
+    - stream
+
+- name: Render stream dirs
+  template:
+    src: "{{ item }}.stream.j2"
+    dest: "/etc/nginx/stream.d/{{ item }}.conf"
+  with_items:
+    - apiservice
+    - ingress
+  notify:
+    - Restart Nginx
+
+- name: Render http dirs
+  template:
+    src: "{{ item }}.http.j2"
+    dest: "/etc/nginx/http.d/{{ item }}.conf"
+  with_items:
+    - ingress
+  notify:
+    - Restart Nginx
+
+- meta: flush_handlers
+
+- name: Start and enable nginx
+  service:
+    name: nginx
+    state: started
+    enabled: True

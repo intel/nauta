@@ -1,0 +1,11 @@
+---
+
+- name: Map inventory hostnames with ipaddresses
+  set_fact:
+    # yamllint disable-line rule:line-length
+    scaleio_mapping: "{{ scaleio_mapping | default({}) | combine({host: hostvars[host].dls_configuration.data_interface.ipv4_address }) }}"
+    # yamllint disable-line rule:line-length
+    scaleio_mapping_rev: "{{ scaleio_mapping_rev | default({}) | combine({hostvars[host].dls_configuration.data_interface.ipv4_address: host}) }}"
+  with_items: "{{ groups['scaleio-all'] }}"
+  loop_control:
+    loop_var: host

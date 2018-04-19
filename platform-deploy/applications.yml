@@ -1,0 +1,9 @@
+---
+
+- hosts: kubernetes-master[0]
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: applications
+      tags:
+        - install

@@ -1,0 +1,196 @@
+---
+
+- set_fact:
+    # yamllint disable-line rule:line-length
+    etcd: "{% for host in groups['kubernetes-master'] %}https://{{ hostvars[host].dls_configuration.network.instance_name }}:2379{%- if not loop.last -%},{%- endif -%}{% endfor %}"
+    # yamllint disable-line rule:line-length
+    feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
+    # yamllint disable-line rule:line-length
+    runtime_config: "{% if kubernetes_calculated_runtime_config != {} %}--runtime-config {% for key,value in kubernetes_calculated_runtime_config.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
+
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Render healthz script
+  template:
+    src: kubernetes-check.sh.j2
+    dest: /opt/carbon/kubernetes/check.sh
+    mode: 0755
+
+### Apiserver
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-apiserver
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Apiserver
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-apiserver-check
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Apiserver Check
+
+- name: Copy target templates
+  template:
+    src: "{{ item }}.target.j2"
+    dest: "/etc/systemd/system/{{ item }}.target"
+  with_items:
+    - kubernetes-apiserver
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Apiserver Target
+
+# Controller
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-controller
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Controller
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-controller-check
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Controller Check
+
+- name: Copy target templates
+  template:
+    src: "{{ item }}.target.j2"
+    dest: "/etc/systemd/system/{{ item }}.target"
+  with_items:
+    - kubernetes-controller
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Controller Target
+
+# Scheduler
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-scheduler
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Scheduler
+
+- name: Copy service templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - kubernetes-scheduler-check
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Scheduler Check
+
+- name: Copy target templates
+  template:
+    src: "{{ item }}.target.j2"
+    dest: "/etc/systemd/system/{{ item }}.target"
+  with_items:
+    - kubernetes-scheduler
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Scheduler Target
+
+### Server
+
+- name: Copy target templates
+  template:
+    src: "{{ item }}.target.j2"
+    dest: "/etc/systemd/system/{{ item }}.target"
+  with_items:
+    - kubernetes-server
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Server Target
+
+- meta: flush_handlers
+
+- name: Start and enable apiservice
+  service:
+    name: kubernetes-apiserver
+    state: started
+    enabled: True
+
+- name: Start and enable apiservice check
+  service:
+    name: kubernetes-apiserver-check
+    state: started
+    enabled: True
+
+- name: Start and enable apiserver target
+  service:
+    name: kubernetes-apiserver.target
+    state: started
+    enabled: True
+
+- name: Start and enable controller
+  service:
+    name: kubernetes-controller
+    state: started
+    enabled: True
+
+- name: Start and enable controller check
+  service:
+    name: kubernetes-controller-check
+    state: started
+    enabled: True
+
+- name: Start and enable controller target
+  service:
+    name: kubernetes-controller.target
+    state: started
+    enabled: True
+
+- name: Start and enable scheduler
+  service:
+    name: kubernetes-scheduler
+    state: started
+    enabled: True
+
+- name: Start and enable scheduler check
+  service:
+    name: kubernetes-scheduler-check
+    state: started
+    enabled: True
+
+- name: Start and enable scheduler target
+  service:
+    name: kubernetes-scheduler.target
+    state: started
+    enabled: True
+
+- name: Start and enable server target
+  service:
+    name: kubernetes-server.target
+    state: started
+    enabled: True

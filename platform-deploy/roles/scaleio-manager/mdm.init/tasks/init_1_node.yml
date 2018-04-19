@@ -1,0 +1,43 @@
+---
+
+- name: Set 1_node node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "cluster"
+    option: "mode"
+    no_extra_spaces: True
+    value: "1_node"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when: "'mode' not in SCALEIO_CLUSTER_FACTS"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_MDM_0_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-0'] | default({}) }}"
+
+- name: Set mdm ips node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "cluster"
+    option: "ips"
+    no_extra_spaces: True
+    value: "{{ SCALEIO_MDM_0_FACTS.ip }}"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when: "'ips' not in SCALEIO_CLUSTER_FACTS"
+
+- include: synchronize-facts.yml
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_CLUSTER_FACTS: "{{ (ansible_local.scaleio | default({})).cluster | default({}) }}"

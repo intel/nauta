@@ -1,0 +1,51 @@
+---
+
+base_build:
+  base_docker_definition: "{{ playbook_dir }}/docker/base"
+  base_docker_image: centos:7.4.1708
+
+yum_build:
+  base_docker_definition: "{{ playbook_dir }}/docker/yum"
+
+yum_compile_packages:
+  - libffi-dev
+  - byacc
+  - gcc
+  - gcc-c++
+
+yum_core_packages:
+  - openssl-devel
+  - vim
+  - git
+  - nfs-common
+  - python
+  - python-pip
+  - python-dev
+  - make
+  - rsync
+
+yum_scaleio_apps:
+  - EMC-ScaleIO-sds4-2.0
+  - EMC-ScaleIO-sds3-2.0
+  - EMC-ScaleIO-sds2-2.0
+  - EMC-ScaleIO-sds1-2.0
+  - EMC-ScaleIO-xcache-2.0
+  - EMC-ScaleIO-sds-2.0
+  - EMC-ScaleIO-sdc-2.0
+  - EMC-ScaleIO-mdm-2.0
+  - EMC-ScaleIO-lia-2.0
+  - EMC-ScaleIO-gateway-2.0
+  - java-1.8.0-openjdk
+
+yum_kubernetes_apps:
+  - kubernetes-all-1.10.0
+  - docker-distribution
+  - pacemaker
+  - pcs
+  - resource-agents
+
+yum_apps_packages:
+  - nginx
+  - consul-1.0.6
+
+yum_packages: "{{ (yum_core_packages + yum_apps_packages + yum_kubernetes_apps + yum_scaleio_apps + yum_compile_packages) | sort | unique }}"

@@ -1,0 +1,12 @@
+---
+
+- name: Get file checksum
+  stat:
+    path: "{{ build_dir }}/package.tar.gz"
+    checksum_algorithm: sha256
+  register: package_sha
+
+- name: Save package sha in directory
+  copy:
+    content: "{{ package_sha.checksum }}"
+    dest: "{{ build_dir }}/package.tar.gz.sha256"

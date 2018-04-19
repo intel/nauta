@@ -1,0 +1,14 @@
+---
+
+- name: Wait for node access
+  changed_when: False
+  raw: exit 0
+  register: access
+  until: access is success
+  retries: 5
+  delay: 2
+
+- name: Check sudo access
+  become: True
+  changed_when: False
+  raw: exit 0

@@ -1,0 +1,13 @@
+[Unit]
+Description=Kubernetes scheduler check
+After=kubernetes-scheduler.service
+Requires=kubernetes-scheduler.service
+
+[Service]
+TimeoutStartSec=0
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/opt/carbon/kubernetes/check.sh http://127.0.0.1:10251/healthz
+
+[Install]
+WantedBy=multi-user.target

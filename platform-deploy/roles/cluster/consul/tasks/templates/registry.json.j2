@@ -1,0 +1,14 @@
+{
+  "service": {
+    "name": "registry",
+    "tags": ["registry"],
+    "port": 5000,
+    "checks": [
+      {
+        "http": "http://127.0.0.1:5001/debug/health",
+        "interval": "1s",
+        "timeout": "1s"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+---
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Set SDC name fact
+  set_fact:
+    SDC_NAME: "SDC_{{ hostvars[host].dls_configuration.data_interface.ipv4_address }}"
+
+- name: Load SDC facts
+  set_fact:
+    SCALEIO_SDC: "{{ ((ansible_local.scaleio | default({}))[SDC_NAME] | default({})) }}"
+
+- name: Join SDC to cluster
+  environment:
+    SCLI_MDM: "{{ SCALEIO_MDM_IPS }}"
+    SCLI_USERNAME: admin
+    SCLI_PASSWORD: "{{ scaleio_password }}"
+  script: >
+    scli.sh --add_sdc --sdc_ip {{ hostvars[host].dls_configuration.data_interface.ipv4_address }} --sdc_name {{ SDC_NAME }}
+  when: "'joined' not in SCALEIO_SDC"
+
+- name: Set ScaleIO facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "{{ SDC_NAME }}"
+    option: "joined"
+    no_extra_spaces: True
+    value: "True"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+
+- include: synchronize-facts.yml

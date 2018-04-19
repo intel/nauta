@@ -1,0 +1,20 @@
+---
+
+- name: Ensure that python exists
+  changed_when: python.rc == 1
+  failed_when: python.rc not in [0, 1]
+  raw: "stat {{ item }}"
+  with_items:
+    - "{{ ansible_client_python | default('/bin/python2') }}"
+    - /bin/python2
+    - /usr/bin/python2
+  register: python
+
+- name: Check if any python is installed
+  fail:
+    msg: "Unable to find python installed"
+  when: 0 not in python | json_query('results[].rc') | unique
+
+- name: Set python fact
+  set_fact:
+    ansible_python_interpreter: "{{ python | json_query('results[?rc==`0`].{path: item}[0].path') }}"

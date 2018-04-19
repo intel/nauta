@@ -1,0 +1,50 @@
+---
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Set SDS name fact
+  set_fact:
+    SDS_NAME: "SDS_{{ hostvars[host].dls_configuration.data_interface.ipv4_address }}_{{ SDS_NO }}"
+
+- name: Load SDS facts
+  set_fact:
+    SCALEIO_SDS: "{{ ((ansible_local.scaleio | default({}))[SDS_NAME] | default({})) }}"
+- debug: var=SDS_NAME
+- name: Join SDS to cluster
+  environment:
+    SCLI_MDM: "{{ SCALEIO_MDM_IPS }}"
+    SCLI_USERNAME: admin
+    SCLI_PASSWORD: "{{ scaleio_password }}"
+  script: >
+    scli.sh --add_sds --sds_ip {{ hostvars[host].dls_configuration.data_interface.ipv4_address }} --sds_name {{ SDS_NAME }} --sds_ip_role all --sds_port 707{{ SDS_NO | int + 2 }}
+    --protection_domain_name {{ SCALEIO_PROTECTION_DOMAIN }}
+    --storage_pool_name {{ SCALEIO_STORAGE_POOL }}
+  when: "'joined' not in SCALEIO_SDS"
+
+- name: Set ScaleIO facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "{{ SDS_NAME }}"
+    option: "joined"
+    no_extra_spaces: True
+    value: "True"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+
+- include: synchronize-facts.yml
+
+- set_fact:
+    SDS_DISKS: "{{ hostvars[host]['scaleio_sds_disk_' + SDS_NO] | default('') }}"
+
+- name: Join all disks
+  include_tasks: disk-join.yml
+  with_items: "{{ SDS_DISKS.split(',') }}"
+  loop_control:
+    loop_var: SDS_DISK
+  when: SDS_DISK != ''

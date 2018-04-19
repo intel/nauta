@@ -1,0 +1,32 @@
+---
+
+- hosts: kubernetes-all
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: worker/kubernetes/worker.install
+      tags:
+        - install
+
+- hosts: kubernetes-master[0]
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: worker/kubernetes/worker.add
+      tags:
+        - install
+
+- hosts: kubernetes-all
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Reload Systemd
+      shell: systemctl daemon-reload
+    - name: Restart Kubelet
+      service:
+        name: kubelet
+        state: restarted
+  roles:
+    - role: worker/kubernetes/worker.init
+      tags:
+        - install

@@ -1,0 +1,93 @@
+---
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_CLUSTER_FACTS: "{{ (ansible_local.scaleio | default({})).cluster | default({}) }}"
+
+- name: Include 1 node init
+  include_tasks: 1_node.yml
+  when:
+    - not SCALEIO_CLUSTER_FACTS['1_node_init'] | default(False) | bool
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_MDM_0_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-0'] | default({}) }}"
+
+- name: Ensure that we are on MDM-0
+  fail:
+    msg: MDM-0 is on ip {{ SCALEIO_MDM_0_FACTS.ip }}, not on dls_configuration.data_interface.ipv4_address
+  when: SCALEIO_MDM_0_FACTS.ip != dls_configuration.data_interface.ipv4_address
+
+- name: Include password related tasks
+  include_tasks: password.yml
+
+- name: Check deployment mode
+  set_fact:
+    SCALEIO_MODE: "{{ '1_node' if groups['scaleio-manager'] | length == 1 else ('3_node' if groups['scaleio-manager'] | length == 3 else '5_node' ) }}"
+
+- name: Fail if mode does not match
+  fail:
+    msg: Host is currently in mode {{ SCALEIO_CLUSTER_FACTS.mode }} -- can not upgrade to {{ SCALEIO_MODE }}
+  when:
+    - "'mode' in SCALEIO_CLUSTER_FACTS"
+    - SCALEIO_CLUSTER_FACTS.mode != SCALEIO_MODE
+
+- name: Add MDM-1 if scaleio is in mode 3_node or 5_node
+  vars:
+    host: "{{ groups['scaleio-manager'][1] }}"
+    CURRENT_MDM: MDM-1
+  include_tasks: join-mdm.yml
+  when: SCALEIO_MODE in ['3_node', '5_node']
+
+- name: Add MDM-2 if scaleio is in 5_node
+  vars:
+    host: "{{ groups['scaleio-manager'][2] }}"
+    CURRENT_MDM: MDM-2
+  include_tasks: join-mdm.yml
+  when: SCALEIO_MODE in ['5_node']
+
+- name: Add TB-0 if scaleio is in mode 3_node
+  vars:
+    host: "{{ groups['scaleio-manager'][2] }}"
+    CURRENT_TB: TB-0
+  include_tasks: join-tb.yml
+  when: SCALEIO_MODE in ['3_node']
+
+- name: Add TB-0 if scaleio is in mode 5_node
+  vars:
+    host: "{{ groups['scaleio-manager'][3] }}"
+    CURRENT_TB: TB-0
+  include_tasks: join-tb.yml
+  when: SCALEIO_MODE in ['5_node']
+
+- name: Add TB-1 if scaleio is in mode 5_node
+  vars:
+    host: "{{ groups['scaleio-manager'][4] }}"
+    CURRENT_TB: TB-1
+  include_tasks: join-tb.yml
+  when: SCALEIO_MODE in ['5_node']
+
+- include: init_1_node.yml
+  when: "SCALEIO_MODE == '1_node'"
+
+- include: init_3_node.yml
+  when: "SCALEIO_MODE == '3_node'"
+
+- include: init_5_node.yml
+  when: "SCALEIO_MODE == '5_node'"
+
+- name: Fail if mode does not match
+  fail:
+    msg: Host is currently in mode {{ SCALEIO_CLUSTER_FACTS.mode }} -- can not upgrade to {{ SCALEIO_MODE }}
+  when:
+    - SCALEIO_CLUSTER_FACTS.mode != SCALEIO_MODE
+
+- name: Load MDM ips facts
+  set_fact:
+    SCALEIO_MDM_IPS: "{{ ((ansible_local.scaleio | default({}))['cluster'] | default({})).ips }}"

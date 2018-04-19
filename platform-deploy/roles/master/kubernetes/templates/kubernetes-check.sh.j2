@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+
+sleep 2
+
+while ! curl $1 > /dev/null 2>&1; do
+  sleep 1
+done

@@ -1,0 +1,29 @@
+---
+
+- name: Generate privatekey for type {{ name }}
+  openssl_privatekey:
+    path: "/etc/dls-cluster/master/key/{{ name }}.key"
+
+- name: Generate csr for type {{ name }}
+  changed_when: False
+  openssl_csr:
+    path: "/etc/dls-cluster/master/csr/{{ name }}.csr"
+    privatekey_path: "/etc/dls-cluster/master/key/{{ name }}.key"
+    common_name: "{{ common_name }}"
+    subject_alt_name: "{% for key, value in subject_alt_name.items() %}{{ key }}:{{ value }}{% if not loop.last %},{% endif %}{% endfor %}"
+    key_usage: "{{ key_usage }}"
+    extended_key_usage: "{{ extended_key_usage | default([]) }}"
+
+- name: Render configuration
+  template:
+    dest: "/etc/dls-cluster/master/cfg/{{ name }}.cfg"
+    src: conf.j2
+
+- name: Create crt
+  shell: >
+    openssl x509 -req -in "/etc/dls-cluster/master/csr/{{ name }}.csr"
+    -set_serial {{ 9999 | random }} -CA "/etc/dls-cluster/master/ca/CA.crt" -CAkey "/etc/dls-cluster/master/ca/CA.key"
+    -out "/etc/dls-cluster/master/crt/{{ name }}.crt" -days 3650
+    -extensions v3_req -extfile "/etc/dls-cluster/master/cfg/{{ name }}.cfg"
+  args:
+    creates: "/etc/dls-cluster/master/crt/{{ name }}.crt"

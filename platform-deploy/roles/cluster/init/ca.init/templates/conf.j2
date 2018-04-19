@@ -1,0 +1,18 @@
+[req]
+default_bits = 2048
+default_md = sha256
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+common_name = {{ common_name }}
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = {{ key_usage | join(', ') }}
+{% if extended_key_usage is defined %}
+extendedKeyUsage = {{ extended_key_usage | join(', ') }}
+{% endif %}
+subjectAltName = @alt_names
+[alt_names]
+{% for env, value in subject_alt_name.items() %}
+{{ env }} = {{ value }}
+{% endfor %}

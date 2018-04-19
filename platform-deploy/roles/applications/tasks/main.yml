@@ -1,0 +1,106 @@
+---
+
+- name: Create kubernetes configuration directory
+  file:
+    path: /root/kubernetes/apps
+    state: directory
+
+- name: Render tiller apps
+  template:
+    src: tiller.yml.j2
+    dest: /root/kubernetes/apps/tiller.yml
+
+- name: Apply all node privileges directories
+  changed_when: False
+  shell: kubectl apply -f /root/kubernetes/apps/tiller.yml
+
+- name: Wait for at least one tiller instances to get ready
+  shell: "kubectl --namespace=kube-system get ds tiller -o jsonpath='{.status.numberReady}'"
+  changed_when: False
+  register: tiller_ready
+  until: tiller_ready.stdout | int >= 1
+  retries: 60
+  delay: 1
+
+- name: Fail if all tiller isntances are down
+  fail:
+    msg: Tiller did not get up
+  when: tiller_ready.stdout == '0'
+
+- name: Verify helm access
+  environment: "{{ {'http_proxy': '', 'HTTP_PROXY': '' } }}"
+  shell: helm --host "{{ kubernetes_network.svc_list.tiller.ip }}:{{ kubernetes_network.svc_list.tiller.port }}" ls
+  changed_when: False
+  register: helm_access
+  until: helm_access|success
+  retries: 10
+  delay: 10
+
+- name: Fetch all interfaces names
+  set_fact:
+    all_cluster_interfaces: "{{ (all_cluster_interfaces | default([])) + [hostvars[item].internal_interface] }}"
+  with_items: "{{ groups['kubernetes-all'] }}"
+
+- name: Run helm task for flannel
+  vars:
+    name: flannel
+    helm_values:
+      FlannelImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/flannel:v0.9.1"
+      Interfaces: "{{ all_cluster_interfaces | sort | unique }}"
+      PodNetwork: "{{ kubernetes_network.pod }}"
+    type: networking
+    namespace: kube-system
+  include_tasks: helm.yml
+
+- name: Run helm task for dns
+  vars:
+    name: skydns
+    helm_values:
+      SidecarImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dns-sidecar:1.14.8"
+      DnsmasqNannyImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dnsmasq-nanny:1.14.8"
+      KubeDNSImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-dns:1.14.8"
+      ClusterIP: "{{ kubernetes_network.svc_list.dns.ip }}"
+      Domain: "{{ k8s_domain }}.{{ domain }}"
+    type: dns
+    namespace: kube-system
+  include_tasks: helm.yml
+
+- name: Run helm task for ingress
+  vars:
+    name: ingress
+    helm_values:
+      IngressImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/ingress:0.11.0"
+      DefaultBackendImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/defaultbackend:1.4"
+      ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
+    type: ingress
+    namespace: kube-system
+  include_tasks: helm.yml
+
+- name: Run helm task for heapster
+  vars:
+    name: heapster
+    helm_values:
+      AddonResizerImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/addon-resizer:1.7"
+      HeapsterImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/heapster:v1.4.2"
+    type: heapster
+    namespace: kube-system
+  include_tasks: helm.yml
+
+- name: Run helm task for dashboard
+  vars:
+    name: dashboard
+    helm_values:
+      DashboardImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dashboard:v1.8.3"
+    type: dashboard
+    namespace: kube-system
+  include_tasks: helm.yml
+
+- name: Run helm task for nfs
+  vars:
+    name: nfs
+    helm_values:
+      NfsProvisionerImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/nfs-provisioner:v1.0.8"
+      Node: "{{ ansible_nodename }}"
+    type: storage
+    namespace: kube-system
+  include_tasks: helm.yml

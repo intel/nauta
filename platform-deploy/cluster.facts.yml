@@ -1,0 +1,18 @@
+---
+
+- hosts: kubernetes-master
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: cluster/init/facts
+      tags:
+        - install
+
+- hosts: kubernetes-master[0]
+  become: True
+  become_user: cluster-facts
+  any_errors_fatal: True
+  roles:
+    - role: cluster/init/facts.verify
+      tags:
+        - install

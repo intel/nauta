@@ -1,0 +1,4 @@
+apiVersion: v1
+name: nfs
+description: A DLS-Lite core storage provisioner nfs
+version: 0.1.0

@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Reload Systemd
+      shell: systemctl daemon-reload
+    - name: Restart Consul
+      service:
+        name: consul
+        state: restarted
+  roles:
+    - role: cluster/consul
+      tags:
+        - install

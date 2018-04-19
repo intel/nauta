@@ -1,0 +1,22 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/check.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Check if carbon python file exists
+  file:
+    path: /opt/carbon/python/bin/python2
+
+- name: Set python fact
+  set_fact:
+    ansible_python_interpreter: "/opt/carbon/python/bin/python2"
+
+- name: Setup node facts
+  setup:

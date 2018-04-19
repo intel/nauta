@@ -1,0 +1,14 @@
+{
+  "service": {
+    "name": "kubernetes",
+    "tags": ["apiservice"],
+    "port": {{ kubernetes_network.internal_port }},
+    "checks": [
+      {
+        "http": "http://127.0.0.1:8080",
+        "interval": "1s",
+        "timeout": "1s"
+      }
+    ]
+  }
+}

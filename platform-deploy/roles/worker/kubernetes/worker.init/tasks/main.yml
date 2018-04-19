@@ -1,0 +1,57 @@
+---
+
+- set_fact:
+    # yamllint disable-line rule:line-length
+    labels: "node-role.kubernetes.io/node={{ 'Master' if inventory_hostname in groups['kubernetes-master'] else 'Worker' }},master={{ 'True' if inventory_hostname in groups['kubernetes-master'] else 'False' }},{% for l in (kubernetes_roles | default('')).split(',') %}{% if l %}{{ l }}=True,{% endif %}{% endfor %}iface={{ internal_interface }},gpu={{ 'True' if (gpu | default(False)) else 'False' }}"
+    # yamllint disable-line rule:line-length
+    feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
+
+- name: Create kubelet config dir
+  file:
+    path: /etc/kubelet/static
+    state: directory
+
+- name: Render kubelet service file
+  template:
+    src: kubelet.service.j2
+    dest: /etc/systemd/system/kubelet.service
+  notify:
+    - Reload Systemd
+    - Restart Kubelet
+
+- name: Render template scripts
+  template:
+    src: kube-proxy.yaml.j2
+    dest: /etc/kubelet/static/kube-proxy.yaml
+  notify:
+    - Restart Kubelet
+
+- name: Render kubelet config file
+  template:
+    src: kubelet.j2
+    dest: /etc/kubelet/kubelet
+  notify:
+    - Restart Kubelet
+
+- meta: flush_handlers
+
+- name: Start and enable kubelet
+  service:
+    name: kubelet
+    state: started
+    enabled: True
+
+- name: Configure sysctl
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.neigh.default.gc_thresh1
+      value: 80000
+    - name: net.ipv4.neigh.default.gc_thresh2
+      value: 90000
+    - name: net.ipv4.neigh.default.gc_thresh3
+      value: 100000

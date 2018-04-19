@@ -1,0 +1,22 @@
+[Unit]
+Description=Kubernetes controller
+After=docker.service etcd.service kubernetes-apiserver.target
+Requires=docker.service kubernetes-apiserver.target
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+LimitNOFILE=65536
+ExecStart=/opt/carbon/kubernetes/kube-controller-manager \
+      --service-account-private-key-file /etc/dls-cluster/master/key/service.key \
+      --node-sync-period 2m \
+      --v 0 --leader-elect \
+      --master http://127.0.0.1:8080 \
+      --cluster-cidr {{ kubernetes_network.pod }} \
+      --root-ca-file=/etc/dls-cluster/client/ca.pem \
+      --controllers=*,tokencleaner,bootstrapsigner \
+      --allocate-node-cidrs=true \
+      {{ feature_gates }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+{
+  "ports": {
+    "dns": 53
+  },
+  "dns_config": {
+    "enable_truncate": true
+  },
+  "recursors" : [{% for dns in dns_servers %}"{{ dns }}"{% if not loop.last %},{% endif %}{% endfor %}]
+}

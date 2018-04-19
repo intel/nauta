@@ -1,0 +1,45 @@
+---
+
+- name: Chekc if local repo file exists
+  stat:
+    path: /opt/carbon/yum/yum.conf
+
+- name: Install yum sds components
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - EMC-ScaleIO-sds1
+  when: SDS_COUNT | int >= 1
+
+- name: Install yum sds components
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - EMC-ScaleIO-sds2
+  when: SDS_COUNT | int >= 2
+
+- name: Install yum sds components
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - EMC-ScaleIO-sds3
+  when: SDS_COUNT | int >= 3
+
+- name: Install yum sds components
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - EMC-ScaleIO-sds4
+  when: SDS_COUNT | int >= 4

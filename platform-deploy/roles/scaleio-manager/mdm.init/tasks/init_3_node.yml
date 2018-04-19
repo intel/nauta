@@ -1,0 +1,55 @@
+---
+
+- name: Init 3 node on ScaleIO
+  environment:
+    SCLI_MDM: "{{ SCALEIO_MDM_0_FACTS.ip }}"
+    SCLI_USERNAME: admin
+    SCLI_PASSWORD: "{{ scaleio_password }}"
+  script: >
+    scli.sh --switch_cluster_mode --cluster_mode 3_node
+    --add_slave_mdm_name MDM-1
+    --add_tb_name TB-0
+  when: "'mode' not in SCALEIO_CLUSTER_FACTS"
+
+- name: Set 3_node node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "cluster"
+    option: "mode"
+    no_extra_spaces: True
+    value: "3_node"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when: "'mode' not in SCALEIO_CLUSTER_FACTS"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_MDM_0_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-0'] | default({}) }}"
+    SCALEIO_MDM_1_FACTS: "{{ (ansible_local.scaleio | default({}))['MDM-1'] | default({}) }}"
+
+- name: Set mdm ips node fact
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "cluster"
+    option: "ips"
+    no_extra_spaces: True
+    value: "{{ SCALEIO_MDM_0_FACTS.ip }},{{ SCALEIO_MDM_1_FACTS.ip }}"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when: "'ips' not in SCALEIO_CLUSTER_FACTS"
+
+- include: synchronize-facts.yml
+
+- name: Reload facts
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_CLUSTER_FACTS: "{{ (ansible_local.scaleio | default({})).cluster | default({}) }}"

@@ -1,0 +1,113 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Create consul group
+  group:
+    name: consul
+
+- name: Create consul user
+  user:
+    name: consul
+    group: consul
+
+- name: Allow consul to listen on port 53
+  shell: setcap 'cap_net_bind_service=+ep' /usr/bin/consul
+  changed_when: False
+
+- name: Create consul directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: consul
+    group: consul
+    mode: 0750
+  with_items:
+    - /var/consul
+    - /etc/consul
+    - /etc/consul/ssl
+
+- name: Copy ssl keys
+  copy:
+    remote_src: True
+    src: "/etc/dls-cluster/client/{{ item }}"
+    dest: "/etc/consul/ssl/{{ item }}"
+    owner: consul
+    group: consul
+    mode: 0640
+  with_items:
+    - ca.pem
+    - node.crt
+    - node.key
+
+- name: Copy consul systemd definition
+  template:
+    src: consul.service.j2
+    dest: /etc/systemd/system/consul.service
+  notify:
+    - Reload Systemd
+    - Restart Consul
+
+- name: Render configuration
+  template:
+    src: "{{ item }}.json.j2"
+    dest: "/etc/consul/{{ item }}.json"
+  with_items:
+    - cluster
+    - node
+    - config
+    - dns
+    - agent
+    - ssl
+  notify:
+    - Restart Consul
+
+- name: Render server configuration
+  template:
+    src: "{{ item }}.json.j2"
+    dest: "/etc/consul/{{ item }}.json"
+  when: inventory_hostname in groups['kubernetes-master']
+  with_items:
+    - server
+    - apiservice
+    - registry
+  notify:
+    - Restart Consul
+
+- meta: flush_handlers
+
+- name: Start and enable consul
+  service:
+    name: consul
+    state: started
+    enabled: True
+
+- name: Refresh host hostname
+  hostname:
+    name: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
+
+- name: Set hostname pernamently
+  copy:
+    content: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
+    dest: /etc/hostname
+
+- name: Override dhclient resolver
+  template:
+    src: dhclient.j2
+    dest: /etc/dhclient-enter-hooks
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Override resolver
+  template:
+    src: resolv.j2
+    dest: /etc/resolv.conf

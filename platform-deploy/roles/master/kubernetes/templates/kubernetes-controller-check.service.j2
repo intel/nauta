@@ -1,0 +1,13 @@
+[Unit]
+Description=Kubernetes controller check
+After=kubernetes-controller.service
+Requires=kubernetes-controller.service
+
+[Service]
+TimeoutStartSec=0
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/opt/carbon/kubernetes/check.sh http://127.0.0.1:10252/healthz
+
+[Install]
+WantedBy=multi-user.target

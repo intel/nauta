@@ -1,0 +1,83 @@
+---
+
+# Proxy settings required to download security updates and connect to external network
+# It is not required, but recommended for docker settings
+proxy: {}
+#  http_proxy: http://proxy-mu.intel.com:911
+#  ftp_proxy: http://proxy-mu.intel.com:911
+#  https_proxy: http://proxy-mu.intel.com:912
+#  no_proxy: .intel.com,localhost,127.0.0.1,.{{ nodes_domain }}.{{ domain }}
+
+# List of dns servers used as upstream for dns resolution
+dns_servers:
+  - 10.102.60.20
+  - 10.102.60.30
+dns_search_domains:
+  - "node.{{ nodes_domain }}.{{ domain }}"
+  - "service.{{ nodes_domain }}.{{ domain }}"
+
+
+carbon_release_package_version: 0.1.0
+carbon_release_package_release: 15.jenkins
+
+# Determines if script should try to install DLS package
+# Possible values:
+#   * repo - variables carbon_release_package_repofile is used to install rpm
+#   * None - fail in case of missing packages
+carbon_release_package_installation: repo
+
+# Repofile of carbon release
+carbon_release_package_repofile: "http://repository.toolbox.nervana.sclab.intel.com/releases/{{ carbon_release_package_release }}/carbon.repo"
+
+
+### Network
+
+domain: dls
+
+nodes_domain: infra
+k8s_domain: kubernetes
+
+kubernetes_pod_subnet: 10.3.0.0/16
+kubernetes_svc_subnet: 10.4.0.0/16
+
+kubernetes_version: 1.9.3
+
+kubernetes_network:
+  external_ports:
+    - 6443
+    - 8443
+  internal_port: 18554
+  pod: "{{ kubernetes_pod_subnet }}"
+  svc: "{{ kubernetes_svc_subnet }}"
+  svc_list:
+    apiservice:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(1) | ipaddr('address') }}"
+      consul_name: "kubernetes.service.{{ nodes_domain }}.{{ domain }}"
+    dns:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(10) | ipaddr('address') }}"
+    tiller:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(11) | ipaddr('address') }}"
+      port: 44134
+    ingress:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(15) | ipaddr('address') }}"
+
+helm_applications:
+  networking: flannel # Determines networking type plugin - can be flannel
+  dns: skydns
+  ingress: ingress
+  heapster: heapster
+  dashboard: dashboard
+  storage: nfs
+
+### Docker
+
+# By default enabled "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
+insecure_registries: []
+
+# ScaleIO
+
+# values: deploy, join(not supported)
+scaleio_mode: deploy
+scaleio_password: P@ssw0rd
+scaleio_protection_domain: dls
+scaleio_storage_pool: dls

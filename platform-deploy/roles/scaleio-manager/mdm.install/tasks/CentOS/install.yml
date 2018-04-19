@@ -1,0 +1,15 @@
+---
+
+- name: Chekc if local repo file exists
+  stat:
+    path: /opt/carbon/yum/yum.conf
+
+- name: Install yum mdm components
+  environment: "{{ proxy | combine({'MDM_ROLE_IS_MANAGER': 1 if MDM_ROLE_IS_MANAGER else 0}) }}"
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - EMC-ScaleIO-mdm

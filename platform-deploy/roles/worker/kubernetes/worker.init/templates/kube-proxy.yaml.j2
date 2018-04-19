@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+  labels:
+    role: kube-proxy
+spec:
+  hostNetwork: true
+  tolerations:
+  - operator: "Exists"
+    effect: "NoExecute"
+  - operator: "Exists"
+    effect: "NoSchedule"
+  containers:
+  - name: kube-proxy
+    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-proxy:v1.9.3"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128m
+    command:
+    - /bin/sh
+    - -c
+    - kube-proxy --proxy-mode ipvs --bind-address "$POD_IP" --kubeconfig /etc/kubelet/kubelet --cluster-cidr "{{ kubernetes_network.svc }}" --resource-container="" --oom-score-adj=-998
+    env:
+    - name: POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /run/xtables.lock
+      name: xtables-lock
+      readOnly: false
+    - mountPath: /lib/modules
+      name: lib-modules
+      readOnly: true
+    - name: proxy-cfg
+      mountPath: /etc/kubelet
+      readOnly: True
+    - name: certs
+      mountPath: /etc/dls-cluster/client
+      readOnly: True
+  volumes:
+  - name: xtables-lock
+    hostPath:
+      path: /run/xtables.lock
+      type: FileOrCreate
+  - name: lib-modules
+    hostPath:
+      path: /lib/modules
+  - name: proxy-cfg
+    hostPath:
+      path: /etc/kubelet
+      type: Directory
+  - name: certs
+    hostPath:
+      path: /etc/dls-cluster/client
+      type: Directory

@@ -1,0 +1,9 @@
+---
+
+- name: Pull images from docker
+  docker_image:
+    name: "{{ item.src }}"
+    repository: "127.0.0.1:{{ registry_port }}/{{ item.name }}"
+    pull: True
+    push: True
+  with_items: "{{ registry_images }}"

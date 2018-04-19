@@ -1,0 +1,4 @@
+server {
+    listen     443;
+    proxy_pass {{ kubernetes_network.svc_list.ingress.ip }}:443;
+}

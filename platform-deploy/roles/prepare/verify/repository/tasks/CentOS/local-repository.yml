@@ -1,0 +1,34 @@
+---
+
+- name: Check if carbon-yum-local is installed
+  environment: "{{ proxy }}"
+  tags:
+    - verify
+    - init
+  yum:
+    disable_plugin: '*'
+    disablerepo: '*'
+    list: carbon-yum-local
+  register: package
+
+- name: Check if carbon-registry-repository is installed on master
+  environment: "{{ proxy }}"
+  tags:
+    - verify
+    - init
+  yum:
+    disable_plugin: '*'
+    disablerepo: '*'
+    list: carbon-registry-repository
+  register: package_registry
+  when: inventory_hostname in groups['kubernetes-master']
+
+- tags:
+    - verify
+    - init
+  vars:
+    query: "[?release=='{{ carbon_release_package_release | string }}']"
+    version_query: "[?version=='{{ carbon_release_package_version | string }}']"
+  set_fact:
+    local_repository: "{{ package.results | json_query(query) | json_query(version_query) | length == 1 }}"
+    local_registry: "{{ inventory_hostname in groups['kubernetes-master'] and package_registry.results | json_query(query) | json_query(version_query) | length == 1 }}"

@@ -4,6 +4,9 @@ ignore: |
   /.venv
   /k8s-features/charts
   /cli/draft/packs/*/charts/
+  /platform-deploy/charts/
+  /*/charts
+  /**/charts
 
 rules:
   braces:

@@ -1,0 +1,17 @@
+[Unit]
+Description=Kubernetes scheduler
+After=docker.service kubernetes-apiserver.target
+Requires=docker.service kubernetes-apiserver.target
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+LimitNOFILE=65536
+ExecStart=/opt/carbon/kubernetes/kube-scheduler \
+              --master=127.0.0.1:8080 \
+              --v=0 \
+              --leader-elect=true \
+              {{ feature_gates }}
+
+[Install]
+WantedBy=multi-user.target

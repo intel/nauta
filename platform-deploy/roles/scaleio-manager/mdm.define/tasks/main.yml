@@ -1,0 +1,80 @@
+---
+
+- name: Reload facts
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_HOST_FACTS: "{{ (ansible_local.scaleio | default({}))[hostvars[inventory_hostname].dls_configuration.network.instance_name] | default({}) }}"
+
+- name: set fact based on this if server is mdm MANAGER
+  set_fact:
+    MDM_ROLE_IS_MANAGER: "{{ groups['scaleio-manager'].index(inventory_hostname) <= (groups['scaleio-manager'] | length / 2) }}"
+    MDM_DEFINED: "{{ SCALEIO_HOST_FACTS.is_defined | default(False) | bool }}"
+    MDM_CURRENT_ROLE: "{{ SCALEIO_HOST_FACTS.is_manager | default(False) | bool }}"
+
+- name: Check if node is not colliding with role
+  fail:
+    msg: "Role is not supported on this server"
+  when:
+    - MDM_DEFINED
+    - MDM_CURRENT_ROLE != MDM_ROLE_IS_MANAGER
+
+- name: Set mdm defined fact
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+    option: "is_defined"
+    no_extra_spaces: True
+    value: "True"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when:
+    - inventory_hostname == groups['scaleio-manager'][0]
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  with_items: "{{ groups['scaleio-manager'] }}"
+
+- name: Set mdm role fact
+  ini_file:
+    path: /etc/dls-facts/scaleio.fact
+    section: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+    option: "is_manager"
+    no_extra_spaces: True
+    value: "{{ hostvars[item].MDM_ROLE_IS_MANAGER }}"
+    mode: 0640
+    owner: cluster-facts
+    group: cluster-facts
+  when:
+    - inventory_hostname == groups['scaleio-manager'][0]
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+  with_items: "{{ groups['scaleio-manager'] }}"
+
+- include: synchronize-facts.yml
+  when:
+    - inventory_hostname == groups['scaleio-manager'][0]
+
+- name: Reload facts
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+  delegate_to: "{{ groups['kubernetes-master'][0] }}"
+
+- name: Load host facts
+  set_fact:
+    SCALEIO_HOST_FACTS: "{{ (ansible_local.scaleio | default({}))[hostvars[inventory_hostname].dls_configuration.network.instance_name] | default({}) }}"
+
+- name: set fact based on this if server is mdm MANAGER
+  set_fact:
+    MDM_ROLE_IS_MANAGER: "{{ groups['scaleio-manager'].index(inventory_hostname) <= (groups['scaleio-manager'] | length / 2) }}"
+    MDM_DEFINED: "{{ SCALEIO_HOST_FACTS.is_defined | default(False) | bool }}"
+    MDM_CURRENT_ROLE: "{{ SCALEIO_HOST_FACTS.is_manager | default(False) | bool }}"
+
+- name: Check if node is not colliding with role
+  fail:
+    msg: "Role init failed"
+  when:
+    - not MDM_DEFINED or MDM_CURRENT_ROLE != MDM_ROLE_IS_MANAGER

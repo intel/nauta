@@ -1,0 +1,6 @@
+server {
+{% for port in kubernetes_network.external_ports %}
+    listen {{ port }};
+{% endfor %}
+    proxy_pass {{ kubernetes_network.svc_list.apiservice.consul_name }}:{{ kubernetes_network.internal_port }};
+}

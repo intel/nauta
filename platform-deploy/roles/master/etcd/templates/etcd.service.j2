@@ -1,0 +1,16 @@
+[Unit]
+Description=ETCD container
+After=docker.service
+Requires=docker.service
+
+After=consul.service
+Requires=consul.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStart=/usr/bin/docker start -a etcd
+ExecStop=/usr/bin/docker stop -t 5 etcd
+
+[Install]
+WantedBy=multi-user.target

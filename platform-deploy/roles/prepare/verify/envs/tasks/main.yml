@@ -1,0 +1,25 @@
+---
+
+- name: Set facts for host definition
+  set_fact:
+    dls_configuration:
+      network:
+        instance_name: "{{ ansible_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
+      external_interface:
+        definition: "{{ hostvars[inventory_hostname]['ansible_' + external_interface] }}"
+        ipv4: "{{ hostvars[inventory_hostname]['ansible_' + external_interface].ipv4 }}"
+        ipv4_address: "{{ hostvars[inventory_hostname]['ansible_' + external_interface].ipv4.address }}"
+        ipv4_network: "{{ hostvars[inventory_hostname]['ansible_' + external_interface].ipv4.network }}"
+        ipv4_netmask: "{{ hostvars[inventory_hostname]['ansible_' + external_interface].ipv4.netmask }}"
+      internal_interface:
+        definition: "{{ hostvars[inventory_hostname]['ansible_' + internal_interface] }}"
+        ipv4: "{{ hostvars[inventory_hostname]['ansible_' + internal_interface].ipv4 }}"
+        ipv4_address: "{{ hostvars[inventory_hostname]['ansible_' + internal_interface].ipv4.address }}"
+        ipv4_network: "{{ hostvars[inventory_hostname]['ansible_' + internal_interface].ipv4.network }}"
+        ipv4_netmask: "{{ hostvars[inventory_hostname]['ansible_' + internal_interface].ipv4.netmask }}"
+      data_interface:
+        definition: "{{ hostvars[inventory_hostname]['ansible_' + data_interface] }}"
+        ipv4: "{{ hostvars[inventory_hostname]['ansible_' + data_interface].ipv4 }}"
+        ipv4_address: "{{ hostvars[inventory_hostname]['ansible_' + data_interface].ipv4.address }}"
+        ipv4_network: "{{ hostvars[inventory_hostname]['ansible_' + data_interface].ipv4.network }}"
+        ipv4_netmask: "{{ hostvars[inventory_hostname]['ansible_' + data_interface].ipv4.netmask }}"

@@ -1,0 +1,34 @@
+[Unit]
+Description=Kubernetes apiservice
+After=docker.service etcd.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+LimitNOFILE=65536
+ExecStart=/opt/carbon/kubernetes/kube-apiserver \
+            --advertise-address {{ dls_configuration.internal_interface.ipv4_address }} \
+            --apiserver-count 1 \
+            --secure-port {{ kubernetes_network.internal_port }} \
+            --bind-address {{ dls_configuration.internal_interface.ipv4_address }} \
+            --allow-privileged \
+            --etcd-servers "{{ etcd }}" \
+            --etcd-cafile /etc/dls-cluster/client/ca.pem \
+            --etcd-certfile /etc/dls-cluster/client/node.crt \
+            --etcd-keyfile /etc/dls-cluster/client/node.key \
+            --kubelet-certificate-authority /etc/dls-cluster/client/ca.pem \
+            --service-cluster-ip-range {{ kubernetes_network.svc }} \
+            --client-ca-file /etc/dls-cluster/client/ca.pem \
+            --tls-ca-file /etc/dls-cluster/client/ca.pem \
+            --tls-cert-file /etc/dls-cluster/master/crt/apiservice.crt \
+            --tls-private-key-file /etc/dls-cluster/master/key/apiservice.key \
+            --admission-control "{{ kubernetes_calculated_admission_control | join(',') }}" \
+            {{ feature_gates }} \
+            {{ runtime_config }} \
+            --service-account-key-file /etc/dls-cluster/master/key/service.key \
+            --authorization-mode=RBAC \
+            --anonymous-auth={{ 'true' if kubernetes_anonymous_access else 'False' }}
+
+[Install]
+WantedBy=multi-user.target

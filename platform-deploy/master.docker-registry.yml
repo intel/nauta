@@ -1,0 +1,18 @@
+---
+
+- hosts: kubernetes-master
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Reload Systemd
+      shell: systemctl daemon-reload
+    - name: Restart Docker Distribution
+      service:
+        name: docker-distribution
+        state: restarted
+  serial: # rolling update
+    - 1
+  roles:
+    - role: master/docker-registry
+      tags:
+        - install

@@ -1,0 +1,26 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: node-access-{{ hostvars[host].dls_configuration.network.instance_name }}
+subjects:
+- kind: User
+  name: {{ hostvars[host].dls_configuration.network.instance_name }}
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:node
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:kube-proxy-{{ hostvars[host].dls_configuration.network.instance_name }}
+  namespace: kube-system
+subjects:
+- kind: User
+  name: {{ hostvars[host].dls_configuration.network.instance_name }}
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:node-proxier
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,48 @@
+---
+
+- name: Include distribution based task
+  include_tasks: "{{ item }}"
+  tags:
+    - verify
+    - init
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/local-repository.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Fail if local_repository is not set
+  tags:
+    - verify
+    - init
+  fail:
+    msg: Variable local_repository is not set after loop
+  when: local_repository is not defined
+
+- name: Fail if there are not present any carbon-yum-local packages
+  fail:
+    msg: Unable to find carbon-yum-local package
+  tags:
+    - verify
+  when:
+    - not local_repository
+
+- name: Fail if there are not present any carbon-registry-repository packages
+  fail:
+    msg: Unable to find carbon-registry-repository package
+  tags:
+    - verify
+  when:
+    - not local_registry
+    - inventory_hostname in groups['kubernetes-master']
+
+- name: Fail if there are not present any carbon-yum-local packages
+  fail:
+    msg: Unable to find carbon-yum-local package and unknown type {{ carbon_release_package_installation }}
+  tags:
+    - init
+  when:
+    - not local_repository
+    - carbon_release_package_installation not in ['repo']

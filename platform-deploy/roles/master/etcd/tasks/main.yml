@@ -1,0 +1,60 @@
+---
+
+- name: Pull docker image
+  docker_image:
+    name: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.1.10"
+
+- name: Create etcd server
+  docker_container:
+    name: etcd
+    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.1.10"
+    restart_policy: no
+    state: present
+    published_ports:
+      - "{{ dls_configuration.internal_interface.ipv4_address }}:2379:2379"
+      - "{{ dls_configuration.internal_interface.ipv4_address }}:2380:2380"
+      - "{{ dls_configuration.internal_interface.ipv4_address }}:4001:4001"
+      - "{{ dls_configuration.internal_interface.ipv4_address }}:7001:7001"
+    env:
+      ETCD_NAME: "{{ ansible_hostname }}"
+      ETCD_DATA_DIR: "/etcd-data"
+      ETCD_LISTEN_PEER_URLS: "https://0.0.0.0:2380"
+      ETCD_LISTEN_CLIENT_URLS: "https://0.0.0.0:2379,https://0.0.0.0:4001"
+      ETCD_INITIAL_CLUSTER_STATE: new
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: "https://{{ ansible_nodename }}:2380"
+      ETCD_ADVERTISE_CLIENT_URLS: "https://{{ ansible_nodename }}:2379,https://{{ ansible_nodename }}:4001"
+      # yamllint disable-line rule:line-length
+      ETCD_INITIAL_CLUSTER: "{% for host in groups['kubernetes-master'] %}{{ hostvars[host].ansible_hostname }}=https://{{ hostvars[host].ansible_nodename }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+      ETCD_INITIAL_CLUSTER_TOKEN: etcd
+      ETCD_CLIENT_CERT_AUTH: True
+      ETCD_TRUSTED_CA_FILE: /ca/CA.pem
+      ETCD_CERT_FILE: /ca/node.crt
+      ETCD_KEY_FILE: /ca/node.key
+      ETCD_CORS: 4
+      GOMAXPROCS: 4
+      ETCD_PEER_CLIENT_CERT_AUTH: True
+      ETCD_PEER_TRUSTED_CA_FILE: /ca/CA.pem
+      ETCD_PEER_CERT_FILE: /ca/node.crt
+      ETCD_PEER_KEY_FILE: /ca/node.key
+    volumes:
+      - "/var/lib/etcd:/etcd-data"
+      - "/etc/dls-cluster/client/ca.pem:/ca/CA.pem:ro"
+      - "/etc/dls-cluster/client/node.crt:/ca/node.crt:ro"
+      - "/etc/dls-cluster/client/node.key:/ca/node.key:ro"
+    command: /usr/local/bin/etcd
+
+- name: Render etcd service script
+  template:
+    src: etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+  notify:
+    - Reload Systemd
+    - Restart Etcd
+
+- meta: flush_handlers
+
+- name: Start and enable etcd
+  service:
+    name: etcd
+    state: started
+    enabled: True

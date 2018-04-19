@@ -1,0 +1,97 @@
+{{- $root := . -}}
+{{- range (required "Space separated interfaces list is required" .Values.Interfaces) }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ $root.Release.Name }}-flannel-{{ . }}
+  labels:
+    app: {{ $root.Release.Name }}-flannel
+    chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}
+    release: {{ $root.Release.Name }}
+    heritage: {{ $root.Release.Service }}
+    iface: "{{ . }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ $root.Release.Name }}-flannel
+      chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}
+      release: {{ $root.Release.Name }}
+      heritage: {{ $root.Release.Service }}
+      iface: "{{ . }}"
+  template:
+    metadata:
+      labels:
+        app: {{ $root.Release.Name }}-flannel
+        chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}
+        release: {{ $root.Release.Name }}
+        heritage: {{ $root.Release.Service }}
+        iface: "{{ . }}"
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+        iface: "{{ . }}"
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      serviceAccountName: {{ $root.Release.Name }}-flannel
+      initContainers:
+      - name: install-cni
+        image: {{ required "Flannel IMAGE is required" $root.Values.FlannelImage }}
+        command:
+        - cp
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128m
+        args:
+        - -f
+        - /etc/kube-flannel/cni-conf.json
+        - /etc/cni/net.d/10-flannel.conflist
+        volumeMounts:
+        - name: cni
+          mountPath: /etc/cni/net.d
+        - name: flannel-cfg
+          mountPath: /etc/kube-flannel/
+      containers:
+      - name: kube-flannel
+        image: {{ required "Flannel IMAGE is required" $root.Values.FlannelImage }}
+        command:
+        - /opt/bin/flanneld
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128m
+        args:
+        - --ip-masq
+        - --kube-subnet-mgr
+        - --iface={{ . }}
+        securityContext:
+          privileged: true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: run
+          mountPath: /run
+        - name: flannel-cfg
+          mountPath: /etc/kube-flannel/
+      volumes:
+        - name: run
+          hostPath:
+            path: /run
+        - name: cni
+          hostPath:
+            path: /etc/cni/net.d
+        - name: flannel-cfg
+          configMap:
+            name: {{ $root.Release.Name }}-flannel
+{{- end }}

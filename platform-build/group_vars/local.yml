@@ -1,0 +1,3 @@
+---
+
+ansible_python_interpreter: "{{ default_local_python_intepreter }}"

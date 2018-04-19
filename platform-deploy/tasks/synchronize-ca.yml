@@ -1,0 +1,31 @@
+---
+
+- name: Ensure that node dirs exis
+  file:
+    path: /etc/dls-cluster/master/nodes
+    owner: cluster-master
+    group: cluster-master
+    mode: 0750
+    state: directory
+
+- name: Ensure that dirs exists for each node
+  file:
+    path: /etc/dls-cluster/master/nodes/{{ item }}
+    owner: cluster-master
+    group: cluster-master
+    mode: 0750
+    state: directory
+  with_items: "{{ groups['all'] }}"
+
+- name: Synchronize
+  become_user: cluster-master
+  shell: "rsync -avhz --delete --progress /etc/dls-cluster/master/ master-cluster-{{ item }}:/etc/dls-cluster/master/"
+  changed_when: False
+  with_items: "{{ groups['kubernetes-master'] }}"
+  when: inventory_hostname != item
+
+- name: Synchronize workers
+  become_user: cluster-master
+  shell: "rsync -avhz --delete --progress /etc/dls-cluster/master/nodes/{{ item }}/ cluster-{{ item }}:/etc/dls-cluster/client/"
+  changed_when: False
+  with_items: "{{ groups['all'] }}"

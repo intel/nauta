@@ -1,0 +1,16 @@
+---
+
+- hosts: kubernetes-master
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Reload Systemd
+      shell: systemctl daemon-reload
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+  roles:
+    - role: master/loadbalancer
+      tags:
+        - install

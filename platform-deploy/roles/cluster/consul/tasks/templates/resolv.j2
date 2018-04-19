@@ -1,0 +1,4 @@
+{% for host in groups['kubernetes-master'] %}
+nameserver {{ hostvars[host].dls_configuration.internal_interface.ipv4_address }}
+{% endfor %}
+search {{ dns_search_domains | join(' ') }}

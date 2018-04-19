@@ -1,0 +1,33 @@
+---
+
+- name: Reload facts
+  setup:
+    fact_path: /etc/dls-facts
+    gather_subset: "!all"
+  when: inventory_hostname in groups['kubernetes-master']
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Add all mdm to sdc scini file
+  lineinfile:
+    path: /bin/emc/scaleio/drv_cfg.txt
+    line: "mdm {{ item.value.ip }}"
+  with_dict: "{{ hostvars[groups['kubernetes-master'][0]].ansible_local.scaleio }}"
+  when: item.key in ['MDM-0', 'MDM-1', 'MDM-2']
+  notify: Restart scini
+
+- include: synchronize-facts.yml
+
+- name: Start and enable scini
+  service:
+    name: scini
+    state: started
+    enabled: True

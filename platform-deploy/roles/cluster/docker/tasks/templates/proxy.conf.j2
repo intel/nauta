@@ -1,0 +1,4 @@
+[Service]
+{% for env, value in proxy.items() %}
+Environment="{{ env }}={{ value }}"
+{% endfor %}

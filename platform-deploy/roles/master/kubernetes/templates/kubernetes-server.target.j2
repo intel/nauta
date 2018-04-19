@@ -1,0 +1,6 @@
+[Unit]
+Description=Kubernetes Server target
+Requires=kubernetes-scheduler.target kubernetes-controller.target kubernetes-apiserver.target
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+{% for item in groups['all'] %}
+Host cluster-{{ item }}
+  Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
+  User cluster-client
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking no
+  GlobalKnownHostsFile=/dev/null
+  UserKnownHostsFile=/dev/null
+{% endfor %}
+
+{% if inventory_hostname in groups['kubernetes-master'] %}
+{% for item in groups['kubernetes-master'] %}
+Host master-cluster-{{ item }}
+  Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
+  User cluster-master
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking no
+  GlobalKnownHostsFile=/dev/null
+  UserKnownHostsFile=/dev/null
+{% endfor %}
+{% endif %}

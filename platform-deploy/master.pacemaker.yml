@@ -1,0 +1,9 @@
+---
+
+- hosts: kubernetes-master
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: master/pacemaker
+      tags:
+        - install

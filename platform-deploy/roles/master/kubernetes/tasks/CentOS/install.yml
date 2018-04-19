@@ -1,0 +1,21 @@
+---
+
+- name: Chekc if local repo file exists
+  stat:
+    path: /opt/carbon/yum/yum.conf
+
+- name: Install yum kubernetes server
+  environment: "{{ proxy }}"
+  yum:
+    conf_file: /opt/carbon/yum/yum.conf
+    name: "{{ package_yum }}"
+  loop_control:
+    loop_var: package_yum
+  with_items:
+    - kubernetes-server
+    - kubernetes-client
+  notify:
+    - Reload Systemd
+    - Restart Kubernetes Apiserver
+    - Restart Kubernetes Scheduler
+    - Restart Kubernetes Controller
