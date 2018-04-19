@@ -4,6 +4,7 @@
 
 All trainings have been tested using Python 3.5.2 and TensorFlow 1.7.0
 
+
 ### MNIST digit recognition
 
 #### Preparing dataset
@@ -21,6 +22,16 @@ To run multi node training on MNIST dataset prepare 3 terminal windows (preferab
 
 #### Multi node, deep neural net MNIST training
 The steps are exactly the same as for the above shallow network training. The only difference is that the script's name is `mnist_deep_multi_node.py`
+
+
+### IMDB reviews sentiment analysis with LSTM
+The code is based on https://www.oreilly.com/learning/perform-sentiment-analysis-with-lstms-using-tensorflow tutorial.
+
+#### Preparing dataset
+Download `wordVectors.npy` (word2vec mapping) and `ids_matrix_imdb.npy` (word2vec embedding) and place them in `/datasets/imdb/`. Files are available under https://ftp.nervana.sclab.intel.com/data/lstm_reviews/ and can be easily downloaded using `wget`. An alternative is visiting https://github.com/adeshpande3/LSTM-Sentiment-Analysis.git and downloading it from there.
+
+#### Single node LSTM
+To run sentiment analysis on vectorized IMDB dataset run: `python imdb_lstm.py --data_dir=/datasets/imdb/`
 
 
 ### Image recognition with AlexNet using Imagenet dataset
