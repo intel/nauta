@@ -62,6 +62,7 @@ from alexnet_model import AlexNet
 tf.app.flags.DEFINE_integer('training_epoch', 1,
                             'number of training epochs.')
 tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
+tf.app.flags.DEFINE_integer('batch_size', 128, 'size of image batches.')
 tf.app.flags.DEFINE_string('data_dir', './dataset/imagenet', 'training data directory.')
 tf.app.flags.DEFINE_string('output_dir', './output', 'output directory for model saving.')
 FLAGS = tf.app.flags.FLAGS
@@ -79,8 +80,11 @@ def main(_):
     if FLAGS.model_version <= 0:
         print('Please specify a positive value for version number.')
         sys.exit(-1)
+    if FLAGS.batch_size <= 0:
+        print('Please specify a positive value for batch size.')
+        sys.exit(-1)
 
-    batch_size = 128
+    batch_size = FLAGS.batch_size
 
     print('Loading data')
     training, testing = create_generator(os.path.join(FLAGS.data_dir, 'i1k-extracted/train'),
@@ -151,18 +155,14 @@ def main(_):
 
         step_test = 1
         acc_list = []
-        while step_test * batch_size < len(testing):
+        while step_test * batch_size < testing.samples:
             testing_xs, testing_ys = testing.next()
             acc_up = sess.run([test_accuracy, test_update_op],
                               feed_dict={x_3d: testing_xs, y: testing_ys, keep_prob: 1.})
             acc = sess.run([test_accuracy],
                            feed_dict={x_3d: testing_xs, y: testing_ys, keep_prob: 1.})
             acc_list.append(acc)
-            print("Testing Accuracy:", acc)
             step_test += 1
-
-        print("Max accuracy is", max(acc_list))
-        print("Min accuracy is", min(acc_list))
 
         # save model using SavedModelBuilder from TF
         export_path_base = sys.argv[-1]
@@ -194,6 +194,9 @@ def main(_):
         builder.save()
 
         print('Done exporting!')
+        print("Max batch accuracy is", max(acc_list))
+        print("Min batch accuracy is", min(acc_list))
+        print("Avg. accuracy is:", sum(acc_list) / len(acc_list))
 
 
 if __name__ == '__main__':
