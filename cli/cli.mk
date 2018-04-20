@@ -22,11 +22,20 @@
 
 build: $(ACTIVATE)
 	@. $(ACTIVATE); pip install pyinstaller;
+
+ifeq (Windows,$(OS))
+	@. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" -F main.py;
+	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/windows/draft-v0.13.0-windows-amd64.tar.gz --no-check-certificate -O draft.tar.gz
+endif
+
+ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller -F main.py;
-	@wget https://ftp.nervana.sclab.intel.com/public/draft-ef24e1c6af938e5109319c4e1b69f304504aa288-linux-amd64.tar.gz --no-check-certificate -O draft-linux-amd64.tar.gz
-	@tar -zxf draft-linux-amd64.tar.gz -C dist
-	@rm -f draft-linux-amd64.tar.gz
+	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz --no-check-certificate -O draft.tar.gz
+endif
+	@tar -zxf draft.tar.gz -C dist
+	@rm -f draft.tar.gz
 	@cp -Rf draft/packs/* dist/.draft/packs/
+
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ main.py
@@ -35,4 +44,3 @@ test: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); py.test
 
 cli-check: venv-dev test style
-

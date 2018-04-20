@@ -21,20 +21,45 @@
 
 VIRTUALENV_DIR := .venv
 DEV_VIRTUALENV_MARK := $(VIRTUALENV_DIR)/dev
-ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
+UNAME := $(shell uname)
+
+ifeq ($(findstring MINGW32_NT-6.2,$(UNAME)),MINGW32_NT-6.2)
+	OS := Windows
+endif
+ifeq ($(findstring Linux,$(UNAME)),Linux)
+	OS := Linux
+endif
+
+ifeq (Windows,$(OS))
+	ACTIVATE := $(VIRTUALENV_DIR)/Scripts/activate
+endif
+ifeq (Linux,$(OS))
+	ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
+endif
+
 
 clean:
 	@rm -rf $(VIRTUALENV_DIR) __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache
 
+
 venv: $(ACTIVATE)
 $(ACTIVATE): requirements.txt
+
+ifeq (Windows,$(OS))
+	@python -m venv $(VIRTUALENV_DIR)
+endif
+
+ifeq (Linux,$(OS))
 	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
+endif
+
 	@. $(ACTIVATE); pip install -r requirements.txt;
 
 venv-dev: $(DEV_VIRTUALENV_MARK)
 $(DEV_VIRTUALENV_MARK): requirements-dev.txt $(ACTIVATE)
 	@touch $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); pip install -r requirements-dev.txt;
+
 
 include cli.mk
