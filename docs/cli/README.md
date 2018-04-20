@@ -1,5 +1,75 @@
-# CLI
+# DLSCTL
 
+## **dlsctl** commands
+
+<ol>
+<li> <b>submit</b> - submits one single-node training job on a kuberenetes cluster. Format of the command is as follows:
+
+_dlsctl submit <script_name> -sfl <folder_name> -- <script_arguments>_
+
+arguments:<br>
+_<script_name>_ - name of a python script with a description of training. Obligatory<br>
+_<script_arguments>_ - string with a list of arguments that are passed to a training script. Optional<br>
+
+options:<br>
+_-sfl/-script_folder_location <folder_name>_ - location of a folder content of which is copied into a docker image created
+by _dlsctl submit_ command. _dlsctl_ copies the whole content preserving its structure - including subfolder. Optional<br>
+
+example:<br>
+_dlsctl submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0_<br>
+Starts a single node training job using mnist_cnn.py script located in a folder from which _dlsctl_ command was issued. Content of
+the /data folder is copied into docker image (into /app folder - which is a work directory of docker images created using
+tf-training pack). Arguments _--data-dir_ and _--num_gpus_ are passed to a script.
+</li>
+</ol>
+
+
+## K8S roles definitions
+
+Below is a list of k8s roles and rolebindings needed by _dlsctl_ application. \<USERNAME> is a name of
+user who wants to get access to k8s through _dlsctl_ application.
+
+**I) ClusterRoles**
+1) Type : ClusterRole<br>
+Name : \<USERNAME>-common-access<br>
+PolicyRule:
+
+  | Resources | Non-Resource URLs | Resource Names | Verbs |
+  |:--- |:---|:---|:---|
+  | namespaces.* | [] | [\<USERNAME>] | [get watch list delete] |
+
+
+2) Type : ClusterRole<br>
+Name: \dls-common-access<br>
+PolicyRule:
+
+  | Resources | Non-Resource URLs | Resource Names | Verbs |
+  |:--- |:--- |:--- |:--- |
+  | namespaces.* | [] | [namespaces] | [get watch list delete] |
+
+**II) ClusterRoleBindings**
+1) Name: \<USERNAME>-common-access<br>
+   Role:<br>
+	+ Kind:  ClusterRole<br>
+	+ Name:  \<USERNAME>-common-access<br>
+
+	Subjects:
+
+  | Kind | Name | Namespace |
+  |:--- |:--- |:--- |
+  | ServiceAccount | \<USERNAME> | auth |
+
+2) Name: \<USERNAME>-dls-common-access<br>
+Role:
+	+ Kind:  ClusterRole
+	+ Name:  dls-common-access
+
+	Subjects:
+
+  |Kind | Name | Namespace |
+  |:--- |:--- |:---|
+  | ServiceAccount | \<USERNAME> | auth |
+=======
 ## Example TensorFlow trainings
 
 All trainings have been tested using Python 3.5.2 and TensorFlow 1.7.0
