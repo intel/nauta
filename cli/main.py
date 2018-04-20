@@ -20,12 +20,16 @@
 #
 
 import click
+import sys
 
 import draft.cmd as draft
 from draft import dependencies_checker
-
+from util.kubectl import start_port_forwarding
+from util.logger import initialize_logger
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+log = initialize_logger('main')
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -39,7 +43,26 @@ def train():
     draft.create()
 
     click.echo('Running draft container...')
-    draft.up()
+    try:
+        process = start_port_forwarding()
+    except Exception as exe:
+        log.exception("Error during creation of a proxy for a docker registry.")
+        click.echo("Error during creation of a proxy for a docker registry.")
+        sys.exit(1)
+    try:
+        output, exit_code = draft.up()
+        click.echo(output)
+    except Exception as exe:
+        log.exception("Error during creating of a draft deployment.")
+        click.echo("Error during creating of a draft deployment.")
+        sys.exit(1)
+    finally:
+        try:
+            process.kill()
+        except Exception as exet:
+            log.exception("Error during closing of a proxy for a docker registry.")
+            click.echo("Docker proxy hasn't been closed properly. "
+                       "Check whether it still exists, if yes - close it manually.")
 
 
 @click.command()

@@ -31,8 +31,10 @@ FAKE_CLI_DISTRIBUTION_DIR_PATH = '/home/fakeuser/dist'
 @pytest.fixture
 def draft_mock(mocker):
     cmd.draft_path = FAKE_CLI_DISTRIBUTION_DIR_PATH
+
     exe_mock = mocker.patch.object(cmd, 'execute_system_command')
     exe_mock.return_value = ('some return', 0)
+
     return cmd
 
 
@@ -41,12 +43,22 @@ def test_create(draft_mock):
     draft_mock.create()
 
     assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'create', '--pack=tf-training'], env=ANY)])
+    assert draft_mock.execute_system_command.call_args == call(['draft', 'create', '--pack=tf-training'], env=ANY)
 
 
 # noinspection PyShadowingNames
-def test_up(draft_mock):
+def test_up(draft_mock, mocker):
+    mocker.patch('subprocess.Popen')
+
     draft_mock.up()
 
     assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'up'], env=ANY)])
+    assert draft_mock.execute_system_command.call_args == call(['draft', 'up'], env=ANY)
+
+
+def test_set_registry_port(draft_mock):
+    draft_mock.set_registry_port("5000")
+
+    assert draft_mock.execute_system_command.call_count == 1
+    assert draft_mock.execute_system_command.call_args == call(['draft', 'config', 'set', 'registry', '127.0.0.1:5000'],
+                                                               env=ANY)

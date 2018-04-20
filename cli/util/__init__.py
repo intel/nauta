@@ -19,28 +19,4 @@
 # and approved by Intel in writing.
 #
 
-import os
-import logging
-
-
-def initialize_logger(package_name) -> logging.Logger:
-    logging_level = os.getenv("LOG_LEVEL", "INFO")
-
-    logger = logging.getLogger(package_name)
-    logger.setLevel(logging_level)
-
-    logging.basicConfig(level=logging_level)
-
-    return logger
-
-
-def is_debug_level(logger):
-    """
-    Returns true if log level is set to debug
-
-    :param logger: - a checked logger
-    :return: - true i log level is set to DEBUG, false otherwise
-    """
-    current_level = logger.getEffectiveLevel()
-
-    return current_level == logging.DEBUG
+#

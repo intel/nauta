@@ -32,6 +32,8 @@ draft_path = os.path.dirname(sys.executable)
 
 DRAFT_BIN = 'draft'
 
+DOCKER_IP_ADDRESS = "127.0.0.1"
+
 
 def call_draft(args: List[str]) -> (str, int):
     full_command = [DRAFT_BIN]
@@ -52,3 +54,21 @@ def create():
 def up():
     output, exit_code = call_draft(['up'])
     print(output)
+    return output, exit_code
+
+
+def set_registry_port(registry_port: str) -> (str, int):
+    """
+    Sets port of docker's registry used by draft instance.
+
+    :param registry_port: port under which local k8s registry is available
+    :return: (output, exit_code)
+    - output - message from execution of a command returned by the system
+    - exit_code - 0 - operation was a success, otherwise some error occurred during
+                its execution
+    """
+    docker_location = DOCKER_IP_ADDRESS + ":" + registry_port
+
+    CONFIGURE_DRAFT_PORT_COMMAND = ["config", "set", "registry", docker_location]
+
+    return call_draft(CONFIGURE_DRAFT_PORT_COMMAND)
