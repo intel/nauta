@@ -47,6 +47,7 @@ are properly installed (i.e. `tiller` on )
 - `docker-registry` - Private docker registry
 - `elasticsearch` - distributed RESTful search engine built for the cloud 
 - `fluentd` - open-source log collector
+- `dls-gui` - dls webservice for experiments management
 
 ## Features parametrization
 Each feature can be parametrized using `values.yml` file present in specific feature directory. All
