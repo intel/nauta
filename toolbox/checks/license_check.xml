@@ -16,13 +16,20 @@
                     <include>**/*.js</include>
                     <include>**/*.css</include>
                     <include>**/*.html</include>
+                    <include>**/*.vue</include>
                     <include>**/*.py</include>
                 </includes>
                 <excludes>
                     <exclude>**/.venv/**/*.*</exclude>
+                    <exclude>**/node_modules/**/*.*</exclude>
+                    <exclude>**/dls-gui/build/**/*.*</exclude>
+                    <exclude>**/dls-gui/config/**/*.*</exclude>
+                    <exclude>**/dls-gui/.eslintrc.js</exclude>
+                    <exclude>**/dls-gui/.postcssrc.js</exclude>
                 </excludes>
                 <mapping>
                     <js>JAVADOC_STYLE</js>
+                    <vue>JAVADOC_STYLE</vue>
                     <css>JAVADOC_STYLE</css>
                     <html>XML_STYLE</html>
                     <py>SCRIPT_STYLE</py>
