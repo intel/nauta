@@ -303,7 +303,7 @@ def main(unused_argv):
 
         # Testing
         accuracy_value = sess.run(accuracy, feed_dict=val_feed)
-        print('Test accuracy: %g' % accuracy_value)
+        print('Validation accuracy: %g' % accuracy_value)
 
 
 if __name__ == "__main__":

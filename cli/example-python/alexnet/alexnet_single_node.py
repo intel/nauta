@@ -161,11 +161,11 @@ def main(_):
                               feed_dict={x_3d: testing_xs, y: testing_ys, keep_prob: 1.})
             acc = sess.run([test_accuracy],
                            feed_dict={x_3d: testing_xs, y: testing_ys, keep_prob: 1.})
-            acc_list.append(acc)
+            acc_list.extend(acc)
             step_test += 1
 
         # save model using SavedModelBuilder from TF
-        export_path_base = sys.argv[-1]
+        export_path_base = FLAGS.output_dir
         export_path = os.path.join(
             tf.compat.as_bytes(export_path_base),
             tf.compat.as_bytes(str(FLAGS.model_version)))
@@ -196,7 +196,7 @@ def main(_):
         print('Done exporting!')
         print("Max batch accuracy is", max(acc_list))
         print("Min batch accuracy is", min(acc_list))
-        print("Avg. accuracy is:", sum(acc_list) / len(acc_list))
+        print("Validation accuracy:", sum(acc_list) / len(acc_list))
 
 
 if __name__ == '__main__':

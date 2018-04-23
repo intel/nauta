@@ -126,7 +126,7 @@ It is vital for the directory to have identical structure - `i1k-extracted/` par
  
 #### Single node AlexNet training in TF
 The code is based on: https://github.com/kratzert/finetune_alexnet_with_tensorflow
-To run single node AlexNet training implemented in pure TF enter directory `cli/python_examples/alexnet/` and run: `python alexnet_single_node.py --training_epoch=NUM_EPOCHS --batch_size=BATCH_SIZE --model_version=MODEL_VERSION --data_dir=/PATH/TO/IMAGENET OUTPUT_DIR`
+To run single node AlexNet training implemented in pure TF enter directory `cli/python_examples/alexnet/` and run: `python alexnet_single_node.py --training_epoch=NUM_EPOCHS --batch_size=BATCH_SIZE --model_version=MODEL_VERSION --data_dir=/PATH/TO/IMAGENET --output_dir=OUTPUT_DIR`
 
 
 #### Single node AlexNet training in Keras

@@ -364,10 +364,10 @@ def main(_):
                 training_time = time_end - time_begin
                 print("Training elapsed time: %f s" % training_time)
                 batch_xs_test, batch_ys_test = mnist.validation.next_batch(1000)
-                print('Validation batch accuracy for 1000 images is: %g' % sess.run(accuracy,
-                                                                                    feed_dict={x: batch_xs_test,
-                                                                                               y_: batch_ys_test,
-                                                                                               keep_prob: 1.}))
+                print('Validation batch accuracy for 1000 images: %g' % sess.run(accuracy,
+                                                                                 feed_dict={x: batch_xs_test,
+                                                                                            y_: batch_ys_test,
+                                                                                            keep_prob: 1.}))
                 break
 
 

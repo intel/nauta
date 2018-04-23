@@ -205,8 +205,8 @@ def validate(epoch, total_loss, accuracy):
     mean_test_loss = sum(test_losses) / test_batch_index
 
     print('{} Epoch {} ended. '
-          'Validation accuracy: {}%, '
-          'Validation loss: {}'.format(time.strftime('%X %x %Z'), epoch, mean_test_accuracy, mean_test_loss))
+          'Validation loss: {}'.format(time.strftime('%X %x %Z'), epoch, mean_test_loss))
+    print('Validation accuracy: {}%'.format(mean_test_accuracy))
 
 
 if FLAGS.job_name == "ps":

@@ -161,7 +161,7 @@ def main(_):
         temp_accuracy_val = sess.run(accuracy, {input_data: next_batch, labels: next_batch_labels, keep_prob: 1.})
         accuracy_list.append(temp_accuracy_val)
 
-    print('Average testing accuracy is:', sum(accuracy_list) / len(accuracy_list))
+    print('Validation accuracy:', sum(accuracy_list) / len(accuracy_list))
 
 
 if __name__ == '__main__':
