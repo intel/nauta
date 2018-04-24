@@ -35,7 +35,7 @@ DRAFT_BIN = 'draft'
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
-def call_draft(args: List[str]) -> (str, int):
+def call_draft(args: List[str], cwd: str=None) -> (str, int):
     full_command = [DRAFT_BIN]
     full_command.extend(args)
 
@@ -43,17 +43,28 @@ def call_draft(args: List[str]) -> (str, int):
     envs['DRAFT_HOME'] = os.path.join(draft_path, ".draft")
     envs['PATH'] = os.getenv('PATH') + ':' + draft_path
 
-    return execute_system_command(full_command, env=envs)
+    return execute_system_command(full_command, env=envs, cwd=cwd)
 
 
-def create():
-    output, exit_code = call_draft(['create', '--pack=tf-training'])
+def create(working_directory: str=None, pack_type: str=None) -> (str, int):
+    command = ['create']
+    if pack_type:
+        command.append('--pack={}'.format(pack_type))
+    output, exit_code = call_draft(args=command, cwd=working_directory)
     print(output)
 
+    if not exit_code:
+        output, exit_code = check_create_status(output)
 
-def up():
-    output, exit_code = call_draft(['up'])
+    return output, exit_code
+
+
+def up(working_directory: str=None) -> (str, int):
+    output, exit_code = call_draft(args=['up'], cwd=working_directory)
     print(output)
+    if not exit_code:
+        output, exit_code = check_up_status(output)
+
     return output, exit_code
 
 
@@ -72,3 +83,33 @@ def set_registry_port(registry_port: str) -> (str, int):
     CONFIGURE_DRAFT_PORT_COMMAND = ["config", "set", "registry", docker_location]
 
     return call_draft(CONFIGURE_DRAFT_PORT_COMMAND)
+
+
+def check_up_status(output: str) -> (str, int):
+    """
+    Checks whether up command was finished with success.
+    :param output: output of the 'up' command
+    :return: (message, exit_code):
+    - exit_code - 0 if operation was a success
+    - message - message with a description of a problem
+    """
+    if "Building Docker Image: SUCCESS" not in output:
+        return "Docker image hasn't been built.", 100
+    elif "Pushing Docker Image: SUCCESS" not in output:
+        return "Docker image hasn't been sent to the cluster.", 101
+    elif "Releasing Application: SUCCESS" not in output:
+        return "Application hasn't been released.", 102
+    return "", 0
+
+
+def check_create_status(output: str) -> (str, int):
+    """
+    Checks whether create command was finished with success.
+    :param output: output of the 'create' command
+    :return: (message, exit_code):
+    - exit_code - 0 if operation was a success
+    - message - message with a description of a problem
+    """
+    if "--> Ready to sail" not in output:
+        return "Deployment hasn't been created.", 100
+    return "", 0

@@ -27,6 +27,16 @@ from draft import cmd
 
 FAKE_CLI_DISTRIBUTION_DIR_PATH = '/home/fakeuser/dist'
 
+CORRECT_UP_OUTPUT_BUILD_IMAGE = 'Building Docker Image: SUCCESS'
+CORRECT_UP_OUTPUT_PUSH_IMAGE = 'Pushing Docker Image: SUCCESS'
+CORRECT_UP_OUTPUT_DEPLOY = 'Releasing Application: SUCCESS'
+
+INCORRECT_UP_OUTPUT = 'Building Docker Image: SUCCESS Releasing Application: SUCCESS'
+
+CORRECT_CREATE_OUTPUT = '--> Ready to sail'
+
+INCORRECT_CREATE_OUTPUT = '-->  to sail 1234567890 AbCdEF'
+
 
 @pytest.fixture
 def draft_mock(mocker):
@@ -43,7 +53,7 @@ def test_create(draft_mock):
     draft_mock.create()
 
     assert draft_mock.execute_system_command.call_count == 1
-    assert draft_mock.execute_system_command.call_args == call(['draft', 'create', '--pack=tf-training'], env=ANY)
+    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'create'], env=ANY, cwd=None)])
 
 
 # noinspection PyShadowingNames
@@ -53,7 +63,7 @@ def test_up(draft_mock, mocker):
     draft_mock.up()
 
     assert draft_mock.execute_system_command.call_count == 1
-    assert draft_mock.execute_system_command.call_args == call(['draft', 'up'], env=ANY)
+    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'up'], env=ANY, cwd=None)])
 
 
 def test_set_registry_port(draft_mock):
@@ -61,4 +71,50 @@ def test_set_registry_port(draft_mock):
 
     assert draft_mock.execute_system_command.call_count == 1
     assert draft_mock.execute_system_command.call_args == call(['draft', 'config', 'set', 'registry', '127.0.0.1:5000'],
-                                                               env=ANY)
+                                                               env=ANY, cwd=None)
+
+
+def test_check_up_status_success():
+    output, exit_code = cmd.check_up_status('{} {} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
+                                                              CORRECT_UP_OUTPUT_PUSH_IMAGE,
+                                                              CORRECT_UP_OUTPUT_DEPLOY))
+
+    assert not exit_code
+    assert not output
+
+
+def test_check_up_status_lack_of_push():
+    output, exit_code = cmd.check_up_status('{} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
+                                                           CORRECT_UP_OUTPUT_DEPLOY))
+
+    assert exit_code == 101
+    assert output == 'Docker image hasn\'t been sent to the cluster.'
+
+
+def test_check_up_status_lack_of_build():
+    output, exit_code = cmd.check_up_status('{}'.format(CORRECT_UP_OUTPUT_DEPLOY))
+
+    assert exit_code == 100
+    assert output == 'Docker image hasn\'t been built.'
+
+
+def test_check_up_status_lack_of_deploy():
+    output, exit_code = cmd.check_up_status('{} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
+                                                           CORRECT_UP_OUTPUT_PUSH_IMAGE))
+
+    assert exit_code == 102
+    assert output == 'Application hasn\'t been released.'
+
+
+def test_check_create_status_success():
+    output, exit_code = cmd.check_create_status(CORRECT_CREATE_OUTPUT)
+
+    assert not exit_code
+    assert not output
+
+
+def test_check_create_status_fail():
+    output, exit_code = cmd.check_create_status(INCORRECT_UP_OUTPUT)
+
+    assert exit_code == 100
+    assert output == 'Deployment hasn\'t been created.'

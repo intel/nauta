@@ -1,0 +1,108 @@
+#
+# INTEL CONFIDENTIAL
+# Copyright (c) 2018 Intel Corporation
+#
+# The source code contained or described herein and all documents related to
+# the source code ("Material") are owned by Intel Corporation or its suppliers
+# or licensors. Title to the Material remains with Intel Corporation or its
+# suppliers and licensors. The Material contains trade secrets and proprietary
+# and confidential information of Intel or its suppliers and licensors. The
+# Material is protected by worldwide copyright and trade secret laws and treaty
+# provisions. No part of the Material may be used, copied, reproduced, modified,
+# published, uploaded, posted, transmitted, distributed, or disclosed in any way
+# without Intel's prior express written permission.
+#
+# No license under any patent, copyright, trade secret or other intellectual
+# property right is granted to or conferred upon you by disclosure or delivery
+# of the Materials, either expressly, by implication, inducement, estoppel or
+# otherwise. Any license under such intellectual property rights must be express
+# and approved by Intel in writing.
+#
+
+from unittest.mock import call
+
+import pytest
+
+from commands import common
+
+EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
+EXPERIMENT_NAME = "experiment_name"
+SCRIPT_LOCATION = "training_script.py"
+
+def test_delete_environment(mocker):
+    sh_rmtree_mock = mocker.patch("shutil.rmtree")
+
+    common.delete_environment(EXPERIMENT_FOLDER)
+
+    assert sh_rmtree_mock.call_count == 1, "folder wasn't deleted."
+
+
+def test_create_environment_success(mocker):
+    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+    os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
+    os_mkdirs_mock = mocker.patch("os.makedirs")
+    sh_copy_mock = mocker.patch("shutil.copy2")
+    sh_copytree_mock = mocker.patch("shutil.copytree")
+
+    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+
+    assert crhf_mock.call_count == 1, "home folder doesn't exist"
+    assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
+    assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
+    assert sh_copy_mock.call_count == 1, "files weren't copied"
+
+    assert folder_name
+    assert not message
+
+
+def test_create_environment_makedir_error(mocker):
+    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+    os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
+    os_mkdirs_mock = mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
+    sh_copy_mock = mocker.patch("shutil.copy2")
+    sh_copytree_mock = mocker.patch("shutil.copytree")
+
+    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+
+    assert crhf_mock.call_count == 1, "home folder doesn't exist"
+    assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
+    assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
+    assert sh_copy_mock.call_count == 0, "files were copied"
+
+    assert not folder_name
+    assert message
+
+
+def test_create_environment_lack_of_home_folder(mocker):
+    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[""])
+    os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
+    os_mkdirs_mock = mocker.patch("os.makedirs")
+    sh_copy_mock = mocker.patch("shutil.copy2")
+
+    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+
+    assert crhf_mock.call_count == 1, "home folder doesn't exist"
+    assert os_pexists_mock.call_count == 0, "existence of an experiment's folder was checked"
+    assert os_mkdirs_mock.call_count == 0, "experiment's folder was created"
+    assert sh_copy_mock.call_count == 0, "files were copied"
+
+    assert not folder_name
+    assert message
+
+
+def test_create_environment_copy_error(mocker):
+    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+    os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
+    os_mkdirs_mock = mocker.patch("os.makedirs")
+    sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
+    sh_copytree_mock = mocker.patch("shutil.copytree")
+
+    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+
+    assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
+    assert crhf_mock.call_count == 1, "home folder doesn't exist"
+    assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
+    assert sh_copy_mock.call_count == 1, "files were copied"
+
+    assert not folder_name
+    assert message

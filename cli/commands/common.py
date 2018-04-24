@@ -1,0 +1,99 @@
+#
+# INTEL CONFIDENTIAL
+# Copyright (c) 2018 Intel Corporation
+#
+# The source code contained or described herein and all documents related to
+# the source code ("Material") are owned by Intel Corporation or its suppliers
+# or licensors. Title to the Material remains with Intel Corporation or its
+# suppliers and licensors. The Material contains trade secrets and proprietary
+# and confidential information of Intel or its suppliers and licensors. The
+# Material is protected by worldwide copyright and trade secret laws and treaty
+# provisions. No part of the Material may be used, copied, reproduced, modified,
+# published, uploaded, posted, transmitted, distributed, or disclosed in any way
+# without Intel's prior express written permission.
+#
+# No license under any patent, copyright, trade secret or other intellectual
+# property right is granted to or conferred upon you by disclosure or delivery
+# of the Materials, either expressly, by implication, inducement, estoppel or
+# otherwise. Any license under such intellectual property rights must be express
+# and approved by Intel in writing.
+#
+
+import os
+import shutil
+import time
+import random
+
+from util.config import create_home_folder, EXPERIMENTS_FOLDER
+from util.logger import initialize_logger
+
+# header of a table with status of an experiment - used for example in submit command
+RESULT_HEADER = ["Experiment", "Status"]
+
+log = initialize_logger('commands.common')
+
+
+def create_environment(experiment_name: str, file_location: str, folder_location: str) -> (str, str):
+    """
+    Creates a complete environment for executing a training
+    using draft.
+
+    :param experiment_name: name of an experiment used to create a folder
+                            with content of an experiment
+    :param file_location: location of a trainig script
+    :param folder_location: location of a folder with additional data
+    :return: (experiment_folder. message)
+    experiment_folder - folder with experiment's artifacts
+    message - message describing causes of an error, if environment has been created
+            an empty string
+    """
+    # check if home folder exists
+    log.debug("Create environment - start")
+    home_folder = create_home_folder()
+
+    if not home_folder:
+        log.error("Create environment - accessing home folder error.")
+        return "", "Home folder doesn't exist and cannot be created."
+
+    # create a folder for experiment's purposes
+    experiment_folder = os.path.join(home_folder, EXPERIMENTS_FOLDER, experiment_name)
+
+    # copy folder content
+    if folder_location:
+        try:
+            shutil.copytree(folder_location, experiment_folder)
+        except Exception as exe:
+            log.error("Create environment - copying training folder error : {}".format(exe))
+            return "", "Additional folder cannot be copied into experiment's folder."
+
+    try:
+        if not os.path.exists(experiment_folder):
+            os.makedirs(experiment_folder)
+    except Exception as exe:
+        log.error("Create environment - creating experiment folder error : {}".format(exe))
+        return "", "Folder with experiments' data cannot be created."
+
+    # copy training script - it overwrites the file taken from a folder_location
+    try:
+        shutil.copy2(file_location, experiment_folder)
+    except Exception as exe:
+        log.error("Create environment - copying training script error : {}".format(exe))
+        return "", "Training script cannot be created."
+
+
+    log.debug("Create environment - end")
+
+    return experiment_folder, ""
+
+def generate_experiment_name() -> str:
+    time_part = time.strftime("%Y%m%d%H%M%S")
+    random_part = random.randrange(0,999)
+    experiment_name = "t" + time_part + str(random_part).zfill(3)
+
+    return experiment_name
+
+def delete_environment(experiment_folder: str):
+    try:
+        shutil.rmtree(experiment_folder)
+    except Exception as exe:
+        log.error("Delete environment - i/o error : {}".format(exe))

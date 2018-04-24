@@ -54,7 +54,7 @@ def _check_go_app_version(app_name: str, version_output: str, expected_versions:
 
 def check():
     # draft
-    output, exit_code = call_draft(['version'])
+    output, exit_code = call_draft(args=['version'])
     if exit_code != 0:
         log.critical('draft not installed')
     else:

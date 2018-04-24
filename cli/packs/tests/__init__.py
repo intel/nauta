@@ -19,16 +19,4 @@
 # and approved by Intel in writing.
 #
 
-import subprocess
-from typing import List
-
-
-def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None) -> (str, int):
-    try:
-        output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
-                                         stdin=stdin, env=env, cwd=cwd)
-    except subprocess.CalledProcessError as ex:
-        return ex.output, ex.returncode
-    else:
-        return output, 0
+#

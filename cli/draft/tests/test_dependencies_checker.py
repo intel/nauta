@@ -68,7 +68,7 @@ def revert_version_returns():
 def dependencies_checker_mocked(mocker):
     mocker.patch.object(dependencies_checker, 'execute_system_command',
                         new=lambda cmd, *args, **kwargs: version_returns[cmd[0]])
-    mocker.patch.object(dependencies_checker, 'call_draft', new=lambda cmd, *args, **kwargs: version_returns['draft'])
+    mocker.patch.object(dependencies_checker, 'call_draft', new=lambda *args, **kwargs: version_returns['draft'])
 
     return dependencies_checker
 

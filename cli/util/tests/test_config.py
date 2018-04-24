@@ -19,16 +19,23 @@
 # and approved by Intel in writing.
 #
 
-import subprocess
-from typing import List
+import os
+
+import util.config as config
 
 
-def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None) -> (str, int):
-    try:
-        output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
-                                         stdin=stdin, env=env, cwd=cwd)
-    except subprocess.CalledProcessError as ex:
-        return ex.output, ex.returncode
-    else:
-        return output, 0
+RET_HOME_FOLDER = "/HOME/FOLDER"
+
+
+def test_create_home_folder_success(mocker):
+    mocker.patch.dict("os.environ", {config.ENV_DLSCTL_HOME: RET_HOME_FOLDER})
+    os_md_mock = mocker.patch("os.makedirs")
+    os_path_exists_mock = mocker.patch("os.path.exists")
+
+    os_path_exists_mock.side_effect = [False]
+
+    home_folder = config.create_home_folder()
+
+    assert home_folder == os.path.join(RET_HOME_FOLDER, config.CONFIG_FOLDER), "home folder wasn't set properly."
+    assert os_path_exists_mock.call_count == 1, "presence of a path wasn't checked"
+    assert os_md_mock.call_count == 1, "folder wasn't created"

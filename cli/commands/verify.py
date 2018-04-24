@@ -19,16 +19,14 @@
 # and approved by Intel in writing.
 #
 
-import subprocess
-from typing import List
+import click
 
+from draft import dependencies_checker
 
-def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None) -> (str, int):
-    try:
-        output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
-                                         stdin=stdin, env=env, cwd=cwd)
-    except subprocess.CalledProcessError as ex:
-        return ex.output, ex.returncode
-    else:
-        return output, 0
+HELP = "Command used to verify whether all external components required by dlsctl are installed " \
+       "in proper versions. If something is missing - application displays a detailed information" \
+       " about it."
+
+@click.command(help=HELP)
+def verify():
+    dependencies_checker.check()
