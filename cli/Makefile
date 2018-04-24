@@ -29,11 +29,15 @@ endif
 ifeq ($(findstring Linux,$(UNAME)),Linux)
 	OS := Linux
 endif
+ifeq ($(findstring Darwin,$(UNAME)),Darwin)
+	OS := Darwin
+endif
 
 ifeq (Windows,$(OS))
 	ACTIVATE := $(VIRTUALENV_DIR)/Scripts/activate
 endif
-ifeq (Linux,$(OS))
+
+ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
 endif
 
@@ -49,7 +53,7 @@ ifeq (Windows,$(OS))
 	@python -m venv $(VIRTUALENV_DIR)
 endif
 
-ifeq (Linux,$(OS))
+ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
 endif

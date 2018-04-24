@@ -28,7 +28,7 @@ ifeq (Windows,$(OS))
 	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/windows/draft-v0.13.0-windows-amd64.tar.gz --no-check-certificate -O draft.tar.gz
 endif
 
-ifeq (Linux,$(OS))
+ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	@. $(ACTIVATE); pyinstaller -F main.py;
 	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz --no-check-certificate -O draft.tar.gz
 endif
