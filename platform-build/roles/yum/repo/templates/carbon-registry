@@ -1,6 +1,6 @@
 Summary: Carbon docker registry repository
 Name: carbon-registry-repository
-Version: {{ build_major }}.{{ build_minor }}.{{ build_no }}
+Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
 Release: {{ build_id }}
 License: Apache-2.0
 Group: Tools

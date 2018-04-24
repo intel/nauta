@@ -19,19 +19,19 @@ Virtualenv build process
 
 Example: `MY_VARIABLE=SOME make <target>`
 
-### BUILD_MAJOR
+### VERSION_MAJOR
 
 Major build version
 
 Default: 0
 
-### BUILD_MINOR
+### VERSION_MINOR
 
 Minor build version
 
 Default: 0
 
-### BUILD_NO
+### VERSION_NO
 
 Build number
 

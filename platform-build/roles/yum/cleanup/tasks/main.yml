@@ -2,13 +2,13 @@
 
 - name: Remove build container
   docker_container:
-    name: "yum-build-{{ user }}"
+    name: "yum-build-{{ user }}-{{ build }}"
     state: absent
   changed_when: False
 
 - name: Remove registry container
   docker_container:
-    name: "yum-registry-{{ user }}"
+    name: "yum-registry-{{ user }}-{{ build }}"
     state: absent
   changed_when: False
 

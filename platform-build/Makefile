@@ -13,8 +13,8 @@ LOCAL_INVENTORY:=$(CURDIR)/inventory/local
 
 ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAYBOOK) -e @$(CONFIG) \
                       -e default_local_python_intepreter=$(PYTHON) -i $(if $(INVENTORY),$(INVENTORY),$(LOCAL_INVENTORY)) \
-                      -e build=$(BUILD) -e build_no=$(DEFAULT_BUILD_NO) -e build_minor=$(DEFAULT_BUILD_MINOR) \
-                      -e build_major=$(DEFAULT_BUILD_MAJOR) -e user=$(USER) -e user_id=$(USER_ID) \
+                      -e build=$(BUILD) -e VERSION_NO=$(DEFAULT_VERSION_NO) -e VERSION_MINOR=$(DEFAULT_VERSION_MINOR) \
+                      -e VERSION_MAJOR=$(DEFAULT_VERSION_MAJOR) -e user=$(USER) -e user_id=$(USER_ID) \
                       -e build_dir=$(BUILD_DIR) -e workspace_dir=$(WORKSPACE_BUILD) -e build_id=$(DEFAULT_BUILD_ID) \
                        $(PLAYBOOK) -e tmp_dir=$(TMP_DIR)
 
@@ -26,11 +26,11 @@ USER_ID:=$(shell id -u)
 .PHONY: venv clean
 
 ### Build definitions
-DEFAULT_BUILD_MAJOR:=$(if $(BUILD_MAJOR),$(BUILD_MAJOR),1)
-DEFAULT_BUILD_MINOR:=$(if $(BUILD_MINOR),$(BUILD_MINOR),0)
-DEFAULT_BUILD_NO:=$(if $(BUILD_NO),$(BUILD_NO),0)
+DEFAULT_VERSION_MAJOR:=$(if $(VERSION_MAJOR),$(VERSION_MAJOR),1)
+DEFAULT_VERSION_MINOR:=$(if $(VERSION_MINOR),$(VERSION_MINOR),0)
+DEFAULT_VERSION_NO:=$(if $(VERSION_NO),$(VERSION_NO),0)
 DEFAULT_BUILD_ID:=$(if $(BUILD_ID),$(BUILD_ID),$(shell TZ=UTC date '+%y%m%d%H%M%S'))
-BUILD:=$(DEFAULT_BUILD_MAJOR).$(DEFAULT_BUILD_MINOR).$(DEFAULT_BUILD_NO)-$(DEFAULT_BUILD_ID)
+BUILD:=$(DEFAULT_VERSION_MAJOR).$(DEFAULT_VERSION_MINOR).$(DEFAULT_VERSION_NO)-$(DEFAULT_BUILD_ID)
 
 ### Workspace definitions
 WORKSPACE:=$(CURDIR)/.workspace

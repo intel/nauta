@@ -33,7 +33,7 @@
   vars:
     configuration:
       carbon_release_package_installation: file
-      carbon_release_package_version: "{{ build_major }}.{{ build_minor }}.{{ build_no }}"
+      carbon_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
       carbon_release_package_release: "{{ build_id }}"
   copy:
     dest: "{{ tmp_dir }}/group_vars/all/repository.yml"
@@ -42,12 +42,12 @@
 - name: Create package
   changed_when: False
   shell: >
-    tar -zvcf /opt/project-data/repository/releases/dlse-{{ build_major }}.{{ build_minor }}.{{ build_no }}-{{ build_id }}.tar.gz ./
+    tar -zvcf /opt/project-data/repository/releases/dlse-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ build_id }}.tar.gz ./
   args:
     chdir: "{{ tmp_dir }}"
 
 - name: Get sha of each item
   changed_when: False
   shell: >
-    sha256sum /opt/project-data/repository/releases/dlse-{{ build_major }}.{{ build_minor }}.{{ build_no }}-{{ build_id }}.tar.gz | tr -s ' ' | cut -d ' ' -f1 >
-    /opt/project-data/repository/releases/dlse-{{ build_major }}.{{ build_minor }}.{{ build_no }}-{{ build_id }}.tar.gz.sha256sum
+    sha256sum /opt/project-data/repository/releases/dlse-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ build_id }}.tar.gz | tr -s ' ' | cut -d ' ' -f1 >
+    /opt/project-data/repository/releases/dlse-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ build_id }}.tar.gz.sha256sum
