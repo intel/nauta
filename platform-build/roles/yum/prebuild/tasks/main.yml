@@ -29,7 +29,7 @@
 
 - name: Start build container
   docker_container:
-    name: "yum-build-{{ user }}"
+    name: "yum-build-{{ user }}-{{ build }}"
     env: "{{ proxy }}"
     volumes:
       - "{{ build_dir }}:/output"
