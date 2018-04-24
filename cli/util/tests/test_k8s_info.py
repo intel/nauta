@@ -19,28 +19,25 @@
 # and approved by Intel in writing.
 #
 
-import click
+import pytest
 
-from util.logger import initialize_logger
-from commands import submit
-from commands import verify
-from commands import logs
+from util.k8s_info import get_kubectl_port, get_kubectl_host
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-log = initialize_logger('main')
-
-
-@click.group(context_settings=CONTEXT_SETTINGS)
-def entry_point():
-    pass
+@pytest.fixture()
+def mocked_k8s_config(mocker):
+    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
+    conf_instance = mocked_conf_class.return_value
+    conf_instance.host = 'https://127.0.0.1:8080'
 
 
-entry_point.add_command(submit.submit)
-entry_point.add_command(verify.verify)
-entry_point.add_command(logs.logs)
+def test_get_k8s_host(mocked_k8s_config):
+    k8s_host = get_kubectl_host()
+
+    assert k8s_host == '127.0.0.1'
 
 
-if __name__ == '__main__':
-    entry_point()
+def test_get_k8s_port(mocked_k8s_config):
+    k8s_port = get_kubectl_port()
+
+    assert k8s_port == 8080

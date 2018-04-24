@@ -21,26 +21,21 @@
 
 import click
 
-from util.logger import initialize_logger
-from commands import submit
-from commands import verify
-from commands import logs
+from logs_aggregator.k8s_es_client import K8sElasticSearchClient
+from util.k8s_info import get_kubectl_host, get_kubectl_port
 
+@click.command()
+@click.argument('experiment-name')
+@click.option('--namespace', default='kube-system')
+def logs(experiment_name: str, namespace: str):
+    """
+    Show logs for given experiment.
+    """
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-log = initialize_logger('main')
-
-
-@click.group(context_settings=CONTEXT_SETTINGS)
-def entry_point():
-    pass
-
-
-entry_point.add_command(submit.submit)
-entry_point.add_command(verify.verify)
-entry_point.add_command(logs.logs)
-
-
-if __name__ == '__main__':
-    entry_point()
+    # Namespace option is temporary until we will have namespace written in configuration file
+    es_client = K8sElasticSearchClient(host=get_kubectl_host(), port=get_kubectl_port(),
+                                       namespace=namespace, verify_certs=False)
+    experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name)
+    experiment_logs = ''.join([f'{timestamp} {log_content}' for timestamp, log_content
+                               in experiment_logs if not log_content.isspace()])
+    click.echo(experiment_logs)

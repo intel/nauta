@@ -1,20 +1,27 @@
-apiVersion: apps/v1
+apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ .Release.Name }}-fluentd
   labels:
-    app: {{ .Chart.Name }}
+    app: {{ .Release.Name }}-fluentd
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
     kubernetes.io/cluster-service: "true"
 spec:
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ .Release.Name }}-fluentd
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ .Release.Name }}-fluentd
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
         kubernetes.io/cluster-service: "true"
     spec:
+      serviceAccountName: {{ .Release.Name }}-fluentd-service-account
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -24,6 +31,12 @@ spec:
             value: "{{ .Values.elaticsearch.host }}"
           - name:  FLUENT_ELASTICSEARCH_PORT
             value: "{{ .Values.elaticsearch.port }}"
+          - name:  FLUENTD_CONF
+            value: custom-config/fluent.conf
+          - name: FLUENT_ELASTICSEARCH_USER
+            value: none
+          - name: FLUENT_ELASTICSEARCH_PASSWORD
+            value: none
         resources:
           limits:
             memory: 200Mi
@@ -37,7 +50,7 @@ spec:
           mountPath: /var/lib/docker/containers
           readOnly: true
         - name: config-volume
-          mountPath: /fluentd/etc
+          mountPath: /fluentd/etc/custom-config
       terminationGracePeriodSeconds: 30
       volumes:
       - name: varlog
@@ -48,7 +61,7 @@ spec:
           path: /var/lib/docker/containers
       - name: config-volume
         configMap:
-          name: {{ .Chart.Name }}-config
+          name: {{ .Release.Name }}-fluentd-config
           items:
-           - key: fluent.conf
-             path: fluent.conf
+          - key: fluent.conf
+            path: fluent.conf

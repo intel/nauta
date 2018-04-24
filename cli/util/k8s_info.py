@@ -19,28 +19,15 @@
 # and approved by Intel in writing.
 #
 
-import click
-
-from util.logger import initialize_logger
-from commands import submit
-from commands import verify
-from commands import logs
+from kubernetes import config
+from kubernetes.client import configuration
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-log = initialize_logger('main')
-
-
-@click.group(context_settings=CONTEXT_SETTINGS)
-def entry_point():
-    pass
+def get_kubectl_host() -> str:
+    config.load_kube_config()
+    return configuration.Configuration().host.replace('https://', '').replace('http://', '').split(':')[0]
 
 
-entry_point.add_command(submit.submit)
-entry_point.add_command(verify.verify)
-entry_point.add_command(logs.logs)
-
-
-if __name__ == '__main__':
-    entry_point()
+def get_kubectl_port() -> int:
+    config.load_kube_config()
+    return int(configuration.Configuration().host.split(':')[-1])

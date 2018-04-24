@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
@@ -24,9 +24,9 @@ spec:
           value: "-Xmx512m -Xms512m"
         resources:
           requests:
-            memory: 640Mi
+            memory: 1Gi
           limits:
-            memory: 640Mi
+            memory: 1Gi
         ports:
         - containerPort: {{ .Values.service.internalPort }}
           protocol: TCP
