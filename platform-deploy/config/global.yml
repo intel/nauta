@@ -17,14 +17,15 @@ dns_search_domains:
   - "service.{{ nodes_domain }}.{{ domain }}"
 
 
-carbon_release_package_version: 0.1.0
-carbon_release_package_release: 15.jenkins
+#carbon_release_package_version: 0.1.0
+#carbon_release_package_release: 0003.ajanikow
 
 # Determines if script should try to install DLS package
 # Possible values:
 #   * repo - variables carbon_release_package_repofile is used to install rpm
 #   * None - fail in case of missing packages
-carbon_release_package_installation: repo
+#   * file - repository files should be placed in files/ directory
+#carbon_release_package_installation: repo
 
 # Repofile of carbon release
 carbon_release_package_repofile: "http://repository.toolbox.nervana.sclab.intel.com/releases/{{ carbon_release_package_release }}/carbon.repo"
@@ -73,11 +74,3 @@ helm_applications:
 
 # By default enabled "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
 insecure_registries: []
-
-# ScaleIO
-
-# values: deploy, join(not supported)
-scaleio_mode: deploy
-scaleio_password: P@ssw0rd
-scaleio_protection_domain: dls
-scaleio_storage_pool: dls

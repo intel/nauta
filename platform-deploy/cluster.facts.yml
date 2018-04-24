@@ -1,6 +1,6 @@
 ---
 
-- hosts: kubernetes-master
+- hosts: master
   become: True
   any_errors_fatal: True
   roles:
@@ -8,7 +8,7 @@
       tags:
         - install
 
-- hosts: kubernetes-master[0]
+- hosts: master[0]
   become: True
   become_user: cluster-facts
   any_errors_fatal: True

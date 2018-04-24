@@ -17,7 +17,7 @@ yum_core_packages:
   - openssl-devel
   - vim
   - git
-  - nfs-common
+  - nfs-utils
   - python
   - python-pip
   - python-dev
@@ -48,4 +48,4 @@ yum_apps_packages:
   - nginx
   - consul-1.0.6
 
-yum_packages: "{{ (yum_core_packages + yum_apps_packages + yum_kubernetes_apps + yum_scaleio_apps + yum_compile_packages) | sort | unique }}"
+yum_packages: "{{ (yum_core_packages + yum_apps_packages + yum_kubernetes_apps + yum_compile_packages) | sort | unique }}"

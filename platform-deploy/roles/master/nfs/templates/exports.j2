@@ -1,0 +1,1 @@
+/export {% for host in groups['all'] %}{{ hostvars[host].dls_configuration.data_interface.ipv4_address }}(rw,sync,no_root_squash,no_subtree_check){% if not loop.last %} {% endif %}{% endfor %}

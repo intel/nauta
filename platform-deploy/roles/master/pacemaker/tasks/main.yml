@@ -37,17 +37,17 @@
     pcs cluster auth {{ hostvars[item].dls_configuration.network.instance_name }}
     -u hacluster -p "{{ hostvars[item].hacluster_password.stdout }}"
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
-  with_items: "{{ groups['kubernetes-master'] }}"
+    - inventory_hostname == groups['master'][0]
+  with_items: "{{ groups['master'] }}"
   no_log: True
   changed_when: False
 
 - name: Create PCS cluster
   shell: >
     pcs cluster setup --name dls
-    {% for item in groups['kubernetes-master'] %}{{ hostvars[item].dls_configuration.network.instance_name }} {% endfor %}
+    {% for item in groups['master'] %}{{ hostvars[item].dls_configuration.network.instance_name }} {% endfor %}
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
+    - inventory_hostname == groups['master'][0]
     - not ((ansible_local.pcs | default({})).cluster | default({})).created | default(False) | bool
 
 - name: Set cluster creation fact
@@ -61,24 +61,24 @@
     owner: cluster-facts
     group: cluster-facts
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
-  with_items: "{{ groups['kubernetes-master'] }}"
+    - inventory_hostname == groups['master'][0]
+  with_items: "{{ groups['master'] }}"
 
 - include: synchronize-facts.yml
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
+    - inventory_hostname == groups['master'][0]
 
 - name: Start cluster on all nodes
   changed_when: False
   shell: pcs cluster start --all
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
+    - inventory_hostname == groups['master'][0]
 
 - name: Enable cluster on all nodes
   changed_when: False
   shell: pcs cluster enable --all
   when:
-    - inventory_hostname == groups['kubernetes-master'][0]
+    - inventory_hostname == groups['master'][0]
 
 - name: Dislable stonith
   shell: pcs property set stonith-enabled=false
@@ -87,4 +87,4 @@
 - name: Set no quorum for single node
   shell: pcs property set no-quorum-policy=ignore
   changed_when: False
-  when: groups['kubernetes-master'] | length < 3
+  when: groups['master'] | length < 3

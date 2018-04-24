@@ -2,7 +2,7 @@
 
 - set_fact:
     # yamllint disable-line rule:line-length
-    labels: "node-role.kubernetes.io/node={{ 'Master' if inventory_hostname in groups['kubernetes-master'] else 'Worker' }},master={{ 'True' if inventory_hostname in groups['kubernetes-master'] else 'False' }},{% for l in (kubernetes_roles | default('')).split(',') %}{% if l %}{{ l }}=True,{% endif %}{% endfor %}iface={{ internal_interface }},gpu={{ 'True' if (gpu | default(False)) else 'False' }}"
+    labels: "node-role.kubernetes.io/node={{ 'Master' if inventory_hostname in groups['master'] else 'Worker' }},master={{ 'True' if inventory_hostname in groups['master'] else 'False' }},{% for l in (kubernetes_roles | default('')).split(',') %}{% if l %}{{ l }}=True,{% endif %}{% endfor %}iface={{ internal_interface }},gpu={{ 'True' if (gpu | default(False)) else 'False' }}"
     # yamllint disable-line rule:line-length
     feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
 

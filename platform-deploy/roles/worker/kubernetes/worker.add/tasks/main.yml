@@ -9,13 +9,13 @@
   template:
     src: kubernetes-node-privs.yml.j2
     dest: /root/kubernetes/nodes/{{ host }}.yml
-  with_items: "{{ groups['kubernetes-all'] }}"
+  with_items: "{{ groups['all'] }}"
   loop_control:
     loop_var: host
 
 - name: Apply all node privileges directories
   changed_when: False
   shell: kubectl apply -f /root/kubernetes/nodes/{{ host }}.yml
-  with_items: "{{ groups['kubernetes-all'] }}"
+  with_items: "{{ groups['all'] }}"
   loop_control:
     loop_var: host

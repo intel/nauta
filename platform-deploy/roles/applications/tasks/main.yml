@@ -39,7 +39,7 @@
 - name: Fetch all interfaces names
   set_fact:
     all_cluster_interfaces: "{{ (all_cluster_interfaces | default([])) + [hostvars[item].internal_interface] }}"
-  with_items: "{{ groups['kubernetes-all'] }}"
+  with_items: "{{ groups['all'] }}"
 
 - name: Run helm task for flannel
   vars:
@@ -101,6 +101,7 @@
     helm_values:
       NfsProvisionerImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/nfs-provisioner:v1.0.8"
       Node: "{{ ansible_nodename }}"
+      NodeIP: "{{ dls_configuration.data_interface.ipv4_address }}"
     type: storage
     namespace: kube-system
   include_tasks: helm.yml

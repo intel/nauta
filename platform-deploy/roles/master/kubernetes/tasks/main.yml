@@ -2,7 +2,7 @@
 
 - set_fact:
     # yamllint disable-line rule:line-length
-    etcd: "{% for host in groups['kubernetes-master'] %}https://{{ hostvars[host].dls_configuration.network.instance_name }}:2379{%- if not loop.last -%},{%- endif -%}{% endfor %}"
+    etcd: "{% for host in groups['master'] %}https://{{ hostvars[host].dls_configuration.network.instance_name }}:2379{%- if not loop.last -%},{%- endif -%}{% endfor %}"
     # yamllint disable-line rule:line-length
     feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
     # yamllint disable-line rule:line-length

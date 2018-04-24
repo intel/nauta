@@ -1,6 +1,6 @@
 Summary: Carbon user package
 Name: carbon-yum-local
-Version: 0.1.0
+Version: {{ build_major }}.{{ build_minor }}.{{ build_no }}
 Release: {{ build_id }}
 License: Apache-2.0
 Group: Tools

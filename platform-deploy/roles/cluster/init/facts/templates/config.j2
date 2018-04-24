@@ -1,4 +1,4 @@
-{% for item in groups['kubernetes-master'] %}
+{% for item in groups['master'] %}
 Host facts-{{ item }}
   Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
   User cluster-facts

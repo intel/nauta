@@ -47,7 +47,7 @@
   authorized_key:
     user: cluster-facts
     key: "{{ hostvars[item].cluster_facts_key.content | b64decode }}"
-  with_items: "{{ groups['kubernetes-master'] }}"
+  with_items: "{{ groups['master'] }}"
 
 - name: Render facts key config
   template:
@@ -56,7 +56,7 @@
     mode: 0600
     owner: cluster-facts
     group: cluster-facts
-  when: inventory_hostname in groups['kubernetes-master']
+  when: inventory_hostname in groups['master']
 
 - name: Create cluster directory
   file:

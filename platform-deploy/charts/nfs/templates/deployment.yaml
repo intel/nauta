@@ -25,6 +25,7 @@ spec:
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
     spec:
+      hostNetwork: true
       serviceAccountName: {{ .Release.Name }}-provisioner
       nodeSelector:
         kubernetes.io/hostname: {{ required "Node hostname should be specified" .Values.Node }}
@@ -48,6 +49,10 @@ spec:
                 - SYS_RESOURCE
           args:
             - "-provisioner=internal.com/nfs"
+            - "-run-server=false"
+            - "-use-ganesha=false"
+            - "-server-hostname={{ required "Node data IP should be specified" .Values.NodeIP }}"
+            - "-master=http://127.0.0.1:8080"
           env:
             - name: POD_IP
               valueFrom:
@@ -66,5 +71,5 @@ spec:
       volumes:
         - name: export-volume
           hostPath:
-            path: /data
-            type: DirectoryOrCreate
+            path: /export
+            type: Directory

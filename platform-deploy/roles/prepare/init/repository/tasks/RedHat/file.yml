@@ -1,0 +1,60 @@
+---
+
+- name: Copy repository files
+  copy:
+    src: "{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+    dest: "/root/{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+  with_items:
+    - carbon-yum-repository
+    - carbon-yum-local
+  loop_control:
+    loop_var: pack
+
+- name: Refresh yum repository
+  environment: "{{ proxy }}"
+  yum:
+    disable_plugin: '*'
+    disablerepo: '*'
+    enablerepo: carbon
+    list: '*'
+    update_cache: True
+
+- name: Install carbon-yum-repository package
+  environment: "{{ proxy }}"
+  yum:
+    state: installed
+    disable_plugin: '*'
+    disablerepo: '*'
+    name: "/root/{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+    update_cache: True
+    allow_downgrade: True
+  loop_control:
+    loop_var: pack
+  with_items:
+    - "carbon-yum-repository"
+    - "carbon-yum-local"
+
+- name: Copy repository files
+  copy:
+    src: "{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+    dest: "/root/{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+  with_items:
+    - carbon-registry-repository
+  loop_control:
+    loop_var: pack
+  when: inventory_hostname in groups['master']
+
+- name: Install carbon-registry-repository package
+  environment: "{{ proxy }}"
+  yum:
+    state: installed
+    disable_plugin: '*'
+    disablerepo: '*'
+    name: "/root/{{ pack }}-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.x86_64.rpm"
+    update_cache: True
+    allow_downgrade: True
+  loop_control:
+    loop_var: pack
+  with_items:
+    - carbon-registry-repository
+  when: inventory_hostname in groups['master']

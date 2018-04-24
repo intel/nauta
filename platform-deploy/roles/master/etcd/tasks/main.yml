@@ -24,7 +24,7 @@
       ETCD_INITIAL_ADVERTISE_PEER_URLS: "https://{{ ansible_nodename }}:2380"
       ETCD_ADVERTISE_CLIENT_URLS: "https://{{ ansible_nodename }}:2379,https://{{ ansible_nodename }}:4001"
       # yamllint disable-line rule:line-length
-      ETCD_INITIAL_CLUSTER: "{% for host in groups['kubernetes-master'] %}{{ hostvars[host].ansible_hostname }}=https://{{ hostvars[host].ansible_nodename }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+      ETCD_INITIAL_CLUSTER: "{% for host in groups['master'] %}{{ hostvars[host].ansible_hostname }}=https://{{ hostvars[host].ansible_nodename }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
       ETCD_INITIAL_CLUSTER_TOKEN: etcd
       ETCD_CLIENT_CERT_AUTH: True
       ETCD_TRUSTED_CA_FILE: /ca/CA.pem

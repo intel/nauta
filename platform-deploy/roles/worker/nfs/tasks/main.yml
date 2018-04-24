@@ -1,0 +1,12 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+

@@ -54,14 +54,14 @@
   authorized_key:
     user: cluster-client
     key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
-  with_items: "{{ groups['kubernetes-master'] }}"
+  with_items: "{{ groups['master'] }}"
 
 - name: Add authorized master keys to master users
   authorized_key:
     user: cluster-master
     key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
-  with_items: "{{ groups['kubernetes-master'] }}"
-  when: inventory_hostname in groups['kubernetes-master']
+  with_items: "{{ groups['master'] }}"
+  when: inventory_hostname in groups['master']
 
 - name: Render master key config
   template:
@@ -70,7 +70,7 @@
     mode: 0600
     owner: cluster-master
     group: cluster-master
-  when: inventory_hostname in groups['kubernetes-master']
+  when: inventory_hostname in groups['master']
 
 - name: Create cluster directory
   file:

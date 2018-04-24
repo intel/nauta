@@ -15,8 +15,8 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                       -e default_local_python_intepreter=$(PYTHON) -i $(if $(INVENTORY),$(INVENTORY),$(LOCAL_INVENTORY)) \
                       -e build=$(BUILD) -e build_no=$(DEFAULT_BUILD_NO) -e build_minor=$(DEFAULT_BUILD_MINOR) \
                       -e build_major=$(DEFAULT_BUILD_MAJOR) -e user=$(USER) -e user_id=$(USER_ID) \
-                      -e build_dir=$(BUILD_DIR) -e workspace_dir=$(WORKSPACE_BUILD) -e build_id=$(if $(BUILD_ID),$(BUILD_ID),0) \
-                       $(PLAYBOOK)
+                      -e build_dir=$(BUILD_DIR) -e workspace_dir=$(WORKSPACE_BUILD) -e build_id=$(DEFAULT_BUILD_ID) \
+                       $(PLAYBOOK) -e tmp_dir=$(TMP_DIR)
 
 TOOLBOX_HOME:=$(CURDIR)/toolbox
 
@@ -26,10 +26,11 @@ USER_ID:=$(shell id -u)
 .PHONY: venv clean
 
 ### Build definitions
-DEFAULT_BUILD_MAJOR:=$(if $(BUILD_MAJOR),$(BUILD_MAJOR),0)
-DEFAULT_BUILD_MINOR:=$(if $(BUILD_MINOR),$(BUILD_MINOR),1)
-DEFAULT_BUILD_NO:=$(if $(BUILD_NO),$(BUILD_NO),$(shell TZ=UTC date '+%y%m%d%H%M%S'))
-BUILD:=$(DEFAULT_BUILD_MAJOR).$(DEFAULT_BUILD_MINOR).$(DEFAULT_BUILD_NO)
+DEFAULT_BUILD_MAJOR:=$(if $(BUILD_MAJOR),$(BUILD_MAJOR),1)
+DEFAULT_BUILD_MINOR:=$(if $(BUILD_MINOR),$(BUILD_MINOR),0)
+DEFAULT_BUILD_NO:=$(if $(BUILD_NO),$(BUILD_NO),0)
+DEFAULT_BUILD_ID:=$(if $(BUILD_ID),$(BUILD_ID),$(shell TZ=UTC date '+%y%m%d%H%M%S'))
+BUILD:=$(DEFAULT_BUILD_MAJOR).$(DEFAULT_BUILD_MINOR).$(DEFAULT_BUILD_NO)-$(DEFAULT_BUILD_ID)
 
 ### Workspace definitions
 WORKSPACE:=$(CURDIR)/.workspace
@@ -37,6 +38,10 @@ WORKSPACE:=$(CURDIR)/.workspace
 WORKSPACE_BUILD:=$(WORKSPACE)/build
 
 BUILD_DIR:=$(WORKSPACE_BUILD)/$(BUILD)
+
+WORKSPACE_TMP:=$(WORKSPACE)/tmp
+
+TMP_DIR:=$(WORKSPACE_TMP)/$(BUILD)
 
 $(VIRTUALENV_DIR):
 	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
@@ -56,7 +61,11 @@ $(WORKSPACE_BUILD): $(WORKSPACE)
 $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
-	@ln -fs $(BUILD_DIR) $(WORKSPACE)/build-latest
+	@ln -fs $(BUILD_DIR)/ $(WORKSPACE)/build-latest
+
+$(TMP_DIR): $(WORKSPACE)
+	@mkdir -p $(TMP_DIR)
+	@touch $(TMP_DIR)
 
 venv: $(ACTIVATE)
 clean: clean-venv clean-workspace

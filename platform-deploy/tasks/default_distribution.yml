@@ -1,5 +1,7 @@
 ---
 
 - name: Fail on unknown distribution
+  tags:
+    - always
   fail:
     msg: "Distribution {{ ansible_distribution }} {{ ansible_distribution_version }} is not supported"

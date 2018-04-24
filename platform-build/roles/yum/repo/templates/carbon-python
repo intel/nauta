@@ -1,13 +1,13 @@
 Summary: Python precompiled carbon package
 Name: carbon-python
-Version: 0.1.0
+Version: {{ build_major }}.{{ build_minor }}.{{ build_no }}
 Release: {{ build_id }}
 License: Apache-2.0
 Group: Tools
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-Requires: python python-pip python-devel
+Requires: python
 
 %define  debug_package %{nil}
 

@@ -21,7 +21,7 @@
   become_user: cluster-master
   shell: "rsync -avhz --delete --progress /etc/dls-cluster/master/ master-cluster-{{ item }}:/etc/dls-cluster/master/"
   changed_when: False
-  with_items: "{{ groups['kubernetes-master'] }}"
+  with_items: "{{ groups['master'] }}"
   when: inventory_hostname != item
 
 - name: Synchronize workers

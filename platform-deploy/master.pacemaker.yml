@@ -1,6 +1,6 @@
 ---
 
-- hosts: kubernetes-master
+- hosts: master
   become: True
   any_errors_fatal: True
   roles:

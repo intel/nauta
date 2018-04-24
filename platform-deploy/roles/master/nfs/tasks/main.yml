@@ -1,0 +1,44 @@
+---
+
+- name: Install local repo python installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}/install.yml"
+        - "default_distribution.yml"
+      paths:
+        - ""
+        - "{{ playbook_dir }}/tasks"
+
+- name: Start and enable nfs server
+  service:
+    name: nfs-server.service
+    state: started
+    enabled: True
+
+- name: Create directory for exports
+  file:
+    path: /export
+    state: directory
+    owner: nfsnobody
+    group: nfsnobody
+
+- name: Create xfs on nfs_disk device
+  filesystem:
+    dev: "{{ nfs_device }}"
+    fstype: xfs
+    resizefs: True
+
+- name: Mount xfs for nfs
+  mount:
+    fstype: xfs
+    path: /export
+    state: mounted
+    src: "{{ nfs_device }}"
+
+- name: Render export template
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify:
+    - Exportfs

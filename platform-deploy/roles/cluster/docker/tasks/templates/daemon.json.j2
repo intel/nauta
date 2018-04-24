@@ -1,9 +1,0 @@
-{
-  "storage-driver": "overlay2",
-  "storage-opts": [
-    "overlay2.override_kernel_check=true"
-  ],
-  "dns": [{% for host in groups["kubernetes-master"] %}"{{ hostvars[host].dls_configuration.internal_interface.ipv4_address }}"{% if not loop.last %},{% endif %}{% endfor %}],
-  "insecure-registries": ["registry.service.{{ nodes_domain }}.{{ domain }}:5000"{% for reg in insecure_registries %},"{{ reg }}"{% endfor %}],
-  "max-concurrent-downloads": 15
-}

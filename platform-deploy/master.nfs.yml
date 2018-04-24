@@ -1,0 +1,12 @@
+---
+
+- hosts: master
+  become: True
+  any_errors_fatal: True
+  handlers:
+    - name: Exportfs
+      shell: exportfs -a
+  roles:
+    - role: master/nfs
+      tags:
+        - install

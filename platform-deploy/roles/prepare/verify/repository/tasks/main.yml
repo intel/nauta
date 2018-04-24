@@ -36,7 +36,7 @@
     - verify
   when:
     - not local_registry
-    - inventory_hostname in groups['kubernetes-master']
+    - inventory_hostname in groups['master']
 
 - name: Fail if there are not present any carbon-yum-local packages
   fail:
@@ -45,4 +45,4 @@
     - init
   when:
     - not local_repository
-    - carbon_release_package_installation not in ['repo']
+    - carbon_release_package_installation not in ['repo', 'file']

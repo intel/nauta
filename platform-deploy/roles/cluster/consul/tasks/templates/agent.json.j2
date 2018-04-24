@@ -1,3 +1,0 @@
-{
-  "retry_join": [{% for host in groups["kubernetes-master"] %}"{{ hostvars[host].dls_configuration.internal_interface.ipv4_address }}"{% if not loop.last %},{% endif %}{% endfor %}]
-}

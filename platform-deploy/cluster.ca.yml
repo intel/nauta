@@ -8,7 +8,7 @@
       tags:
         - install
 
-- hosts: kubernetes-master[0]
+- hosts: master[0]
   become: True
   become_user: cluster-master
   any_errors_fatal: True

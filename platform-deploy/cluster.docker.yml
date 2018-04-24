@@ -1,6 +1,6 @@
 ---
 
-- hosts: kubernetes-all
+- hosts: all
   become: True
   any_errors_fatal: True
   handlers:

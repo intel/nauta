@@ -74,7 +74,7 @@
   template:
     src: "{{ item }}.json.j2"
     dest: "/etc/consul/{{ item }}.json"
-  when: inventory_hostname in groups['kubernetes-master']
+  when: inventory_hostname in groups['master']
   with_items:
     - server
     - apiservice

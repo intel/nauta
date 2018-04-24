@@ -69,49 +69,6 @@ Spec:
 * Exclusive with: -
 * Acceptable values: interface name
 
-### scaleio_sds
-Determine if host should be used as sds server (single mode)
-
-Spec:
-* Type: bool
-* Default: False
-* Required: False
-* Used when: host in group scaleio-all
-* Exclusive with: scaleio_sds_multi
-* Acceptable values: False, True
-
-### scaleio_sds_disk
-Comma separated paths to disks which should should be added to sds on this server
-
-Spec:
-* Type: list of comma separated strings
-* Default: ''
-* Required: when scaleio_sds is True
-* Used when: when scaleio_sds is True
-* Exclusive with: -
-
-### scaleio_sds_multi
-Determine if host should be used as sds server (multi mode)
-
-Spec:
-* Type: bool
-* Default: False
-* Required: False
-* Used when: host in group scaleio-all
-* Exclusive with: scaleio_sds
-* Acceptable values: False, True
-
-### scaleio_sds_multi_count
-Count of sds servers which should be installed on this host.
-
-Spec:
-* Type: int
-* Default: 2
-* Required: False
-* Used when: scaleio_sds_multi is True
-* Exclusive with: -
-* Acceptable values: 1, 2, 3, 4
-
 ## Installation config file
 <TBD>
 
