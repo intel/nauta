@@ -31,3 +31,6 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 
 include toolbox/checks/checks.mk
 include k8s-features/k8s-features.mk
+
+k8s-installer-build:
+	@(cd $(CURDIR)/platform-build && make yum-build)
