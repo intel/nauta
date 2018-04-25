@@ -1,0 +1,16 @@
+server {
+    listen     137 udp;
+    proxy_pass {{ kubernetes_network.svc_list.samba.ip }}:137;
+}
+server {
+    listen     138 udp;
+    proxy_pass {{ kubernetes_network.svc_list.samba.ip }}:138;
+}
+server {
+    listen     139;
+    proxy_pass {{ kubernetes_network.svc_list.samba.ip }}:139;
+}
+server {
+    listen     445;
+    proxy_pass {{ kubernetes_network.svc_list.samba.ip }}:445;
+}

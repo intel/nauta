@@ -61,6 +61,8 @@ kubernetes_network:
       port: 44134
     ingress:
       ip: "{{ kubernetes_svc_subnet | ipaddr(15) | ipaddr('address') }}"
+    samba:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(14) | ipaddr('address') }}"
 
 helm_applications:
   networking: flannel # Determines networking type plugin - can be flannel
@@ -69,6 +71,7 @@ helm_applications:
   heapster: heapster
   dashboard: dashboard
   storage: nfs
+  samba: samba
 
 ### Docker
 

@@ -76,6 +76,17 @@
     namespace: kube-system
   include_tasks: helm.yml
 
+- name: Run helm task for samba
+  vars:
+    name: samba
+    helm_values:
+      #IngressImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dls-samba:latest"
+      SambaImage: "my-little-registry.pl/dls-samba"
+      ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
+    type: samba
+    namespace: kube-system
+  include_tasks: helm.yml
+
 - name: Run helm task for heapster
   vars:
     name: heapster
