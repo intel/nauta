@@ -36,13 +36,11 @@ DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
 def call_draft(args: List[str], cwd: str=None) -> (str, int):
-    full_command = [DRAFT_BIN]
+    full_command = [os.path.join(draft_path, DRAFT_BIN)]
     full_command.extend(args)
 
     envs = os.environ.copy()
     envs['DRAFT_HOME'] = os.path.join(draft_path, ".draft")
-    envs['PATH'] = os.getenv('PATH') + ':' + draft_path
-
     return execute_system_command(full_command, env=envs, cwd=cwd)
 
 
