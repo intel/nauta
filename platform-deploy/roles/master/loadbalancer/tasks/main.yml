@@ -45,6 +45,7 @@
   with_items:
     - apiservice
     - ingress
+    - samba
   notify:
     - Restart Nginx
 
