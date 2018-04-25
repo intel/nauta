@@ -69,6 +69,17 @@ Spec:
 * Exclusive with: -
 * Acceptable values: interface name
 
+### nfs_device
+Device used for NFS file system
+
+Spec:
+* Type: string
+* Default: None
+* Required: True
+* Used when: always
+* Exclusive with: -
+* Acceptable values: device name
+
 ## Installation config file
 <TBD>
 
@@ -98,3 +109,10 @@ Location of configuration file
 ### ENV_INVENTORY
 
 Location of inventory file
+
+## Installation process
+
+* Create inventory file
+* Copy and modify configuration file
+* Init hosts for installation `make init ENV_CONFIG=<config> ENV_INVENTORY=<inventory>`
+* Install kubernetes `make install ENV_CONFIG=<config> ENV_INVENTORY=<inventory>`
