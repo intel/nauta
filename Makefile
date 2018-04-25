@@ -34,3 +34,6 @@ include k8s-features/k8s-features.mk
 
 k8s-installer-build:
 	@(cd $(CURDIR)/platform-build && make yum-build)
+
+dlsctl-build:
+	@(cd $(CURDIR)/cli && make clean && make build)
