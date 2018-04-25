@@ -22,20 +22,36 @@
 import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
-from util.k8s_info import get_kubectl_host, get_kubectl_port
+from logs_aggregator.log_filters import SeverityLevel
+from util.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
 
 @click.command()
 @click.argument('experiment-name')
-@click.option('--namespace', default='kube-system')
-def logs(experiment_name: str, namespace: str):
+@click.option('--namespace', default='kube-system', help='Namespace where ElasticSearch k8s service is deployed')
+@click.option('--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
+              help='Minimal severity of logs')
+@click.option('--start-date', default=None, help='Retrieve logs produced from this date (use ISO 8601 date format)')
+@click.option('--end-date', default=None, help='Retrieve logs produced until this date (use ISO 8601 date format)')
+@click.option('--pod-ids', default=None, help='Comma separated list of pod IDs, if provided, only logs from these '
+                                              'pods will be returned')
+@click.option('--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
+              help='Get logs only for pods with given status')
+def logs(experiment_name: str, namespace: str, min_severity: SeverityLevel, start_date: str,
+         end_date: str, pod_ids: str, pod_status: PodStatus):
     """
     Show logs for given experiment.
     """
 
-    # Namespace option is temporary until we will have namespace written in configuration file
+    # Namespace option is used temporary until we will have namespace written in configuration file
     es_client = K8sElasticSearchClient(host=get_kubectl_host(), port=get_kubectl_port(),
                                        namespace=namespace, verify_certs=False)
-    experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name)
-    experiment_logs = ''.join([f'{timestamp} {log_content}' for timestamp, log_content
-                               in experiment_logs if not log_content.isspace()])
+
+    pod_ids = pod_ids.split(',') if pod_ids else None
+    min_severity = SeverityLevel(min_severity) if min_severity else None
+    pod_status = PodStatus(pod_status) if pod_status else None
+    experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name, min_severity=min_severity,
+                                                    start_date=start_date, end_date=end_date, pod_ids=pod_ids,
+                                                    pod_status=pod_status)
+    experiment_logs = ''.join([f'{log_entry.date} {log_entry.pod_name} {log_entry.content}' for log_entry
+                               in experiment_logs if not log_entry.content.isspace()])
     click.echo(experiment_logs)

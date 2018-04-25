@@ -20,6 +20,7 @@
 #
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
+from logs_aggregator.k8s_log_entry import LogEntry
 
 TEST_SEARCH_OUTPUT = {'took': 38,
                       'timed_out': False,
@@ -76,10 +77,14 @@ TEST_SEARCH_OUTPUT = {'took': 38,
                                }
                       }
 
-TEST_POD_LOGS = [('2018-04-17T09:28:39+00:00',
-                         'Warning: Unable to load /usr/share/zoneinfo/right/Factory as time zone. Skipping it.\n'),
-                        ('2018-04-17T09:28:49+00:00',
-                         'MySQL init process done. Ready for start up.\n')]
+TEST_POD_LOGS = [LogEntry(date='2018-04-17T09:28:39+00:00',
+                          content='Warning: Unable to load /usr/share/zoneinfo/right/Factory as time zone. Skipping it.\n',
+                          pod_name='understood-gnat-mysql-868b556f8f-lwdr9',
+                          namespace='default'),
+                 LogEntry(date='2018-04-17T09:28:49+00:00',
+                          content='MySQL init process done. Ready for start up.\n',
+                          pod_name='understood-gnat-mysql-868b556f8f-lwdr9',
+                          namespace='default')]
 
 TEST_SEARCH_OUTPUT_EMPTY = { "took": 6,
                              "timed_out": False,
@@ -116,6 +121,70 @@ def test_get_pod_logs_invalid_pod(mocker):
     assert pod_logs == []
 
 
+def test_get_pod_logs_start_date(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    es_search_mock = mocker.patch.object(client, 'search')
+    es_search_mock.return_value = TEST_SEARCH_OUTPUT
+
+    log_entry_timestamp = TEST_POD_LOGS[0].date
+
+    pod_name = 'understood-gnat-mysql-868b556f8f-lwdr9'
+    client.get_pod_logs(pod_name=pod_name,
+                        start_date=log_entry_timestamp,
+                        index='_all',
+                        log_count=100,
+                        sort='@timestamp:asc')
+    es_search_mock.assert_called_once_with(q=f'kubernetes.pod_name:"{pod_name}" '
+                                             f'AND @timestamp:[{log_entry_timestamp} TO *]',
+                                           index='_all',
+                                           size=100,
+                                           sort='@timestamp:asc')
+
+def test_get_pod_logs_end_date(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    es_search_mock = mocker.patch.object(client, 'search')
+    es_search_mock.return_value = TEST_SEARCH_OUTPUT
+
+
+    log_entry_timestamp = TEST_POD_LOGS[0].date
+
+    pod_name = 'understood-gnat-mysql-868b556f8f-lwdr9'
+    client.get_pod_logs(pod_name=pod_name,
+                        end_date=log_entry_timestamp,
+                        index='_all',
+                        log_count=100,
+                        sort='@timestamp:asc')
+    es_search_mock.assert_called_once_with(q=f'kubernetes.pod_name:"{pod_name}" '
+                                             f'AND @timestamp:[*'
+                                             f' TO {log_entry_timestamp}]',
+                                           index='_all',
+                                           size=100,
+                                           sort='@timestamp:asc')
+
+
+def test_get_pod_logs_date_range(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    es_search_mock = mocker.patch.object(client, 'search')
+    es_search_mock.return_value = TEST_SEARCH_OUTPUT
+
+    first_log_entry_timestamp = TEST_POD_LOGS[0].date
+    second_log_entry_timestamp = TEST_POD_LOGS[1].date
+
+    pod_name = 'understood-gnat-mysql-868b556f8f-lwdr9'
+    client.get_pod_logs(pod_name=pod_name,
+                        start_date=first_log_entry_timestamp,
+                        end_date=second_log_entry_timestamp,
+                        index='_all',
+                        log_count=100,
+                        sort='@timestamp:asc')
+    es_search_mock.assert_called_once_with(q=f'kubernetes.pod_name:"{pod_name}" '
+                                             f'AND @timestamp:[{first_log_entry_timestamp} '
+                                             f'TO {second_log_entry_timestamp}]',
+                                           index='_all',
+                                           size=100,
+                                           sort='@timestamp:asc')
+
+
 def test_get_experiment_logs(mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocker.patch.object(client, 'get_pod_logs').return_value = TEST_POD_LOGS
@@ -123,3 +192,17 @@ def test_get_experiment_logs(mocker):
     experiment_logs = client.get_experiment_logs(experiment_name='understood-gnat-mysql-868b556f8f-lwdr9')
 
     assert experiment_logs == TEST_POD_LOGS
+
+
+def test_get_experiment_logs_pod_ids(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    get_pod_logs_mock = mocker.patch.object(client, 'get_pod_logs')
+    get_pod_logs_mock.return_value = TEST_POD_LOGS
+    client.get_experiment_logs(experiment_name='myqsl',
+                               pod_ids=['understood-gnat-mysql-868b556f8f-A',
+                                        'understood-gnat-mysql-868b556f8f-B'],
+                               log_count=100)
+    get_pod_logs_mock.assert_any_call(pod_name='understood-gnat-mysql-868b556f8f-A',
+                                      log_count=100, end_date=None, start_date=None)
+    get_pod_logs_mock.assert_any_call(pod_name='understood-gnat-mysql-868b556f8f-B',
+                                      log_count=100, end_date=None, start_date=None)

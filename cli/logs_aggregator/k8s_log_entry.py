@@ -19,31 +19,7 @@
 # and approved by Intel in writing.
 #
 
-from enum import Enum
 
-from kubernetes import config, client
-from kubernetes.client import configuration
+from collections import namedtuple
 
-
-class PodStatus(Enum):
-    PENDING = 'PENDING'
-    RUNNING = 'RUNNING'
-    SUCCEEDED = 'SUCCEEDED'
-    FAILED = 'FAILED'
-    UNKNOWN = 'UNKNOWN'
-
-
-def get_kubectl_host() -> str:
-    config.load_kube_config()
-    return configuration.Configuration().host.replace('https://', '').replace('http://', '').split(':')[0]
-
-
-def get_kubectl_port() -> int:
-    config.load_kube_config()
-    return int(configuration.Configuration().host.split(':')[-1])
-
-
-def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
-    config.load_kube_config()
-    api = client.CoreV1Api(client.ApiClient())
-    return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
+LogEntry = namedtuple('LogEntry', ['date', 'content', 'pod_name', 'namespace'])
