@@ -20,7 +20,8 @@ ExecStart=/opt/carbon/kubernetes/kubelet \
                   --pod-infra-container-image registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/pause:3.1 \
                   --serialize-image-pulls=True --image-pull-progress-deadline=30m0s \
                   --tls-cert-file /etc/dls-cluster/client/node.crt \
-                  --tls-private-key-file /etc/dls-cluster/client/node.key
+                  --tls-private-key-file /etc/dls-cluster/client/node.key --maximum-dead-containers 512 \
+                  --maximum-dead-containers-per-container 1 --minimum-container-ttl-duration 0
 RestartSec=10
 StartLimitInterval=0
 
