@@ -22,25 +22,22 @@
 import os
 import logging
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "CRITICAL")
+
 
 def initialize_logger(package_name) -> logging.Logger:
-    logging_level = os.getenv("LOG_LEVEL", "INFO")
-
     logger = logging.getLogger(package_name)
-    logger.setLevel(logging_level)
-
-    logging.basicConfig(level=logging_level)
+    logging.basicConfig(level=LOG_LEVEL)
 
     return logger
 
 
-def is_debug_level(logger):
-    """
-    Returns true if log level is set to debug
+def set_verbosity_level(verbosity):
+    logging_level = logging.CRITICAL
 
-    :param logger: - a checked logger
-    :return: - true i log level is set to DEBUG, false otherwise
-    """
-    current_level = logger.getEffectiveLevel()
+    if verbosity == 1:
+        logging_level = logging.INFO
+    elif verbosity >= 2:
+        logging_level = logging.DEBUG
 
-    return current_level == logging.DEBUG
+    return logging_level

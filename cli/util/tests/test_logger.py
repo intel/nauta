@@ -19,18 +19,24 @@
 # and approved by Intel in writing.
 #
 
-import click
+import logging
 
-from draft import dependencies_checker
-from cli_state import common_options, pass_state, State
+import pytest
 
-HELP = "Command used to verify whether all external components required by dlsctl are installed " \
-       "in proper versions. If something is missing - application displays a detailed information" \
-       " about it."
+import util.logger as logger
 
 
-@click.command(help=HELP)
-@common_options
-@pass_state
-def verify(state: State):
-    dependencies_checker.check()
+def test_initialize_logger():
+    mock_package_name = 'mock_package'
+    default_log_level = logging.CRITICAL
+
+    mock_logger = logger.initialize_logger(mock_package_name)
+
+    assert mock_logger
+    assert logging.getLogger(mock_package_name).getEffectiveLevel() == default_log_level
+
+
+@pytest.mark.parametrize('mock_verbosity,expected_log_level', [(0, logging.CRITICAL), (1, logging.INFO),
+                                                               (2, logging.DEBUG), (5, logging.DEBUG)])
+def test_set_verbosity_level(mock_verbosity, expected_log_level):
+    assert logger.set_verbosity_level(mock_verbosity) == expected_log_level

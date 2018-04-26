@@ -21,15 +21,12 @@
 
 import click
 
-from util.logger import initialize_logger
 from commands import submit
 from commands import verify
 from commands import logs
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-log = initialize_logger('main')
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)

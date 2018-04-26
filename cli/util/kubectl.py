@@ -19,9 +19,10 @@
 # and approved by Intel in writing.
 #
 
+import logging
 import subprocess
 
-from util.logger import initialize_logger, is_debug_level
+from util.logger import initialize_logger
 from util.system import execute_system_command
 from util.exceptions import KubectlIntError
 from draft.cmd import set_registry_port
@@ -101,7 +102,7 @@ def start_port_forwarding():
         # if a log level is set to DEBUG - additional information from creatoin of a proxy
         # are sent to console
         std_output = subprocess.DEVNULL
-        if is_debug_level(logger):
+        if logger.getEffectiveLevel() == logging.debug:
             std_output = subprocess.STDOUT
 
         process = subprocess.Popen(args=PORT_FORWARD_COMMAND, stdout=std_output, stderr=std_output)

@@ -24,6 +24,7 @@ import click
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
 from util.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
+from cli_state import common_options, pass_state, State
 
 @click.command()
 @click.argument('experiment-name')
@@ -36,7 +37,9 @@ from util.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
                                               'pods will be returned')
 @click.option('--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
               help='Get logs only for pods with given status')
-def logs(experiment_name: str, namespace: str, min_severity: SeverityLevel, start_date: str,
+@common_options
+@pass_state
+def logs(state: State, experiment_name: str, namespace: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus):
     """
     Show logs for given experiment.

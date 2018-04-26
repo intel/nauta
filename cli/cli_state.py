@@ -19,18 +19,35 @@
 # and approved by Intel in writing.
 #
 
+import logging
+
 import click
 
-from draft import dependencies_checker
-from cli_state import common_options, pass_state, State
-
-HELP = "Command used to verify whether all external components required by dlsctl are installed " \
-       "in proper versions. If something is missing - application displays a detailed information" \
-       " about it."
+from util.logger import set_verbosity_level
 
 
-@click.command(help=HELP)
-@common_options
-@pass_state
-def verify(state: State):
-    dependencies_checker.check()
+class State:
+
+    def __init__(self):
+        self.verbosity = 0
+
+
+pass_state = click.make_pass_decorator(State, ensure=True)
+
+
+def verbosity_option(f):
+    def callback(ctx, param, value):
+        state = ctx.ensure_object(State)
+        state.verbosity = value
+        logging_level = set_verbosity_level(state.verbosity)
+        logging.getLogger().setLevel(logging_level)
+        return value
+    return click.option('-v', '--verbose', count=True,
+                        expose_value=False,
+                        help='Set verbosity level: \n -v for INFO \n -vv for DEBUG',
+                        callback=callback)(f)
+
+
+def common_options(f):
+    f = verbosity_option(f)
+    return f

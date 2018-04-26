@@ -29,6 +29,7 @@ import draft.cmd as cmd
 from util.logger import initialize_logger
 from packs.tf_training import update_configuration
 from util.kubectl import start_port_forwarding
+from cli_state import common_options, pass_state, State
 
 log = initialize_logger('commands.submit')
 
@@ -41,7 +42,9 @@ HELP_SFL = "Name of a folder with additional files used by a script - other .py 
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.argument("script_parameters", nargs=-1)
-def submit(script_location: str, script_folder_location: str, script_parameters: Tuple[str, ...]):
+@common_options
+@pass_state
+def submit(state: State, script_location: str, script_folder_location: str, script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
     click.echo("Submitting task.")
 
