@@ -40,7 +40,12 @@ def get_kubectl_host() -> str:
 
 def get_kubectl_port() -> int:
     config.load_kube_config()
-    return int(configuration.Configuration().host.split(':')[-1])
+    try:
+        port = int(configuration.Configuration().host.split(':')[-1])
+    except ValueError:
+        port = 443
+
+    return port
 
 
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
