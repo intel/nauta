@@ -18,6 +18,7 @@ yum_core_packages:
   - vim
   - git
   - nfs-utils
+  - cifs-utils
   - python
   - python-pip
   - python-dev
@@ -47,5 +48,6 @@ yum_kubernetes_apps:
 yum_apps_packages:
   - nginx
   - consul-1.0.6
+  - socat
 
 yum_packages: "{{ (yum_core_packages + yum_apps_packages + yum_kubernetes_apps + yum_compile_packages) | sort | unique }}"

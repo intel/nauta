@@ -3,8 +3,8 @@
 registry_images:
   - name: "core/flannel:v0.9.1"
     src: "quay.io/coreos/flannel:v0.9.1-amd64"
-  - name: "core/kube-proxy:v1.9.3"
-    src: "gcr.io/google-containers/kube-proxy-amd64:v1.9.3"
+  - name: "core/kube-proxy:v1.10.0"
+    src: "gcr.io/google-containers/kube-proxy-amd64:v1.10.0"
   - name: "core/pause:3.1"
     src: "gcr.io/google-containers/pause-amd64:3.1"
   - name: "core/tiller:v2.8.1"

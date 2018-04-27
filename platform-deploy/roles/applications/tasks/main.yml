@@ -116,3 +116,12 @@
     type: storage
     namespace: kube-system
   include_tasks: helm.yml
+
+- name: Run helm task for dlse
+  vars:
+    name: dls-admin
+    helm_values:
+      ExternalIP: "{{ dls_configuration.external_interface.ipv4_address }}"
+    type: dls-admin
+    namespace: kube-system
+  include_tasks: helm.yml

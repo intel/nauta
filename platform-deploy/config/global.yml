@@ -72,6 +72,7 @@ helm_applications:
   dashboard: dashboard
   storage: nfs
   samba: samba
+  dls-admin: dls-admin
 
 ### Docker
 

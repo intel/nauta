@@ -45,4 +45,4 @@ init: configured $(ACTIVATE)
 
 install: PLAYBOOK=$(CURDIR)/dls.yml
 install: configured $(ACTIVATE)
-	@$(ANSIBLE_PLAYBOOK_RUN) --tags verify,install
+	@$(ANSIBLE_PLAYBOOK_RUN) --tags init,install

@@ -1,0 +1,4 @@
+apiVersion: v1
+name: dls-admin
+description: A DLS Admin User creation
+version: 1.0.0
