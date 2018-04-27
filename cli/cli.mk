@@ -41,7 +41,7 @@ endif
 
 
 style: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); flake8 draft/ util/ main.py
+	@. $(ACTIVATE); flake8 draft/ util/ commands/ main.py
 
 test: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); py.test
