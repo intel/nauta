@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import os
+
 import click
 
 from commands import submit
@@ -27,6 +29,8 @@ from commands import logs
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+DEFAULT_LANG = "en_US.UTF-8"
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -40,4 +44,9 @@ entry_point.add_command(logs.logs)
 
 
 if __name__ == '__main__':
-    entry_point()
+    try:
+        entry_point()
+    except RuntimeError:
+        os.environ["LC_ALL"] = DEFAULT_LANG
+        os.environ["LANG"] = DEFAULT_LANG
+        entry_point()

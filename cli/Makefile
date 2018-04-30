@@ -23,7 +23,7 @@ VIRTUALENV_DIR := .venv
 DEV_VIRTUALENV_MARK := $(VIRTUALENV_DIR)/dev
 UNAME := $(shell uname)
 
-ifeq ($(findstring MINGW32_NT-6.2,$(UNAME)),MINGW32_NT-6.2)
+ifeq ($(findstring MSYS_NT-10.0,$(UNAME)),MSYS_NT-10.0)
 	OS := Windows
 endif
 ifeq ($(findstring Linux,$(UNAME)),Linux)

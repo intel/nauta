@@ -25,18 +25,26 @@ build: $(ACTIVATE)
 
 ifeq (Windows,$(OS))
 	@. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" -F main.py;
-	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/windows/draft-v0.13.0-windows-amd64.tar.gz --no-check-certificate -O draft.tar.gz
+	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-windows-amd64.7z -O draft.7z
+
+	@7z x draft.7z -odist
+	@rm -f draft.7z
 endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller -F main.py;
-	@wget https://ftp.nervana.sclab.intel.com/public/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz --no-check-certificate -O draft.tar.gz
+	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz -O draft.tar.gz
+
+	@tar -zxf draft.tar.gz -C dist
+	@rm -f draft.tar.gz
 endif
 ifeq (Darwin,$(OS))
 	@. $(ACTIVATE); pyinstaller -F main.py;
-	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-darwin-amd64.tar.gz --no-check-certificate -O draft.tar.gz
-endif
+	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-darwin-amd64.tar.gz -O draft.tar.gz
+
 	@tar -zxf draft.tar.gz -C dist
 	@rm -f draft.tar.gz
+endif
+
 	@cp -Rf draft/packs/* dist/.draft/packs/
 
 
