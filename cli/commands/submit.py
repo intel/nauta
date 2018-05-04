@@ -28,8 +28,10 @@ import commands.common as common
 import draft.cmd as cmd
 from util.logger import initialize_logger
 from packs.tf_training import update_configuration
-from util.kubectl import start_port_forwarding
+from util.kubectl import start_port_forwarding, get_registry_port
 from cli_state import common_options, pass_state, State
+from util.system import get_current_os, OS
+from util import socat
 
 log = initialize_logger('commands.submit')
 
@@ -80,23 +82,57 @@ def submit(state: State, script_location: str, script_folder_location: str, scri
         sys.exit(1)
 
     # start port forwarding
+    # noinspection PyBroadException
     try:
         process = start_port_forwarding()
-    except Exception as exe:
+    except Exception:
         log.exception("Error during creation of a proxy for a docker registry.")
         click.echo("Error during creation of a proxy for a docker registry.")
         sys.exit(1)
+
+    # run socat if on Windows or Mac OS
+    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyBroadException
+        try:
+            docker_registry_port = get_registry_port()
+            socat.start(docker_registry_port)
+        except Exception:
+            log.exception("Error during creation of a proxy for a local docker-host tunnel")
+            click.echo("Error during creation of a local docker-host tunnel.")
+
+            # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
+            # close port forwarding
+            # noinspection PyBroadException
+            try:
+                process.kill()
+            except Exception:
+                log.exception("Error during closing of a proxy for a docker registry.")
+                click.echo("Docker proxy hasn't been closed properly. "
+                           "Check whether it still exists, if yes - close it manually.")
+
+            sys.exit(1)
 
     # run training
     output, exit_code = cmd.up(working_directory=experiment_folder)
 
     # close port forwarding
+    # noinspection PyBroadException
     try:
         process.kill()
-    except Exception as exet:
+    except Exception:
         log.exception("Error during closing of a proxy for a docker registry.")
         click.echo("Docker proxy hasn't been closed properly. "
                    "Check whether it still exists, if yes - close it manually.")
+
+    # terminate socat if on Windows or Mac OS
+    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyBroadException
+        try:
+            socat.stop()
+        except Exception:
+            log.exception("Error during closing of a proxy for a local docker-host tunnel")
+            click.echo("Local Docker-host tunnel hasn't been closed properly. "
+                       "Check whether it still exists, if yes - close it manually.")
 
     if exit_code:
         click.echo("Training script hasn't been submitted. "

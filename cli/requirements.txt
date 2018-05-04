@@ -3,3 +3,4 @@ pyyaml==3.12
 tabulate==0.8.2
 elasticsearch==5.5.0
 kubernetes==6.0.0
+docker==3.3.0

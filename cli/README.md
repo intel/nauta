@@ -72,8 +72,8 @@ sudo apt install make python3-venv python3-dev binutils
 You should have these tools (except Windows SDK) available system-wide via command-line (add them to PATH).
 
 Also, remember about setting `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you're behind
-proxy. `no_proxy` should include in particular `repository.toolbox.nervana.sclab.intel.com` for downloading draft binary 
-from our storage.
+proxy. `no_proxy` should include in particular `127.0.0.1` and `repository.toolbox.nervana.sclab.intel.com` for 
+downloading draft binary from our storage.
 
 
 ## Build

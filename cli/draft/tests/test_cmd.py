@@ -24,6 +24,7 @@ from unittest.mock import call, ANY
 import pytest
 
 from draft import cmd
+import draft
 
 FAKE_CLI_DISTRIBUTION_DIR_PATH = '/home/fakeuser/dist'
 
@@ -45,6 +46,9 @@ def draft_mock(mocker):
     exe_mock = mocker.patch.object(cmd, 'execute_system_command')
     exe_mock.return_value = ('some return', 0)
 
+    call_draft_mock = mocker.patch.object(cmd, 'call_draft')
+    call_draft_mock.return_value = ('some return', 0)
+
     return cmd
 
 
@@ -52,8 +56,8 @@ def draft_mock(mocker):
 def test_create(draft_mock):
     draft_mock.create()
 
-    assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'create'], env=ANY, cwd=None)])
+    assert draft_mock.call_draft.call_count == 1
+    assert draft_mock.call_draft.call_args == call(args=['create'], cwd=None)
 
 
 # noinspection PyShadowingNames
@@ -62,16 +66,15 @@ def test_up(draft_mock, mocker):
 
     draft_mock.up()
 
-    assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call(['draft', 'up'], env=ANY, cwd=None)])
+    assert draft_mock.call_draft.call_count == 1
+    assert draft_mock.call_draft.call_args == call(args=['up'], cwd=None)
 
 
 def test_set_registry_port(draft_mock):
     draft_mock.set_registry_port("5000")
 
-    assert draft_mock.execute_system_command.call_count == 1
-    assert draft_mock.execute_system_command.call_args == call(['draft', 'config', 'set', 'registry', '127.0.0.1:5000'],
-                                                               env=ANY, cwd=None)
+    assert draft_mock.call_draft.call_count == 1
+    assert draft_mock.call_draft.call_args == call(['config', 'set', 'registry', '127.0.0.1:5000'])
 
 
 def test_check_up_status_success():

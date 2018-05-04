@@ -19,40 +19,37 @@
 # and approved by Intel in writing.
 #
 
-from enum import Enum
-import subprocess
-import sys
-from typing import List
+from typing import Optional
+
+import docker
+from docker.errors import NotFound
+from docker.models.containers import Container
+
+client = docker.from_env()
+
+SOCAT_CONTAINER_NAME = 'dlsctl-registry-bridge'
 
 
-def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None) -> (str, int):
+def get() -> Optional[Container]:
     try:
-        output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
-                                         stdin=stdin, env=env, cwd=cwd)
-    except subprocess.CalledProcessError as ex:
-        return ex.output, ex.returncode
-    else:
-        return output, 0
+        socat_container = client.containers.get(SOCAT_CONTAINER_NAME)  # type: Container
+        if socat_container.status != 'running':
+            socat_container.remove(force=True)
+            return None
+    except NotFound:
+        return None
+
+    return socat_container
 
 
-class OS(Enum):
-    WINDOWS = "win"
-    MACOS = "darwin"
-    LINUX = "linux"
-
-    @classmethod
-    def all_str(cls):
-        return ''.join([e.value for e in cls])
+def start(docker_registry_port: str):
+    if not get():
+        client.containers.run(detach=True, remove=True, network_mode='host', name=SOCAT_CONTAINER_NAME,
+                              image='alpine/socat', command=f'TCP-LISTEN:{docker_registry_port},fork,reuseaddr '
+                                                            f'TCP:host.docker.internal:{docker_registry_port}')
 
 
-def get_current_os() -> OS:
-    sys_platform = sys.platform  # type: str
-    if sys_platform.startswith(OS.WINDOWS.value):
-        return OS.WINDOWS
-    elif sys_platform.startswith(OS.LINUX.value):
-        return OS.LINUX
-    elif sys_platform.startswith(OS.MACOS.value):
-        return OS.MACOS
-
-    raise RuntimeError(f'unsupported platform: {sys_platform}, supported: {OS.all_str()}!')
+def stop():
+    socat_container = get()
+    if socat_container:
+        socat_container.stop()

@@ -47,6 +47,18 @@ GETTING_PORT_COMMAND.extend(LABELS)
 DOCKER_PORT = "5000"
 
 
+def get_registry_port() -> str:
+    t_registry_port, exit_code = execute_system_command(GETTING_PORT_COMMAND)
+
+    if t_registry_port and not exit_code and t_registry_port.isdigit():
+        return t_registry_port
+    else:
+        logger.error("Port forwarding - exception - missing pod port : {}".format(
+            t_registry_port if t_registry_port else "missing data"
+        ))
+        raise KubectlIntError("Missing pod port during creation of registry port proxy.")
+
+
 def start_port_forwarding():
     """
     Creates a proxy responsible for forwarding requests to and from a
@@ -61,11 +73,9 @@ def start_port_forwarding():
         instance of a process with proxy
     """
     logger.debug("Start port forwarding")
-    process = None
 
     try:
         t_registry_pod_name, exit_code = execute_system_command(GETTING_POD_NAME_COMMAND)
-        registry_pod_name = None
 
         if t_registry_pod_name and not exit_code:
             # pod name taken this way contains \n at the end - so it has to be removed
@@ -76,17 +86,7 @@ def start_port_forwarding():
             ))
             raise KubectlIntError("Missing pod name during creation of registry port proxy.")
 
-        t_registry_port, exit_code = execute_system_command(GETTING_PORT_COMMAND)
-        registry_port = None
-
-        if t_registry_port and not exit_code and t_registry_port.isdigit():
-            # pod name taken this way contains \n at the end - so it has to be removed
-            registry_port = t_registry_port
-        else:
-            logger.error("Port forwarding - exception - missing pod port : {}".format(
-                t_registry_port if t_registry_port else "missing data"
-            ))
-            raise KubectlIntError("Missing pod port during creation of registry port proxy.")
+        registry_port = get_registry_port()
 
         dc_output, dc_exit_code = set_registry_port(registry_port)
 
@@ -96,7 +96,7 @@ def start_port_forwarding():
             ))
             raise KubectlIntError("Setting draft config failed.")
 
-        PORT_FORWARD_COMMAND = ["kubectl", "port-forward", "--namespace={}".format(NAMESPACE),
+        port_forward_command = ["kubectl", "port-forward", "--namespace={}".format(NAMESPACE),
                                 registry_pod_name, "{}:{}".format(registry_port, DOCKER_PORT)]
 
         # if a log level is set to DEBUG - additional information from creatoin of a proxy
@@ -105,7 +105,7 @@ def start_port_forwarding():
         if logger.getEffectiveLevel() == logging.debug:
             std_output = subprocess.STDOUT
 
-        process = subprocess.Popen(args=PORT_FORWARD_COMMAND, stdout=std_output, stderr=std_output)
+        process = subprocess.Popen(args=port_forward_command, stdout=std_output, stderr=std_output)
 
         if not process:
             logger.error("Port forwarding - exception - process doesn't exist.")
@@ -113,7 +113,7 @@ def start_port_forwarding():
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)
-    except Exception as exe:
+    except Exception:
         logger.exception("Port forwarding - exception - other.")
         raise RuntimeError("Other error during creation of registry port proxy.")
 
