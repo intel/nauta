@@ -43,7 +43,7 @@ endif
 
 
 clean:
-	@rm -rf $(VIRTUALENV_DIR) __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache
+	@rm -rf $(VIRTUALENV_DIR) __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip
 
 
 venv: $(ACTIVATE)
@@ -57,7 +57,7 @@ ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
 endif
-
+	@. $(ACTIVATE); python -m pip install -U pip
 	@. $(ACTIVATE); pip install -r requirements.txt;
 
 venv-dev: $(DEV_VIRTUALENV_MARK)

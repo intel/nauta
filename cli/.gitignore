@@ -19,3 +19,5 @@ example-python/Dockerfile
 example-python/.draftignore
 draft.toml
 .draftignore
+dlsctl-*.tar.gz
+dlsctl-*.zip
