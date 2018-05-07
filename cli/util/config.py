@@ -19,49 +19,27 @@
 # and approved by Intel in writing.
 #
 
-import os
-from util.logger import initialize_logger
-import platform
+from enum import Enum
 
-log = initialize_logger('util.config')
-# environmental variable with a dlsctl home folder
-ENV_DLSCTL_HOME = 'DLSCTL_HOME'
-LINUX_ENV_HOME = 'HOME'
-WINDOWS_ENV_HOME = 'USERPROFILE'
+# environmental variable with a dlsctl HOME folder
+DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
+DLS_CTL_CONFIG_DIR_NAME = 'dls_ctl_config'
 
-# name of a config folder
-CONFIG_FOLDER = '.dlsctl'
-
-# name of a folder with experiment's data
-EXPERIMENTS_FOLDER = 'tmp'
+# name of a directory with EXPERIMENT's data
+EXPERIMENTS_DIR_NAME = 'experiments'
 
 
-def create_home_folder() -> str:
-    """
-    Creates a home folder of a cli application - if it doesn't exist.
+class Fields(Enum):
+    CONFIG_PATH = 'config_path'
 
-    :return:
-    - name of a home folder, if empty - home folder doesn't exist and hasn't
-      been created
-    """
-    home_folder = ""
-    log.debug("Create home folder - start")
-    try:
-        try:
-            home_folder = os.environ[ENV_DLSCTL_HOME]
-        except KeyError:
-            if platform.system() == 'Windows':
-                home_folder = os.environ[WINDOWS_ENV_HOME]
-            else:
-                home_folder = os.environ[LINUX_ENV_HOME]
 
-        home_folder = os.path.join(home_folder, CONFIG_FOLDER)
+class Config:
+    __params = dict()
 
-        if not os.path.exists(home_folder):
-            os.makedirs(home_folder)
-    except Exception as exe:
-        log.error("Create home folder - error : {}".format(exe))
-        home_folder = ""
+    @staticmethod
+    def get(field: Fields):
+        return Config.__params.get(field.value)
 
-    log.debug("Create home folder - end")
-    return home_folder
+    @staticmethod
+    def set(field: Fields, value):
+        Config.__params[field.value] = value

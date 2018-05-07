@@ -19,14 +19,16 @@
 # and approved by Intel in writing.
 #
 
+import os
 from unittest.mock import call, ANY
 
 import pytest
 
 from draft import cmd
-import draft
+from util.config import Config
 
-FAKE_CLI_DISTRIBUTION_DIR_PATH = '/home/fakeuser/dist'
+FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
+FAKE_DRAFT_BIN_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, cmd.DRAFT_BIN)
 
 CORRECT_UP_OUTPUT_BUILD_IMAGE = 'Building Docker Image: SUCCESS'
 CORRECT_UP_OUTPUT_PUSH_IMAGE = 'Pushing Docker Image: SUCCESS'
@@ -41,13 +43,11 @@ INCORRECT_CREATE_OUTPUT = '-->  to sail 1234567890 AbCdEF'
 
 @pytest.fixture
 def draft_mock(mocker):
-    cmd.draft_path = FAKE_CLI_DISTRIBUTION_DIR_PATH
+    path_mock = mocker.patch.object(Config, 'get')
+    path_mock.return_value = FAKE_CLI_CONFIG_DIR_PATH
 
     exe_mock = mocker.patch.object(cmd, 'execute_system_command')
     exe_mock.return_value = ('some return', 0)
-
-    call_draft_mock = mocker.patch.object(cmd, 'call_draft')
-    call_draft_mock.return_value = ('some return', 0)
 
     return cmd
 
@@ -56,8 +56,8 @@ def draft_mock(mocker):
 def test_create(draft_mock):
     draft_mock.create()
 
-    assert draft_mock.call_draft.call_count == 1
-    assert draft_mock.call_draft.call_args == call(args=['create'], cwd=None)
+    assert draft_mock.execute_system_command.call_count == 1
+    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'create'], env=ANY, cwd=None)])
 
 
 # noinspection PyShadowingNames
@@ -66,15 +66,16 @@ def test_up(draft_mock, mocker):
 
     draft_mock.up()
 
-    assert draft_mock.call_draft.call_count == 1
-    assert draft_mock.call_draft.call_args == call(args=['up'], cwd=None)
+    assert draft_mock.execute_system_command.call_count == 1
+    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'], env=ANY, cwd=None)])
 
 
 def test_set_registry_port(draft_mock):
     draft_mock.set_registry_port("5000")
 
-    assert draft_mock.call_draft.call_count == 1
-    assert draft_mock.call_draft.call_args == call(['config', 'set', 'registry', '127.0.0.1:5000'])
+    assert draft_mock.execute_system_command.call_count == 1
+    assert draft_mock.execute_system_command.call_args == call([FAKE_DRAFT_BIN_PATH, 'config', 'set', 'registry',
+                                                                '127.0.0.1:5000'], env=ANY, cwd=None)
 
 
 def test_check_up_status_success():

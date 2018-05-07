@@ -20,15 +20,13 @@
 #
 
 import os
-import sys
 from typing import List
 
+from util.config import Config, Fields
 from util.system import execute_system_command
 from util.logger import initialize_logger
 
 log = initialize_logger('draft.cmd')
-
-draft_path = os.path.dirname(sys.executable)
 
 DRAFT_BIN = 'draft'
 
@@ -36,12 +34,13 @@ DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
 def call_draft(args: List[str], cwd: str=None) -> (str, int):
-    full_command = [os.path.join(draft_path, DRAFT_BIN)]
+    config_path = Config.get(Fields.CONFIG_PATH)
+    full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
 
-    envs = os.environ.copy()
-    envs['DRAFT_HOME'] = os.path.join(draft_path, ".draft")
-    return execute_system_command(full_command, env=envs, cwd=cwd)
+    env = os.environ.copy()
+    env['DRAFT_HOME'] = os.path.join(config_path, ".draft")
+    return execute_system_command(full_command, env=env, cwd=cwd)
 
 
 def create(working_directory: str=None, pack_type: str=None) -> (str, int):

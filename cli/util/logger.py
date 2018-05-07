@@ -19,19 +19,16 @@
 # and approved by Intel in writing.
 #
 
-import os
 import logging
-
-LOG_LEVEL = os.getenv("LOG_LEVEL", "CRITICAL")
 
 
 def initialize_logger(package_name) -> logging.Logger:
     logger = logging.getLogger(package_name)
-    logging.basicConfig(level=LOG_LEVEL)
-
+    logging.basicConfig(level=logging.CRITICAL)
     return logger
 
 
+# ALWAYS called on CLI command init
 def set_verbosity_level(verbosity):
     logging_level = logging.CRITICAL
 

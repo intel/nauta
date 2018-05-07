@@ -24,8 +24,9 @@ import shutil
 import time
 import random
 
-from util.config import create_home_folder, EXPERIMENTS_FOLDER
+from util.config import EXPERIMENTS_DIR_NAME, Config, Fields
 from util.logger import initialize_logger
+
 
 # header of a table with status of an experiment - used for example in submit command
 RESULT_HEADER = ["Experiment", "Status"]
@@ -35,55 +36,46 @@ log = initialize_logger('commands.common')
 
 def create_environment(experiment_name: str, file_location: str, folder_location: str) -> (str, str):
     """
-    Creates a complete environment for executing a training
-    using draft.
+    Creates a complete environment for executing a training using draft.
 
     :param experiment_name: name of an experiment used to create a folder
                             with content of an experiment
-    :param file_location: location of a trainig script
+    :param file_location: location of a training script
     :param folder_location: location of a folder with additional data
-    :return: (experiment_folder. message)
-    experiment_folder - folder with experiment's artifacts
-    message - message describing causes of an error, if environment has been created
-            an empty string
+    :return: (experiment_path. message)
+    experiment_path - folder with experiment's artifacts
+    message - message describing causes of an error, if environment has been created an empty string
     """
-    # check if home folder exists
     log.debug("Create environment - start")
-    home_folder = create_home_folder()
-
-    if not home_folder:
-        log.error("Create environment - accessing home folder error.")
-        return "", "Home folder doesn't exist and cannot be created."
 
     # create a folder for experiment's purposes
-    experiment_folder = os.path.join(home_folder, EXPERIMENTS_FOLDER, experiment_name)
+    experiment_path = os.path.join(Config.get(Fields.CONFIG_PATH), EXPERIMENTS_DIR_NAME, experiment_name)
 
     # copy folder content
     if folder_location:
         try:
-            shutil.copytree(folder_location, experiment_folder)
+            shutil.copytree(folder_location, experiment_path)
         except Exception as exe:
             log.error("Create environment - copying training folder error : {}".format(exe))
             return "", "Additional folder cannot be copied into experiment's folder."
 
     try:
-        if not os.path.exists(experiment_folder):
-            os.makedirs(experiment_folder)
+        if not os.path.exists(experiment_path):
+            os.makedirs(experiment_path)
     except Exception as exe:
         log.error("Create environment - creating experiment folder error : {}".format(exe))
         return "", "Folder with experiments' data cannot be created."
 
     # copy training script - it overwrites the file taken from a folder_location
     try:
-        shutil.copy2(file_location, experiment_folder)
+        shutil.copy2(file_location, experiment_path)
     except Exception as exe:
         log.error("Create environment - copying training script error : {}".format(exe))
         return "", "Training script cannot be created."
 
-
     log.debug("Create environment - end")
+    return experiment_path, ""
 
-    return experiment_folder, ""
 
 def generate_experiment_name() -> str:
     time_part = time.strftime("%Y%m%d%H%M%S")
@@ -91,6 +83,7 @@ def generate_experiment_name() -> str:
     experiment_name = "t" + time_part + str(random_part).zfill(3)
 
     return experiment_name
+
 
 def delete_environment(experiment_folder: str):
     try:

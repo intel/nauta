@@ -19,15 +19,26 @@
 # and approved by Intel in writing.
 #
 
-from unittest.mock import call
-
+import os
 import pytest
 
 from commands import common
+from util.config import Config, EXPERIMENTS_DIR_NAME
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
 EXPERIMENT_NAME = "experiment_name"
 SCRIPT_LOCATION = "training_script.py"
+
+FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
+FAKE_CLI_EXPERIMENT_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, EXPERIMENTS_DIR_NAME, EXPERIMENT_NAME)
+
+
+@pytest.fixture
+def config_path_mock(mocker):
+    config_path_mock = mocker.patch.object(Config, 'get')
+    config_path_mock.return_value = FAKE_CLI_CONFIG_DIR_PATH
+    return config_path_mock
+
 
 def test_delete_environment(mocker):
     sh_rmtree_mock = mocker.patch("shutil.rmtree")
@@ -37,72 +48,68 @@ def test_delete_environment(mocker):
     assert sh_rmtree_mock.call_count == 1, "folder wasn't deleted."
 
 
-def test_create_environment_success(mocker):
-    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+def test_create_environment_success(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     os_mkdirs_mock = mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
-    assert crhf_mock.call_count == 1, "home folder doesn't exist"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert sh_copy_mock.call_count == 1, "files weren't copied"
+    assert config_path_mock.call_count == 1, "configuration path not fetched"
 
-    assert folder_name
+    assert experiment_path == FAKE_CLI_EXPERIMENT_PATH
     assert not message
 
 
-def test_create_environment_makedir_error(mocker):
-    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+def test_create_environment_makedir_error(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     os_mkdirs_mock = mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
-    assert crhf_mock.call_count == 1, "home folder doesn't exist"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert sh_copy_mock.call_count == 0, "files were copied"
+    assert config_path_mock.call_count == 1, "configuration path not fetched"
 
-    assert not folder_name
+    assert not experiment_path
     assert message
 
 
-def test_create_environment_lack_of_home_folder(mocker):
-    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[""])
+def test_create_environment_lack_of_home_folder(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     os_mkdirs_mock = mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2")
 
-    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
-    assert crhf_mock.call_count == 1, "home folder doesn't exist"
     assert os_pexists_mock.call_count == 0, "existence of an experiment's folder was checked"
     assert os_mkdirs_mock.call_count == 0, "experiment's folder was created"
     assert sh_copy_mock.call_count == 0, "files were copied"
+    assert config_path_mock.call_count == 1, "configuration path not fetched"
 
-    assert not folder_name
+    assert not experiment_path
     assert message
 
 
-def test_create_environment_copy_error(mocker):
-    crhf_mock = mocker.patch("commands.common.create_home_folder", side_effect=[EXPERIMENT_FOLDER])
+def test_create_environment_copy_error(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     os_mkdirs_mock = mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    folder_name, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
-    assert crhf_mock.call_count == 1, "home folder doesn't exist"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copy_mock.call_count == 1, "files were copied"
+    assert config_path_mock.call_count == 1, "configuration path not fetched"
 
-    assert not folder_name
+    assert not experiment_path
     assert message
