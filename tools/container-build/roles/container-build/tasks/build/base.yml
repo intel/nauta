@@ -1,0 +1,13 @@
+---
+
+- name: Calculate base image
+  set_fact:
+    base_image: "127.0.0.1:{{ registry_port }}/{{ image.required }}:{{ images[image.required].version }}"
+
+- name: Add image definition
+  set_fact:
+    docker_images_base: "{{ docker_images_base | combine({ name: base_image }) }}"
+
+- name: Ensure directory exists
+  file:
+    path: "{{ image.directory }}"

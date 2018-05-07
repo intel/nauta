@@ -1,0 +1,61 @@
+---
+
+# Proxy settings required to download security updates and connect to external network
+# It is not required, but recommended for docker settings
+proxy: {}
+#  http_proxy: http://proxy-mu.intel.com:911
+#  ftp_proxy: http://proxy-mu.intel.com:911
+#  https_proxy: http://proxy-mu.intel.com:912
+#  no_proxy: .intel.com,localhost,127.0.0.1,.{{ nodes_domain }}.{{ domain }}
+
+# List of dns servers used as upstream for dns resolution
+dns_servers: []
+dns_search_domains: []
+
+### Network
+
+domain: dlse
+
+nodes_domain: infra
+k8s_domain: kubernetes
+
+kubernetes_pod_subnet: 10.3.0.0/16
+kubernetes_svc_subnet: 10.4.0.0/16
+
+kubernetes_version: 1.9.3
+
+kubernetes_network:
+  external_ports:
+    - 6443
+    - 8443
+  internal_port: 18554
+  pod: "{{ kubernetes_pod_subnet }}"
+  svc: "{{ kubernetes_svc_subnet }}"
+  svc_list:
+    apiservice:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(1) | ipaddr('address') }}"
+      consul_name: "kubernetes.service.{{ nodes_domain }}.{{ domain }}"
+    dns:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(10) | ipaddr('address') }}"
+    tiller:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(11) | ipaddr('address') }}"
+      port: 44134
+    ingress:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(15) | ipaddr('address') }}"
+    samba:
+      ip: "{{ kubernetes_svc_subnet | ipaddr(14) | ipaddr('address') }}"
+
+helm_applications:
+  networking: flannel # Determines networking type plugin - can be flannel
+  dns: skydns
+  ingress: ingress
+  heapster: heapster
+  dashboard: dashboard
+  storage: nfs
+  samba: samba
+  dls-admin: dls-admin
+
+### Docker
+
+# By default enabled "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
+insecure_registries: []

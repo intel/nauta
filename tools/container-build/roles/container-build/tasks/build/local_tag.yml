@@ -1,0 +1,15 @@
+---
+
+- name: List files in directory
+  find:
+    path: "{{ image.directory }}"
+    get_checksum: True
+    recurse: True
+  register: files
+
+- set_fact:
+    dir_sha: "{{ files | json_query('files[].checksum') | sort | join(' ' ) | hash('sha1') }}"
+
+- name: Add image definition
+  set_fact:
+    docker_images_local_tags: "{{ docker_images_local_tags | combine({ name: dir_sha }) }}"

@@ -1,0 +1,21 @@
+---
+
+- name: Set async task
+  set_fact:
+    docker_async_tasks: {}
+
+- name: Build all images
+  vars:
+    image: "{{ images[name] }}"
+  include_tasks: "{{ image.method }}/build.yml"
+  with_items: "{{ layer }}"
+  when: not docker_images_remote_exists[name]
+  loop_control:
+    loop_var: name
+
+- name: Wait for tasks
+  vars:
+    name: "{{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ docker_async_tasks }}"

@@ -1,4 +1,5 @@
-FROM centos:7
+ARG BASE_IMAGE=centos:7
+FROM ${BASE_IMAGE}
 
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 RUN yum -y install nodejs bzip2 gcc

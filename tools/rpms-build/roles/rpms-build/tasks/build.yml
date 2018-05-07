@@ -1,0 +1,22 @@
+---
+
+- name: Start docker build task in background
+  docker_container:
+    name: "{{ name }}-{{ version }}"
+    image: "{{ yum_builder_image }}"
+    volumes:
+      - "{{ build_dir }}/in:/in:ro"
+      - "{{ build_dir }}/out:/out"
+      - "{{ build_dir }}/spec:/root/rpmbuild/SPECS:ro"
+    command: /build.sh "/root/rpmbuild/SPECS/{{ name }}" "{{ user_id }}" "{{ group_id }}" /in /out
+    env: "{{ proxy }}"
+    interactive: True
+    recreate: True
+    detach: False
+  register: build_async
+  failed_when: "'ansible_job_id' not in build_async"
+  async: 1800
+  poll: 0
+
+- set_fact:
+    async_tasks: "{{ async_tasks | combine({name: build_async.ansible_job_id}) }}"

@@ -1,0 +1,22 @@
+---
+
+- name: Start registry container
+  docker_container:
+    name: "yum-registry-{{ build_name }}-{{ user }}-{{ version }}"
+    env: "{{ proxy }}"
+    volumes:
+      - "{{ build_dir }}:/var/lib/registry"
+    ports:
+      - 5000
+    image: "registry:2"
+    stop_timeout: 0
+    recreate: True
+    restart_policy: no
+    user: "{{ user_id }}"
+  register: registry
+  notify:
+    - Cleanup registry container
+    - Remove build dir
+
+- set_fact:
+    registry_port: "{{ registry.ansible_facts.docker_container.NetworkSettings.Ports['5000/tcp'][0].HostPort }}"

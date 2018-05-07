@@ -17,11 +17,9 @@ dist/
 .compile
 files/*.tar.gz
 
-build/workspace
 .workspace
 htmlcov/
 .coverage
-build/
 .make.stamp
 .make.stamp.tmp
 coverage.xml

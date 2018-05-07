@@ -1,0 +1,18 @@
+---
+
+- name: Copy all deployer files
+  synchronize:
+    src: "{{ deployer }}/"
+    dest: "{{ build_dir }}/"
+  notify:
+    - Remove build dir
+
+- name: Copy deployer bins
+  synchronize:
+    src: "{{ package }}"
+    dest: "{{ build_dir }}/dls4e.tar.gz"
+
+- name: Create package
+  shell: tar -cf {{ output }} -I pigz ./
+  args:
+    chdir: "{{ build_dir }}"

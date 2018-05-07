@@ -1,0 +1,8 @@
+---
+
+- name: Calculate remote repository tags for all images
+  vars:
+    name: "{{ item }}"
+    image: "{{ images[item] }}"
+  include_tasks: "{{ image.method }}/remote_tag.yml"
+  with_items: "{{ layer }}"

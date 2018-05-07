@@ -1,0 +1,21 @@
+---
+
+- set_fact:
+    local_buildargs:
+      BASE_IMAGE: "{{ docker_images_base[name] }}"
+
+- name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
+  docker_image:
+    name: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
+    pull: False
+    push: False
+    timeout: "{{ docker_timeout }}"
+    path: "{{ image.directory }}"
+    buildargs: "{{ proxy | combine(local_buildargs) }}"
+  register: build_async
+  failed_when: "'ansible_job_id' not in build_async"
+  async: 1800
+  poll: 0
+
+- set_fact:
+    docker_async_tasks: "{{ docker_async_tasks | combine({name: build_async.ansible_job_id}) }}"

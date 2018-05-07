@@ -1,0 +1,215 @@
+---
+
+proxy:
+  http_proxy: http://proxy-mu.intel.com:911
+  https_proxy: http://proxy-mu.intel.com:912
+  no_proxy: .intel.com,127.0.0.1,localhost
+
+rpm_pre_packages:
+  carbon-python:
+    summary: Python precompiled carbon package
+    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+    release: "{{ VERSION_ID }}"
+    requires:
+      - python
+    sections:
+      install: |
+        rm -rf %{buildroot}
+        mkdir -p  %{buildroot}
+
+        mkdir -p %{buildroot}/opt/carbon
+        virtualenv -p python2 --clear --prompt=carbon --system-site-packages %{buildroot}/opt/carbon/python
+        %{buildroot}/opt/carbon/python/bin/pip install -U ansible==2.5.0.0 docker-py==1.10.6 pyOpenSSL==17.5.0
+        virtualenv -p python2 --relocatable %{buildroot}/opt/carbon/python
+        find %{buildroot} -name '*.pyc' -type f -exec rm -rf {} \;
+        find %{buildroot} -name '__pycache__' -type f -exec rm -rf {} \;
+
+        exit 0
+    files:
+      - /opt/carbon/python/*
+
+rpm_packages:
+  carbon-yum-repository:
+    summary: Carbon CentOS7 yum package repository
+    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+    release: "{{ VERSION_ID }}"
+    sections:
+      prep: |
+        cd %{_topdir}/BUILD
+        rm -rf %{name}
+        mkdir %{name}
+        tar xf /in/package.tar.gz --use-compress-program=pigz -C %{name}
+        cd %{name}
+        chown -R root:root .
+        chmod -R a+rX,g-w,o-w .
+      install: |
+        rm -rf %{buildroot}
+        mkdir -p  %{buildroot}
+
+        mkdir -p %{buildroot}/opt/carbon/repository/
+        cp -a %{name}/* %{buildroot}/opt/carbon/repository/
+        exit 0
+    files:
+      - /opt/carbon/repository/*
+  carbon-registry-repository:
+    summary: Carbon docker registry repository
+    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+    release: "{{ VERSION_ID }}"
+    sections:
+      prep: |
+        cd %{_topdir}/BUILD
+        rm -rf %{name}
+        mkdir %{name}
+        tar xf /in/docker.tar.gz --use-compress-program=pigz -C %{name}
+        cd %{name}
+        chown -R root:root .
+        chmod -R a+rX,g-w,o-w .
+      install: |
+        rm -rf %{buildroot}
+        mkdir -p  %{buildroot}
+
+        mkdir -p %{buildroot}/opt/carbon/registry
+        cp -a %{name}/* %{buildroot}/opt/carbon/registry/
+        exit 0
+    files:
+      - /opt/carbon/registry/docker/*
+  carbon-yum-local:
+    summary: Carbon user package
+    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+    release: "{{ VERSION_ID }}"
+    requires:
+      - carbon-yum-repository = %{version}-%{release}
+    sections:
+      install: |
+        rm -rf %{buildroot}
+        mkdir -p  %{buildroot}
+
+        mkdir -p %{buildroot}/opt/carbon/yum/yum.repos.d
+        mkdir -p %{buildroot}%{_bindir}
+
+        echo "[main]
+        cachedir=/var/cache/yum-carbon/$basearch/$releasever
+        keepcache=0
+        debuglevel=2
+        logfile=/var/log/yum.log
+        exactarch=1
+        obsoletes=1
+        gpgcheck=0
+        plugins=0
+        installonly_limit=5
+        distroverpkg=centos-release
+        reposdir=/opt/carbon/yum/yum.repos.d
+        proxy=_none_" > %{buildroot}/opt/carbon/yum/yum.conf
+
+        echo "[CarbonLocal]
+        name=Carbon Local Repository
+        gpgcheck=0
+        enabled=1
+        baseurl=file:///opt/carbon/repository" > %{buildroot}/opt/carbon/yum/yum.repos.d/local.repo
+
+        echo '#!/usr/bin/env bash
+        set -e
+        yum -c /opt/carbon/yum/yum.conf $@' > %{buildroot}%{_bindir}/yum-carbon
+        chmod +x %{buildroot}%{_bindir}/yum-carbon
+        exit 0
+    files:
+      - "%{_bindir}/yum-carbon"
+      - /opt/carbon/yum/yum.conf
+      - /opt/carbon/yum/yum.repos.d/local.repo
+
+rpm_ready_packages:
+  - libffi-dev
+  - byacc
+  - gcc
+  - gcc-c++
+  - openssl-devel
+  - vim
+  - git
+  - nfs-utils
+  - cifs-utils
+  - python
+  - python-pip
+  - python-dev
+  - make
+  - rsync
+  - kubernetes-all-1.10.0
+  - docker-distribution
+  - pacemaker
+  - pcs
+  - resource-agents
+  - nginx
+  - consul-1.0.6
+  - socat
+
+
+images:
+  core/centos:
+    version: "7.4.1708"
+    image: "centos:7.4.1708"
+    method: "pull"
+    push: False
+  core/flannel:
+    version: "v0.9.1"
+    image: "quay.io/coreos/flannel:v0.9.1-amd64"
+    method: "pull"
+  core/kube-proxy:
+    version: "v1.10.0"
+    image: "gcr.io/google-containers/kube-proxy-amd64:v1.10.0"
+    method: "pull"
+  core/pause:
+    version: "3.1"
+    image: "gcr.io/google-containers/pause-amd64:3.1"
+    method: "pull"
+  core/tiller:
+    version: "v2.8.1"
+    image: "gcr.io/kubernetes-helm/tiller:v2.8.1"
+    method: "pull"
+  core/addon-resizer:
+    version: "v1.7"
+    image: "k8s.gcr.io/addon-resizer:1.7"
+    method: "pull"
+  core/heapster:
+    version: "v1.4.2"
+    image: "k8s.gcr.io/heapster-amd64:v1.4.2"
+    method: "pull"
+  core/defaultbackend:
+    version: "1.4"
+    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
+    method: "pull"
+  core/ingress:
+    version: "0.14.0"
+    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
+    method: "pull"
+  core/kube-dns:
+    version: "1.14.8"
+    image: "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.8"
+    method: "pull"
+  core/dnsmasq-nanny:
+    version: "1.14.8"
+    image: "gcr.io/google-containers/k8s-dns-dnsmasq-nanny-amd64:1.14.8"
+    method: "pull"
+  core/dns-sidecar:
+    version: "1.14.8"
+    image: "gcr.io/google-containers/k8s-dns-sidecar-amd64:1.14.8"
+    method: "pull"
+  core/etcd:
+    version: "3.1.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.1.10"
+    method: "pull"
+  core/nfs-provisioner:
+    version: "v1.0.8"
+    image: "quay.io/kubernetes_incubator/nfs-provisioner:v1.0.8"
+    method: "pull"
+  core/dashboard:
+    version: "v1.8.3"
+    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
+    method: "pull"
+  core/registry:
+    version: "v2"
+    image: "registry:2"
+    method: "pull"
+  core/samba:
+    version: "1.0.0"
+    required: "core/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/samba"

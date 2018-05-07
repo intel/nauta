@@ -1,0 +1,20 @@
+---
+
+- name: Set async task
+  set_fact:
+    docker_async_tasks: {}
+
+- name: Push all images
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "push_image.yml"
+  with_dict: "{{ images }}"
+  when: image.push | default(True)
+
+- name: Wait for tasks
+  vars:
+    name: "{{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ docker_async_tasks }}"

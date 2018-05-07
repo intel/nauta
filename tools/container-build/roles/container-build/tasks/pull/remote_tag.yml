@@ -1,0 +1,5 @@
+---
+
+- name: Add image definition
+  set_fact:
+    docker_images_remote_tags: "{{ docker_images_remote_tags | combine({ name: image.version }) }}"

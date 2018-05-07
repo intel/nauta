@@ -1,0 +1,30 @@
+---
+
+proxy:
+  http_proxy: http://proxy-mu.intel.com:911
+  https_proxy: http://proxy-mu.intel.com:912
+  no_proxy: .intel.com,127.0.0.1,localhost
+
+images:
+  dls4e/centos:
+    version: "7.4.1708"
+    image: "centos:7.4.1708"
+    method: "pull"
+    push: False
+  dls4e/gui:
+    version: "1.0.0"
+    required: "dls4e/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/dls-gui"
+  dls4e/elasticsearch:
+    version: "5.6.9"
+    image: "elasticsearch:5.6.9"
+    method: pull
+  dls4e/fluentd:
+    version: "v0.12"
+    image: "fluent/fluentd-kubernetes-daemonset:v0.12-debian-elasticsearch"
+    method: pull
+  dls4e/registry:
+    version: "2.6.2"
+    image: "registry:2.6.2"
+    method: pull

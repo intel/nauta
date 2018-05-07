@@ -1,0 +1,16 @@
+---
+
+- name: Pull image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
+  docker_image:
+    name: "{{ image.image }}"
+    repository: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
+    pull: True
+    push: False
+    timeout: "{{ docker_timeout }}"
+  register: pull_async
+  failed_when: "'ansible_job_id' not in pull_async"
+  async: 1800
+  poll: 0
+
+- set_fact:
+    docker_async_tasks: "{{ docker_async_tasks | combine({name: pull_async.ansible_job_id}) }}"

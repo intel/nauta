@@ -1,0 +1,127 @@
+---
+
+- name: Create included build directory
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - pre-in
+    - pre-out
+    - in
+    - out
+    - spec
+    - packages
+  notify:
+    - Remove build dir
+
+- name: Render spec files for pre rpms
+  include_tasks: render.yml
+  with_dict: "{{ rpm_pre_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Render spec files for rpms
+  include_tasks: render.yml
+  with_dict: "{{ rpm_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- set_fact:
+    async_tasks: {}
+
+- name: Start pre-build jobs
+  include_tasks: pre-build.yml
+  with_dict: "{{ rpm_pre_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Wait for tasks
+  vars:
+    name: "{{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ async_tasks }}"
+
+- name: Remove all obsolete containers
+  docker_container:
+    name: "{{ name }}-{{ version }}"
+    state: absent
+  with_dict: "{{ rpm_pre_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Find all packages in out directory
+  find:
+    path: "{{ build_dir }}/pre-out"
+    patterns: "*.rpm"
+  register: files
+
+- name: Register local rpm files
+  set_fact:
+    rpm_local_files: "{{ rpm_local_files | default([]) + ['/in/' + (item | basename)] }}"
+  with_items: "{{ files | json_query('files[].path') }}"
+
+- name: Register all rpm files
+  set_fact:
+    rpm_files: "{{ (rpm_local_files + (rpm_ready_packages | default([]))) | sort }}"
+
+- name: Create package file
+  file:
+    path: "{{ build_dir }}/in/package.tar.gz"
+    state: touch
+
+- name: Start docker download task
+  docker_container:
+    name: "download-{{ version }}"
+    image: "{{ yum_builder_image }}"
+    volumes:
+      - "{{ build_dir }}/pre-out:/in:ro"
+      - "{{ build_dir }}/in/package.tar.gz:/out.tar.gz"
+    command: /download.sh /out.tar.gz {{ rpm_files | join(' ') }}
+    env: "{{ proxy }}"
+    interactive: True
+    recreate: True
+    detach: False
+
+- name: Cleanup docker download task
+  docker_container:
+    name: "download-{{ version }}"
+    state: absent
+
+- name: Fetch all defined files
+  copy:
+    remote_src: True
+    src: "{{ item }}"
+    dest: "{{ build_dir }}/in/{{ item | basename }}"
+  when: item != ''
+  with_items: "{{ (included_files | default('')).split(',') }}"
+
+- set_fact:
+    async_tasks: {}
+
+- name: Start build jobs
+  include_tasks: build.yml
+  with_dict: "{{ rpm_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Wait for tasks
+  vars:
+    name: "{{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ async_tasks }}"
+
+- name: Remove all obsolete containers
+  docker_container:
+    name: "{{ name }}-{{ version }}"
+    state: absent
+  with_dict: "{{ rpm_packages | default({}) }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"

@@ -1,0 +1,18 @@
+---
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  handlers:
+  - name: Cleanup registry container
+    docker_container:
+      name: "yum-registry-{{ build_name }}-{{ user }}-{{ version }}"
+      state: absent
+  - name: Remove build dir
+    file:
+      path: "{{ build_dir }}"
+      state: absent
+  roles:
+    - role: prepare
+    - role: container-build
+    - role: finalize

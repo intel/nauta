@@ -1,0 +1,12 @@
+---
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  handlers:
+  - name: Remove build dir
+    file:
+      path: "{{ build_dir }}"
+      state: absent
+  roles:
+    - role: finalize

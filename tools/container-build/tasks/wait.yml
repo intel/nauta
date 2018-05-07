@@ -1,0 +1,10 @@
+---
+
+- name: Wait for task {{ name }}
+  async_status:
+    jid: "{{ task_id }}"
+  changed_when: False
+  register: task_state
+  until: task_state.finished
+  retries: "{{ retries | default(3600) }}"
+  delay: "{{ delay | default(1) }}"

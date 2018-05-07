@@ -1,0 +1,8 @@
+---
+
+- set_fact:
+    image_sha: "{{ [docker_images_local_tags[name], docker_images_local_tags[image.required]] | sort | join(' ') | hash('sha1') }}"
+
+- name: Add image definition
+  set_fact:
+    docker_images_remote_tags: "{{ docker_images_remote_tags | combine({ name: image_sha }) }}"

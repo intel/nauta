@@ -1,0 +1,53 @@
+---
+
+- set_fact:
+    docker_images_local_tags: {}
+    docker_images_remote_tags: {}
+    docker_images_remote_exists: {}
+    docker_images_base: {}
+    docker_images_organized: "{{ images | organize_images }}"
+
+- debug: var=docker_images_organized
+
+- name: Verify presence of base images
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "{{ image.method }}/base.yml"
+  with_dict: "{{ images }}"
+
+- name: Calculate local repository tags for all images
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "{{ image.method }}/local_tag.yml"
+  with_dict: "{{ images }}"
+
+- name: Calculate remote repository tags for all images
+  include_tasks: "remote_tag.yml"
+  loop_control:
+    loop_var: layer
+  with_list: "{{ docker_images_organized }}"
+
+- name: Check if image exists
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "exists.yml"
+  with_dict: "{{ images }}"
+
+# ADD pull
+- name: Load image layers
+  include_tasks: load.yml
+
+- name: Build image layers
+  include_tasks: build.yml
+  loop_control:
+    loop_var: layer
+  with_list: "{{ docker_images_organized }}"
+
+- name: Push image layers
+  include_tasks: push.yml
+
+- name: Save image layers
+  include_tasks: save.yml

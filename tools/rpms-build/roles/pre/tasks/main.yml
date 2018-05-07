@@ -1,0 +1,27 @@
+---
+
+- name: Pull base image
+  docker_image:
+    name: "{{ base_build.base_docker_image }}"
+
+- name: Build base image
+  changed_when: False
+  docker_image:
+    path: "{{ base_build.base_docker_definition }}"
+    name: "base-build-{{ user }}:{{ version }}"
+    pull: False
+    push: False
+    buildargs: "{{ proxy | combine({'BASE_IMAGE': base_build.base_docker_image }) }}"
+
+- name: Build worker image
+  changed_when: False
+  docker_image:
+    path: "{{ yum_build.base_docker_definition }}"
+    name: "yum-build-{{ user }}:{{ version }}"
+    pull: False
+    push: False
+    buildargs: "{{ proxy | combine({'BASE_IMAGE': 'base-build-' + user + ':' + version }) }}"
+
+- name: Set yum builder container name
+  set_fact:
+    yum_builder_image: "yum-build-{{ user }}:{{ version }}"

@@ -1,0 +1,22 @@
+---
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  handlers:
+  - name: Remove build dir
+    file:
+      path: "{{ build_dir }}"
+      state: absent
+  tasks:
+    - name: Upload file
+      aws_s3:
+        bucket: repository
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        s3_url: "{{ s3_url }}"
+        mode: put
+        rgw: True
+        permission: []
+        src: "{{ src }}"
+        object: "{{ dest }}"

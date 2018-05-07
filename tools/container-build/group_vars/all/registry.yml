@@ -1,0 +1,11 @@
+---
+
+docker_repository:
+  url: registry.toolbox.nervana.sclab.intel.com
+  schema: http
+  port: 80
+
+docker_repository_registry: "{{ docker_repository.url }}:{{ docker_repository.port }}"
+docker_repository_url: "{{ docker_repository.schema }}://{{ docker_repository.url }}:{{ docker_repository.port }}"
+docker_version_prefix: dls4e
+docker_timeout: 600

@@ -1,0 +1,38 @@
+---
+
+- name: Copy all deployer files
+  synchronize:
+    src: "{{ deployer }}/"
+    dest: "{{ build_dir }}/"
+  notify:
+    - Remove build dir
+
+- name: Ensure files directory exists
+  file:
+    path: "{{ build_dir }}/files"
+    state: directory
+
+- name: Ensure that config directory exist
+  file:
+    path: "{{ build_dir }}/group_vars/all"
+    state: directory
+
+- name: Unpack deployer bins
+  shell: tar -xf {{ package }} -I pigz
+  args:
+    chdir: "{{ build_dir }}/files"
+
+- name: Generate file with configuration
+  vars:
+    configuration:
+      carbon_release_package_installation: file
+      carbon_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+      carbon_release_package_release: "{{ VERSION_ID }}"
+  copy:
+    dest: "{{ build_dir }}/group_vars/all/repository.yml"
+    content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+
+- name: Create package
+  shell: tar -cf {{ output }} -I pigz ./
+  args:
+    chdir: "{{ build_dir }}"
