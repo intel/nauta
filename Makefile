@@ -37,3 +37,6 @@ k8s-installer-build:
 
 dlsctl-build:
 	@(cd $(CURDIR)/cli && make clean && make build)
+
+unit-tests:
+	@(cd $(CURDIR)/cli && make test)
