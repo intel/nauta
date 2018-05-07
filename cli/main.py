@@ -36,7 +36,6 @@ DEFAULT_LANG = "en_US.UTF-8"
 @click.group(context_settings=CONTEXT_SETTINGS)
 def entry_point():
     Config.set(Fields.CONFIG_PATH, verify.validate_config_path())
-    pass
 
 
 entry_point.add_command(submit.submit)

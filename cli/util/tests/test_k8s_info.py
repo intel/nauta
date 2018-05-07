@@ -26,6 +26,7 @@ from util.k8s_info import get_kubectl_port, get_kubectl_host
 
 @pytest.fixture()
 def mocked_k8s_config(mocker):
+    config_loader_mock = mocker.patch('kubernetes.config.load_kube_config')
     mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
     conf_instance = mocked_conf_class.return_value
     conf_instance.host = 'https://127.0.0.1:8080'
