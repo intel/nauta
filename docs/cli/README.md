@@ -2,27 +2,62 @@
 
 ## **dlsctl** commands
 
-<ol>
-<li> <b>submit</b> - submits one single-node training job on a kuberenetes cluster. Format of the command is as follows:
+#### General options/flags
+ Here is a list of flags/options that can used with any command from a list of commands given below:  
+ _-v/-vv/--verbose_ </b> - verbose. If this option is given, application displays on a console logs from execution of a certain command. If _-v_ option is
+ given - basic logs on INFO/EXCEPTION/ERROR levels are displayed. If _-vv_ option (it may contain more vs - for example _-vvv_)
+ is given - detailed logs on INFO/DEBUG/EXCEPTION/ERROR levels are displayed.  
 
-_dlsctl submit <script_name> -sfl <folder_name> -- <script_arguments>_
+ _-s_ - silent. If the option is given - all commands that return some kind of ids (for example submit command returns a name of a
+ submitted experiment) return it in a plain format (without any tables or paramater names - just plain id). Detailed description of
+ how this flag is interpreted by a certain command can be found in a description of commands.
 
-arguments:<br>
-_<script_name>_ - name of a python script with a description of training. Obligatory<br>
-_<script_arguments>_ - string with a list of arguments that are passed to a training script. Optional<br>
+#### Format of messages returned by commands
 
-options:<br>
-_-sfl/-script_folder_location <folder_name>_ - location of a folder content of which is copied into a docker image created
-by _dlsctl submit_ command. _dlsctl_ copies the whole content preserving its structure - including subfolder. Optional<br>
+If option -s isn't given - _dlsctl_ command returns its outcome in a tabluar format. If except of outcome of the command
+additional messages are also returned - they appear before the table with output.
+If option -s is given - _dlsctl_ command returns only its outcome, additional messages are hidden. Outcome in this case is
+displayed as a plain text - without any names etc. More details concerning formatting of output using this option
+can be found in a description of a _-s_ option and in description of certain commands.
 
-example:<br>
-_dlsctl submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0_<br>
-Starts a single node training job using mnist_cnn.py script located in a folder from which _dlsctl_ command was issued. Content of
-the /data folder is copied into docker image (into /app folder - which is a work directory of docker images created using
-tf-training pack). Arguments _--data-dir_ and _--num_gpus_ are passed to a script.
-</li>
-</ol>
+Here is an example output of _submit_ command:
+<!-- language: lang-none -->
 
+    dlsctl submit training.py
+    
+    
+    | Experiment         | Status   |
+    +--------------------+----------+
+    | t20180423121021851 | Received |
+
+    dlsctl submit error_training.py
+
+    Missing pod name during creation of registry port proxy.<br>
+
+    | Experiment         | Status   |
+    +--------------------+----------+
+    | t20180423121021851 | Error    |
+    
+
+    dlsctl submit -s error_training.py</i> </li>
+
+    t20180423121021851
+
+
+### List of commands
+
+- [submit](commands/SUBMIT.md) - submits one single-node training job on kubernetes cluster. 
+- [adduser](commands/ADDUSER.md) - creates and initializes a new DLS4E user.
+- [mounts](commands/MOUNTS.md) - mounts a user's directory on a local machine
+- [list](commands/LIST.md) - displays a list of experiments
+- [view](commands/VIEW.md) - displays details of an experiment
+- [launch](commands/LAUNCH.md) - exposes a DLS4E web app to a user
+- [cancel](commands/CANCEL.md) - cancels an experiment
+- [interact](commands/INTERACT.md) - starts interactive session with Jupyter Notebook
+- [predict](commands/PREDICT.md) - starts predictions
+- [verify](commands/VERIFY.md) - verifies installation of _dlsctl_ application
+- [version](commands/VERSION.md) - displays version of _dlsctl_ application
+- [template_list](commands/TEMPLATE_LIST.md) - displays a list of available templates
 
 ## K8S roles definitions
 
@@ -69,7 +104,7 @@ Role:
   |Kind | Name | Namespace |
   |:--- |:--- |:---|
   | ServiceAccount | \<USERNAME> | auth |
-=======
+
 ## Example TensorFlow trainings
 
 All trainings have been tested using Python 3.5.2 and TensorFlow 1.7.0
