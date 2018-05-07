@@ -25,21 +25,21 @@ build: $(ACTIVATE)
 
 ifeq (Windows,$(OS))
 	@. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" -F main.py -n dlsctl;
-	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-windows-amd64.7z -O draft.7z
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-windows-amd64.7z -o draft.7z
 	@mkdir dist/dls_ctl_config/
 	@7z x draft.7z -odist/dls_ctl_config/
 	@rm -f draft.7z
 endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller -F main.py -n dlsctl;
-	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz -O draft.tar.gz
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-linux-amd64.tar.gz -o draft.tar.gz
 	@mkdir dist/dls_ctl_config/
 	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
 	@rm -f draft.tar.gz
 endif
 ifeq (Darwin,$(OS))
 	@. $(ACTIVATE); pyinstaller -F main.py -n dlsctl;
-	@wget http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-darwin-amd64.tar.gz -O draft.tar.gz
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-darwin-amd64.tar.gz -o draft.tar.gz
 	@mkdir dist/dls_ctl_config/
 	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
 	@rm -f draft.tar.gz
@@ -57,14 +57,32 @@ test: $(DEV_VIRTUALENV_MARK)
 cli-check: venv-dev test style
 
 
-pack: build
+export CLI_ARTIFACT_DIRECTORY:=$(CURDIR)
+export CLI_ARTIFACT_VERSION_STRING:=$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(BUILD_ID)
 
 ifeq (Windows,$(OS))
-	@7z a -tzip dlsctl-$(CLIENT_VERSION_MAJOR).$(CLIENT_VERSION_MINOR).$(CLIENT_VERSION_NO)-$(BUILD_ID)-windows.zip ./dist/* ./dist/.draft
+export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-windows.zip
+export CLI_ARTIFACT_PLATFORM:=windows
 endif
 ifeq (Linux,$(OS))
-	@tar -zcf dlsctl-$(CLIENT_VERSION_MAJOR).$(CLIENT_VERSION_MINOR).$(CLIENT_VERSION_NO)-$(BUILD_ID)-linux.tar.gz -C dist .
+export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-linux.tar.gz
+export CLI_ARTIFACT_PLATFORM:=linux
 endif
 ifeq (Darwin,$(OS))
-	@tar -zcf dlsctl-$(CLIENT_VERSION_MAJOR).$(CLIENT_VERSION_MINOR).$(CLIENT_VERSION_NO)-$(BUILD_ID)-darwin.tar.gz -C dist .
+export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
+export CLI_ARTIFACT_PLATFORM:=darwin
 endif
+
+pack: build
+ifeq (Windows,$(OS))
+	@7z a -tzip $(CLI_ARTIFACT_NAME) ./dist/* ./dist/.draft
+endif
+ifeq (Linux,$(OS))
+	@tar -zcf $(CLI_ARTIFACT_NAME) -C dist .
+endif
+ifeq (Darwin,$(OS))
+	@tar -zcf $(CLI_ARTIFACT_NAME) -C dist .
+endif
+
+push: pack
+	@cd $(CURDIR)/.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)

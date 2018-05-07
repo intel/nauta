@@ -95,3 +95,13 @@ release: export ENV_SRC := $(RELEASE_PACKAGE)
 release: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
 release:
 	@$(PUSH_MAKE)
+
+push: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY ENV_SRC ENV_DEST
+push: export ENV_S3_URL := $(ENV_S3_URL)
+push: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
+push: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
+push: export ENV_SRC := $(ENV_SRC)
+push: export ENV_DEST := $(ENV_DEST)
+
+push:
+	@$(PUSH_MAKE)
