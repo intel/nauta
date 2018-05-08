@@ -19,37 +19,39 @@
 # and approved by Intel in writing.
 #
 
-import os
-
 import click
+import os
+import sys
 
-from commands import submit
-from commands import verify
-from commands import logs
+from tabulate import tabulate
+
+from util.logger import initialize_logger
 from util.config import Config, Fields
-from commands import template_list
+from draft.cmd import DRAFT_HOME_FOLDER
+
+log = initialize_logger('commands.template_list')
+
+HELP = "Command returns a list of available templates that can be used to submit training jobs."
+
+CHART_YAML_FILENAME = "Chart.yaml"
+TEMPL_FOLDER_NAME = "templates"
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+@click.command(help=HELP)
+def template_list():
+    path = os.path.join(Config.get(Fields.CONFIG_PATH), DRAFT_HOME_FOLDER, "packs")
 
-DEFAULT_LANG = "en_US.UTF-8"
+    list_of_packs = []
+    for (dirpath, dirnames, filenames) in os.walk(path):
 
+        if CHART_YAML_FILENAME in filenames and TEMPL_FOLDER_NAME in dirnames:
+            pack_name = os.path.split(os.path.split(dirpath)[0])[1]
+            list_of_packs.append(pack_name)
 
-@click.group(context_settings=CONTEXT_SETTINGS)
-def entry_point():
-    Config.set(Fields.CONFIG_PATH, verify.validate_config_path())
-
-
-entry_point.add_command(submit.submit)
-entry_point.add_command(verify.verify)
-entry_point.add_command(logs.logs)
-entry_point.add_command(template_list.template_list)
-
-
-if __name__ == '__main__':
-    try:
-        entry_point()
-    except RuntimeError:
-        os.environ["LC_ALL"] = DEFAULT_LANG
-        os.environ["LANG"] = DEFAULT_LANG
-        entry_point()
+    if list_of_packs:
+        click.echo(tabulate([[row] for row in list_of_packs],
+                            headers=["Template name"],
+                            tablefmt="orgtbl"))
+    else:
+        click.echo("Lack of installed packs.")
+        sys.exit(1)

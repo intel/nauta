@@ -29,6 +29,7 @@ from util.logger import initialize_logger
 log = initialize_logger('draft.cmd')
 
 DRAFT_BIN = 'draft'
+DRAFT_HOME_FOLDER = ".draft"
 
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
@@ -39,7 +40,7 @@ def call_draft(args: List[str], cwd: str=None) -> (str, int):
     full_command.extend(args)
 
     env = os.environ.copy()
-    env['DRAFT_HOME'] = os.path.join(config_path, ".draft")
+    env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)
     return execute_system_command(full_command, env=env, cwd=cwd)
 
 
@@ -48,17 +49,17 @@ def create(working_directory: str=None, pack_type: str=None) -> (str, int):
     if pack_type:
         command.append('--pack={}'.format(pack_type))
     output, exit_code = call_draft(args=command, cwd=working_directory)
-    print(output)
 
     if not exit_code:
         output, exit_code = check_create_status(output)
+    else:
+        output = translate_create_status_description(output)
 
     return output, exit_code
 
 
 def up(working_directory: str=None) -> (str, int):
     output, exit_code = call_draft(args=['up'], cwd=working_directory)
-    print(output)
     if not exit_code:
         output, exit_code = check_up_status(output)
 
@@ -110,3 +111,19 @@ def check_create_status(output: str) -> (str, int):
     if "--> Ready to sail" not in output:
         return "Deployment hasn't been created.", 100
     return "", 0
+
+
+def translate_create_status_description(output: str) -> str:
+    """
+    Converts a description of a known error to human readable
+    form
+
+    :param output: - message to be converted
+    :return: converted message - if the message given as input param
+    is recognized by the system, if is not recognized - original
+    output
+    """
+    if "Error: could not load pack:" in output:
+        return "Chosen pack doesn't exist."
+    else:
+        return output

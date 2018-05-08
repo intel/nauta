@@ -79,7 +79,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
 
 def generate_experiment_name() -> str:
     time_part = time.strftime("%Y%m%d%H%M%S")
-    random_part = random.randrange(0,999)
+    random_part = random.randrange(0, 999)
     experiment_name = "t" + time_part + str(random_part).zfill(3)
 
     return experiment_name

@@ -35,6 +35,7 @@ NAMESPACE = "kube-system"
 # labels used to find a local-registry deployment
 LABELS = ["-l", "app=docker-registry"]
 
+
 GETTING_POD_NAME_COMMAND = ["kubectl", "get", "--namespace={}".format(NAMESPACE), "--no-headers=true", "pods", "-o",
                             "custom-columns=:metadata.name"]
 GETTING_POD_NAME_COMMAND.extend(LABELS)

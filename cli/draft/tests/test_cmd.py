@@ -19,13 +19,15 @@
 # and approved by Intel in writing.
 #
 
-import os
 from unittest.mock import call, ANY
 
+from util.config import Config
+from unittest.mock import call
+import os
 import pytest
 
 from draft import cmd
-from util.config import Config
+
 
 FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
 FAKE_DRAFT_BIN_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, cmd.DRAFT_BIN)

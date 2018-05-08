@@ -50,7 +50,7 @@ def test_delete_environment(mocker):
 
 def test_create_environment_success(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
-    os_mkdirs_mock = mocker.patch("os.makedirs")
+    mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
@@ -67,7 +67,7 @@ def test_create_environment_success(config_path_mock, mocker):
 
 def test_create_environment_makedir_error(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
-    os_mkdirs_mock = mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
+    mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
@@ -100,7 +100,7 @@ def test_create_environment_lack_of_home_folder(config_path_mock, mocker):
 
 def test_create_environment_copy_error(config_path_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
-    os_mkdirs_mock = mocker.patch("os.makedirs")
+    mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
     sh_copytree_mock = mocker.patch("shutil.copytree")
 

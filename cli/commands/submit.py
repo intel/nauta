@@ -38,15 +38,19 @@ log = initialize_logger('commands.submit')
 HELP = "Command used to submitting training scripts for a single node tensorflow training."
 HELP_SFL = "Name of a folder with additional files used by a script - other .py files, data etc. " \
            "If not given - its content won't be copied into an image."
+HELP_T = "Name of a template used for a training. List of available templates might be obtained by" \
+         " issuing dlsctl template_list command."
 
 
 @click.command(help=HELP)
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
+@click.option("-t", "--template", help=HELP_T, default="tf-training")
 @click.argument("script_parameters", nargs=-1)
 @common_options
 @pass_state
-def submit(state: State, script_location: str, script_folder_location: str, script_parameters: Tuple[str, ...]):
+def submit(state: State, script_location: str, script_folder_location: str,
+           template: str, script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
     click.echo("Submitting task.")
 
@@ -54,7 +58,8 @@ def submit(state: State, script_location: str, script_folder_location: str, scri
     experiment_name = common.generate_experiment_name()
 
     # create an enviornment
-    experiment_folder, env_error_message = common.create_environment(experiment_name, script_location, script_folder_location)
+    experiment_folder, env_error_message = common.create_environment(experiment_name, script_location,
+                                                                     script_folder_location)
 
     if env_error_message:
         click.echo("Training script hasn't been submitted. "
@@ -64,7 +69,7 @@ def submit(state: State, script_location: str, script_folder_location: str, scri
         sys.exit(1)
 
     # generate draft's data
-    output, exit_code = cmd.create(working_directory=experiment_folder, pack_type="tf-training")
+    output, exit_code = cmd.create(working_directory=experiment_folder, pack_type=template)
 
     if exit_code:
         click.echo("Training script hasn't been submitted. "
@@ -143,6 +148,6 @@ def submit(state: State, script_location: str, script_folder_location: str, scri
     # display information about status of a training
     click.echo(tabulate([[experiment_name, "Received"]],
                         headers=common.RESULT_HEADER,
-                        tablefmt="grid"))
+                        tablefmt="orgtbl"))
 
     log.debug("Submit - stop")
