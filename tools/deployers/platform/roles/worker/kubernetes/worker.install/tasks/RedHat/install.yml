@@ -13,3 +13,4 @@
     loop_var: package_yum
   with_items:
     - kubernetes-kubelet
+    - socat
