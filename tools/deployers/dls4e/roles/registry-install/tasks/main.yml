@@ -1,0 +1,30 @@
+---
+
+- name: Check if image exists
+  shell: "helm status dls4e-registry-{{ dls4e_version }}"
+  register: chart
+  changed_when: chart.rc == 1
+  failed_when: chart.rc not in [0, 1]
+
+- name: Copy registry chart file
+  copy:
+    src: "dls4e-registry-{{ dls4e_version }}.tgz"
+    dest: "/tmp/dls4e-registry-{{ dls4e_version }}.tgz"
+  when: chart is changed
+
+- name: Install helm chart
+  shell: "helm install -n dls4e-registry-{{ dls4e_version }} --namespace dls4e  /tmp/dls4e-registry-{{ dls4e_version }}.tgz --wait"
+  when: chart is changed
+
+- name: Remove image file
+  file:
+    path: "/tmp/dls4e-registry-{{ dls4e_version }}.tgz"
+    state: absent
+  when: chart is changed
+
+- name: Fetch kubectl nodeport
+  shell: kubectl -n dls4e get svc dls4enterprise-{{ dls4e_version.replace('.', '-') }} -o 'jsonpath={.spec.ports[?(@.targetPort=='5000')].nodePort}'
+  register: nodeport
+
+- set_fact:
+    registry_nodeport: "{{ nodeport.stdout | int }}"

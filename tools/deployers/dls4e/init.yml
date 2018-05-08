@@ -1,0 +1,8 @@
+---
+
+- name: Init node
+  hosts: master
+  become: True
+  gather_facts: False
+  roles:
+    - role: init

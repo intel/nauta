@@ -1,9 +1,0 @@
----
-
-- name: "Run helm tasks for {{ k8s_feature }}"
-  vars:
-    name: "{{ k8s_feature }}"
-    kind: "{{ k8s_feature }}"
-    namespace: kube-system
-    operation: "{{ k8s_operation }}"
-  include_tasks: helm.yml

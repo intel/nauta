@@ -1,0 +1,10 @@
+---
+
+- name: Install node
+  hosts: master
+  become: True
+  gather_facts: False
+  roles:
+    - role: init
+    - role: registry-install
+    - role: dls4e-install

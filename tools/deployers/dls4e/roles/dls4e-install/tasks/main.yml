@@ -1,0 +1,48 @@
+---
+
+- name: Check if image exists
+  shell: "helm status dls4e"
+  register: chart
+  changed_when: chart.rc == 1
+  failed_when: chart.rc not in [0, 1]
+
+- name: Fail if upgrade is not possoble
+  fail:
+    msg: DLS4E is already installed and upgrade option is not selected
+  when:
+    - not chart is changed
+    - not (upgrade | default(False) | bool)
+
+- name: Copy registry chart file
+  copy:
+    src: "dls4e-{{ dls4e_version }}.tgz"
+    dest: "/tmp/dls4e-{{ dls4e_version }}.tgz"
+
+- name: Render values
+  vars:
+    rendered_values:
+      global:
+        dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
+  copy:
+    content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
+
+- name: Install helm chart
+  shell: "helm install -n dls4e --namespace dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml"
+  when: chart is changed
+
+- name: Upgrade helm chart
+  shell: "helm upgrade dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
+  when:
+    - not chart is changed
+    - upgrade | default(False) | bool
+
+- name: Remove image file
+  file:
+    path: "/tmp/dls4e-{{ dls4e_version }}.tgz"
+    state: absent
+
+- name: Remove image values file
+  file:
+    path: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
+    state: absent

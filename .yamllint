@@ -7,6 +7,8 @@ ignore: |
   /platform-deploy/charts/
   /*/charts
   /**/charts
+  /tools/finalizers/dls4e/dls4e-registry
+  /dls4e-charts
 
 rules:
   braces:

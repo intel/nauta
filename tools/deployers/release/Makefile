@@ -11,6 +11,20 @@ ANSIBLE_PLAYBOOK_RUN=ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAYBOOK) \
 
 configured: ENV_INVENTORY
 
-install: PLAYBOOK=$(CURDIR)/platform/dls.yml
-install: configured $(ANSIBLE_PLAYBOOK)
+platform-install: PLAYBOOK=$(CURDIR)/platform/dls.yml
+platform-install: configured $(ANSIBLE_PLAYBOOK)
 	@$(ANSIBLE_PLAYBOOK_RUN) --tags init,install
+
+dls4e-init: PLAYBOOK=$(CURDIR)/dls4e/init.yml
+dls4e-init: configured $(ANSIBLE_PLAYBOOK)
+	@$(ANSIBLE_PLAYBOOK_RUN)
+
+dls4e-install: PLAYBOOK=$(CURDIR)/dls4e/install.yml
+dls4e-install: configured $(ANSIBLE_PLAYBOOK)
+	@$(ANSIBLE_PLAYBOOK_RUN) -e upgrade=False
+
+dls4e-upgrade: PLAYBOOK=$(CURDIR)/dls4e/install.yml
+dls4e-upgrade: configured $(ANSIBLE_PLAYBOOK)
+	@$(ANSIBLE_PLAYBOOK_RUN) -e upgrade=True
+
+install: platform-install dls4e-install

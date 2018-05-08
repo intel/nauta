@@ -7,11 +7,117 @@
   with_items:
     - docker
     - repository
+    - dls4e
+    - dls4e/charts
+    - dls4e-registry
+    - helm-cache
+
+- name: Create ansible files
+  file:
+    path: "{{ build_dir }}/repository/{{ item }}"
+    state: directory
+  with_items:
+    - files
+    - group_vars/all
+
+- name: Download helm bin
+  environment: "{{ proxy }}"
+  get_url:
+    url: "{{ helm_url }}"
+    checksum: "sha256:{{ helm_sha }}"
+    dest: "{{ helm_local }}"
+    mode: 0755
+
+- name: Init helm
+  shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache"
+
+- name: Build subcharts
+  include_tasks: chart-dep.yml
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Render Chart.yaml file
+  template:
+    src: Chart.yaml
+    dest: "{{ build_dir }}/dls4e/Chart.yaml"
+
+- name: Render requirements
+  set_fact:
+    chart_reqs: "{{ (chart_reqs | default([])) + [{'name':name,'version':spec.version}] }}"
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Create requirements.yaml file
+  vars:
+    deps:
+      dependencies: "{{ chart_reqs }}"
+  copy:
+    content: "{{ deps | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ build_dir }}/dls4e/requirements.yaml"
+
+- set_fact:
+    dls4e_values:
+      global:
+        dls4e: dls4enterprise
+        dls4e_release: "{{ version }}"
+        dls4e_release_standarized: "{{ version.replace('.', '-') }}"
+
+- name: Render values
+  set_fact:
+    dls4e_values: "{{ dls4e_values | combine({name: spec.chart_values | default({})}) }}"
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Create dls4e values.yaml file
+  copy:
+    content: "{{ dls4e_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ build_dir }}/dls4e/values.yaml"
+
+- name: Create chart dls4e
+  shell: "{{ helm_local }} package -d {{ build_dir }}/repository/files {{ build_dir }}/dls4e --home {{ build_dir }}/helm-cache"
+
+- name: Check if chart dls4e-{{ version }}.tgz exists
+  file:
+    path: "{{ build_dir }}/repository/files/dls4e-{{ version }}.tgz"
+
+- name: Copy all deployer files
+  synchronize:
+    src: "{{ playbook_dir }}/dls4e-registry/"
+    dest: "{{ build_dir }}/dls4e-registry/"
+
+- name: Render registry Chart.yaml file
+  template:
+    src: registry/Chart.yaml
+    dest: "{{ build_dir }}/dls4e-registry/Chart.yaml"
+
+- name: Create registry values.yaml file
+  vars:
+    values:
+      global:
+        dls4e: dls4enterprise
+        dls4e_release: "{{ version }}"
+        dls4e_release_standarized: "{{ version.replace('.', '-') }}"
+  copy:
+    content: "{{ values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ build_dir }}/dls4e-registry/values.yaml"
+
+- name: Create chart dls4e-registry
+  shell: "{{ helm_local }} package -d {{ build_dir }}/repository/files {{ build_dir }}/dls4e-registry --home {{ build_dir }}/helm-cache"
+
+- name: Check if chart dls4e-registry-{{ version }}.tgz exists
+  file:
+    path: "{{ build_dir }}/repository/files/dls4e-registry-{{ version }}.tgz"
 
 - name: Copy all deployer files
   synchronize:
     src: "{{ deployer }}/"
-    dest: "{{ build_dir }}/repository"
+    dest: "{{ build_dir }}/repository/"
   notify:
     - Remove build dir
 
@@ -27,14 +133,6 @@
   with_items:
     - Dockerfile
     - registry.yml
-
-- name: Create ansible files
-  file:
-    path: "{{ build_dir }}/repository/{{ item }}"
-    state: directory
-  with_items:
-    - files
-    - group_vars/all
 
 - name: Download base image
   docker_image:
@@ -53,7 +151,7 @@
 - name: Save image
   vars:
     image: "dls4e-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
-    dest: "{{ build_dir }}/repository/files/dls4e-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.tar.gz"
+    dest: "{{ build_dir }}/repository/files/dls4e-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.img"
   shell: docker save {{ image }} -o {{ dest }}
 
 - name: Generate file with configuration

@@ -1,9 +1,0 @@
-image:
-  tag: "latest"
-  repository: "dls-gui"
-
-replicaCount: 1
-
-service:
-  externalPort: 9000
-  internalPort: 9000

@@ -30,7 +30,6 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 	@touch $(ACTIVATE)
 
 include toolbox/checks/checks.mk
-include k8s-features/k8s-features.mk
 
 k8s-installer-build:
 	@make tools-release
