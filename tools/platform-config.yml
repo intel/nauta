@@ -1,10 +1,5 @@
 ---
 
-proxy:
-  http_proxy: http://proxy-mu.intel.com:911
-  https_proxy: http://proxy-mu.intel.com:912
-  no_proxy: .intel.com,127.0.0.1,localhost
-
 rpm_pre_packages:
   carbon-python:
     summary: Python precompiled carbon package

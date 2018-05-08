@@ -1,0 +1,5 @@
+FROM registry:2
+
+ADD docker.tar.gz /var/lib/registry
+
+ADD registry.yml /etc/docker/registry/config.yml

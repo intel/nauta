@@ -1,0 +1,3 @@
+ansible==2.5.0.0
+docker==3.3.0
+jmespath==0.9.3

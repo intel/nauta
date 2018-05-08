@@ -1,18 +1,70 @@
 ---
 
+- name: Create build dir directories
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - docker
+    - repository
+
 - name: Copy all deployer files
   synchronize:
     src: "{{ deployer }}/"
-    dest: "{{ build_dir }}/"
+    dest: "{{ build_dir }}/repository"
   notify:
     - Remove build dir
 
 - name: Copy deployer bins
   synchronize:
     src: "{{ package }}"
-    dest: "{{ build_dir }}/dls4e.tar.gz"
+    dest: "{{ build_dir }}/docker/docker.tar.gz"
+
+- name: Copy templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ build_dir }}/docker/{{ item }}"
+  with_items:
+    - Dockerfile
+    - registry.yml
+
+- name: Create ansible files
+  file:
+    path: "{{ build_dir }}/repository/{{ item }}"
+    state: directory
+  with_items:
+    - files
+    - group_vars/all
+
+- name: Download base image
+  docker_image:
+    name: "registry:2"
+    state: present
+
+- name: Build image
+  docker_image:
+    path: "{{ build_dir }}/docker"
+    name: "dls4e-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+    pull: False
+    push: False
+  notify:
+    - Remove docker image
+
+- name: Save image
+  vars:
+    image: "dls4e-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+    dest: "{{ build_dir }}/repository/files/dls4e-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.tar.gz"
+  shell: docker save {{ image }} -o {{ dest }}
+
+- name: Generate file with configuration
+  vars:
+    configuration:
+      dls4e_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+  copy:
+    dest: "{{ build_dir }}/repository/group_vars/all/version.yml"
+    content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
 
 - name: Create package
   shell: tar -cf {{ output }} -I pigz ./
   args:
-    chdir: "{{ build_dir }}"
+    chdir: "{{ build_dir }}/repository"

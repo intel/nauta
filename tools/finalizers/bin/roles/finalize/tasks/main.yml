@@ -1,0 +1,24 @@
+---
+
+- name: Stop all images
+  vars:
+    name: "{{ item.key }}"
+    data: "{{ item.value }}"
+  with_dict: "{{ supported_os_versions }}"
+  docker_container:
+    name: "release-builder-{{ version }}-{{ name }}-{{ data.type }}"
+    state: absent
+
+- name: Get all types
+  vars:
+    name: "{{ type.key }}"
+    spec: "{{ type.value }}"
+  with_dict: "{{ downloads }}"
+  loop_control:
+    loop_var: type
+  include_tasks: type.yml
+
+- name: Create package
+  shell: tar -cf {{ output }} -I pigz ./
+  args:
+    chdir: "{{ build_dir }}/bin"

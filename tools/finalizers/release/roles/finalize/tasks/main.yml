@@ -1,5 +1,12 @@
 ---
 
+- name: Copy all deployer files
+  synchronize:
+    src: "{{ deployer }}/"
+    dest: "{{ build_dir }}"
+  notify:
+    - Remove build dir
+
 - name: Ensure release directories exists
   file:
     path: "{{ build_dir }}/{{ item }}"
@@ -7,6 +14,7 @@
   with_items:
     - dls4e
     - platform
+    - bin
 
 - name: Unpack deployer bins
   shell: tar -xf {{ item.package }} -I pigz
@@ -17,6 +25,8 @@
       package: "{{ dls4e_package }}"
     - name: platform
       package: "{{ platform_package }}"
+    - name: bin
+      package: "{{ bin_package }}"
 
 - name: Create package
   shell: tar -cf {{ output }} -I pigz ./

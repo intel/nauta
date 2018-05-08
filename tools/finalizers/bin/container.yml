@@ -1,0 +1,20 @@
+---
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  roles:
+    - role: pre
+
+- name: Run local docker tasks
+  hosts: releases
+  become: False
+  any_errors_fatal: True
+  roles:
+    - role: init
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  roles:
+    - role: finalize

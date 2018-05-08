@@ -6,12 +6,12 @@ storage:
     cache:
         layerinfo: inmemory
     filesystem:
-        rootdirectory: /opt/carbon/registry
+        rootdirectory: /var/lib/registry
     maintenance:
         readonly:
             enabled: true
 http:
-    addr: {{ dls_configuration.internal_interface.ipv4_address }}:5000
-    secret: REDACTED
+    addr: :5000
+    secret: DLS4EREGISTRY
     debug:
         addr: 127.0.0.1:5001

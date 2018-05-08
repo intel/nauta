@@ -1,0 +1,5 @@
+[localhost]
+local ansible_connection=local
+
+[localhost:vars]
+ansible_python_interpreter={{ default_ansible_python_interpreter }}

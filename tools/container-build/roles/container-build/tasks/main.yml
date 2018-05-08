@@ -48,6 +48,11 @@
 
 - name: Push image layers
   include_tasks: push.yml
+  when: push_local | default(True)
 
 - name: Save image layers
   include_tasks: save.yml
+
+- name: Tag image layers
+  include_tasks: tag.yml
+  when: tag_local | default(False)

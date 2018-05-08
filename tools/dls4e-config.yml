@@ -1,10 +1,5 @@
 ---
 
-proxy:
-  http_proxy: http://proxy-mu.intel.com:911
-  https_proxy: http://proxy-mu.intel.com:912
-  no_proxy: .intel.com,127.0.0.1,localhost
-
 images:
   dls4e/centos:
     version: "7.4.1708"

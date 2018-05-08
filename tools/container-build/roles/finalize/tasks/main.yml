@@ -4,3 +4,10 @@
   shell: tar -cf {{ output }} --use-compress-program=pigz ./
   args:
     chdir: "{{ build_dir }}"
+  when: create_package | default(True)
+
+- name: Touch file
+  file:
+    path: "{{ output }}"
+    state: touch
+  when: not (create_package | default(True))

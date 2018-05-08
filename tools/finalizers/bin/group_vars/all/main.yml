@@ -1,0 +1,29 @@
+---
+
+supported_os_versions:
+  ubuntu16:
+    image: compiler/ubuntu16-ready:16.04
+    type: Linux
+    name: Ubuntu
+    version: 16.04
+  centos7:
+    image: compiler/centos7-ready:7.4.1708
+    type: Linux
+    name: CentOS
+    version: 7.4.1708
+
+
+pip_packages:
+  - ansible==2.5.0.0
+  - docker==3.3.0
+  - jmespath==0.9.3
+  - netaddr==0.7.19
+
+downloads:
+  Linux:
+    kubectl:
+      url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/kubectl
+      shasum: 49f7e5791d7cd91009c728eb4dc1dbf9ee1ae6a881be6b970e631116065384c3
+    helm:
+      url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm
+      shasum: 422c1378c2c4fa99cf436c077a50ec54158173f100117763338cf7f2df5de0b9

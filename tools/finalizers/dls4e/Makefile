@@ -1,5 +1,5 @@
 DIRECTORY:=$(CURDIR)
-WORKSPACE_NAME:=finalizer-platform
+WORKSPACE_NAME:=finalizer-dls4e
 include $(CURDIR)/../../makelibs/commons.mk
 
 configured: ENV_PLATFORM_PACKAGE $(BUILD_DIR) ENV_OUTPUT ENV_DEPLOYER
