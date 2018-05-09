@@ -50,6 +50,7 @@ Here is an example output of _submit_ command:
 - [adduser](commands/ADDUSER.md) - creates and initializes a new DLS4E user.
 - [mounts](commands/MOUNTS.md) - mounts a user's directory on a local machine
 - [list](commands/LIST.md) - displays a list of experiments
+- [logs](commands/LOGS.md) - displays logs from an experiment
 - [view](commands/VIEW.md) - displays details of an experiment
 - [launch](commands/LAUNCH.md) - exposes a DLS4E web app to a user
 - [cancel](commands/CANCEL.md) - cancels an experiment

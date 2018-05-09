@@ -19,26 +19,21 @@
 # and approved by Intel in writing.
 #
 
-import pytest
+import click
 
-from util.k8s_info import get_kubectl_port, get_kubectl_host
+from cli_state import common_options, pass_state, State
 
-
-@pytest.fixture()
-def mocked_k8s_config(mocker):
-    mocker.patch('kubernetes.config.load_kube_config')
-    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
-    conf_instance = mocked_conf_class.return_value
-    conf_instance.host = 'https://127.0.0.1:8080'
+HELP = "Displays basic details of experiment with a given name."
+HELP_T = "If given - exposes a tensorboard's instance with exepriment's data."
 
 
-def test_get_k8s_host(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
-
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
+@click.command(help=HELP)
+@click.argument("experiment_name")
+@click.option('-t', '--tensorboard', default=None, help=HELP_T, is_flag=True)
+@common_options
+@pass_state
+def view(state: State, experiment_name: str, tensorboard: bool):
+    """
+    Displays details of an experiment.
+    """
+    click.echo("View command - under development")

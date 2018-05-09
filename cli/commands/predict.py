@@ -19,26 +19,21 @@
 # and approved by Intel in writing.
 #
 
-import pytest
+import click
 
-from util.k8s_info import get_kubectl_port, get_kubectl_host
+from cli_state import common_options, pass_state, State
 
-
-@pytest.fixture()
-def mocked_k8s_config(mocker):
-    mocker.patch('kubernetes.config.load_kube_config')
-    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
-    conf_instance = mocked_conf_class.return_value
-    conf_instance.host = 'https://127.0.0.1:8080'
+HELP = "Runs inference on previously trained model."
+HELP_N = "Name of prediction session."
 
 
-def test_get_k8s_host(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
-
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
+@click.command(help=HELP)
+@click.argument("model_location")
+@click.option('-n', '--name', default=None, help=HELP_N)
+@common_options
+@pass_state
+def predict(state: State, model_location: str, name: str):
+    """
+    Runs an inference based on a trained model
+    """
+    click.echo("predict command - under development")

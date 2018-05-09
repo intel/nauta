@@ -19,26 +19,22 @@
 # and approved by Intel in writing.
 #
 
-import pytest
+import click
 
-from util.k8s_info import get_kubectl_port, get_kubectl_host
+from cli_state import common_options, pass_state, State
 
-
-@pytest.fixture()
-def mocked_k8s_config(mocker):
-    mocker.patch('kubernetes.config.load_kube_config')
-    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
-    conf_instance = mocked_conf_class.return_value
-    conf_instance.host = 'https://127.0.0.1:8080'
+HELP = "Displays a list of experiments with some basic information regarding each of them."
+HELP_M = "Filters list of experiments by an experiment's name. Name of an experiment can be a regular expression."
+HELP_A = "If given - list contains experiments of all users."
 
 
-def test_get_k8s_host(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
-
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
+@click.command(help=HELP)
+@click.option('-m', '--match', default=None, help=HELP_M)
+@click.option('-a', '--all_users', default=None, help=HELP_A, is_flag=True)
+@common_options
+@pass_state
+def list(state: State, match: str, all_user: bool):
+    """
+    Lists experiments
+    """
+    click.echo("List command - under development")

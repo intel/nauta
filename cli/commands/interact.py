@@ -19,26 +19,22 @@
 # and approved by Intel in writing.
 #
 
-import pytest
+import click
 
-from util.k8s_info import get_kubectl_port, get_kubectl_host
+from cli_state import common_options, pass_state, State
 
-
-@pytest.fixture()
-def mocked_k8s_config(mocker):
-    mocker.patch('kubernetes.config.load_kube_config')
-    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
-    conf_instance = mocked_conf_class.return_value
-    conf_instance.host = 'https://127.0.0.1:8080'
+HELP = "Launches a local browser with Jupyter notebook. If script name argument is given - script is put" \
+       "into opened notebook."
+HELP_N = "Name of a Jupyter notebook's session.."
 
 
-def test_get_k8s_host(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
-
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
+@click.command(help=HELP)
+@click.argument("script_name", default="")
+@click.option('-n', '--name', default=None, help=HELP_N)
+@common_options
+@pass_state
+def interact(state: State, script_name: str, name: str):
+    """
+    Starts an interactive session with Jupyter Notebook
+    """
+    click.echo("Interact command - under development")

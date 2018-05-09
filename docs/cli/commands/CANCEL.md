@@ -2,30 +2,33 @@
 
 - [Synopsis](#synopsis)  
 - [Arguments](#arguments)  
+- [Options](#options)
 - [Returns](#returns)
-- [Notes](#notes)  
 - [Examples](#examples)  
 - [Status](#status)
 
 ## Synopsis
 
-Cancels training with a name given as a paramater. Format of this command is as follows:
+Cancels training chosen based on provided parameters. Format of this command is as follows:
 
-_dlsctl cancel <experiment_name>_
+_dlsctl cancel <name>_
 
 ## Arguments
 
 | Name | Obligatory | Description |
 |:--- |:--- |:--- |
-|_<experiment_name>_ | Yes | name of an experiment to be cancelled |
+|_<name>_ | Yes | name of an experiment/pod id/status of a pod to be cancelled. Command searches for objects matching given value - starting from names of experiments, pods ids and pods in a given status. If any such object has been found - the command displays for each of such objects a question whether this object should be cancelled. Value given here might contain only a part of an object's name. |
+
+## Options
+
+| Name | Obligatory | Description | 
+|:--- |:--- |:--- |
+|_-p/--purge_| No | if given - all information concerning experiments is removed from the system.|
 
 
 ## Returns
 
-Description of a problem - if any occurs. Otherwise information that training was cancelled sucessfully. 
-
-## Notes
-
+Description of a problem - if any occurs. Otherwise information that training job/jobs was/were cancelled sucessfully. 
 
 ## Examples
 

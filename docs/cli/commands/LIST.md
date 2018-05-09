@@ -34,16 +34,15 @@ example table returned by this command.
 
 <!-- language: lang-none -->
 
-    +----------------------+---------------------+---------------+----------------+----------+----------+
+    
     | Experiment           | Parameters used     | Metrics       | Time submitted | Username | Status   |
-    +======================+=====================+===============+================+==========+==========|
+    +----------------------+---------------------+---------------+----------------+----------+----------|
     | exp1-20181122:0830-1 | learningrate: 0.1   | loss: 0.05    |  20181122:0830 | jdoe     | Complete |
     |                      | padding: 2          | accuracy: 0.9 |                |          |          |
     |                      | layers: 10          |               |                |          |          |
     | exp1-20181122:0830-2 | learningrate: 0.01  |               |  20181122:0830 | jdoe     | Running` |
     | exp1-20181122:0830-3 | learningrate: 0.001 |               |  20181122:0830 | jdoe     | Queued   |
-    +----------------------+---------------------+---------------+----------------+----------+----------+
-    
+        
 ### Additional remarks
 
 This command doesn't handle _-s/--silent_ option.

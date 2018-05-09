@@ -3,7 +3,6 @@
 - [Synopsis](#synopsis)  
 - [Arguments](#arguments)  
 - [Returns](#returns)
-- [Notes](#notes)  
 - [Examples](#examples)  
 - [Status](#status)
 
@@ -15,9 +14,6 @@ is executed using a context of other type of a user, it fails.
 
 _dlsctl adduser <user_name>_
 
-  
-
-
 ## Arguments
 
 | Name | Obligatory | Description |
@@ -26,11 +22,8 @@ _dlsctl adduser <user_name>_
 
 ## Returns
 
-In case of any problems - message desribing their cause/causes. In case of a success \- message
-that a user has been created. 
-
-## Notes
-
+In case of any problems - message desribing their cause/causes. In case of a success - content of a _kubectl_ configuration
+file with data of a created user.
 
 ## Examples
 

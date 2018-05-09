@@ -1,7 +1,8 @@
-# view - exposes web interfaces to a user
+# view - displays basic details of an experiment
 
 - [Synopsis](#synopsis)  
 - [Arguments](#arguments)  
+- [Options](#options)
 - [Returns](#returns)
 - [Notes](#notes)  
 - [Examples](#examples)  
@@ -9,31 +10,34 @@
 
 ## Synopsis
 
-Launches and exposes to a user a DLS4E web frontend. Format of the command is as follows:
+Displays basic details of an experiment - like a name of an experiment, parameters, submission date etc. 
+Format of this command is as follows:
 
-_dlsctl launch <app_name>_
+_dlsctl view <experiment_name>_
 
 ## Arguments
 
 | Name | Obligatory | Description |
 |:--- |:--- |:--- |
-|_<app_name>_ | Yes | Name of an application that should be deployed to a customer. Available values are:<br> - _webUI_ - exposes web interface for tracking experiments |
+|_\<experiment_name\>_ | Yes | Name of an experiment to be displayed. |
+
+## Options
+
+| Name | Obligatory | Description | 
+|:--- |:--- |:--- |
+|_-t/--tensorboard_ | No | exposes _tensorboard_ instance with data from an experiment to a user.  |
 
 ## Returns
 
-Link to an exposed application. Example link might look like that:
-<!-- language: lang-none -->
+Displays details of an experiment. If _-t/--tensorboard_ option is given - the command returns also a link to tensorboard's instance with data from an experiment.
 
-    http://127.0.0.1/dls-gui/token=AB123CA27F  
-
-## Notes
-
-Notes concerning this command
 
 ## Examples
 
-_dlsctl launch webUI_
+_dlsctl view experiment_name_2 -t_
+
+Displays details of an _experiment_name_2_ experiment and exposes _tensorboard_ instance with experiment's data to a user.
 
 ## Status
 
-Under development
+Planned
