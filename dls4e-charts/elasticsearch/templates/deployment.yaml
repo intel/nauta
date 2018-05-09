@@ -1,23 +1,35 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+    dls4e_app_name: elasticsearch
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        heritage: {{ .Release.Service }}
+        dls4e_app_name: elasticsearch
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E elasticsearch image is required" .Values.image }}
         imagePullPolicy: "IfNotPresent"
         env:
         - name: ES_JAVA_OPTS
@@ -25,8 +37,10 @@ spec:
         resources:
           requests:
             memory: 1Gi
+            cpu: 1
           limits:
             memory: 1Gi
+            cpu: 1
         ports:
-        - containerPort: {{ .Values.service.internalPort }}
+        - containerPort: 9200
           protocol: TCP

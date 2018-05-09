@@ -1,12 +1,14 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-client
   labels:
-    app: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     heritage: {{ .Release.Service }}
-  name: {{ .Release.Name }}-client
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
 rules:
 - apiGroups:
   - ""
@@ -16,4 +18,4 @@ rules:
   - get
   - create
   resourceNames:
-  - '{{ .Chart.Name }}-svc'
+  - {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}

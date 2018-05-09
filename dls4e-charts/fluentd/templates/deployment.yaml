@@ -1,36 +1,42 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ .Release.Name }}-fluentd
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
   labels:
-    app: {{ .Release.Name }}-fluentd
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
     heritage: {{ .Release.Service }}
     kubernetes.io/cluster-service: "true"
 spec:
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-fluentd
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-fluentd
-        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        app: {{ .Chart.Name }}
         release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
         kubernetes.io/cluster-service: "true"
     spec:
-      serviceAccountName: {{ .Release.Name }}-fluentd-service-account
+      serviceAccountName: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E fluentd image is required" .Values.image }}
         imagePullPolicy: "IfNotPresent"
         env:
           - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "{{ .Values.elaticsearch.host }}"
+            value: "elasticsearch"
           - name:  FLUENT_ELASTICSEARCH_PORT
-            value: "{{ .Values.elaticsearch.port }}"
+            value: "9200"
           - name:  FLUENTD_CONF
             value: custom-config/fluent.conf
           - name: FLUENT_ELASTICSEARCH_USER
@@ -61,7 +67,7 @@ spec:
           path: /var/lib/docker/containers
       - name: config-volume
         configMap:
-          name: {{ .Release.Name }}-fluentd-config
+          name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
           items:
           - key: fluent.conf
             path: fluent.conf

@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+    dls4e_app_name: gui
 spec:
   replicas: 1
   selector:
@@ -24,6 +25,7 @@ spec:
         release: {{ .Release.Name }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
+        dls4e_app_name: gui
     spec:
       containers:
       - name: {{ .Chart.Name }}

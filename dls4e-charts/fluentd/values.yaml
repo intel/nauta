@@ -1,7 +1,0 @@
-image:
-  repository: "fluent/fluentd-kubernetes-daemonset"
-  tag: "v0.12-debian-elasticsearch"
-
-elaticsearch:
-   host: "elasticsearch.default"
-   port: 9200
