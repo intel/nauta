@@ -98,12 +98,14 @@ def test_modify_dockerfile(mocker):
 def test_update_configuration_success(mocker):
     modify_job_yaml_mock = mocker.patch("packs.tf_training.modify_job_yaml")
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
+    modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
     output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
     assert modify_job_yaml_mock.call_count == 1, "job yaml wasn't modified"
+    assert modify_draft_toml_mock.call_count == 1, "draft toml wasn't modified"
 
 
 def test_update_configuration_failure(mocker):

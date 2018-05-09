@@ -23,13 +23,15 @@ import yaml
 import os
 import shutil
 from typing import Tuple
+import toml
 
+from util.k8s import k8s_info
 from util.logger import initialize_logger
+import packs.common as common
 
 
 log = initialize_logger('packs.tf_training')
 
-import packs.common as common
 
 def update_configuration(experiment_folder: str, script_location: str,
                          script_folder_location: str,
@@ -50,12 +52,14 @@ def update_configuration(experiment_folder: str, script_location: str,
     try:
         modify_job_yaml(experiment_folder, script_location, script_parameters)
         modify_dockerfile(experiment_folder)
+        modify_draft_toml(experiment_folder)
     except Exception as exe:
         log.error("Update configuration - i/o error : {}".format(exe))
         return 1
 
     log.debug("Update configuration - end")
     return 0
+
 
 def modify_dockerfile(experiment_folder: str):
     log.debug("Modify dockerfile - start")
@@ -76,8 +80,9 @@ def modify_dockerfile(experiment_folder: str):
     shutil.move(dockerfile_temp_name, dockerfile_name)
     log.debug("Modify dockerfile - end")
 
+
 def modify_job_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...]):
-    log.debug("Modify job yaml - start")
+    log.debug("Modify job.yaml - start")
     job_yaml_filename = os.path.join(experiment_folder, "charts//tf-training//values.yaml")
     job_yaml_temp_filename = os.path.join(experiment_folder, "charts//tf-training//values_temp.yaml")
 
@@ -89,4 +94,22 @@ def modify_job_yaml(experiment_folder: str, script_location: str, script_paramet
         yaml.dump(y, job_yaml_file)
 
     shutil.move(job_yaml_temp_filename, job_yaml_filename)
-    log.debug("Modify job yaml - end")
+    log.debug("Modify job.yaml - end")
+
+
+def modify_draft_toml(experiment_folder: str):
+    log.debug("Modify draft.toml - start")
+    draft_toml_filename = os.path.join(experiment_folder, "draft.toml")
+    draft_toml_temp_filename = os.path.join(experiment_folder, "draft_temp.toml")
+    namespace = k8s_info.get_kubectl_current_context_namespace()
+
+    with open(draft_toml_filename, "r") as draft_toml_file:
+        t = toml.load(draft_toml_file)
+        log.debug(t["environments"])
+        t["environments"]["development"]["namespace"] = namespace
+
+    with open(draft_toml_temp_filename, "w") as draft_toml_file:
+        toml.dump(t, draft_toml_file)
+
+    shutil.move(draft_toml_temp_filename, draft_toml_filename)
+    log.debug("Modify draft.toml - end")

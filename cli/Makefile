@@ -43,8 +43,10 @@ endif
 
 
 clean:
-	@rm -rf $(VIRTUALENV_DIR) __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip
+	@rm -rf __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip
 
+full_clean: clean
+	@rm -rf $(VIRTUALENV_DIR)
 
 venv: $(ACTIVATE)
 $(ACTIVATE): requirements.txt

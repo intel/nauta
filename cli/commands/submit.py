@@ -89,7 +89,7 @@ def submit(state: State, script_location: str, script_folder_location: str,
     # start port forwarding
     # noinspection PyBroadException
     try:
-        process, tunnel_port = start_port_forwarding('docker-registry')
+        process, tunnel_port, container_port = start_port_forwarding('docker-registry')
     except Exception:
         log.exception("Error during creation of a proxy for a docker registry.")
         click.echo("Error during creation of a proxy for a docker registry.")

@@ -53,19 +53,19 @@ def launch(state: State, app: str, run_browser: bool):
     k8s_app_name = K8S_APP_NAME[app]
 
     try:
-        process, tunnel_port = start_port_forwarding(k8s_app_name)
+        process, tunneled_port, container_port = start_port_forwarding(k8s_app_name)
     except Exception:
         logger.exception('Error during creation of a proxy for a {}'.format(k8s_app_name))
         click.echo('Error during creation of a proxy for a {}'.format(k8s_app_name))
         sys.exit(1)
 
-    url = FORWARDED_URL.format(tunnel_port)
+    url = FORWARDED_URL.format(container_port)
 
     # run socat if on Windows or Mac OS
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         # noinspection PyBroadException
         try:
-            socat.start(tunnel_port)
+            socat.start(container_port)
         except Exception:
             logger.exception("Error during creation of a proxy for a local docker-host tunnel")
             click.echo("Error during creation of a local docker-host tunnel.")

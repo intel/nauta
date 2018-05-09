@@ -30,7 +30,7 @@ DISABLE_BROWSER_ARG = '--run-browser=False'
 
 
 def test_launch_with_browser_success(mocker):
-    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000)])
+    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.input")
@@ -51,7 +51,7 @@ def test_launch_with_browser_success(mocker):
 
 
 def test_launch_without_browser_success(mocker):
-    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000)])
+    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.input")

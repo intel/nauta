@@ -30,7 +30,7 @@ from util.k8s.k8s_info import get_app_pods, get_app_services, get_pod_status, Po
 logger = initialize_logger('util.kubectl')
 
 
-def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int):
+def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -43,13 +43,13 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int):
     :param k8s_app_name: name of kubernetes application for tunnel creation
 
     :return:
-        instance of a process with proxy and forwarded port
+        instance of a process with proxy, tunneled port and container port
     """
     logger.debug("Start port forwarding")
 
     try:
         running_pod_name = None
-        service_port = None
+        service_node_port = None
         namespace = None
 
         app_pods = get_app_pods(k8s_app_name)
@@ -70,33 +70,36 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int):
 
         app_services = get_app_services(k8s_app_name)
         if app_services:
-            service_port = app_services[0].spec.ports[0].port
-            if service_port:
-                logger.debug('Service port for {} pod has been found: {}'.format(running_pod_name, service_port))
+            service_node_port = app_services[0].spec.ports[0].node_port
+            if service_node_port:
+                logger.debug('Service node port for {} pod has been found: {}'.format(running_pod_name, service_node_port))
 
-        if not service_port:
-            logger.error('Cannot find open port for {} app pod'.format(k8s_app_name))
+            service_container_port = app_services[0].spec.ports[0].port
+            if service_container_port:
+                logger.debug('Service container port for {} pod has been found: {}'.format(running_pod_name, service_container_port))
+
+        if not service_node_port or not service_container_port:
+            logger.error(f'Cannot find open port for {k8s_app_name} app pod')
             raise KubectlIntError("Missing pod port during creation of port proxy.")
 
         if k8s_app_name == 'docker-registry':
             # setting draft conf, only for docker-registry case
-            dc_output, dc_exit_code = set_registry_port(service_port)
+            dc_output, dc_exit_code = set_registry_port(service_node_port)
             if dc_exit_code:
                 logger.error("Port forwarding - exception - setting draft config failed : {}".format(
                     dc_output
                 ))
                 raise KubectlIntError("Setting draft config failed.")
 
-        port_forward_command = ['kubectl', 'port-forward', '--namespace={}'.format(namespace),
-                                running_pod_name, '{}'.format(service_port)]
+        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', running_pod_name,
+                                f'{service_node_port}:{service_container_port}']
 
-        # if a log level is set to DEBUG - additional information from creatoin of a proxy
-        # are sent to console
-        std_output = subprocess.DEVNULL
-        if logger.getEffectiveLevel() == logging.DEBUG:
-            std_output = subprocess.STDOUT
+        # if a log level is set to DEBUG - additional information from creatoin of a proxy are sent to console
+        std_output_destination = None if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
+        std_error_destination = subprocess.STDOUT if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
 
-        process = subprocess.Popen(args=port_forward_command, stdout=std_output, stderr=std_output)
+        process = subprocess.Popen(args=port_forward_command, stdout=std_output_destination,
+                                   stderr=std_error_destination)
 
         if not process:
             logger.error("Port forwarding - exception - process doesn't exist.")
@@ -109,4 +112,4 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int):
         raise RuntimeError("Other error during creation of port proxy.")
 
     logger.info("Port forwarding - proxy set up")
-    return process, service_port
+    return process, service_node_port, service_container_port

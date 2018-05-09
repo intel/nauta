@@ -47,6 +47,12 @@ def get_kubectl_port() -> int:
     return port
 
 
+def get_kubectl_current_context_namespace() -> str:
+    config.load_kube_config()
+    context_list, current_context = config.list_kube_config_contexts()
+    return current_context['context']['namespace']
+
+
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     config.load_kube_config()
     api = client.CoreV1Api(client.ApiClient())

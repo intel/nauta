@@ -33,7 +33,7 @@ PODS_LIST_MOCK = V1PodList(items=[
 ]).items
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
-    V1Service(spec=V1ServiceSpec(ports=[V1ServicePort(port=5000)]))
+    V1Service(spec=V1ServiceSpec(ports=[V1ServicePort(port=5000,node_port=33451)]))
 ]).items
 
 
@@ -50,7 +50,7 @@ def test_start_port_forwarding_success(mock_k8s_pods_and_svc, mocker):
     pod_status_mock.return_value = PodStatus.RUNNING
     popen_mock = mocker.patch('subprocess.Popen')
 
-    process = kubectl.start_port_forwarding(TEST_APP_NAME)
+    process, _, _ = kubectl.start_port_forwarding(TEST_APP_NAME)
 
     assert process, "proxy process doesn't exist."
     assert popen_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"

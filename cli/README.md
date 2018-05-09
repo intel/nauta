@@ -98,9 +98,9 @@ Step-by-step instruction to run example training:
     mkdir experiment
     cd experiment
     ```
-1. Download training py script (cli/example-python/mnist/mnist_single_node.py):
+1. Copy training py script (cli/example-python/mnist/mnist_single_node.py):
     ```
-    wget https://github.com/NervanaSystems/carbon/blob/develop/cli/example-python/mnist/mnist_single_node.py
+    cp cli/example-python/mnist/mnist_single_node.py .
     ```
 1. Download MNIST dataset (from http://yann.lecun.com/exdb/mnist/):
     ```
