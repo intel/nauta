@@ -20,6 +20,7 @@
 #
 
 import os
+import urllib3
 
 import click
 
@@ -32,12 +33,12 @@ from commands import cancel
 from commands import version
 from commands import interact
 from commands import predict
+from commands import launch
 from util.config import Config, Fields
 from commands import template_list
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
 DEFAULT_LANG = "en_US.UTF-8"
 
 
@@ -48,6 +49,7 @@ def entry_point():
 
 entry_point.add_command(submit.submit)
 entry_point.add_command(verify.verify)
+entry_point.add_command(launch.launch)
 entry_point.add_command(logs.logs)
 entry_point.add_command(template_list.template_list)
 entry_point.add_command(list.list)
@@ -59,6 +61,7 @@ entry_point.add_command(predict.predict)
 
 if __name__ == '__main__':
     try:
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         entry_point()
     except RuntimeError:
         os.environ["LC_ALL"] = DEFAULT_LANG

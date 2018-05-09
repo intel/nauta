@@ -20,7 +20,6 @@
 #
 
 from enum import Enum
-
 from kubernetes import config, client
 from kubernetes.client import configuration
 
@@ -52,3 +51,15 @@ def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     config.load_kube_config()
     api = client.CoreV1Api(client.ApiClient())
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
+
+
+def get_app_pods(app_name: str) -> list:
+    config.load_kube_config()
+    api = client.CoreV1Api(client.ApiClient())
+    return api.list_pod_for_all_namespaces(label_selector='app={}'.format(app_name)).items
+
+
+def get_app_services(app_name: str) -> list:
+    config.load_kube_config()
+    api = client.CoreV1Api(client.ApiClient())
+    return api.list_service_for_all_namespaces(label_selector='app={}'.format(app_name)).items

@@ -23,8 +23,8 @@ import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
-from util.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
 from cli_state import common_options, pass_state, State
+from util.k8s.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
 
 
 @click.command()

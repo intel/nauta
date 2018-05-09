@@ -19,19 +19,18 @@
 # and approved by Intel in writing.
 #
 
+from unittest.mock import Mock
 from click.testing import CliRunner
-
 from commands import submit
 from util.system import get_current_os, OS
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
 EXPERIMENT_NAME = "experiment_name"
 SCRIPT_LOCATION = "training_script.py"
-EXPERIMENT_NAME = "experiment_name"
 PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
-FAKE_PORT = 'fake_port'
 TEMPLATE_PARAM = "--template"
 TEMPLATE_NAME = "non-existing-template"
+FAKE_PORT = 1000
 
 
 def test_submit_success(mocker):
@@ -41,10 +40,9 @@ def test_submit_success(mocker):
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    spf_mock = mocker.patch("commands.submit.start_port_forwarding")
+    spf_mock = mocker.patch("commands.submit.start_port_forwarding", side_effect=[(Mock, FAKE_PORT)])
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        get_registry_port_mock = mocker.patch("commands.submit.get_registry_port", side_effect=[FAKE_PORT])
         socat_mock = mocker.patch("commands.submit.socat")
 
     runner = CliRunner()
@@ -58,9 +56,7 @@ def test_submit_success(mocker):
     assert cmd_up_mock.call_count == 1, "training wasn't deployed"
     assert del_env_mock.call_count == 0, "environment folder was deleted"
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        assert get_registry_port_mock.call_count == 1, "port on MacOS/Windows wasn't returned"
         assert socat_mock.start.call_count == 1, "socat wasn't started"
-        socat_mock.start.assert_called_with(FAKE_PORT)
 
 
 def test_submit_fail(mocker):
@@ -70,7 +66,7 @@ def test_submit_fail(mocker):
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    spf_mock = mocker.patch("commands.submit.start_port_forwarding")
+    spf_mock = mocker.patch("commands.submit.start_port_forwarding", side_effect=[(Mock, FAKE_PORT)])
 
     runner = CliRunner()
     runner.invoke(submit.submit, [SCRIPT_LOCATION])
@@ -91,7 +87,7 @@ def test_submit_depl_fail(mocker):
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    spf_mock = mocker.patch("commands.submit.start_port_forwarding")
+    spf_mock = mocker.patch("commands.submit.start_port_forwarding", side_effect=[(Mock, FAKE_PORT)])
 
     runner = CliRunner()
     runner.invoke(submit.submit, [SCRIPT_LOCATION])
@@ -112,7 +108,7 @@ def test_submit_env_update_fail(mocker):
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[1])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    spf_mock = mocker.patch("commands.submit.start_port_forwarding")
+    spf_mock = mocker.patch("commands.submit.start_port_forwarding", side_effect=[(Mock, FAKE_PORT)])
 
     runner = CliRunner()
     runner.invoke(submit.submit, [SCRIPT_LOCATION])
@@ -133,10 +129,9 @@ def test_submit_start_depl_fail(mocker):
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("error message", 1)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    spf_mock = mocker.patch("commands.submit.start_port_forwarding")
+    spf_mock = mocker.patch("commands.submit.start_port_forwarding", side_effect=[(Mock, FAKE_PORT)])
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        get_registry_port_mock = mocker.patch("commands.submit.get_registry_port", side_effect=[FAKE_PORT])
         socat_mock = mocker.patch("commands.submit.socat")
 
     runner = CliRunner()
@@ -150,7 +145,6 @@ def test_submit_start_depl_fail(mocker):
     assert upd_conf_mock.call_count == 1, "configuration was updated"
     assert cmd_up_mock.call_count == 1, "app didn't try to start deployment"
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        assert get_registry_port_mock.call_count == 1, "port on MacOS/Windows wasn't returned"
         assert socat_mock.start.call_count == 1, "socat wasn't started"
         socat_mock.start.assert_called_with(FAKE_PORT)
 

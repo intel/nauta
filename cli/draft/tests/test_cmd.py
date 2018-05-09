@@ -20,13 +20,11 @@
 #
 
 from unittest.mock import call, ANY
-
 from util.config import Config
-from unittest.mock import call
+from draft import cmd
+
 import os
 import pytest
-
-from draft import cmd
 
 
 FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'

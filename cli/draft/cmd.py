@@ -76,7 +76,7 @@ def set_registry_port(registry_port: str) -> (str, int):
     - exit_code - 0 - operation was a success, otherwise some error occurred during
                 its execution
     """
-    docker_location = DOCKER_IP_ADDRESS + ":" + registry_port
+    docker_location = f'{DOCKER_IP_ADDRESS}:{registry_port}'
 
     CONFIGURE_DRAFT_PORT_COMMAND = ["config", "set", "registry", docker_location]
 

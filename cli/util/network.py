@@ -19,26 +19,16 @@
 # and approved by Intel in writing.
 #
 
-import pytest
-
-from util.k8s_info import get_kubectl_port, get_kubectl_host
-
-
-@pytest.fixture()
-def mocked_k8s_config(mocker):
-    mocker.patch('kubernetes.config.load_kube_config')
-    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
-    conf_instance = mocked_conf_class.return_value
-    conf_instance.host = 'https://127.0.0.1:8080'
+import requests
+import time
 
 
-def test_get_k8s_host(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
-
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
+def wait_for_connection(url, retries=10, timeout=1) -> bool:
+    while retries:
+        try:
+            response = requests.get(url)
+            return int(response.status_code / 100) == 2
+        except requests.exceptions.ConnectionError:
+            retries = retries - 1
+            time.sleep(timeout)
+    return False

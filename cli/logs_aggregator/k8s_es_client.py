@@ -28,7 +28,7 @@ from logs_aggregator.log_filters import SeverityLevel, filter_logs_by_severity,\
     filter_logs_by_pod_status
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
-from util.k8s_info import PodStatus
+from util.k8s.k8s_info import PodStatus
 
 
 log = initialize_logger(__name__)

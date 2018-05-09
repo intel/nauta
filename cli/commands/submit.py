@@ -28,7 +28,7 @@ import commands.common as common
 import draft.cmd as cmd
 from util.logger import initialize_logger
 from packs.tf_training import update_configuration
-from util.kubectl import start_port_forwarding, get_registry_port
+from util.k8s.kubectl import start_port_forwarding
 from cli_state import common_options, pass_state, State
 from util.system import get_current_os, OS
 from util import socat
@@ -89,7 +89,7 @@ def submit(state: State, script_location: str, script_folder_location: str,
     # start port forwarding
     # noinspection PyBroadException
     try:
-        process = start_port_forwarding()
+        process, tunnel_port = start_port_forwarding('docker-registry')
     except Exception:
         log.exception("Error during creation of a proxy for a docker registry.")
         click.echo("Error during creation of a proxy for a docker registry.")
@@ -99,8 +99,7 @@ def submit(state: State, script_location: str, script_folder_location: str,
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         # noinspection PyBroadException
         try:
-            docker_registry_port = get_registry_port()
-            socat.start(docker_registry_port)
+            socat.start(tunnel_port)
         except Exception:
             log.exception("Error during creation of a proxy for a local docker-host tunnel")
             click.echo("Error during creation of a local docker-host tunnel.")
