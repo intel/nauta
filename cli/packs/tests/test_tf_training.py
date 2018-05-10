@@ -59,12 +59,13 @@ ADD training.py
 ENV PYTHONUNBUFFERED 1
 '''
 
-def test_modify_job_yaml(mocker):
+
+def test_modify_values_yaml(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
     sh_move_mock = mocker.patch("shutil.move")
     yaml_dump_mock = mocker.patch("yaml.dump")
 
-    tf_training.modify_job_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS)
+    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS)
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -97,7 +98,7 @@ def test_modify_dockerfile(mocker):
 
 
 def test_update_configuration_success(mocker):
-    modify_job_yaml_mock = mocker.patch("packs.tf_training.modify_job_yaml")
+    modify_values_yaml_mock = mocker.patch("packs.tf_training.modify_values_yaml")
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
     modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
@@ -105,17 +106,17 @@ def test_update_configuration_success(mocker):
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
-    assert modify_job_yaml_mock.call_count == 1, "job yaml wasn't modified"
+    assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"
     assert modify_draft_toml_mock.call_count == 1, "draft toml wasn't modified"
 
 
 def test_update_configuration_failure(mocker):
-    modify_job_yaml_mock = mocker.patch("packs.tf_training.modify_job_yaml")
+    modify_values_yaml_mock = mocker.patch("packs.tf_training.modify_values_yaml")
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
 
-    modify_job_yaml_mock.side_effect = Exception("Test error")
+    modify_values_yaml_mock.side_effect = Exception("Test error")
     with pytest.raises(KubectlIntError):
         tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
-    assert modify_job_yaml_mock.call_count == 1, "job yaml wasn't modified"
+    assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"

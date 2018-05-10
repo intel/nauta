@@ -53,7 +53,7 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - start")
 
     try:
-        modify_job_yaml(experiment_folder, script_location, script_parameters)
+        modify_values_yaml(experiment_folder, script_location, script_parameters)
         modify_dockerfile(experiment_folder)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
@@ -84,20 +84,20 @@ def modify_dockerfile(experiment_folder: str):
     log.debug("Modify dockerfile - end")
 
 
-def modify_job_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...]):
-    log.debug("Modify job.yaml - start")
-    job_yaml_filename = os.path.join(experiment_folder, "charts//tf-training//values.yaml")
-    job_yaml_temp_filename = os.path.join(experiment_folder, "charts//tf-training//values_temp.yaml")
+def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...]):
+    log.debug("Modify values.yaml - start")
+    values_yaml_filename = os.path.join(experiment_folder, "charts//tf-training//values.yaml")
+    values_yaml_temp_filename = os.path.join(experiment_folder, "charts//tf-training//values_temp.yaml")
 
-    with open(job_yaml_filename, "r") as job_yaml_file:
-        y = yaml.load(job_yaml_file)
-        y["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
+    with open(values_yaml_filename, "r") as values_yaml_file:
+        v = yaml.load(values_yaml_file)
+        v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
 
-    with open(job_yaml_temp_filename, "w") as job_yaml_file:
-        yaml.dump(y, job_yaml_file)
+    with open(values_yaml_temp_filename, "w") as values_yaml_file:
+        yaml.dump(v, values_yaml_file)
 
-    shutil.move(job_yaml_temp_filename, job_yaml_filename)
-    log.debug("Modify job.yaml - end")
+    shutil.move(values_yaml_temp_filename, values_yaml_filename)
+    log.debug("Modify values.yaml - end")
 
 
 def modify_draft_toml(experiment_folder: str):

@@ -30,14 +30,16 @@ spec:
               type: string
             pod-selector:
               description: A Kubernetes label specification allowing to unambiguously identify all pods associated with this Run
-              type: string
+              type: object
             pod-count:
               description: The total number of pods in a fully deployed configuration of this Run
               type: integer
               minimum: 1
             parameters:
-              description: A list of key-value pairs representing the set of parameter names and values that this Run is executing with
-              type: object
+              description: A list of string representing the set of parameter values that this Run is executing with
+              type: array
+              items:
+                type: string
             metrics:
               description: A list of key-value pairs representing any metrics reported so far for this Run
               type: object

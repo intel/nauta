@@ -21,10 +21,11 @@
 
 import os
 from typing import List, Tuple
-import platform
+
 
 # list of files/folders created by helm/draft
 draft_files = ['.draftignore', 'dockerignore', 'Dockerfile', 'draft.toml']
+
 
 def prepare_list_of_files(experiment_folder: str) -> str:
     """
@@ -57,6 +58,7 @@ def prepare_list_of_files(experiment_folder: str) -> str:
             content = content + mkdir + cp
 
     return content
+
 
 def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_location: str,
                               script_name_as_a_first_element: bool=True) -> List[str]:

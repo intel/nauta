@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+import logging
 import os
 from typing import List
 
@@ -38,6 +39,8 @@ def call_draft(args: List[str], cwd: str=None) -> (str, int):
     config_path = Config.get(Fields.CONFIG_PATH)
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
+    if log.getEffectiveLevel() == logging.DEBUG:
+        full_command.append('--debug')
 
     env = os.environ.copy()
     env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)

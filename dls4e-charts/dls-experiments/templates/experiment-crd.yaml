@@ -35,7 +35,9 @@ spec:
               type: string
             parameters-spec:
               description: The list of parameter specifications as supplied with the Submit command
-              type: object
+              type: array
+              items:
+                type: string
             state:
               type: string
               description: Current state of experiment

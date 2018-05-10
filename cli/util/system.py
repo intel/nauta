@@ -24,12 +24,18 @@ import subprocess
 import sys
 from typing import List
 
+from util.logger import initialize_logger
+
+
+log = initialize_logger('util.system')
+
 
 def execute_system_command(command: List[str], timeout: int or None = None,
                            stdin=None, env=None, cwd=None) -> (str, int):
     try:
         output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
                                          stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
+        log.debug(f'COMMAND: {command} \n RESULT: {output}')
     except subprocess.CalledProcessError as ex:
         return ex.output, ex.returncode
     else:
