@@ -19,11 +19,15 @@
 # and approved by Intel in writing.
 #
 
+
 import os
+
 import pytest
 
 from commands import common
+from util.exceptions import KubectlIntError
 from util.config import Config, EXPERIMENTS_DIR_NAME
+
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
 EXPERIMENT_NAME = "experiment_name"
@@ -54,15 +58,13 @@ def test_create_environment_success(config_path_mock, mocker):
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    experiment_path = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert sh_copy_mock.call_count == 1, "files weren't copied"
     assert config_path_mock.call_count == 1, "configuration path not fetched"
-
     assert experiment_path == FAKE_CLI_EXPERIMENT_PATH
-    assert not message
 
 
 def test_create_environment_makedir_error(config_path_mock, mocker):
@@ -71,15 +73,13 @@ def test_create_environment_makedir_error(config_path_mock, mocker):
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    with pytest.raises(KubectlIntError):
+        common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert sh_copy_mock.call_count == 0, "files were copied"
     assert config_path_mock.call_count == 1, "configuration path not fetched"
-
-    assert not experiment_path
-    assert message
 
 
 def test_create_environment_lack_of_home_folder(config_path_mock, mocker):
@@ -87,15 +87,13 @@ def test_create_environment_lack_of_home_folder(config_path_mock, mocker):
     os_mkdirs_mock = mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2")
 
-    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    with pytest.raises(KubectlIntError):
+        common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 0, "existence of an experiment's folder was checked"
     assert os_mkdirs_mock.call_count == 0, "experiment's folder was created"
     assert sh_copy_mock.call_count == 0, "files were copied"
     assert config_path_mock.call_count == 1, "configuration path not fetched"
-
-    assert not experiment_path
-    assert message
 
 
 def test_create_environment_copy_error(config_path_mock, mocker):
@@ -104,12 +102,11 @@ def test_create_environment_copy_error(config_path_mock, mocker):
     sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    experiment_path, message = common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
+    with pytest.raises(KubectlIntError):
+        common.create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copy_mock.call_count == 1, "files were copied"
-    assert config_path_mock.call_count == 1, "configuration path not fetched"
 
-    assert not experiment_path
-    assert message
+    assert config_path_mock.call_count == 1, "configuration path not fetched"

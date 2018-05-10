@@ -27,7 +27,9 @@ import toml
 
 from util.k8s import k8s_info
 from util.logger import initialize_logger
+
 import packs.common as common
+from util.exceptions import KubectlIntError
 
 
 log = initialize_logger('packs.tf_training')
@@ -35,7 +37,7 @@ log = initialize_logger('packs.tf_training')
 
 def update_configuration(experiment_folder: str, script_location: str,
                          script_folder_location: str,
-                         script_parameters: Tuple[str, ...]) -> int:
+                         script_parameters: Tuple[str, ...]):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -46,19 +48,20 @@ def update_configuration(experiment_folder: str, script_location: str,
     - charts/templates/job.yaml - list of arguments is replaces with those given by a user
 
     :return:
-    - exit_code - 0 if configuration was updated correctly, 1 otherwise
+    in case of any errors it throws an exception with a description of a problem
     """
     log.debug("Update configuration - start")
+
     try:
         modify_job_yaml(experiment_folder, script_location, script_parameters)
         modify_dockerfile(experiment_folder)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
-        log.error("Update configuration - i/o error : {}".format(exe))
-        return 1
+        log.exception("Update configuration - i/o error : {}".format(exe))
+        raise KubectlIntError("Configuration hasn't been updated.")
 
     log.debug("Update configuration - end")
-    return 0
+
 
 
 def modify_dockerfile(experiment_folder: str):

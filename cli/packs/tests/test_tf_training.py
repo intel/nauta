@@ -20,9 +20,12 @@
 #
 
 import unittest.mock as mock
+import pytest
 
 import packs.common as common
 import packs.tf_training as tf_training
+from util.exceptions import KubectlIntError
+
 
 SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
 SCRIPT_LOCATION = "training_script.py"
@@ -91,8 +94,6 @@ def test_modify_dockerfile(mocker):
 
     assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
-    #fp = open_mock.return_value.__enter__.return_value
-    #fp.write.assert_called_with('test')
 
 
 def test_update_configuration_success(mocker):
@@ -113,8 +114,8 @@ def test_update_configuration_failure(mocker):
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
 
     modify_job_yaml_mock.side_effect = Exception("Test error")
-    output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
+    with pytest.raises(KubectlIntError):
+        tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
 
-    assert output
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_job_yaml_mock.call_count == 1, "job yaml wasn't modified"

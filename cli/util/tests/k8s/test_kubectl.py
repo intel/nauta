@@ -33,7 +33,7 @@ PODS_LIST_MOCK = V1PodList(items=[
 ]).items
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
-    V1Service(spec=V1ServiceSpec(ports=[V1ServicePort(port=5000,node_port=33451)]))
+    V1Service(spec=V1ServiceSpec(ports=[V1ServicePort(port=5000, node_port=33451)]))
 ]).items
 
 

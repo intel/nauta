@@ -72,11 +72,13 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
         if app_services:
             service_node_port = app_services[0].spec.ports[0].node_port
             if service_node_port:
-                logger.debug('Service node port for {} pod has been found: {}'.format(running_pod_name, service_node_port))
+                logger.debug('Service node port for {} pod has been found: {}'.
+                             format(running_pod_name, service_node_port))
 
             service_container_port = app_services[0].spec.ports[0].port
             if service_container_port:
-                logger.debug('Service container port for {} pod has been found: {}'.format(running_pod_name, service_container_port))
+                logger.debug('Service container port for {} pod has been found: {}'.
+                             format(running_pod_name, service_container_port))
 
         if not service_node_port or not service_container_port:
             logger.error(f'Cannot find open port for {k8s_app_name} app pod')
