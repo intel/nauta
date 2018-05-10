@@ -43,6 +43,10 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 
+
+    def full_log_search(self, q=None, index='_all', sort='@timestamp:asc'):
+        self.scroll()
+
     def get_pod_logs(self, pod_name: str, index='_all',
                      start_date: str = None, end_date: str = None,
                      log_count=100, sort='@timestamp:asc') -> List[LogEntry]:

@@ -27,16 +27,15 @@ import click
 from commands import submit
 from commands import verify
 from commands import logs
-from commands import list
 from commands import view
 from commands import cancel
 from commands import version
 from commands import interact
 from commands import predict
 from commands import launch
-from util.config import Config, Fields
 from commands import template_list
-
+from commands import list_experiments
+from util.config import Config, Fields
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
@@ -52,12 +51,13 @@ entry_point.add_command(verify.verify)
 entry_point.add_command(launch.launch)
 entry_point.add_command(logs.logs)
 entry_point.add_command(template_list.template_list)
-entry_point.add_command(list.list)
 entry_point.add_command(view.view)
 entry_point.add_command(cancel.cancel)
 entry_point.add_command(version.version)
 entry_point.add_command(interact.interact)
 entry_point.add_command(predict.predict)
+entry_point.add_command(list_experiments.list_experiments)
+
 
 if __name__ == '__main__':
     try:

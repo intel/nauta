@@ -19,12 +19,18 @@
 # and approved by Intel in writing.
 #
 
+import sys
+
 import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
+from util.logger import initialize_logger
+
+
+logger = initialize_logger(__name__)
 
 
 @click.command()
@@ -53,9 +59,16 @@ def logs(state: State, experiment_name: str, namespace: str, min_severity: Sever
     pod_ids = pod_ids.split(',') if pod_ids else None
     min_severity = SeverityLevel(min_severity) if min_severity else None
     pod_status = PodStatus(pod_status) if pod_status else None
-    experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name, min_severity=min_severity,
-                                                    start_date=start_date, end_date=end_date, pod_ids=pod_ids,
-                                                    pod_status=pod_status)
-    experiment_logs = ''.join([f'{log_entry.date} {log_entry.pod_name} {log_entry.content}' for log_entry
-                               in experiment_logs if not log_entry.content.isspace()])
+    try:
+        experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name, min_severity=min_severity,
+                                                        start_date=start_date, end_date=end_date, pod_ids=pod_ids,
+                                                        pod_status=pod_status)
+        experiment_logs = ''.join([f'{log_entry.date} {log_entry.pod_name} {log_entry.content}' for log_entry
+                                   in experiment_logs if not log_entry.content.isspace()])
+    except Exception:
+        error_msg = 'Failed to get experiment logs.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
+
     click.echo(experiment_logs)

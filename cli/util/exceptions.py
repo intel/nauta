@@ -23,3 +23,8 @@
 class KubectlIntError(Exception):
     """Error raised in case of problems detected by the application"""
     pass
+
+
+class InvalidRegularExpressionError(RuntimeError):
+    """Error raised when user provided regular expression is invalid"""
+    pass

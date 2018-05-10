@@ -113,3 +113,13 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
 
     logger.info("Port forwarding - proxy set up")
     return process, service_node_port, service_container_port
+
+
+def get_kubectl_username() -> str:
+    try:
+        username = subprocess.check_output(['kubectl', 'config', 'view',
+                                            '--minify', "-o=jsonpath={.users[0].name}'"])
+        return username.decode('utf-8')
+    except subprocess.CalledProcessError:
+        logger.exception("Failed to get name of current user from kubectl.")
+
