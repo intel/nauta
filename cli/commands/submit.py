@@ -40,7 +40,7 @@ from cli_state import common_options, pass_state, State
 from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import KubectlIntError
-
+from util.app_names import DLS4EAppNames
 
 log = initialize_logger('commands.submit')
 
@@ -124,7 +124,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     # start port forwarding
     # noinspection PyBroadException
     try:
-        process, tunnel_port, container_port = start_port_forwarding('docker-registry')
+        process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
     except Exception as exe:
         delete_experiments(experiments_list)
         log.exception("Error during creation of a proxy for a docker registry.")

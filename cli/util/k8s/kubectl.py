@@ -25,12 +25,13 @@ import subprocess
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from draft.cmd import set_registry_port
-from util.k8s.k8s_info import get_app_pods, get_app_services, get_pod_status, PodStatus
+from util.k8s.k8s_info import get_app_services
+from util.app_names import DLS4EAppNames
 
 logger = initialize_logger('util.kubectl')
 
 
-def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
+def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, int, int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -41,6 +42,7 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
     function.
 
     :param k8s_app_name: name of kubernetes application for tunnel creation
+                         value taken from DLS4EAppNames enum
 
     :return:
         instance of a process with proxy, tunneled port and container port
@@ -48,43 +50,27 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
     logger.debug("Start port forwarding")
 
     try:
-        running_pod_name = None
         service_node_port = None
         namespace = None
-
-        app_pods = get_app_pods(k8s_app_name)
-        for pod in app_pods:
-            pod_name = pod.metadata.name
-            pod_namespace = pod.metadata.namespace
-            pod_status = get_pod_status(pod_name, pod_namespace)
-
-            if pod_status == PodStatus.RUNNING:
-                running_pod_name = pod_name
-                namespace = pod_namespace
-                logger.debug('Running pod for {} has been found: {}'.format(k8s_app_name, running_pod_name))
-                break
-
-        if not running_pod_name:
-            logger.error('Cannot find running k8s pod for {}'.format(k8s_app_name))
-            raise KubectlIntError("Missing running pod name during creation of port proxy.")
-
-        app_services = get_app_services(k8s_app_name)
+        app_services = get_app_services(k8s_app_name.value)
         if app_services:
             service_node_port = app_services[0].spec.ports[0].node_port
             if service_node_port:
-                logger.debug('Service node port for {} pod has been found: {}'.
-                             format(running_pod_name, service_node_port))
+                logger.debug('Service node port pod has been found: {}'.
+                             format(service_node_port))
 
             service_container_port = app_services[0].spec.ports[0].port
             if service_container_port:
-                logger.debug('Service container port for {} pod has been found: {}'.
-                             format(running_pod_name, service_container_port))
+                logger.debug('Service container port has been found: {}'.
+                             format(service_container_port))
+            service_name = app_services[0].metadata.name
+            namespace = app_services[0].metadata.namespace
 
         if not service_node_port or not service_container_port:
-            logger.error(f'Cannot find open port for {k8s_app_name} app pod')
-            raise KubectlIntError("Missing pod port during creation of port proxy.")
+            logger.error(f'Cannot find open port for {k8s_app_name} app')
+            raise KubectlIntError("Missing port during creation of port proxy.")
 
-        if k8s_app_name == 'docker-registry':
+        if k8s_app_name == DLS4EAppNames.DOCKER_REGISTRY:
             # setting draft conf, only for docker-registry case
             dc_output, dc_exit_code = set_registry_port(service_node_port)
             if dc_exit_code:
@@ -93,13 +79,17 @@ def start_port_forwarding(k8s_app_name: str) -> (subprocess.Popen, int, int):
                 ))
                 raise KubectlIntError("Setting draft config failed.")
 
-        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', running_pod_name,
-                                f'{service_node_port}:{service_container_port}']
+        if not service_node_port:
+            ports_to_be_forwarded = str(service_container_port)
+        else:
+            ports_to_be_forwarded = f'{service_node_port}:{service_container_port}'
 
+        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}',
+                                'service/{}'.format(service_name),
+                                ports_to_be_forwarded]
         # if a log level is set to DEBUG - additional information from creatoin of a proxy are sent to console
         std_output_destination = None if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
         std_error_destination = subprocess.STDOUT if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-
         process = subprocess.Popen(args=port_forward_command, stdout=std_output_destination,
                                    stderr=std_error_destination)
 

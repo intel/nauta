@@ -26,16 +26,16 @@ import click
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
 from cli_state import common_options, pass_state, State
-from util.k8s.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus
+from util.k8s.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus, get_app_namespace
 from util.logger import initialize_logger
-
+from util.app_names import DLS4EAppNames
+from util.k8s.kubectl import start_port_forwarding
 
 logger = initialize_logger(__name__)
 
 
 @click.command()
 @click.argument('experiment-name')
-@click.option('--namespace', default='kube-system', help='Namespace where ElasticSearch k8s service is deployed')
 @click.option('--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
               help='Minimal severity of logs')
 @click.option('--start-date', default=None, help='Retrieve logs produced from this date (use ISO 8601 date format)')
@@ -46,14 +46,23 @@ logger = initialize_logger(__name__)
               help='Get logs only for pods with given status')
 @common_options
 @pass_state
-def logs(state: State, experiment_name: str, namespace: str, min_severity: SeverityLevel, start_date: str,
+def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus):
     """
     Show logs for given experiment.
     """
 
-    # Namespace option is used temporary until we will have namespace written in configuration file
-    es_client = K8sElasticSearchClient(host=get_kubectl_host(), port=get_kubectl_port(),
+
+    namespace = get_app_namespace(DLS4EAppNames.ELASTICSEARCH.value)
+
+    try:
+        process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
+    except Exception as exe:
+        logger.exception("Error during creation of a proxy for elasticsearch.")
+        click.echo("Error during creation of a proxy for elasticsearch.")
+        sys.exit(1)
+
+    es_client = K8sElasticSearchClient(host="127.0.0.1", port="9200",
                                        namespace=namespace, verify_certs=False)
 
     pod_ids = pod_ids.split(',') if pod_ids else None
@@ -69,6 +78,15 @@ def logs(state: State, experiment_name: str, namespace: str, min_severity: Sever
         error_msg = 'Failed to get experiment logs.'
         logger.exception(error_msg)
         click.echo(error_msg)
+        sys.exit(1)
+    finally:
+        try:
+            process.kill()
+        except Exception:
+            logger.exception("Error during closing of a proxy for elasticsearch.")
+            click.echo("Elasticsearch hasn't been closed properly. "
+                       "Check whether it still exists, if yes - close it manually.")
+
         sys.exit(1)
 
     click.echo(experiment_logs)

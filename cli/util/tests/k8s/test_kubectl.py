@@ -19,86 +19,62 @@
 # and approved by Intel in writing.
 #
 
+from enum import Enum
+
 from pytest import raises, fixture
 from kubernetes.client import V1PodList, V1Pod, V1ObjectMeta, V1ServiceList, V1Service, V1ServiceSpec, V1ServicePort
 from util.k8s.k8s_info import PodStatus
 import util.k8s.kubectl as kubectl
+from util.app_names import DLS4EAppNames
 
-
-TEST_APP_NAME = 'test-app'
-
-PODS_LIST_MOCK = V1PodList(items=[
-    V1Pod(metadata=V1ObjectMeta(name='test-1', namespace='test-namespace-1')),
-    V1Pod(metadata=V1ObjectMeta(name='test-2', namespace='test-namespace-2'))
-]).items
+class TestEnum(Enum):
+    TEST_APP_NAME = 'test-app'
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
-    V1Service(spec=V1ServiceSpec(ports=[V1ServicePort(port=5000, node_port=33451)]))
+    V1Service(metadata=V1ObjectMeta(name="service", namespace="namespace"),
+              spec=V1ServiceSpec(ports=[V1ServicePort(port=5000, node_port=33451)]))
 ]).items
 
 
 @fixture()
-def mock_k8s_pods_and_svc(mocker):
-    pods_list_mock = mocker.patch('util.k8s.kubectl.get_app_pods')
-    pods_list_mock.return_value = PODS_LIST_MOCK
+def mock_k8s_svc(mocker):
     svcs_list_mock = mocker.patch('util.k8s.kubectl.get_app_services')
     svcs_list_mock.return_value = SERVICES_LIST_MOCK
 
 
-def test_start_port_forwarding_success(mock_k8s_pods_and_svc, mocker):
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.RUNNING
+def test_start_port_forwarding_success(mock_k8s_svc, mocker):
     popen_mock = mocker.patch('subprocess.Popen')
 
-    process, _, _ = kubectl.start_port_forwarding(TEST_APP_NAME)
+    process, _, _ = kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
 
     assert process, "proxy process doesn't exist."
     assert popen_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
 
 
-def test_start_port_forwarding_missing_pod(mocker):
-    popen_mock = mocker.patch("subprocess.Popen")
-    pods_list_mock = mocker.patch('util.k8s.kubectl.get_app_pods')
-    pods_list_mock.return_value = []
-
-    with raises(RuntimeError, message="Missing pod name during creation of registry port proxy."):
-        kubectl.start_port_forwarding(TEST_APP_NAME)
-
-    assert popen_mock.call_count == 0, "kubectl proxy-forwarding command was called"
-
-
 def test_start_port_forwarding_missing_port(mocker):
     popen_mock = mocker.patch("subprocess.Popen")
-    pods_list_mock = mocker.patch('util.k8s.kubectl.get_app_pods')
-    pods_list_mock.return_value = PODS_LIST_MOCK
     svcs_list_mock = mocker.patch('util.k8s.kubectl.get_app_services')
     svcs_list_mock.return_value = []
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.RUNNING
 
-    with raises(RuntimeError, message="Missing pod port during creation of registry port proxy."):
-        kubectl.start_port_forwarding(TEST_APP_NAME)
+    with raises(RuntimeError, message="Missing port during creation of registry port proxy."):
+        kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
 
     assert popen_mock.call_count == 0, "kubectl proxy-forwarding command was called"
 
 
-def test_start_port_forwarding_other_error(mock_k8s_pods_and_svc, mocker):
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.FAILED
+def test_start_port_forwarding_other_error(mock_k8s_svc, mocker):
     popen_mock = mocker.patch('subprocess.Popen',
                               side_effect=Exception("Other error during creation of registry port proxy."))
-
+    print("test start port forwarding")
     with raises(RuntimeError, message="Other error during creation of registry port proxy."):
-        kubectl.start_port_forwarding(TEST_APP_NAME)
+        kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
 
-    assert popen_mock.call_count == 0, "kubectl proxy-forwarding command was called"
+    assert popen_mock.call_count == 1, "kubectl proxy-forwarding command was called"
 
 
-def test_set_registry_port_for_draft_if_docker_registry(mock_k8s_pods_and_svc, mocker):
-    app_name = 'docker-registry'
+def test_set_registry_port_for_draft_if_docker_registry(mock_k8s_svc, mocker):
+    app_name = DLS4EAppNames.DOCKER_REGISTRY
     popen_mock = mocker.patch('subprocess.Popen')
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.RUNNING
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port", side_effect=[("OK", 0)])
 
     kubectl.start_port_forwarding(app_name)
@@ -107,23 +83,19 @@ def test_set_registry_port_for_draft_if_docker_registry(mock_k8s_pods_and_svc, m
     assert srp_mock.call_count == 1, "draft.set_registry_port command wasn't called"
 
 
-def test_set_registry_port_for_draft_if_not_docker_registry(mock_k8s_pods_and_svc, mocker):
+def test_set_registry_port_for_draft_if_not_docker_registry(mock_k8s_svc, mocker):
     popen_mock = mocker.patch('subprocess.Popen')
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.RUNNING
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port")
 
-    kubectl.start_port_forwarding(TEST_APP_NAME)
+    kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
 
     assert popen_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert srp_mock.call_count == 0, "draft.set_registry_port command was called"
 
 
-def test_start_port_forwarding_draft_config_fail(mock_k8s_pods_and_svc, mocker):
-    app_name = 'docker-registry'
+def test_start_port_forwarding_draft_config_fail(mock_k8s_svc, mocker):
+    app_name = DLS4EAppNames.DOCKER_REGISTRY
     popen_mock = mocker.patch('subprocess.Popen')
-    pod_status_mock = mocker.patch('util.k8s.kubectl.get_pod_status')
-    pod_status_mock.return_value = PodStatus.RUNNING
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port", side_effect=[("Error message", 1)])
 
     with raises(RuntimeError, message="Setting draft config failed."):

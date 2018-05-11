@@ -21,7 +21,7 @@
 
 import pytest
 
-from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_pods, get_app_services
+from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services
 
 
 @pytest.fixture()
@@ -63,13 +63,6 @@ def test_get_k8s_port(mocked_k8s_config):
     k8s_port = get_kubectl_port()
 
     assert k8s_port == 8080
-
-
-def test_get_app_pods(mocked_k8s_config, mocked_k8s_CoreV1Api):
-    app_name = 'test-app'
-    pods = get_app_pods(app_name)
-
-    assert pods == [1, 2, 3]
 
 
 def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):

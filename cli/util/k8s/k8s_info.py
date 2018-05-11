@@ -59,13 +59,18 @@ def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
 
 
-def get_app_pods(app_name: str) -> list:
-    config.load_kube_config()
-    api = client.CoreV1Api(client.ApiClient())
-    return api.list_pod_for_all_namespaces(label_selector='app={}'.format(app_name)).items
-
-
 def get_app_services(app_name: str) -> list:
     config.load_kube_config()
     api = client.CoreV1Api(client.ApiClient())
-    return api.list_service_for_all_namespaces(label_selector='app={}'.format(app_name)).items
+    return api.list_service_for_all_namespaces(label_selector='dls4e_app_name={}'.format(app_name)).items
+
+
+def get_app_namespace(app_name: str) -> str:
+    namespace = ""
+
+    app_services = get_app_services(app_name)
+
+    if app_services:
+        namespace = app_services[0].metadata.namespace
+
+    return namespace
