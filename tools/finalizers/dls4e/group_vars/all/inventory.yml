@@ -13,6 +13,9 @@ subcharts_list:
   dls-experiments:
     version: 1.0.0
     path: "{{ playbook_dir }}/../../../dls4e-charts/dls-experiments"
+  dls-configuration:
+    version: 1.0.0
+    path: "{{ playbook_dir }}/../../../dls4e-charts/dls-configuration"
   dls-commons:
     version: 1.0.0
     path: "{{ playbook_dir }}/../../../dls4e-charts/dls-commons"
@@ -31,3 +34,8 @@ subcharts_list:
     path: "{{ playbook_dir }}/../../../dls4e-charts/fluentd"
     chart_values:
       image: dls4e/fluentd:v0.12
+  samba:
+    version: 1.0.0
+    path: "{{ playbook_dir }}/../../../dls4e-charts/samba"
+    chart_values:
+      image: dls4e/samba:1.0.0

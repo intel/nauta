@@ -1,3 +1,6 @@
+---
+api_group_name: aipg.intel.com
+
 configData:
   version: 0.1
   log:

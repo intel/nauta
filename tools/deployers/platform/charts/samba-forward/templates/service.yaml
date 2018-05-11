@@ -1,7 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Chart.Name }}-svc"
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
 spec:
   type: ClusterIP
   clusterIP: {{ required "Samba ClusterIP is required" .Values.ClusterIP }}
@@ -23,5 +28,4 @@ spec:
       protocol: UDP
       name: "samba-udp-138"
   selector:
-    app: {{ .Chart.Name }}
-
+    dls4e_app_name: samba

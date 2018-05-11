@@ -203,8 +203,3 @@ images:
     version: "v2"
     image: "registry:2"
     method: "pull"
-  core/samba:
-    version: "1.0.0"
-    required: "core/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/samba"

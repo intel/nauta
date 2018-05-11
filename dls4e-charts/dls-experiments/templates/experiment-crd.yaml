@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   name: experiments.{{ .Values.api_group_name }}
   labels:
-    app: {{ .Release.Name }}-dls4e-crds
+    app: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}

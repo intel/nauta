@@ -1,0 +1,5 @@
+---
+nodePort: ""
+api_group_name: aipg.intel.com
+
+internal_nfs: True

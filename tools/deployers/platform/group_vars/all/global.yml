@@ -52,7 +52,7 @@ helm_applications:
   heapster: heapster
   dashboard: dashboard
   storage: nfs
-  samba: samba
+  samba-forward: samba-forward
   dls-admin: dls-admin
 
 ### Docker

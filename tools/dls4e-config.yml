@@ -6,6 +6,11 @@ images:
     image: "centos:7.4.1708"
     method: "pull"
     push: False
+  dls4e/kubectl:
+    version: "1.10.0"
+    required: "dls4e/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
   dls4e/gui:
     version: "1.0.0"
     required: "dls4e/centos"
@@ -23,3 +28,12 @@ images:
     version: "2.6.2"
     image: "registry:2.6.2"
     method: pull
+  dls4e/samba:
+    version: "1.0.0"
+    required: "dls4e/kubectl"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
+  dls4e/tiller:
+    version: "v2.8.1"
+    image: "gcr.io/kubernetes-helm/tiller:v2.8.1"
+    method: "pull"

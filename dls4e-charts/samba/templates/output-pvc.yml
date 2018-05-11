@@ -1,7 +1,10 @@
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+{{- if not .Values.internal_nfs }}
+{{ required "A valid foo is required!" .Values.test_val }}
+{{- else }}
+kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
-  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-client
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-output
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
@@ -9,13 +12,10 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
-rules:
-- apiGroups:
-  - ""
+spec:
+  accessModes:
+    - ReadWriteOnce
   resources:
-  - services/proxy
-  verbs:
-  - get
-  - create
-  resourceNames:
-  - {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
+    requests:
+      storage: 32Gi
+{{- end }}

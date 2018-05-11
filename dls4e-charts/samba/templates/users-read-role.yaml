@@ -2,7 +2,7 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-access
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
   labels:
     app: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
@@ -10,8 +10,22 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
-aggregationRule:
-  clusterRoleSelectors:
-  - matchLabels:
-      {{ .Values.api_group_name }}/aggregate-to-common: "true"
-rules: []
+rules:
+  - apiGroups:
+      - "{{ .Values.api_group_name }}"
+    resources:
+      - users
+    verbs:
+      - list
+      - get
+      - watch
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs:
+      - list
+      - get
+      - create

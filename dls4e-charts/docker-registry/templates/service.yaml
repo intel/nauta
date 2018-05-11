@@ -13,9 +13,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 5000
+    - name: dls4e
+      port: 5000
       protocol: TCP
-      name: http
       targetPort: 5000
   selector:
     app: {{ .Chart.Name }}

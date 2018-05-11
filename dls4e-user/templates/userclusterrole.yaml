@@ -1,0 +1,22 @@
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter username" .Values.username }}-user
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+- apiGroups:
+    - "{{ .Values.api_group_name }}"
+  resources:
+    - users
+  verbs:
+    - list
+    - get
+    - watch
+  resourceNames:
+    - {{ required "DLS4E Username is required as parameter username" .Values.username }}

@@ -9,16 +9,20 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
-    dls4e_app_name: gui
+    dls4e_app_name: samba
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
-    - name: dls4e
-      port: 9000
-      targetPort: 9000
+    - port: 445
+      targetPort: 445
+      {{- if .Values.nodePort }}
+      nodePort: {{ .Values.nodePort }}
+      {{- end }}
       protocol: TCP
+      name: dls4e
   selector:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     heritage: {{ .Release.Service }}
+

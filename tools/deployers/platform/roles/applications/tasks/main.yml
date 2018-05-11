@@ -1,5 +1,8 @@
 ---
 
+- name: Create a k8s dls4e namespace
+  shell: "kubectl get namespace dls4e || kubectl create namespace dls4e"
+
 - name: Create kubernetes configuration directory
   file:
     path: /root/kubernetes/apps
@@ -10,7 +13,7 @@
     src: tiller.yml.j2
     dest: /root/kubernetes/apps/tiller.yml
 
-- name: Apply all node privileges directories
+- name: Apply tiller release
   changed_when: False
   shell: kubectl apply -f /root/kubernetes/apps/tiller.yml
 
@@ -35,6 +38,16 @@
   until: helm_access|success
   retries: 10
   delay: 10
+
+- name: Run helm task for samba-forward
+  vars:
+    name: samba-forward
+    helm_values:
+      SambaImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/samba:1.0.0"
+      ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
+    type: samba-forward
+    namespace: dls4e
+  include_tasks: helm.yml
 
 - name: Fetch all interfaces names
   set_fact:
@@ -73,16 +86,6 @@
       DefaultBackendImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/defaultbackend:1.4"
       ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
     type: ingress
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for samba
-  vars:
-    name: samba
-    helm_values:
-      SambaImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/samba:1.0.0"
-      ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
-    type: samba
     namespace: kube-system
   include_tasks: helm.yml
 

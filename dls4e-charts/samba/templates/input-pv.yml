@@ -1,0 +1,3 @@
+{{- if not .Values.internal_nfs }}
+{{ required "A valid foo is required!" .Values.test_val }}
+{{- end }}

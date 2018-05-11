@@ -49,10 +49,6 @@ spec:
                 - SYS_RESOURCE
           args:
             - "-provisioner=internal.com/nfs"
-            - "-run-server=false"
-            - "-use-ganesha=false"
-            - "-server-hostname={{ required "Node data IP should be specified" .Values.NodeIP }}"
-            - "-master=http://127.0.0.1:8080"
           env:
             - name: POD_IP
               valueFrom:
