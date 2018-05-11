@@ -19,9 +19,9 @@
 # and approved by Intel in writing.
 #
 
-import logging
 import subprocess
 
+from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from draft.cmd import set_registry_port
@@ -84,23 +84,10 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, int
         else:
             ports_to_be_forwarded = f'{service_node_port}:{service_container_port}'
 
-        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}',
-                                'service/{}'.format(service_name),
+        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
                                 ports_to_be_forwarded]
-        # if a log level is set to DEBUG - additional information from creatoin of a proxy are sent to console
-        std_output_destination = None if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-        std_error_destination = subprocess.STDOUT if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-        process = subprocess.Popen(args=port_forward_command, stdout=std_output_destination,
-                                   stderr=std_error_destination)
-
-        if not process:
-            logger.error("Port forwarding - exception - process doesn't exist.")
-            raise KubectlIntError("Port proxy hasn't been created.")
-
-    except KubectlIntError as exe:
-        raise RuntimeError(exe)
+        process = system.execute_subprocess_command(port_forward_command)
     except Exception:
-        logger.exception("Port forwarding - exception - other.")
         raise RuntimeError("Other error during creation of port proxy.")
 
     logger.info("Port forwarding - proxy set up")
@@ -114,4 +101,3 @@ def get_kubectl_username() -> str:
         return username.decode('utf-8')
     except subprocess.CalledProcessError:
         logger.exception("Failed to get name of current user from kubectl.")
-

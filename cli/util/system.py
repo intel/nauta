@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import logging
+import time
 from enum import Enum
 import subprocess
 import sys
@@ -40,6 +42,26 @@ def execute_system_command(command: List[str], timeout: int or None = None,
         return ex.output, ex.returncode
     else:
         return output, 0
+
+
+def execute_subprocess_command(command: List[str], timeout: int or None = 1, stdin=None, env=None,
+                               cwd=None) -> subprocess.Popen:
+
+    # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
+    std_output_destination = None if log.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
+    std_error_destination = subprocess.STDOUT if log.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
+
+    log.debug(f'executing COMMAND in subprocess: {command}')
+    process = subprocess.Popen(args=command, stdout=std_output_destination, stderr=std_error_destination,
+                               universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
+
+    # wait for command execution
+    time.sleep(timeout)
+
+    if not process or process.poll() != (0 or None):
+        log.error(f'COMMAND execution FAIL: {command}')
+        raise RuntimeError(f'COMMAND execution FAIL: {command}')
+    return process
 
 
 class OS(Enum):
