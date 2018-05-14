@@ -22,8 +22,6 @@ k8s_domain: kubernetes
 kubernetes_pod_subnet: 10.3.0.0/16
 kubernetes_svc_subnet: 10.4.0.0/16
 
-kubernetes_version: 1.9.3
-
 kubernetes_network:
   external_ports:
     - 6443

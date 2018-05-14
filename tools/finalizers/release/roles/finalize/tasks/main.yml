@@ -15,6 +15,7 @@
     - dls4e
     - platform
     - bin
+    - docs
 
 - name: Unpack deployer bins
   shell: tar -xf {{ item.package }} -I pigz
@@ -27,6 +28,8 @@
       package: "{{ platform_package }}"
     - name: bin
       package: "{{ bin_package }}"
+    - name: docs
+      package: "{{ docs_package }}"
 
 - name: Create package
   shell: tar -cf {{ output }} -I pigz ./
