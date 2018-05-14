@@ -37,9 +37,9 @@ ELASTICSEARCH_K8S_SERVICE = 'elasticsearch-svc'
 
 
 class K8sElasticSearchClient(elasticsearch.Elasticsearch):
-    def __init__(self, host: str, port: int, namespace: str, use_ssl=True, verify_certs=True, **kwargs):
+    def __init__(self, host: str, port: int, use_ssl=True, verify_certs=True, **kwargs):
+        #  we assume here connecting using proxy - not directly to k8s cluster
         hosts = [{'host': host,
-                  'url_prefix': f'api/v1/namespaces/{namespace}/services/{ELASTICSEARCH_K8S_SERVICE}/proxy',
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 

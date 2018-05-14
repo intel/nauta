@@ -26,7 +26,7 @@ import click
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
 from cli_state import common_options, pass_state, State
-from util.k8s.k8s_info import get_kubectl_host, get_kubectl_port, PodStatus, get_app_namespace
+from util.k8s.k8s_info import PodStatus
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
 from util.k8s.kubectl import start_port_forwarding
@@ -52,9 +52,6 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
     Show logs for given experiment.
     """
 
-
-    namespace = get_app_namespace(DLS4EAppNames.ELASTICSEARCH.value)
-
     try:
         process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
     except Exception as exe:
@@ -62,8 +59,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
         click.echo("Error during creation of a proxy for elasticsearch.")
         sys.exit(1)
 
-    es_client = K8sElasticSearchClient(host="127.0.0.1", port="9200",
-                                       namespace=namespace, verify_certs=False)
+    es_client = K8sElasticSearchClient(host="127.0.0.1", port=container_port, verify_certs=False, use_ssl=False)
 
     pod_ids = pod_ids.split(',') if pod_ids else None
     min_severity = SeverityLevel(min_severity) if min_severity else None
@@ -84,9 +80,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             process.kill()
         except Exception:
             logger.exception("Error during closing of a proxy for elasticsearch.")
-            click.echo("Elasticsearch hasn't been closed properly. "
+            click.echo("Elasticsearch proxy hasn't been closed properly. "
                        "Check whether it still exists, if yes - close it manually.")
-
-        sys.exit(1)
 
     click.echo(experiment_logs)

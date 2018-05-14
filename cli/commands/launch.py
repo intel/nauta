@@ -30,12 +30,13 @@ from util.k8s.kubectl import start_port_forwarding
 from util.network import wait_for_connection
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
+from util.app_names import DLS4EAppNames
 
 logger = initialize_logger('commands.launch')
 
 K8S_APP_NAME = {
-    'webui': 'dls-gui',
-    'tensorboard': 'tensorboard'
+    'webui': DLS4EAppNames.WEB_GUI,
+    'tensorboard': DLS4EAppNames.TENSORBOARD
 }
 
 FORWARDED_URL = 'http://localhost:{}'

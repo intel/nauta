@@ -21,7 +21,10 @@
 
 from enum import Enum
 
+
 #  list of dls4e app names - it contains labels under which dls4e apps are visible on a cluster
 class DLS4EAppNames(Enum):
     ELASTICSEARCH = "elasticsearch"
     DOCKER_REGISTRY = "docker-registry"
+    WEB_GUI = "gui"
+    TENSORBOARD = "tensorboard"

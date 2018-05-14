@@ -21,7 +21,7 @@
 
 import click
 
-from cli_state import common_options, pass_state, State
+from cli_state import common_options, pass_state
 
 HELP = "Displays version of dlsctl application."
 
@@ -29,7 +29,7 @@ HELP = "Displays version of dlsctl application."
 @click.command(help=HELP)
 @common_options
 @pass_state
-def version(state: State, name: str, purge: bool):
+def version():
     """
     Returns a version of the dlsctl application
     """

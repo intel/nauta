@@ -129,7 +129,6 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         delete_experiments(experiments_list)
         log.exception("Error during creation of a proxy for a docker registry.")
         click.echo("Error during creation of a proxy for a docker registry.")
-        click.echo(exe)
         sys.exit(1)
 
     # run socat if on Windows or Mac OS

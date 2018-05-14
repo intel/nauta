@@ -22,13 +22,14 @@
 from enum import Enum
 
 from pytest import raises, fixture
-from kubernetes.client import V1PodList, V1Pod, V1ObjectMeta, V1ServiceList, V1Service, V1ServiceSpec, V1ServicePort
-from util.k8s.k8s_info import PodStatus
+from kubernetes.client import V1ObjectMeta, V1ServiceList, V1Service, V1ServiceSpec, V1ServicePort
 import util.k8s.kubectl as kubectl
 from util.app_names import DLS4EAppNames
 
-class TestEnum(Enum):
+
+class AppNameEnum(Enum):
     TEST_APP_NAME = 'test-app'
+
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
     V1Service(metadata=V1ObjectMeta(name="service", namespace="namespace"),
@@ -45,7 +46,7 @@ def mock_k8s_svc(mocker):
 def test_start_port_forwarding_success(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
 
-    process, _, _ = kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
+    process, _, _ = kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert process, "proxy process doesn't exist."
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
@@ -57,7 +58,7 @@ def test_start_port_forwarding_missing_port(mocker):
     svcs_list_mock.return_value = []
 
     with raises(RuntimeError, message="Missing port during creation of registry port proxy."):
-        kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
+        kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert subprocess_command_mock.call_count == 0, "kubectl proxy-forwarding command was called"
 
@@ -67,7 +68,7 @@ def test_start_port_forwarding_other_error(mock_k8s_svc, mocker):
                               side_effect=Exception("Other error during creation of registry port proxy."))
     print("test start port forwarding")
     with raises(RuntimeError, message="Other error during creation of registry port proxy."):
-        kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
+        kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert popen_mock.call_count == 1, "kubectl proxy-forwarding command was called"
 
@@ -87,7 +88,7 @@ def test_set_registry_port_for_draft_if_not_docker_registry(mock_k8s_svc, mocker
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port")
 
-    kubectl.start_port_forwarding(TestEnum.TEST_APP_NAME)
+    kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert srp_mock.call_count == 0, "draft.set_registry_port command was called"
