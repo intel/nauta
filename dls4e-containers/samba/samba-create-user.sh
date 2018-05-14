@@ -32,7 +32,7 @@ function create_user() {
   if ! id $kUID; then
       useradd -u $kUID -g $kUID -m $USER
   fi
-  ( echo ${PASSWORD} ; echo ${PASSWORD}; ) | smbpasswd -a "{USER}"
+  ( echo ${PASSWORD} ; echo ${PASSWORD}; ) | smbpasswd -a "${USER}"
 }
 
 user=$1
@@ -59,8 +59,8 @@ mkdir -p /output/$user
 
 chown -R $kUID:$kUID /input/$user /output/$user
 echo "Create links"
-ln -sfn /input/$user /home/$user/input
-ln -sfn /output/$user /home/$user/output
+ln -sfn /input/$user /home/user_$user/input
+ln -sfn /output/$user /home/user_$user/output
 
 if [ X"$STATE" != X"CREATED" ]; then
     echo "Update user state"

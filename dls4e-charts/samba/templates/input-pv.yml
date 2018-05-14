@@ -1,3 +1,22 @@
-{{- if not .Values.internal_nfs }}
-{{ required "A valid foo is required!" .Values.test_val }}
+{{- if .Values.global.input_nfs }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-{{ .Release.Namespace }}-input
+  labels:
+    app_name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    type: input
+    app: samba
+    namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  capacity:
+    storage: 32Gi
+  nfs:
+    path: {{ .Values.global.input_nfs.path }}
+    server: {{ .Values.global.input_nfs.server }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
 {{- end }}

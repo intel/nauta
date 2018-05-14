@@ -1,6 +1,3 @@
-{{- if not .Values.internal_nfs }}
-{{ required "A valid foo is required!" .Values.test_val }}
-{{- else }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -18,4 +15,12 @@ spec:
   resources:
     requests:
       storage: 32Gi
+{{- if .Values.global.output_nfs }}
+  storageClassName: ""
+  selector:
+    matchLabels:
+      app_name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+      type: output
+      app: samba
+      namespace: {{ .Release.Namespace }}
 {{- end }}

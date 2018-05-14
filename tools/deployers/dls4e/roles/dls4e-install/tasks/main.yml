@@ -18,16 +18,20 @@
     src: "dls4e-{{ dls4e_version }}.tgz"
     dest: "/tmp/dls4e-{{ dls4e_version }}.tgz"
 
+- name: Set global values in configuration
+  set_fact:
+    global_values:
+      dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
+      dls4e_configuration:
+        external_ip: "{{ dls_configuration.external_interface.ipv4_address }}"
+      images:
+        - name: tiller
+          value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.8.1"
+
 - name: Render values
   vars:
     rendered_values:
-      global:
-        dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
-        dls4e_configuration:
-          external_ip: "{{ dls_configuration.external_interface.ipv4_address }}"
-        images:
-          - name: tiller
-            value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.8.1"
+      global: "{{ dls4e_configuration | default({}) | combine(global_values) }}"
   copy:
     content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
