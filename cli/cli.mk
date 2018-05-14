@@ -75,7 +75,7 @@ endif
 
 pack: build
 ifeq (Windows,$(OS))
-	@7z a -tzip $(CLI_ARTIFACT_NAME) ./dist/* ./dist/.draft
+	@7z a -tzip $(CLI_ARTIFACT_NAME) ./dist/*
 endif
 ifeq (Linux,$(OS))
 	@tar -zcf $(CLI_ARTIFACT_NAME) -C dist .
