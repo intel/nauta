@@ -7,6 +7,9 @@ RUN yum install -y samba
 
 COPY samba-init.sh /bin
 COPY samba-loop.sh /bin
+COPY samba-create.sh /bin
+COPY samba-create-user.sh /bin
+COPY samba-create-pv.sh /bin
 COPY smb.conf /etc/samba/smb.conf
 
 RUN mkdir -vp /etc/secrets/samba-users

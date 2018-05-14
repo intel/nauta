@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
   name: tiller
   labels:
@@ -59,9 +59,3 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
       restartPolicy: Always
-      hostNetwork: True
-      serviceAccountName: tiller
-      tolerations:
-      - effect: NoExecute
-        key: node.kubernetes.io/network-unavailable
-        operator: Exists

@@ -47,6 +47,8 @@ spec:
           value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-input
         - name: OUTPUT_PVC
           value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-output
+        - name: APP_RELEASE
+          value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
         ports:
         - containerPort: 137
           protocol: UDP
