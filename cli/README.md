@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* kubectl >= 1.9.2
+* kubectl >= 1.10
 * helm >= 2.8.1
 * docker >= 18.03.0-ce
 

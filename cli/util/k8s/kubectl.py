@@ -87,15 +87,8 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, int
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
                                 ports_to_be_forwarded]
         logger.debug(port_forward_command)
-        # if a log level is set to DEBUG - additional information from creatoin of a proxy are sent to console
-        std_output_destination = None if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-        std_error_destination = subprocess.STDOUT if logger.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-        process = subprocess.Popen(args=port_forward_command, stdout=std_output_destination,
-                                   stderr=std_error_destination)
 
-        if not process:
-            logger.error("Port forwarding - exception - process doesn't exist.")
-            raise KubectlIntError("Port proxy hasn't been created.")
+        process = system.execute_subprocess_command(port_forward_command)
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)
