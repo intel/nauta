@@ -43,7 +43,7 @@ If a combination of both paramaters is given - _dlsctl_ launches a number of exp
 equal to combination of values passed in those paramater. For example if the following
 combination of paramater is passed to _dlsctl_ command:
 
-_-pr param1 {0.1, 0.2, 0.3} -ps {param2: 3, param4: 5} -ps {param6: 7}_ 
+_-pr param1 "{0.1, 0.2, 0.3}" -ps "{param2: 3, param4: 5}" -ps "{param6: 7}" 
 
 the following experiments will be launched:  
 - _param1 = 0.1, param2 = 3, param4 = 5, param6 - not set_
