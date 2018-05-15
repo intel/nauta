@@ -22,6 +22,11 @@
   args:
     chdir: "{{ build_dir }}/files"
 
+- name: Get charts
+  shell: tar -xf {{ chart }} -I pigz
+  args:
+    chdir: "{{ build_dir }}/files"
+
 - name: Generate file with configuration
   vars:
     configuration:

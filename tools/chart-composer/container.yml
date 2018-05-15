@@ -1,0 +1,16 @@
+---
+
+- name: Run local tasks
+  hosts: localhost
+  become: False
+  handlers:
+  - name: Remove build dir
+    file:
+      path: "{{ build_dir }}"
+      state: absent
+  - name: Remove docker image
+    docker_image:
+      name: "dls4e-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+      state: absent
+  roles:
+    - role: finalize

@@ -1,0 +1,8 @@
+---
+
+- name: Create chart {{ name }} package in {{ spec.path }}
+  shell: "{{ helm_local }} package -d {{ build_dir }}/charts/{{ package_name }}/charts {{ spec.path }} --home {{ build_dir }}/helm-cache"
+
+- name: Check if chart {{ name }}-{{ spec.version }}.tgz exists
+  file:
+    path: "{{ build_dir }}/charts/{{ package_name }}/charts/{{ name }}-{{ spec.version }}.tgz"

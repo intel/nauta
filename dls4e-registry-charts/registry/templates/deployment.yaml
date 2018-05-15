@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        heritage: {{ .Release.Service }}
+    spec:
+      nodeSelector:
+        dls4e-release-version-{{ required "DLS4E Release standarized version is required" .Values.global.dls4e_release_standarized }}: "True"
+      containers:
+      - name: {{ .Chart.Name }}
+        image: dls4e-repository:{{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+        imagePullPolicy: "Never"
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 200m
+        ports:
+        - containerPort: 5000
+          protocol: TCP

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}

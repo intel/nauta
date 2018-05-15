@@ -1,12 +1,12 @@
 ---
 
 - name: Check if image exists
-  shell: "helm status dls4e"
+  shell: "helm status dls4enterprise"
   register: chart
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
 
-- name: Fail if upgrade is not possoble
+- name: Fail if upgrade is not possible
   fail:
     msg: DLS4E is already installed and upgrade option is not selected
   when:
@@ -37,11 +37,11 @@
     dest: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
 
 - name: Install helm chart
-  shell: "helm install -n dls4e --namespace dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml"
+  shell: "helm install -n dls4enterprise --namespace dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml"
   when: chart is changed
 
 - name: Upgrade helm chart
-  shell: "helm upgrade dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
+  shell: "helm upgrade dls4enterprise  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
   when:
     - not chart is changed
     - upgrade | default(False) | bool

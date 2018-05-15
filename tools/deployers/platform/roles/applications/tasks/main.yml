@@ -39,91 +39,40 @@
   retries: 10
   delay: 10
 
-- name: Run helm task for samba-forward
-  vars:
-    name: samba-forward
-    helm_values:
-      SambaImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/samba:1.0.0"
-      ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
-    type: samba-forward
-    namespace: dls4e
-  include_tasks: helm.yml
+- name: Copy chart
+  copy:
+    src: dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz
+    dest: /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz
 
 - name: Fetch all interfaces names
   set_fact:
     all_cluster_interfaces: "{{ (all_cluster_interfaces | default([])) + [hostvars[item].internal_interface] }}"
   with_items: "{{ groups['all'] }}"
 
-- name: Run helm task for flannel
+- name: Render values
   vars:
-    name: flannel
-    helm_values:
-      FlannelImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/flannel:v0.9.1"
-      Interfaces: "{{ all_cluster_interfaces | sort | unique }}"
-      PodNetwork: "{{ kubernetes_network.pod }}"
-    type: networking
-    namespace: kube-system
-  include_tasks: helm.yml
+    dls_release_values:
+      global:
+        dls4e_registry: "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
+      flannel:
+        interfaces: "{{ all_cluster_interfaces | sort | unique }}"
+        pod_network: "{{ kubernetes_network.pod }}"
+      samba-forward:
+        ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
+      nfs:
+        node: "{{ ansible_nodename }}"
+      skydns:
+        ClusterIP: "{{ kubernetes_network.svc_list.dns.ip }}"
+        Domain: "{{ k8s_domain }}.{{ domain }}"
+      ingress:
+        ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
+  copy:
+    content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "/tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.values.yaml"
 
-- name: Run helm task for dns
-  vars:
-    name: skydns
-    helm_values:
-      SidecarImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dns-sidecar:1.14.8"
-      DnsmasqNannyImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dnsmasq-nanny:1.14.8"
-      KubeDNSImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-dns:1.14.8"
-      ClusterIP: "{{ kubernetes_network.svc_list.dns.ip }}"
-      Domain: "{{ k8s_domain }}.{{ domain }}"
-    type: dns
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for ingress
-  vars:
-    name: ingress
-    helm_values:
-      IngressImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/ingress:0.14.0"
-      DefaultBackendImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/defaultbackend:1.4"
-      ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
-    type: ingress
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for heapster
-  vars:
-    name: heapster
-    helm_values:
-      AddonResizerImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/addon-resizer:v1.7"
-      HeapsterImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/heapster:v1.4.2"
-    type: heapster
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for dashboard
-  vars:
-    name: dashboard
-    helm_values:
-      DashboardImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/dashboard:v1.8.3"
-    type: dashboard
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for nfs
-  vars:
-    name: nfs
-    helm_values:
-      NfsProvisionerImage: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/nfs-provisioner:v1.0.8"
-      Node: "{{ ansible_nodename }}"
-      NodeIP: "{{ dls_configuration.data_interface.ipv4_address }}"
-    type: storage
-    namespace: kube-system
-  include_tasks: helm.yml
-
-- name: Run helm task for dlse
-  vars:
-    name: dls-admin
-    helm_values:
-      ExternalIP: "{{ dls_configuration.external_interface.ipv4_address }}"
-    type: dls-admin
-    namespace: kube-system
-  include_tasks: helm.yml
+- name: Install helm chart
+  shell: >
+    helm upgrade dls4enterprise-k8s-platform
+    --namespace kube-system -i
+    /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz --wait
+    -f /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.values.yaml

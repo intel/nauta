@@ -1,0 +1,72 @@
+---
+
+- name: Create build dir directories
+  file:
+    path: "{{ build_dir }}/charts/{{ item }}"
+    state: directory
+  with_items:
+    - "{{ package_name }}"
+    - "{{ package_name }}/charts"
+
+- name: Build subcharts
+  include_tasks: chart-dep.yml
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Render Chart.yaml file
+  template:
+    src: Chart.yaml
+    dest: "{{ build_dir }}/charts/{{ package_name }}/Chart.yaml"
+
+- name: Cleanup facts
+  set_fact:
+    chart_reqs: []
+
+- name: Render requirements
+  set_fact:
+    chart_reqs: "{{ (chart_reqs | default([])) + [{'name':name,'version':spec.version,'condition':(spec.condition | default()) }] }}"
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Create requirements.yaml file
+  vars:
+    deps:
+      dependencies: "{{ chart_reqs }}"
+  copy:
+    content: "{{ deps | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ build_dir }}/charts/{{ package_name }}/requirements.yaml"
+
+- set_fact:
+    dls4e_values:
+      global:
+        dls4e: "{{ package_name }}"
+        dls4e_release: "{{ version }}"
+        dls4e_release_standarized: "{{ version.replace('.', '-') }}"
+
+- name: Mix values
+  set_fact:
+    dls4e_values: "{{ dls4e_values | combine(chart_values | default({})) }}"
+
+- name: Render values
+  set_fact:
+    dls4e_values: "{{ dls4e_values | combine({name: spec.chart_values | default({})}) }}"
+  with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Create {{ package_name }} values.yaml file
+  copy:
+    content: "{{ dls4e_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ build_dir }}/charts/{{ package_name }}/values.yaml"
+
+- name: Create chart {{ package_name }}
+  shell: "{{ helm_local }} package -d {{ build_dir }}/output {{ build_dir }}/charts/{{ package_name }} --home {{ build_dir }}/helm-cache"
+
+- name: Check if chart {{ package_name }}-{{ version }}.tgz exists
+  file:
+    path: "{{ build_dir }}/output/{{ package_name }}-{{ version }}.tgz"

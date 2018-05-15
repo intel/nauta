@@ -1,0 +1,35 @@
+---
+
+- name: Create build dir directories
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - "charts"
+    - "helm-cache"
+    - "output"
+
+- name: Download helm bin
+  environment: "{{ proxy }}"
+  get_url:
+    url: "{{ helm_url }}"
+    checksum: "sha256:{{ helm_sha }}"
+    dest: "{{ helm_local }}"
+    mode: 0755
+
+- name: Init helm
+  shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache"
+
+- name: Include charts
+  vars:
+    package_name: "{{ package.key }}"
+    subcharts_list: "{{ package.value }}"
+  include_tasks: chart.yml
+  with_dict: "{{ subcharts }}"
+  loop_control:
+    loop_var: package
+
+- name: Create tar
+  shell: tar -cf {{ output }} --use-compress-program=pigz ./
+  args:
+    chdir: "{{ build_dir }}/output"

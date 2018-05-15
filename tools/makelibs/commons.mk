@@ -1,9 +1,9 @@
+LIBS_DIRECTORY:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
 VIRTUALENV_DIR:=$(if $(GLOBAL_VIRTUALENV_DIR),$(GLOBAL_VIRTUALENV_DIR),$(DIRECTORY)/.venv)
 VIRTUALENV_BIN:=$(VIRTUALENV_DIR)/bin
 ACTIVATE:=$(VIRTUALENV_BIN)/activate
-REQUIREMENTS:=$(DIRECTORY)/requirements.txt
-
-LIBS_DIRECTORY:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+REQUIREMENTS:=$(LIBS_DIRECTORY)/../requirements.txt
 
 PIP:=$(VIRTUALENV_BIN)/pip
 PYTHON:=$(VIRTUALENV_BIN)/python
@@ -12,6 +12,8 @@ ANSIBLE_CFG:=$(DIRECTORY)/ansible.cfg
 ANSIBLE_PLAYBOOK:=$(VIRTUALENV_BIN)/ansible-playbook
 
 WORKSPACE:=$(if $(GLOBAL_WORKSPACE),$(GLOBAL_WORKSPACE),$(CURDIR)/.workspace)
+
+VENV_LOCK:=$(WORKSPACE)/.venv
 
 WORKSPACE_BUILD:=$(WORKSPACE)/$(if $(WORKSPACE_NAME),$(WORKSPACE_NAME),default)
 
@@ -39,6 +41,12 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                        -e group=$(GROUP) -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml
 
+$(REQUIREMENTS_LOCK):
+	@touch $(REQUIREMENTS_LOCK)
+
+$(VENV_LOCK):
+	@touch $(VENV_LOCK)
+
 $(WORKSPACE):
 	@mkdir -p $(WORKSPACE)
 	@touch $(WORKSPACE)
@@ -51,11 +59,11 @@ $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
 
-$(VIRTUALENV_DIR):
-	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
+$(VIRTUALENV_DIR): $(VENV_LOCK)
+	@flock $(VENV_LOCK) virtualenv -p python3.6 $(VIRTUALENV_DIR)
 
 $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
-	@$(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS)
+	@flock $(VENV_LOCK) $(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS)
 	@touch $(ACTIVATE)
 
 ENV_%:

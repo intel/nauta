@@ -203,3 +203,52 @@ images:
     version: "v2"
     image: "registry:2"
     method: "pull"
+
+chart_values:
+  features:
+    nfs: true
+
+subcharts:
+  dls4e-platform:
+    dashboard:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/dashboard"
+      chart_values:
+        image: core/dashboard:v1.8.3
+    flannel:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/flannel"
+      chart_values:
+        image: core/flannel:v0.9.1
+    heapster:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/heapster"
+      chart_values:
+        image: core/heapster:v1.4.2
+        nanny_image: core/addon-resizer:v1.7
+    samba-forward:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../platform-charts/samba-forward"
+    admin:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../platform-charts/admin"
+    nfs:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/nfs"
+      chart_values:
+        image: core/nfs-provisioner:v1.0.8
+      conditions: features.nfs
+    skydns:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/skydns"
+      chart_values:
+        kubedns_image: core/kube-dns:1.14.8
+        nanny_image: core/dnsmasq-nanny:1.14.8
+        sidecar_image: core/dns-sidecar:1.14.8
+    ingress:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/ingress"
+      chart_values:
+        ingress_image: core/ingress:0.14.0
+        defaultbackend_image: core/defaultbackend:1.4
+

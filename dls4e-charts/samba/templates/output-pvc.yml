@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-output
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-output
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}

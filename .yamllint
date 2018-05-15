@@ -10,6 +10,8 @@ ignore: |
   /tools/finalizers/dls4e/dls4e-registry
   /dls4e-charts
   /dls4e-user
+  /dls4e-registry-charts
+  /platform-charts
 
 rules:
   braces:
