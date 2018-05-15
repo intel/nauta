@@ -1,5 +1,15 @@
 LIBS_DIRECTORY:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+ifeq ($(findstring MSYS_NT-10.0,$(UNAME)),MSYS_NT-10.0)
+	OS := Windows
+endif
+ifeq ($(findstring Linux,$(UNAME)),Linux)
+	OS := Linux
+endif
+ifeq ($(findstring Darwin,$(UNAME)),Darwin)
+	OS := Darwin
+endif
+
 VIRTUALENV_DIR:=$(if $(GLOBAL_VIRTUALENV_DIR),$(GLOBAL_VIRTUALENV_DIR),$(DIRECTORY)/.venv)
 VIRTUALENV_BIN:=$(VIRTUALENV_DIR)/bin
 ACTIVATE:=$(VIRTUALENV_BIN)/activate
@@ -59,12 +69,21 @@ $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
 
+ifeq (Windows,$(OS))
+$(VIRTUALENV_DIR):
+	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
+
+$(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
+	@$(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS)
+	@touch $(ACTIVATE)
+else
 $(VIRTUALENV_DIR): $(VENV_LOCK)
 	@flock $(VENV_LOCK) virtualenv -p python3.6 $(VIRTUALENV_DIR)
 
 $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 	@flock $(VENV_LOCK) $(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS)
 	@touch $(ACTIVATE)
+endif
 
 ENV_%:
 	@ if [ "${ENV_${*}}" = "" ]; then \
