@@ -44,11 +44,11 @@ spec:
             memory: 512Mi
         env:
         - name: INPUT_PVC
-          value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-input
+          value: {{ .Release.Name }}-{{ .Chart.Name }}-input
         - name: OUTPUT_PVC
-          value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ .Chart.Name }}-output
+          value: {{ .Release.Name }}-{{ .Chart.Name }}-output
         - name: APP_RELEASE
-          value: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+          value: {{ .Release.Name }}
         ports:
         - containerPort: 137
           protocol: UDP
