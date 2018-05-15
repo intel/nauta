@@ -1,20 +1,29 @@
 LIBS_DIRECTORY:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+# OS detection
+UNAME:=$(shell uname)
 ifeq ($(findstring MSYS_NT-10.0,$(UNAME)),MSYS_NT-10.0)
-	OS := Windows
+OS:=Windows
 endif
 ifeq ($(findstring Linux,$(UNAME)),Linux)
-	OS := Linux
+OS:=Linux
 endif
 ifeq ($(findstring Darwin,$(UNAME)),Darwin)
-	OS := Darwin
+OS:=Darwin
 endif
 
 VIRTUALENV_DIR:=$(if $(GLOBAL_VIRTUALENV_DIR),$(GLOBAL_VIRTUALENV_DIR),$(DIRECTORY)/.venv)
+
+ifeq (Windows,$(OS))
+VIRTUALENV_BIN:=$(VIRTUALENV_DIR)/Scripts
+endif
+ifeq ($(OS), $(filter $(OS),Linux Darwin))
 VIRTUALENV_BIN:=$(VIRTUALENV_DIR)/bin
-ACTIVATE:=$(VIRTUALENV_BIN)/activate
+endif
+
 REQUIREMENTS:=$(LIBS_DIRECTORY)/../requirements.txt
 
+ACTIVATE:=$(VIRTUALENV_BIN)/activate
 PIP:=$(VIRTUALENV_BIN)/pip
 PYTHON:=$(VIRTUALENV_BIN)/python
 ANSIBLE:=$(VIRTUALENV_BIN)/ansible
@@ -23,9 +32,9 @@ ANSIBLE_PLAYBOOK:=$(VIRTUALENV_BIN)/ansible-playbook
 
 WORKSPACE:=$(if $(GLOBAL_WORKSPACE),$(GLOBAL_WORKSPACE),$(CURDIR)/.workspace)
 
-VENV_LOCK:=$(WORKSPACE)/.venv
-
 WORKSPACE_BUILD:=$(WORKSPACE)/$(if $(WORKSPACE_NAME),$(WORKSPACE_NAME),default)
+
+VENV_LOCK:=$(WORKSPACE)/.venv
 
 USER:=$(shell id -un)
 USER_ID:=$(shell id -u)
@@ -78,7 +87,7 @@ $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
 
-ifneq (Linux,$(OS))
+ifneq ($(OS), $(filter $(OS),Linux Darwin))
 $(VIRTUALENV_DIR):
 	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
 
@@ -87,10 +96,10 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 	@touch $(ACTIVATE)
 else
 $(VIRTUALENV_DIR): $(VENV_LOCK)
-	@flock $(VENV_LOCK) virtualenv -p python3.6 $(VIRTUALENV_DIR)
+	@flock $(VENV_LOCK) bash -c "if [ ! -d $(VIRTUALENV_DIR) ]; then virtualenv -p python3.6 $(VIRTUALENV_DIR); fi"
 
 $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
-	@flock $(VENV_LOCK) $(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS)
+	@flock $(VENV_LOCK) bash -c "if [ ! -f $(VIRTUALENV_DIR)/.act-$(VERSION) ]; then $(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS) && touch $(VIRTUALENV_DIR)/.act-$(VERSION); fi"
 	@touch $(ACTIVATE)
 endif
 
