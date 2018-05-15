@@ -24,15 +24,7 @@
     <v-list dense>
       <v-list-tile @click="test">
         <v-list-tile-action>
-          <v-icon>dashboard</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Dashboard</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="test">
-        <v-list-tile-action>
-          <v-icon>perm_media</v-icon>
+          <v-icon>track_changes</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title>Models</v-list-tile-title>
@@ -40,42 +32,10 @@
       </v-list-tile>
       <v-list-tile @click="test">
         <v-list-tile-action>
-          <v-icon>assessment</v-icon>
+          <v-icon>dashboard</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          <v-list-tile-title>Logs</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="test">
-        <v-list-tile-action>
-          <v-icon>clear_all</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Example 1</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="test">
-        <v-list-tile-action>
-          <v-icon>mail_outline</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Example 2</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="test">
-        <v-list-tile-action>
-          <v-icon>multiline_chart</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Example 3</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="test">
-        <v-list-tile-action>
-          <v-icon>settings</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Example 4</v-list-tile-title>
+          <v-list-tile-title>Resources Dashboard</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
@@ -90,7 +50,9 @@ export default {
       get () {
         return this.$store.state.app.menu.visible;
       },
-      set () {}
+      set (value) {
+        this.$store.commit('setMenuVisibility', value);
+      }
     }
   },
   methods: {
@@ -101,6 +63,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.navigation-drawer {
+  background-color: #f3f3f3;
+}
 </style>

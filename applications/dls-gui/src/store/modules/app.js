@@ -31,12 +31,14 @@ const getters = {
 
 const actions = {
   toggleMenu: ({commit}) => {
-    commit('toggleMenuVisibility');
+    commit('setMenuVisibility');
   }
 };
 
 const mutations = {
-  toggleMenuVisibility: (state) => { state.menu.visible = !state.menu.visible }
+  setMenuVisibility: (state, visible) => {
+    state.menu.visible = typeof (visible) !== 'undefined' ? visible : !state.menu.visible;
+  }
 };
 
 export default {

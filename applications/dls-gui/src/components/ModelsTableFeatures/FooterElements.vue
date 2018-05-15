@@ -19,13 +19,50 @@
  * and approved by Intel in writing.
  */
 
-import { Line } from 'vue-chartjs'
+<template>
+<div class="datatable table">
+  <div class="datatable__actions">
+    <div class="datatable__actions__select">
+      Rows per page:
+      <v-select
+        :items="itemsPerPageOptions"
+        v-model="chosenCount"
+        single-line
+      ></v-select>
+    </div>
+    <div class="datatable__actions__range-controls">
+      <div class="datatable__actions__pagination">
+        {{ paginationStats }}
+      </div>
+      <v-btn flat v-on:click="prevPageAction()" :disabled="currentPage === 1">
+        <v-icon>keyboard_arrow_left</v-icon>
+      </v-btn>
+      <v-btn flat v-on:click="nextPageAction()" :disabled="currentPage === pagesCount">
+        <v-icon>keyboard_arrow_right</v-icon>
+      </v-btn>
+    </div>
+  </div>
+</div>
+</template>
 
+<script>
 export default {
-  extends: Line,
-  props: ['data'],
-  mounted () {
-    // Overwriting base render method with actual data.
-    this.renderChart(this.data, {maintainAspectRatio: true});
+  name: 'FooterElements',
+  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'paginationStats'],
+  data: () => {
+    return {
+      itemsPerPageOptions: [5, 10, 15, 25],
+      chosenCount: 5
+    }
+  },
+  watch: {
+    chosenCount: function (val) {
+      this.updateCountHandler(val);
+    }
   }
 }
+</script>
+
+<style scoped>
+
+</style>

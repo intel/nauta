@@ -20,14 +20,26 @@
  */
 
 <template>
-  <v-toolbar app fixed clipped-left>
+  <v-toolbar dark color="intel_primary" app fixed clipped-left height="110px">
     <v-toolbar-side-icon @click.stop="toggleMenu"></v-toolbar-side-icon>
     <v-toolbar-title>
-      <div class="logo">
-        <img src="../img/logo.png" width="42">
-      </div>
-      Deep Learning Studio Enterprise
+      <v-container grid-list-md>
+        <v-layout row >
+          <v-flex md4>
+            <img src="../img/intel-ai-acrnym-rgb-3000-wht.png"/>
+          </v-flex>
+          <v-flex md8 hidden-xs-only>
+            DEEP LEARNING STUDIO
+          </v-flex>
+        </v-layout>
+      </v-container>
     </v-toolbar-title>
+    <v-spacer></v-spacer>
+    <v-icon>ic_help_outline</v-icon>
+    <v-btn flat>
+      Andrzej
+      <v-icon>keyboard_arrow_down</v-icon>
+    </v-btn>
   </v-toolbar>
 </template>
 
@@ -42,9 +54,14 @@ export default {
 }
 </script>
 
-<style>
-.logo {
-  float: left;
-  margin-right: 10px;
+<style scoped>
+.toolbar__title {
+  overflow: visible;
+  font-family: "Intel Clear Pro", sans-serif;
+  font-size: 42px;
 }
+.toolbar__title img {
+  margin-top: 14px;
+}
+
 </style>

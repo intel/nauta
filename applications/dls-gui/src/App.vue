@@ -21,7 +21,7 @@
 
 <template>
   <div id="app">
-    <v-app dark>
+    <v-app>
       <Navigation></Navigation>
       <Toolbar></Toolbar>
       <v-content>
@@ -51,9 +51,10 @@ export default {
 
 <style>
 #app {
-  font-family: 'Roboto', 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Intel Clear', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #ffffff;
+  background-color: #f3f3f3;
 }
 </style>

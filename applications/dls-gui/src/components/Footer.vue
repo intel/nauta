@@ -20,9 +20,12 @@
  */
 
 <template>
-  <v-footer app>
+  <v-footer app color="intel_lightest_gray">
     <v-layout row justify-center>
-      Copyright © Intel Corporation 2018
+      &#9400; Intel Corporation
+      <a>Terms of Use</a>
+      <a>Trademarks</a>
+      <a>Privacy</a>
     </v-layout>
   </v-footer>
 </template>
@@ -33,6 +36,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+a {
+  padding-left: 20px;
+  text-decoration: none;
+  color: inherit;
+}
 </style>

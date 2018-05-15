@@ -28,10 +28,16 @@ import router from './router';
 import store from './store';
 
 import 'vuetify/dist/vuetify.min.css';
-import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import 'material-icons/iconfont/material-icons.css';
+import './fonts.css';
 
-Vue.use(Vuetify);
+Vue.use(Vuetify, {
+  theme: {
+    intel_primary: '#0071c5',
+    intel_secondary: '#003c71',
+    intel_lightest_gray: '#f3f3f3'
+  }
+});
 
 Vue.config.productionTip = false;
 

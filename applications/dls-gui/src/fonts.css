@@ -19,19 +19,22 @@
  * and approved by Intel in writing.
  */
 
-import Vue from 'vue';
-import Router from 'vue-router';
-import Models from '../components/Models.vue';
+@font-face {
+  font-family: 'Intel Clear Pro';
+  src:
+    url(./fonts/IntelClearProLCProductNamesBd.woff) format('woff');
+}
 
-Vue.use(Router);
+@font-face {
+  font-family: 'Intel Clear';
+  font-weight: normal;
+  src:
+    url(./fonts/IntelClear_WArabic_Rg.woff) format('woff');
+}
 
-export default new Router({
-  mode: 'history',
-  routes: [
-    {
-      path: '/',
-      name: 'Models',
-      component: Models
-    }
-  ]
-})
+@font-face {
+  font-family: 'Intel Clear';
+  font-weight: bold;
+  src:
+    url(./fonts/IntelClear_WArabic_Bd.woff) format('woff');
+}
