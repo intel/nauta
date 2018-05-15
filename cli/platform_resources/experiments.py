@@ -20,13 +20,13 @@
 #
 
 from collections import namedtuple
-from enum import Enum
 from typing import List
 import re
 import sre_constants
 
 from kubernetes import config, client
 
+import platform_resources.experiment_model as model
 from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
 
@@ -38,16 +38,10 @@ EXPERIMENTS_PLURAL = 'experiments'
 EXPERIMENTS_VERSION = 'v1'
 
 
-Experiment = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter', 'status'])
+ExperimentShort = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter', 'status'])
 
 
-class ExperimentStatus(Enum):
-    CREATING = 'CREATING'
-    SUBMITTED = 'SUBMITTED'
-    FAILED = 'FAILED'
-
-
-def list_experiments(namespace: str = None, state: ExperimentStatus=None, name_filter: str = None) -> List[Experiment]:
+def list_experiments(namespace: str = None, state: model.ExperimentStatus=None, name_filter: str = None) -> List[ExperimentShort]:
     """
     Return list of experiments.
     :param namespace: If provided, only experiments from this namespace will be returned
@@ -74,13 +68,40 @@ def list_experiments(namespace: str = None, state: ExperimentStatus=None, name_f
     experiment_filters = [lambda experiment_dict: not state or experiment_dict['spec']['state'] == state.value,
                           lambda experiment_dict: not name_regex or name_regex.search(experiment_dict['spec']['name'])]
 
-    experiments = [Experiment(name=experiment_dict['spec']['name'],
-                              parameters_spec=experiment_dict['spec']['parameters-spec'],
-                              creation_timestamp=experiment_dict['metadata']['creationTimestamp'],
-                              submitter=experiment_dict['metadata']['namespace'], # Assumption: namespace == username
-                              status=experiment_dict['spec']['state'])
+    experiments = [ExperimentShort(name=experiment_dict['spec']['name'],
+                                   parameters_spec=experiment_dict['spec']['parameters-spec'],
+                                   creation_timestamp=experiment_dict['metadata']['creationTimestamp'],
+                                   submitter=experiment_dict['metadata']['namespace'],
+                                   status=experiment_dict['spec']['state'])
                    for experiment_dict in raw_experiments['items']
                    if all(f(experiment_dict) for f in experiment_filters)
                    ]
 
     return experiments
+
+
+def add_experiment(exp: model.Experiment, namespace: str) -> model.ExperimentKubernetes:
+    """
+    Return list of experiments.
+    :param exp model to save
+    :param namespace where Experiment will be saved
+    :return: Kubernetes response object
+    """
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+
+    exp_kubernetes = model.ExperimentKubernetes(exp, client.V1ObjectMeta(name=exp.name, namespace=namespace))
+    schema = model.ExperimentKubernetesSchema()
+    body, err = schema.dump(exp_kubernetes)
+    if err:
+        raise RuntimeError(f'preparing dump of ExperimentKubernetes request object error - {err}')
+
+    raw_exp = api.create_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace, body = body,
+                                                  plural=EXPERIMENTS_PLURAL, version=EXPERIMENTS_VERSION)
+
+    response, err = schema.load(raw_exp)
+    if err:
+        raise RuntimeError(f'preparing load of ExperimentKubernetes response object error - {err}')
+
+    return response

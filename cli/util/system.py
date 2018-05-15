@@ -55,7 +55,7 @@ def execute_subprocess_command(command: List[str], timeout: int or None = 1, std
     process = subprocess.Popen(args=command, stdout=std_output_destination, stderr=std_error_destination,
                                universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
 
-    # wait for command execution
+    # wait for command execution initialization
     time.sleep(timeout)
 
     if not process or process.poll() != (0 or None):

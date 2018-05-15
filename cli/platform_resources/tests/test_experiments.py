@@ -21,7 +21,8 @@
 
 import pytest
 
-from platform_resources.experiments import list_experiments, Experiment, ExperimentStatus, InvalidRegularExpressionError
+from platform_resources.experiment_model import ExperimentStatus
+from platform_resources.experiments import list_experiments, ExperimentShort, InvalidRegularExpressionError
 
 TEST_RAW_EXPERIMENTS = {'apiVersion':
                             'aipg.intel.com/v1',
@@ -72,12 +73,12 @@ TEST_RAW_EXPERIMENTS = {'apiVersion':
                         'metadata': {'continue': '', 'resourceVersion': '3136167',
                                      'selfLink': '/apis/aipg.intel.com/v1/experiments'}}
 
-TEST_EXPERIMENTS = [Experiment(name='test-experiment', parameters_spec={'a': 1, 'b': 2},
-                               creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
-                               status='CREATING'),
-                    Experiment(name='test-experiment-2', parameters_spec={'a': 1, 'b': 2},
-                               creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
-                               status='SUBMITTED')]
+TEST_EXPERIMENTS = [ExperimentShort(name='test-experiment', parameters_spec={'a': 1, 'b': 2},
+                                    creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                                    status='CREATING'),
+                    ExperimentShort(name='test-experiment-2', parameters_spec={'a': 1, 'b': 2},
+                                    creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                                    status='SUBMITTED')]
 
 @pytest.fixture()
 def mock_k8s_api_client(mocker):

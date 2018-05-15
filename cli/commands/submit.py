@@ -19,28 +19,31 @@
 # and approved by Intel in writing.
 #
 
+import time
 import click
 import sys
 import itertools
+from pathlib import Path
 from typing import Tuple, List
 
+import draft.cmd as cmd
 from tabulate import tabulate
-
 
 from commands.common import EXPERIMENT_NAME, EXPERIMENT_PARAMETERS, \
     EXPERIMENT_STATUS, EXPERIMENT_MESSAGE, create_environment, \
     delete_environment, convert_to_number, ExperimentDescription, ExperimentStatus, \
     generate_experiment_name
-import draft.cmd as cmd
-from util.logger import initialize_logger
-from packs.tf_training import update_configuration
-from util.k8s.kubectl import start_port_forwarding
 from cli_state import common_options, pass_state, State
-
+from packs.tf_training import update_configuration
+import platform_resources.experiments as experiments_api
+import platform_resources.experiment_model as experiments_model
+from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import KubectlIntError
 from util.app_names import DLS4EAppNames
+from util.k8s.kubectl import start_port_forwarding
 
 log = initialize_logger('commands.submit')
 
@@ -70,7 +73,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     click.echo("Submitting experiment/experiments.")
 
     try:
-        experiments_list = create_list_of_experiments(parameter_range, parameter_set)
+        experiments_list = prepare_list_of_experiments(parameter_range, parameter_set)
     except KubectlIntError as exe:
         log.exception(str(exe))
         click.echo(str(exe))
@@ -152,6 +155,15 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
             sys.exit(1)
 
+    # create Experiment model
+    # TODO template_name & template_namespace should be filled after Template implementation: Path(script_location).name.lower()
+    # TODO CAN-16 implement name algorithm
+    temp_name = 'exp-' + time.strftime('%H-%M-%S', time.localtime())
+    experiments_api.add_experiment(experiments_model.Experiment(name=temp_name, parameters_spec=list(script_parameters),
+                                                                template_name="template-name",
+                                                                template_namespace="template-namespace"),
+                                   get_kubectl_current_context_namespace())
+
     # submit experiments
     for experiment in experiments_list:
         try:
@@ -192,8 +204,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     log.debug("Submit - stop")
 
 
-def create_list_of_experiments(parameter_range: List[Tuple[str, str]],
-                               parameter_set: Tuple[str, ...]) -> List[ExperimentDescription]:
+def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]],
+                                parameter_set: Tuple[str, ...]) -> List[ExperimentDescription]:
     # each element of the list contains
     # - experiment name
     # - experiment status

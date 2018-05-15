@@ -26,7 +26,8 @@ from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
 import platform_resources.experiments as experiments_api
-from util.k8s.kubectl import get_kubectl_username
+import platform_resources.experiment_model as experiments_model
+from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 
 logger = initialize_logger(__name__)
@@ -37,17 +38,17 @@ logger = initialize_logger(__name__)
               help='Show all experiments, regardless of owner')
 @click.option('--name', type=str,
               help='A regular expression to narrow down list to experiments that are matching this expression')
-@click.option('--status', type=click.Choice([status.name for status in experiments_api.ExperimentStatus]),
+@click.option('--status', type=click.Choice([status.name for status in experiments_model.ExperimentStatus]),
               help='List experiments with matching status')
 @common_options
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: experiments_api.ExperimentStatus):
+def list_experiments(state: State, all_users: bool, name: str, status: experiments_model.ExperimentStatus):
     """
     List experiments
     """
 
-    namespace = None if all_users else get_kubectl_username()
-    status = experiments_api.ExperimentStatus(status) if status else None
+    namespace = None if all_users else get_kubectl_current_context_namespace()
+    status = experiments_model.ExperimentStatus(status) if status else None
     try:
         experiments = experiments_api.list_experiments(namespace=namespace, state=status, name_filter=name)
     except experiments_api.InvalidRegularExpressionError:
