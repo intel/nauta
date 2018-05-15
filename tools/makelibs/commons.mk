@@ -87,7 +87,7 @@ $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
 
-ifneq ($(OS), $(filter $(OS),Linux Darwin))
+ifneq ($(OS), $(filter $(OS),Linux))
 $(VIRTUALENV_DIR):
 	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
 
