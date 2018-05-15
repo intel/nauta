@@ -14,14 +14,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-skydns
+      app: {{ .Release.Name }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       release: {{ .Release.Name }}
       heritage: {{ .Release.Service }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-skydns
+        app: {{ .Release.Name }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
