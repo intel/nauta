@@ -33,6 +33,15 @@ USER_ID:=$(shell id -u)
 GROUP:=$(shell id -gn)
 GROUP_ID:=$(shell id -g)
 
+UNAME:=$(shell uname)
+ifeq ($(UNAME), Linux)
+OS:=Linux
+endif
+
+ifeq ($(OS),)
+OS:=Unknown
+endif
+
 ### Build definitions
 DEFAULT_NAME:=$(if $(NAME),$(NAME),$(if $(WORKSPACE_NAME),$(WORKSPACE_NAME),default))
 DEFAULT_VERSION_MAJOR:=$(if $(VERSION_MAJOR),$(VERSION_MAJOR),1)
@@ -69,7 +78,7 @@ $(BUILD_DIR): $(WORKSPACE_BUILD)
 	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)
 
-ifeq (Windows,$(OS))
+ifneq (Linux,$(OS))
 $(VIRTUALENV_DIR):
 	@virtualenv -p python3.6 $(VIRTUALENV_DIR)
 
