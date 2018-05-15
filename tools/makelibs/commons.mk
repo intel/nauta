@@ -41,10 +41,10 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                        -e group=$(GROUP) -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml
 
-$(REQUIREMENTS_LOCK):
+$(REQUIREMENTS_LOCK): $(WORKSPACE)
 	@touch $(REQUIREMENTS_LOCK)
 
-$(VENV_LOCK):
+$(VENV_LOCK): $(WORKSPACE)
 	@touch $(VENV_LOCK)
 
 $(WORKSPACE):
