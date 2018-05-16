@@ -37,7 +37,7 @@ def execute_system_command(command: List[str], timeout: int or None = None,
     try:
         output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
                                          stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
-        log.debug(f'COMMAND: {command} \n RESULT: {output}')
+        log.debug(f'COMMAND: {command} RESULT: {output}'.replace('\n', '\\n'))
     except subprocess.CalledProcessError as ex:
         return ex.output, ex.returncode
     else:
