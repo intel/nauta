@@ -25,10 +25,10 @@
     <v-toolbar-title>
       <v-container grid-list-md>
         <v-layout row >
-          <v-flex md4>
+          <v-flex md3>
             <img src="../img/intel-ai-acrnym-rgb-3000-wht.png"/>
           </v-flex>
-          <v-flex md8 hidden-xs-only>
+          <v-flex md9 hidden-xs-only>
             DEEP LEARNING STUDIO
           </v-flex>
         </v-layout>
