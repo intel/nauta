@@ -23,10 +23,10 @@ from enum import Enum
 from typing import List
 
 from kubernetes import client
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields, post_load, validates
 from marshmallow_enum import EnumField
 
-from platform_resources.object_meta_model import V1ObjectMetaSchema
+from platform_resources.object_meta_model import V1ObjectMetaSchema, validate_kubernetes_name
 
 
 class ExperimentStatus(Enum):
@@ -55,6 +55,10 @@ class ExperimentSchema(Schema):
     @post_load
     def make_experiment(self, data):
         return Experiment(**data)
+
+    @validates('name')
+    def validate_name(self, name: str):
+        validate_kubernetes_name(name)
 
 
 class ExperimentKubernetes(object):

@@ -19,8 +19,20 @@
 # and approved by Intel in writing.
 #
 
+import re
+
 from kubernetes import client
-from marshmallow import Schema, fields, post_load, post_dump
+from marshmallow import Schema, fields, post_load, post_dump, validates, ValidationError
+
+# kubernetes name requirements
+KUBERNETES_NAME_RE = re.compile(r'[a-z0-9]([-.a-z0-9]*[a-z0-9])?')
+
+
+def validate_kubernetes_name(name: str):
+    match = KUBERNETES_NAME_RE.fullmatch(name)
+    if not match:
+        raise ValidationError("name must consist of lower case alphanumeric characters, '-' or '.', " +
+                              "and must start and end with an alphanumeric character ")
 
 
 class V1ObjectMetaSchema(Schema):
@@ -51,3 +63,7 @@ class V1ObjectMetaSchema(Schema):
         for key in filter(lambda key: data[key] is None, data):
             del result[key]
         return result
+
+    @validates('name')
+    def validate_name(self, name: str):
+        validate_kubernetes_name(name)

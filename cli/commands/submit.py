@@ -27,16 +27,17 @@ from pathlib import Path
 from typing import Tuple, List
 
 import draft.cmd as cmd
+from marshmallow import ValidationError
 from tabulate import tabulate
 
 from commands.common import EXPERIMENT_NAME, EXPERIMENT_PARAMETERS, \
     EXPERIMENT_STATUS, EXPERIMENT_MESSAGE, create_environment, \
-    delete_environment, convert_to_number, ExperimentDescription, ExperimentStatus, \
-    generate_experiment_name
+    delete_environment, convert_to_number, ExperimentDescription, ExperimentStatus
 from cli_state import common_options, pass_state, State
 from packs.tf_training import update_configuration
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
+from platform_resources.object_meta_model import validate_kubernetes_name
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import get_current_os, OS
@@ -48,6 +49,7 @@ from util.k8s.kubectl import start_port_forwarding
 log = initialize_logger('commands.submit')
 
 HELP = "Command used to submitting training scripts for a single-node tensorflow training."
+HELP_N = "Experiment custom name"
 HELP_SFL = "Name of a folder with additional files used by a script - other .py files, data etc. " \
            "If not given - its content won't be copied into an image."
 HELP_T = "Name of a template used to create a delpoyment. By default a single-node tensorflow training" \
@@ -57,23 +59,38 @@ HELP_PR = "Values (set or range) of a single parameter. "
 HELP_PS = "Set of values of one or several parameters."
 
 
+def validate_experiment_name(ctx, param, value):
+    try:
+        if value:
+            validate_kubernetes_name(value)
+            return value
+    except ValidationError as ex:
+        raise click.BadParameter(ex)
+
+
 @click.command(help=HELP)
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.option("-t", "--template", help=HELP_T, default="tf-training")
+@click.option("-n", "--name", help=HELP_N, callback=validate_experiment_name)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=HELP_PS)
 @click.argument("script_parameters", nargs=-1)
 @common_options
 @pass_state
-def submit(state: State, script_location: str, script_folder_location: str, template: str,
+def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
     click.echo("Submitting experiment/experiments.")
 
     try:
-        experiments_list = prepare_list_of_experiments(parameter_range, parameter_set)
+        namespace = get_kubectl_current_context_namespace()
+        experiment_name = experiments_api.generate_experiment_name(script_name=Path(script_location).name,
+                                                                   namespace=namespace, name=name)
+        # TODO refactor required: change Experiment to Run
+        experiments_list = prepare_list_of_experiments(experiment_name=experiment_name, parameter_range=parameter_range,
+                                                       parameter_set=parameter_set)
     except KubectlIntError as exe:
         log.exception(str(exe))
         click.echo(str(exe))
@@ -156,13 +173,10 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
             sys.exit(1)
 
     # create Experiment model
-    # TODO template_name & template_namespace should be filled after Template implementation: Path(script_location).name.lower()
-    # TODO CAN-16 implement name algorithm
-    temp_name = 'exp-' + time.strftime('%H-%M-%S', time.localtime())
-    experiments_api.add_experiment(experiments_model.Experiment(name=temp_name, parameters_spec=list(script_parameters),
-                                                                template_name="template-name",
-                                                                template_namespace="template-namespace"),
-                                   get_kubectl_current_context_namespace())
+    # TODO template_name & template_namespace should be filled after Template implementation
+    experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
+                                                                parameters_spec=list(script_parameters),
+                                                                template_namespace="template-namespace"), namespace)
 
     # submit experiments
     for experiment in experiments_list:
@@ -204,7 +218,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     log.debug("Submit - stop")
 
 
-def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]],
+def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]], experiment_name: str,
                                 parameter_set: Tuple[str, ...]) -> List[ExperimentDescription]:
     # each element of the list contains
     # - experiment name
@@ -212,8 +226,6 @@ def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]],
     # - error message (if exists)
     # - experiment folder
     # - experiment paramaters
-    experiment_name = generate_experiment_name()
-
     experiments_list = []
 
     if not parameter_range and not parameter_set:

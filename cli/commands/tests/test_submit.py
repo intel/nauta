@@ -46,13 +46,13 @@ PS_PARAMETER = ["-ps", "{param2:3}"]
 
 
 def test_submit_success(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
     del_env_mock = mocker.patch("commands.common.delete_environment")
-    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
     add_experiment_mock = mocker.patch("platform_resources.experiments.add_experiment")
     spf_mock = mocker.patch("commands.submit.start_port_forwarding",
                             side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
@@ -77,7 +77,8 @@ def test_submit_success(config_path_mock, mocker):  # noqa: F811
 
 
 def test_submit_fail(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[KubectlIntError()])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -90,6 +91,7 @@ def test_submit_fail(config_path_mock, mocker):  # noqa: F811
     runner.invoke(submit.submit, [SCRIPT_LOCATION])
 
     assert spf_mock.call_count == 0, "port was forwarded"
+    assert get_namespace_mock.call_count == 1, "current user namespace was not fetched"
     assert gen_expname_mock.call_count == 1, "home folder doesn't exist"
     assert crenv_mock.call_count == 1, "environment was created"
     assert cmd_create_mock.call_count == 0, "deployment was created"
@@ -99,7 +101,8 @@ def test_submit_fail(config_path_mock, mocker):  # noqa: F811
 
 
 def test_submit_depl_fail(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -113,6 +116,7 @@ def test_submit_depl_fail(config_path_mock, mocker):  # noqa: F811
 
     assert spf_mock.call_count == 0, "port was forwarded"
     assert del_env_mock.call_count == 1, "environment folder wasn't deleted"
+    assert get_namespace_mock.call_count == 1, "current user namespace was not fetched"
     assert gen_expname_mock.call_count == 1, "home folder doesn't exist"
     assert crenv_mock.call_count == 1, "environment wasn't created"
     assert cmd_create_mock.call_count == 1, "app didn't try to deploy training"
@@ -121,7 +125,8 @@ def test_submit_depl_fail(config_path_mock, mocker):  # noqa: F811
 
 
 def test_submit_env_update_fail(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[KubectlIntError])
@@ -135,6 +140,7 @@ def test_submit_env_update_fail(config_path_mock, mocker):  # noqa: F811
 
     assert spf_mock.call_count == 0, "port was forwarded"
     assert del_env_mock.call_count == 1, "environment folder wasn't deleted"
+    assert get_namespace_mock.call_count == 1, "current user namespace was not fetched"
     assert gen_expname_mock.call_count == 1, "home folder doesn't exist"
     assert crenv_mock.call_count == 1, "environment wasn't created"
     assert cmd_create_mock.call_count == 1, "deployment wasn't created"
@@ -143,14 +149,14 @@ def test_submit_env_update_fail(config_path_mock, mocker):  # noqa: F811
 
 
 def test_submit_start_depl_fail(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("error message", 1)])
     del_env_mock = mocker.patch("commands.submit.delete_environment")
     add_experiment_mock = mocker.patch("platform_resources.experiments.add_experiment")
-    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
     spf_mock = mocker.patch("commands.submit.start_port_forwarding",
                             side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
 
@@ -175,7 +181,8 @@ def test_submit_start_depl_fail(config_path_mock, mocker):  # noqa: F811
 
 
 def test_submit_lack_of_template(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_call_draft_mock = mocker.patch("draft.cmd.call_draft",
                                        side_effect=[("Error: could not load pack: rest of a message", 1)])
@@ -192,6 +199,7 @@ def test_submit_lack_of_template(config_path_mock, mocker):  # noqa: F811
 
     assert spf_mock.call_count == 0, "port was forwarded"
     assert del_env_mock.call_count == 1, "environment folder wasn't deleted"
+    assert get_namespace_mock.call_count == 1, "current user namespace was not fetched"
     assert gen_expname_mock.call_count == 1, "home folder doesn't exist"
     assert crenv_mock.call_count == 1, "environment wasn't created"
     assert cmd_call_draft_mock.call_count == 1, "app didn't try to deploy training"
@@ -344,7 +352,7 @@ def test_check_enclosing_brackets():
 
 def test_create_list_of_experiments_pr_only(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("commands.submit.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     two_params_list_result = \
@@ -355,7 +363,7 @@ def test_create_list_of_experiments_pr_only(mocker):
          ExperimentDescription(name=experiment_name + "-5", parameters=("param1=1", "param2=1")),
          ExperimentDescription(name=experiment_name + "-6", parameters=("param1=1", "param2=2"))]
 
-    output = submit.prepare_list_of_experiments(two_params_list, ())
+    output = submit.prepare_list_of_experiments(two_params_list, experiment_name, ())
 
     assert len(output) == 6
     assert output == two_params_list_result
@@ -363,13 +371,13 @@ def test_create_list_of_experiments_pr_only(mocker):
 
 def test_create_list_of_experiments_ps_only(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("commands.submit.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
 
     multiple_two_params = ("{param1:0, param2:1}", "{param1:2,param3:3}")
     multiple_two_params_list_result = \
         [ExperimentDescription(name=experiment_name + "-1", parameters=("param1=0", "param2=1")),
          ExperimentDescription(name=experiment_name + "-2", parameters=("param1=2", "param3=3"))]
-    output = submit.prepare_list_of_experiments((), multiple_two_params)
+    output = submit.prepare_list_of_experiments((), experiment_name, multiple_two_params)
 
     assert len(output) == 2
     assert output == multiple_two_params_list_result
@@ -377,7 +385,7 @@ def test_create_list_of_experiments_ps_only(mocker):
 
 def test_create_list_of_experiments_pr_and_ps(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("commands.submit.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     multiple_two_params = ("{param3:0, param4:1}", "{param3:2,param4:3}")
@@ -407,24 +415,28 @@ def test_create_list_of_experiments_pr_and_ps(mocker):
                        ExperimentDescription(name=experiment_name + "-12",
                                              parameters=("param3=2", "param4=3", "param1=1", "param2=2"))]
 
-    output = submit.prepare_list_of_experiments(two_params_list, multiple_two_params)
+    output = submit.prepare_list_of_experiments(two_params_list, experiment_name, multiple_two_params)
 
     assert len(output) == 12
     assert output == expected_result
 
 
 def test_submit_two_experiment_success(config_path_mock, mocker):  # noqa: F811
-    gen_expname_mock = mocker.patch("commands.submit.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment",
                               side_effect=[(EXPERIMENT_FOLDER), (EXPERIMENT_FOLDER)])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0), ("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration")
     add_experiment_mock = mocker.patch("platform_resources.experiments.add_experiment")
-    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0), ("", 0)])
     del_env_mock = mocker.patch("commands.submit.delete_environment")
     spf_mock = mocker.patch("commands.submit.start_port_forwarding",
                             side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
+
+    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        socat_mock = mocker.patch("commands.submit.socat")
 
     runner = CliRunner()
     parameters = [SCRIPT_LOCATION]

@@ -85,14 +85,6 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     return experiment_path
 
 
-def generate_experiment_name(suffix: str="") -> str:
-    time_part = time.strftime("%Y%m%d%H%M%S")
-    random_part = random.randrange(0, 999)
-    experiment_name = "t" + time_part + str(random_part).zfill(3) + suffix
-
-    return experiment_name
-
-
 def delete_environment(experiment_folder: str):
     """
     Deletes draft environment located in a folder given as a paramater
