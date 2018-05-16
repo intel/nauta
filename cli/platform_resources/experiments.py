@@ -39,7 +39,6 @@ API_GROUP_NAME = 'aipg.intel.com'
 EXPERIMENTS_PLURAL = 'experiments'
 EXPERIMENTS_VERSION = 'v1'
 
-
 ExperimentShort = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter', 'status'])
 
 

@@ -30,7 +30,7 @@ from commands import submit
 from util.exceptions import KubectlIntError
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
-EXPERIMENT_NAME = "experiment_name"
+EXPERIMENT_NAME = "experiment-name"
 EXPERIMENT_NAMESPACE = "user-namespace"
 SCRIPT_LOCATION = "training_script.py"
 
@@ -140,16 +140,25 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitMocks):
     prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.submit.update_configuration", side_effect=[0, 0])
     prepare_mocks.cmd_up = prepare_mocks.mocker.patch("draft.cmd.up", side_effect=[("", 0), ("", 0)])
 
-    runner = CliRunner()
     parameters = [SCRIPT_LOCATION]
     parameters.extend(PR_PARAMETER)
     parameters.extend(PS_PARAMETER)
 
-    result = runner.invoke(submit.submit, parameters, input="y")
+    result = CliRunner().invoke(submit.submit, parameters, input="y")
     check_asserts(prepare_mocks, create_env_count=2, cmd_create_count=2, update_conf_count=2, cmd_up_count=2)
     assert "param1=1" in result.output
     assert "param1=2" in result.output
     assert "param2=3" in result.output
+
+
+def test_submit_with_name_success(prepare_mocks: SubmitMocks):
+    CliRunner().invoke(submit.submit, [SCRIPT_LOCATION, '-n', EXPERIMENT_NAME])
+    check_asserts(prepare_mocks)
+
+
+def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks):
+    result = CliRunner().invoke(submit.submit, [SCRIPT_LOCATION, '-n', 'Wrong_&name'])
+    assert 'name must consist of lower case alphanumeric characters' in result.output
 
 
 def test_delete_runs(mocker):
