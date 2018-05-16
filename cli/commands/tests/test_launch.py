@@ -26,7 +26,7 @@ from commands import launch
 from util.system import get_current_os, OS
 
 APP_NAME = 'webui'
-DISABLE_BROWSER_ARG = '--run-browser=False'
+DISABLE_BROWSER_ARG = '--no-browser'
 
 
 def test_launch_with_browser_success(mocker):
@@ -82,7 +82,7 @@ def test_launch_start_tunnel_fail(mocker):
         socat_mock = mocker.patch("commands.launch.socat")
 
     runner = CliRunner()
-    runner.invoke(launch.launch, [APP_NAME, DISABLE_BROWSER_ARG])
+    runner.invoke(launch.launch, [APP_NAME])
 
     assert spf_mock.call_count == 1, "port wasn't forwarded"
     assert wfc_mock.call_count == 0, "connection was checked"

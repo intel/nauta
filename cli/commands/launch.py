@@ -46,10 +46,17 @@ FORWARDED_URL = 'http://localhost:{}'
 @common_options
 @pass_state
 @click.argument('app', type=click.Choice(['webui', 'tensorboard']))
-@click.option('--run-browser', default=True, type=bool, help='Run web browser with app')
-def launch(state: State, app: str, run_browser: bool):
+@click.option('--no-browser', is_flag=True, help='Run command without a web browser starting, '
+                                                 'only proxy tunnel is created')
+def launch(state: State, app: str, no_browser: bool):
     """
-    Launch experiments gui
+    Subcommand for launching browser with credentials
+
+    Possible APP values:
+
+        * webui - launches web user-interface in local browser,
+
+        * tensorboard - launches tensorboard in local browser.
     """
     k8s_app_name = K8S_APP_NAME[app]
 
@@ -80,7 +87,7 @@ def launch(state: State, app: str, run_browser: bool):
 
             sys.exit(1)
 
-    if run_browser:
+    if not no_browser:
         click.echo('Browser will start in few seconds. Please wait... ')
         wait_for_connection(url)
         webbrowser.open_new(url)
