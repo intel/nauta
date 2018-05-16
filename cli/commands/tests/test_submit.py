@@ -19,7 +19,6 @@
 # and approved by Intel in writing.
 #
 
-
 from unittest.mock import Mock
 from util.system import get_current_os, OS
 from click.testing import CliRunner
@@ -46,7 +45,8 @@ FAKE_CONTAINER_PORT = 5000
 
 class SubmitMocks:
     def __init__(self, mocker, get_namespace=None, gen_exp_name=None, add_exp=None, cmd_create=None, cmd_up=None,
-                 update_conf=None, create_env=None, del_env=None, start_port_fwd=None, socat=None) -> None:
+                 update_conf=None, create_env=None, del_env=None, start_port_fwd=None, socat=None, isfile=None,
+                 isdir=None) -> None:
         self.mocker = mocker
         self.get_namespace = get_namespace
         self.gen_exp_name = gen_exp_name
@@ -58,6 +58,8 @@ class SubmitMocks:
         self.del_env = del_env
         self.start_port_fwd = start_port_fwd
         self.socat = socat
+        self.isfile = isfile
+        self.isdir = isdir
 
 
 @pytest.fixture
@@ -75,16 +77,19 @@ def prepare_mocks(mocker) -> SubmitMocks:
     start_port_fwd_mock = mocker.patch("commands.submit.start_port_forwarding",
                                        side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
     socat_mock = mocker.patch("commands.submit.socat") if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
+    isfile_mock = mocker.patch("os.path.isfile", return_value=True)
+    isdir_mock = mocker.patch("os.path.isdir", return_value=True)
 
     return SubmitMocks(mocker=mocker, get_namespace=get_namespace_mock, gen_exp_name=gen_exp_name_mock,
                        add_exp=add_exp_mock, cmd_create=cmd_create_mock, cmd_up=cmd_up_mock,
                        update_conf=update_conf_mock, create_env=create_env_mock, del_env=del_env_mock,
-                       start_port_fwd=start_port_fwd_mock, socat=socat_mock)
+                       start_port_fwd=start_port_fwd_mock, socat=socat_mock, isfile=isfile_mock, isdir=isdir_mock)
 
 
 def check_asserts(prepare_mocks: SubmitMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
                   cmd_create_count=1, update_conf_count=1, start_port_fwd_count=1, add_exp_count=1, cmd_up_count=1,
-                  del_env_count=0):
+                  del_env_count=0, isfile_count=1):
+    assert prepare_mocks.isfile.call_count == isfile_count, "Script location was not checked"
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "current user namespace was not fetched"
     assert prepare_mocks.gen_exp_name.call_count == get_exp_name_count, "experiment name wasn't created"
     assert prepare_mocks.create_env.call_count == create_env_count, "environment wasn't created"
@@ -337,3 +342,30 @@ def test_create_list_of_runs_pr_and_ps(mocker):
     output = submit.prepare_list_of_runs(two_params_list, experiment_name, multiple_two_params)
     assert len(output) == 12
     assert output == expected_result
+
+
+def test_submit_invalid_script_path(prepare_mocks: SubmitMocks):
+    prepare_mocks.isfile.return_value = False
+
+    script_location = 'invalid-script.py'
+
+    runner = CliRunner()
+    parameters = [script_location]
+
+    result = runner.invoke(submit.submit, parameters, input="y")
+    assert f"Cannot find script: {script_location}. Make sure that provided path is correct." in result.output
+    assert result.exit_code == 1
+
+
+def test_submit_invalid_script_folder_path(prepare_mocks: SubmitMocks):
+    prepare_mocks.isdir.return_value = False
+
+    script_folder_location = 'invalid-script.py'
+
+    runner = CliRunner()
+    parameters = [SCRIPT_LOCATION, "-sfl", script_folder_location]
+
+    result = runner.invoke(submit.submit, parameters, input="y")
+    assert f"Cannot find script folder: {script_folder_location}." \
+           f" Make sure that provided path is correct." in result.output
+    assert result.exit_code == 1

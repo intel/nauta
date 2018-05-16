@@ -23,6 +23,7 @@ import sys
 import itertools
 from pathlib import Path
 from typing import Tuple, List
+import os
 
 import click
 from marshmallow import ValidationError
@@ -80,6 +81,15 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
            parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
+
+    if not os.path.isfile(script_location):
+        click.echo(f'Cannot find script: {script_location}. Make sure that provided path is correct.')
+        sys.exit(1)
+
+    if script_folder_location and not os.path.isdir(script_folder_location):
+        click.echo(f'Cannot find script folder: {script_folder_location}. Make sure that provided path is correct.')
+        sys.exit(1)
+
     click.echo("Submitting experiments.")
 
     try:
