@@ -19,7 +19,6 @@
 # and approved by Intel in writing.
 #
 
-
 import sys
 import itertools
 from pathlib import Path
@@ -29,9 +28,8 @@ import click
 from marshmallow import ValidationError
 from tabulate import tabulate
 
-from commands.common import EXPERIMENT_NAME, EXPERIMENT_PARAMETERS, \
-    EXPERIMENT_STATUS, EXPERIMENT_MESSAGE, create_environment, \
-    delete_environment, convert_to_number, ExperimentDescription, ExperimentStatus
+from commands.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, \
+    create_environment, delete_environment, convert_to_number, RunDescription, RunStatus
 from cli_state import common_options, pass_state, State
 import draft.cmd as cmd
 from packs.tf_training import update_configuration
@@ -82,15 +80,14 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
            parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
-    click.echo("Submitting experiment/experiments.")
+    click.echo("Submitting experiments.")
 
     try:
         namespace = get_kubectl_current_context_namespace()
         experiment_name = experiments_api.generate_experiment_name(script_name=Path(script_location).name,
                                                                    namespace=namespace, name=name)
-        # TODO refactor required: change Experiment to Run
-        experiments_list = prepare_list_of_experiments(experiment_name=experiment_name, parameter_range=parameter_range,
-                                                       parameter_set=parameter_set)
+        runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
+                                         parameter_set=parameter_set)
     except KubectlIntError as exe:
         log.exception(str(exe))
         click.echo(str(exe))
@@ -103,7 +100,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     try:
         # prepare environments for all experiment's runs
-        for experiment_run in experiments_list:
+        for experiment_run in runs_list:
             if script_parameters and experiment_run.parameters:
                 current_script_parameters = script_parameters + experiment_run.parameters
             elif script_parameters:
@@ -113,34 +110,29 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
             else:
                 current_script_parameters = ""
 
-            experiment_folder = prepare_experiment_environment(experiment_name=experiment_name,
-                                                               run_name=experiment_run.name,
-                                                               script_location=script_location,
-                                                               script_folder_location=script_folder_location,
-                                                               script_parameters=current_script_parameters,
-                                                               pack_type=template)
-
-            experiment_run.folder = experiment_folder
+            experiment_run.folder = prepare_experiment_environment(experiment_name=experiment_name,
+                                                                   run_name=experiment_run.name,
+                                                                   script_location=script_location,
+                                                                   script_folder_location=script_folder_location,
+                                                                   script_parameters=current_script_parameters,
+                                                                   pack_type=template)
     except Exception as exe:
         # any error in this step breaks execution of this command
         message = "Problems during creation of experiments' environments."
         log.exception(message)
         click.echo(message)
         # just in case - remove folders that were created with a success
-        delete_experiments(experiments_list)
+        delete_runs(runs_list)
         sys.exit(1)
 
-    # if there is more than one experiment to be scheduled - first ask whether all of them should
-    # be submitted
-    if len(experiments_list) > 1:
-        click.echo("Please confirm that the following experiments should be submitted.")
-        click.echo(tabulate({EXPERIMENT_NAME: [experiment.name for experiment in experiments_list],
-                             EXPERIMENT_PARAMETERS:
-                                 [experiment.formatted_parameters() for experiment in experiments_list]},
-                            headers=[EXPERIMENT_NAME, EXPERIMENT_PARAMETERS],
-                            tablefmt="orgtbl"))
-        if not click.confirm('Do you want to continue?'):
-            delete_experiments(experiments_list)
+    # if there is more than one run to be scheduled - first ask whether all of them should be submitted
+    if len(runs_list) > 1:
+        click.echo("Please confirm that the following Runs should be submitted.")
+        click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
+                             RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
+                            headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
+        if not click.confirm('Do you want to continue?', default=True):
+            delete_runs(runs_list)
             sys.exit(1)
 
     # start port forwarding
@@ -148,7 +140,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     try:
         process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
     except Exception as exe:
-        delete_experiments(experiments_list)
+        delete_runs(runs_list)
         log.exception("Error during creation of a proxy for a docker registry.")
         click.echo("Error during creation of a proxy for a docker registry.")
         sys.exit(1)
@@ -180,14 +172,14 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                                                                 parameters_spec=list(script_parameters),
                                                                 template_namespace="template-namespace"), namespace)
 
-    # submit experiments
-    for experiment_run in experiments_list:
+    # submit runs
+    for run in runs_list:
         try:
-            submit_one_experiment(experiment_run.folder)
-            experiment_run.status = ExperimentStatus.SUBMITTED
+            submit_one_run(run.folder)
+            run.status = RunStatus.SUBMITTED
         except Exception as exe:
-            experiment_run.status = ExperimentStatus.ERROR
-            experiment_run.message = exe
+            run.status = RunStatus.ERROR
+            run.message = exe
 
     # close port forwarding
     # noinspection PyBroadException
@@ -209,29 +201,20 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                        "Check whether it still exists, if yes - close it manually.")
 
     # display information about status of a training
-    click.echo(tabulate({EXPERIMENT_NAME: [experiment.name for experiment in experiments_list],
-                         EXPERIMENT_PARAMETERS: [experiment.formatted_parameters() for experiment in experiments_list],
-                         EXPERIMENT_STATUS: [experiment.formatted_status() for experiment in experiments_list],
-                         EXPERIMENT_MESSAGE: [experiment.error_message for experiment in experiments_list]},
-                        headers=[EXPERIMENT_NAME, EXPERIMENT_PARAMETERS, EXPERIMENT_STATUS,
-                                 EXPERIMENT_MESSAGE],
-                        tablefmt="orgtbl"))
-
-    log.debug("Submit - stop")
+    click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
+                         RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list],
+                         RUN_STATUS: [run.formatted_status() for run in runs_list],
+                         RUN_MESSAGE: [run.error_message for run in runs_list]},
+                        headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
+    log.debug("Submit - finish")
 
 
-def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]], experiment_name: str,
-                                parameter_set: Tuple[str, ...]) -> List[ExperimentDescription]:
-    # each element of the list contains
-    # - experiment name
-    # - experiment status
-    # - error message (if exists)
-    # - experiment folder
-    # - experiment paramaters
-    experiments_list = []
+def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name: str,
+                         parameter_set: Tuple[str, ...]) -> List[RunDescription]:
+    run_list = []
 
     if not parameter_range and not parameter_set:
-        experiments_list = [ExperimentDescription(name=experiment_name)]
+        run_list = [RunDescription(name=experiment_name)]
     else:
         list_of_range_parameters = [("", )]
         list_of_set_parameters = [("", )]
@@ -242,11 +225,10 @@ def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]], experime
         if parameter_set:
             list_of_set_parameters = analyze_ps_parameters_list(parameter_set)
 
-        experiment_index = 1
+        run_index = 1
         for set_param in list_of_set_parameters:
             for range_param in list_of_range_parameters:
-                current_experiment_name = experiment_name + "-" + str(experiment_index)
-
+                current_run_name = experiment_name + "-" + str(run_index)
                 current_params = ()
 
                 if len(set_param) >= 1 and set_param[0]:
@@ -255,80 +237,70 @@ def prepare_list_of_experiments(parameter_range: List[Tuple[str, str]], experime
                 if len(range_param) >= 1 and range_param[0]:
                     current_params = current_params + range_param
 
-                experiments_list.append(ExperimentDescription(name=current_experiment_name,
-                                                              parameters=current_params))
-
-                experiment_index = experiment_index + 1
-
-    return experiments_list
+                run_list.append(RunDescription(name=current_run_name, parameters=current_params))
+                run_index = run_index + 1
+    return run_list
 
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, script_location: str,
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
                                    pack_type: str) -> str:
     """
-    Prepares draft's environment for a certain experiment based on provided parameters
-
+    Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
     :param run_name: name of an experiment run
     :param script_location: location of a script used for training purposes
     :param script_folder_location: location of an additional folder used in training
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
-    :return: name of folder with an environment created for this experiment
+    :return: name of folder with an environment created for this run
     In case of any problems - an exception with a description of a problem is thrown
     """
-    log.debug("Prepare experiment environment - start")
-    log.debug("Prepare experiment environment - experiment name : {}".format(run_name))
+    log.debug(f'Prepare run {run_name} environment - start')
     try:
         # create an environment
-        experiment_folder = create_environment(run_name, script_location, script_folder_location)
+        run_folder = create_environment(run_name, script_location, script_folder_location)
         # generate draft's data
-        output, exit_code = cmd.create(working_directory=experiment_folder, pack_type=pack_type)
+        output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
         if exit_code:
             raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
         # reconfigure draft's templates
-        update_configuration(experiment_folder, script_location, script_folder_location, script_parameters,
+        update_configuration(run_folder, script_location, script_folder_location, script_parameters,
                              experiment_name=experiment_name)
     except Exception as exe:
-        delete_environment(experiment_folder)
+        delete_environment(run_folder)
         raise KubectlIntError(exe)
+    log.debug(f'Prepare run {run_name} environment - finish')
+    return run_folder
 
-    log.debug("Prepare experiment environment - stop")
-    return experiment_folder
 
-
-def submit_one_experiment(experiment_folder: str):
+def submit_one_run(run_folder: str):
     """
-    Submits one experiment using draft's environment located in a folder given as a pramater.
-
-    :param experiment_folder: location of a folder with a description of an environment
+    Submits one run using draft's environment located in a folder given as a parameter.
+    :param run_folder: location of a folder with a description of an environment
     In case of any problems it throws an exception with a description of a problem
     """
-    log.debug("Submit one experiment - start")
-    log.debug("Submit one experiment - experiment name : {}".format(experiment_folder))
+    log.debug(f'Submit one run: {run_folder} - start')
 
     # run training
-    output, exit_code = cmd.up(working_directory=experiment_folder)
+    output, exit_code = cmd.up(working_directory=run_folder)
 
     if exit_code:
         error_message = "Job hasn't been deployed. Reason - {}".format(output)
         log.error(error_message)
-        delete_environment(experiment_folder)
+        delete_environment(run_folder)
         raise KubectlIntError(error_message)
+    log.debug(f'Submit one run {run_folder} - finish')
 
-    log.debug("Submit one experiment - stop")
 
-
-def delete_experiments(experiments_list: List[ExperimentDescription]):
+def delete_runs(runs_list: List[RunDescription]):
     """
-    Removes folders with experiments from a list given as a parameter.
-
-    :param experiments_list: list of experiments to be removed.
+    Removes folders with Runs from a list given as a parameter.
+    :param runs_list: list of runs to be removed.
     """
-    for experiment in experiments_list:
-        if experiment.folder:
-            delete_environment(experiment.folder)
+    for run in runs_list:
+        if run.folder:
+            delete_environment(run.folder)
 
 
 def values_range(start: str, stop: str, step: str) -> List[str]:
@@ -377,12 +349,9 @@ def prepare_list_of_values(param_name: str, param_values: str) -> List[str]:
         # {start...stop:step} form
         if "..." in param_values:
             range_step = param_values.split(":")
-
             range_values = range_step[0]
             step = range_step[1]
-
             start, stop = range_values.split("...")
-
             temp_param_values.extend(values_range(start, stop, step))
         else:
             # {x, y, z} form
@@ -448,11 +417,8 @@ def analyze_ps_parameters_list(list_of_params: Tuple[str, ...]):
 
         try:
             param_values = str.strip(param_set, "{}")
-
             param_values = [l.strip() for l in param_values.split(",")]
-
             param_tuple = tuple([l.replace(":", "=", 1) for l in param_values])
-
             ret_list.append(param_tuple)
         except Exception:
             log.exception(error_message)

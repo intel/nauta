@@ -29,10 +29,10 @@ from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 
 # definitions of headers content for different commands
-EXPERIMENT_NAME = "Experiment"
-EXPERIMENT_STATUS = "Status"
-EXPERIMENT_MESSAGE = "Message"
-EXPERIMENT_PARAMETERS = "Parameters used"
+RUN_NAME = "Run"
+RUN_STATUS = "Status"
+RUN_MESSAGE = "Message"
+RUN_PARAMETERS = "Parameters used"
 
 log = initialize_logger('commands.common')
 
@@ -107,13 +107,13 @@ def convert_to_number(s: str) -> int or float:
         return float(s)
 
 
-class ExperimentStatus(Enum):
+class RunStatus(Enum):
     SUBMITTED = "Submitted"
     ERROR = "Error"
 
 
-class ExperimentDescription:
-    def __init__(self, name: str="", status: ExperimentStatus=None,
+class RunDescription:
+    def __init__(self, name: str="", status: RunStatus=None,
                  error_message: str="", folder: str="", parameters: Tuple[str, ...]=None):
         self.name = name
         self.status = status
