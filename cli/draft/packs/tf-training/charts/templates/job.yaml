@@ -8,6 +8,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     draft: {{ .Values.draft }}
+    experimentName: {{ .Values.experimentName }}
 spec:
   template:
     metadata:
@@ -17,6 +18,7 @@ spec:
         app: {{ template "name" . }}
         draft: {{ .Values.draft }}
         release: {{ .Release.Name }}
+        experimentName: {{ .Values.experimentName }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

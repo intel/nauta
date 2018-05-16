@@ -47,7 +47,8 @@ PS_PARAMETER = ["-ps", "{param2:3}"]
 
 def test_submit_success(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -78,7 +79,8 @@ def test_submit_success(config_path_mock, mocker):  # noqa: F811
 
 def test_submit_fail(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[KubectlIntError()])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -102,7 +104,8 @@ def test_submit_fail(config_path_mock, mocker):  # noqa: F811
 
 def test_submit_depl_fail(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -126,7 +129,8 @@ def test_submit_depl_fail(config_path_mock, mocker):  # noqa: F811
 
 def test_submit_env_update_fail(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[KubectlIntError])
@@ -150,7 +154,8 @@ def test_submit_env_update_fail(config_path_mock, mocker):  # noqa: F811
 
 def test_submit_start_depl_fail(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     upd_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
@@ -182,7 +187,8 @@ def test_submit_start_depl_fail(config_path_mock, mocker):  # noqa: F811
 
 def test_submit_lack_of_template(config_path_mock, mocker):  # noqa: F811
     get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace")
-    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[EXPERIMENT_NAME])
+    gen_expname_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
+                                    side_effect=[EXPERIMENT_NAME])
     crenv_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
     cmd_call_draft_mock = mocker.patch("draft.cmd.call_draft",
                                        side_effect=[("Error: could not load pack: rest of a message", 1)])
@@ -436,7 +442,7 @@ def test_submit_two_experiment_success(config_path_mock, mocker):  # noqa: F811
                             side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.submit.socat")
+        mocker.patch("commands.submit.socat")
 
     runner = CliRunner()
     parameters = [SCRIPT_LOCATION]

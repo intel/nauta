@@ -20,12 +20,14 @@
 #
 
 import dateutil.parser
-from typing import List
+from functools import partial
+from typing import List, Callable, Generator
 
 import elasticsearch
+import elasticsearch.helpers
 
-from logs_aggregator.log_filters import SeverityLevel, filter_logs_by_severity,\
-    filter_logs_by_pod_status
+from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity,\
+    filter_log_by_pod_status, filter_log_by_pod_ids
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
@@ -37,22 +39,42 @@ ELASTICSEARCH_K8S_SERVICE = 'elasticsearch-svc'
 
 
 class K8sElasticSearchClient(elasticsearch.Elasticsearch):
-    def __init__(self, host: str, port: int, use_ssl=True, verify_certs=True, **kwargs):
-        #  we assume here connecting using proxy - not directly to k8s cluster
+    def __init__(self, host: str, port: int,
+                 use_ssl=True, verify_certs=True, **kwargs):
         hosts = [{'host': host,
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 
 
-    def full_log_search(self, q=None, index='_all', sort='@timestamp:asc'):
-        self.scroll()
-
-    def get_pod_logs(self, pod_name: str, index='_all',
-                     start_date: str = None, end_date: str = None,
-                     log_count=100, sort='@timestamp:asc') -> List[LogEntry]:
+    def full_log_search(self, lucene_query: str=None, index='_all',
+                        scroll='1m', filters: List[Callable] = None) -> Generator[LogEntry, None, None]:
         """
-        Return logs for given pod.
-        :param pod_name: Name of pod to search
+        A generator that yields LogEntry objects constructed from Kubernetes resource logs.
+        Logs to be returned are defined by passed Lucene query and filtered according to passed
+        filter functions, which have to accept LogEntry as argument and return a boolean value.
+        :param lucene_query: Lucene query string
+        :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
+        :param scroll: ElasticSearch scroll lifetime
+        :param filters: List of filter functions with signatures f(LogEntry) -> Bool
+        :return:
+        """
+        for log in elasticsearch.helpers.scan(self, q=lucene_query, index=index, scroll=scroll, clear_scroll=False):
+            log_entry = LogEntry(date=log['_source']['@timestamp'],
+                                 content=log['_source']['log'],
+                                 pod_name=log['_source']['kubernetes']['pod_name'],
+                                 namespace=log['_source']['kubernetes']['namespace_name'])
+            if not filters or all(f(log_entry) for f in filters):
+                yield log_entry
+
+
+    def get_experiment_logs(self, experiment_name: str, namespace: str, index='_all',
+                            start_date: str = None, end_date: str = None,
+                            pod_ids: List[str] = None, pod_status: PodStatus = None,
+                            min_severity: SeverityLevel = None) -> List[LogEntry]:
+        """
+        Return logs for given experiment.
+        :param experiment_name: Name of experiment to search
+        :param namespace: Name of namespace where experiment was started
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         :param start_date: if provided, only logs produced after this date will be returned
         :param end_date: if provided, only logs produced before this date will be returned
@@ -60,52 +82,32 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param sort: Sorting command in field:direction format
         :return: List of LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
-        log.debug(f'Searching for {pod_name} pod logs.')
+        log.debug(f'Searching for {experiment_name} experiment logs.')
 
         if start_date or end_date:
             start_date = start_date or '*'
             end_date = end_date or '*'
-            lucene_query = f'kubernetes.pod_name:"{pod_name}" AND @timestamp:[{start_date} TO {end_date}]'
+            lucene_query = f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+                           f'AND kubernetes.namespace_name:"{namespace}" ' \
+                           f'AND @timestamp:[{start_date} TO {end_date}]'
         else:
-            lucene_query = f'kubernetes.pod_name:"{pod_name}"'
+            lucene_query = f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+                           f'AND kubernetes.namespace_name:"{namespace}"'
 
-        found_logs = self.search(q=lucene_query,
-                                 index=index, size=log_count, sort=sort)
-        pod_logs = [LogEntry(date=hit['_source']['@timestamp'],
-                             content=hit['_source']['log'],
-                             pod_name=hit['_source']['kubernetes']['pod_name'],
-                             namespace=hit['_source']['kubernetes']['namespace_name'])
-                    for hit in found_logs['hits']['hits']]
-
-        log.debug(f'Logs found for {pod_name} pod: {pod_logs}')
-        return pod_logs
-
-    def get_experiment_logs(self, experiment_name: str, min_severity: SeverityLevel or str = None,
-                            log_count=100, start_date: str = None, end_date: str = None,
-                            pod_ids: List[str] = None, pod_status: PodStatus = None) -> List[LogEntry]:
-        """
-        Return logs for given experiment. Currently, experiment corresponds to a single k8s pod.
-        :param experiment_name: Name of experiment.
-        :param severity: pass optional minimal severity level for logs to be retrieved,
-         if set to None, all logs will be returned
-        :param log_count: number of log entries to be returned
-        :param start_date: string representing a initial date for logs that will be returned
-        :param end_date: string representing a final date for logs that will be returned
-        :param pod_ids: If provided, only logs from pods with given IDs will be returned
-        :return: List of LogEntry (date, log_content, pod_name, namespace) named tuples.
-        """
-        if pod_ids:
-            pod_logs = [log for pod_id in pod_ids for log
-                        in self.get_pod_logs(pod_name=pod_id, log_count=log_count,
-                                             start_date=start_date, end_date=end_date)]
-            pod_logs.sort(key=lambda log_entry: dateutil.parser.parse(log_entry.date))
-        else:
-            pod_logs = self.get_pod_logs(pod_name=experiment_name, log_count=log_count,
-                                         start_date=start_date, end_date=end_date)
-
+        filters = []
         if min_severity:
-            pod_logs = filter_logs_by_severity(logs=pod_logs, min_severity=min_severity)
+            filters.append(partial(filter_log_by_severity, min_severity=min_severity))
         if pod_status:
-            pod_logs = filter_logs_by_pod_status(logs=pod_logs, pod_status=pod_status)
+            filters.append(partial(filter_log_by_pod_status, pod_status=pod_status))
+        if pod_ids:
+            filters.append(partial(filter_log_by_pod_ids, pod_ids=set(pod_ids)))
 
-        return pod_logs
+
+        experiment_logs = sorted(self.full_log_search(lucene_query=lucene_query, index=index, filters=filters),
+                                 key=lambda log_entry: dateutil.parser.parse(log_entry.date))
+
+        if experiment_logs:
+            log.debug(f'Logs found for {experiment_name}.')
+        else:
+            log.debug(f'Logs not found for {experiment_name}.')
+        return experiment_logs

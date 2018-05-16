@@ -44,22 +44,23 @@ logger = initialize_logger(__name__)
 @pass_state
 def list_experiments(state: State, all_users: bool, name: str, status: experiments_model.ExperimentStatus):
     """
-    List experiments
+    List experiments.
     """
 
-    namespace = None if all_users else get_kubectl_current_context_namespace()
-    status = experiments_model.ExperimentStatus(status) if status else None
     try:
+        namespace = None if all_users else get_kubectl_current_context_namespace()
+        status = experiments_model.ExperimentStatus[status] if status else None
         experiments = experiments_api.list_experiments(namespace=namespace, state=status, name_filter=name)
+        click.echo(tabulate(experiments, headers=['Name', 'Parameter specification',
+                                                  'Creation timestamp',
+                                                  'Submitter', 'Status'], tablefmt="orgtab"))
     except experiments_api.InvalidRegularExpressionError:
-        click.echo(f'Regular expression provided for name filtering is invalid: {name}')
+        error_msg = f'Regular expression provided for name filtering is invalid: {name}'
+        logger.exception(error_msg)
+        click.echo(error_msg)
         sys.exit(1)
     except Exception:
         error_msg = 'Failed to get experiments list.'
         logger.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
-
-    click.echo(tabulate(experiments, headers=['Name', 'Parameter specification',
-                                              'Creation timestamp',
-                                              'Submitter', 'Status'], tablefmt="orgtab"))

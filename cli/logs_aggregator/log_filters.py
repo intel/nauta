@@ -20,7 +20,8 @@
 #
 
 from enum import Enum
-from typing import List
+from functools import lru_cache
+from typing import Set
 
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
@@ -40,16 +41,22 @@ class SeverityLevel(Enum):
     DEBUG = {'ERROR', 'CRITICAL', 'WARNING', 'INFO', 'DEBUG'}
 
 
-def filter_logs_by_severity(logs: List[LogEntry],
-                            min_severity: SeverityLevel) -> List[LogEntry]:
-    return [log_entry for log_entry in logs
-            if any(severity in log_entry.content.upper() for severity in min_severity.value)]
+def filter_log_by_severity(log_entry: LogEntry,
+                           min_severity: SeverityLevel) -> bool:
+    return any(severity in log_entry.content.upper() for severity in min_severity.value)
 
 
-def filter_logs_by_pod_status(logs: List[LogEntry], pod_status: PodStatus) -> List[LogEntry]:
-    pod_names_with_namespaces = {(log_entry.pod_name, log_entry.namespace) for log_entry in logs}
+@lru_cache(maxsize=128)
+def cached_pod_status(pod_name: str, namespace: str) -> PodStatus:
+    """
+    Wrapper for caching Pod status calls in LRU cache.
+    """
+    return get_pod_status(pod_name=pod_name, namespace=namespace)
 
-    filtered_pod_names = {pod_name for pod_name, namespace in pod_names_with_namespaces
-                          if get_pod_status(pod_name=pod_name, namespace=namespace) == pod_status}
 
-    return [log_entry for log_entry in logs if log_entry.pod_name in filtered_pod_names]
+def filter_log_by_pod_status(log_entry: LogEntry, pod_status: PodStatus) -> bool:
+    return cached_pod_status(pod_name=log_entry.pod_name, namespace=log_entry.namespace) == pod_status
+
+
+def filter_log_by_pod_ids(log_entry: LogEntry, pod_ids: Set[str]) -> bool:
+    return log_entry.pod_name in pod_ids

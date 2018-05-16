@@ -37,7 +37,8 @@ log = initialize_logger('packs.tf_training')
 
 def update_configuration(experiment_folder: str, script_location: str,
                          script_folder_location: str,
-                         script_parameters: Tuple[str, ...]):
+                         script_parameters: Tuple[str, ...],
+                         experiment_name: str):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -53,7 +54,8 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - start")
 
     try:
-        modify_values_yaml(experiment_folder, script_location, script_parameters)
+        modify_values_yaml(experiment_folder, script_location, script_parameters,
+                           experiment_name=experiment_name)
         modify_dockerfile(experiment_folder)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
@@ -84,7 +86,8 @@ def modify_dockerfile(experiment_folder: str):
     log.debug("Modify dockerfile - end")
 
 
-def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...]):
+def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
+                       experiment_name):
     log.debug("Modify values.yaml - start")
     values_yaml_filename = os.path.join(experiment_folder, "charts//tf-training//values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, "charts//tf-training//values_temp.yaml")
@@ -92,6 +95,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
     with open(values_yaml_filename, "r") as values_yaml_file:
         v = yaml.load(values_yaml_file)
         v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
+        v["experimentName"] = experiment_name
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)

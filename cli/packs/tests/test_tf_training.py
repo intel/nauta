@@ -65,7 +65,8 @@ def test_modify_values_yaml(mocker):
     sh_move_mock = mocker.patch("shutil.move")
     yaml_dump_mock = mocker.patch("yaml.dump")
 
-    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS)
+    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
+                                   experiment_name='test-experiment')
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -102,7 +103,8 @@ def test_update_configuration_success(mocker):
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
     modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
-    output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
+    output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
+                                              experiment_name='test-experiment')
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
@@ -116,7 +118,8 @@ def test_update_configuration_failure(mocker):
 
     modify_values_yaml_mock.side_effect = Exception("Test error")
     with pytest.raises(KubectlIntError):
-        tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"",SCRIPT_PARAMETERS)
+        tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
+                                         experiment_name='test-experiment')
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"
