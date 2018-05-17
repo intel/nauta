@@ -1,0 +1,4 @@
+package: github.com/NervanaSystems/carbon/applications/experiment-service/service
+import:
+- package: k8s.io/client-go
+  version: v7.0.0

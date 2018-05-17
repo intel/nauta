@@ -2,6 +2,7 @@ extends: default
 
 ignore: |
   /.venv
+  /applications/experiment-service/
   /k8s-features/charts
   /cli/draft/packs/*/charts/
   /platform-deploy/charts/
