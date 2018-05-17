@@ -43,13 +43,17 @@ images:
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
   dls4e/tensorflow:
-    version: "1.6.0-py3"
+    version: "1.8.0-py3"
     method: pull
-    image: "tensorflow/tensorflow:1.6.0-devel-py3"
+    image: "tensorflow/tensorflow:1.8.0-devel-py3"
   dls4e/tensorboard:
-    version: "1.6.0-py3"
+    version: "1.8.0-py3"
     method: pull
-    image: "tensorflow/tensorflow:1.6.0-devel-py3"
+    image: "tensorflow/tensorflow:1.8.0-devel-py3"
+  dls4e/nginx:
+    version: "1.14.0"
+    method: pull
+    image: "nginx:1.14.0"
 
 subcharts:
   dls4e-registry:
@@ -99,3 +103,8 @@ subcharts:
       chart_values:
         image: dls4e/redsocks:1.0.0
         Interfaces: cni0
+    registry-nginx:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/registry-nginx"
+      chart_values:
+        image: dls4e/nginx:1.14.0

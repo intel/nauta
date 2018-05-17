@@ -11,6 +11,7 @@ configData:
       blobdescriptor: inmemory
   http:
     addr: :5000
+    secret: DLS4EREGISTRY
     headers:
       X-Content-Type-Options: [nosniff]
   health:

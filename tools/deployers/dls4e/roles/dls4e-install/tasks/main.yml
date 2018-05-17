@@ -29,9 +29,9 @@
         - name: tiller
           value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.8.1"
         - name: tensorflow
-          value: "dls4e/tensorflow:1.6.0-py3"
+          value: "dls4e/tensorflow:1.8.0-py3"
         - name: tensorboard
-          value: "dls4e/tensorflow:1.6.0-py3"
+          value: "dls4e/tensorflow:1.8.0-py3"
 
 - name: Render configuration
   set_fact:

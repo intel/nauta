@@ -9,10 +9,8 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
-    dls4e_app_name: docker-registry
 spec:
   replicas: 1
-  minReadySeconds: 5
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -26,47 +24,22 @@ spec:
         release: {{ .Release.Name }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
-        dls4e_app_name: docker-registry
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E registry image is required" .Values.image }}
+          image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E nginx image is required" .Values.image }}
           imagePullPolicy: "IfNotPresent"
-          command:
-          - /bin/registry
-          - serve
-          - /etc/docker/registry/config.yml
           ports:
             - containerPort: 5000
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 5000
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 5000
           resources:
             limits:
               cpu: 200m
               memory: 128Mi
-          env:
-            - name: REGISTRY_HTTP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}
-                  key: haSharedSecret
-            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
-              value: "/var/lib/registry"
           volumeMounts:
-            - name: data
-              mountPath: /var/lib/registry/
             - name: "config"
-              mountPath: "/etc/docker/registry"
+              mountPath: "/etc/nginx/nginx.conf"
+              subPath: nginx.conf
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-{{ .Chart.Name }}
         - name: config
           configMap:
             name: {{ .Release.Name }}-{{ .Chart.Name }}
