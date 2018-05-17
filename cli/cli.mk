@@ -52,7 +52,7 @@ style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ commands/ main.py
 
 test: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); py.test
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
 
 cli-check: venv-dev test style
 
