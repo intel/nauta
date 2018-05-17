@@ -238,6 +238,7 @@ subcharts:
       chart_values:
         image: core/nfs-provisioner:v1.0.8
       conditions: features.nfs
+      feature_enabled: True
     skydns:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/skydns"

@@ -37,6 +37,19 @@ images:
     version: "v2.8.1"
     image: "gcr.io/kubernetes-helm/tiller:v2.8.1"
     method: "pull"
+  dls4e/redsocks:
+    version: "1.0.0"
+    required: "dls4e/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
+  dls4e/tensorflow:
+    version: "1.6.0-py3"
+    method: pull
+    image: "tensorflow/tensorflow:1.6.0-devel-py3"
+  dls4e/tensorboard:
+    version: "1.6.0-py3"
+    method: pull
+    image: "tensorflow/tensorflow:1.6.0-devel-py3"
 
 subcharts:
   dls4e-registry:
@@ -78,3 +91,11 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/samba"
       chart_values:
         image: dls4e/samba:1.0.0
+    redsocks:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/redsocks"
+      conditions: features.redsocks
+      feature_enabled: False
+      chart_values:
+        image: dls4e/redsocks:1.0.0
+        Interfaces: cni0

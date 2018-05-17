@@ -23,11 +23,21 @@
 - name: Cleanup facts
   set_fact:
     chart_reqs: []
+    chart_features: {}
 
 - name: Render requirements
   set_fact:
-    chart_reqs: "{{ (chart_reqs | default([])) + [{'name':name,'version':spec.version,'condition':(spec.condition | default()) }] }}"
+    chart_reqs: "{{ (chart_reqs | default([])) + [{'name':name,'version':spec.version,'condition':(spec.conditions | default()) }] }}"
   with_dict: "{{ subcharts_list }}"
+  vars:
+    name: "{{ item.key }}"
+    spec: "{{ item.value }}"
+
+- name: Render external
+  set_fact:
+    chart_features: "{{ (chart_features | default({})) | combine({name: spec.feature_enabled}) }}"
+  with_dict: "{{ subcharts_list }}"
+  when: "'feature_enabled' in spec"
   vars:
     name: "{{ item.key }}"
     spec: "{{ item.value }}"
@@ -42,6 +52,7 @@
 
 - set_fact:
     dls4e_values:
+      features: "{{ chart_features }}"
       global:
         dls4e: "{{ package_name }}"
         dls4e_release: "{{ version }}"

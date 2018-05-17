@@ -136,7 +136,6 @@ Default value: {}
 Fields:
   - path: NFS path to mount
   - server: NFS server
-  
 
 Example:
 ```yaml
@@ -147,6 +146,19 @@ dls4e_configuration:
   output_nfs:
     path: /exports/test/output
     server: 10.91.120.230
+```
+
+
+### features
+
+Description: Map of enabled features. More information can be found under [Features directory](features/README.md)
+  
+
+Example:
+```yaml
+features:
+  nfs: True
+  redsocks: True
 ```
 
 ## Examples

@@ -24,14 +24,24 @@
       dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
       dls4e_configuration:
         external_ip: "{{ dls_configuration.external_interface.ipv4_address }}"
+        registry: "127.0.0.1:{{ registry_nodeport }}"
       images:
         - name: tiller
           value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.8.1"
+        - name: tensorflow
+          value: "dls4e/tensorflow:1.6.0-py3"
+        - name: tensorboard
+          value: "dls4e/tensorflow:1.6.0-py3"
+
+- name: Render configuration
+  set_fact:
+    dls4e_config_values:
+      global: "{{ dls4e_configuration | default({}) | combine(global_values) }}"
+      features: "{{ features | default({}) }}"
 
 - name: Render values
   vars:
-    rendered_values:
-      global: "{{ dls4e_configuration | default({}) | combine(global_values) }}"
+    rendered_values: "{{ features_config | default({}) | combine(dls4e_config_values) }}"
   copy:
     content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
