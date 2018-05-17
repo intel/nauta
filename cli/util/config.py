@@ -20,6 +20,7 @@
 #
 
 from enum import Enum
+from typing import Dict
 
 # environmental variable with a dlsctl HOME folder
 DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
@@ -33,6 +34,11 @@ class Fields(Enum):
     CONFIG_PATH = 'config_path'
 
 
+class DLS4EConfigMapFields(Enum):
+    IMAGE_TILLER = 'image.tiller'
+    EXTERNAL_IP = "external_ip"
+
+
 class Config:
     __params = dict()
 
@@ -43,3 +49,19 @@ class Config:
     @staticmethod
     def set(field: Fields, value):
         Config.__params[field.value] = value
+
+
+class DLS4EConfigMap:
+    _params = dict()
+
+    @staticmethod
+    def get(field: DLS4EConfigMapFields):
+        return DLS4EConfigMap._params[field.value]
+
+    @staticmethod
+    def set(field: DLS4EConfigMapFields, value):
+        DLS4EConfigMap._params[field.value] = value
+
+    @staticmethod
+    def init(data: Dict[str, str]):
+        DLS4EConfigMap._params = data

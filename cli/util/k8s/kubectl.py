@@ -25,8 +25,9 @@ from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from draft.cmd import set_registry_port
-from util.k8s.k8s_info import get_app_services
+from util.k8s.k8s_info import get_app_services, find_namespace
 from util.app_names import DLS4EAppNames
+from util.system import execute_system_command
 
 logger = initialize_logger('util.kubectl')
 
@@ -97,3 +98,29 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, int
 
     logger.info("Port forwarding - proxy set up")
     return process, service_node_port, service_container_port
+
+
+def check_users_presence(username: str) -> bool:
+    """
+    Checks whether a user with a given name exists. It searches also for a namespace
+    with a name equal to the given username
+
+    :param username: username
+    :return: True if a user exists, False otherwise
+    In case of problems during gathering user's data - it raises an exception.
+    """
+    if find_namespace(username):
+        logger.debug("Namespace {} already exists.".format(username))
+        return True
+
+    find_user_command = ["kubectl", "get", "users", "-o",
+                         f"jsonpath={{.items[?(@.metadata.name==\"{username}\")].metadata.name}}"]
+
+    output, err_code = execute_system_command(find_user_command)
+
+    if err_code:
+        error_message = "Error during checking user's presence."
+        logger.error(error_message)
+        raise KubectlIntError(error_message)
+
+    return output == username

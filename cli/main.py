@@ -24,6 +24,8 @@ import urllib3
 
 import click
 
+import util.dls4e_settings as dls4e_settings
+
 from commands import submit
 from commands import verify
 from commands import logs
@@ -35,7 +37,10 @@ from commands import predict
 from commands import launch
 from commands import template_list
 from commands import list_experiments
-from util.config import Config, Fields
+from commands import adduser
+from util.config import Config, Fields, DLS4EConfigMap
+
+from util.k8s.k8s_info import get_config_map_data
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
@@ -44,6 +49,10 @@ DEFAULT_LANG = "en_US.UTF-8"
 @click.group(context_settings=CONTEXT_SETTINGS)
 def entry_point():
     Config.set(Fields.CONFIG_PATH, verify.validate_config_path())
+    try:
+        DLS4EConfigMap.init(get_config_map_data(dls4e_settings.DLS4E_CONFIGURATION_CM, dls4e_settings.DLS4E_NAMESPACE))
+    except Exception:
+        pass
 
 
 entry_point.add_command(submit.submit)
@@ -57,6 +66,7 @@ entry_point.add_command(version.version)
 entry_point.add_command(interact.interact)
 entry_point.add_command(predict.predict)
 entry_point.add_command(list_experiments.list_experiments)
+entry_point.add_command(adduser.adduser)
 
 
 if __name__ == '__main__':

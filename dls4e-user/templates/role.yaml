@@ -191,4 +191,10 @@ rules:
   - patch
   - update
   - watch
-
+- apiGroups:
+  - "*"
+  resources:
+  - runs
+  - experiments
+  verbs:
+  - "*"
