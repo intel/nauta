@@ -275,7 +275,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
         if exit_code:
             raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
         # reconfigure draft's templates
-        update_configuration(run_folder, script_location, script_folder_location, script_parameters,
+        update_configuration(run_folder, Path(script_location).name, script_folder_location, script_parameters,
                              experiment_name=experiment_name)
     except Exception as exe:
         delete_environment(run_folder)
