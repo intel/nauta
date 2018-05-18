@@ -1,8 +1,14 @@
 ---
 
+- set_fact:
+    base_image: {}
+
 - name: Calculate base image
+  vars:
+    image_to_add: "127.0.0.1:{{ registry_port }}/{{ item.value }}:{{ images[item.value].version }}"
   set_fact:
-    base_image: "127.0.0.1:{{ registry_port }}/{{ image.required }}:{{ images[image.required].version }}"
+    base_image: "{{ base_image | combine({item.key: image_to_add}) }}"
+  with_dict: "{{ image.required }}"
 
 - name: Add image definition
   set_fact:

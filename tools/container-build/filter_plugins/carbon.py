@@ -26,23 +26,27 @@ __metaclass__ = type
 
 def organize_images(images):
     image_names = list(images.keys())
+    image_reqs = {}
+    for image in image_names:
+        if 'required' not in images[image]:
+            image_reqs[image] = []
+        else:
+            image_reqs[image] = [value for key,value in images[image]['required'].items()]
     layers = []
 
     while len(image_names) > 0:
         layer = []
         for image in image_names:
-            if 'required' not in images[image]:
-                layer.append(image)
-                continue
-            req = images[image]['required']
-            if req not in image_names:
+            if len(image_reqs[image]) == 0:
                 layer.append(image)
         if len(layer) == 0:
             raise Exception("Loop error")
         layers.append(layer)
         for image in layer:
             image_names.remove(image)
-
+            for obs_image in image_names:
+                if image in image_reqs[obs_image]:
+                    image_reqs[obs_image].remove(image)
     return layers
 
 

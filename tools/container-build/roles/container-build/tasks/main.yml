@@ -11,15 +11,19 @@
 
 - name: Verify presence of base images
   vars:
-    name: "{{ item.key }}"
-    image: "{{ item.value }}"
+    name: "{{ image_def.key }}"
+    image: "{{ image_def.value }}"
+  loop_control:
+    loop_var: image_def
   include_tasks: "{{ image.method }}/base.yml"
   with_dict: "{{ images }}"
 
 - name: Calculate local repository tags for all images
   vars:
-    name: "{{ item.key }}"
-    image: "{{ item.value }}"
+    name: "{{ image_def.key }}"
+    image: "{{ image_def.value }}"
+  loop_control:
+    loop_var: image_def
   include_tasks: "{{ image.method }}/local_tag.yml"
   with_dict: "{{ images }}"
 
@@ -31,8 +35,10 @@
 
 - name: Check if image exists
   vars:
-    name: "{{ item.key }}"
-    image: "{{ item.value }}"
+    name: "{{ image_def.key }}"
+    image: "{{ image_def.value }}"
+  loop_control:
+    loop_var: image_def
   include_tasks: "exists.yml"
   with_dict: "{{ images }}"
 

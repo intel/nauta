@@ -11,7 +11,8 @@ images:
     method: "pull"
   compiler/centos7-ready:
     version: "7.4.1708"
-    required: "compiler/centos7"
+    required:
+      BASE_IMAGE: "compiler/centos7"
     directory: "{{ playbook_dir }}/../../compile-containers/centos7"
     method: build
   compiler/ubuntu16:
@@ -20,6 +21,7 @@ images:
     method: "pull"
   compiler/ubuntu16-ready:
     version: "16.04"
-    required: "compiler/ubuntu16"
+    required:
+      BASE_IMAGE: "compiler/ubuntu16"
     directory: "{{ playbook_dir }}/../../compile-containers/ubuntu16"
     method: build

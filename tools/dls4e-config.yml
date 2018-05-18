@@ -6,14 +6,30 @@ images:
     image: "centos:7.4.1708"
     method: "pull"
     push: False
+  dls4e/build:
+    version: "7.4.1708"
+    required:
+      BASE_IMAGE: "dls4e/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/build"
+    push: False
+  dls4e/build-go:
+    version: "1.10.2"
+    required:
+      BASE_IMAGE: "dls4e/build"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/build-go"
+    push: False
   dls4e/kubectl:
     version: "1.10.0"
-    required: "dls4e/centos"
+    required:
+      BASE_IMAGE: "dls4e/centos"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
   dls4e/gui:
     version: "1.0.0"
-    required: "dls4e/centos"
+    required:
+      BASE_IMAGE: "dls4e/centos"
     method: build
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
@@ -30,7 +46,8 @@ images:
     method: pull
   dls4e/samba:
     version: "1.0.0"
-    required: "dls4e/kubectl"
+    required:
+      BASE_IMAGE: "dls4e/kubectl"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
   dls4e/tiller:
@@ -39,9 +56,18 @@ images:
     method: "pull"
   dls4e/redsocks:
     version: "1.0.0"
-    required: "dls4e/centos"
+    required:
+      BASE_IMAGE: "dls4e/centos"
+      BUILD_IMAGE: "dls4e/build"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
+  dls4e/experiment-service:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "dls4e/centos"
+      BUILD_IMAGE: "dls4e/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/experiment-service"
   dls4e/tensorflow:
     version: "1.8.0-py3"
     method: pull
@@ -54,6 +80,10 @@ images:
     version: "1.14.0"
     method: pull
     image: "nginx:1.14.0"
+  dls4e/postgres:
+    version: "10.4"
+    method: pull
+    image: "postgres:10.4"
 
 subcharts:
   dls4e-registry:

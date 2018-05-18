@@ -1,7 +1,14 @@
 ---
 
 - set_fact:
-    image_sha: "{{ [docker_images_local_tags[name], docker_images_local_tags[image.required]] | sort | join(' ') | hash('sha1') }}"
+    required_image_sha: []
+
+- set_fact:
+    required_image_sha: "{{ (required_image_sha | default([])) + [docker_images_local_tags[item.value]] }}"
+  with_dict: "{{ image.required | default({}) }}"
+
+- set_fact:
+    image_sha: "{{ ([docker_images_local_tags[name]] + (required_image_sha | default([]))) | sort | join(' ') | hash('sha1') }}"
 
 - name: Add image definition
   set_fact:

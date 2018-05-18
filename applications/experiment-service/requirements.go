@@ -20,20 +20,10 @@
 
 package main
 
+// Only standard imports to improve docker build logic
 import (
-	"fmt"
-	"log"
-	"net/http"
-
-	_ "github.com/NervanaSystems/carbon/applications/experiment-service/service"
+	_ "k8s.io/apimachinery/pkg/api/errors"
+	_ "k8s.io/apimachinery/pkg/apis/meta/v1"
+	_ "k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/rest"
 )
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi %s!", r.URL.Path[1:])
-}
-
-func main() {
-	//service.Check_pods()
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}

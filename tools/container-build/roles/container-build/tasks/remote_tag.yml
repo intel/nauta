@@ -1,8 +1,10 @@
 ---
 
 - name: Calculate remote repository tags for all images
+  loop_control:
+    loop_var: image_def
   vars:
-    name: "{{ item }}"
-    image: "{{ images[item] }}"
+    name: "{{ image_def }}"
+    image: "{{ images[image_def] }}"
   include_tasks: "{{ image.method }}/remote_tag.yml"
   with_items: "{{ layer }}"

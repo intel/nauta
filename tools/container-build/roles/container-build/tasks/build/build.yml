@@ -1,8 +1,7 @@
 ---
 
 - set_fact:
-    local_buildargs:
-      BASE_IMAGE: "{{ docker_images_base[name] }}"
+    local_buildargs: "{{ docker_images_base[name] }}"
 
 - name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
