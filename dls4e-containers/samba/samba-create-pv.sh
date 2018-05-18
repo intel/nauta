@@ -70,7 +70,7 @@ spec:
   capacity:
     storage: 32Gi
   nfs:
-    path: ${INPUT_NFS_PATH}/public
+    path: ${INPUT_NFS_PATH}
     server: ${INPUT_NFS_SERVER}
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
@@ -119,7 +119,7 @@ spec:
   capacity:
     storage: 32Gi
   nfs:
-    path: ${OUTPUT_NFS_PATH}/public
+    path: ${OUTPUT_NFS_PATH}
     server: ${OUTPUT_NFS_SERVER}
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""

@@ -34,9 +34,43 @@ spec:
               name: "tensorboard"
             - containerPort: {{ .Values.TensorIPythonPort }}
               name: "ipython"
+          volumeMounts:
+            - name: input-home
+              mountPath: /mnt/input/home
+              readOnly: True
+            - name: input-public
+              mountPath: /mnt/input/root
+              readOnly: True
+            - name: output-home
+              mountPath: /mnt/output/home
+            - name: output-public
+              mountPath: /mnt/output/root
+            - name: output-home
+              mountPath: /mnt/output/experiment
+              subPath: {{ .Values.experimentName }}
           securityContext:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       restartPolicy: Never
+      volumes:
+        - name: input-home
+          persistentVolumeClaim:
+            claimName: input-home
+        - name: input-public
+          persistentVolumeClaim:
+            claimName: input-public
+        - name: output-home
+          persistentVolumeClaim:
+            claimName: output-home
+        - name: output-public
+          persistentVolumeClaim:
+            claimName: output-public
+      initContainers:
+        - name: init-experiment-pod
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+          volumeMounts:
+            - name: output-home
+              mountPath: /mnt/output/home
   backoffLimit: 5
