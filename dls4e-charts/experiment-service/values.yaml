@@ -1,0 +1,3 @@
+postgres:
+  db: dls4e
+  user: dls4e

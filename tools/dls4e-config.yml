@@ -138,3 +138,9 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/registry-nginx"
       chart_values:
         image: dls4e/nginx:1.14.0
+    experiment-service:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/experiment-service"
+      chart_values:
+        image: dls4e/postgres:10.4
+        service_image: dls4e/experiment-service:1.0.0
