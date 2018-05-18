@@ -48,8 +48,8 @@ spec:
               port: 5000
           resources:
             limits:
-              cpu: 200m
-              memory: 128Mi
+              cpu: "1"
+              memory: 512Mi
           env:
             - name: REGISTRY_HTTP_SECRET
               valueFrom:
