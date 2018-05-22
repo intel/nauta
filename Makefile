@@ -45,3 +45,6 @@ single-tools-%:
 
 unit-tests:
 	@(cd $(CURDIR)/cli && make test)
+
+cli-style:
+	@(cd $(CURDIR)/cli && make style)

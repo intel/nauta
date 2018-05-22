@@ -41,7 +41,6 @@ ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
 endif
 
-
 clean:
 	@rm -rf __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip
 
