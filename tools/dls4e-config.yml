@@ -84,6 +84,14 @@ images:
     version: "10.4"
     method: pull
     image: "postgres:10.4"
+  dls4e/tf/operator:
+    version: "latest"
+    method: pull
+    image: "gcr.io/kubeflow-images-public/tf_operator:v20180329-a7511ff"
+  dls4e/tf/test:
+    version: "latest"
+    method: pull
+    image: "gcr.io/kubeflow-images-public/test-tf-image:latest"
 
 subcharts:
   dls4e-registry:
