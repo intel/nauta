@@ -21,7 +21,7 @@
 
 from click.testing import CliRunner
 
-from commands import list_experiments
+from commands.experiment import list
 from platform_resources.experiments import ExperimentShort
 
 
@@ -34,41 +34,41 @@ TEST_EXPERIMENTS = [ExperimentShort(name='test-experiment', parameters_spec={'a'
 
 
 def test_list_experiments_success(mocker):
-    api_list_experiments_mock = mocker.patch("commands.list_experiments.experiments_api.list_experiments")
+    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
     api_list_experiments_mock.return_value = TEST_EXPERIMENTS
 
-    get_namespace_mock = mocker.patch("commands.list_experiments.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
 
     runner = CliRunner()
-    runner.invoke(list_experiments.list_experiments, [])
+    runner.invoke(list.list_experiments, [])
 
     assert get_namespace_mock.call_count == 1
     assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
 
 
 def test_list_experiments_all_users_success(mocker):
-    api_list_experiments_mock = mocker.patch("commands.list_experiments.experiments_api.list_experiments")
+    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
     api_list_experiments_mock.return_value = TEST_EXPERIMENTS
 
-    get_namespace_mock = mocker.patch("commands.list_experiments.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
 
     runner = CliRunner()
-    runner.invoke(list_experiments.list_experiments, ['--all-users'])
+    runner.invoke(list.list_experiments, ['--all-users'])
 
     assert get_namespace_mock.call_count == 0
     assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
 
 
 def test_list_experiments_failure(mocker):
-    api_list_experiments_mock = mocker.patch("commands.list_experiments.experiments_api.list_experiments")
+    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
     api_list_experiments_mock.side_effect = RuntimeError
 
-    get_namespace_mock = mocker.patch("commands.list_experiments.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
     mocker.patch("sys.exit")
 
     runner = CliRunner()
 
-    runner.invoke(list_experiments.list_experiments, [])
+    runner.invoke(list.list_experiments, [])
 
     assert get_namespace_mock.call_count == 1
     assert api_list_experiments_mock.call_count == 1, "Experiments retrieval was not called"

@@ -13,6 +13,7 @@ __pycache__
 dist/
 *.iml
 *.swp
+.DS_Store
 
 .compile
 files/*.tar.gz

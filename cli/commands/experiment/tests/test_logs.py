@@ -23,7 +23,7 @@ from unittest.mock import Mock
 
 from click.testing import CliRunner
 
-from commands import logs
+from commands.experiment import logs
 from logs_aggregator.k8s_log_entry import LogEntry
 
 
@@ -39,13 +39,13 @@ TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
 
 
 def test_show_logs_success(mocker):
-    es_client_mock = mocker.patch("commands.logs.K8sElasticSearchClient")
+    es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
 
-    port_forwarding_mock = mocker.patch("commands.logs.start_port_forwarding")
+    port_forwarding_mock = mocker.patch("commands.experiment.logs.start_port_forwarding")
     port_forwarding_mock.return_value = Mock(), 123, 123
-    get_current_namespace_mock = mocker.patch("commands.logs.get_kubectl_current_context_namespace")
+    get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
     runner = CliRunner()
     result = runner.invoke(logs.logs, ['fake-experiment'])
@@ -58,15 +58,15 @@ def test_show_logs_success(mocker):
 
 
 def test_show_logs_failure(mocker):
-    es_client_mock = mocker.patch("commands.logs.K8sElasticSearchClient")
+    es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.side_effect = RuntimeError
 
-    port_forwarding_mock = mocker.patch("commands.logs.start_port_forwarding")
+    port_forwarding_mock = mocker.patch("commands.experiment.logs.start_port_forwarding")
     port_forwarding_mock.return_value = Mock(), 123, 123
-    get_current_namespace_mock = mocker.patch("commands.logs.get_kubectl_current_context_namespace")
+    get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
-    mocker.patch("commands.logs.sys.exit")
+    mocker.patch("commands.experiment.logs.sys.exit")
 
     runner = CliRunner()
 

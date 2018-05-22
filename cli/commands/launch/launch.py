@@ -34,32 +34,12 @@ from util.app_names import DLS4EAppNames
 
 logger = initialize_logger('commands.launch')
 
-K8S_APP_NAME = {
-    'webui': DLS4EAppNames.WEB_GUI,
-    'tensorboard': DLS4EAppNames.TENSORBOARD
-}
+HELP = "Command for launching web user-interface or tensorboard"
 
 FORWARDED_URL = 'http://localhost:{}'
 
 
-@click.command()
-@common_options
-@pass_state
-@click.argument('app', type=click.Choice(['webui', 'tensorboard']))
-@click.option('--no-browser', is_flag=True, help='Run command without a web browser starting, '
-                                                 'only proxy tunnel is created')
-def launch(state: State, app: str, no_browser: bool):
-    """
-    Subcommand for launching browser with credentials
-
-    Possible APP values:
-
-        * webui - launches web user-interface in local browser,
-
-        * tensorboard - launches tensorboard in local browser.
-    """
-    k8s_app_name = K8S_APP_NAME[app]
-
+def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
     try:
         process, tunneled_port, container_port = start_port_forwarding(k8s_app_name)
     except Exception:
@@ -87,7 +67,7 @@ def launch(state: State, app: str, no_browser: bool):
 
             sys.exit(1)
 
-    if not no_browser:
+    if not no_launch:
         click.echo('Browser will start in few seconds. Please wait... ')
         wait_for_connection(url)
         webbrowser.open_new(url)
@@ -112,3 +92,37 @@ def launch(state: State, app: str, no_browser: bool):
             logger.exception("Error during closing of a proxy for a local docker-host tunnel")
             click.echo("Local Docker-host tunnel hasn't been closed properly. "
                        "Check whether it still exists, if yes - close it manually.")
+
+
+@click.command()
+@common_options
+@pass_state
+@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
+                                                'only proxy tunnel is created')
+def webui(state: State, no_launch: bool):
+    """
+    Subcommand for launching webUI with credentials
+    """
+    launch_app(DLS4EAppNames.WEB_GUI, no_launch)
+
+
+@click.command()
+@common_options
+@pass_state
+@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
+                                                'only proxy tunnel is created')
+def tensorboard(state: State, no_launch: bool):
+    """
+    Subcommand for launching tensorboard with credentials
+
+    """
+    launch_app(DLS4EAppNames.TENSORBOARD, no_launch)
+
+
+@click.group(help=HELP)
+def launch():
+    pass
+
+
+launch.add_command(webui)
+launch.add_command(tensorboard)

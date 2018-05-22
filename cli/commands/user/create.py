@@ -72,7 +72,7 @@ users:
 @click.command(help=HELP)
 @common_options
 @pass_state
-def adduser(state: State, username: str):
+def create(state: State, username: str):
     """
     Adds a new user with a name given as a parameter.
 

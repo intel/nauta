@@ -24,7 +24,7 @@ from unittest.mock import patch
 
 import pytest
 
-from commands import verify
+from commands.verify import verify
 from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME
 
 APP_DIR_PATH = '/my/App'

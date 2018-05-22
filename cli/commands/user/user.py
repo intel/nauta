@@ -21,16 +21,18 @@
 
 import click
 
-from cli_state import common_options, pass_state, State
+from commands.user.create import create
+from util.logger import initialize_logger
 
-HELP = "Displays version of dlsctl application."
+log = initialize_logger(__name__)
+
+HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
+       "run by a platform administrator."
 
 
-@click.command(help=HELP)
-@common_options
-@pass_state
-def version(state: State):
-    """
-    Returns a version of the dlsctl application
-    """
-    click.echo("Version command - under development")
+@click.group(help=HELP)
+def user():
+    pass
+
+
+user.add_command(create)

@@ -24,7 +24,7 @@ import os
 
 import pytest
 
-from commands import common
+from commands.experiment import common
 from util.exceptions import KubectlIntError
 from util.config import Config, EXPERIMENTS_DIR_NAME
 

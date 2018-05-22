@@ -22,21 +22,21 @@
 from unittest.mock import Mock
 from click.testing import CliRunner
 
-from commands import launch
+from commands.launch import launch
 from util.system import get_current_os, OS
 
 APP_NAME = 'webui'
-DISABLE_BROWSER_ARG = '--no-browser'
+DISABLE_BROWSER_ARG = '--no-launch'
 
 
 def test_launch_with_browser_success(mocker):
-    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
-    wfc_mock = mocker.patch("commands.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.input")
+    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
+    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
+    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    input_mock = mocker.patch("commands.launch.launch.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.socat")
+        socat_mock = mocker.patch("commands.launch.launch.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
@@ -51,13 +51,13 @@ def test_launch_with_browser_success(mocker):
 
 
 def test_launch_without_browser_success(mocker):
-    spf_mock = mocker.patch("commands.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
-    wfc_mock = mocker.patch("commands.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.input")
+    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
+    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
+    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    input_mock = mocker.patch("commands.launch.launch.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.socat")
+        socat_mock = mocker.patch("commands.launch.launch.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME, DISABLE_BROWSER_ARG])
@@ -72,14 +72,14 @@ def test_launch_without_browser_success(mocker):
 
 
 def test_launch_start_tunnel_fail(mocker):
-    spf_mock = mocker.patch("commands.launch.start_port_forwarding")
+    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding")
     spf_mock.return_value = 0
-    wfc_mock = mocker.patch("commands.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.input")
+    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
+    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    input_mock = mocker.patch("commands.launch.launch.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.socat")
+        socat_mock = mocker.patch("commands.launch.launch.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])

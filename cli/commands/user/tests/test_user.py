@@ -25,10 +25,9 @@ import pytest
 from click.testing import CliRunner
 
 from util.exceptions import KubectlIntError
-from commands.adduser import check_users_presence, generate_kubeconfig, delete_user, \
-                             adduser
+from commands.user.create import check_users_presence, generate_kubeconfig, delete_user, \
+                             create
 from util.helm import delete_helm_release
-from commands.tests.test_common import config_path_mock  # noqa: F401
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -122,13 +121,13 @@ def test_delete_user_failure(mocker):
     dhr_mock.call_count == 0
 
 
-def test_adduser_failure(mocker):  # noqa: F811
-    cup_mock = mocker.patch("commands.adduser.check_users_presence", return_value=True)
-    esc_mock = mocker.patch("commands.adduser.execute_system_command", return_value=("", 0))
-    gut_mock = mocker.patch("commands.adduser.get_users_token", return_value=test_samba_password)
+def test_create_user_failure(mocker):  # noqa: F811
+    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=True)
+    esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
+    gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
 
     runner = CliRunner()
-    runner.invoke(adduser, [test_username])
+    runner.invoke(create, [test_username])
 
     assert cup_mock.call_count == 1, "users presence wasn't checked"
     assert esc_mock.call_count == 0, "user was created"

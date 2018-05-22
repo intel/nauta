@@ -29,7 +29,7 @@ import click
 from marshmallow import ValidationError
 from tabulate import tabulate
 
-from commands.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, \
+from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, \
     create_environment, delete_environment, convert_to_number, RunDescription, RunStatus
 from cli_state import common_options, pass_state, State
 import draft.cmd as cmd

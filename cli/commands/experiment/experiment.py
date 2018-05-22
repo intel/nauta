@@ -21,16 +21,23 @@
 
 import click
 
-from cli_state import common_options, pass_state, State
+from commands.experiment import list, cancel, logs, view, template_list, submit, interact
+from util.logger import initialize_logger
 
-HELP = "Displays version of dlsctl application."
+logger = initialize_logger(__name__)
+
+HELP = "Command for training and managing training jobs"
 
 
-@click.command(help=HELP)
-@common_options
-@pass_state
-def version(state: State):
-    """
-    Returns a version of the dlsctl application
-    """
-    click.echo("Version command - under development")
+@click.group(help=HELP)
+def experiment():
+    pass
+
+
+experiment.add_command(cancel.cancel)
+experiment.add_command(submit.submit)
+experiment.add_command(list.list_experiments)
+experiment.add_command(logs.logs)
+experiment.add_command(interact.interact)
+experiment.add_command(view.view)
+experiment.add_command(template_list.template_list)

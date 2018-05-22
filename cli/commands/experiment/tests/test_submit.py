@@ -24,8 +24,8 @@ from util.system import get_current_os, OS
 from click.testing import CliRunner
 import pytest
 
-from commands.common import RunDescription
-from commands import submit
+from commands.experiment.common import RunDescription
+from commands.experiment import submit
 from util.exceptions import KubectlIntError
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
@@ -64,19 +64,21 @@ class SubmitMocks:
 
 @pytest.fixture
 def prepare_mocks(mocker) -> SubmitMocks:
-    get_namespace_mock = mocker.patch("commands.submit.get_kubectl_current_context_namespace",
+    get_namespace_mock = mocker.patch("commands.experiment.submit.get_kubectl_current_context_namespace",
                                       side_effect=[EXPERIMENT_NAMESPACE])
     gen_exp_name_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
                                      side_effect=[EXPERIMENT_NAME])
     add_exp_mock = mocker.patch("platform_resources.experiments.add_experiment")
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
-    update_conf_mock = mocker.patch("commands.submit.update_configuration", side_effect=[0])
-    create_env_mock = mocker.patch("commands.submit.create_environment", side_effect=[(EXPERIMENT_FOLDER, "")])
-    del_env_mock = mocker.patch("commands.submit.delete_environment")
-    start_port_fwd_mock = mocker.patch("commands.submit.start_port_forwarding",
+    update_conf_mock = mocker.patch("commands.experiment.submit.update_configuration", side_effect=[0])
+    create_env_mock = mocker.patch("commands.experiment.submit.create_environment",
+                                   side_effect=[(EXPERIMENT_FOLDER, "")])
+    del_env_mock = mocker.patch("commands.experiment.submit.delete_environment")
+    start_port_fwd_mock = mocker.patch("commands.experiment.submit.start_port_forwarding",
                                        side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
-    socat_mock = mocker.patch("commands.submit.socat") if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
+    socat_mock = mocker.patch("commands.experiment.submit.socat") \
+        if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
     isfile_mock = mocker.patch("os.path.isfile", return_value=True)
     isdir_mock = mocker.patch("os.path.isdir", return_value=True)
 
@@ -111,7 +113,7 @@ def test_submit_success(prepare_mocks: SubmitMocks):
 
 
 def test_submit_fail(prepare_mocks: SubmitMocks):
-    prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.submit.create_environment",
+    prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.experiment.submit.create_environment",
                                                           side_effect=[KubectlIntError()])
     CliRunner().invoke(submit.submit, [SCRIPT_LOCATION])
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, start_port_fwd_count=0, add_exp_count=0,
@@ -126,7 +128,7 @@ def test_submit_depl_fail(prepare_mocks: SubmitMocks):
 
 
 def test_submit_env_update_fail(prepare_mocks: SubmitMocks):
-    prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.submit.update_configuration",
+    prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.experiment.submit.update_configuration",
                                                            side_effect=[KubectlIntError])
     CliRunner().invoke(submit.submit, [SCRIPT_LOCATION])
     check_asserts(prepare_mocks, start_port_fwd_count=0, add_exp_count=0, cmd_up_count=0, del_env_count=1)
@@ -139,10 +141,11 @@ def test_submit_start_depl_fail(prepare_mocks: SubmitMocks):
 
 
 def test_submit_two_experiment_success(prepare_mocks: SubmitMocks):
-    prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.submit.create_environment",
+    prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.experiment.submit.create_environment",
                                                           side_effect=[(EXPERIMENT_FOLDER), (EXPERIMENT_FOLDER)])
     prepare_mocks.cmd_create = prepare_mocks.mocker.patch("draft.cmd.create", side_effect=[("", 0), ("", 0)])
-    prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.submit.update_configuration", side_effect=[0, 0])
+    prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.experiment.submit.update_configuration",
+                                                           side_effect=[0, 0])
     prepare_mocks.cmd_up = prepare_mocks.mocker.patch("draft.cmd.up", side_effect=[("", 0), ("", 0)])
 
     parameters = [SCRIPT_LOCATION]
@@ -167,7 +170,7 @@ def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks):
 
 
 def test_delete_runs(mocker):
-    del_env_mock = mocker.patch("commands.submit.delete_environment")
+    del_env_mock = mocker.patch("commands.experiment.submit.delete_environment")
 
     runs_list = [RunDescription(folder="folder1"), RunDescription(), RunDescription(folder="folder3")]
     submit.delete_runs(runs_list)
@@ -241,13 +244,13 @@ def test_analyze_pr_parameters_list_wrong_format():
 
 
 def test_analyze_ps_parameters_list_success():
-    three_params = ("{param1:value1, param2:value2, param3:value3}", )
+    three_params = ("{param1:value1, param2:value2, param3:value3}",)
     three_params_output = [("param1=value1", "param2=value2", "param3=value3")]
     output = submit.analyze_ps_parameters_list(three_params)
     assert output == three_params_output
 
-    one_param = ("{param1: value2}", )
-    one_param_output = [("param1= value2", )]
+    one_param = ("{param1: value2}",)
+    one_param_output = [("param1= value2",)]
     output = submit.analyze_ps_parameters_list(one_param)
     assert output == one_param_output
 
@@ -259,7 +262,7 @@ def test_analyze_ps_parameters_list_success():
 
 
 def test_analyze_ps_parameters_wrong_format():
-    three_params = ("{param1:value1, param2:value2, param3:value3", )
+    three_params = ("{param1:value1, param2:value2, param3:value3",)
     with pytest.raises(KubectlIntError) as exe:
         submit.analyze_ps_parameters_list(three_params)
     assert str(exe.value) == "One of -ps options has incorrect format."

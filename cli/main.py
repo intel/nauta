@@ -26,18 +26,12 @@ import click
 
 import util.dls4e_settings as dls4e_settings
 
-from commands import submit
-from commands import verify
-from commands import logs
-from commands import view
-from commands import cancel
+from commands.experiment import experiment
+from commands.launch import launch
+from commands.predict import predict
+from commands.user import user
+from commands.verify import verify
 from commands import version
-from commands import interact
-from commands import predict
-from commands import launch
-from commands import template_list
-from commands import list_experiments
-from commands import adduser
 from util.config import Config, Fields, DLS4EConfigMap
 
 from util.k8s.k8s_info import get_config_map_data
@@ -55,18 +49,12 @@ def entry_point():
         pass
 
 
-entry_point.add_command(submit.submit)
-entry_point.add_command(verify.verify)
+entry_point.add_command(experiment.experiment)
 entry_point.add_command(launch.launch)
-entry_point.add_command(logs.logs)
-entry_point.add_command(template_list.template_list)
-entry_point.add_command(view.view)
-entry_point.add_command(cancel.cancel)
-entry_point.add_command(version.version)
-entry_point.add_command(interact.interact)
 entry_point.add_command(predict.predict)
-entry_point.add_command(list_experiments.list_experiments)
-entry_point.add_command(adduser.adduser)
+entry_point.add_command(user.user)
+entry_point.add_command(verify.verify)
+entry_point.add_command(version.version)
 
 
 if __name__ == '__main__':
