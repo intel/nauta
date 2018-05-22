@@ -19,7 +19,6 @@
 # and approved by Intel in writing.
 #
 
-from collections import namedtuple
 from typing import List
 import re
 import sre_constants
@@ -28,7 +27,7 @@ import time
 from kubernetes import config, client
 
 import platform_resources.experiment_model as model
-from platform_resources.object_meta_model import validate_kubernetes_name
+from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
 
@@ -39,16 +38,15 @@ API_GROUP_NAME = 'aipg.intel.com'
 EXPERIMENTS_PLURAL = 'experiments'
 EXPERIMENTS_VERSION = 'v1'
 
-ExperimentShort = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter', 'status'])
-
-
-def list_experiments(namespace: str = None, state: model.ExperimentStatus=None, name_filter: str = None) -> List[ExperimentShort]:
+def list_experiments(namespace: str = None,
+                     state: model.ExperimentStatus=None,
+                     name_filter: str = None) -> List[model.Experiment]:
     """
     Return list of experiments.
     :param namespace: If provided, only experiments from this namespace will be returned
     :param state: If provided, only experiments with given state will be returned
     :param name_filter: If provided, only experiments matching name_filter regular expression will be returned
-    :return: List of Experiment named tuples
+    :return: List of Experiment objects
     """
     config.load_kube_config()
     api = client.CustomObjectsApi(client.ApiClient())
@@ -69,14 +67,9 @@ def list_experiments(namespace: str = None, state: model.ExperimentStatus=None, 
     experiment_filters = [lambda experiment_dict: not state or experiment_dict['spec']['state'] == state.value,
                           lambda experiment_dict: not name_regex or name_regex.search(experiment_dict['spec']['name'])]
 
-    experiments = [ExperimentShort(name=experiment_dict['spec']['name'],
-                                   parameters_spec=experiment_dict['spec']['parameters-spec'],
-                                   creation_timestamp=experiment_dict['metadata']['creationTimestamp'],
-                                   submitter=experiment_dict['metadata']['namespace'],
-                                   status=experiment_dict['spec']['state'])
+    experiments = [model.Experiment.from_k8s_response_dict(experiment_dict)
                    for experiment_dict in raw_experiments['items']
-                   if all(f(experiment_dict) for f in experiment_filters)
-                   ]
+                   if all(f(experiment_dict) for f in experiment_filters)]
 
     return experiments
 

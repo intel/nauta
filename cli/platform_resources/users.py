@@ -19,22 +19,41 @@
 # and approved by Intel in writing.
 #
 
-import click
+from typing import List
 
-from commands.user.create import create
-from commands.user.list_users import list_users
+from kubernetes import config, client
+
+from platform_resources.user_model import User
+from platform_resources.runs import list_runs
 from util.logger import initialize_logger
 
-log = initialize_logger(__name__)
 
-HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
-       "run by a platform administrator."
+logger = initialize_logger(__name__)
 
-
-@click.group(help=HELP)
-def user():
-    pass
+API_GROUP_NAME = 'aipg.intel.com'
+USERS_PLURAL = 'users'
+USERS_VERSION = 'v1'
 
 
-user.add_command(create)
-user.add_command(list_users)
+def list_users() -> List[User]:
+    """
+    Return list of users.
+    :return: List of User objects
+    """
+    logger.debug('Listing users.')
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+    raw_users = api.list_cluster_custom_object(group=API_GROUP_NAME, plural=USERS_PLURAL,
+                                               version=USERS_VERSION)
+
+    users = [User.from_k8s_response_dict(user_dict) for user_dict in raw_users['items']]
+
+    # Get experiment runs for each user
+    # TODO: CHANGE IMPLEMENTATION TO USE AGGREGATED USER DATA AFTER CAN-366
+    runs = list_runs()
+    user_map = {user.name: user for user in users}
+    for run in runs:
+        user_map[run.submitter].experiment_runs.append(run)
+
+    return users
+

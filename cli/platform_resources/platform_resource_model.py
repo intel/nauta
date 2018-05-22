@@ -19,22 +19,34 @@
 # and approved by Intel in writing.
 #
 
-import click
-
-from commands.user.create import create
-from commands.user.list_users import list_users
-from util.logger import initialize_logger
-
-log = initialize_logger(__name__)
-
-HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
-       "run by a platform administrator."
+from abc import ABC
+from collections import namedtuple
 
 
-@click.group(help=HELP)
-def user():
-    pass
+class PlatformResource(ABC):
+    submitter: str
+    creation_timestamp: str
+
+    def __repr__(self):
+        def format_field_value(value):
+            return f'"{value}"' if type(value) == str else value
+
+        fields =  ', '.join(['{key}={value}'.format(key=key, value=format_field_value(value))
+                             for key, value in self.__dict__.items()])
+        return '{class_name}({fields})'.format(class_name=self.__class__.__name__,
+                                               fields=fields)
+
+    def __eq__(self, other):
+        if isinstance(self, other.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    @classmethod
+    def from_k8s_response_dict(cls, object_dict: dict):
+        raise NotImplementedError
+
+    @property
+    def cli_representation(self) -> namedtuple:
+        raise NotImplementedError
 
 
-user.add_command(create)
-user.add_command(list_users)

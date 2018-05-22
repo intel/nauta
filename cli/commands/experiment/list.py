@@ -51,9 +51,9 @@ def list_experiments(state: State, all_users: bool, name: str, status: experimen
         namespace = None if all_users else get_kubectl_current_context_namespace()
         status = experiments_model.ExperimentStatus[status] if status else None
         experiments = experiments_api.list_experiments(namespace=namespace, state=status, name_filter=name)
-        click.echo(tabulate(experiments, headers=['Name', 'Parameter specification',
-                                                  'Creation timestamp',
-                                                  'Submitter', 'Status'], tablefmt="orgtab"))
+        click.echo(tabulate([exp.cli_representation for exp in experiments],
+                            headers=['Name', 'Parameter specification', 'Creation timestamp',
+                                     'Submitter', 'Status'], tablefmt="orgtbl"))
     except experiments_api.InvalidRegularExpressionError:
         error_msg = f'Regular expression provided for name filtering is invalid: {name}'
         logger.exception(error_msg)

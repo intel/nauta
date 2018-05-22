@@ -36,7 +36,7 @@ import draft.cmd as cmd
 from packs.tf_training import update_configuration
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
-from platform_resources.object_meta_model import validate_kubernetes_name
+from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import get_current_os, OS

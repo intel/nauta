@@ -22,15 +22,17 @@
 from click.testing import CliRunner
 
 from commands.experiment import list
-from platform_resources.experiments import ExperimentShort
+from platform_resources.experiment_model import Experiment, ExperimentStatus
 
 
-TEST_EXPERIMENTS = [ExperimentShort(name='test-experiment', parameters_spec={'a': 1, 'b': 2},
-                                    creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
-                                    status='CREATING'),
-                    ExperimentShort(name='test-experiment-2', parameters_spec={'a': 1, 'b': 2},
-                                    creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
-                                    status='SUBMITTED')]
+TEST_EXPERIMENTS = [Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
+                               creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                               state=ExperimentStatus.CREATING, template_name='test-ex-template',
+                               template_namespace='test-ex-namespace'),
+                    Experiment(name='test-experiment-2', parameters_spec=['a 1', 'b 2'],
+                               creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                               state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
+                               template_namespace='test-ex-namespace')]
 
 
 def test_list_experiments_success(mocker):
@@ -64,7 +66,7 @@ def test_list_experiments_failure(mocker):
     api_list_experiments_mock.side_effect = RuntimeError
 
     get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
-    mocker.patch("sys.exit")
+    sys_exit_mock = mocker.patch("sys.exit")
 
     runner = CliRunner()
 
@@ -72,3 +74,4 @@ def test_list_experiments_failure(mocker):
 
     assert get_namespace_mock.call_count == 1
     assert api_list_experiments_mock.call_count == 1, "Experiments retrieval was not called"
+    assert sys_exit_mock.called_once_with(1)

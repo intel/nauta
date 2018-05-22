@@ -25,7 +25,7 @@ from kubernetes.client import CustomObjectsApi
 from marshmallow import ValidationError
 
 from platform_resources.experiment_model import ExperimentStatus, Experiment
-from platform_resources.experiments import list_experiments, ExperimentShort, InvalidRegularExpressionError, \
+from platform_resources.experiments import list_experiments, InvalidRegularExpressionError, \
     add_experiment, generate_experiment_name
 
 EXPERIMENT_NAME = 'test-exp'
@@ -33,12 +33,14 @@ NAMESPACE = 'test-env'
 TEMPLATE_NAME = 'template'
 TEMPLATE_NAMESPACE = 'template-namespace-test'
 
-TEST_EXPERIMENTS = [ExperimentShort(name='test-experiment', parameters_spec={'a': 1, 'b': 2},
-                                    creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
-                                    status='CREATING'),
-                    ExperimentShort(name='test-experiment-2', parameters_spec={'a': 1, 'b': 2},
-                                    creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
-                                    status='SUBMITTED')]
+TEST_EXPERIMENTS = [Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
+                               creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                               state=ExperimentStatus.CREATING, template_name='test-ex-template',
+                               template_namespace='test-ex-namespace'),
+                    Experiment(name='test-experiment-2', parameters_spec=['a 1', 'b 2'],
+                               creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                               state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
+                               template_namespace='test-ex-namespace')]
 
 
 @pytest.fixture()
@@ -143,7 +145,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                           '"name":"test-experiment",'
                                                           '"namespace":"namespace-1"},'
                                                           '"spec":{"name":"test-experiment",'
-                                                          '"parameters-spec":{"a":1,"b":2},'
+                                                          '"parameters-spec":["a 1", "b 2:"],'
                                                           '"state":"CREATING",'
                                                           '"template-name":"test-ex-template",'
                                                           '"template-namespace":"test-ex-namespace"}}\n'},
@@ -155,7 +157,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                  'resourceVersion': '1350906',
                                                  'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-ef-stack/experiments/test-experiment',
                                                  'uid': 'bd298c60-4957-11e8-96f7-527100002000'},
-                                            'spec': {'name': 'test-experiment', 'parameters-spec': {'a': 1, 'b': 2},
+                                            'spec': {'name': 'test-experiment', 'parameters-spec': ['a 1', 'b 2'],
                                                      'state': 'CREATING', 'template-name': 'test-ex-template',
                                                      'template-namespace': 'test-ex-namespace'}},
                                            {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment', 'metadata': {
@@ -165,7 +167,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                        '"kind":"Experiment",'
                                                        '"metadata":{"annotations":{},"name":"test-experiment-2",'
                                                        '"namespace":"namespace-2"},'
-                                                       '"spec":{"name":"test-experiment-2","parameters-spec":{"a":1,"b":2},'
+                                                       '"spec":{"name":"test-experiment-2","parameters-spec":["a 1", "b 2"],'
                                                        '"state":"SUBMITTED","template-name":"test-ex-template",'
                                                        '"template-namespace":"test-ex-namespace"}}\n'},
                                                'clusterName': '', 'creationTimestamp': '2018-05-08T13:05:04Z',
@@ -174,7 +176,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                'resourceVersion': '3129108',
                                                'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-ef-stack/experiments/test-experiment-2',
                                                'uid': '6ce9d932-52c0-11e8-ae8b-527100001230'},
-                                            'spec': {'name': 'test-experiment-2', 'parameters-spec': {'a': 1, 'b': 2},
+                                            'spec': {'name': 'test-experiment-2', 'parameters-spec': ['a 1', 'b 2'],
                                                      'state': 'SUBMITTED', 'template-name': 'test-ex-template',
                                                      'template-namespace': 'test-ex-namespace'}}],
                                  'kind': 'ExperimentList',

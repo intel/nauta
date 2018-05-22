@@ -19,22 +19,33 @@
 # and approved by Intel in writing.
 #
 
-import click
+import sys
 
-from commands.user.create import create
-from commands.user.list_users import list_users
+import click
+from tabulate import tabulate
+
+from cli_state import common_options, pass_state, State
+import platform_resources.users as users_api
 from util.logger import initialize_logger
 
-log = initialize_logger(__name__)
-
-HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
-       "run by a platform administrator."
+logger = initialize_logger(__name__)
 
 
-@click.group(help=HELP)
-def user():
-    pass
-
-
-user.add_command(create)
-user.add_command(list_users)
+@click.command(name='list')
+@common_options
+@pass_state
+def list_users(state: State):
+    """
+    List users.
+    """
+    try:
+        users = users_api.list_users()
+        click.echo(tabulate([user.cli_representation for user in users],
+                            headers=['Name', 'Creation date', 'Date of last submitted job',
+                                     'Number of running jobs', 'Number of queued jobs'],
+                            tablefmt="orgtbl"))
+    except Exception:
+        error_msg = 'Failed to get users list.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)

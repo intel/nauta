@@ -19,22 +19,33 @@
 # and approved by Intel in writing.
 #
 
-import click
+from typing import List
 
-from commands.user.create import create
-from commands.user.list_users import list_users
+from kubernetes import config, client
+
+from platform_resources.run_model import Run
 from util.logger import initialize_logger
 
-log = initialize_logger(__name__)
 
-HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
-       "run by a platform administrator."
+logger = initialize_logger(__name__)
 
-
-@click.group(help=HELP)
-def user():
-    pass
+API_GROUP_NAME = 'aipg.intel.com'
+RUN_PLURAL = 'runs'
+RUN_VERSION = 'v1'
 
 
-user.add_command(create)
-user.add_command(list_users)
+def list_runs() -> List[Run]:
+    """
+    Return list of experiment runs.
+    :return: List of Run objects
+    """
+    logger.debug('Listing runs.')
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+    raw_runs = api.list_cluster_custom_object(group=API_GROUP_NAME, plural=RUN_PLURAL,
+                                              version=RUN_VERSION)
+
+    runs = [Run.from_k8s_response_dict(run_dict)
+            for run_dict in raw_runs['items']]
+
+    return runs
