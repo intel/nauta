@@ -152,3 +152,9 @@ subcharts:
       chart_values:
         image: dls4e/postgres:10.4
         service_image: dls4e/experiment-service:1.0.0
+    tf:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/tf"
+      chart_values:
+        image: dls4e/tf/operator:latest
+        tfimage: dls4e/tensorflow:1.8.0-py3
