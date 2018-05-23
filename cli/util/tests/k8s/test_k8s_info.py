@@ -25,7 +25,7 @@ from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Sta
 
 from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, get_app_namespace, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token
-from util.config import DLS4EConfigMapFields
+from util.config import DLS4EConfigMap
 
 test_namespace = "test_namespace"
 
@@ -89,9 +89,9 @@ class K8SServicesListMock(object):
         self.items = items
 
 
-def test_k8s_configuration():
-    return {DLS4EConfigMapFields.EXTERNAL_IP: TEST_EXTERNAL_IP,
-            DLS4EConfigMapFields.IMAGE_TILLER: TEST_IMAGE_TILLER}
+def test_config_map_data():
+    return {DLS4EConfigMap.EXTERNAL_IP_FIELD: TEST_EXTERNAL_IP,
+            DLS4EConfigMap.IMAGE_TILLER_FIELD: TEST_IMAGE_TILLER}
 
 
 @pytest.fixture()
@@ -114,7 +114,7 @@ def mocked_k8s_CoreV1Api(mocker):
     coreV1API_instance.read_namespace.return_value = v1_namespace
     coreV1API_instance.delete_namespace.return_value = V1Status(status="ok")
 
-    v1_config_map = V1ConfigMap(data=test_k8s_configuration())
+    v1_config_map = V1ConfigMap(data=test_config_map_data())
 
     coreV1API_instance.read_namespaced_config_map.return_value = v1_config_map
 
@@ -178,8 +178,8 @@ def test_delete_namespace(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
 def test_get_config_map_data(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     data = get_config_map_data("config_map_name", test_namespace)
 
-    assert data.get(DLS4EConfigMapFields.EXTERNAL_IP) == TEST_EXTERNAL_IP
-    assert data.get(DLS4EConfigMapFields.IMAGE_TILLER) == TEST_IMAGE_TILLER
+    assert data.get(DLS4EConfigMap.EXTERNAL_IP_FIELD) == TEST_EXTERNAL_IP
+    assert data.get(DLS4EConfigMap.IMAGE_TILLER_FIELD) == TEST_IMAGE_TILLER
 
 
 def test_get_users_token(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):

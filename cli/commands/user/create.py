@@ -29,7 +29,7 @@ from util.config import Config, Fields
 from util.logger import initialize_logger
 from util.system import execute_system_command
 from util.k8s.k8s_info import get_users_token
-from util.config import DLS4EConfigMap, DLS4EConfigMapFields
+from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.k8s.kubectl import check_users_presence
 from util.helm import delete_user
@@ -83,13 +83,17 @@ def create(state: State, username: str):
             click.echo("User already exists.")
             sys.exit(1)
     except Exception:
-        click.echo("Problems during verifying users presence.")
+        error_msg = "Problems during verifying users presence."
+        log.exception(error_msg)
+        click.echo(error_msg)
         sys.exit(1)
 
     try:
         chart_location = os.path.join(Config.get(Fields.CONFIG_PATH), ADD_USER_CHART_NAME)
 
-        tiller_location = DLS4EConfigMap.get(DLS4EConfigMapFields.IMAGE_TILLER)
+        dls4e_config_map = DLS4EConfigMap()
+
+        tiller_location = dls4e_config_map.image_tiller
 
         add_user_command = ["helm", "install", "--namespace", username, "--name", username, chart_location,
                             "--set", "global.dls4e=dls4enterprise", "--set", f"username={username}",
@@ -106,7 +110,9 @@ def create(state: State, username: str):
         try:
             users_password = get_users_token(username)
         except Exception:
-            click.echo("The app encountered problems when gathering user's password.")
+            error_msg = "The app encountered problems when gathering user's password."
+            log.exception(error_msg)
+            click.echo(error_msg)
             users_password = ""
 
     except Exception:
@@ -120,7 +126,7 @@ def create(state: State, username: str):
     click.echo(f"User {username} has been added successfully.")
     click.echo("Please use the following kubectl config to connect to this user.")
     click.echo("----------------------------------------------------------------")
-    click.echo(generate_kubeconfig(username, username, DLS4EConfigMap.get(DLS4EConfigMapFields.EXTERNAL_IP),
+    click.echo(generate_kubeconfig(username, username, dls4e_config_map.external_ip,
                                    users_password, ""))
 
 

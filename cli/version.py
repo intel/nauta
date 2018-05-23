@@ -19,19 +19,4 @@
 # and approved by Intel in writing.
 #
 
-import click
-
-from cli_state import common_options, pass_state, State
-from version import VERSION
-
-HELP = "Displays version of dlsctl application."
-
-
-@click.command(help=HELP)
-@common_options
-@pass_state
-def version(state: State):
-    """
-    Returns a version of the dlsctl application
-    """
-    click.echo(VERSION)
+VERSION = '1.0.0-dev'

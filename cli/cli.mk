@@ -20,7 +20,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-build: $(ACTIVATE)
+build: $(ACTIVATE) set-version
 	@. $(ACTIVATE); pip install pyinstaller;
 
 ifeq (Windows,$(OS))
@@ -91,3 +91,12 @@ else
 	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
 	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
 endif
+
+VERSION_CLIENT_MAJOR ?= 1
+VERSION_CLIENT_MINOR ?= 0
+VERSION_CLIENT_NO ?= 0
+BUILD_ID ?= develop
+VERSION_CLIENT_BUMP_PART ?= patch
+
+set-version:
+	./set-version.sh "$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(BUILD_ID)"

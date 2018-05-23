@@ -20,7 +20,8 @@
 #
 
 from enum import Enum
-from typing import Dict
+
+from util.k8s.k8s_info import get_config_map_data
 
 # environmental variable with a dlsctl HOME folder
 DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
@@ -29,14 +30,12 @@ DLS_CTL_CONFIG_DIR_NAME = 'dls_ctl_config'
 # name of a directory with EXPERIMENT's data
 EXPERIMENTS_DIR_NAME = 'experiments'
 
+DLS4E_NAMESPACE = "dls4e"
+DLS4E_CONFIGURATION_CM = "dls4enterprise"
+
 
 class Fields(Enum):
     CONFIG_PATH = 'config_path'
-
-
-class DLS4EConfigMapFields(Enum):
-    IMAGE_TILLER = 'image.tiller'
-    EXTERNAL_IP = "external_ip"
 
 
 class Config:
@@ -52,16 +51,21 @@ class Config:
 
 
 class DLS4EConfigMap:
-    _params = dict()
+    """
+    Class for accessing values stored in DLS4E config map on Kubernetes cluster.
+    It is implemented using borg pattern (http://code.activestate.com/recipes/66531/),
+    so each instance of this class will have shared state, ensuring configuration consistency.
+    """
+    IMAGE_TILLER_FIELD = 'image.tiller'
+    EXTERNAL_IP_FIELD = 'external_ip'
 
-    @staticmethod
-    def get(field: DLS4EConfigMapFields):
-        return DLS4EConfigMap._params[field.value]
+    __shared_state = {}
+    image_tiller: str = None
+    external_ip: str = None
 
-    @staticmethod
-    def set(field: DLS4EConfigMapFields, value):
-        DLS4EConfigMap._params[field.value] = value
-
-    @staticmethod
-    def init(data: Dict[str, str]):
-        DLS4EConfigMap._params = data
+    def __init__(self):
+        self.__dict__ = self.__shared_state
+        if not self.image_tiller or not self.external_ip:
+            config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE)
+            self.image_tiller = config_map_data[self.IMAGE_TILLER_FIELD]
+            self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]
