@@ -19,22 +19,35 @@
 # and approved by Intel in writing.
 #
 
+from util.k8s.kubectl import start_port_forwarding
+from util.app_names import DLS4EAppNames
+from util.logger import initialize_logger
+from util.exceptions import K8sProxyCloseError, K8sProxyOpenError
 
-class KubectlIntError(Exception):
-    """Error raised in case of problems detected by the application"""
-    pass
-
-
-class InvalidRegularExpressionError(RuntimeError):
-    """Error raised when user provided regular expression is invalid"""
-    pass
+logger = initialize_logger(__name__)
 
 
-class K8sProxyOpenError(Exception):
-    """Error raised in case of any problems during establishing k8s proxy error"""
-    pass
+class K8sProxy():
 
+    def __init__(self, app_name: DLS4EAppNames):
+        self.app_name = app_name
 
-class K8sProxyCloseError(Exception):
-    """Error raised in case of any problems during closing k8s proxy error"""
-    pass
+    def __enter__(self):
+        logger.debug("k8s_proxy - entering")
+        try:
+            self.process, self.tunnel_port, self.container_port = start_port_forwarding(self.app_name)
+        except Exception as exe:
+            error_message = "k8s_proxy - enter - error"
+            logger.exception(error_message)
+            raise K8sProxyOpenError(error_message) from exe
+
+        return self
+
+    def __exit__(self, *args):
+        logger.debug("k8s_proxy - exiting")
+        try:
+            self.process.kill()
+        except Exception as exe:
+            error_message = "k8s_proxy - exit - error"
+            logger.exception(error_message)
+            raise K8sProxyCloseError(error_message) from exe

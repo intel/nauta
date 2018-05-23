@@ -40,7 +40,8 @@ def mocked_k8s_config(mocker):
 
 
 def test_launch_webui_with_browser_success(mocked_k8s_config, mocker):
-    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+                            side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.launch.input")
@@ -61,8 +62,9 @@ def test_launch_webui_with_browser_success(mocked_k8s_config, mocker):
 
 
 def test_launch_webui_with_kube_config_loading_success(mocker):
-    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
-    kube_config_mock = mocker.patch('kubernetes.config.load_kube_config')
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+                            side_effect=[(Mock, 1000, 2000)])
+    kube_config_mock = mocker.patch('util.k8s.k8s_info.config.load_kube_config')
     kube_client_mock = mocker.patch('kubernetes.client.configuration.Configuration')
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
@@ -86,7 +88,8 @@ def test_launch_webui_with_kube_config_loading_success(mocker):
 
 
 def test_launch_webui_without_browser_success(mocked_k8s_config, mocker):
-    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+                            side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.launch.input")
@@ -107,7 +110,7 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocker):
 
 
 def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocker):
-    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding")
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding")
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")

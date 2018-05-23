@@ -71,11 +71,12 @@ def prepare_mocks(mocker) -> SubmitMocks:
     add_exp_mock = mocker.patch("platform_resources.experiments.add_experiment")
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     cmd_up_mock = mocker.patch("draft.cmd.up", side_effect=[("", 0)])
+
     update_conf_mock = mocker.patch("commands.experiment.submit.update_configuration", side_effect=[0])
     create_env_mock = mocker.patch("commands.experiment.submit.create_environment",
                                    side_effect=[(EXPERIMENT_FOLDER, "")])
     del_env_mock = mocker.patch("commands.experiment.submit.delete_environment")
-    start_port_fwd_mock = mocker.patch("commands.experiment.submit.start_port_forwarding",
+    start_port_fwd_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
                                        side_effect=[(Mock, FAKE_NODE_PORT, FAKE_CONTAINER_PORT)])
     socat_mock = mocker.patch("commands.experiment.submit.socat") \
         if get_current_os() in (OS.WINDOWS, OS.MACOS) else None

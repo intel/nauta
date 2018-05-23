@@ -43,7 +43,8 @@ def test_show_logs_success(mocker):
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
 
-    port_forwarding_mock = mocker.patch("commands.experiment.logs.start_port_forwarding")
+    port_forwarding_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding")
+
     port_forwarding_mock.return_value = Mock(), 123, 123
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
@@ -62,7 +63,7 @@ def test_show_logs_failure(mocker):
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.side_effect = RuntimeError
 
-    port_forwarding_mock = mocker.patch("commands.experiment.logs.start_port_forwarding")
+    port_forwarding_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding")
     port_forwarding_mock.return_value = Mock(), 123, 123
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 

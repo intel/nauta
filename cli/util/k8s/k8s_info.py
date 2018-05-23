@@ -108,17 +108,28 @@ def find_namespace(namespace: str) -> bool:
             raise KubectlIntError(error_message)
 
 
-def delete_namespace(namespace: str):
+def delete_namespace(namespace: str, propagate: bool=False):
     """
     Removes a namespace with the given name
 
     :param namespace: namespace to be deleted
+    :param propagate: If True - all objects in a namespace will be deleted
+    In case of any problems (i.e. lack of privileges) it throws an exception
     """
     try:
         api = get_k8s_api()
-        body = V1DeleteOptions()
+        propagation_policy = "Orphan"
+        if propagate:
+            propagation_policy = "Foreground"
+        body = V1DeleteOptions(propagation_policy=propagation_policy)
 
-        api.delete_namespace(namespace, body)
+        response = api.delete_namespace(namespace, body)
+
+        if response.status != "{'phase': 'Terminating'}":
+            error_description = f"Error during deleting namespace {namespace}"
+            logger.exception(error_description)
+            raise KubectlIntError(error_description)
+
     except Exception:
         error_description = f"Error during deleting namespace {namespace}"
         logger.exception(error_description)

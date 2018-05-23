@@ -163,3 +163,27 @@ def test_get_experiment_logs_time_range(mocker):
                                                       f'AND @timestamp:[{start_date} TO {end_date}]',
                                          filters=[], index='_all')
 
+
+def test_get_experiment_logs(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    mocked_log_search = mocker.patch.object(client, 'full_log_search')
+    mocked_log_search.return_value = TEST_LOG_ENTRIES
+
+    experiment_name = 'fake-experiment'
+    namespace = 'fake-namespace'
+
+    experiment_logs = client.get_experiment_logs(experiment_name=experiment_name, namespace=namespace)
+
+    assert experiment_logs == TEST_LOG_ENTRIES
+    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+                                                      f'AND kubernetes.namespace_name:"{namespace}"',
+                                         filters=[], index='_all')
+
+
+def test_delete_logs_for_namespace(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    mocked_delete_logs = mocker.patch.object(client, 'delete_by_query')
+
+    client.delete_logs_for_namespace("namespace")
+
+    assert mocked_delete_logs.call_count == 1

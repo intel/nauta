@@ -112,7 +112,7 @@ def mocked_k8s_CoreV1Api(mocker):
     v1_namespace.metadata = v1_metadata_namespace
 
     coreV1API_instance.read_namespace.return_value = v1_namespace
-    coreV1API_instance.delete_namespace.return_value = V1Status(status="ok")
+    coreV1API_instance.delete_namespace.return_value = V1Status(status="{'phase': 'Terminating'}")
 
     v1_config_map = V1ConfigMap(data=test_config_map_data())
 

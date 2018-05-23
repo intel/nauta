@@ -25,6 +25,7 @@ from typing import List, Callable, Generator
 
 import elasticsearch
 import elasticsearch.helpers
+import elasticsearch.client
 
 from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity,\
     filter_log_by_pod_status, filter_log_by_pod_ids
@@ -111,3 +112,19 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         else:
             log.debug(f'Logs not found for {experiment_name}.')
         return experiment_logs
+
+
+    def delete_logs_for_namespace(self, namespace: str, index='_all'):
+        """
+        Removes logs for a given namespace.
+        :param namespace: namespace for which logs should be deleted
+        :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
+        Throws exception in case of any errors during removing of logs.
+        """
+        log.debug(f'Deleting logs for {namespace} namespace.')
+
+        delete_query={"query": {"match": {'kubernetes.namespace_name': namespace}}}
+
+        output = self.delete_by_query(index=index, body=delete_query)
+
+        log.debug(f"Deleting logs - result :{str(output)}")

@@ -55,7 +55,7 @@ def delete_helm_release(release_name: str) -> bool:
 
     output, err_code = execute_system_command(delete_release_command)
 
-    if err_code:
+    if err_code or f"release \"{release_name}\" deleted" not in output:
         log.error(output)
         raise RuntimeError("Error during removal of helm release {}.".format(release_name))
 

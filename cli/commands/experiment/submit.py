@@ -43,7 +43,7 @@ from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import KubectlIntError
 from util.app_names import DLS4EAppNames
-from util.k8s.kubectl import start_port_forwarding
+from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
 
 log = initialize_logger('commands.submit')
 
@@ -108,119 +108,102 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         click.echo(message)
         sys.exit(1)
 
-    # start port forwarding
+    k8s_app_name = DLS4EAppNames.DOCKER_REGISTRY
     try:
-        process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
-    except Exception:
-        delete_runs(runs_list)
-        log.exception("Error during creation of a proxy for a docker registry.")
-        click.echo("Error during creation of a proxy for a docker registry.")
-        sys.exit(1)
-
-    try:
-        # prepare environments for all experiment's runs
-        for experiment_run in runs_list:
-            if script_parameters and experiment_run.parameters:
-                current_script_parameters = script_parameters + experiment_run.parameters
-            elif script_parameters:
-                current_script_parameters = script_parameters
-            elif experiment_run.parameters:
-                current_script_parameters = experiment_run.parameters
-            else:
-                current_script_parameters = ""
-
-            experiment_run.folder = prepare_experiment_environment(experiment_name=experiment_name,
-                                                                   run_name=experiment_run.name,
-                                                                   script_location=script_location,
-                                                                   script_folder_location=script_folder_location,
-                                                                   script_parameters=current_script_parameters,
-                                                                   pack_type=template,
-                                                                   internal_registry_port=tunnel_port)
-    except Exception:
-        # any error in this step breaks execution of this command
-        message = "Problems during creation of experiments' environments."
-        log.exception(message)
-        click.echo(message)
-        # just in case - remove folders that were created with a success
-        delete_runs(runs_list)
-
-        # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
-        # close port forwarding
+        # start port forwarding
         # noinspection PyBroadException
-        try:
-            process.kill()
-        except Exception:
-            log.exception("Error during closing of a proxy for a docker registry.")
-            click.echo("Docker proxy hasn't been closed properly. "
-                       "Check whether it still exists, if yes - close it manually.")
+        with K8sProxy(k8s_app_name) as proxy:
 
+            try:
+                # prepare environments for all experiment's runs
+                for experiment_run in runs_list:
+                    if script_parameters and experiment_run.parameters:
+                        current_script_parameters = script_parameters + experiment_run.parameters
+                    elif script_parameters:
+                        current_script_parameters = script_parameters
+                    elif experiment_run.parameters:
+                        current_script_parameters = experiment_run.parameters
+                    else:
+                        current_script_parameters = ""
+
+                    experiment_run.folder = prepare_experiment_environment(experiment_name=experiment_name,
+                                                                           run_name=experiment_run.name,
+                                                                           script_location=script_location,
+                                                                           script_folder_location=script_folder_location,  # noqa: E501
+                                                                           script_parameters=current_script_parameters,
+                                                                           pack_type=template,
+                                                                           internal_registry_port=proxy.tunnel_port)
+            except Exception:
+                # any error in this step breaks execution of this command
+                message = "Problems during creation of experiments' environments."
+                log.exception(message)
+                click.echo(message)
+                # just in case - remove folders that were created with a success
+                delete_runs(runs_list)
+
+                sys.exit(1)
+
+            # if there is more than one run to be scheduled - first ask whether all of them should be submitted
+            if len(runs_list) > 1:
+                click.echo("Please confirm that the following Runs should be submitted.")
+                click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
+                                     RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
+                                    headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
+                if not click.confirm('Do you want to continue?', default=True):
+                    delete_runs(runs_list)
+                    sys.exit(1)
+
+            # run socat if on Windows or Mac OS
+            if get_current_os() in (OS.WINDOWS, OS.MACOS):
+                # noinspection PyBroadException
+                try:
+                    socat.start(proxy.tunnel_port)
+                except Exception:
+                    log.exception("Error during creation of a proxy for a local docker-host tunnel")
+                    click.echo("Error during creation of a local docker-host tunnel.")
+                    sys.exit(1)
+
+            # create Experiment model
+            # TODO template_name & template_namespace should be filled after Template implementation
+            experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
+                                                                        parameters_spec=list(script_parameters),
+                                                                        template_namespace="template-namespace"),
+                                           namespace)
+
+            # submit runs
+            for run in runs_list:
+                try:
+                    submit_one_run(run.folder)
+                    run.status = RunStatus.SUBMITTED
+                except Exception as exe:
+                    run.status = RunStatus.ERROR
+                    run.message = exe
+
+    except K8sProxyCloseError:
+        click.echo('Docker proxy hasn\'t been closed properly. '
+                   'Check whether it still exists, if yes - close it manually.')
+        log.exception('Error during closing of a proxy for a {}'.format(k8s_app_name))
+    except K8sProxyOpenError:
+        error_msg = "Error during opening of a proxy for a docker registry."
+        log.exception(error_msg)
+        click.echo(error_msg)
         sys.exit(1)
-
-    # if there is more than one run to be scheduled - first ask whether all of them should be submitted
-    if len(runs_list) > 1:
-        click.echo("Please confirm that the following Runs should be submitted.")
-        click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
-                             RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
-                            headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
-        if not click.confirm('Do you want to continue?', default=True):
-            delete_runs(runs_list)
-            sys.exit(1)
-
-    # run socat if on Windows or Mac OS
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+    except Exception:
+        error_msg = 'Other error during submitting exepriments.'
+        log.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
+    finally:
         # noinspection PyBroadException
-        try:
-            socat.start(tunnel_port)
-        except Exception:
-            log.exception("Error during creation of a proxy for a local docker-host tunnel")
-            click.echo("Error during creation of a local docker-host tunnel.")
-
-            # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
-            # close port forwarding
+        # terminate socat if on Windows or Mac OS
+        if get_current_os() in (OS.WINDOWS, OS.MACOS):
             # noinspection PyBroadException
             try:
-                process.kill()
+                socat.stop()
             except Exception:
-                log.exception("Error during closing of a proxy for a docker registry.")
-                click.echo("Docker proxy hasn't been closed properly. "
+                log.exception("Error during closing of a proxy for a local docker-host tunnel")
+                click.echo("Local Docker-host tunnel hasn't been closed properly. "
                            "Check whether it still exists, if yes - close it manually.")
-
-            sys.exit(1)
-
-    # create Experiment model
-    # TODO template_name & template_namespace should be filled after Template implementation
-    experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
-                                                                parameters_spec=list(script_parameters),
-                                                                template_namespace="template-namespace"), namespace)
-
-    # submit runs
-    for run in runs_list:
-        try:
-            submit_one_run(run.folder)
-            run.status = RunStatus.SUBMITTED
-        except Exception as exe:
-            run.status = RunStatus.ERROR
-            run.message = exe
-
-    # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
-    # close port forwarding
-    # noinspection PyBroadException
-    try:
-        process.kill()
-    except Exception:
-        log.exception("Error during closing of a proxy for a docker registry.")
-        click.echo("Docker proxy hasn't been closed properly. "
-                   "Check whether it still exists, if yes - close it manually.")
-
-    # terminate socat if on Windows or Mac OS
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyBroadException
-        try:
-            socat.stop()
-        except Exception:
-            log.exception("Error during closing of a proxy for a local docker-host tunnel")
-            click.echo("Local Docker-host tunnel hasn't been closed properly. "
-                       "Check whether it still exists, if yes - close it manually.")
 
     # display information about status of a training
     click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],

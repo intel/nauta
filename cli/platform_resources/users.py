@@ -26,7 +26,9 @@ from kubernetes import config, client
 from platform_resources.user_model import User
 from platform_resources.runs import list_runs
 from util.logger import initialize_logger
-
+from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyCloseError
+from util.app_names import DLS4EAppNames
+from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 
 logger = initialize_logger(__name__)
 
@@ -56,4 +58,29 @@ def list_users() -> List[User]:
         user_map[run.submitter].experiment_runs.append(run)
 
     return users
+
+def purge_user(username: str):
+    """
+    Removes all system's artifacts that belong to a removed user.
+    K8s objects are removed during removal of a namespace.
+
+    :param username: name of a user for which artifacts should be removed
+    It throws exception in case of any problems detected during removal of a user
+    """
+    # remove data from elasticsearch
+    try:
+        with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
+            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.container_port,
+                                               verify_certs=False, use_ssl=False)
+            es_client.delete_logs_for_namespace(username)
+    except K8sProxyCloseError as exe:
+        logger.exception("Error during closing of a proxy for elasticsearch.")
+        raise exe
+    except Exception as exe:
+        logger.exception("Error during removal of data from elasticsearch")
+        raise exe
+
+    # remove experiments/runs data
+    # TODO
+
 

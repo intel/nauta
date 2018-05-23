@@ -91,7 +91,7 @@ def test_generate_kubeconfig():
 
 
 def test_delete_helm_release_success(mocker):
-    mocker.patch("util.helm.execute_system_command", return_value=("", 0))
+    mocker.patch("util.helm.execute_system_command", return_value=(f"release \"{test_username}\" deleted", 0))
     assert delete_helm_release(test_username)
 
 
