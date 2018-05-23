@@ -108,6 +108,15 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         click.echo(message)
         sys.exit(1)
 
+    # start port forwarding
+    try:
+        process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
+    except Exception:
+        delete_runs(runs_list)
+        log.exception("Error during creation of a proxy for a docker registry.")
+        click.echo("Error during creation of a proxy for a docker registry.")
+        sys.exit(1)
+
     try:
         # prepare environments for all experiment's runs
         for experiment_run in runs_list:
@@ -125,14 +134,26 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                                                                    script_location=script_location,
                                                                    script_folder_location=script_folder_location,
                                                                    script_parameters=current_script_parameters,
-                                                                   pack_type=template)
-    except Exception as exe:
+                                                                   pack_type=template,
+                                                                   internal_registry_port=tunnel_port)
+    except Exception:
         # any error in this step breaks execution of this command
         message = "Problems during creation of experiments' environments."
         log.exception(message)
         click.echo(message)
         # just in case - remove folders that were created with a success
         delete_runs(runs_list)
+
+        # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
+        # close port forwarding
+        # noinspection PyBroadException
+        try:
+            process.kill()
+        except Exception:
+            log.exception("Error during closing of a proxy for a docker registry.")
+            click.echo("Docker proxy hasn't been closed properly. "
+                       "Check whether it still exists, if yes - close it manually.")
+
         sys.exit(1)
 
     # if there is more than one run to be scheduled - first ask whether all of them should be submitted
@@ -144,16 +165,6 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         if not click.confirm('Do you want to continue?', default=True):
             delete_runs(runs_list)
             sys.exit(1)
-
-    # start port forwarding
-    # noinspection PyBroadException
-    try:
-        process, tunnel_port, container_port = start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
-    except Exception as exe:
-        delete_runs(runs_list)
-        log.exception("Error during creation of a proxy for a docker registry.")
-        click.echo("Error during creation of a proxy for a docker registry.")
-        sys.exit(1)
 
     # run socat if on Windows or Mac OS
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
@@ -191,6 +202,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
             run.status = RunStatus.ERROR
             run.message = exe
 
+    # TODO: move port-forwarding process management to context manager, so we can avoid that kind of flowers
     # close port forwarding
     # noinspection PyBroadException
     try:
@@ -254,7 +266,7 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, script_location: str,
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
-                                   pack_type: str) -> str:
+                                   pack_type: str, internal_registry_port: str) -> str:
     """
     Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
@@ -276,7 +288,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
             raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
         # reconfigure draft's templates
         update_configuration(run_folder, Path(script_location).name, script_folder_location, script_parameters,
-                             experiment_name=experiment_name)
+                             experiment_name=experiment_name, internal_registry_port=internal_registry_port)
     except Exception as exe:
         delete_environment(run_folder)
         raise KubectlIntError(exe)

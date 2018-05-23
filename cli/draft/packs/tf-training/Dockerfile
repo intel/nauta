@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow
+FROM dls4e/tensorflow:1.8.0-py3
 
 WORKDIR /app
 

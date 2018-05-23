@@ -90,7 +90,7 @@ def prepare_mocks(mocker) -> SubmitMocks:
 
 def check_asserts(prepare_mocks: SubmitMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
                   cmd_create_count=1, update_conf_count=1, start_port_fwd_count=1, add_exp_count=1, cmd_up_count=1,
-                  del_env_count=0, isfile_count=1):
+                  del_env_count=0, isfile_count=1, socat_start_count=1):
     assert prepare_mocks.isfile.call_count == isfile_count, "Script location was not checked"
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "current user namespace was not fetched"
     assert prepare_mocks.gen_exp_name.call_count == get_exp_name_count, "experiment name wasn't created"
@@ -102,8 +102,8 @@ def check_asserts(prepare_mocks: SubmitMocks, get_namespace_count=1, get_exp_nam
     assert prepare_mocks.cmd_up.call_count == cmd_up_count, "training wasn't deployed"
     assert prepare_mocks.del_env.call_count == del_env_count, "environment folder was deleted"
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        assert prepare_mocks.socat.start.call_count == start_port_fwd_count, "socat wasn't started"
-        if start_port_fwd_count > 0:
+        assert prepare_mocks.socat.start.call_count == socat_start_count, "socat wasn't started"
+        if socat_start_count > 0:
             prepare_mocks.socat.start.assert_called_with(FAKE_NODE_PORT)
 
 
@@ -116,22 +116,23 @@ def test_submit_fail(prepare_mocks: SubmitMocks):
     prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.experiment.submit.create_environment",
                                                           side_effect=[KubectlIntError()])
     CliRunner().invoke(submit.submit, [SCRIPT_LOCATION])
-    check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, start_port_fwd_count=0, add_exp_count=0,
-                  cmd_up_count=0)
+    check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, start_port_fwd_count=1, add_exp_count=0,
+                  cmd_up_count=0, socat_start_count=0)
 
 
 def test_submit_depl_fail(prepare_mocks: SubmitMocks):
     prepare_mocks.cmd_create = prepare_mocks.mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
     CliRunner().invoke(submit.submit, [SCRIPT_LOCATION])
-    check_asserts(prepare_mocks, update_conf_count=0, start_port_fwd_count=0, add_exp_count=0, cmd_up_count=0,
-                  del_env_count=1)
+    check_asserts(prepare_mocks, update_conf_count=0, start_port_fwd_count=1, add_exp_count=0, cmd_up_count=0,
+                  del_env_count=1, socat_start_count=0)
 
 
 def test_submit_env_update_fail(prepare_mocks: SubmitMocks):
     prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.experiment.submit.update_configuration",
                                                            side_effect=[KubectlIntError])
     CliRunner().invoke(submit.submit, [SCRIPT_LOCATION])
-    check_asserts(prepare_mocks, start_port_fwd_count=0, add_exp_count=0, cmd_up_count=0, del_env_count=1)
+    check_asserts(prepare_mocks, start_port_fwd_count=1, add_exp_count=0, cmd_up_count=0, del_env_count=1,
+                  socat_start_count=0)
 
 
 def test_submit_start_depl_fail(prepare_mocks: SubmitMocks):

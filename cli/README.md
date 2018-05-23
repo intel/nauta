@@ -3,7 +3,7 @@
 ## Requirements
 
 * kubectl >= 1.10
-* helm >= 2.8.1
+* helm **==** 2.8.1
 * docker >= 18.03.0-ce
 
 These tools need to be installed on system (i.e. available in terminal by PATH).

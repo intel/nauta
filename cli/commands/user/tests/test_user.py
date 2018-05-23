@@ -25,9 +25,9 @@ import pytest
 from click.testing import CliRunner
 
 from util.exceptions import KubectlIntError
-from commands.user.create import check_users_presence, generate_kubeconfig, delete_user, \
-                             create
-from util.helm import delete_helm_release
+from commands.user.create import check_users_presence, generate_kubeconfig, create
+from util.helm import delete_user, delete_helm_release
+
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -102,23 +102,25 @@ def test_delete_helm_release_failure(mocker):
 
 
 def test_delete_user_success(mocker):
-    dns_mock = mocker.patch("util.k8s.k8s_info.delete_namespace")
+    dns_mock = mocker.patch("util.helm.delete_namespace")
     dhr_mock = mocker.patch("util.helm.delete_helm_release")
 
-    delete_user(test_username)
+    user_deleted = delete_user(test_username)
 
-    dns_mock.call_count == 1
-    dhr_mock.call_count == 1
+    assert user_deleted
+    assert dns_mock.call_count == 1
+    assert dhr_mock.call_count == 1
 
 
 def test_delete_user_failure(mocker):
-    dns_mock = mocker.patch("util.k8s.k8s_info.delete_namespace", side_effect=RuntimeError)
+    dns_mock = mocker.patch("util.helm.delete_namespace", side_effect=RuntimeError)
     dhr_mock = mocker.patch("util.helm.delete_helm_release")
 
-    assert not delete_user(test_username)
+    user_deleted = delete_user(test_username)
 
-    dns_mock.call_count == 1
-    dhr_mock.call_count == 0
+    assert not user_deleted
+    assert dns_mock.call_count == 1
+    assert dhr_mock.call_count == 0
 
 
 def test_create_user_failure(mocker):  # noqa: F811

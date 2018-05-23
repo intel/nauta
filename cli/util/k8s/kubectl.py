@@ -20,6 +20,7 @@
 #
 
 import subprocess
+from typing import Optional
 
 from util import system
 from util.logger import initialize_logger
@@ -32,7 +33,7 @@ from util.system import execute_system_command
 logger = initialize_logger('util.kubectl')
 
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, int, int):
+def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the

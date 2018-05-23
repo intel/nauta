@@ -92,7 +92,7 @@ def test_modify_dockerfile(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_DOCKERFILE)
     sh_move_mock = mocker.patch("shutil.move")
 
-    tf_training.modify_dockerfile(EXPERIMENT_FOLDER)
+    tf_training.modify_dockerfile(EXPERIMENT_FOLDER, "12345")
 
     assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
@@ -104,7 +104,7 @@ def test_update_configuration_success(mocker):
     modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
     output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                              experiment_name='test-experiment')
+                                              experiment_name='test-experiment', internal_registry_port="12345")
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
@@ -119,7 +119,7 @@ def test_update_configuration_failure(mocker):
     modify_values_yaml_mock.side_effect = Exception("Test error")
     with pytest.raises(KubectlIntError):
         tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                         experiment_name='test-experiment')
+                                         experiment_name='test-experiment', internal_registry_port="12345")
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"
