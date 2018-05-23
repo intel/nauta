@@ -27,8 +27,6 @@ spec:
           properties:
             uid:
               type: integer
-            password:
-              type: string
             state:
               type: string
               enum:

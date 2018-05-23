@@ -29,3 +29,11 @@ rules:
       - list
       - get
       - create
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - list
+      - get
+      - create
