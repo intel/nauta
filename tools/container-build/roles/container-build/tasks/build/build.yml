@@ -11,6 +11,7 @@
     timeout: "{{ docker_timeout }}"
     path: "{{ image.directory }}"
     buildargs: "{{ proxy | combine(local_buildargs) }}"
+    force: True
   register: build_async
   failed_when: "'ansible_job_id' not in build_async"
   async: 1800

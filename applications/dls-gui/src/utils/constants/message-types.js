@@ -19,27 +19,9 @@
  * and approved by Intel in writing.
  */
 
-const state = {
-  data: []
-};
-
-const getters = {
-  getData: state => state.data
-};
-
-const actions = {
-  setData: ({commit}) => {
-    commit('setData', {});
-  }
-};
-
-const mutations = {
-  setData: (state, data) => { state.data = data }
-};
-
 export default {
-  state,
-  getters,
-  actions,
-  mutations
+  SUCCESS: 'success',
+  INFO: 'info',
+  WARNING: 'warning',
+  ERROR: 'error'
 }

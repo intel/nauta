@@ -20,14 +20,35 @@
  */
 
 const config = require('./config');
+const path = require('path');
 const express = require('express');
-const logger = require('./utils/logger');
+const logger = require('./src/utils/logger');
+const bodyParser = require('body-parser');
 
 const app = express();
 
+// configuration
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 app.use(express.static('dist'));
-app.use('/api/experiments', require('./handlers/experiments'));
 
+// handlers mappings
+app.use('/api/auth', require('./src/handlers/auth'));
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, '../dist/index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
+
+// server start listening
 app.listen(config.port, () => {
   logger.info('API listening on port %d...', config.port);
 });
+

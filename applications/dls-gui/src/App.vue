@@ -22,19 +22,33 @@
 <template>
   <div id="app">
     <v-app>
-      <Navigation></Navigation>
-      <Toolbar></Toolbar>
-      <v-content>
-        <v-container fluid>
-          <router-view></router-view>
-        </v-container>
-      </v-content>
-      <Footer></Footer>
+      <div id="app-bg" :class="{intelBlue: !isLogged, intelGray: isLogged}">
+        <Navigation v-if="isLogged"></Navigation>
+        <Toolbar></Toolbar>
+        <v-content>
+          <v-container fluid>
+            <router-view></router-view>
+            <notifications group="app" width="400px" position="top right" class="pa-2">
+              <template slot="body" slot-scope="props">
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-alert :value="true" :type="props.item.type" dismissible v-on:click="props.close">
+                      {{ props.item.text }}
+                    </v-alert>
+                  </v-flex>
+                </v-layout>
+              </template>
+            </notifications>
+          </v-container>
+        </v-content>
+        <Footer v-if="isLogged"></Footer>
+      </div>
     </v-app>
   </div>
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 import Navigation from './components/Navigation.vue';
 import Toolbar from './components/Toolbar.vue';
 import Footer from './components/Footer.vue';
@@ -45,6 +59,21 @@ export default {
     Navigation,
     Toolbar,
     Footer
+  },
+  computed: {
+    ...mapGetters({
+      isLogged: 'isLogged',
+      errorType: 'errorType',
+      errorContent: 'errorContent'
+    }),
+    combinedError: function () {
+      return {type: this.errorType, content: this.errorContent};
+    }
+  },
+  watch: {
+    combinedError: function (val) {
+      this.$notify({group: 'app', text: val.content, type: val.type});
+    }
   }
 }
 </script>
@@ -55,6 +84,15 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #ffffff;
+  background-color: #f3f3f3;
+}
+#app-bg {
+  height: 100%
+}
+.intelBlue {
+  background-color: #003c71;
+}
+.intelGray {
   background-color: #f3f3f3;
 }
 </style>

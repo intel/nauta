@@ -18,26 +18,88 @@
  * otherwise. Any license under such intellectual property rights must be express
  * and approved by Intel in writing.
  */
+import RESPONSE_TYPES from '../../utils/constants/message-types';
+
+const DEFAULT_BANNER_TYPE = RESPONSE_TYPES.WARNING;
 
 const state = {
   menu: {
+    visible: true,
+    btnVisible: false
+  },
+  userbox: {
+    visible: false
+  },
+  spinner: {
     visible: true
+  },
+  error: {
+    content: '',
+    type: DEFAULT_BANNER_TYPE,
+    visible: false
   }
 };
 
-const getters = {
-  getMenuParams: state => state.menu
+export const getters = {
+  getMenuParams: state => state.menu,
+  getUserboxParams: state => state.userbox,
+  getSpinnerParams: state => state.spinner,
+  errorType: state => state.error.type,
+  errorContent: state => state.error.content
 };
 
-const actions = {
+export const actions = {
   toggleMenu: ({commit}) => {
     commit('setMenuVisibility');
+  },
+  showMenuToggleBtn: ({commit}) => {
+    commit('setMenuToggleBtnVisibility', true);
+  },
+  hideMenuToggleBtn: ({commit}) => {
+    commit('setMenuToggleBtnVisibility', false);
+  },
+  showUserbox: ({commit}) => {
+    commit('setUserboxVisibility', true);
+  },
+  hideUserbox: ({commit}) => {
+    commit('setUserboxVisibility', false);
+  },
+  showError: ({commit}, {type, content}) => {
+    commit('setError', {type, content});
+  },
+  hideError: ({commit}) => {
+    commit('removeError');
+  },
+  showSpinner: ({commit}) => {
+    commit('setSpinnerVisibility', true);
+  },
+  hideSpinner: ({commit}) => {
+    commit('setSpinnerVisibility', false);
   }
 };
 
-const mutations = {
+export const mutations = {
   setMenuVisibility: (state, visible) => {
     state.menu.visible = typeof (visible) !== 'undefined' ? visible : !state.menu.visible;
+  },
+  setMenuToggleBtnVisibility: (state, visibility) => {
+    state.menu.btnVisible = visibility;
+  },
+  setUserboxVisibility: (state, visibility) => {
+    state.userbox.visible = visibility;
+  },
+  setError: (state, {type, content}) => {
+    state.error.type = type;
+    state.error.content = content;
+    state.error.visible = true;
+  },
+  removeError: (state) => {
+    state.error.type = '';
+    state.error.content = '';
+    state.error.visible = false;
+  },
+  setSpinnerVisibility: (state, visibility) => {
+    state.spinner.visible = visibility;
   }
 };
 

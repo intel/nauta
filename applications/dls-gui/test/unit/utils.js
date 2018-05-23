@@ -19,50 +19,49 @@
  * and approved by Intel in writing.
  */
 
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import Vuetify from 'vuetify';
-import App from './App';
-import router from './router';
-import store from './store';
-import axios from 'axios';
-import Notifications from 'vue-notification';
+export function testAction (action, payload, state, expectedMutations, expectedActions, done) {
+  let mutationsCount = 0;
+  let actionsCount = 0;
 
-import 'vuetify/dist/vuetify.min.css';
-import 'material-icons/iconfont/material-icons.css';
-import './fonts.css';
-
-Vue.use(Notifications);
-Vue.use(Vuetify, {
-  theme: {
-    intel_primary: '#0071c5',
-    intel_secondary: '#003c71',
-    intel_lightest_gray: '#f3f3f3'
-  }
-});
-
-Vue.config.productionTip = false;
-
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:9000';
-}
-
-router.beforeEach((to, from, next) => {
-  store.dispatch('loadAuthority').then(() => {
-    const authorized = store.getters.isLogged;
-    if (to.meta.authorized && !authorized) {
-      next({path: '/invalid_token'});
+  const commit = function (type, payload) {
+    const mutation = expectedMutations[mutationsCount];
+    try {
+      expect(type).to.equal(mutation.type);
+      if (payload) {
+        expect(payload).to.deep.equal(mutation.payload);
+      }
+    } catch (error) {
+      done(error);
     }
-    next();
-  });
-});
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  store,
-  router,
-  components: { App },
-  template: '<App/>'
-});
+    mutationsCount++;
+    if (mutationsCount >= expectedMutations.length) {
+      done();
+    }
+  };
+
+  const dispatch = function (type, payload) {
+    const action = expectedActions[actionsCount];
+    try {
+      expect(type).to.equal(action.type);
+      if (payload) {
+        expect(payload).to.deep.equal(action.payload);
+      }
+    } catch (error) {
+      done(error);
+    }
+
+    actionsCount++;
+    if (actionsCount >= expectedActions.length) {
+      done();
+    }
+  };
+
+  action({commit, dispatch, state}, payload);
+
+  if (expectedMutations.length === 0 && expectedActions.length === 0) {
+    expect(mutationsCount).to.equal(0);
+    expect(actionsCount).to.equal(0);
+    done();
+  }
+}

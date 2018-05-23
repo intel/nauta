@@ -19,50 +19,27 @@
  * and approved by Intel in writing.
  */
 
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import Vuetify from 'vuetify';
-import App from './App';
-import router from './router';
-import store from './store';
-import axios from 'axios';
-import Notifications from 'vue-notification';
+const logger = require('../../utils/logger');
+const jwt = require('jsonwebtoken');
 
-import 'vuetify/dist/vuetify.min.css';
-import 'material-icons/iconfont/material-icons.css';
-import './fonts.css';
-
-Vue.use(Notifications);
-Vue.use(Vuetify, {
-  theme: {
-    intel_primary: '#0071c5',
-    intel_secondary: '#003c71',
-    intel_lightest_gray: '#f3f3f3'
+module.exports.decodeToken = function (req, res) {
+  if (!req.body.token) {
+    logger.debug('Missing token in request body');
+    res.status(400).send({error: 'Missing token'});
+    return;
   }
-});
-
-Vue.config.productionTip = false;
-
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:9000';
-}
-
-router.beforeEach((to, from, next) => {
-  store.dispatch('loadAuthority').then(() => {
-    const authorized = store.getters.isLogged;
-    if (to.meta.authorized && !authorized) {
-      next({path: '/invalid_token'});
+  try {
+    const decoded = jwt.decode(req.body.token);
+    if (!decoded) {
+      throw new Error('Cannot decode received token');
     }
-    next();
-  });
-});
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  store,
-  router,
-  components: { App },
-  template: '<App/>'
-});
+    if (!decoded['kubernetes.io/serviceaccount/service-account.name']) {
+      throw new Error('Token decoded but is not valid for DLS4E');
+    }
+    logger.debug('Token decoded. Data sent to user');
+    res.send({decoded: decoded});
+  } catch (err) {
+    logger.debug('Cannot decode provided token');
+    res.status(401).send({error: 'Cannot decode provided token'});
+  }
+};

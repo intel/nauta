@@ -19,10 +19,32 @@
  * and approved by Intel in writing.
  */
 
-const log4js = require('log4js');
-const config = require('../config');
+<template>
+  <v-layout row wrap>
+    <v-flex xs12 align-center>
+      <h1>WE'RE SORRY, YOUR TOKEN IS INVALID</h1>
+    </v-flex>
+    <v-flex xs12>
+      <h3>Please contact your IT Administrator.</h3>
+    </v-flex>
+  </v-layout>
+</template>
 
-const logger = log4js.getLogger('cheese');
-logger.level = config.logLevel;
+<script>
+export default {
+  name: 'InvalidToken'
+}
+</script>
 
-module.exports = logger;
+<style scoped>
+h1 {
+  font-family: 'Intel Clear Pro', sans-serif;
+  font-size: 64px;
+  margin-left: 100px;
+  margin-top: 100px;
+}
+h3 {
+  font-family: 'Intel Clear', sans-serif;
+  margin-left: 100px;
+}
+</style>

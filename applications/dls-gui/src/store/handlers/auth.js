@@ -19,11 +19,13 @@
  * and approved by Intel in writing.
  */
 
-const express = require('express');
-const router = express.Router();
+import axios from 'axios'
 
-router.get('/list', (req, res) => {
-  res.send({message: 'test message'});
-});
+const DECODE_TOKEN_ENDPOINT = '/api/auth/decode';
 
-module.exports = router;
+export function decodeAuthK8SToken (token) {
+  const body = {
+    token: token
+  };
+  return axios.post(DECODE_TOKEN_ENDPOINT, body);
+};

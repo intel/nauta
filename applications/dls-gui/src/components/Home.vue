@@ -19,50 +19,54 @@
  * and approved by Intel in writing.
  */
 
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import Vuetify from 'vuetify';
-import App from './App';
-import router from './router';
-import store from './store';
-import axios from 'axios';
-import Notifications from 'vue-notification';
+<template>
+  <div>
+    <v-container v-if="spinnerParams.visible" fill-height justify-center>
+      <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
+    </v-container>
+    <v-layout row wrap v-if="!spinnerParams.visible">
+      <v-flex xs12 align-center>
+        <h1>WE'RE SORRY, UNEXPECTED ERROR OCCURRED</h1>
+      </v-flex>
+      <v-flex xs12>
+        <h3>Please contact your IT Administrator.</h3>
+      </v-flex>
+    </v-layout>
+  </div>
+</template>
 
-import 'vuetify/dist/vuetify.min.css';
-import 'material-icons/iconfont/material-icons.css';
-import './fonts.css';
+<script>
+import {mapGetters, mapActions} from 'vuex';
 
-Vue.use(Notifications);
-Vue.use(Vuetify, {
-  theme: {
-    intel_primary: '#0071c5',
-    intel_secondary: '#003c71',
-    intel_lightest_gray: '#f3f3f3'
+export default {
+  name: 'Home',
+  data () {
+    return {}
+  },
+  created: function () {
+    const token = this.$route.query.token;
+    this.$store.dispatch('loadAuthority', token);
+  },
+  methods: {
+    ...mapActions(['loadAuthority'])
+  },
+  computed: {
+    ...mapGetters({
+      spinnerParams: 'getSpinnerParams'
+    })
   }
-});
-
-Vue.config.productionTip = false;
-
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:9000';
 }
+</script>
 
-router.beforeEach((to, from, next) => {
-  store.dispatch('loadAuthority').then(() => {
-    const authorized = store.getters.isLogged;
-    if (to.meta.authorized && !authorized) {
-      next({path: '/invalid_token'});
-    }
-    next();
-  });
-});
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  store,
-  router,
-  components: { App },
-  template: '<App/>'
-});
+<style scoped>
+h1 {
+  font-family: 'Intel Clear Pro', sans-serif;
+  font-size: 64px;
+  margin-left: 100px;
+  margin-top: 100px;
+}
+h3 {
+  font-family: 'Intel Clear', sans-serif;
+  margin-left: 100px;
+}
+</style>

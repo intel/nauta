@@ -21,7 +21,7 @@
 
 <template>
   <v-toolbar dark color="intel_primary" app fixed clipped-left height="110px">
-    <v-toolbar-side-icon @click.stop="toggleMenu"></v-toolbar-side-icon>
+    <v-toolbar-side-icon v-if="menuParams.btnVisible" @click.stop="toggleMenu"></v-toolbar-side-icon>
     <v-toolbar-title>
       <v-container grid-list-md>
         <v-layout row >
@@ -35,21 +35,38 @@
       </v-container>
     </v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-icon>ic_help_outline</v-icon>
-    <v-btn flat>
-      Andrzej
-      <v-icon>keyboard_arrow_down</v-icon>
-    </v-btn>
+    <v-icon v-if="userboxParams.visible">ic_help_outline</v-icon>
+    <v-menu v-if="userboxParams.visible" bottom offset-y>
+      <v-btn flat slot="activator">
+        {{ username }}
+        <v-icon>keyboard_arrow_down</v-icon>
+      </v-btn>
+      <v-list>
+        <v-list-tile v-on:click="onSingOutBtnClick()">
+          <v-list-tile-title>SIGN OUT</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-menu>
   </v-toolbar>
 </template>
 
 <script>
-import {mapActions} from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: 'Toolbar',
   methods: {
-    ...mapActions(['toggleMenu'])
+    ...mapActions(['toggleMenu', 'clearAuthorityData']),
+    onSingOutBtnClick: function () {
+      this.$store.dispatch('clearAuthorityData');
+    }
+  },
+  computed: {
+    ...mapGetters({
+      username: 'username',
+      menuParams: 'getMenuParams',
+      userboxParams: 'getUserboxParams'
+    })
   }
 }
 </script>

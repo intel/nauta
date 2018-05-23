@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+import pytest
 from unittest.mock import Mock
 from click.testing import CliRunner
 
@@ -29,7 +30,16 @@ APP_NAME = 'webui'
 DISABLE_BROWSER_ARG = '--no-launch'
 
 
-def test_launch_with_browser_success(mocker):
+@pytest.fixture()
+def mocked_k8s_config(mocker):
+    mocker.patch('kubernetes.config.load_kube_config')
+    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
+    conf_instance = mocked_conf_class.return_value
+    conf_instance.api_key = dict(authorization='fake_token')
+    return conf_instance
+
+
+def test_launch_webui_with_browser_success(mocked_k8s_config, mocker):
     spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
@@ -50,7 +60,32 @@ def test_launch_with_browser_success(mocker):
         assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
-def test_launch_without_browser_success(mocker):
+def test_launch_webui_with_kube_config_loading_success(mocker):
+    spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
+    kube_config_mock = mocker.patch('kubernetes.config.load_kube_config')
+    kube_client_mock = mocker.patch('kubernetes.client.configuration.Configuration')
+    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
+    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    input_mock = mocker.patch("commands.launch.launch.input")
+
+    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        socat_mock = mocker.patch("commands.launch.launch.socat")
+
+    runner = CliRunner()
+    runner.invoke(launch.launch, [APP_NAME])
+
+    assert spf_mock.call_count == 1, "port wasn't forwarded"
+    assert kube_config_mock.call_count == 1, "kube config wasn't loaded"
+    assert kube_client_mock.call_count == 1, "kubernetes api key wasn't read"
+    assert wfc_mock.call_count == 1, "connection wasn't checked"
+    assert browser_mock.call_count == 1, "browser wasn't started"
+    assert input_mock.call_count == 1, "enter wasn't prompted"
+
+    if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        assert socat_mock.start.call_count == 1, "socat wasn't started"
+
+
+def test_launch_webui_without_browser_success(mocked_k8s_config, mocker):
     spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding", side_effect=[(Mock, 1000, 2000)])
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
     browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
@@ -71,7 +106,7 @@ def test_launch_without_browser_success(mocker):
         assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
-def test_launch_start_tunnel_fail(mocker):
+def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocker):
     spf_mock = mocker.patch("commands.launch.launch.start_port_forwarding")
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")

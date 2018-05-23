@@ -19,50 +19,13 @@
  * and approved by Intel in writing.
  */
 
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import Vuetify from 'vuetify';
-import App from './App';
-import router from './router';
-import store from './store';
-import axios from 'axios';
-import Notifications from 'vue-notification';
+const express = require('express');
+const logger = require('../../utils/logger');
+const jwt = require('jsonwebtoken');
+const authApi = require('./auth');
 
-import 'vuetify/dist/vuetify.min.css';
-import 'material-icons/iconfont/material-icons.css';
-import './fonts.css';
+const router = express.Router();
 
-Vue.use(Notifications);
-Vue.use(Vuetify, {
-  theme: {
-    intel_primary: '#0071c5',
-    intel_secondary: '#003c71',
-    intel_lightest_gray: '#f3f3f3'
-  }
-});
+router.post('/decode', authApi.decodeToken);
 
-Vue.config.productionTip = false;
-
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:9000';
-}
-
-router.beforeEach((to, from, next) => {
-  store.dispatch('loadAuthority').then(() => {
-    const authorized = store.getters.isLogged;
-    if (to.meta.authorized && !authorized) {
-      next({path: '/invalid_token'});
-    }
-    next();
-  });
-});
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  store,
-  router,
-  components: { App },
-  template: '<App/>'
-});
+module.exports = router;

@@ -22,16 +22,39 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Models from '../components/Models.vue';
+import Home from '../components/Home.vue';
+import InvalidToken from '../components/InvalidToken.vue';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
       path: '/',
+      name: 'Home',
+      component: Home,
+      meta: {
+        authorized: false
+      }
+    },
+    {
+      path: '/models',
       name: 'Models',
-      component: Models
+      component: Models,
+      meta: {
+        authorized: true
+      }
+    },
+    {
+      path: '/invalid_token',
+      name: 'InvalidToken',
+      component: InvalidToken,
+      meta: {
+        authorized: false
+      }
     }
   ]
-})
+});
+
+export default router;

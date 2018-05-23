@@ -48,3 +48,6 @@ unit-tests:
 
 cli-style:
 	@(cd $(CURDIR)/cli && make style)
+
+gui-unit-tests:
+	@(cd $(CURDIR)/applications/dls-gui && make test)

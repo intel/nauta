@@ -24,6 +24,8 @@ import sys
 
 import click
 
+from kubernetes import config
+from kubernetes.client import configuration
 from util.system import get_current_os, OS
 from util import socat
 from util.k8s.kubectl import start_port_forwarding
@@ -47,8 +49,6 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
         click.echo('Error during creation of a proxy for a {}'.format(k8s_app_name))
         sys.exit(1)
 
-    url = FORWARDED_URL.format(container_port)
-
     # run socat if on Windows or Mac OS
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         # noinspection PyBroadException
@@ -67,12 +67,20 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
 
             sys.exit(1)
 
+    url = FORWARDED_URL.format(container_port)
+
+    if k8s_app_name == DLS4EAppNames.WEB_GUI:
+        config.load_kube_config()
+        user_token = configuration.Configuration().api_key.get('authorization')
+        prepared_user_token = user_token.replace('Bearer ', '')
+        url = f'{url}?token={prepared_user_token}'
+
     if not no_launch:
         click.echo('Browser will start in few seconds. Please wait... ')
         wait_for_connection(url)
         webbrowser.open_new(url)
-    else:
-        click.echo('Go to {}'.format(url))
+
+    click.echo('Go to {}'.format(url))
 
     input('Proxy connection created.\nPress ENTER key to close a port forwarding process...')
     # close port forwarding
