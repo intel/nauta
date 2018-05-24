@@ -95,7 +95,7 @@ endif
 VERSION_CLIENT_MAJOR ?= 1
 VERSION_CLIENT_MINOR ?= 0
 VERSION_CLIENT_NO ?= 0
-BUILD_ID ?= develop
+BUILD_ID ?= dev
 VERSION_CLIENT_BUMP_PART ?= patch
 
 set-version:
