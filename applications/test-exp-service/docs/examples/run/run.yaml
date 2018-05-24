@@ -1,0 +1,7 @@
+note: Run Example
+sample: |
+  apiVersion: aggregator.aipg.intel.com/v1
+  kind: Run
+  metadata:
+    name: run-example
+  spec:
