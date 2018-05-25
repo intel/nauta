@@ -20,15 +20,16 @@
 #
 
 import subprocess
+
 from typing import Optional
 
+import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from draft.cmd import set_registry_port
 from util.k8s.k8s_info import get_app_services, find_namespace
 from util.app_names import DLS4EAppNames
-from util.system import execute_system_command
 
 logger = initialize_logger('util.kubectl')
 
@@ -114,14 +115,14 @@ def check_users_presence(username: str) -> bool:
         logger.debug("Namespace {} already exists.".format(username))
         return True
 
-    find_user_command = ["kubectl", "get", "users", "-o",
-                         f"jsonpath={{.items[?(@.metadata.name==\"{username}\")].metadata.name}}"]
+    try:
+        user_data = users_api.get_user_data(username)
 
-    output, err_code = execute_system_command(find_user_command)
-
-    if err_code:
+        return user_data and user_data.name == username
+    except Exception as exe:
+        print(exe)
         error_message = "Error during checking user's presence."
         logger.error(error_message)
-        raise KubectlIntError(error_message)
+        raise KubectlIntError(error_message) from exe
 
-    return output == username
+    return False

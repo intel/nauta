@@ -41,10 +41,12 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
-from util.exceptions import KubectlIntError
+
 from util.aliascmd import AliasCmd
+
+from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseError
 from util.app_names import DLS4EAppNames
-from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
+from util.k8s.k8s_proxy_context_manager import K8sProxy
 
 log = initialize_logger('commands.submit')
 

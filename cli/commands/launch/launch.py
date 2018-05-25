@@ -32,8 +32,10 @@ from util.network import wait_for_connection
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
 from util.app_names import DLS4EAppNames
+
 from util.aliascmd import AliasCmd, AliasGroup
-from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
+from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
 
 
 logger = initialize_logger('commands.launch')

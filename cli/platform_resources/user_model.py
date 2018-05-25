@@ -38,11 +38,10 @@ class User(PlatformResource):
     UserCliModel = namedtuple('UserCliModel', ['name', 'created', 'date_of_last_submitted_job',
                                                'running_jobs', 'queued_jobs'])
 
-    def __init__(self, name: str, uid: int, password: str, state: UserStatus = UserStatus.DEFINED,
+    def __init__(self, name: str, uid: int, state: UserStatus = UserStatus.DEFINED,
                  creation_timestamp: str = None, experiment_runs: List[Run] = None):
         self.name = name
         self.uid = uid
-        self.password = password
         self.state = state
         self.creation_timestamp = creation_timestamp
         self.experiment_runs = experiment_runs if experiment_runs else []
@@ -52,7 +51,6 @@ class User(PlatformResource):
     def from_k8s_response_dict(cls, object_dict: dict):
         return cls(name=object_dict['metadata']['name'],
                    uid=object_dict['spec']['uid'],
-                   password=object_dict['spec']['password'],
                    state=UserStatus[object_dict['spec']['state']],
                    creation_timestamp=object_dict['metadata']['creationTimestamp'])
 

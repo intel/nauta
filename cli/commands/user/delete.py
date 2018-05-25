@@ -27,7 +27,7 @@ from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
 from util.k8s.kubectl import check_users_presence
 from util.helm import delete_user
-from util.k8s.k8s_proxy_context_manager import K8sProxyCloseError
+from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
 log = initialize_logger(__name__)
 

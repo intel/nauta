@@ -185,3 +185,54 @@ def get_users_token(namespace: str) -> str:
         raise KubectlIntError(error_message) from exe
 
     return ret_token
+
+
+def get_current_user() -> str:
+    """
+    Returns name of a user from a current kubectl context
+    :return: name of a user
+    In case of any problems - it raises an exception
+    """
+    return config.list_kube_config_contexts()[1]["context"]["user"]
+
+
+def get_current_namespace() -> str:
+    """
+    Returns namespace from a current kubectl context
+    :return: namespace
+    In case of any problems - it raises an exception
+    """
+    return config.list_kube_config_contexts()[1]["context"]["namespace"]
+
+
+def get_users_samba_password(username: str) -> str:
+    """
+    Returns samba password of a user with a given username
+
+    :param username: name of a user
+    :return: password of a user,
+    In case of any problems during gathering of a password it raises KubectlIntError
+    If password doesnt exist - it raises ValueError.
+    """
+    error_message = "Error during gathering users password."
+    password = None
+    try:
+        api = get_k8s_api()
+
+        secret = api.read_namespaced_secret("password", username)
+
+        password = str(base64.b64decode(secret.data["password"]), encoding="utf-8")
+    except ApiException as exe:
+        if exe.status == 404:
+            password = None
+        else:
+            logger.exception(error_message)
+            raise KubectlIntError(error_message) from exe
+    except Exception as exe:
+        logger.exception(error_message)
+        raise KubectlIntError(error_message) from exe
+
+    if password is None:
+        raise ValueError("Lack of password.")
+
+    return password

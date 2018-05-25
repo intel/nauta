@@ -25,10 +25,10 @@ from commands.user import list_users
 from platform_resources.user_model import User, UserStatus
 
 
-TEST_USERS = [User(name='test-dev', uid=1, password='bla', state=UserStatus.DEFINED,
+TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
                    creation_timestamp='2018-05-17T12:49:04Z',
                    experiment_runs=[]),
-              User(name='test-user', uid=100, password='bla',
+              User(name='test-user', uid=100,
                    state=UserStatus.DEFINED, creation_timestamp='2018-05-17T11:42:22Z',
                    experiment_runs=[])]
 

@@ -23,13 +23,14 @@ import pytest
 
 from kubernetes.client import CustomObjectsApi
 
-from platform_resources.user_model import User, UserStatus
-from platform_resources.users import list_users
 
-TEST_USERS = [User(name='test-dev', uid=1, password='bla', state=UserStatus.DEFINED,
+from platform_resources.user_model import User, UserStatus
+from platform_resources.users import list_users, get_user_data
+
+TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
                    creation_timestamp='2018-05-17T12:49:04Z',
                    experiment_runs=[]),
-              User(name='test-user', uid=100, password='bla',
+              User(name='test-user', uid=100,
                    state=UserStatus.DEFINED, creation_timestamp='2018-05-17T11:42:22Z',
                    experiment_runs=[])]
 
@@ -84,3 +85,10 @@ LIST_USERS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1',
                                 'spec': {'password': 'bla', 'state': 'DEFINED', 'uid': 100}}], 'kind': 'UserList',
                            'metadata': {'continue': '', 'resourceVersion': '434920',
                                         'selfLink': '/apis/aipg.intel.com/v1/users'}}
+
+
+def test_get_user_data(mock_k8s_api_client, mocker):
+    mock_k8s_api_client.get_cluster_custom_object.return_value = LIST_USERS_RESPONSE_RAW["items"][0]
+
+    user = get_user_data("user_name")
+    assert user == TEST_USERS[0]

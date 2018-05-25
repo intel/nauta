@@ -29,8 +29,11 @@ from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
+
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
+from util.k8s.k8s_proxy_context_manager import K8sProxy
+
 
 logger = initialize_logger(__name__)
 

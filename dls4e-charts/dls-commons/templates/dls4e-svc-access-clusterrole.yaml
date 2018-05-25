@@ -19,6 +19,7 @@ rules:
   - services
   - pods
   - pods/portforward
+  - configmaps
   verbs:
   - list
   - get

@@ -24,7 +24,8 @@ import base64
 import pytest
 from click.testing import CliRunner
 
-from util.exceptions import KubectlIntError
+from platform_resources.user_model import User, UserStatus
+
 from commands.user.create import check_users_presence, generate_kubeconfig, create
 from util.helm import delete_user, delete_helm_release
 
@@ -63,10 +64,18 @@ users:
     token: {test_token}
 '''
 
+user_data = User(name=test_username,
+                 uid="10001",
+                 state=UserStatus.CREATED,
+                 creation_timestamp="2019-01-01",
+                 experiment_runs=None
+                 )
+
 
 def test_check_users_presence_success(mocker):
     mocker.patch("util.k8s.kubectl.find_namespace", return_value=False)
-    mocker.patch("util.k8s.kubectl.execute_system_command", return_value=(test_username, 0))
+    mocker.patch("util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+
     assert check_users_presence(test_username)
 
     mocker.patch("util.k8s.kubectl.find_namespace", return_value=True)
@@ -75,9 +84,9 @@ def test_check_users_presence_success(mocker):
 
 def test_check_users_presence_failure(mocker):
     mocker.patch("util.k8s.kubectl.find_namespace", return_value=False)
-    mocker.patch("util.k8s.kubectl.execute_system_command", return_value=(test_username, 1))
-    with pytest.raises(KubectlIntError):
-        check_users_presence(test_username+"_wrong")
+    mocker.patch("util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+
+    assert not check_users_presence(test_username+"_wrong")
 
 
 def test_generate_kubeconfig():

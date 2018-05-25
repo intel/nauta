@@ -22,7 +22,7 @@
 from util.k8s.kubectl import start_port_forwarding
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
-from util.exceptions import K8sProxyCloseError, K8sProxyOpenError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
 
 logger = initialize_logger(__name__)
 

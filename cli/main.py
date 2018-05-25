@@ -35,7 +35,9 @@ from util.aliascmd import AliasGroup
 from util.config import Config, Fields
 from util.logger import initialize_logger
 
+
 logger = initialize_logger(__name__)
+
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
