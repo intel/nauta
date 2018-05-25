@@ -71,11 +71,11 @@ images:
   dls4e/tensorflow:
     version: "1.8.0-py3"
     method: pull
-    image: "tensorflow/tensorflow:1.8.0-devel-py3"
+    image: "tensorflow/tensorflow:1.8.0-py3"
   dls4e/tensorboard:
     version: "1.8.0-py3"
     method: pull
-    image: "tensorflow/tensorflow:1.8.0-devel-py3"
+    image: "tensorflow/tensorflow:1.8.0-py3"
   dls4e/nginx:
     version: "1.14.0"
     method: pull
