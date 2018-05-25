@@ -28,10 +28,10 @@ install:
 build:	install
 	@npm run build
 
-style:
+style:	install
 	@npm run lint
 
-test:	style
+test:	install style
 	@npm run test
 
 run-dev:	install
