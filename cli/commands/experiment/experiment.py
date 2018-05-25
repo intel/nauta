@@ -23,13 +23,14 @@ import click
 
 from commands.experiment import list, cancel, logs, view, template_list, submit, interact
 from util.logger import initialize_logger
+from util.aliascmd import AliasGroup
 
 logger = initialize_logger(__name__)
 
 HELP = "Command for training and managing training jobs"
 
 
-@click.group(help=HELP)
+@click.group(help=HELP, cls=AliasGroup, alias='exp')
 def experiment():
     pass
 

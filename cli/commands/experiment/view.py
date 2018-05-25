@@ -22,14 +22,16 @@
 import click
 
 from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
+
 
 HELP = "Displays basic details of experiment with a given name."
 HELP_T = "If given - exposes a tensorboard's instance with exepriment's data."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
-@click.option('-t', '--tensorboard', default=None, help=HELP_T, is_flag=True)
+@click.option('-tb', '--tensorboard', default=None, help=HELP_T, is_flag=True)
 @common_options
 @pass_state
 def view(state: State, experiment_name: str, tensorboard: bool):

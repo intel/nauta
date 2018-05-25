@@ -32,7 +32,9 @@ from util.network import wait_for_connection
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
 from util.app_names import DLS4EAppNames
+from util.aliascmd import AliasCmd, AliasGroup
 from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
+
 
 logger = initialize_logger('commands.launch')
 
@@ -96,7 +98,7 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
                            "Check whether it still exists, if yes - close it manually.")
 
 
-@click.command()
+@click.command(cls=AliasCmd, alias='ui')
 @common_options
 @pass_state
 @click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
@@ -108,11 +110,11 @@ def webui(state: State, no_launch: bool):
     launch_app(DLS4EAppNames.WEB_GUI, no_launch)
 
 
-@click.command()
+@click.command(cls=AliasCmd, alias='tb')
 @common_options
 @pass_state
-@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
-                                                'only proxy tunnel is created')
+@click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
+                                                      'only proxy tunnel is created')
 def tensorboard(state: State, no_launch: bool):
     """
     Subcommand for launching tensorboard with credentials
@@ -121,7 +123,7 @@ def tensorboard(state: State, no_launch: bool):
     launch_app(DLS4EAppNames.TENSORBOARD, no_launch)
 
 
-@click.group(help=HELP)
+@click.group(help=HELP, cls=AliasGroup, alias='l')
 def launch():
     pass
 

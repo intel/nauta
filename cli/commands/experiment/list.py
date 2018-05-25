@@ -27,18 +27,19 @@ from tabulate import tabulate
 from cli_state import common_options, pass_state, State
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
-from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
+from util.k8s.k8s_info import get_kubectl_current_context_namespace
 
 logger = initialize_logger(__name__)
 
 
-@click.command(name='list')
-@click.option('--all-users', is_flag=True,
+@click.command(name='list', cls=AliasCmd, alias='ls')
+@click.option('-a', '--all-users', is_flag=True,
               help='Show all experiments, regardless of owner')
-@click.option('--name', type=str,
+@click.option('-n', '--name', type=str,
               help='A regular expression to narrow down list to experiments that are matching this expression')
-@click.option('--status', type=click.Choice([status.name for status in experiments_model.ExperimentStatus]),
+@click.option('-s', '--status', type=click.Choice([status.name for status in experiments_model.ExperimentStatus]),
               help='List experiments with matching status')
 @common_options
 @pass_state

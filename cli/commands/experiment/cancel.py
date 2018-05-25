@@ -22,12 +22,13 @@
 import click
 
 from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
 
 HELP = "Cancels experiment/s chosen based on criteria given as a parameter."
 HELP_P = "If given - all information concerning experiments is removed from the system."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='c')
 @click.argument("name")
 @click.option('-p', '--purge', default=None, help=HELP_P, is_flag=True)
 @common_options

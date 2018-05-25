@@ -25,9 +25,10 @@ import sys
 
 from tabulate import tabulate
 
-from util.logger import initialize_logger
-from util.config import Config, Fields
 from draft.cmd import DRAFT_HOME_FOLDER
+from util.aliascmd import AliasCmd
+from util.config import Config, Fields
+from util.logger import initialize_logger
 
 log = initialize_logger('commands.template_list')
 
@@ -37,7 +38,7 @@ CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='t')
 def template_list():
     path = os.path.join(Config.get(Fields.CONFIG_PATH), DRAFT_HOME_FOLDER, "packs")
 

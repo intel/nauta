@@ -24,6 +24,7 @@ import click
 from commands.user.create import create
 from commands.user.list_users import list_users
 from commands.user.delete import delete
+from util.aliascmd import AliasGroup
 from util.logger import initialize_logger
 
 log = initialize_logger(__name__)
@@ -32,7 +33,7 @@ HELP = "Command for creating/deleting/listing users of the platform. Can be only
        "run by a platform administrator."
 
 
-@click.group(help=HELP)
+@click.group(help=HELP, cls=AliasGroup, alias='u')
 def user():
     pass
 

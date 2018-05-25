@@ -42,6 +42,7 @@ from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import KubectlIntError
+from util.aliascmd import AliasCmd
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
 
@@ -67,7 +68,7 @@ def validate_experiment_name(ctx, param, value):
         raise click.BadParameter(ex)
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.option("-t", "--template", help=HELP_T, default="tf-training")

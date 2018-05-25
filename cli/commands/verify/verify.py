@@ -26,6 +26,7 @@ import click
 
 from cli_state import common_options, pass_state, State
 from draft import dependencies_checker
+from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME
 
@@ -37,7 +38,7 @@ HELP = "Command used to verify whether all external components required by dlsct
 log = initialize_logger('commands.verify')
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='ver')
 @common_options
 @pass_state
 def verify(state: State):

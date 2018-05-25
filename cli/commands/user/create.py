@@ -31,8 +31,9 @@ from util.system import execute_system_command
 from util.k8s.k8s_info import get_users_token
 from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
-from util.k8s.kubectl import check_users_presence
+from util.aliascmd import AliasCmd
 from util.helm import delete_user
+from util.k8s.kubectl import check_users_presence
 
 log = initialize_logger(__name__)
 
@@ -69,7 +70,7 @@ users:
 
 
 @click.argument('username')
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='c')
 @common_options
 @pass_state
 def create(state: State, username: str):

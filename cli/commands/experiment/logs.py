@@ -29,20 +29,23 @@ from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
+from util.aliascmd import AliasCmd
 from util.k8s.k8s_proxy_context_manager import K8sProxy, K8sProxyOpenError, K8sProxyCloseError
 
 logger = initialize_logger(__name__)
 
 
-@click.command()
+@click.command(cls=AliasCmd, alias='lg')
 @click.argument('experiment-name')
-@click.option('--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
+@click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
               help='Minimal severity of logs')
-@click.option('--start-date', default=None, help='Retrieve logs produced from this date (use ISO 8601 date format)')
-@click.option('--end-date', default=None, help='Retrieve logs produced until this date (use ISO 8601 date format)')
-@click.option('--pod-ids', default=None, help='Comma separated list of pod IDs, if provided, only logs from these '
-                                              'pods will be returned')
-@click.option('--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
+@click.option('-sd', '--start-date', default=None,
+              help='Retrieve logs produced from this date (use ISO 8601 date format)')
+@click.option('-ed', '--end-date', default=None,
+              help='Retrieve logs produced until this date (use ISO 8601 date format)')
+@click.option('-i', '--pod-ids', default=None,
+              help='Comma separated list of pod IDs, if provided, only logs from these pods will be returned')
+@click.option('-p', '--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
               help='Get logs only for pods with given status')
 @common_options
 @pass_state

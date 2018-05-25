@@ -22,12 +22,13 @@
 import click
 
 from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
 from version import VERSION
 
 HELP = "Displays version of dlsctl application."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='v')
 @common_options
 @pass_state
 def version(state: State):

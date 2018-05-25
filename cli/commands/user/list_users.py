@@ -26,12 +26,13 @@ from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
 import platform_resources.users as users_api
+from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 
 logger = initialize_logger(__name__)
 
 
-@click.command(name='list')
+@click.command(name='list', cls=AliasCmd, alias='ls')
 @common_options
 @pass_state
 def list_users(state: State):

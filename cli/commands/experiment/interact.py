@@ -22,13 +22,14 @@
 import click
 
 from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
 
 HELP = "Launches a local browser with Jupyter notebook. If script name argument is given - script is put" \
        "into opened notebook."
 HELP_N = "Name of a Jupyter notebook's session.."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='i')
 @click.argument("script_name", default="")
 @click.option('-n', '--name', default=None, help=HELP_N)
 @common_options

@@ -29,7 +29,9 @@ from commands.launch import launch
 from commands.predict import predict
 from commands.user import user
 from commands.verify import verify
+
 from commands.version import version
+from util.aliascmd import AliasGroup
 from util.config import Config, Fields
 from util.logger import initialize_logger
 
@@ -39,7 +41,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup)
 def entry_point():
     Config.set(Fields.CONFIG_PATH, verify.validate_config_path())
 
