@@ -59,8 +59,12 @@ def list_users() -> List[User]:
     # TODO: CHANGE IMPLEMENTATION TO USE AGGREGATED USER DATA AFTER CAN-366
     runs = list_runs()
     user_map = {user.name: user for user in users}
+
     for run in runs:
-        user_map[run.submitter].experiment_runs.append(run)
+        if user_map.get(run.submitter):
+            user_map[run.submitter].experiment_runs.append(run)
+        else:
+            logger.error(f"Run exists for nonexisting user {run.submitter}")
 
     return users
 

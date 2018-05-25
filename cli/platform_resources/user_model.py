@@ -31,6 +31,7 @@ from platform_resources.run_model import Run, RunStatus
 class UserStatus(Enum):
     DEFINED = 'DEFINED'
     CREATED = 'CREATED'
+    UNKNOWN = 'UNKNOWN'
 
 
 class User(PlatformResource):
@@ -49,10 +50,27 @@ class User(PlatformResource):
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
-        return cls(name=object_dict['metadata']['name'],
-                   uid=object_dict['spec']['uid'],
-                   state=UserStatus[object_dict['spec']['state']],
-                   creation_timestamp=object_dict['metadata']['creationTimestamp'])
+        name = "---"
+        uid = "---"
+        state = UserStatus.UNKNOWN
+        creation_timestamp = "---"
+
+        if object_dict:
+            if object_dict.get('metadata'):
+                    name = object_dict.get('metadata').get('name')
+                    creation_timestamp = object_dict.get('metadata').get('creationTimestamp')
+
+            if object_dict.get('spec'):
+                uid = object_dict.get('spec').get('uid')
+
+                if object_dict.get('spec').get('state'):
+                    state = UserStatus[object_dict.get('spec').get('state')]
+
+        return cls(name=name,
+                   uid=uid,
+                   state=state,
+                   creation_timestamp=creation_timestamp)
+
 
     @property
     def cli_representation(self):
