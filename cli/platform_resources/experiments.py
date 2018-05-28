@@ -101,7 +101,7 @@ def add_experiment(exp: model.Experiment, namespace: str) -> model.ExperimentKub
     return response
 
 
-def generate_experiment_name(script_name: str, namespace: str, name: str= None) -> str:
+def generate_experiment_name(script_name: str, namespace: str, name: str = None) -> str:
     if name:
         validate_kubernetes_name(name)
         experiments = list_experiments(namespace=namespace, name_filter=name)
@@ -109,11 +109,11 @@ def generate_experiment_name(script_name: str, namespace: str, name: str= None) 
             return f'{name}-{len(experiments)}'
         return name
     else:
-        formatter = re.compile(r'[^a-z0-9-.]')
-        formatted_name = f"exp-{script_name.lower().replace('_', '-')}"
+        formatter = re.compile(r'[^a-z0-9-]')
+        formatted_name = f"exp-{script_name.lower().replace('_', '-').replace('.', '-')}"
         formatted_name = formatter.sub('', formatted_name)
         experiments = list_experiments(namespace=namespace, name_filter=formatted_name)
-        result = f'{formatted_name}-{time.strftime("%y.%m.%d-%H.%M.%S", time.localtime())}'
+        result = f'{formatted_name}-{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
         if experiments and len(experiments) > 0:
             return f'{result}-{len(experiments)}'
         return result

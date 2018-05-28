@@ -35,7 +35,7 @@ DRAFT_HOME_FOLDER = ".draft"
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
-def call_draft(args: List[str], cwd: str=None) -> (str, int):
+def call_draft(args: List[str], cwd: str = None) -> (str, int):
     config_path = Config.get(Fields.CONFIG_PATH)
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
@@ -47,7 +47,7 @@ def call_draft(args: List[str], cwd: str=None) -> (str, int):
     return execute_system_command(full_command, env=env, cwd=cwd)
 
 
-def create(working_directory: str=None, pack_type: str=None) -> (str, int):
+def create(working_directory: str = None, pack_type: str = None) -> (str, int):
     command = ['create']
     if pack_type:
         command.append('--pack={}'.format(pack_type))
@@ -61,7 +61,7 @@ def create(working_directory: str=None, pack_type: str=None) -> (str, int):
     return output, exit_code
 
 
-def up(working_directory: str=None) -> (str, int):
+def up(working_directory: str = None) -> (str, int):
     output, exit_code = call_draft(args=['up'], cwd=working_directory)
     if not exit_code:
         output, exit_code = check_up_status(output)
@@ -81,9 +81,9 @@ def set_registry_port(registry_port: str) -> (str, int):
     """
     docker_location = f'{DOCKER_IP_ADDRESS}:{registry_port}'
 
-    CONFIGURE_DRAFT_PORT_COMMAND = ["config", "set", "registry", docker_location]
+    configure_draft_port_command = ["config", "set", "registry", docker_location]
 
-    return call_draft(CONFIGURE_DRAFT_PORT_COMMAND)
+    return call_draft(configure_draft_port_command)
 
 
 def check_up_status(output: str) -> (str, int):

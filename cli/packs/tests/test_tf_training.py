@@ -59,6 +59,8 @@ ADD training.py
 ENV PYTHONUNBUFFERED 1
 '''
 
+EXAMPLE_PACK_TYPE = "example-pack-type"
+
 
 def test_modify_values_yaml(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
@@ -66,7 +68,7 @@ def test_modify_values_yaml(mocker):
     yaml_dump_mock = mocker.patch("yaml.dump")
 
     tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
-                                   experiment_name='test-experiment')
+                                   experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE)
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -74,6 +76,7 @@ def test_modify_values_yaml(mocker):
 
     assert yaml_dump_mock.call_count == 1, "job yaml wasn't modified"
     assert open_mock.call_count == 2, "files weren't read/written"
+    assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
 
 
 def compare_yaml(args_list, script_location):
@@ -104,7 +107,8 @@ def test_update_configuration_success(mocker):
     modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
     output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                              experiment_name='test-experiment', internal_registry_port="12345")
+                                              experiment_name='test-experiment', internal_registry_port="12345",
+                                              pack_type=EXAMPLE_PACK_TYPE)
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
@@ -119,7 +123,8 @@ def test_update_configuration_failure(mocker):
     modify_values_yaml_mock.side_effect = Exception("Test error")
     with pytest.raises(KubectlIntError):
         tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                         experiment_name='test-experiment', internal_registry_port="12345")
+                                         experiment_name='test-experiment', internal_registry_port="12345",
+                                         pack_type=EXAMPLE_PACK_TYPE)
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"

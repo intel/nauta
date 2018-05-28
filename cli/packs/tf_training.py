@@ -39,7 +39,8 @@ def update_configuration(experiment_folder: str, script_location: str,
                          script_folder_location: str,
                          script_parameters: Tuple[str, ...],
                          experiment_name: str,
-                         internal_registry_port: str):
+                         internal_registry_port: str,
+                         pack_type: str):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -56,7 +57,7 @@ def update_configuration(experiment_folder: str, script_location: str,
 
     try:
         modify_values_yaml(experiment_folder, script_location, script_parameters,
-                           experiment_name=experiment_name)
+                           experiment_name=experiment_name, pack_type=pack_type)
         modify_dockerfile(experiment_folder, internal_registry_port)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
@@ -91,10 +92,10 @@ def modify_dockerfile(experiment_folder: str, internal_registry_port: str):
 
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
-                       experiment_name):
+                       experiment_name: str, pack_type: str):
     log.debug("Modify values.yaml - start")
-    values_yaml_filename = os.path.join(experiment_folder, "charts//tf-training//values.yaml")
-    values_yaml_temp_filename = os.path.join(experiment_folder, "charts//tf-training//values_temp.yaml")
+    values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
+    values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
 
     with open(values_yaml_filename, "r") as values_yaml_file:
         v = yaml.load(values_yaml_file)

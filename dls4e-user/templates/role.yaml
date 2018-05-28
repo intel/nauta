@@ -196,5 +196,6 @@ rules:
   resources:
   - runs
   - experiments
+  - tfjobs
   verbs:
   - "*"

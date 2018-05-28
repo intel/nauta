@@ -56,7 +56,7 @@ HELP_SFL = "Name of a folder with additional files used by a script - other .py 
            "If not given - its content won't be copied into an image."
 HELP_T = "Name of a template used to create a delpoyment. By default a single-node tensorflow training" \
          " template is chosen. List of available templates might be obtained by" \
-         " issuing dlsctl template_list command."
+         " issuing dlsctl experiment template_list command."
 HELP_PR = "Values (set or range) of a single parameter. "
 HELP_PS = "Set of values of one or several parameters."
 
@@ -73,7 +73,7 @@ def validate_experiment_name(ctx, param, value):
 @click.command(help=HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
-@click.option("-t", "--template", help=HELP_T, default="tf-training")
+@click.option("-t", "--template", help=HELP_T, default="tf-training-tfjob")
 @click.option("-n", "--name", help=HELP_N, callback=validate_experiment_name)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=HELP_PS)
@@ -274,7 +274,8 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
             raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
         # reconfigure draft's templates
         update_configuration(run_folder, Path(script_location).name, script_folder_location, script_parameters,
-                             experiment_name=experiment_name, internal_registry_port=internal_registry_port)
+                             experiment_name=experiment_name, internal_registry_port=internal_registry_port,
+                             pack_type=pack_type)
     except Exception as exe:
         delete_environment(run_folder)
         raise KubectlIntError(exe)
