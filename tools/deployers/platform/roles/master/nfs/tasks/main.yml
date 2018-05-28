@@ -12,6 +12,7 @@
     dev: "{{ nfs_device }}"
     fstype: xfs
     resizefs: True
+  when: nfs_device is defined
 
 - name: Mount xfs for nfs
   mount:
@@ -19,6 +20,7 @@
     path: /export
     state: mounted
     src: "{{ nfs_device }}"
+  when: nfs_device is defined
 
 - name: Create directory for exports
   file:
