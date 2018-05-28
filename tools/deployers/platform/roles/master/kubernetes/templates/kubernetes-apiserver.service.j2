@@ -23,6 +23,7 @@ ExecStart=/opt/carbon/kubernetes/kube-apiserver \
             --tls-ca-file /etc/dls-cluster/client/ca.pem \
             --tls-cert-file /etc/dls-cluster/master/crt/apiservice.crt \
             --tls-private-key-file /etc/dls-cluster/master/key/apiservice.key \
+            --requestheader-client-ca-file /etc/dls-cluster/client/ca.pem \
             --admission-control "{{ kubernetes_calculated_admission_control | join(',') }}" \
             {{ feature_gates }} \
             {{ runtime_config }} \
