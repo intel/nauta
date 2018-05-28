@@ -29,6 +29,9 @@ from util.k8s.kubectl import check_users_presence
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
+from util.k8s.k8s_info import is_current_user_administrator
+from util.aliascmd import AliasCmd
+
 log = initialize_logger(__name__)
 
 HELP = "Command used to delete a user from the platform. Can be only " \
@@ -36,7 +39,7 @@ HELP = "Command used to delete a user from the platform. Can be only " \
 HELP_PR = "If this option is added - command removes all client's artifacts."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='d')
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=HELP_PR)
 @common_options
@@ -49,6 +52,10 @@ def delete(state: State, username: str, purge: bool):
     :param purge: if set - command removes also all artifacts associated with a user
     """
     try:
+        if not is_current_user_administrator():
+            click.echo("Only administrators can delete users.")
+            sys.exit(1)
+
         if not check_users_presence(username):
             click.echo(f"User {username} doesn't exists.")
             sys.exit(1)

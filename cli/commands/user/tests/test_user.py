@@ -136,6 +136,8 @@ def test_create_user_failure(mocker):  # noqa: F811
     cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=True)
     esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
     gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
+    vun_mock = mocker.patch("commands.user.create.validate_user_name")
+    icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=True)
 
     runner = CliRunner()
     runner.invoke(create, [test_username])
@@ -143,3 +145,34 @@ def test_create_user_failure(mocker):  # noqa: F811
     assert cup_mock.call_count == 1, "users presence wasn't checked"
     assert esc_mock.call_count == 0, "user was created"
     assert gut_mock.call_count == 0, "users password was taken"
+    assert vun_mock.call_count == 1, "username wasn't validated"
+    assert icu_mock.call_count == 1, "admin wasn't checked"
+
+
+def test_create_user_not_admin(mocker):  # noqa: F811
+    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=False)
+    vun_mock = mocker.patch("commands.user.create.validate_user_name")
+    icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=False)
+
+    runner = CliRunner()
+    result = runner.invoke(create, [test_username])
+
+    assert "Only administrators can create new users." in result.output
+
+    assert cup_mock.call_count == 0, "users presence wasn't checked"
+    assert vun_mock.call_count == 1, "username wasn't validated"
+    assert icu_mock.call_count == 1, "admin wasn't checked"
+
+
+def test_create_user_incorrect_name(mocker):  # noqa: F811
+    error_message = "error message"
+    vun_mock = mocker.patch("commands.user.create.validate_user_name", side_effect=ValueError(error_message))
+    icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=False)
+
+    runner = CliRunner()
+    result = runner.invoke(create, [test_username])
+
+    assert error_message in result.output
+
+    assert vun_mock.call_count == 1, "username wasn't validated"
+    assert icu_mock.call_count == 0, "admin wasn't checked"

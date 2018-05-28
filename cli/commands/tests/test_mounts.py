@@ -23,7 +23,7 @@ import platform
 
 from click.testing import CliRunner
 
-from commands.user.mounts import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mounts
+from commands.mounts import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mounts
 
 TEST_USR = "test_user"
 TEST_PSW = "test_password"
@@ -64,9 +64,10 @@ def test_get_mount_command_osx(mocker):
 def test_mounts(mocker):
     host_system = platform.system()
 
-    gcu_mock = mocker.patch("commands.user.mounts.get_current_user", return_value=TEST_USR)
-    gus_mock = mocker.patch("commands.user.mounts.get_users_samba_password", return_value=TEST_PSW)
-    cmp_mock = mocker.patch("commands.user.mounts.DLS4EConfigMap")
+    mocker.patch("commands.mounts.is_current_user_administrator", return_value=False)
+    gcu_mock = mocker.patch("commands.mounts.get_current_user", return_value=TEST_USR)
+    gus_mock = mocker.patch("commands.mounts.get_users_samba_password", return_value=TEST_PSW)
+    cmp_mock = mocker.patch("commands.mounts.DLS4EConfigMap")
 
     cmp_mock.return_value.external_ip = TEST_ADR
 
@@ -102,3 +103,13 @@ def test_mounts(mocker):
     assert gcu_mock.call_count == call_number
     assert gus_mock.call_count == call_number
     assert cmp_mock.call_count == call_number
+
+
+def test_mounts_is_admin(mocker):
+    icu_mock = mocker.patch("commands.mounts.is_current_user_administrator", return_value=True)
+
+    runner = CliRunner()
+    result = runner.invoke(mounts)
+
+    assert icu_mock.call_count == 1
+    assert "DLS4E doesn't create shares for administrators." in result.output

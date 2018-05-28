@@ -28,12 +28,14 @@ import click
 from util.config import Config, Fields
 from util.logger import initialize_logger
 from util.system import execute_system_command
-from util.k8s.k8s_info import get_users_token
+from util.k8s.k8s_info import get_users_token, is_current_user_administrator
 from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence
+from platform_resources.users import validate_user_name
+
 
 log = initialize_logger(__name__)
 
@@ -80,11 +82,22 @@ def create(state: State, username: str):
     :param username: name of a new user
     """
     try:
+        try:
+            validate_user_name(username)
+        except ValueError as exe:
+            log.exception("Error during validating user name.")
+            click.echo(exe)
+            sys.exit(1)
+
+        if not is_current_user_administrator():
+            click.echo("Only administrators can create new users.")
+            sys.exit(1)
+
         if check_users_presence(username):
             click.echo("User already exists.")
             sys.exit(1)
     except Exception:
-        error_msg = "Problems during verifying users presence."
+        error_msg = "Problems during verifying user with given user name."
         log.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)

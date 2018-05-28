@@ -22,7 +22,9 @@
 from typing import List
 
 from kubernetes import config, client
+
 from kubernetes.client.rest import ApiException
+from marshmallow import ValidationError
 
 from platform_resources.user_model import User
 from platform_resources.runs import list_runs
@@ -33,6 +35,7 @@ from util.k8s import k8s_proxy_context_manager
 from util.exceptions import K8sProxyCloseError
 from util.app_names import DLS4EAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
+from platform_resources.custom_object_meta_model import validate_kubernetes_name
 
 logger = initialize_logger(__name__)
 
@@ -113,3 +116,27 @@ def get_user_data(username: str) -> model.User:
         raise exe
 
     return User.from_k8s_response_dict(user_data)
+
+
+def validate_user_name(username: str) -> bool:
+    """
+    Verifies whether a name given as a parameter is a value
+    accepted by the DLS4E system.
+
+    :param username: - name of a user
+    :return: throws a ValueError in case when username cannot be accepted by
+    the DLS4E system. Message in error describes a detected problem
+    """
+    # name cannot be longer than 32 and shorter than 1 character - due to lmitations
+    # of a mechanism responsible for creating user/public shares
+    if not username:
+        raise ValueError("Name of a user cannot be an empty string.")
+
+    if len(username)>32:
+        raise ValueError("Name of a user cannot be longer than 32 characters.")
+
+    # name must be a correct k8s name
+    try:
+        validate_kubernetes_name(username)
+    except ValidationError as exe:
+        raise ValueError("Incorrect k8s user name.")

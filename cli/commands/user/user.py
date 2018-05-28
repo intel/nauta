@@ -22,12 +22,9 @@
 import click
 
 from commands.user.create import create
-from commands.user.list_users import list_users
-
 from commands.user.delete import delete
-
+from commands.user.list_users import list_users
 from util.aliascmd import AliasGroup
-from commands.user.mounts import mounts
 from util.logger import initialize_logger
 
 log = initialize_logger(__name__)
@@ -44,4 +41,3 @@ def user():
 user.add_command(create)
 user.add_command(list_users)
 user.add_command(delete)
-user.add_command(mounts)

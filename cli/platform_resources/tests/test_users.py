@@ -23,9 +23,8 @@ import pytest
 
 from kubernetes.client import CustomObjectsApi
 
-
 from platform_resources.user_model import User, UserStatus
-from platform_resources.users import list_users, get_user_data
+from platform_resources.users import list_users, get_user_data, validate_user_name
 
 TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
                    creation_timestamp='2018-05-17T12:49:04Z',
@@ -92,3 +91,24 @@ def test_get_user_data(mock_k8s_api_client, mocker):
 
     user = get_user_data("user_name")
     assert user == TEST_USERS[0]
+
+
+def test_validate_user_name_too_short():
+    username = ""
+    with pytest.raises(ValueError) as exe:
+        validate_user_name(username)
+    assert str(exe.value) == "Name of a user cannot be an empty string."
+
+
+def test_validate_user_name_too_long():
+    username = "a"*33
+    with pytest.raises(ValueError) as exe:
+        validate_user_name(username)
+    assert str(exe.value) == "Name of a user cannot be longer than 32 characters."
+
+
+def test_validate_user_name_incorrect_k8s_string():
+    username = "aBBcd.=-"
+    with pytest.raises(ValueError) as exe:
+        validate_user_name(username)
+    assert str(exe.value) == "Incorrect k8s user name."

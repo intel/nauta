@@ -21,10 +21,13 @@
 
 import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
-                                     V1SecretList, V1Secret
+                                     V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
+                                     V1PolicyRule
+from kubernetes.client.rest import ApiException
 
 from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, get_app_namespace, \
-                              find_namespace, delete_namespace, get_config_map_data, get_users_token
+                              find_namespace, delete_namespace, get_config_map_data, get_users_token, \
+                              get_cluster_roles, is_current_user_administrator
 from util.config import DLS4EConfigMap
 
 test_namespace = "test_namespace"
@@ -128,6 +131,20 @@ def mocked_k8s_CoreV1Api(mocker):
     return coreV1API_instance
 
 
+@pytest.fixture()
+def mocked_k8s_RbacAuthorizationV1Api(mocker):
+    mocked_RbacAuthorizationV1Api_class = mocker.patch('kubernetes.client.RbacAuthorizationV1Api')
+    mocker.patch('kubernetes.client.ApiClient')
+    rbacAuthorizationV1_instance = mocked_RbacAuthorizationV1Api_class.return_value
+
+    v1_metadata_role = V1ObjectMeta(name="metadata-role")
+    v1_policy_rule = V1PolicyRule(verbs=["verb"])
+    v1_role = V1ClusterRole(metadata=v1_metadata_role, kind="ClusterRole", rules=[v1_policy_rule])
+    v1_cluster_role_list = V1ClusterRoleList(items=[v1_role])
+
+    rbacAuthorizationV1_instance.list_cluster_role.return_value = v1_cluster_role_list
+
+
 def test_get_k8s_host(mocked_k8s_config):
     k8s_host = get_kubectl_host()
 
@@ -186,3 +203,32 @@ def test_get_users_token(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     token = get_users_token(test_namespace)
 
     assert token == TEST_TOKEN_ENCODED
+
+
+def test_get_cluster_roles(mocked_k8s_config, mocked_k8s_RbacAuthorizationV1Api):
+    roles = get_cluster_roles()
+    print(roles)
+    assert roles.items[0].kind == "ClusterRole"
+
+
+def test_is_current_user_administrator_is(mocker):
+    gcr_mock = mocker.patch("util.k8s.k8s_info.get_cluster_roles")
+
+    assert is_current_user_administrator()
+    assert gcr_mock.call_count == 1
+
+
+def test_is_current_user_administrator_is_not(mocker):
+    gcr_mock = mocker.patch("util.k8s.k8s_info.get_cluster_roles", side_effect=ApiException(status=403))
+
+    assert not is_current_user_administrator()
+    assert gcr_mock.call_count == 1
+
+
+def test_is_current_user_administrator_(mocker):
+    gcr_mock = mocker.patch("util.k8s.k8s_info.get_cluster_roles", side_effect=ApiException(status=404))
+
+    with pytest.raises(ApiException):
+        is_current_user_administrator()
+
+    assert gcr_mock.call_count == 1

@@ -235,4 +235,30 @@ def get_users_samba_password(username: str) -> str:
     if password is None:
         raise ValueError("Lack of password.")
 
-    return password
+    return str.strip(password)
+
+
+def get_cluster_roles() -> client.V1ClusterRoleList:
+    config.load_kube_config()
+    api = client.RbacAuthorizationV1Api(client.ApiClient())
+    return api.list_cluster_role()
+
+
+def is_current_user_administrator() -> bool:
+    """
+    Function checks whether a current user is a k8s administrator
+
+    :return: True if a user is a k8s administrator, False otherwise
+    In case of any errors - raises an exception
+    """
+    # regular users shouldn't have access to cluster roles
+    try:
+        get_cluster_roles()
+    except ApiException as exe:
+        # 403 - forbidden
+        if exe.status == 403:
+            return False
+        else:
+            raise exe
+
+    return True

@@ -22,13 +22,15 @@
 import platform
 
 import os
+import sys
 
 import click
 
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
-from util.k8s.k8s_info import get_current_user, get_users_samba_password
+from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator
 from util.config import DLS4EConfigMap
+from util.aliascmd import AliasCmd
 
 log = initialize_logger(__name__)
 
@@ -36,17 +38,35 @@ HELP = "Command displays a command that should be used to mount client's" \
        " folders on his/her local machine."
 
 
-@click.command(help=HELP)
+@click.command(help=HELP, cls=AliasCmd, alias='m')
 @common_options
 @pass_state
 def mounts(state: State):
+    try:
+        if is_current_user_administrator():
+            click.echo("DLS4E doesn't create shares for administrators. Please execute this command as "
+                       "a regular user.")
+            sys.exit(1)
+    except Exception:
+        error_msg = "Problems during verifying whether current user is an administrator."
+        log.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
+
     click.echo("Use the following command to mount those folders:")
     click.echo(" - replace <MOUNTPOINT> with a proper location on your local machine)")
     click.echo(" - replace <DLS4E_FOLDER> with one of the following:")
     click.echo("        - input - user's private input folder (read/write)")
+    click.echo("          (can be accessed as /mnt/input/home from training script)")
     click.echo("        - output - user's private output folder (read)")
+    click.echo("          (can be accessed as /mnt/output/home from training script)")
     click.echo("        - input-shared - shared input folder (read/write)")
+    click.echo("          (can be accessed as /mnt/input/root from training script)")
     click.echo("        - output-shared - shared output folder (read)")
+    click.echo("          (can be accessed as /mnt/output/root from training script)")
+    click.echo("Additionally each experiment has a special folder which can be accessed")
+    click.echo("as /mnt/output/experiment from training script. This folder is shared by Samba")
+    click.echo("as output/<EXPERIMENT_NAME>.")
     click.echo("--------------------------------------------------------------------")
     click.echo(get_mount_command())
 

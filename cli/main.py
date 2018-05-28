@@ -29,7 +29,7 @@ from commands.launch import launch
 from commands.predict import predict
 from commands.user import user
 from commands.verify import verify
-
+from commands.mounts import mounts
 from commands.version import version
 from util.aliascmd import AliasGroup
 from util.config import Config, Fields
@@ -54,7 +54,7 @@ entry_point.add_command(predict.predict)
 entry_point.add_command(user.user)
 entry_point.add_command(verify.verify)
 entry_point.add_command(version)
-
+entry_point.add_command(mounts)
 
 if __name__ == '__main__':
     try:
