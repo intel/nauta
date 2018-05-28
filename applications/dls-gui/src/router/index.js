@@ -21,7 +21,7 @@
 
 import Vue from 'vue';
 import Router from 'vue-router';
-import Models from '../components/Models.vue';
+import ModelsTable from '../components/ModelsTable.vue';
 import Home from '../components/Home.vue';
 import InvalidToken from '../components/InvalidToken.vue';
 
@@ -41,7 +41,7 @@ const router = new Router({
     {
       path: '/models',
       name: 'Models',
-      component: Models,
+      component: ModelsTable,
       meta: {
         authorized: true
       }

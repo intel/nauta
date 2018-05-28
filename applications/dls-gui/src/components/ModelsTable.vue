@@ -21,48 +21,44 @@
 
 <template>
     <v-layout row wrap>
-      <v-flex xs12 md4 offset-md8>
-        <v-card-title>
-          <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
-        </v-card-title>
-      </v-flex>
       <v-flex xs12>
         <v-card>
           <v-card-title>
             <h2>Models</h2>
             <v-spacer></v-spacer>
             <ActionHeaderButtons
-              :clearSort="clearSort" :hiddenColumns="hiddenColumns" :setHiddenColumnsHandler="setHiddenColumns" :headers="headers"
+              :clearSort="clearSort" :hiddenColumns="hiddenColumns" :setHiddenColumnsHandler="setHiddenColumns" :headers="experimentsParams"
             ></ActionHeaderButtons>
+            <v-flex xs12 md4>
+              <v-card-title>
+                <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
+              </v-card-title>
+            </v-flex>
           </v-card-title>
+          <v-alert v-if="!experimentsTotal" :value="true" type="info">
+            No data to display.
+          </v-alert>
           <div class="elevation-3">
             <div class="table__overflow">
               <table class="datatable table">
                 <thead>
-                <th class="text-xs-left">
-                  <v-icon small class="pointer-btn">{{ filterIcon }}</v-icon>
-                  Favourites
-                </th>
-                <th v-for="(header, idx) in headers" v-if="isVisibleColumn(header.value)" v-bind:key="header.value" class="text-xs-left"
-                    @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
-                  <v-icon v-if="header.filterable" small class="pointer-btn">{{ filterIcon }}</v-icon>
-                  <v-tooltip bottom>
-                    <span slot="activator" v-bind:class="{active: activeColumnName === header.value}">
-                      {{ cutLongText(header.text) }}
-                    </span>
-                    <span>{{ header.text }}</span>
-                  </v-tooltip>
-                  <v-icon v-if="header.sortable && (hoveredColumnIdx === idx || activeColumnIdx === idx)" small
-                          v-on:click="toggleOrder(header.value, idx)" class="header-btn">
-                    {{ sorting.currentSortIcon }}
-                  </v-icon>
-                </th>
+                  <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
+                      class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
+                    <v-icon small class="pointer-btn">{{ filterIcon }}</v-icon>
+                    <v-tooltip bottom>
+                      <span slot="activator" v-bind:class="{active: activeColumnName === header}">
+                        {{ cutLongText(header) }}
+                      </span>
+                        <span>{{ header }}</span>
+                    </v-tooltip>
+                    <v-icon v-if="(hoveredColumnIdx === idx || activeColumnIdx === idx)" small
+                            v-on:click="toggleOrder(header, idx)" class="header-btn">
+                      {{ sorting.currentSortIcon }}
+                    </v-icon>
+                  </th>
                 </thead>
                 <tbody>
-                <tr v-for="item in orderedData" v-bind:key="item.modelName">
-                  <td>
-                    <v-icon class="pointer-btn">star_border</v-icon>
-                  </td>
+                <tr v-for="item in experimentsData" v-bind:key="item.name" :id="item.name">
                   <td v-for="attr in Object.keys(item)" v-bind:key="attr" v-if="isVisibleColumn(attr)">
                     {{ item[attr] }}
                   </td>
@@ -70,9 +66,9 @@
                 </tbody>
               </table>
             </div>
-            <FooterElements
+            <FooterElements v-if="experimentsTotal"
               :currentPage="pagination.currentPage"
-              :pagesCount="pagesCount"
+              :pagesCount="experimentsTotalPagesCount"
               :nextPageAction="nextPage"
               :prevPageAction="previousPage"
               :paginationStats="paginationStats"
@@ -85,7 +81,7 @@
 </template>
 
 <script>
-import lodash from 'lodash';
+import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 
@@ -102,6 +98,7 @@ export default {
   },
   data: () => {
     return {
+      filterIcon: 'filter_list',
       searchPattern: '',
       hiddenColumns: [],
       sorting: {
@@ -111,7 +108,7 @@ export default {
         currentSortIcon: 'arrow_upward'
       },
       pagination: {
-        currentItemsCountPerPage: 5,
+        itemsCountPerPage: 5,
         currentPage: 1
       },
       activeColumnIdx: 0,
@@ -119,56 +116,56 @@ export default {
       hoveredColumnIdx: null
     }
   },
-  props: {
-    headers: Array,
-    tableData: Array,
-    filterIcon: String,
-    lastUpdate: Number
+  created: function () {
+    this.getUserExperiments({
+      limitPerPage: this.pagination.itemsCountPerPage,
+      pageNo: this.pagination.currentPage,
+      orderBy: this.activeColumnName,
+      order: this.sorting.order,
+      searchBy: this.searchPattern
+    });
   },
   computed: {
-    orderedData: function () {
-      // sorting
-      const sortedData = lodash.orderBy(this.tableData, [this.activeColumnName], [this.sorting.order]);
-      // filtering
-      const filteredData = lodash.filter(sortedData, (item) => {
-        if (item.modelName.toUpperCase().indexOf(this.searchPattern.toUpperCase()) !== -1 ||
-          item.trainingStatus.toUpperCase().indexOf(this.searchPattern.toUpperCase()) !== -1 ||
-          item.owner.toUpperCase().indexOf(this.searchPattern.toUpperCase()) !== -1) {
-          return item;
-        }
-      });
-      // pagination
-      const a = (this.pagination.currentPage - 1) * this.pagination.currentItemsCountPerPage;
-      const b = this.pagination.currentPage * this.pagination.currentItemsCountPerPage;
-      return filteredData.slice(a, b);
-    },
-    dataLifeInSeconds: function () {
-      return Math.round((Date.now() - this.lastUpdate) / 1000)
-    },
-    dataItemsCount: function () {
-      return this.orderedData.length;
-    },
-    pagesCount: function () {
-      return Math.ceil(this.tableData.length / this.pagination.currentItemsCountPerPage);
-    },
+    ...mapGetters({
+      experimentsData: 'experimentsData',
+      experimentsParams: 'experimentsParams',
+      experimentsBegin: 'experimentsBegin',
+      experimentsTotal: 'experimentsTotal',
+      experimentsEnd: 'experimentsEnd',
+      experimentsPageNumber: 'experimentsPageNumber',
+      experimentsTotalPagesCount: 'experimentsTotalPagesCount'
+    }),
     paginationStats: function () {
-      const total = this.tableData.length;
-      const a = (this.pagination.currentPage - 1) * this.pagination.currentItemsCountPerPage + 1;
-      let b = this.pagination.currentPage * this.pagination.currentItemsCountPerPage;
-      if (b > total) {
-        b = total;
-      }
-      return `${a}-${b} of ${total}`
+      return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.experimentsTotal}`;
     },
     visibleColumns: function () {
-      return this.headers.map((header) => {
-        if (this.hiddenColumns.indexOf(header.value) === -1) {
-          return header.value;
+      return this.experimentsParams.map((header) => {
+        if (this.hiddenColumns.indexOf(header) === -1) {
+          return header;
         }
       });
+    },
+    refreshTableDataTriggers: function () {
+      return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
+      ${this.pagination.currentPage}|${this.searchPattern}`;
+    }
+  },
+  watch: {
+    refreshTableDataTriggers: function () {
+      this.getUserExperiments({
+        limitPerPage: this.pagination.itemsCountPerPage,
+        pageNo: this.pagination.currentPage,
+        orderBy: this.activeColumnName,
+        order: this.sorting.order,
+        searchBy: this.searchPattern
+      });
+    },
+    experimentsPageNumber: function () {
+      this.pagination.currentPage = this.experimentsPageNumber;
     }
   },
   methods: {
+    ...mapActions(['getUserExperiments']),
     cutLongText (str) {
       return str.length > 14 ? `${str.substr(0, 14)}...` : str;
     },
@@ -181,6 +178,7 @@ export default {
     clearSort () {
       this.activeColumnName = null;
       this.activeColumnIdx = null;
+      this.sorting.order = '';
     },
     clearFilter () {
       console.log('clear filter');
@@ -189,7 +187,8 @@ export default {
       console.log('revert order');
     },
     updateCountPerPage (count) {
-      this.pagination.currentItemsCountPerPage = count;
+      console.log(count);
+      this.pagination.itemsCountPerPage = count;
       this.pagination.currentPage = 1;
     },
     nextPage () {

@@ -4,6 +4,8 @@ FROM ${BASE_IMAGE}
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 RUN yum -y install nodejs bzip2 gcc
 
+ENV NODE_TLS_REJECT_UNAUTHORIZED 0
+
 ADD package.json /app/
 WORKDIR /app
 

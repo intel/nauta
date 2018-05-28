@@ -49,13 +49,15 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 router.beforeEach((to, from, next) => {
-  store.dispatch('loadAuthority').then(() => {
-    const authorized = store.getters.isLogged;
-    if (to.meta.authorized && !authorized) {
-      next({path: '/invalid_token'});
-    }
-    next();
-  });
+  if (to.meta.authorized) {
+    store.dispatch('loadAuthority').then(() => {
+      const authorized = store.getters.isLogged;
+      if (!authorized) {
+        next({path: '/invalid_token'});
+      }
+    });
+  }
+  next();
 });
 
 /* eslint-disable no-new */

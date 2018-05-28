@@ -19,25 +19,18 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-footer app color="intel_lightest_gray">
-    <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
-    </v-layout>
-  </v-footer>
-</template>
+const expect = require('chai').expect;
+const errorHandler = require('../../src/utils/error-handler');
 
-<script>
-export default {
-  name: 'Footer'
-}
-</script>
+describe('Utils ', function () {
 
-<style scoped>
-a {
-  padding-left: 20px;
-  text-decoration: none;
-  color: inherit;
-}
-</style>
+  describe('error-handler', function () {
+    it('should return error object', function () {
+      const status = 400;
+      const message = 'message';
+      const result = errorHandler(status, message);
+      expect(result.status).to.equal(status);
+      expect(result.message).to.equal(message);
+    });
+  });
+});

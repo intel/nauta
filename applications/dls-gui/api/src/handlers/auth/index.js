@@ -26,6 +26,6 @@ const authApi = require('./auth');
 
 const router = express.Router();
 
-router.post('/decode', authApi.decodeToken);
+router.post('/decode', authApi.getUserAuthority);
 
 module.exports = router;

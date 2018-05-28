@@ -19,25 +19,19 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-footer app color="intel_lightest_gray">
-    <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
-    </v-layout>
-  </v-footer>
-</template>
-
-<script>
-export default {
-  name: 'Footer'
-}
-</script>
-
-<style scoped>
-a {
-  padding-left: 20px;
-  text-decoration: none;
-  color: inherit;
-}
-</style>
+module.exports = {
+  GENERAL: {
+    INTERNAL_SERVER_ERROR: 'Internal server error'
+  },
+  AUTH: {
+    INVALID_TOKEN: 'Provided token is invalid.',
+    MISSING_TOKEN: 'Missing authorization token',
+    FORBIDDEN_OPERATION: 'Forbidden operation.',
+    UNAUTHORIZED_OPERATION: 'Unauthorized operation.'
+  },
+  K8S: {
+    CUSTOM_OBJECT: {
+      CANNOT_LIST: 'Cannot list custom objects'
+    }
+  }
+};

@@ -19,25 +19,8 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-footer app color="intel_lightest_gray">
-    <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
-    </v-layout>
-  </v-footer>
-</template>
-
-<script>
-export default {
-  name: 'Footer'
-}
-</script>
-
-<style scoped>
-a {
-  padding-left: 20px;
-  text-decoration: none;
-  color: inherit;
-}
-</style>
+module.exports.parseStringToUTC = function (str) {
+  const timestamp = Date.parse(str);
+  const result = new Date(timestamp);
+  return result == 'Invalid Date' ? str : result.toUTCString();
+};

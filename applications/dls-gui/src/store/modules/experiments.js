@@ -19,59 +19,64 @@
  * and approved by Intel in writing.
  */
 
-import cookies from 'js-cookie';
 import router from '../../router';
-import {decodeAuthK8SToken} from '../handlers/auth';
+import {getExperiments} from '../handlers/experiments';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
-const INVALID_TOKEN_STATUS_GROUP = 4;
-const TOKEN_COOKIE_KEY = 'TOKEN';
-
 const state = {
-  logged: false,
-  username: 'anonymous'
+  experiments: {
+    data: [],
+    params: [],
+    stats: {
+      total: 0,
+      a: 0,
+      b: 0,
+      pageNumber: 0,
+      totalPagesCount: 0
+    }
+  }
 };
 
 export const getters = {
-  isLogged: state => state.logged,
-  username: state => state.username
+  experimentsData: state => state.experiments.data,
+  experimentsParams: state => state.experiments.params,
+  experimentsTotal: state => state.experiments.stats.total,
+  experimentsBegin: state => state.experiments.stats.a,
+  experimentsEnd: state => state.experiments.stats.b,
+  experimentsPageNumber: state => state.experiments.stats.pageNumber,
+  experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount
 };
 
 export const actions = {
-  loadAuthority: ({commit, dispatch}, token) => {
-    const savedToken = token || cookies.get(TOKEN_COOKIE_KEY);
-    decodeAuthK8SToken(savedToken)
+  getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy}) => {
+    getExperiments(limitPerPage, pageNo, orderBy, order, searchBy)
       .then((res) => {
-        const logged = true;
-        const username = res.data.decoded.username;
-        cookies.set(TOKEN_COOKIE_KEY, savedToken);
-        commit('setAuthority', {logged, username});
-        dispatch('hideSpinner');
-        dispatch('showMenuToggleBtn');
-        dispatch('showUserbox');
-        router.push({path: '/models'})
+        const data = res.data;
+        commit('setExperimentsData', {data: data.data});
+        commit('setExperimentsParams', {data: data.params});
+        commit('setExperimentsStats', {data: data.stats});
       })
       .catch((err) => {
-        dispatch('hideSpinner');
-        if (err && err.response && err.response.status && Math.round(err.response.status / 100) === INVALID_TOKEN_STATUS_GROUP) {
+        if (err && err.response && err.response.status && err.response.status === 401) {
           router.push({path: '/invalid_token'});
+          dispatch('clearAuthorityData');
         } else {
           dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
         }
       });
-  },
-  clearAuthorityData: ({commit}) => {
-    cookies.remove(TOKEN_COOKIE_KEY);
-    commit('setAuthority', {logged: false, username: ''});
-    location.reload();
   }
 };
 
 export const mutations = {
-  setAuthority: (state, {logged, username}) => {
-    state.logged = logged;
-    state.username = username;
+  setExperimentsData: (state, {data}) => {
+    state.experiments.data = data;
+  },
+  setExperimentsParams: (state, {data}) => {
+    state.experiments.params = data;
+  },
+  setExperimentsStats: (state, {data}) => {
+    state.experiments.stats = data;
   }
 };
 

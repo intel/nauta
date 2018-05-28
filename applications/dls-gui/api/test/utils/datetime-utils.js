@@ -19,25 +19,29 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-footer app color="intel_lightest_gray">
-    <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
-    </v-layout>
-  </v-footer>
-</template>
+const expect = require('chai').expect;
+const datetimeUtils = require('../../src/utils/datetime-utils');
 
-<script>
-export default {
-  name: 'Footer'
-}
-</script>
+describe('Utils ', function () {
 
-<style scoped>
-a {
-  padding-left: 20px;
-  text-decoration: none;
-  color: inherit;
-}
-</style>
+  let str;
+
+  beforeEach(function () {
+    str = '2018-05-23T11:50:27Z';
+  });
+
+  describe('parseStringToUTC', function () {
+    it('should return UTC string if str valid', function () {
+      const expectedResult = 'Wed, 23 May 2018 11:50:27 GMT';
+      const result = datetimeUtils.parseStringToUTC(str);
+      expect(result).to.equal(expectedResult);
+    });
+
+    it('should return the same object if cannot parse str', function () {
+      const expectedResult = '';
+      str = '';
+      const result = datetimeUtils.parseStringToUTC(str);
+      expect(result).to.equal(expectedResult);
+    });
+  });
+});

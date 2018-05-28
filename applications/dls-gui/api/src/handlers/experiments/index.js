@@ -19,25 +19,11 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-footer app color="intel_lightest_gray">
-    <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
-    </v-layout>
-  </v-footer>
-</template>
+const express = require('express');
+const expApi = require('./experiments');
 
-<script>
-export default {
-  name: 'Footer'
-}
-</script>
+const router = express.Router();
 
-<style scoped>
-a {
-  padding-left: 20px;
-  text-decoration: none;
-  color: inherit;
-}
-</style>
+router.get('/list', expApi.getUserExperiments);
+
+module.exports = router;

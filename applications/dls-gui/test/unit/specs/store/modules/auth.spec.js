@@ -60,12 +60,13 @@ describe('VUEX modules auth', () => {
     const state = {};
     let expectedMutations = [];
     let expectedActions = [];
-    let mock = new MockAdapter(axios);
+    let mock;
 
     describe('loadAuthority', () => {
       beforeEach(() => {
         expectedMutations = [];
         expectedActions = [];
+        mock = new MockAdapter(axios);
         mock.reset();
       });
 
@@ -98,7 +99,7 @@ describe('VUEX modules auth', () => {
           {type: 'showUserbox'}
         ];
         mock.onPost('/api/auth/decode').reply(200, {
-          decoded: {'kubernetes.io/serviceaccount/service-account.name': 'test'}
+          decoded: {username: 'test'}
         });
         testAction(actions.loadAuthority, token, state, expectedMutations, expectedActions, done);
       });

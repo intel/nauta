@@ -48,10 +48,10 @@
       <v-card-text>
         <v-layout row wrap>
           <v-flex xs12>
-            <div v-for="header in headers" v-bind:key="header.value" class="input-group input-group--dirty checkbox input-group--selection-controls input-group--active accent--text">
-              <label :for="header.value">{{ header.text }}</label>
+            <div v-for="header in headers" v-bind:key="header" class="input-group input-group--dirty checkbox input-group--selection-controls input-group--active accent--text">
+              <label :for="header">{{ header }}</label>
               <div class="input-group__input">
-                <input :id="header.value" type="checkbox" v-model="visibilityDraft[header.value]"/>
+                <input :id="header" type="checkbox" v-model="visibilityDraft[header]"/>
               </div>
             </div>
           </v-flex>
@@ -84,15 +84,15 @@ export default {
       visibilityDraft: {}
     }
   },
-  created: function () {
-    this.headers.forEach((header) => {
-      this.visibilityDraft[header.value] = this.hiddenColumns.indexOf(header.value) === -1;
-    });
-  },
   watch: {
     hiddenColumns: function () {
       this.headers.forEach((header) => {
-        this.visibilityDraft[header.value] = this.hiddenColumns.indexOf(header.value) === -1;
+        this.visibilityDraft[header] = this.hiddenColumns.indexOf(header) === -1;
+      });
+    },
+    headers: function () {
+      this.headers.forEach((header) => {
+        this.visibilityDraft[header] = this.hiddenColumns.indexOf(header) === -1;
       });
     }
   },
@@ -117,6 +117,7 @@ export default {
 
 <style scoped>
 #buttons_block button {
+  margin-top: 22px;
   color: #0071c5;
   background-color: rgba(0, 113, 197, 0.12);
   width: 180px;

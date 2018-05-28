@@ -34,10 +34,10 @@
       <div class="datatable__actions__pagination">
         {{ paginationStats }}
       </div>
-      <v-btn flat v-on:click="prevPageAction()" :disabled="currentPage === 1">
+      <v-btn flat v-on:click="prevPageAction()" :disabled="currentPage == 1">
         <v-icon>keyboard_arrow_left</v-icon>
       </v-btn>
-      <v-btn flat v-on:click="nextPageAction()" :disabled="currentPage === pagesCount">
+      <v-btn flat v-on:click="nextPageAction()" :disabled="currentPage == pagesCount">
         <v-icon>keyboard_arrow_right</v-icon>
       </v-btn>
     </div>

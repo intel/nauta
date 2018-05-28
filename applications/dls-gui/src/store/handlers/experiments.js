@@ -19,8 +19,25 @@
  * and approved by Intel in writing.
  */
 
-describe('Test example', () => {
-  it('Test A', () => {
-    expect(1).to.equal(1)
-  })
-})
+import axios from 'axios';
+import cookies from 'js-cookie';
+
+const DECODE_TOKEN_ENDPOINT = '/api/experiments/list';
+
+export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy) {
+  const token = cookies.get('TOKEN');
+  let queryParams = {
+    limit: limitPerPage || 5,
+    page: pageNo || 1,
+    orderBy: orderBy || '',
+    order: order || '',
+    searchBy: searchBy || ''
+  };
+  const options = {
+    url: DECODE_TOKEN_ENDPOINT,
+    headers: {'Authorization': token},
+    params: queryParams,
+    method: 'GET'
+  };
+  return axios(options);
+}

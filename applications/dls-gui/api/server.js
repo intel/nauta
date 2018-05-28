@@ -24,6 +24,7 @@ const path = require('path');
 const express = require('express');
 const logger = require('./src/utils/logger');
 const bodyParser = require('body-parser');
+const HttpStatus = require('http-status-codes');
 
 const app = express();
 
@@ -39,10 +40,12 @@ app.use(express.static('dist'));
 
 // handlers mappings
 app.use('/api/auth', require('./src/handlers/auth'));
+app.use('/api/experiments', require('./src/handlers/experiments'));
+
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, '../dist/index.html'), function (err) {
     if (err) {
-      res.status(500).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     }
   });
 });
@@ -51,4 +54,3 @@ app.get('/*', function (req, res) {
 app.listen(config.port, () => {
   logger.info('API listening on port %d...', config.port);
 });
-

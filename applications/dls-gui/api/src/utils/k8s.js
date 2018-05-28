@@ -19,46 +19,41 @@
  * and approved by Intel in writing.
  */
 
-const logger = require('../../utils/logger');
-const errHandler = require('../../utils/error-handler');
-const errMessages = require('../../utils/error-messages');
-const jwt = require('jsonwebtoken');
-const Q = require('q');
+const logger = require('./logger');
 const HttpStatus = require('http-status-codes');
+const errHandler = require('./error-handler');
+const request = require('./requestWrapper');
+const errMessages = require('./error-messages');
+const Q = require('q');
+const authApi = require('../../src/handlers/auth/auth');
 
 const K8S_TOKEN_USER_KEY = 'kubernetes.io/serviceaccount/namespace';
+const K8S_API_URL = process.env.NODE_ENV === 'dev' ? 'http://localhost:9090' : 'https://kubernetes.default';
+const API_GROUP_NAME = 'aipg.intel.com';
+const EXPERIMENTS_VERSION = 'v1';
 
-const decodeToken = function (token) {
+module.exports.listNamespacedCustomObject = function (token, resourceName) {
   return Q.Promise(function (resolve, reject) {
-    const decoded = jwt.decode(token);
-    if (decoded && decoded[K8S_TOKEN_USER_KEY]) {
-      logger.debug('Provided token is valid');
-      resolve(decoded);
-    } else {
-      logger.debug('Provided token is invalid');
-      reject(errHandler(HttpStatus.UNAUTHORIZED, errMessages.AUTH.INVALID_TOKEN));
-    }
+    authApi.decodeToken(token)
+      .then(function (decoded) {
+        const namespace = decoded[K8S_TOKEN_USER_KEY];
+        const options = {
+          url: `${K8S_API_URL}/apis/${API_GROUP_NAME}/${EXPERIMENTS_VERSION}/namespaces/${namespace}/${resourceName}`,
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        };
+        logger.debug('Performing request to kubernetes API for fetching experiments data');
+        return request(options);
+      })
+      .then(function (data) {
+        if (typeof (data) === 'object') {
+          resolve(data);
+        }
+        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT));
+      })
+      .catch(function (err) {
+        reject(err);
+      });
   });
-};
-
-const getUserAuthority = function (req, res) {
-  if (!req.body.token) {
-    logger.debug('Missing token in request body');
-    res.status(HttpStatus.BAD_REQUEST).send({message: errMessages.AUTH.MISSING_TOKEN});
-    return;
-  }
-  decodeToken(req.body.token)
-    .then(function (decoded) {
-      logger.info('Token decoded. Data sent to user');
-      res.send({decoded: {username: decoded[K8S_TOKEN_USER_KEY]}});
-    })
-    .catch(function (err) {
-      logger.debug('Cannot decode provided token');
-      res.status(err.status).send({message: err.message});
-    });
-};
-
-module.exports = {
-  getUserAuthority: getUserAuthority,
-  decodeToken: decodeToken
 };
