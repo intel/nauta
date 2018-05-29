@@ -136,8 +136,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 headers=['Name', 'Uid', 'Status', 'Container Details'],
                 tablefmt="orgtbl"))
     except Exception as ex:
-        import traceback
-        error_msg = 'Failed to get experiment: ' + str(traceback.format_exc())
+        error_msg = 'Failed to get experiment'
         logger.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)

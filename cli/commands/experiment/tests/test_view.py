@@ -81,6 +81,9 @@ def test_view_experiment_success(mocker):
         "commands.experiment.view.experiments_api.list_experiments")
     api_list_experiments_mock.return_value = TEST_EXPERIMENTS
 
+    mocker.patch(
+        "commands.experiment.view.get_kubectl_current_context_namespace")
+
     kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
     kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
 
@@ -108,6 +111,9 @@ def test_view_experiments_not_found(mocker):
 
     sys_exit_mock = mocker.patch("sys.exit")
 
+    mocker.patch(
+        "commands.experiment.view.get_kubectl_current_context_namespace")
+
     kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
     kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
 
@@ -128,6 +134,9 @@ def test_view_experiments_no_argument(mocker):
         "commands.experiment.view.experiments_api.list_experiments")
     api_list_experiments_mock.return_value = []
 
+    mocker.patch(
+        "commands.experiment.view.get_kubectl_current_context_namespace")
+
     kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
     kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
 
@@ -145,6 +154,9 @@ def test_view_experiment_failure(mocker):
     api_list_experiments_mock = mocker.patch(
         "commands.experiment.view.experiments_api.list_experiments")
     api_list_experiments_mock.side_effect = RuntimeError
+
+    mocker.patch(
+        "commands.experiment.view.get_kubectl_current_context_namespace")
 
     sys_exit_mock = mocker.patch("sys.exit")
 
