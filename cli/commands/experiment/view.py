@@ -19,14 +19,51 @@
 # and approved by Intel in writing.
 #
 
+import sys
+
+from tabulate import tabulate
 import click
+from kubernetes import client, config
 
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
+from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.logger import initialize_logger
+import platform_resources.experiments as experiments_api
 
-
-HELP = "Displays basic details of experiment with a given name."
+HELP = "Displays details of experiment with a given name."
 HELP_T = "If given - exposes a tensorboard's instance with exepriment's data."
+
+logger = initialize_logger(__name__)
+
+
+def container_status_to_msg(state):
+    if state.running is not None:
+        return "Running, " + str(state.running)
+    if state.terminated is not None:
+        return "Terminated, " + str(state.terminated.reason)
+    if state.waiting is not None:
+        return "Waiting, " + str(state.waiting)
+
+
+def container_volume_mounts_to_msg(volume_mounts):
+    ret = "\n"
+    for mount in volume_mounts:
+        ret += "       " + mount.name + " @ " + mount.mount_path + "\n"
+    return ret[:-1]
+
+
+def container_resources_to_msg(resources):
+    ret = "\n"
+    if resources.requests is not None:
+        ret += "    - Requests:\n"
+        for k, v in resources.requests.items():
+            ret += "       " + k + ": " + str(v) + "\n"
+    if resources.limits is not None:
+        ret = ret[:-1] + "\n    - Limits:\n"
+        for k, v in resources.limits.items():
+            ret += "      " + k + ": " + str(v) + "\n"
+    return ret[:-1]
 
 
 @click.command(help=HELP, cls=AliasCmd, alias='v')
@@ -38,4 +75,69 @@ def view(state: State, experiment_name: str, tensorboard: bool):
     """
     Displays details of an experiment.
     """
-    click.echo("View command - under development")
+    try:
+        namespace = get_kubectl_current_context_namespace()
+        status = None
+        experiments = experiments_api.list_experiments(
+            namespace=namespace, state=status, name_filter=experiment_name)
+        if len(experiments) < 1:
+            click.echo("Experiment not found.")
+            sys.exit(2)
+        experiment = experiments[0]
+        click.echo(
+            tabulate(
+                [[
+                    experiment.name,
+                    str(experiment.parameters_spec),
+                    str(experiment.creation_timestamp),
+                    str(experiment.submitter),
+                    str(experiment.state).split(".")[1],
+                    str(experiment.template_name),
+                ]],
+                headers=[
+                    'Name', 'Parameter specification', 'Creation timestamp',
+                    'Submitter', 'Status'
+                ],
+                tablefmt="orgtbl"))
+        click.echo("\nPods participating in the execution:\n")
+        config.load_kube_config()
+        v1 = client.CoreV1Api()
+        ret = v1.list_pod_for_all_namespaces(
+            watch=False, label_selector="experimentName=" + experiment_name)
+        containers_details = {}
+        tabular_output = []
+        for i in ret.items:
+            status_string = ""
+            for cond in i.status.conditions:
+                msg = "" if cond.reason is None else ", reason: " + cond.reason
+                status_string = "     " + cond.type + ": " + cond.status + msg
+            for container in i.spec.containers:
+                containers_details[container.name] = {
+                    "container_spec": container,
+                    "status": None
+                }
+            for st in i.status.container_statuses:
+                containers_details[st.name]["status"] = st
+            container_details = ""
+            for c_k, c_v in containers_details.items():
+                container_details += f"- Name: {c_k}\n   - Status: " + container_status_to_msg(
+                    c_v["status"].state
+                ) + "\n   - Volumes: " + container_volume_mounts_to_msg(
+                    c_v["container_spec"].volume_mounts
+                ) + "\n   - Resources: " + container_resources_to_msg(
+                    c_v["container_spec"].resources) + "\n\n"
+            tabular_output.append([
+                i.metadata.name, i.metadata.uid, status_string,
+                container_details
+            ])
+        click.echo(
+            tabulate(
+                tabular_output,
+                headers=['Name', 'Uid', 'Status', 'Container Details'],
+                tablefmt="orgtbl"))
+    except Exception as ex:
+        import traceback
+        error_msg = 'Failed to get experiment: ' + str(traceback.format_exc())
+        logger.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
