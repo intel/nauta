@@ -27,7 +27,7 @@ spec:
           command: ["python"]
           args:
           {{- range .Values.commandline.args }}
-            - {{ . }}
+            - "{{ . }}"
           {{- end }}
           ports:
             - containerPort: {{ .Values.TensorBoardPort }}

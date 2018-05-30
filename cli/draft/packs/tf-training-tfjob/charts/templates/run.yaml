@@ -13,7 +13,7 @@ spec:
   pod-count: 1
   parameters:
   {{- range .Values.commandline.args }}
-    - {{ . }}
+    - "{{ . }}"
   {{- end }}
   metrics:
     accuracy: 52.322
