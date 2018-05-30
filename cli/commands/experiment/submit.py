@@ -168,8 +168,11 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
             # create Experiment model
             # TODO template_name & template_namespace should be filled after Template implementation
+            parameter_range_spec = [f'-pr {param_name} {param_value}' for param_name, param_value in parameter_range]
+            parameter_set_spec = [f'-ps {ps_spec}' for ps_spec in parameter_set]
+            experiment_parameters_spec = list(script_parameters) + parameter_range_spec + parameter_set_spec
             experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
-                                                                        parameters_spec=list(script_parameters),
+                                                                        parameters_spec=experiment_parameters_spec,
                                                                         template_namespace="template-namespace"),
                                            namespace)
 

@@ -145,7 +145,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                           '"name":"test-experiment",'
                                                           '"namespace":"namespace-1"},'
                                                           '"spec":{"name":"test-experiment",'
-                                                          '"parameters-spec":["a 1", "b 2:"],'
+                                                          '"parameters-spec":["a 1", "b 2"],'
                                                           '"state":"CREATING",'
                                                           '"template-name":"test-ex-template",'
                                                           '"template-namespace":"test-ex-namespace"}}\n'},
