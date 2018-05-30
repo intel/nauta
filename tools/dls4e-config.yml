@@ -28,8 +28,8 @@ images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/go-apiserver-builder"
     push: False
   dls4e/etcd:
-    version: "v3.3"
-    image: "etcd:v3.3"
+    version: "3.1.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.1.10"
     method: "pull"
   dls4e/kubectl:
     version: "1.10.0"
