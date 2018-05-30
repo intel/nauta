@@ -58,17 +58,22 @@ clusters:
 contexts:
 - context:
     cluster: dls-cluster
-    namespace: {context_namespace}
-    user: {context_username}
+    namespace: "{context_namespace}"
+    user: "{context_username}"
   name: user-context
 kind: Config
 preferences:
   colors: true
 users:
-- name: {username}
+- name: "{username}"
   user:
     token: {token}
 '''
+
+ADD_USER_ERROR_DESCRIPTION = "User hasn't been created. To get more information about causes " \
+                             "of a problem - run command with -v option."
+REMOVE_USER_ERROR_DESCRIPTION = "Partially created user hasn't been removed successfully - " \
+                                "please remove the user manually."
 
 
 @click.argument('username')
@@ -109,16 +114,17 @@ def create(state: State, username: str):
 
         tiller_location = dls4e_config_map.image_tiller
 
-        add_user_command = ["helm", "install", "--namespace", username, "--name", username, chart_location,
-                            "--set", "global.dls4e=dls4enterprise", "--set", f"username={username}",
-                            "--set", "TillerImage={}".format(tiller_location)]
+        add_user_command = ["helm", "install", "--namespace", username, "--name", username,
+                            chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
+                            f"username={username}", "--set", "TillerImage={}".format(tiller_location)]
 
         output, err_code = execute_system_command(add_user_command)
 
         if err_code:
-            click.echo("User hasn't been created. To get more information about causes "
-                       "of a problem - run command with -v option.")
+            click.echo(ADD_USER_ERROR_DESCRIPTION)
             log.error(output)
+            if not delete_user(username):
+                click.echo(REMOVE_USER_ERROR_DESCRIPTION)
             sys.exit(1)
 
         try:
@@ -131,10 +137,9 @@ def create(state: State, username: str):
 
     except Exception:
         log.exception("Error during adding of a user.")
-        click.echo("User hasn't been created. To get more information about causes "
-                   "of a problem - run command with -v option.")
+        click.echo(ADD_USER_ERROR_DESCRIPTION)
         if not delete_user(username):
-            click.echo("User hasn't been removed - please remove the user manually.")
+            click.echo(REMOVE_USER_ERROR_DESCRIPTION)
         sys.exit(1)
 
     click.echo(f"User {username} has been added successfully.")

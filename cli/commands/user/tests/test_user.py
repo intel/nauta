@@ -52,14 +52,14 @@ clusters:
 contexts:
 - context:
     cluster: dls-cluster
-    namespace: {test_namespace}
-    user: {test_username}
+    namespace: "{test_namespace}"
+    user: "{test_username}"
   name: user-context
 kind: Config
 preferences:
   colors: true
 users:
-- name: {test_username}
+- name: "{test_username}"
   user:
     token: {test_token}
 '''

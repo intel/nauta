@@ -3,12 +3,12 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ required "DLS4E Username is required as parameter user" .Values.username }}
+  name: "{{ required "DLS4E Username is required as parameter user" .Values.username }}"
   labels:
-    app: {{ .Chart.Name }}
-    release: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    heritage: {{ .Release.Service }}
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
 rules:
 - apiGroups:
   - ""
