@@ -38,6 +38,25 @@ HELP = "Command displays a command that should be used to mount client's" \
        " folders on his/her local machine."
 
 
+MOUNT_MESSAGE = '''
+Use the following command to mount those folders:
+ - replace <MOUNTPOINT> with a proper location on your local machine)
+ - replace <DLS4E_FOLDER> with one of the following:
+        - input - user's private input folder (read/write)
+          (can be accessed as /mnt/input/home from training script)
+        - output - user's private output folder (read)
+          (can be accessed as /mnt/output/home from training script)
+        - input-shared - shared input folder (read/write)
+          (can be accessed as /mnt/input/root/public from training script)
+        - output-shared - shared output folder (read)
+          (can be accessed as /mnt/output/root/public from training script)
+Additionally each experiment has a special folder which can be accessed
+as /mnt/output/experiment from training script. This folder is shared by Samba
+as output/<EXPERIMENT_NAME>.
+--------------------------------------------------------------------
+'''
+
+
 @click.command(help=HELP, cls=AliasCmd, alias='m')
 @common_options
 @pass_state
@@ -53,21 +72,7 @@ def mounts(state: State):
         click.echo(error_msg)
         sys.exit(1)
 
-    click.echo("Use the following command to mount those folders:")
-    click.echo(" - replace <MOUNTPOINT> with a proper location on your local machine)")
-    click.echo(" - replace <DLS4E_FOLDER> with one of the following:")
-    click.echo("        - input - user's private input folder (read/write)")
-    click.echo("          (can be accessed as /mnt/input/home from training script)")
-    click.echo("        - output - user's private output folder (read)")
-    click.echo("          (can be accessed as /mnt/output/home from training script)")
-    click.echo("        - input-shared - shared input folder (read/write)")
-    click.echo("          (can be accessed as /mnt/input/root from training script)")
-    click.echo("        - output-shared - shared output folder (read)")
-    click.echo("          (can be accessed as /mnt/output/root from training script)")
-    click.echo("Additionally each experiment has a special folder which can be accessed")
-    click.echo("as /mnt/output/experiment from training script. This folder is shared by Samba")
-    click.echo("as output/<EXPERIMENT_NAME>.")
-    click.echo("--------------------------------------------------------------------")
+    click.echo(MOUNT_MESSAGE)
     click.echo(get_mount_command())
 
 
