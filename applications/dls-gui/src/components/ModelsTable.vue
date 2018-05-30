@@ -26,22 +26,28 @@
           <v-card-title>
             <h2>Models</h2>
             <v-spacer></v-spacer>
-            <ActionHeaderButtons
-              :clearSort="clearSort" :hiddenColumns="hiddenColumns" :setHiddenColumnsHandler="setHiddenColumns" :headers="experimentsParams"
+            <ActionHeaderButtons v-if="experimentsTotal !== 0"
+              :clearSort="clearSort"
+              :hiddenColumns="hiddenColumns"
+              :setHiddenColumnsHandler="setHiddenColumns"
+              :onLaunchTensorHandler="launchTensorboard"
+              :onDiscardTensorHandler="discardTensorboard"
+              :headers="experimentsParams"
             ></ActionHeaderButtons>
-            <v-flex xs12 md4>
+            <v-flex xs12 md3 v-if="!tensorMode && (experimentsTotal !== 0 || searchPattern)">
               <v-card-title>
                 <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
               </v-card-title>
             </v-flex>
           </v-card-title>
-          <v-alert v-if="!experimentsTotal" :value="true" type="info">
+          <v-alert v-if="experimentsTotal === 0" :value="true" type="info">
             No data to display.
           </v-alert>
           <div class="elevation-3">
             <div class="table__overflow">
               <table class="datatable table">
                 <thead>
+                  <th v-if="tensorMode"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
                     <v-icon small class="pointer-btn">{{ filterIcon }}</v-icon>
@@ -59,6 +65,14 @@
                 </thead>
                 <tbody>
                 <tr v-for="item in experimentsData" v-bind:key="item.name" :id="item.name">
+                  <td v-if="tensorMode">
+                    <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn">
+                      check_circle
+                    </v-icon>
+                    <v-icon v-if="!isSelected(item)" v-on:click="selectExp(item)" class="pointer-btn">
+                      panorama_fish_eye
+                    </v-icon>
+                  </td>
                   <td v-for="attr in Object.keys(item)" v-bind:key="attr" v-if="isVisibleColumn(attr)">
                     {{ item[attr] }}
                   </td>
@@ -113,7 +127,8 @@ export default {
       },
       activeColumnIdx: 0,
       activeColumnName: null,
-      hoveredColumnIdx: null
+      hoveredColumnIdx: null,
+      selected: []
     }
   },
   created: function () {
@@ -133,7 +148,8 @@ export default {
       experimentsTotal: 'experimentsTotal',
       experimentsEnd: 'experimentsEnd',
       experimentsPageNumber: 'experimentsPageNumber',
-      experimentsTotalPagesCount: 'experimentsTotalPagesCount'
+      experimentsTotalPagesCount: 'experimentsTotalPagesCount',
+      tensorMode: 'tensorMode'
     }),
     paginationStats: function () {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.experimentsTotal}`;
@@ -165,7 +181,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserExperiments']),
+    ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode']),
     cutLongText (str) {
       return str.length > 14 ? `${str.substr(0, 14)}...` : str;
     },
@@ -187,7 +203,6 @@ export default {
       console.log('revert order');
     },
     updateCountPerPage (count) {
-      console.log(count);
       this.pagination.itemsCountPerPage = count;
       this.pagination.currentPage = 1;
     },
@@ -202,6 +217,31 @@ export default {
     },
     setHiddenColumns (columns) {
       this.hiddenColumns = columns;
+    },
+    launchTensorboard () {
+      if (this.tensorMode) {
+        alert('Now tensorboard should be run with params: ' + JSON.stringify(this.selected));
+      } else {
+        this.enableTensorMode();
+      }
+    },
+    discardTensorboard () {
+      this.disableTensorMode();
+      this.selected = [];
+    },
+    selectExp (exp) {
+      this.selected.push(exp);
+    },
+    deselectExp (exp) {
+      this.selected = this.selected.filter((item) => {
+        return item.name !== exp.name;
+      });
+    },
+    isSelected (exp) {
+      const filtered = this.selected.filter((item) => {
+        return item.name === exp.name;
+      });
+      return filtered.length !== 0;
     }
   }
 }

@@ -38,10 +38,16 @@ describe('VUEX modules app', () => {
       content: '',
       type: 'warning',
       visible: false
-    }
+    },
+    tensorMode: false
   };
 
   describe('Getters', () => {
+    it('tensorMode', () => {
+      const result = getters.tensorMode(state);
+      expect(result).to.deep.equal(state.tensorMode);
+    });
+
     it('getMenuParams', () => {
       const result = getters.getMenuParams(state);
       expect(result).to.deep.equal(state.menu);
@@ -69,6 +75,12 @@ describe('VUEX modules app', () => {
   });
 
   describe('Mutations', () => {
+    it('setTensorMode', () => {
+      const enabled = true;
+      mutations.setTensorMode(state, enabled);
+      expect(state.tensorMode).to.deep.equal(enabled);
+    });
+
     it('setMenuVisibility', () => {
       const visibility = true;
       mutations.setMenuVisibility(state, visibility);
@@ -162,6 +174,18 @@ describe('VUEX modules app', () => {
     it('hideSpinner', (done) => {
       testAction(actions.hideSpinner, null, state, [
         { type: 'setSpinnerVisibility', payload: false }
+      ], [], done);
+    });
+
+    it('enableTensorMode', (done) => {
+      testAction(actions.enableTensorMode, null, state, [
+        { type: 'setTensorMode', payload: true }
+      ], [], done);
+    });
+
+    it('disableTensorMode', (done) => {
+      testAction(actions.disableTensorMode, null, state, [
+        { type: 'setTensorMode', payload: false }
       ], [], done);
     });
   });

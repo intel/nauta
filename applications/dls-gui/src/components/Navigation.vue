@@ -20,7 +20,7 @@
  */
 
 <template>
-  <v-navigation-drawer app clipped fixed v-model="visible">
+  <v-navigation-drawer v-if="!tensorMode" app clipped fixed v-model="visible">
     <v-list dense>
       <v-list-tile @click="test">
         <v-list-tile-action>
@@ -43,9 +43,13 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 export default {
   name: 'Navigation',
   computed: {
+    ...mapGetters({
+      tensorMode: 'tensorMode'
+    }),
     visible: {
       get () {
         return this.$store.state.app.menu.visible;

@@ -21,8 +21,9 @@
 
 <template>
 <div id="buttons_block">
-  <v-btn dark small>LAUNCH TENSORBOARD</v-btn>
-  <v-menu bottom offset-y>
+  <v-btn dark small v-on:click="onLaunchTensorHandler()">LAUNCH TENSORBOARD</v-btn>
+  <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">EXIT</v-btn>
+  <v-menu v-if="!tensorModeViewState" bottom offset-y>
     <v-btn slot="activator" dark small>RESET</v-btn>
     <v-list>
       <v-list-tile v-on:click="clearSort()">
@@ -36,7 +37,7 @@
       </v-list-tile>
     </v-list>
   </v-menu>
-  <v-btn v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
+  <v-btn v-if="!tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
   <v-dialog
     v-model="showColumnMgmtModal"
     max-width="600px"
@@ -73,11 +74,13 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 import lodash from 'lodash';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'setHiddenColumnsHandler', 'hiddenColumns', 'headers'],
+  props: ['clearSort', 'setHiddenColumnsHandler', 'hiddenColumns', 'headers', 'onLaunchTensorHandler',
+    'onDiscardTensorHandler', 'disabled'],
   data: () => {
     return {
       showColumnMgmtModal: false,
@@ -95,6 +98,11 @@ export default {
         this.visibilityDraft[header] = this.hiddenColumns.indexOf(header) === -1;
       });
     }
+  },
+  computed: {
+    ...mapGetters({
+      tensorModeViewState: 'tensorMode'
+    })
   },
   methods: {
     revertToDefault: function () {
@@ -118,9 +126,9 @@ export default {
 <style scoped>
 #buttons_block button {
   margin-top: 22px;
-  color: #0071c5;
+  color: rgb(0, 113, 197);
   background-color: rgba(0, 113, 197, 0.12);
-  width: 180px;
+  width: 170px;
 }
 input {
   margin: 7px;

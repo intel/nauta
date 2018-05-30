@@ -37,10 +37,12 @@ const state = {
     content: '',
     type: DEFAULT_BANNER_TYPE,
     visible: false
-  }
+  },
+  tensorMode: false
 };
 
 export const getters = {
+  tensorMode: state => state.tensorMode,
   getMenuParams: state => state.menu,
   getUserboxParams: state => state.userbox,
   getSpinnerParams: state => state.spinner,
@@ -75,6 +77,12 @@ export const actions = {
   },
   hideSpinner: ({commit}) => {
     commit('setSpinnerVisibility', false);
+  },
+  enableTensorMode: ({commit}) => {
+    commit('setTensorMode', true)
+  },
+  disableTensorMode: ({commit}) => {
+    commit('setTensorMode', false)
   }
 };
 
@@ -100,6 +108,9 @@ export const mutations = {
   },
   setSpinnerVisibility: (state, visibility) => {
     state.spinner.visible = visibility;
+  },
+  setTensorMode: (state, enabled) => {
+    state.tensorMode = enabled;
   }
 };
 

@@ -22,7 +22,8 @@
 <template>
   <div id="app">
     <v-app>
-      <div id="app-bg" :class="{intelBlue: !isLogged, intelGray: isLogged}">
+      <div id="app-bg"
+           :class="{intelBlue: !isLogged, intelGray: isLogged && !tensorMode, intelGrayTransparent: isLogged && tensorMode}">
         <Navigation v-if="isLogged"></Navigation>
         <Toolbar></Toolbar>
         <v-content>
@@ -64,7 +65,8 @@ export default {
     ...mapGetters({
       isLogged: 'isLogged',
       errorType: 'errorType',
-      errorContent: 'errorContent'
+      errorContent: 'errorContent',
+      tensorMode: 'tensorMode'
     }),
     combinedError: function () {
       return {type: this.errorType, content: this.errorContent};
@@ -94,5 +96,8 @@ export default {
 }
 .intelGray {
   background-color: #f3f3f3;
+}
+.intelGrayTransparent {
+  background-color: rgba(243, 243, 243, 0.12);
 }
 </style>

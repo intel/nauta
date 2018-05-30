@@ -20,7 +20,7 @@
  */
 
 <template>
-  <v-toolbar dark color="intel_primary" app fixed clipped-left height="110px">
+  <v-toolbar dark color="intel_primary" :class="{ transparent: tensorMode }" app fixed clipped-left height="110px">
     <v-toolbar-side-icon v-if="menuParams.btnVisible" @click.stop="toggleMenu"></v-toolbar-side-icon>
     <v-toolbar-title>
       <v-container grid-list-md>
@@ -65,7 +65,8 @@ export default {
     ...mapGetters({
       username: 'username',
       menuParams: 'getMenuParams',
-      userboxParams: 'getUserboxParams'
+      userboxParams: 'getUserboxParams',
+      tensorMode: 'tensorMode'
     })
   }
 }
@@ -79,6 +80,9 @@ export default {
 }
 .toolbar__title img {
   margin-top: 14px;
+}
+.transparent {
+  background-color: rgba(0, 113, 197, 0.12) !important;
 }
 
 </style>
