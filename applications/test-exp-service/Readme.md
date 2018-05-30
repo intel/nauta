@@ -17,13 +17,13 @@ Install:
         1. run port forwarding (FORWARDED_PORT == 5000): `kubectl port-forward docker-registry 32111:5000`
     1. For Sclab cluster:
         1. run port forwarding (RETURNS FORWARDER_PORT): `./dev-local-cluster/registry.sh`
-1. Build image: `apiserver-boot build container --image 127.0.0.1:{FORWARDED_PORT}/experiment-service`
-1. Push image: `docker push 127.0.0.1:{FORWARDED_PORT}/experiment-service`
+    1. Set `FORWARDED_PORT` env in terminal: `export FORWARDED_PORT=XXXXX`
+1. Build image: `apiserver-boot build container --image 127.0.0.1:${FORWARDED_PORT}/experiment-service`
+1. Push image: `docker push 127.0.0.1:${FORWARDED_PORT}/experiment-service`
 1. Prepare current cluster configuration:
     1. Remove current conf: `rm -Rf config/`
-    1. Generate new cluster conf: 
-        1. for current user: `apiserver-boot build config --name experiment-service --namespace $(kubectl config view --minify -o=jsonpath={.contexts[0].context.namespace}) --image {FORWARDED_PORT}/experiment-service`
-        1. or for specific user: `apiserver-boot build config --name experiment-service --namespace $(kubectl config view --minify -o=jsonpath={.contexts[0].context.namespace}) --image {FORWARDED_PORT}/experiment-service --service-account=jwierzboadmin`
+    1. [TEMPORARY SOLUTION] Install required kubernetes config: `kubectl create -f ./dev-local-cluster/auth.yaml`
+    1. Generate new cluster conf: `apiserver-boot build config --name experiment-service --namespace dls4e --image 127.0.0.1:${FORWARDED_PORT}/experiment-service --service-account=exp-apiserver`
 1. Prepare storage:
     1. for local Kubernetes from Docker on Mac `./dev-local-cluster/storage-docer-mac.yaml`
     1. for Sclab cluster: in `config/.apiserver.yaml` set `volume.beta.kubernetes.io/storage-class` value to: `dls4enterprise-k8s-platform-nfs`
@@ -34,13 +34,13 @@ Install:
 # Update cluster
 1. Make changes in your code e.g.: add new field.
 1. Build and push image again:
-    1. `apiserver-boot build container --image 127.0.0.1:{FORWARDED_PORT}/experiment-service`
+    1. `apiserver-boot build container --image 127.0.0.1:${FORWARDED_PORT}/experiment-service`
     1. `docker push 127.0.0.1:{FORWARDED_PORT}/experiment-service`
 1. Kill `experiment-service` Pod to create new one from new image.
 1. Test it!
 
 # Problems and Tips:
-1. If on Sclab you get the following error in experiment-service: `User "system:serviceaccount:{NAMESPACE}:{USER}" cannot list runs.aggregator.aipg.intel.com at the cluster scope`
-Add cluster-admin role to your user: `kubectl create clusterrolebinding temp-cluster-role-bind --clusterrole=cluster-admin  --serviceaccount={NAMESPACE}:{USER}`
+1. If on Sclab you get the following error in experiment-service: `User "system:anonymous" cannot list  runs.aggregator.aipg.intel.com at the cluster scope`
+Add cluster-admin role to your user: `kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=exp-apiserver-role --user=system:anonymous`
 1. If on Sclab you get the following error in experiment-service: `panic: cluster doesn't provide requestheader-client-ca-file` -> check [Jira issue](https://jira01.devtools.intel.com/browse/CAN-403)
 1. You can manually remove CRD Run to be sure that the traffic for Run resources goes through experiment-service: `kubectl delete crd runs.aipg.intel.com`
