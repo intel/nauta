@@ -4,7 +4,7 @@
   set_fact:
     dls_configuration:
       network:
-        instance_name: "{{ ansible_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
+        instance_name: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
       external_interface:
         definition: "{{ hostvars[inventory_hostname]['ansible_' + external_interface] }}"
         ipv4: "{{ hostvars[inventory_hostname]['ansible_' + external_interface].ipv4 }}"

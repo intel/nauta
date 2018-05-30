@@ -30,6 +30,21 @@
   notify:
     - Restart Nginx
 
+- name: Create service configuration path
+  file:
+    path: /etc/systemd/system/nginx.service.d
+    state: directory
+
+- name: Render proxy configuration
+  template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/systemd/system/nginx.service.d/{{ item }}.conf"
+  with_items:
+    - consul
+  notify:
+    - Reload Systemd
+    - Restart Nginx
+
 - name: Create nginx config dirs
   file:
     path: "/etc/nginx/{{ item }}.d"

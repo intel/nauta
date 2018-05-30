@@ -107,7 +107,17 @@
     owner: root
     group: root
 
+- name: Remove chattr -x from resolver
+  file:
+    path: /etc/resolv.conf
+    attr: e
+
 - name: Override resolver
   template:
     src: resolv.j2
     dest: /etc/resolv.conf
+
+- name: Add chattr +x to resolver
+  file:
+    path: /etc/resolv.conf
+    attr: ie

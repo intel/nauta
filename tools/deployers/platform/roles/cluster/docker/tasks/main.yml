@@ -22,8 +22,11 @@
 
 - name: Render proxy configuration
   template:
-    src: proxy.conf.j2
-    dest: /etc/systemd/system/docker.service.d/proxy.conf
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/{{ item }}.conf"
+  with_items:
+    - proxy
+    - consul
   notify:
     - Reload Systemd
     - Restart Docker
