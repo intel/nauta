@@ -22,22 +22,20 @@
 from click.testing import CliRunner
 
 from commands.experiment import list
-from platform_resources.experiment_model import Experiment, ExperimentStatus
+from platform_resources.run_model import Run, RunStatus
 
 
-TEST_EXPERIMENTS = [Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
-                               creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
-                               state=ExperimentStatus.CREATING, template_name='test-ex-template',
-                               template_namespace='test-ex-namespace'),
-                    Experiment(name='test-experiment-2', parameters_spec=['a 1', 'b 2'],
-                               creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
-                               state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
-                               template_namespace='test-ex-namespace')]
+TEST_RUNS = [Run(name='test-experiment', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                 creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                 state=RunStatus.QUEUED, experiment_name='test-experiment', pod_count=0, pod_selector={}),
+             Run(name='test-experiment-2', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                 creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                 state=RunStatus.COMPLETE, experiment_name='test-experiment', pod_count=0, pod_selector={})]
 
 
 def test_list_experiments_success(mocker):
-    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
-    api_list_experiments_mock.return_value = TEST_EXPERIMENTS
+    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
 
     get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
 
@@ -45,12 +43,12 @@ def test_list_experiments_success(mocker):
     runner.invoke(list.list_experiments, [])
 
     assert get_namespace_mock.call_count == 1
-    assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 
 
 def test_list_experiments_all_users_success(mocker):
-    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
-    api_list_experiments_mock.return_value = TEST_EXPERIMENTS
+    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
 
     get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
 
@@ -58,12 +56,12 @@ def test_list_experiments_all_users_success(mocker):
     runner.invoke(list.list_experiments, ['--all-users'])
 
     assert get_namespace_mock.call_count == 0
-    assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 
 
 def test_list_experiments_failure(mocker):
-    api_list_experiments_mock = mocker.patch("commands.experiment.list.experiments_api.list_experiments")
-    api_list_experiments_mock.side_effect = RuntimeError
+    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock.side_effect = RuntimeError
 
     get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
     sys_exit_mock = mocker.patch("sys.exit")
@@ -73,5 +71,5 @@ def test_list_experiments_failure(mocker):
     runner.invoke(list.list_experiments, [])
 
     assert get_namespace_mock.call_count == 1
-    assert api_list_experiments_mock.call_count == 1, "Experiments retrieval was not called"
+    assert api_list_runs_mock.call_count == 1, "Runs retrieval was not called"
     assert sys_exit_mock.called_once_with(1)

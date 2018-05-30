@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from collections import namedtuple
 from enum import Enum
 from typing import List
 
@@ -34,6 +35,10 @@ class RunStatus(Enum):
 
 
 class Run(PlatformResource):
+
+    RunCliModel = namedtuple('Run', ['name', 'parameters', 'metrics',
+                                     'submission_date', 'submitter', 'status'])
+
     def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
                  pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
                  creation_timestamp: str = None):
@@ -61,4 +66,7 @@ class Run(PlatformResource):
 
     @property
     def cli_representation(self):
-        raise NotImplementedError
+        return Run.RunCliModel(name=self.name, parameters=' '.join(self.parameters),
+                               metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
+                               submission_date=self.creation_timestamp, submitter=self.submitter,
+                               status=self.state)

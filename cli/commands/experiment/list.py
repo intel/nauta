@@ -25,8 +25,8 @@ import click
 from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
-import platform_resources.experiments as experiments_api
-import platform_resources.experiment_model as experiments_model
+import platform_resources.runs as runs_api
+from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
@@ -39,23 +39,25 @@ logger = initialize_logger(__name__)
               help='Show all experiments, regardless of owner')
 @click.option('-n', '--name', type=str,
               help='A regular expression to narrow down list to experiments that are matching this expression')
-@click.option('-s', '--status', type=click.Choice([status.name for status in experiments_model.ExperimentStatus]),
+@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]),
               help='List experiments with matching status')
 @common_options
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: experiments_model.ExperimentStatus):
+def list_experiments(state: State, all_users: bool, name: str, status: RunStatus):
     """
     List experiments.
     """
 
     try:
         namespace = None if all_users else get_kubectl_current_context_namespace()
-        status = experiments_model.ExperimentStatus[status] if status else None
-        experiments = experiments_api.list_experiments(namespace=namespace, state=status, name_filter=name)
-        click.echo(tabulate([exp.cli_representation for exp in experiments],
-                            headers=['Name', 'Parameter specification', 'Creation timestamp',
+        status = RunStatus[status] if status else None
+
+        # List experiments command is actually listing Run resources instead of Experiment resources
+        runs = runs_api.list_runs(namespace=namespace, state=status, name_filter=name)
+        click.echo(tabulate([run.cli_representation for run in runs],
+                            headers=['Name', 'Parameters', 'Metrics', 'Submission date',
                                      'Submitter', 'Status'], tablefmt="orgtbl"))
-    except experiments_api.InvalidRegularExpressionError:
+    except runs_api.InvalidRegularExpressionError:
         error_msg = f'Regular expression provided for name filtering is invalid: {name}'
         logger.exception(error_msg)
         click.echo(error_msg)

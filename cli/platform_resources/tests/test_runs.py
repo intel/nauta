@@ -25,6 +25,8 @@ from kubernetes.client import CustomObjectsApi
 
 from platform_resources.run_model import Run, RunStatus
 from platform_resources.runs import list_runs
+from util.exceptions import InvalidRegularExpressionError
+
 
 TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
                  parameters=['mnist_single_node.py', '--data_dir', '/app'],
@@ -37,7 +39,7 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
                  submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z"),
              Run(name="exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training",
-                 parameters=['mnist_single_node.py', '--data_dir', '/app'], state=RunStatus.QUEUED,
+                 parameters=['mnist_single_node.py', '--data_dir', '/app'], state=RunStatus.COMPLETE,
                  metrics={'accuracy': 52.322}, experiment_name="experiment-name-will-be-added-soon", pod_count=1,
                  pod_selector={
                      'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
@@ -57,6 +59,34 @@ def test_list_runs(mock_k8s_api_client):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
     runs = list_runs()
     assert runs == TEST_RUNS
+
+
+def test_list_runs_from_namespace(mock_k8s_api_client: CustomObjectsApi):
+    raw_runs_single_namespace = dict(LIST_RUNS_RESPONSE_RAW)
+    raw_runs_single_namespace['items'] = [raw_runs_single_namespace['items'][0]]
+    mock_k8s_api_client.list_namespaced_custom_object.return_value = raw_runs_single_namespace
+
+    runs = list_runs(namespace='namespace-1')
+
+    assert [TEST_RUNS[0]] == runs
+
+
+def test_list_runs_filter_status(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
+    runs = list_runs(state=RunStatus.QUEUED)
+    assert [TEST_RUNS[0]] == runs
+
+
+def test_list_runs_name_filter(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
+    runs = list_runs(name_filter=TEST_RUNS[1].name)
+    assert [TEST_RUNS[1]] == runs
+
+
+def test_list_runs_invalid_name_filter(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
+    with pytest.raises(InvalidRegularExpressionError):
+        list_runs(name_filter='*')
 
 
 LIST_RUNS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'items': [
@@ -83,6 +113,6 @@ LIST_RUNS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'items': [
               'name': 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
               'parameters': ['mnist_single_node.py', '--data_dir', '/app'], 'pod-count': 1, 'pod-selector': {
              'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
-                             'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}}, 'state': 'QUEUED'}}],
+                             'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}}, 'state': 'COMPLETE'}}],
                           'kind': 'RunList', 'metadata': {'continue': '', 'resourceVersion': '436078',
                                                           'selfLink': '/apis/aipg.intel.com/v1/runs'}}

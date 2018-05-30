@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from functools import partial
 from typing import List
 import re
 import sre_constants
@@ -27,6 +28,7 @@ import time
 from kubernetes import config, client
 
 import platform_resources.experiment_model as model
+from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
@@ -48,6 +50,8 @@ def list_experiments(namespace: str = None,
     :param name_filter: If provided, only experiments matching name_filter regular expression will be returned
     :return: List of Experiment objects
     """
+    logger.debug('Listing experiments.')
+
     config.load_kube_config()
     api = client.CustomObjectsApi(client.ApiClient())
     if namespace:
@@ -64,8 +68,8 @@ def list_experiments(namespace: str = None,
         logger.exception(error_msg)
         raise InvalidRegularExpressionError(error_msg) from e
 
-    experiment_filters = [lambda experiment_dict: not state or experiment_dict['spec']['state'] == state.value,
-                          lambda experiment_dict: not name_regex or name_regex.search(experiment_dict['spec']['name'])]
+    experiment_filters = [partial(filter_by_name_regex, name_regex=name_regex),
+                          partial(filter_by_state, state=state)]
 
     experiments = [model.Experiment.from_k8s_response_dict(experiment_dict)
                    for experiment_dict in raw_experiments['items']
