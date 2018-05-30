@@ -69,4 +69,4 @@ class Run(PlatformResource):
         return Run.RunCliModel(name=self.name, parameters=' '.join(self.parameters),
                                metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
                                submission_date=self.creation_timestamp, submitter=self.submitter,
-                               status=self.state)
+                               status=self.state.value)
