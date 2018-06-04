@@ -49,6 +49,8 @@ spec:
           value: {{ .Release.Name }}-{{ .Chart.Name }}-output
         - name: APP_RELEASE
           value: {{ .Release.Name }}
+        - name: SAMBA_LOG_LEVEL
+          value: "10"
         ports:
         - containerPort: 137
           protocol: UDP
