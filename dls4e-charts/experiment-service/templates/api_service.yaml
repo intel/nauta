@@ -1,7 +1,7 @@
-apiVersion: v1
-kind: Service
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
 metadata:
-  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  name: v1.aggregator.aipg.intel.com
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
@@ -9,15 +9,15 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
-spec:
-  type: ClusterIP
-  ports:
-  - port: 443
-    protocol: TCP
-    targetPort: 443
-  selector:
-    app: {{ .Chart.Name }}
-    release: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    heritage: {{ .Release.Service }}
+    api: {{ .Chart.Name }}
     apiserver: "true"
+spec:
+  version: v1
+  group: aggregator.aipg.intel.com
+  groupPriorityMinimum: 2000
+  priority: 200
+  service:
+    name: {{ .Release.Name }}-{{ .Chart.Name }}
+    namespace: {{ .Release.Namespace }}
+  versionPriority: 10
+  insecureSkipTLSVerify: true

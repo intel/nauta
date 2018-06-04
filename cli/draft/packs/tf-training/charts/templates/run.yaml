@@ -1,9 +1,8 @@
-apiVersion: "aipg.intel.com/v1"
+apiVersion: "aggregator.aipg.intel.com/v1"
 kind: Run
 metadata:
   name: {{ template "fullname" . }}
 spec:
-  name: {{ template "fullname" . }}
   experiment-name: experiment-name-will-be-added-soon
   pod-selector:
     matchLabels:
@@ -16,5 +15,5 @@ spec:
     - "{{ . }}"
   {{- end }}
   metrics:
-    accuracy: 52.322
+    accuracy: "52.322"
   state: QUEUED

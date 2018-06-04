@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator"
+	"github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator/common"
 )
 
 // +genclient
@@ -49,14 +50,17 @@ type Run struct {
 
 // RunSpec defines the desired state of Run
 type RunSpec struct {
-	ExperimentName string `json:"experimentName,omitempty"`
-	PodSelector string `json:"podSelector,omitempty"`
-	PodCount int64 `json:"podCount,omitempty"`
-	// TODO add rest fields!
+	ExperimentName string `json:"experiment-name,omitempty"`
+	PodSelector metav1.LabelSelector `json:"pod-selector,omitempty"`
+	PodCount int64 `json:"pod-count,omitempty"`
+	Parameters []string `json:"parameters,omitempty"`
+	Metrics map[string]string `json:"metrics,omitempty"`
+	State common.RunState `json:"state,omitempty"`
 }
 
 // RunStatus defines the observed state of Run
 type RunStatus struct {
+	// TODO common.RunState state should be set here?
 }
 
 // Validate checks that an instance of Run is well formed

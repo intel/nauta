@@ -1,5 +1,5 @@
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: Service
 metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}
   labels:
@@ -10,14 +10,8 @@ metadata:
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
 spec:
-  type: ClusterIP
-  ports:
-  - port: 443
-    protocol: TCP
-    targetPort: 443
-  selector:
-    app: {{ .Chart.Name }}
-    release: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    heritage: {{ .Release.Service }}
-    apiserver: "true"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

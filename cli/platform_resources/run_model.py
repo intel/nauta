@@ -58,7 +58,7 @@ class Run(PlatformResource):
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
-        return cls(name=object_dict['spec']['name'],
+        return cls(name=object_dict['metadata']['name'],
                    parameters=object_dict['spec']['parameters'],
                    creation_timestamp=object_dict['metadata']['creationTimestamp'],
                    submitter=object_dict['metadata']['namespace'],

@@ -72,15 +72,8 @@ images:
       BUILD_IMAGE: "dls4e/build"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
-# TODO REMOVE ME and set test-exp-service as default
+# TODO Change directory PATH after move
   dls4e/experiment-service:
-    version: "1.0.0"
-    required:
-      BASE_IMAGE: "dls4e/centos"
-      BUILD_IMAGE: "dls4e/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  dls4e/test-exp-service:
     version: "1.0.0"
     required:
       BASE_IMAGE: "dls4e/centos"
@@ -171,7 +164,7 @@ subcharts:
       chart_values:
         image: dls4e/postgres:10.4
         service_image: dls4e/experiment-service:1.0.0
-        etcd_image: dls4e/etcd:v3.3
+        etcd_image: dls4e/etcd:3.1.10
     tf:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../dls4e-charts/tf"

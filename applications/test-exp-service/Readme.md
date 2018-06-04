@@ -3,11 +3,17 @@ Install:
 1. apiserver-builder v1.9-alpha.4: [info](https://github.com/kubernetes-incubator/apiserver-builder/blob/master/docs/installing.md)
 1. Go 1.10.2
 
-# Add and update models
+# Add new models
 1. (already done) Init new APIService: `apiserver-boot init repo --domain aipg.intel.com`
 1. (already done) Create new model: `apiserver-boot create group version resource --group aggregator --version v1 --kind Run`
 1. (one-time only for downloaded project) Fetch vendor data: `apiserver-boot update vendor`
 1. Update fields and methods in file: `pkg/apis/aggregator/v1/run_types.go`
+1. Regenerate code: `apiserver-boot build executables`
+
+# Update model fields
+1. Make changes, ex. add new field
+1. Regenerate code: `apiserver-boot build executables`
+1. Commit
 
 # Deploy on cluster
 1. Setup Docker Registry:
@@ -18,12 +24,12 @@ Install:
     1. For Sclab cluster:
         1. run port forwarding (RETURNS FORWARDER_PORT): `./dev-local-cluster/registry.sh`
     1. Set `FORWARDED_PORT` env in terminal: `export FORWARDED_PORT=XXXXX`
-1. Build image: `apiserver-boot build container --image 127.0.0.1:${FORWARDED_PORT}/experiment-service`
-1. Push image: `docker push 127.0.0.1:${FORWARDED_PORT}/experiment-service`
+1. Build image: `apiserver-boot build container --image 127.0.0.1:31048/experiment-service`
+1. Push image: `docker push 127.0.0.1:31048/experiment-service`
 1. Prepare current cluster configuration:
     1. Remove current conf: `rm -Rf config/`
     1. [TEMPORARY SOLUTION] Install required kubernetes config: `kubectl create -f ./dev-local-cluster/auth.yaml`
-    1. Generate new cluster conf: `apiserver-boot build config --name experiment-service --namespace dls4e --image 127.0.0.1:${FORWARDED_PORT}/experiment-service --service-account=exp-apiserver`
+    1. Generate new cluster conf: `apiserver-boot build config --name experiment-service --namespace dls4e --image 127.0.0.1:31048/experiment-service --service-account=exp-apiserver`
 1. Prepare storage:
     1. for local Kubernetes from Docker on Mac `./dev-local-cluster/storage-docer-mac.yaml`
     1. for Sclab cluster: in `config/.apiserver.yaml` set `volume.beta.kubernetes.io/storage-class` value to: `dls4enterprise-k8s-platform-nfs`

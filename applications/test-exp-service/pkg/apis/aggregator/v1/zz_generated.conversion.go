@@ -25,6 +25,7 @@ package v1
 
 import (
 	aggregator "github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator"
+	common "github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator/common"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	unsafe "unsafe"
@@ -111,6 +112,9 @@ func autoConvert_v1_RunSpec_To_aggregator_RunSpec(in *RunSpec, out *aggregator.R
 	out.ExperimentName = in.ExperimentName
 	out.PodSelector = in.PodSelector
 	out.PodCount = in.PodCount
+	out.Parameters = *(*[]string)(unsafe.Pointer(&in.Parameters))
+	out.Metrics = *(*map[string]string)(unsafe.Pointer(&in.Metrics))
+	out.State = common.RunState(in.State)
 	return nil
 }
 
@@ -123,6 +127,9 @@ func autoConvert_aggregator_RunSpec_To_v1_RunSpec(in *aggregator.RunSpec, out *R
 	out.ExperimentName = in.ExperimentName
 	out.PodSelector = in.PodSelector
 	out.PodCount = in.PodCount
+	out.Parameters = *(*[]string)(unsafe.Pointer(&in.Parameters))
+	out.Metrics = *(*map[string]string)(unsafe.Pointer(&in.Metrics))
+	out.State = common.RunState(in.State)
 	return nil
 }
 

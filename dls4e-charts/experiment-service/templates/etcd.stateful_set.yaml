@@ -1,0 +1,74 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-etcd
+  labels:
+    app: {{ .Chart.Name }}-etcd
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+spec:
+  serviceName: {{ .Release.Name }}-{{ .Chart.Name }}-etcd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-etcd
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        heritage: {{ .Release.Service }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: etcd
+        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E etcd image is required" .Values.etcd_image }}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+        env:
+        - name: ETCD_DATA_DIR
+          value: /etcd-data-dir
+        command:
+        - /usr/local/bin/etcd
+        - --listen-client-urls
+        - http://0.0.0.0:2379
+        - --advertise-client-urls
+        - http://localhost:2379
+        ports:
+        - containerPort: 2379
+        volumeMounts:
+        - name: {{ .Release.Name }}-{{ .Chart.Name }}-etcd
+          mountPath: /etcd-data-dir
+        readinessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+  volumeClaimTemplates:
+  - metadata:
+     name: {{ .Release.Name }}-{{ .Chart.Name }}-etcd
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+         storage: 10Gi

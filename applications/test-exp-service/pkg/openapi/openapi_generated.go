@@ -137,28 +137,60 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 				SchemaProps: spec.SchemaProps{
 					Description: "RunSpec defines the desired state of Run",
 					Properties: map[string]spec.Schema{
-						"experimentName": {
+						"experiment-name": {
 							SchemaProps: spec.SchemaProps{
 								Type:   []string{"string"},
 								Format: "",
 							},
 						},
-						"podSelector": {
+						"pod-selector": {
 							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 							},
 						},
-						"podCount": {
+						"pod-count": {
 							SchemaProps: spec.SchemaProps{
 								Type:   []string{"integer"},
 								Format: "int64",
 							},
 						},
+						"parameters": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+						"metrics": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+						"state": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
 					},
 				},
 			},
-			Dependencies: []string{},
+			Dependencies: []string{
+				"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 		},
 		"github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator/v1.RunStatus": {
 			Schema: spec.Schema{

@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+    apiserver: "true"
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,7 @@ spec:
       release: {{ .Release.Name }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       heritage: {{ .Release.Service }}
+      apiserver: "true"
   template:
     metadata:
       labels:
@@ -24,33 +26,42 @@ spec:
         release: {{ .Release.Name }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
-        dls4e_app_name: docker-registry
+        apiserver: "true"
     spec:
+      serviceAccount: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: apiserver
           image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E service image is required" .Values.service_image }}
-          imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 8080
+          command:
+          - "./apiserver"
+          args:
+          - "--etcd-servers=http://{{ .Release.Name }}-{{ .Chart.Name }}-etcd:2379"
+          - "--audit-log-path=-"
+          - "--audit-log-maxage=0"
+          - "--audit-log-maxbackup=0"
           resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
             limits:
-              cpu: 500m
-              memory: 256Mi
-          env:
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}-password
-                  key: password
-            - name: POSTGRES_SERVICE
-              value: {{ .Release.Name }}-{{ .Chart.Name }}-postgres
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}-password
-                  key: user
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}-password
-                  key: db
+              cpu: 100m
+              memory: 30Mi
+          volumeMounts:
+          - name: apiserver-certs-temp
+            mountPath: /apiserver.local.config/certificates
+        - name: controller
+          image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E service image is required" .Values.service_image }}
+          command:
+          - "./controller-manager"
+          args:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
+            limits:
+              cpu: 100m
+              memory: 30Mi
+      volumes:
+        - name: apiserver-certs-temp
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-{{ .Chart.Name }}

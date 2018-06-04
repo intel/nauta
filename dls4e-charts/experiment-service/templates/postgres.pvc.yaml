@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-postgres
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}

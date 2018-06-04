@@ -21,6 +21,7 @@ package aggregator
 import (
 	"fmt"
 	"github.com/kubernetes-incubator/apiserver-builder/pkg/builders"
+	aggregatorcommon "github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator/common"
 	"k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -80,8 +81,11 @@ type Run struct {
 
 type RunSpec struct {
 	ExperimentName string
-	PodSelector    string
+	PodSelector    metav1.LabelSelector
 	PodCount       int64
+	Parameters     []string
+	Metrics        map[string]string
+	State          aggregatorcommon.RunState
 }
 
 type RunStatus struct {

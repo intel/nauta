@@ -58,4 +58,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-{{ .Chart.Name }}
+            claimName: {{ .Release.Name }}-{{ .Chart.Name }}-postgres
