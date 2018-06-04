@@ -46,6 +46,7 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     :param state: If provided, only runs with given state will be returned
     :param name_filter: If provided, only runs matching name_filter regular expression will be returned
     :return: List of Run objects
+    In case of problems during getting a list of runs - throws an error
     """
     logger.debug('Listing runs.')
     config.load_kube_config()

@@ -19,9 +19,9 @@
 # and approved by Intel in writing.
 #
 
-from collections import namedtuple
 from enum import Enum
 from typing import List
+from collections import namedtuple
 
 from platform_resources.platform_resource_model import PlatformResource
 
@@ -35,13 +35,15 @@ class RunStatus(Enum):
 
 
 class Run(PlatformResource):
-
     RunCliModel = namedtuple('Run', ['name', 'parameters', 'metrics',
+                                     'submission_date', 'submitter', 'status', 'template_name'])
+
+    RunCliShortModel = namedtuple('Run', ['name', 'parameters', 'metrics',
                                      'submission_date', 'submitter', 'status'])
 
     def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
                  pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
-                 creation_timestamp: str = None):
+                 creation_timestamp: str = None, template_name: str = None):
         self.name = name
         self.parameters = parameters
         self.state = state
@@ -51,6 +53,8 @@ class Run(PlatformResource):
         self.pod_selector = pod_selector
         self.submitter = submitter
         self.creation_timestamp = creation_timestamp
+        self.template_name = template_name
+
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -62,11 +66,20 @@ class Run(PlatformResource):
                    pod_count=object_dict['spec']['pod-count'],
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
-                   metrics=object_dict['spec']['metrics'])
+                   metrics=object_dict['spec']['metrics'],
+                   template_name=object_dict['spec']['pod-selector']['matchLabels']['app'])
 
     @property
     def cli_representation(self):
         return Run.RunCliModel(name=self.name, parameters=' '.join(self.parameters),
                                metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
                                submission_date=self.creation_timestamp, submitter=self.submitter,
-                               status=self.state.value)
+                               status=self.state.value, template_name=self.template_name)
+
+
+    @property
+    def cli_short_representation(self):
+        return Run.RunCliShortModel(name=self.name, parameters=' '.join(self.parameters),
+                               metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
+                               submission_date=self.creation_timestamp, submitter=self.submitter,
+                               status=self.state)

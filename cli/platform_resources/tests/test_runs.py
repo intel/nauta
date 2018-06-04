@@ -37,14 +37,16 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                  pod_selector={'matchLabels': {'app': 'tf-training',
                                                'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z"),
+                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                 template_name="tf-training"),
              Run(name="exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training",
                  parameters=['mnist_single_node.py', '--data_dir', '/app'], state=RunStatus.COMPLETE,
                  metrics={'accuracy': 52.322}, experiment_name="experiment-name-will-be-added-soon", pod_count=1,
                  pod_selector={
                      'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
                                      'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}},
-                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:06:03Z")]
+                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:06:03Z",
+                 template_name="tf-training")]
 
 
 @pytest.fixture()

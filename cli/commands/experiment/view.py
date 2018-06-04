@@ -29,7 +29,8 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
-import platform_resources.experiments as experiments_api
+import platform_resources.runs as runs_api
+
 
 HELP = "Displays details of experiment with a given name."
 HELP_T = "If given - exposes a tensorboard's instance with exepriment's data."
@@ -77,33 +78,29 @@ def view(state: State, experiment_name: str, tensorboard: bool):
     """
     try:
         namespace = get_kubectl_current_context_namespace()
-        status = None
-        experiments = experiments_api.list_experiments(
-            namespace=namespace, state=status, name_filter=experiment_name)
-        if len(experiments) < 1:
-            click.echo("Experiment not found.")
+        runs = runs_api.list_runs(name_filter=experiment_name,
+                                  namespace=namespace)
+
+        if not runs:
+            click.echo(f"Experiment \"{experiment_name}\" not found.")
             sys.exit(2)
-        experiment = experiments[0]
+
+        run = runs[0]
         click.echo(
             tabulate(
-                [[
-                    experiment.name,
-                    str(experiment.parameters_spec),
-                    str(experiment.creation_timestamp),
-                    str(experiment.submitter),
-                    str(experiment.state).split(".")[1],
-                    str(experiment.template_name),
-                ]],
+                [run.cli_representation],
                 headers=[
-                    'Name', 'Parameter specification', 'Creation timestamp',
-                    'Submitter', 'Status'
+                    "Name", "Parameters", "Metrics", "Submission date",
+                    "Submitter", "Status", "Template name"
                 ],
                 tablefmt="orgtbl"))
+
         click.echo("\nPods participating in the execution:\n")
+
         config.load_kube_config()
         v1 = client.CoreV1Api()
         ret = v1.list_pod_for_all_namespaces(
-            watch=False, label_selector="experimentName=" + experiment_name)
+            watch=False, label_selector="job-name=" + experiment_name)
         containers_details = {}
         tabular_output = []
         for i in ret.items:
@@ -130,13 +127,17 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 i.metadata.name, i.metadata.uid, status_string,
                 container_details
             ])
-        click.echo(
-            tabulate(
-                tabular_output,
-                headers=['Name', 'Uid', 'Status', 'Container Details'],
-                tablefmt="orgtbl"))
-    except Exception as ex:
-        error_msg = 'Failed to get experiment'
+        if ret.items:
+            click.echo(
+                tabulate(
+                    tabular_output,
+                    headers=['Name', 'Uid', 'Status', 'Container Details'],
+                    tablefmt="orgtbl"))
+        else:
+            click.echo('At this moment there are no pods connected with this experiment.')
+
+    except Exception:
+        error_msg = 'Failed to get experiment.'
         logger.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
