@@ -34,7 +34,7 @@ from util.exceptions import InvalidRegularExpressionError
 
 logger = initialize_logger(__name__)
 
-API_GROUP_NAME = 'aipg.intel.com'
+API_GROUP_NAME = 'aggregator.aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
