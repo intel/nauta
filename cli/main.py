@@ -21,7 +21,8 @@
 
 import os
 import urllib3
-
+import sys
+import traceback
 import click
 
 from commands.experiment import experiment
@@ -42,6 +43,8 @@ logger = initialize_logger(__name__)
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
 
+ERROR_MESSAGE = "Other error during starting application."
+
 
 @click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup)
 def entry_point():
@@ -57,10 +60,29 @@ entry_point.add_command(version)
 entry_point.add_command(mounts)
 
 if __name__ == '__main__':
+    # at this moment we don't have all click's functions to handle parameters
+    verbose_option = any(x.startswith("-vv") or x == "-v" or x == "--verbose" for x in sys.argv)
     try:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         entry_point()
-    except RuntimeError:
-        os.environ["LC_ALL"] = DEFAULT_LANG
-        os.environ["LANG"] = DEFAULT_LANG
-        entry_point()
+    except RuntimeError as exe:
+        if "was configured to use ASCII as encoding for the environment" in str(exe):
+            os.environ["LC_ALL"] = DEFAULT_LANG
+            os.environ["LANG"] = DEFAULT_LANG
+            os.environ["LANGUAGE"] = DEFAULT_LANG
+            os.environ["LC_CTYPE"] = DEFAULT_LANG
+            try:
+                entry_point()
+            except Exception as add_exe:
+                print(ERROR_MESSAGE)
+                if verbose_option:
+                    traceback.print_tb(add_exe.__traceback__)
+        else:
+            # click may not work here due to an exception
+            print(ERROR_MESSAGE)
+            if verbose_option:
+                traceback.print_tb(exe.__traceback__)
+    except Exception as exe:
+        print(ERROR_MESSAGE)
+        if verbose_option:
+            traceback.print_tb(exe.__traceback__)
