@@ -1,4 +1,3 @@
-
 /*
 INTEL CONFIDENTIAL
 Copyright (c) 2018 Intel Corporation
@@ -50,12 +49,12 @@ type Run struct {
 
 // RunSpec defines the desired state of Run
 type RunSpec struct {
-	ExperimentName string `json:"experiment-name,omitempty"`
-	PodSelector metav1.LabelSelector `json:"pod-selector,omitempty"`
-	PodCount int64 `json:"pod-count,omitempty"`
-	Parameters []string `json:"parameters,omitempty"`
-	Metrics map[string]string `json:"metrics,omitempty"`
-	State common.RunState `json:"state,omitempty"`
+	ExperimentName string               `json:"experiment-name,omitempty"`
+	PodSelector    metav1.LabelSelector `json:"pod-selector,omitempty"`
+	PodCount       int64                `json:"pod-count,omitempty"`
+	Parameters     []string             `json:"parameters,omitempty"`
+	Metrics        map[string]string    `json:"metrics,omitempty"`
+	State          common.RunState      `json:"state,omitempty"`
 }
 
 // RunStatus defines the observed state of Run

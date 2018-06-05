@@ -1,4 +1,3 @@
-
 /*
 INTEL CONFIDENTIAL
 Copyright (c) 2018 Intel Corporation
@@ -29,4 +28,3 @@ and approved by Intel in writing.
 // +k8s:defaulter-gen=TypeMeta
 // +groupName=aggregator.aipg.intel.com
 package v1 // import "github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis/aggregator/v1"
-

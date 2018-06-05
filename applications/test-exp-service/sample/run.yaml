@@ -1,16 +1,16 @@
+apiVersion: "aggregator.aipg.intel.com/v1"
 kind: Run
 metadata:
   name: run-example
 spec:
   pod-count: 2
-  experimentName: exp-test
-  pod-selector:
-    matchLabels:
-      app: test-app
-      release: 0.1
+  experiment-name: exp-test
+    pod-selector:
+      matchLabels:
+        app: test-app
   parameters:
     - param1
     - param2
   metrics:
     accuracy: "52.322"
-  state: QUEUED
+  state: ""

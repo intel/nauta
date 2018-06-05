@@ -12,8 +12,8 @@ ADD ./ ./
 # LOAD vendor data
 RUN apiserver-boot update vendor
 
-# Build
-RUN apiserver-boot build executables
+# Build (generate step should be made before 'docker build' call)
+RUN apiserver-boot build executables --generate=false
 
 # Preapre Run Image
 FROM ${BASE_IMAGE}

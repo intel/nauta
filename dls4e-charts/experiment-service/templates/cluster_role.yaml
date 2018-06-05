@@ -10,21 +10,23 @@ metadata:
     dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - aggregator.aipg.intel.com
-  resources:
-  - runs
-  verbs:
-  - "*"
-- nonResourceURLs:
-  - "/"
-  verbs:
-  - get
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - events
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - aggregator.aipg.intel.com
+    resources:
+      - runs
+    verbs:
+      - "*"
+  - nonResourceURLs:
+      - "/"
+    verbs:
+      - get

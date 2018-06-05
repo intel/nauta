@@ -1,4 +1,3 @@
-
 /*
 INTEL CONFIDENTIAL
 Copyright (c) 2018 Intel Corporation
@@ -24,9 +23,9 @@ package v1_test
 import (
 	"testing"
 
+	"github.com/kubernetes-incubator/apiserver-builder/pkg/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/kubernetes-incubator/apiserver-builder/pkg/test"
 	"k8s.io/client-go/rest"
 
 	"github.com/nervanasystems/carbon/applications/test-exp-service/pkg/apis"

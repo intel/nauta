@@ -1,21 +1,31 @@
-# Setup
+# DLS4E Experiment Service
+
+## Setup
 Install:
 1. apiserver-builder v1.9-alpha.4: [info](https://github.com/kubernetes-incubator/apiserver-builder/blob/master/docs/installing.md)
-1. Go 1.10.2
+1. Go 1.10.2 https://golang.org/doc/install
 
-# Add new models
+### Prepare Go project environment
+If `$GOPATH` is not set, Go will use following location as the default one: `$HOME/go`
+This project should be placed under (only non-capitals letters!) `$HOME/go/src/github.com/nervanasystems/carbon`
+
+## Development
+
+### Add new models
 1. (already done) Init new APIService: `apiserver-boot init repo --domain aipg.intel.com`
 1. (already done) Create new model: `apiserver-boot create group version resource --group aggregator --version v1 --kind Run`
 1. (one-time only for downloaded project) Fetch vendor data: `apiserver-boot update vendor`
 1. Update fields and methods in file: `pkg/apis/aggregator/v1/run_types.go`
 1. Regenerate code: `apiserver-boot build executables`
 
-# Update model fields
+### Update code
 1. Make changes, ex. add new field
 1. Regenerate code: `apiserver-boot build executables`
 1. Commit
 
-# Deploy on cluster
+## Deployment
+
+### Deploy on cluster
 1. Setup Docker Registry:
     1. For local cluster:
         1. `kubectl create -f dev-local-cluster/pod-registry.yaml`
@@ -37,7 +47,7 @@ Install:
 1. Verify new APIService status: `kubectl describe apiservice v1.aggregator.aipg.intel.com`
 1. Add exampled Run: `kubectl create -f sample/run.yaml`
 
-# Update cluster
+### Update running image in cluster
 1. Make changes in your code e.g.: add new field.
 1. Build and push image again:
     1. `apiserver-boot build container --image 127.0.0.1:${FORWARDED_PORT}/experiment-service`
@@ -45,8 +55,7 @@ Install:
 1. Kill `experiment-service` Pod to create new one from new image.
 1. Test it!
 
-# Problems and Tips:
+## Problems and Tips:
 1. If on Sclab you get the following error in experiment-service: `User "system:anonymous" cannot list  runs.aggregator.aipg.intel.com at the cluster scope`
 Add cluster-admin role to your user: `kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=exp-apiserver-role --user=system:anonymous`
 1. If on Sclab you get the following error in experiment-service: `panic: cluster doesn't provide requestheader-client-ca-file` -> check [Jira issue](https://jira01.devtools.intel.com/browse/CAN-403)
-1. You can manually remove CRD Run to be sure that the traffic for Run resources goes through experiment-service: `kubectl delete crd runs.aipg.intel.com`

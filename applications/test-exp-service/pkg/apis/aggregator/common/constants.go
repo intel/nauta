@@ -23,9 +23,9 @@ package common
 type RunState string
 
 const (
-	Queued RunState = "QUEUED"
-	Running RunState = "RUNNING"
-	Complete RunState = "COMPLETE"
+	Queued    RunState = "QUEUED"
+	Running   RunState = "RUNNING"
+	Complete  RunState = "COMPLETE"
 	Cancelled RunState = "CANCELLED"
-	Failed RunState = "FAILED"
+	Failed    RunState = "FAILED"
 )

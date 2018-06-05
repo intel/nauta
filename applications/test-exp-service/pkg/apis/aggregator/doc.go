@@ -1,4 +1,3 @@
-
 /*
 INTEL CONFIDENTIAL
 Copyright (c) 2018 Intel Corporation
@@ -19,10 +18,8 @@ otherwise. Any license under such intellectual property rights must be express
 and approved by Intel in writing.
 */
 
-
 // +k8s:deepcopy-gen=package,register
 // +groupName=aggregator.aipg.intel.com
 
 // Package api is the internal version of the API.
 package aggregator
-

@@ -1,4 +1,3 @@
-
 /*
 INTEL CONFIDENTIAL
 Copyright (c) 2018 Intel Corporation
@@ -20,4 +19,3 @@ and approved by Intel in writing.
 */
 
 package install
-
