@@ -115,6 +115,7 @@ describe('Handlers | Experiments', function () {
   });
 
   describe('parseExperiments', function () {
+    let dateMock;
     beforeEach(function () {
       data = [
         {
@@ -142,13 +143,15 @@ describe('Handlers | Experiments', function () {
           }
         }
       ];
+      Date.now = sinon.stub().returns(1);
     });
 
     it('should return correct data if no experiments provided', function () {
       const expectedResult = {
         data: [],
         stats: {
-          total: 0
+          total: 0,
+          datetime: 1
         },
         params: []
       };
@@ -179,7 +182,8 @@ describe('Handlers | Experiments', function () {
           }
         ],
         stats: {
-          total: 2
+          total: 2,
+          datetime: 1
         },
         params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
       };
@@ -203,7 +207,8 @@ describe('Handlers | Experiments', function () {
           }
         ],
         stats: {
-          total: 1
+          total: 1,
+          datetime: 1
         },
         params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
       };
@@ -235,7 +240,8 @@ describe('Handlers | Experiments', function () {
           }
         ],
         stats: {
-          total: 2
+          total: 2,
+          datetime: 1
         },
         params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
       };
@@ -263,7 +269,8 @@ describe('Handlers | Experiments', function () {
           a: 2,
           b: 2,
           pageNumber: 2,
-          totalPagesCount: 2
+          totalPagesCount: 2,
+          datetime: 1
         },
         params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
       };

@@ -25,6 +25,7 @@ import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
 const state = {
+  fetchingDataActive: false,
   experiments: {
     data: [],
     params: [],
@@ -33,7 +34,8 @@ const state = {
       a: 0,
       b: 0,
       pageNumber: 0,
-      totalPagesCount: 0
+      totalPagesCount: 0,
+      datetime: 0
     }
   }
 };
@@ -45,17 +47,21 @@ export const getters = {
   experimentsBegin: state => state.experiments.stats.a,
   experimentsEnd: state => state.experiments.stats.b,
   experimentsPageNumber: state => state.experiments.stats.pageNumber,
-  experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount
+  experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount,
+  lastUpdate: state => state.experiments.stats.datetime,
+  fetchingDataActive: state => state.fetchingDataActive
 };
 
 export const actions = {
   getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy}) => {
+    commit('setFetchingDataFlag', {isActive: true});
     getExperiments(limitPerPage, pageNo, orderBy, order, searchBy)
       .then((res) => {
         const data = res.data;
         commit('setExperimentsData', {data: data.data});
         commit('setExperimentsParams', {data: data.params});
         commit('setExperimentsStats', {data: data.stats});
+        commit('setFetchingDataFlag', {isActive: false});
       })
       .catch((err) => {
         if (err && err.response && err.response.status && err.response.status === 401) {
@@ -64,6 +70,7 @@ export const actions = {
         } else {
           dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
         }
+        commit('setFetchingDataFlag', {isActive: false});
       });
   }
 };
@@ -77,6 +84,9 @@ export const mutations = {
   },
   setExperimentsStats: (state, {data}) => {
     state.experiments.stats = data;
+  },
+  setFetchingDataFlag: (state, {isActive}) => {
+    state.fetchingDataActive = isActive;
   }
 };
 

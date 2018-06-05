@@ -22,6 +22,10 @@
 <template>
 <div class="datatable table">
   <div class="datatable__actions">
+    <div class="refreshStat">
+      {{ lastUpdateLabel }}
+    </div>
+    <v-spacer></v-spacer>
     <div class="datatable__actions__select">
       Rows per page:
       <v-select
@@ -48,7 +52,8 @@
 <script>
 export default {
   name: 'FooterElements',
-  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'paginationStats'],
+  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'paginationStats',
+    'lastUpdateLabel'],
   data: () => {
     return {
       itemsPerPageOptions: [5, 10, 15, 25],
@@ -64,5 +69,7 @@ export default {
 </script>
 
 <style scoped>
-
+.refreshStat {
+  margin-left: 25px;
+}
 </style>

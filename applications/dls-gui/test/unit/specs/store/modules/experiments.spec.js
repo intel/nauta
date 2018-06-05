@@ -28,6 +28,7 @@ import RESPONSE_MESSAGES from '../../../../../src/utils/constants/messages';
 
 describe('VUEX modules experiments', () => {
   const state = {
+    fetchingDataActive: false,
     experiments: {
       data: [],
       params: [],
@@ -36,7 +37,8 @@ describe('VUEX modules experiments', () => {
         a: 0,
         b: 0,
         pageNumber: 0,
-        totalPagesCount: 0
+        totalPagesCount: 0,
+        datetime: 1
       }
     }
   };
@@ -76,6 +78,16 @@ describe('VUEX modules experiments', () => {
       const result = getters.experimentsTotalPagesCount(state);
       expect(result).to.equal(state.experiments.stats.totalPagesCount);
     });
+
+    it('lastUpdate', () => {
+      const result = getters.lastUpdate(state);
+      expect(result).to.equal(state.experiments.stats.datetime);
+    });
+
+    it('fetchingDataActive', () => {
+      const result = getters.fetchingDataActive(state);
+      expect(result).to.equal(state.fetchingDataActive);
+    });
   });
 
   describe('Mutations', () => {
@@ -96,6 +108,12 @@ describe('VUEX modules experiments', () => {
       mutations.setExperimentsStats(state, {data});
       expect(state.experiments.stats).to.deep.equal(data);
     });
+
+    it('setFetchingDataFlag', () => {
+      const data = {isActive: true};
+      mutations.setFetchingDataFlag(state, data);
+      expect(state.fetchingDataActive).to.equal(data.isActive);
+    });
   });
 
   describe('Actions', () => {
@@ -113,7 +131,10 @@ describe('VUEX modules experiments', () => {
       });
 
       it('should show error if internal server error occurs in  experiments fetching', (done) => {
-        expectedMutations = [];
+        expectedMutations = [
+          {type: 'setFetchingDataFlag', payload: {isActive: true}},
+          {type: 'setFetchingDataFlag', payload: {isActive: false}}
+        ];
         expectedActions = [
           {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
         ];
@@ -122,7 +143,10 @@ describe('VUEX modules experiments', () => {
       });
 
       it('should show invalid token page if token is invalid', (done) => {
-        expectedMutations = [];
+        expectedMutations = [
+          {type: 'setFetchingDataFlag', payload: {isActive: true}},
+          {type: 'setFetchingDataFlag', payload: {isActive: false}}
+        ];
         expectedActions = [
           {type: 'clearAuthorityData'}
         ];
@@ -137,9 +161,11 @@ describe('VUEX modules experiments', () => {
           stats: ['test3']
         };
         expectedMutations = [
+          {type: 'setFetchingDataFlag', payload: {isActive: true}},
           {type: 'setExperimentsData', payload: {data: data.data}},
           {type: 'setExperimentsParams', payload: {data: data.params}},
-          {type: 'setExperimentsStats', payload: {data: data.stats}}
+          {type: 'setExperimentsStats', payload: {data: data.stats}},
+          {type: 'setFetchingDataFlag', payload: {isActive: false}}
         ];
         expectedActions = [];
         mock.onGet('/api/experiments/list').reply(200, data);

@@ -87,6 +87,7 @@
               :prevPageAction="previousPage"
               :paginationStats="paginationStats"
               :updateCountHandler="updateCountPerPage"
+              :lastUpdateLabel="refresh.lastUpdateLabel"
             ></FooterElements>
           </div>
         </v-card>
@@ -128,17 +129,19 @@ export default {
       activeColumnIdx: 0,
       activeColumnName: null,
       hoveredColumnIdx: null,
-      selected: []
+      selected: [],
+      refresh: {
+        interval: 30,
+        lastUpdateLabel: 'Last updated moment ago.'
+      }
     }
   },
   created: function () {
-    this.getUserExperiments({
-      limitPerPage: this.pagination.itemsCountPerPage,
-      pageNo: this.pagination.currentPage,
-      orderBy: this.activeColumnName,
-      order: this.sorting.order,
-      searchBy: this.searchPattern
-    });
+    this.getData();
+    this.intervalId = setInterval(this.timer, 1000);
+  },
+  beforeDestroy: function () {
+    clearInterval(this.intervalId);
   },
   computed: {
     ...mapGetters({
@@ -149,6 +152,8 @@ export default {
       experimentsEnd: 'experimentsEnd',
       experimentsPageNumber: 'experimentsPageNumber',
       experimentsTotalPagesCount: 'experimentsTotalPagesCount',
+      lastUpdate: 'lastUpdate',
+      fetchingDataActive: 'fetchingDataActive',
       tensorMode: 'tensorMode'
     }),
     paginationStats: function () {
@@ -163,18 +168,12 @@ export default {
     },
     refreshTableDataTriggers: function () {
       return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
-      ${this.pagination.currentPage}|${this.searchPattern}`;
+      ${this.pagination.currentPage}`;
     }
   },
   watch: {
     refreshTableDataTriggers: function () {
-      this.getUserExperiments({
-        limitPerPage: this.pagination.itemsCountPerPage,
-        pageNo: this.pagination.currentPage,
-        orderBy: this.activeColumnName,
-        order: this.sorting.order,
-        searchBy: this.searchPattern
-      });
+      this.getData();
     },
     experimentsPageNumber: function () {
       this.pagination.currentPage = this.experimentsPageNumber;
@@ -242,6 +241,28 @@ export default {
         return item.name === exp.name;
       });
       return filtered.length !== 0;
+    },
+    getData () {
+      this.getUserExperiments({
+        limitPerPage: this.pagination.itemsCountPerPage,
+        pageNo: this.pagination.currentPage,
+        orderBy: this.activeColumnName,
+        order: this.sorting.order,
+        searchBy: this.searchPattern
+      });
+    },
+    timer () {
+      const currentTime = Date.now();
+      this.dupa = `${currentTime} - ${this.lastUpdate}) / 1000)`;
+      const lastUpdateTimeDiffer = Math.ceil((currentTime - this.lastUpdate) / 1000); // in seconds
+      if (lastUpdateTimeDiffer <= this.refresh.interval) {
+        this.refresh.lastUpdateLabel = 'Last updated moment ago.';
+      } else {
+        this.refresh.lastUpdateLabel = `Last updated over ${this.refresh.interval} seconds ago.`;
+        if (!this.fetchingDataActive) {
+          this.getData();
+        }
+      }
     }
   }
 }

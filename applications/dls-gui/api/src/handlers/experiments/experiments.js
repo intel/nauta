@@ -43,7 +43,8 @@ const parseExperiments = function (experiments, queryParams) {
 
   let result = {
     stats: {
-      total: experiments.length
+      total: experiments.length,
+      datetime: Date.now()
     }
   };
 
