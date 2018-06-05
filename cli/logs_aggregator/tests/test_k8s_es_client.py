@@ -133,10 +133,10 @@ def test_get_experiment_logs(mocker):
     experiment_name = 'fake-experiment'
     namespace = 'fake-namespace'
 
-    experiment_logs = client.get_experiment_logs(experiment_name=experiment_name, namespace=namespace)
+    experiment_logs = client.get_experiment_logs(run_name=experiment_name, namespace=namespace)
 
     assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName:"{experiment_name}" ' \
                                                       f'AND kubernetes.namespace_name:"{namespace}"',
                                          filters=[], index='_all')
 
@@ -152,31 +152,15 @@ def test_get_experiment_logs_time_range(mocker):
     start_date = '2018-04-17T09:28:39+00:00'
     end_date = '2018-04-17T09:28:49+00:00'
 
-    experiment_logs = client.get_experiment_logs(experiment_name=experiment_name,
+    experiment_logs = client.get_experiment_logs(run_name=experiment_name,
                                                  namespace=namespace,
                                                  start_date=start_date,
                                                  end_date=end_date)
 
     assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName:"{experiment_name}" ' \
                                                       f'AND kubernetes.namespace_name:"{namespace}" ' \
                                                       f'AND @timestamp:[{start_date} TO {end_date}]',
-                                         filters=[], index='_all')
-
-
-def test_get_experiment_logs(mocker):
-    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
-    mocked_log_search = mocker.patch.object(client, 'full_log_search')
-    mocked_log_search.return_value = TEST_LOG_ENTRIES
-
-    experiment_name = 'fake-experiment'
-    namespace = 'fake-namespace'
-
-    experiment_logs = client.get_experiment_logs(experiment_name=experiment_name, namespace=namespace)
-
-    assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.experimentName:"{experiment_name}" ' \
-                                                      f'AND kubernetes.namespace_name:"{namespace}"',
                                          filters=[], index='_all')
 
 

@@ -31,14 +31,6 @@ spec:
       - name: {{ .Release.Name }}-{{ .Chart.Name }}
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E tf-operator image is required" .Values.image }}
         command:
-          - /opt/mlkube/tf-operator
-          - --controller-config-file=/etc/config/controller-config-file.yaml
+          - /opt/kubeflow/tf-operator.v2
           - -alsologtostderr
           - -v=1
-        volumeMounts:
-          - name: config-volume
-            mountPath: /etc/config
-      volumes:
-        - name: config-volume
-          configMap:
-            name: {{ .Release.Name }}-{{ .Chart.Name }}

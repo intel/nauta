@@ -106,15 +106,24 @@ def add_experiment(exp: model.Experiment, namespace: str) -> model.ExperimentKub
 
 
 def generate_experiment_name(script_name: str, namespace: str, name: str = None) -> str:
+    # TODO: CAN-310
     if name:
-        validate_kubernetes_name(name)
-        experiments = list_experiments(namespace=namespace, name_filter=name)
+        # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit name passed
+        # by user
+        limited_name = name[:30]
+
+        validate_kubernetes_name(limited_name)
+        experiments = list_experiments(namespace=namespace, name_filter=limited_name)
         if experiments and len(experiments) > 0:
-            return f'{name}-{len(experiments)}'
-        return name
+            return f'{limited_name}-{len(experiments)}'
+        return limited_name
     else:
+        # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit script name,
+        # so user cannot pass script name with any number of chars
+        normalized_script_name = script_name.lower().replace('_', '-').replace('.', '-')[:10]
+
         formatter = re.compile(r'[^a-z0-9-]')
-        formatted_name = f"exp-{script_name.lower().replace('_', '-').replace('.', '-')}"
+        formatted_name = f"exp-{normalized_script_name}"
         formatted_name = formatter.sub('', formatted_name)
         experiments = list_experiments(namespace=namespace, name_filter=formatted_name)
         result = f'{formatted_name}-{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'

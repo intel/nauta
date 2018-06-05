@@ -66,7 +66,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             pod_ids = pod_ids.split(',') if pod_ids else None
             min_severity = SeverityLevel[min_severity] if min_severity else None
             pod_status = PodStatus[pod_status] if pod_status else None
-            experiment_logs = es_client.get_experiment_logs(experiment_name=experiment_name,
+            experiment_logs = es_client.get_experiment_logs(run_name=experiment_name,
                                                             namespace=namespace,
                                                             min_severity=min_severity,
                                                             start_date=start_date, end_date=end_date, pod_ids=pod_ids,

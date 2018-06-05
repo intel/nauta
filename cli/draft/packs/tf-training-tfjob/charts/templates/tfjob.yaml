@@ -1,17 +1,19 @@
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ .Release.Name }}
   labels:
     app: {{ template "name" . }}
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     draft: {{ .Values.draft }}
-    experimentName: {{ .Values.experimentName }}
+    runName: {{ .Release.Name }}
 spec:
-  replicaSpecs:
-    - tfReplicaType: MASTER
+  tfReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
       template:
         metadata:
           annotations:
@@ -20,7 +22,7 @@ spec:
             app: {{ template "name" . }}
             draft: {{ .Values.draft }}
             release: {{ .Release.Name }}
-            experimentName: {{ .Values.experimentName }}
+            runName: {{ .Release.Name }}
         spec:
           containers:
             - name: tensorflow
@@ -54,7 +56,6 @@ spec:
                 privileged: true
               resources:
     {{ toYaml .Values.resources | indent 12 }}
-          restartPolicy: Never
           volumes:
             - name: input-home
               persistentVolumeClaim:

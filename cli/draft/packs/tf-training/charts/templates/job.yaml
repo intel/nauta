@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ .Release.Name }}
   labels:
     app: {{ template "name" . }}
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     draft: {{ .Values.draft }}
-    experimentName: {{ .Values.experimentName }}
+    runName: {{ .Release.Name }}
 spec:
   template:
     metadata:
@@ -18,7 +18,7 @@ spec:
         app: {{ template "name" . }}
         draft: {{ .Values.draft }}
         release: {{ .Release.Name }}
-        experimentName: {{ .Values.experimentName }}
+        runName: {{ .Release.Name }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

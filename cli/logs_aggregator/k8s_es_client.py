@@ -46,7 +46,6 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 
-
     def full_log_search(self, lucene_query: str=None, index='_all',
                         scroll='1m', filters: List[Callable] = None) -> Generator[LogEntry, None, None]:
         """
@@ -67,32 +66,32 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             if not filters or all(f(log_entry) for f in filters):
                 yield log_entry
 
-
-    def get_experiment_logs(self, experiment_name: str, namespace: str, index='_all',
+    def get_experiment_logs(self, run_name: str, namespace: str, index='_all',
                             start_date: str = None, end_date: str = None,
                             pod_ids: List[str] = None, pod_status: PodStatus = None,
                             min_severity: SeverityLevel = None) -> List[LogEntry]:
         """
         Return logs for given experiment.
-        :param experiment_name: Name of experiment to search
+        :param run_name: Name of experiment to search
         :param namespace: Name of namespace where experiment was started
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         :param start_date: if provided, only logs produced after this date will be returned
         :param end_date: if provided, only logs produced before this date will be returned
-        :param log_count: Number of log entries that will be returned
-        :param sort: Sorting command in field:direction format
+        :param pod_ids: filter logs by pod ids
+        :param pod_status: filter logs by pod status
+        :param min_severity: return logs with minimum provided severity
         :return: List of LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
-        log.debug(f'Searching for {experiment_name} experiment logs.')
+        log.debug(f'Searching for {run_name} experiment logs.')
 
         if start_date or end_date:
             start_date = start_date or '*'
             end_date = end_date or '*'
-            lucene_query = f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+            lucene_query = f'kubernetes.labels.runName:"{run_name}" ' \
                            f'AND kubernetes.namespace_name:"{namespace}" ' \
                            f'AND @timestamp:[{start_date} TO {end_date}]'
         else:
-            lucene_query = f'kubernetes.labels.experimentName:"{experiment_name}" ' \
+            lucene_query = f'kubernetes.labels.runName:"{run_name}" ' \
                            f'AND kubernetes.namespace_name:"{namespace}"'
 
         filters = []
@@ -103,16 +102,14 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         if pod_ids:
             filters.append(partial(filter_log_by_pod_ids, pod_ids=set(pod_ids)))
 
-
         experiment_logs = sorted(self.full_log_search(lucene_query=lucene_query, index=index, filters=filters),
                                  key=lambda log_entry: dateutil.parser.parse(log_entry.date))
 
         if experiment_logs:
-            log.debug(f'Logs found for {experiment_name}.')
+            log.debug(f'Logs found for {run_name}.')
         else:
-            log.debug(f'Logs not found for {experiment_name}.')
+            log.debug(f'Logs not found for {run_name}.')
         return experiment_logs
-
 
     def delete_logs_for_namespace(self, namespace: str, index='_all'):
         """
@@ -123,7 +120,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         """
         log.debug(f'Deleting logs for {namespace} namespace.')
 
-        delete_query={"query": {"match": {'kubernetes.namespace_name': namespace}}}
+        delete_query = {"query": {"match": {'kubernetes.namespace_name': namespace}}}
 
         output = self.delete_by_query(index=index, body=delete_query)
 
