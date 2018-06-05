@@ -18,7 +18,8 @@ SAMBA_LOG_LEVEL=${SAMBA_LOG_LEVEL:-3}
 #        log to stdout -/
 #
 
-/usr/sbin/nmbd      -F -S --debuglevel=${SAMBA_LOG_LEVEL}  &
+# probably not needed for now:
+#/usr/sbin/nmbd      -F -S --debuglevel=${SAMBA_LOG_LEVEL}  &
 #                    ^  ^
 #                    |  |
 # run in foreground -/  |

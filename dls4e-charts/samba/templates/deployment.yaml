@@ -50,7 +50,7 @@ spec:
         - name: APP_RELEASE
           value: {{ .Release.Name }}
         - name: SAMBA_LOG_LEVEL
-          value: "10"
+          value: "3"
         ports:
         - containerPort: 137
           protocol: UDP

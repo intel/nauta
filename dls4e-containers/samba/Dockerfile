@@ -5,6 +5,9 @@ RUN yum clean all
 RUN yum update -y
 RUN yum install -y samba
 
+RUN curl http://repository.toolbox.nervana.sclab.intel.com/files/jq-linux64 -o /bin/jq
+RUN chmod +x /bin/jq
+
 COPY samba-init.sh /bin
 COPY samba-loop.sh /bin
 COPY samba-create.sh /bin

@@ -33,7 +33,10 @@ rules:
       - ""
     resources:
       - secrets
+      - configmaps
     verbs:
       - list
       - get
       - create
+      - patch
+      - watch
