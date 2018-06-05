@@ -23,8 +23,13 @@ from enum import Enum
 from typing import Pattern
 
 
-def filter_by_name_regex(resource_object_dict: dict, name_regex: Pattern = None):
-    return name_regex.search(resource_object_dict['spec']['name']) if name_regex else True
+def filter_by_name_regex(resource_object_dict: dict, name_regex: Pattern = None, spec_location: bool = True):
+    if spec_location:
+        rod = resource_object_dict['spec']['name']
+    else:
+        rod = resource_object_dict['metadata']['name']
+
+    return name_regex.search(rod) if name_regex else True
 
 
 def filter_by_state(resource_object_dict: dict, state: Enum = None):

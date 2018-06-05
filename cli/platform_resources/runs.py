@@ -64,7 +64,7 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
         logger.exception(error_msg)
         raise InvalidRegularExpressionError(error_msg) from e
 
-    run_filters = [partial(filter_by_name_regex, name_regex=name_regex),
+    run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False),
                    partial(filter_by_state, state=state)]
 
     runs = [Run.from_k8s_response_dict(run_dict)
