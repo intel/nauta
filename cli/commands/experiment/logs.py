@@ -50,7 +50,7 @@ logger = initialize_logger(__name__)
               help='Comma separated list of pod IDs, if provided, only logs from these pods will be returned')
 @click.option('-p', '--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
               help='Get logs only for pods with given status')
-@common_options
+@common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus):

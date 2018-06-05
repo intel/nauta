@@ -23,7 +23,7 @@ import logging
 import os
 from typing import List
 
-from util.config import Config, Fields
+from util.config import Config
 from util.system import execute_system_command
 from util.logger import initialize_logger
 
@@ -36,7 +36,7 @@ DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
 def call_draft(args: List[str], cwd: str = None) -> (str, int):
-    config_path = Config.get(Fields.CONFIG_PATH)
+    config_path = Config().config_path
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
     if log.getEffectiveLevel() == logging.DEBUG:

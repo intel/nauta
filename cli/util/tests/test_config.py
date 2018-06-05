@@ -24,8 +24,7 @@ from unittest.mock import patch
 
 import pytest
 
-from commands.verify import verify
-from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME
+from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME, Config, ConfigInitError
 
 APP_DIR_PATH = '/my/App'
 APP_BINARY_PATH = os.path.join(APP_DIR_PATH, 'binary')
@@ -40,7 +39,7 @@ def test_validate_config_path_success_with_app_dir(exists_mock, expanduser_mock)
     expanduser_mock.return_value = USER_HOME_PATH
     exists_mock.side_effect = [False, True]
 
-    result = verify.validate_config_path()
+    result = Config.get_config_path()
 
     assert result == os.path.join(APP_DIR_PATH, DLS_CTL_CONFIG_DIR_NAME)
     assert exists_mock.call_count == 2
@@ -51,9 +50,9 @@ def test_validate_config_path_success_with_app_dir(exists_mock, expanduser_mock)
 @patch('os.path.exists')
 def test_validate_config_path_success_with_user_local_dir(exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
-    exists_mock.side_effect = [True]
+    exists_mock.return_value = True
 
-    result = verify.validate_config_path()
+    result = Config.get_config_path()
 
     assert result == os.path.join(USER_HOME_PATH, DLS_CTL_CONFIG_DIR_NAME)
     assert exists_mock.call_count == 1
@@ -65,9 +64,9 @@ def test_validate_config_path_success_with_user_local_dir(exists_mock, expanduse
 @patch('os.path.exists')
 def test_validate_config_path_success_with_env(exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
-    exists_mock.side_effect = [True]
+    exists_mock.return_value = True
 
-    result = verify.validate_config_path()
+    result = Config.get_config_path()
 
     assert result == USER_CUSTOM_PATH
     assert exists_mock.call_count == 1
@@ -79,10 +78,10 @@ def test_validate_config_path_success_with_env(exists_mock, expanduser_mock):
 @patch('os.path.exists')
 def test_validate_config_path_error_with_env_not_exist_dir(exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
-    exists_mock.side_effect = [False]
+    exists_mock.return_value = False
 
-    with pytest.raises(SystemExit):
-        verify.validate_config_path()
+    with pytest.raises(ConfigInitError):
+        Config.get_config_path()
 
     assert exists_mock.call_count == 1
 
@@ -94,7 +93,7 @@ def test_validate_config_path_error(exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
     exists_mock.side_effect = [False, False]
 
-    with pytest.raises(SystemExit):
-        verify.validate_config_path()
+    with pytest.raises(ConfigInitError):
+        Config.get_config_path()
 
     assert exists_mock.call_count == 2

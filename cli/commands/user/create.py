@@ -25,7 +25,7 @@ import sys
 
 import click
 
-from util.config import Config, Fields
+from util.config import Config
 from util.logger import initialize_logger
 from util.system import execute_system_command
 from util.k8s.k8s_info import get_users_token, is_current_user_administrator
@@ -78,7 +78,7 @@ REMOVE_USER_ERROR_DESCRIPTION = "Partially created user hasn't been removed succ
 
 @click.argument('username')
 @click.command(help=HELP, cls=AliasCmd, alias='c')
-@common_options
+@common_options()
 @pass_state
 def create(state: State, username: str):
     """
@@ -108,7 +108,7 @@ def create(state: State, username: str):
         sys.exit(1)
 
     try:
-        chart_location = os.path.join(Config.get(Fields.CONFIG_PATH), ADD_USER_CHART_NAME)
+        chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
 
         dls4e_config_map = DLS4EConfigMap()
 

@@ -19,14 +19,19 @@
 # and approved by Intel in writing.
 #
 
+from functools import wraps
 import logging
+import sys
+
 import click
 
-from util.logger import set_verbosity_level
+from util.logger import set_verbosity_level, initialize_logger
+from util.config import Config, ConfigInitError
+from util.dependencies_checker import check_all_binary_dependencies, InvalidDependencyError
 
+logger = initialize_logger(__name__)
 
 class State:
-
     def __init__(self):
         self.verbosity = 0
 
@@ -36,9 +41,7 @@ pass_state = click.make_pass_decorator(State, ensure=True)
 
 def verbosity_option(f):
     def callback(ctx, param, value):
-        state = ctx.ensure_object(State)
-        state.verbosity = value
-        logging_level = set_verbosity_level(state.verbosity)
+        logging_level = set_verbosity_level(value)
         logging.getLogger().setLevel(logging_level)
         return value
 
@@ -48,6 +51,45 @@ def verbosity_option(f):
                         callback=callback)(f)
 
 
-def common_options(f):
-    f = verbosity_option(f)
-    return f
+def verify_cli_dependencies():
+    try:
+        check_all_binary_dependencies()
+    except InvalidDependencyError as e:
+        error_msg = 'Dependency check failed. Run "dlsctl verify -vv" for more detailed information.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(str(e))
+
+
+
+def verify_cli_config_path():
+    try:
+        config = Config()
+        if not config.config_path:
+            raise ConfigInitError('Configuration directory for dlsctl is not set.')
+    except ConfigInitError as e:
+        error_msg = 'Config initialization failed.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(str(e))
+
+
+def common_options(verify_dependencies=True, verify_config_path=True):
+    """
+    Common options decorator for Click command functions. Adds verbosity option and optionally runs CLI dependencies
+    verification before command run.
+    :param verify_dependencies: if set to True, CLI dependencies will be verified before command run
+    :param verify_config_path: if set to True, CLI config path will be verified before command run
+    :return: decorated command
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if verify_config_path:
+                verify_cli_config_path()
+            if verify_dependencies:
+                verify_cli_dependencies()
+            return func(*args, **kwargs)
+        wrapper = verbosity_option(wrapper)
+        return wrapper
+    return decorator

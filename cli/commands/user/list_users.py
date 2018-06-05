@@ -33,7 +33,7 @@ logger = initialize_logger(__name__)
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
-@common_options
+@common_options()
 @pass_state
 def list_users(state: State):
     """

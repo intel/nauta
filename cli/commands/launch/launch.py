@@ -101,7 +101,7 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
 
 
 @click.command(cls=AliasCmd, alias='ui')
-@common_options
+@common_options()
 @pass_state
 @click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                 'only proxy tunnel is created')
@@ -113,7 +113,7 @@ def webui(state: State, no_launch: bool):
 
 
 @click.command(cls=AliasCmd, alias='tb')
-@common_options
+@common_options()
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                       'only proxy tunnel is created')

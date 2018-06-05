@@ -24,7 +24,7 @@ import shutil
 from enum import Enum
 from typing import Tuple
 
-from util.config import EXPERIMENTS_DIR_NAME, Config, Fields
+from util.config import EXPERIMENTS_DIR_NAME, Config
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 
@@ -54,7 +54,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     message_prefix = "Experiment's environment hasn't been created. Reason - {}"
 
     # create a folder for experiment's purposes
-    experiment_path = os.path.join(Config.get(Fields.CONFIG_PATH), EXPERIMENTS_DIR_NAME, experiment_name)
+    experiment_path = os.path.join(Config().config_path, EXPERIMENTS_DIR_NAME, experiment_name)
 
     # copy folder content
     if folder_location:

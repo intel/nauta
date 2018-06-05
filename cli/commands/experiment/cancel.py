@@ -31,7 +31,7 @@ HELP_P = "If given - all information concerning experiments is removed from the 
 @click.command(help=HELP, cls=AliasCmd, alias='c')
 @click.argument("name")
 @click.option('-p', '--purge', default=None, help=HELP_P, is_flag=True)
-@common_options
+@common_options()
 @pass_state
 def cancel(state: State, name: str, purge: bool):
     """

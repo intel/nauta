@@ -19,56 +19,40 @@
 # and approved by Intel in writing.
 #
 
-import os
-import sys
-
 import click
 
 from cli_state import common_options, pass_state, State
-from draft import dependencies_checker
-from util.aliascmd import AliasCmd
+from util.dependencies_checker import check_dependency, DEPENDENCY_MAP
 from util.logger import initialize_logger
-from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME
+from util.aliascmd import AliasCmd
 
 
 HELP = "Command used to verify whether all external components required by dlsctl are installed " \
        "in proper versions. If something is missing - application displays a detailed information" \
        " about it."
 
-log = initialize_logger('commands.verify')
+log = initialize_logger(__name__)
 
 
 @click.command(help=HELP, cls=AliasCmd, alias='ver')
-@common_options
+@common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):
-    dependencies_checker.check()
-
-
-def validate_config_path() -> str:
-    binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), DLS_CTL_CONFIG_DIR_NAME)
-    user_local_config_dir_path = os.path.join(os.path.expanduser('~'), DLS_CTL_CONFIG_DIR_NAME)
-
-    log.debug(f"{DLS_CTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
-    log.debug(f'{DLS_CTL_CONFIG_DIR_NAME} user home path:  {binary_config_dir_path}')
-
-    if DLS_CTL_CONFIG_ENV_NAME in os.environ and os.environ.get(DLS_CTL_CONFIG_ENV_NAME):
-        user_path = os.environ.get(DLS_CTL_CONFIG_ENV_NAME)
-        if os.path.exists(user_path):
-            return user_path
-        else:
-            message = f'can not find {user_path} directory from {DLS_CTL_CONFIG_ENV_NAME} env!'
-            log.exception(message)
-            click.echo(message)
-            sys.exit(1)
-    elif user_local_config_dir_path and os.path.exists(user_local_config_dir_path):
-        return user_local_config_dir_path
-    elif binary_config_dir_path and os.path.exists(binary_config_dir_path):
-        return binary_config_dir_path
-    else:
-        message = f'can not find {DLS_CTL_CONFIG_DIR_NAME} directory in {binary_config_dir_path} and ' \
-                  f'{user_local_config_dir_path}. Use {DLS_CTL_CONFIG_ENV_NAME} env to point ' \
-                  f'{DLS_CTL_CONFIG_DIR_NAME} directory location'
-        log.exception(message)
-        click.echo(message)
-        sys.exit(1)
+    for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
+        try:
+            valid, installed_version = check_dependency(dependency_spec)
+            if valid:
+                click.echo(f'{dependency_name} verified successfully.')
+            else:
+                supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
+                click.echo(f'{dependency_name} installed version ({installed_version}) '
+                           f'was not tested, supported version {supported_versions_sign}'
+                           f' {dependency_spec.expected_version}')
+        except RuntimeError:
+            error_msg = f'{dependency_name} is not installed.'
+            log.exception(error_msg)
+            click.echo(error_msg)
+        except ValueError:
+            error_msg = f'Failed to parse {dependency_name} version.'
+            log.exception(error_msg)
+            click.echo(error_msg)

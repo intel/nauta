@@ -89,7 +89,8 @@ class ExperimentSchema(Schema):
 
 
 class ExperimentKubernetes(object):
-    def __init__(self, spec: Experiment, metadata: client.V1ObjectMeta, apiVersion: str='aipg.intel.com/v1', kind: str='Experiment') -> None:
+    def __init__(self, spec: Experiment, metadata: client.V1ObjectMeta, apiVersion: str='aipg.intel.com/v1',
+                 kind: str='Experiment') -> None:
         self.apiVersion = apiVersion
         self.kind = kind
         self.metadata = metadata

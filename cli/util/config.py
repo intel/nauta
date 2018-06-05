@@ -19,9 +19,11 @@
 # and approved by Intel in writing.
 #
 
-from enum import Enum
+import os
+import sys
 
 from util.k8s.k8s_info import get_config_map_data
+from util.logger import initialize_logger
 
 # environmental variable with a dlsctl HOME folder
 DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
@@ -34,20 +36,46 @@ DLS4E_NAMESPACE = "dls4e"
 DLS4E_CONFIGURATION_CM = "dls4enterprise"
 
 
-class Fields(Enum):
-    CONFIG_PATH = 'config_path'
+log = initialize_logger(__name__)
+
+
+class ConfigInitError(Exception):
+    def __init__(self, message: str):
+        self.message = message
 
 
 class Config:
-    __params = dict()
+    __shared_state = {}
 
-    @staticmethod
-    def get(field: Fields):
-        return Config.__params.get(field.value)
+    def __init__(self):
+        self.__dict__ = self.__shared_state
+        if not hasattr(self, 'config_path'):
+            self.config_path = self.get_config_path()
 
-    @staticmethod
-    def set(field: Fields, value):
-        Config.__params[field.value] = value
+    @classmethod
+    def get_config_path(self) -> str:
+        binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), DLS_CTL_CONFIG_DIR_NAME)
+        user_local_config_dir_path = os.path.join(os.path.expanduser('~'), DLS_CTL_CONFIG_DIR_NAME)
+
+        log.debug(f"{DLS_CTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
+        log.debug(f'{DLS_CTL_CONFIG_DIR_NAME} user home path:  {binary_config_dir_path}')
+
+        if DLS_CTL_CONFIG_ENV_NAME in os.environ and os.environ.get(DLS_CTL_CONFIG_ENV_NAME):
+            user_path = os.environ.get(DLS_CTL_CONFIG_ENV_NAME)
+            if os.path.exists(user_path):
+                return user_path
+            else:
+                message = f'Cannot find {user_path} directory from {DLS_CTL_CONFIG_ENV_NAME} env!'
+                raise ConfigInitError(message)
+        elif user_local_config_dir_path and os.path.exists(user_local_config_dir_path):
+            return user_local_config_dir_path
+        elif binary_config_dir_path and os.path.exists(binary_config_dir_path):
+            return binary_config_dir_path
+        else:
+            message = f'Cannot find {DLS_CTL_CONFIG_DIR_NAME} directory in {binary_config_dir_path} and ' \
+                      f'{user_local_config_dir_path}. Use {DLS_CTL_CONFIG_ENV_NAME} env to point ' \
+                      f'{DLS_CTL_CONFIG_DIR_NAME} directory location'
+            raise ConfigInitError(message)
 
 
 class DLS4EConfigMap:
@@ -60,12 +88,10 @@ class DLS4EConfigMap:
     EXTERNAL_IP_FIELD = 'external_ip'
 
     __shared_state = {}
-    image_tiller: str = None
-    external_ip: str = None
 
     def __init__(self):
         self.__dict__ = self.__shared_state
-        if not self.image_tiller or not self.external_ip:
+        if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip'):
             config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE)
             self.image_tiller = config_map_data[self.IMAGE_TILLER_FIELD]
             self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]

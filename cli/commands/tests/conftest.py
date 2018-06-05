@@ -19,23 +19,10 @@
 # and approved by Intel in writing.
 #
 
-import click
-
-from cli_state import common_options, pass_state, State
-from util.aliascmd import AliasCmd
-
-HELP = "Launches a local browser with Jupyter notebook. If script name argument is given - script is put" \
-       "into opened notebook."
-HELP_N = "Name of a Jupyter notebook's session.."
+import pytest
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='i')
-@click.argument("script_name", default="")
-@click.option('-n', '--name', default=None, help=HELP_N)
-@common_options()
-@pass_state
-def interact(state: State, script_name: str, name: str):
-    """
-    Starts an interactive session with Jupyter Notebook
-    """
-    click.echo("Interact command - under development")
+@pytest.fixture(autouse=True)
+def mock_cli_validation(mocker):
+    mocker.patch('cli_state.verify_cli_dependencies')
+    mocker.patch('cli_state.verify_cli_config_path')

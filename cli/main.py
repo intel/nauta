@@ -33,7 +33,6 @@ from commands.verify import verify
 from commands.mounts import mounts
 from commands.version import version
 from util.aliascmd import AliasGroup
-from util.config import Config, Fields
 from util.logger import initialize_logger
 
 
@@ -48,7 +47,7 @@ ERROR_MESSAGE = "Other error during starting application."
 
 @click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup)
 def entry_point():
-    Config.set(Fields.CONFIG_PATH, verify.validate_config_path())
+    pass
 
 
 entry_point.add_command(experiment.experiment)

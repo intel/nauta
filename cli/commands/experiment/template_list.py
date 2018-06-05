@@ -19,15 +19,15 @@
 # and approved by Intel in writing.
 #
 
-import click
 import os
 import sys
 
+import click
 from tabulate import tabulate
 
-from draft.cmd import DRAFT_HOME_FOLDER
 from util.aliascmd import AliasCmd
-from util.config import Config, Fields
+from draft.cmd import DRAFT_HOME_FOLDER
+from util.config import Config
 from util.logger import initialize_logger
 
 log = initialize_logger('commands.template_list')
@@ -40,7 +40,7 @@ TEMPL_FOLDER_NAME = "templates"
 
 @click.command(help=HELP, cls=AliasCmd, alias='t')
 def template_list():
-    path = os.path.join(Config.get(Fields.CONFIG_PATH), DRAFT_HOME_FOLDER, "packs")
+    path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")
 
     list_of_packs = []
     for (dirpath, dirnames, filenames) in os.walk(path):

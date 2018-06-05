@@ -70,7 +70,7 @@ def container_resources_to_msg(resources):
 @click.command(help=HELP, cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
 @click.option('-tb', '--tensorboard', default=None, help=HELP_T, is_flag=True)
-@common_options
+@common_options()
 @pass_state
 def view(state: State, experiment_name: str, tensorboard: bool):
     """

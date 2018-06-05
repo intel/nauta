@@ -78,7 +78,7 @@ def validate_experiment_name(ctx, param, value):
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=HELP_PS)
 @click.argument("script_parameters", nargs=-1)
-@common_options
+@common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],

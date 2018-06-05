@@ -31,7 +31,7 @@ HELP_N = "Name of prediction session."
 @click.command(help=HELP, cls=AliasCmd, alias='p')
 @click.argument("model_location")
 @click.option('-n', '--name', default=None, help=HELP_N)
-@common_options
+@common_options()
 @pass_state
 def predict(state: State, model_location: str, name: str):
     """

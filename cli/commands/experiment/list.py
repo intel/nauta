@@ -41,7 +41,7 @@ logger = initialize_logger(__name__)
               help='A regular expression to narrow down list to experiments that are matching this expression')
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]),
               help='List experiments with matching status')
-@common_options
+@common_options()
 @pass_state
 def list_experiments(state: State, all_users: bool, name: str, status: RunStatus):
     """

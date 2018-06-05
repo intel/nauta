@@ -24,7 +24,6 @@ import os
 import pytest
 from unittest.mock import call, ANY
 
-from util.config import Config
 from draft import cmd
 
 
@@ -44,8 +43,9 @@ INCORRECT_CREATE_OUTPUT = '-->  to sail 1234567890 AbCdEF'
 
 @pytest.fixture
 def draft_mock(mocker):
-    path_mock = mocker.patch.object(Config, 'get')
-    path_mock.return_value = FAKE_CLI_CONFIG_DIR_PATH
+    config_class_mock = mocker.patch('draft.cmd.Config')
+    config_instance_mock = config_class_mock.return_value
+    config_instance_mock.config_path = FAKE_CLI_CONFIG_DIR_PATH
 
     exe_mock = mocker.patch.object(cmd, 'execute_system_command')
     exe_mock.return_value = ('some return', 0)

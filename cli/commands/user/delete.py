@@ -42,7 +42,7 @@ HELP_PR = "If this option is added - command removes all client's artifacts."
 @click.command(help=HELP, cls=AliasCmd, alias='d')
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=HELP_PR)
-@common_options
+@common_options()
 @pass_state
 def delete(state: State, username: str, purge: bool):
     """
