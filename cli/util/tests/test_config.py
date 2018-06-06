@@ -35,9 +35,11 @@ USER_CUSTOM_PATH = '/custom/path'
 @patch('sys.executable', APP_BINARY_PATH)
 @patch('os.path.expanduser')
 @patch('os.path.exists')
-def test_validate_config_path_success_with_app_dir(exists_mock, expanduser_mock):
+@patch('os.environ.get')
+def test_validate_config_path_success_with_app_dir(os_env_get, exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
     exists_mock.side_effect = [False, True]
+    os_env_get.return_value = ""
 
     result = Config.get_config_path()
 
@@ -48,9 +50,11 @@ def test_validate_config_path_success_with_app_dir(exists_mock, expanduser_mock)
 @patch('sys.executable', APP_BINARY_PATH)
 @patch('os.path.expanduser')
 @patch('os.path.exists')
-def test_validate_config_path_success_with_user_local_dir(exists_mock, expanduser_mock):
+@patch('os.environ.get')
+def test_validate_config_path_success_with_user_local_dir(os_env_get, exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
     exists_mock.return_value = True
+    os_env_get.return_value = ""
 
     result = Config.get_config_path()
 
@@ -89,9 +93,11 @@ def test_validate_config_path_error_with_env_not_exist_dir(exists_mock, expandus
 @patch('sys.executable', APP_BINARY_PATH)
 @patch('os.path.expanduser')
 @patch('os.path.exists')
-def test_validate_config_path_error(exists_mock, expanduser_mock):
+@patch('os.environ.get')
+def test_validate_config_path_error(os_env_get, exists_mock, expanduser_mock):
     expanduser_mock.return_value = USER_HOME_PATH
     exists_mock.side_effect = [False, False]
+    os_env_get.return_value = ""
 
     with pytest.raises(ConfigInitError):
         Config.get_config_path()
