@@ -19,9 +19,10 @@
 # and approved by Intel in writing.
 #
 
-from enum import Enum
-from typing import List
 from collections import namedtuple
+from enum import Enum
+import textwrap
+from typing import List
 
 from platform_resources.platform_resource_model import PlatformResource
 
@@ -35,11 +36,8 @@ class RunStatus(Enum):
 
 
 class Run(PlatformResource):
-    RunCliModel = namedtuple('Run', ['name', 'parameters', 'metrics',
-                                     'submission_date', 'submitter', 'status', 'template_name'])
-
-    RunCliShortModel = namedtuple('Run', ['name', 'parameters', 'metrics',
-                                     'submission_date', 'submitter', 'status'])
+    RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics',
+                                             'submission_date', 'submitter', 'status', 'template_name'])
 
     def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
                  pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
@@ -71,15 +69,14 @@ class Run(PlatformResource):
 
     @property
     def cli_representation(self):
-        return Run.RunCliModel(name=self.name, parameters=' '.join(self.parameters),
-                               metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
-                               submission_date=self.creation_timestamp, submitter=self.submitter,
-                               status=self.state.value, template_name=self.template_name)
-
-
-    @property
-    def cli_short_representation(self):
-        return Run.RunCliShortModel(name=self.name, parameters=' '.join(self.parameters),
-                               metrics=' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
-                               submission_date=self.creation_timestamp, submitter=self.submitter,
-                               status=self.state)
+        return Run.RunCliModel(name=self.name,
+                               parameters=textwrap.fill(
+                                   ' '.join(self.parameters),
+                                   width=30),
+                               metrics=textwrap.fill(
+                                   ' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
+                                   width=30),
+                               submission_date=self.creation_timestamp,
+                               submitter=self.submitter,
+                               status=self.state.value,
+                               template_name=self.template_name)

@@ -54,9 +54,9 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
 
         # List experiments command is actually listing Run resources instead of Experiment resources
         runs = runs_api.list_runs(namespace=namespace, state=status, name_filter=name)
-        click.echo(tabulate([run.cli_short_representation for run in runs],
+        click.echo(tabulate([run.cli_representation for run in runs],
                             headers=['Name', 'Parameters', 'Metrics', 'Submission date',
-                                     'Submitter', 'Status'], tablefmt="orgtbl"))
+                                     'Submitter', 'Status', 'Template name'], tablefmt="orgtbl"))
     except runs_api.InvalidRegularExpressionError:
         error_msg = f'Regular expression provided for name filtering is invalid: {name}'
         logger.exception(error_msg)
