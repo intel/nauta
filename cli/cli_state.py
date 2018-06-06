@@ -31,6 +31,7 @@ from util.dependencies_checker import check_all_binary_dependencies, InvalidDepe
 
 logger = initialize_logger(__name__)
 
+
 class State:
     def __init__(self):
         self.verbosity = 0
@@ -54,12 +55,10 @@ def verbosity_option(f):
 def verify_cli_dependencies():
     try:
         check_all_binary_dependencies()
-    except InvalidDependencyError as e:
+    except InvalidDependencyError:
         error_msg = 'Dependency check failed. Run "dlsctl verify -vv" for more detailed information.'
         logger.exception(error_msg)
         click.echo(error_msg)
-        sys.exit(str(e))
-
 
 
 def verify_cli_config_path():
