@@ -100,7 +100,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
         config.load_kube_config()
         v1 = client.CoreV1Api()
         ret = v1.list_pod_for_all_namespaces(
-            watch=False, label_selector="job-name=" + experiment_name)
+            watch=False, label_selector="runName=" + experiment_name)
         containers_details = {}
         tabular_output = []
         for i in ret.items:
