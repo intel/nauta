@@ -45,6 +45,12 @@ HELP = "Command for launching web user-interface or tensorboard"
 FORWARDED_URL = 'http://localhost:{}'
 
 
+def is_gui_browser_available() -> bool:
+    browser = webbrowser.get()
+    logger.debug(f'Available web browser: {browser.name}')
+    return True if type(browser) not in {webbrowser.GenericBrowser, None} else False
+
+
 def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
     try:
         with K8sProxy(k8s_app_name) as proxy:
@@ -66,9 +72,13 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
                 url = f'{url}?token={prepared_user_token}'
 
             if not no_launch:
-                click.echo('Browser will start in few seconds. Please wait... ')
-                wait_for_connection(url)
-                webbrowser.open_new(url)
+                if is_gui_browser_available():
+                    click.echo('Browser will start in few seconds. Please wait... ')
+                    wait_for_connection(url)
+                    webbrowser.open_new(url)
+                else:
+                    click.echo('Cannot find a suitable web browser. Try running this command with --no-launch option.')
+                    sys.exit(1)
 
             click.echo('Go to {}'.format(url))
 
