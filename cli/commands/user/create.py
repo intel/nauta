@@ -77,7 +77,7 @@ REMOVE_USER_ERROR_DESCRIPTION = "Partially created user hasn't been removed succ
 
 
 @click.argument('username')
-@click.command(help=HELP, cls=AliasCmd, alias='c')
+@click.command(short_help=HELP, cls=AliasCmd, alias='c')
 @common_options()
 @pass_state
 def create(state: State, username: str):

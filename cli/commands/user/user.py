@@ -33,7 +33,7 @@ HELP = "Command for creating/deleting/listing users of the platform. Can be only
        "run by a platform administrator."
 
 
-@click.group(help=HELP, cls=AliasGroup, alias='u')
+@click.group(short_help=HELP, cls=AliasGroup, alias='u')
 def user():
     pass
 

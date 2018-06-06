@@ -29,7 +29,7 @@ HELP = "Launches a local browser with Jupyter notebook. If script name argument 
 HELP_N = "Name of a Jupyter notebook's session.."
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='i')
+@click.command(short_help=HELP, cls=AliasCmd, alias='i')
 @click.argument("script_name", default="")
 @click.option('-n', '--name', default=None, help=HELP_N)
 @common_options()

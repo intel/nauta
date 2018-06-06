@@ -70,7 +70,7 @@ def validate_experiment_name(ctx, param, value):
         raise click.BadParameter(ex)
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='s')
+@click.command(short_help=HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.option("-t", "--template", help=HELP_T, default="tf-training-tfjob")

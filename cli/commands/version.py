@@ -29,7 +29,7 @@ from version import VERSION
 HELP = "Displays version of dlsctl application."
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='v')
+@click.command(short_help=HELP, cls=AliasCmd, alias='v')
 @common_options(verify_dependencies=False, verify_config_path=False)
 def version():
     """

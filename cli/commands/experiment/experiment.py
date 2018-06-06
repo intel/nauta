@@ -30,7 +30,7 @@ logger = initialize_logger(__name__)
 HELP = "Command for training and managing training jobs"
 
 
-@click.group(help=HELP, cls=AliasGroup, alias='exp')
+@click.group(short_help=HELP, cls=AliasGroup, alias='exp')
 def experiment():
     pass
 

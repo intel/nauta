@@ -34,7 +34,7 @@ HELP = "Command used to verify whether all external components required by dlsct
 log = initialize_logger(__name__)
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='ver')
+@click.command(short_help=HELP, cls=AliasCmd, alias='ver')
 @common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):

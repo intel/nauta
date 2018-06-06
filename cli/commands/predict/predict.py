@@ -28,7 +28,7 @@ HELP = "Runs inference on previously trained model."
 HELP_N = "Name of prediction session."
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='p')
+@click.command(short_help=HELP, cls=AliasCmd, alias='p')
 @click.argument("model_location")
 @click.option('-n', '--name', default=None, help=HELP_N)
 @common_options()

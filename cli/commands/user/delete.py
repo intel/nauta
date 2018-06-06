@@ -39,7 +39,7 @@ HELP = "Command used to delete a user from the platform. Can be only " \
 HELP_PR = "If this option is added - command removes all client's artifacts."
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='d')
+@click.command(short_help=HELP, cls=AliasCmd, alias='d')
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=HELP_PR)
 @common_options()

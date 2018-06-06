@@ -67,7 +67,7 @@ def container_resources_to_msg(resources):
     return ret[:-1]
 
 
-@click.command(help=HELP, cls=AliasCmd, alias='v')
+@click.command(short_help=HELP, cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
 @click.option('-tb', '--tensorboard', default=None, help=HELP_T, is_flag=True)
 @common_options()

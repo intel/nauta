@@ -135,7 +135,7 @@ def tensorboard(state: State, no_launch: bool):
     launch_app(DLS4EAppNames.TENSORBOARD, no_launch)
 
 
-@click.group(help=HELP, cls=AliasGroup, alias='l')
+@click.group(short_help=HELP, cls=AliasGroup, alias='l')
 def launch():
     pass
 
