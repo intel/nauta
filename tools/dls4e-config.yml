@@ -72,14 +72,13 @@ images:
       BUILD_IMAGE: "dls4e/build"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
-# TODO Change directory PATH after move
   dls4e/experiment-service:
     version: "1.0.0"
     required:
       BASE_IMAGE: "dls4e/centos"
       BUILD_IMAGE: "dls4e/go-apiserver-builder"
     method: build
-    directory: "{{ playbook_dir }}/../../applications/test-exp-service"
+    directory: "{{ playbook_dir }}/../../applications/experiment-service"
   dls4e/tensorflow:
     version: "1.8.0-py3"
     method: pull

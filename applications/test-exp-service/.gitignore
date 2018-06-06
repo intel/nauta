@@ -1,5 +1,0 @@
-bin/*
-default.etcd/*
-config/*
-experiment-svc
-vendor
