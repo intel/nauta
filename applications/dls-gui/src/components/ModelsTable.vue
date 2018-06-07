@@ -53,9 +53,9 @@
                     <v-icon small class="pointer-btn">{{ filterIcon }}</v-icon>
                     <v-tooltip bottom>
                       <span slot="activator" v-bind:class="{active: activeColumnName === header}">
-                        {{ cutLongText(header) }}
+                        {{ cutLongText(getLabel(header)) }}
                       </span>
-                        <span>{{ header }}</span>
+                      <span>{{ getLabel(header) }}</span>
                     </v-tooltip>
                     <v-icon v-if="(hoveredColumnIdx === idx || activeColumnIdx === idx)" small
                             v-on:click="toggleOrder(header, idx)" class="header-btn">
@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import LABELS from '../utils/header-titles';
 import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FooterElements from './ModelsTableFeatures/FooterElements';
@@ -181,6 +182,9 @@ export default {
   },
   methods: {
     ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode']),
+    getLabel: function (header) {
+      return LABELS[header] || header;
+    },
     cutLongText (str) {
       return str.length > 14 ? `${str.substr(0, 14)}...` : str;
     },
@@ -253,7 +257,6 @@ export default {
     },
     timer () {
       const currentTime = Date.now();
-      this.dupa = `${currentTime} - ${this.lastUpdate}) / 1000)`;
       const lastUpdateTimeDiffer = Math.ceil((currentTime - this.lastUpdate) / 1000); // in seconds
       if (lastUpdateTimeDiffer <= this.refresh.interval) {
         this.refresh.lastUpdateLabel = 'Last updated moment ago.';
@@ -272,6 +275,7 @@ export default {
 th {
   height: 46px;
   color: rgba(0, 0, 0, 0.52);
+  font-size: 14px !important;
 }
 .pointer-btn {
   cursor: pointer;

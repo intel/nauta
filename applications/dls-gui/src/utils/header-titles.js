@@ -19,32 +19,12 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-layout row wrap>
-    <v-flex xs12 align-center>
-      <h1>YOU ARE SIGNED OUT.</h1>
-    </v-flex>
-    <v-flex xs12>
-      <h3>To sign in, run <i>dlsctl launch webui</i> command again.</h3>
-    </v-flex>
-  </v-layout>
-</template>
-
-<script>
 export default {
-  name: 'SignedOut'
-}
-</script>
-
-<style scoped>
-h1 {
-  font-family: 'Intel Clear Pro', sans-serif;
-  font-size: 64px;
-  margin-left: 100px;
-  margin-top: 100px;
-}
-h3 {
-  font-family: 'Intel Clear', sans-serif;
-  margin-left: 100px;
-}
-</style>
+  creationTimestamp: 'Submission Date',
+  namespace: 'Owner',
+  name: 'Experiment Name',
+  'parameters-spec': 'Submit Parameters',
+  state: 'Experiment State',
+  'template-name': 'Template Name',
+  'template-namespace': 'Template Namespace'
+};

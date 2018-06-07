@@ -50,7 +50,7 @@
         <v-layout row wrap>
           <v-flex xs12>
             <div v-for="header in headers" v-bind:key="header" class="input-group input-group--dirty checkbox input-group--selection-controls input-group--active accent--text">
-              <label :for="header">{{ header }}</label>
+              <label :for="header">{{ getLabel(header) }}</label>
               <div class="input-group__input">
                 <input :id="header" type="checkbox" v-model="visibilityDraft[header]"/>
               </div>
@@ -76,6 +76,7 @@
 <script>
 import {mapGetters} from 'vuex';
 import lodash from 'lodash';
+import LABELS from '../../utils/header-titles';
 
 export default {
   name: 'ActionHeaderButtons',
@@ -105,6 +106,9 @@ export default {
     })
   },
   methods: {
+    getLabel: function (header) {
+      return LABELS[header] || header;
+    },
     revertToDefault: function () {
       this.setHiddenColumnsHandler([]);
       this.showColumnMgmtModal = false;
