@@ -18,5 +18,13 @@ rules:
     - list
     - get
     - watch
-  resourceNames:
-    - "{{ required "DLS4E Username is required as parameter username" .Values.username }}"
+- apiGroups:
+    - "*"
+  resources:
+    - runs
+    - experiments
+    - tfjobs
+  verbs:
+    - list
+    - get
+    - watch
