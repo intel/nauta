@@ -20,10 +20,12 @@
 #
 
 import subprocess
+import errno
 
 import pytest
 
-from util.system import execute_system_command
+from util.system import execute_system_command, check_port_availability
+from util.exceptions import KubectlIntError
 
 
 def test_execute_system_command(mocker):
@@ -59,3 +61,23 @@ def test_execute_system_command_unknown_error(mocker):
 
     with pytest.raises(subprocess.SubprocessError):
         execute_system_command(['ls'])
+
+
+def test_check_port_availability_success(mocker):
+    mocker.patch("socket.socket")
+    assert check_port_availability(9000)
+
+
+def test_check_port_availability_failure(mocker):
+    socket_local = mocker.patch("socket.socket.bind")
+    socket_local.side_effect = OSError()
+
+    with pytest.raises(KubectlIntError):
+        check_port_availability(9000)
+
+
+def test_check_port_availability_occupied(mocker):
+    socket_local = mocker.patch("socket.socket.bind")
+    socket_local.side_effect = OSError(errno.EADDRINUSE, "Address in use")
+
+    assert not check_port_availability(9000)

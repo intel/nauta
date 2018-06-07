@@ -25,7 +25,10 @@ from enum import Enum
 import subprocess
 import sys
 from typing import List
+import errno
+import socket
 
+from util.exceptions import KubectlIntError
 from util.logger import initialize_logger
 
 
@@ -84,3 +87,28 @@ def get_current_os() -> OS:
         return OS.MACOS
 
     raise RuntimeError(f'unsupported platform: {sys_platform}, supported: {OS.all_str()}!')
+
+
+def check_port_availability(port: int) -> bool:
+    """
+    Checks whether a port given as a parameter is available for application.
+
+    :param port: port to be checked
+    :return: True if port is available, False - otherwise
+    In case of any problems it throws an excpetion
+    """
+    ret_value = True
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(("127.0.0.1", port))
+    except socket.error as e:
+        if e.errno == errno.EADDRINUSE:
+            log.debug(f"Port {port} is occupied.")
+            ret_value = False
+        else:
+            # something else raised the socket.error exception
+            error_msg = "Problem during checking port's availability."
+            log.exception(error_msg)
+            raise KubectlIntError(error_msg) from e
+
+    return ret_value

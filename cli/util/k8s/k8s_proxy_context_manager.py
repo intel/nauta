@@ -22,20 +22,24 @@
 from util.k8s.kubectl import start_port_forwarding
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
-from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 
 logger = initialize_logger(__name__)
 
 
 class K8sProxy():
 
-    def __init__(self, app_name: DLS4EAppNames):
+    def __init__(self, app_name: DLS4EAppNames, port: int = None):
         self.app_name = app_name
+        self.external_port = port
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
         try:
-            self.process, self.tunnel_port, self.container_port = start_port_forwarding(self.app_name)
+            self.process, self.tunnel_port, self.container_port = start_port_forwarding(self.app_name,
+                                                                                        self.external_port)
+        except LocalPortOccupiedError as exe:
+            raise exe
         except Exception as exe:
             error_message = "k8s_proxy - enter - error"
             logger.exception(error_message)

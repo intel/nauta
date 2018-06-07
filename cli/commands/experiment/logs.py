@@ -31,7 +31,7 @@ from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
 
 from util.aliascmd import AliasCmd
-from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 
 
@@ -59,7 +59,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
     """
     try:
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.container_port,
+            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             namespace = get_kubectl_current_context_namespace()
 
@@ -78,6 +78,10 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
         logger.exception("Error during closing of a proxy for elasticsearch.")
         click.echo("Elasticsearch proxy hasn't been closed properly. "
                    "Check whether it still exists, if yes - close it manually.")
+        sys.exit(1)
+    except LocalPortOccupiedError as exe:
+        logger.exception("Error during creation of proxy - port is occupied.")
+        click.echo(f"Error during creation of a proxy for elasticsearch. {exe.message}")
         sys.exit(1)
     except K8sProxyOpenError:
         logger.exception("Error during creation of a proxy for elasticsearch.")

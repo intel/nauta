@@ -30,11 +30,22 @@ class InvalidRegularExpressionError(RuntimeError):
     pass
 
 
-class K8sProxyOpenError(Exception):
+class ExceptionWithMessage(Exception):
+    """Exception with placeholder for a message"""
+    def __init__(self, message: str = None):
+        self.message = message
+
+
+class K8sProxyOpenError(ExceptionWithMessage):
     """Error raised in case of any problems during establishing k8s proxy error"""
     pass
 
 
-class K8sProxyCloseError(Exception):
+class K8sProxyCloseError(ExceptionWithMessage):
     """Error raised in case of any problems during closing k8s proxy error"""
+    pass
+
+
+class LocalPortOccupiedError(ExceptionWithMessage):
+    """Error raised in case when app is not able to use a local port"""
     pass

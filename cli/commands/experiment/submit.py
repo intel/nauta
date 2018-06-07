@@ -44,7 +44,7 @@ from util import socat
 
 from util.aliascmd import AliasCmd
 
-from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseError
+from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 
@@ -185,6 +185,9 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                     run.status = RunStatus.ERROR
                     run.message = exe
 
+    except LocalPortOccupiedError as exe:
+        click.echo(exe.message)
+        sys.exit(1)
     except K8sProxyCloseError:
         click.echo('Docker proxy hasn\'t been closed properly. '
                    'Check whether it still exists, if yes - close it manually.')

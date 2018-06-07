@@ -26,15 +26,18 @@ from typing import Optional
 import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
-from util.exceptions import KubectlIntError
+from util.exceptions import KubectlIntError, LocalPortOccupiedError
 from draft.cmd import set_registry_port
 from util.k8s.k8s_info import get_app_services, find_namespace
 from util.app_names import DLS4EAppNames
+from util.system import check_port_availability
 
 logger = initialize_logger('util.kubectl')
 
+MAX_NUMBER_OF_TRIES = 10
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, Optional[int], int):
+
+def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None) -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -46,7 +49,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, Opt
 
     :param k8s_app_name: name of kubernetes application for tunnel creation
                          value taken from DLS4EAppNames enum
-
+    :param port: if given - the system will try to use it as a local port
     :return:
         instance of a process with proxy, tunneled port and container port
     """
@@ -81,20 +84,36 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames) -> (subprocess.Popen, Opt
                     dc_output
                 ))
                 raise KubectlIntError("Setting draft config failed.")
-
-        if not service_node_port:
-            ports_to_be_forwarded = str(service_container_port)
         else:
-            ports_to_be_forwarded = f'{service_node_port}:{service_container_port}'
+            # local port might be set only for services other than DOCKER_REGISTRY
+            if port:
+                if not check_port_availability(port):
+                    error_msg = f"Port {port} is occupied. Please try to use another one."
+                    logger.error(error_msg)
+                    raise LocalPortOccupiedError(error_msg)
+                service_node_port = port
+            else:
+                if not service_node_port:
+                    service_node_port = service_container_port
+                count = 0
+                while not check_port_availability(service_node_port):
+                    service_node_port = service_node_port + 10
+                    count = count + 1
+                    if count >= MAX_NUMBER_OF_TRIES:
+                        error_msg = "Available port cannot be found."
+                        logger.error(error_msg)
+                        raise LocalPortOccupiedError(error_msg)
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
-                                ports_to_be_forwarded]
+                                f'{service_node_port}:{service_container_port}']
         logger.debug(port_forward_command)
 
         process = system.execute_subprocess_command(port_forward_command)
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)
+    except LocalPortOccupiedError as exe:
+        raise exe
     except Exception:
         raise RuntimeError("Other error during creation of port proxy.")
 

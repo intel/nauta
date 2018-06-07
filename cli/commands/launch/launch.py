@@ -35,12 +35,13 @@ from util.app_names import DLS4EAppNames
 
 from util.aliascmd import AliasCmd, AliasGroup
 from util.k8s.k8s_proxy_context_manager import K8sProxy
-from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 
 
 logger = initialize_logger('commands.launch')
 
 HELP = "Command for launching web user-interface or tensorboard"
+HELP_P = "Port on which service will be exposed locally."
 
 FORWARDED_URL = 'http://localhost:{}'
 
@@ -51,10 +52,10 @@ def is_gui_browser_available() -> bool:
     return True if type(browser) not in {webbrowser.GenericBrowser, None} else False
 
 
-def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
+def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool, port: int = None):
     try:
-        with K8sProxy(k8s_app_name) as proxy:
-            url = FORWARDED_URL.format(proxy.container_port)
+        with K8sProxy(k8s_app_name, port) as proxy:
+            url = FORWARDED_URL.format(proxy.tunnel_port)
             # run socat if on Windows or Mac OS
             if get_current_os() in (OS.WINDOWS, OS.MACOS):
                 # noinspection PyBroadException
@@ -87,9 +88,13 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
         click.echo('Docker proxy hasn\'t been closed properly. '
                    'Check whether it still exists, if yes - close it manually.')
         logger.exception('Error during creation of a proxy for a {}'.format(k8s_app_name))
+    except LocalPortOccupiedError as exe:
+        click.echo('Error during creation of a proxy for a {}. {}'.format(k8s_app_name, exe.message))
+        sys.exit(1)
     except K8sProxyOpenError:
-        logger.exception('Error during creation of a proxy for a {}'.format(k8s_app_name))
-        click.echo('Error during creation of a proxy for a {}'.format(k8s_app_name))
+        error_msg = 'Error during creation of a proxy for a {}'
+        logger.exception(error_msg.format(k8s_app_name))
+        click.echo(error_msg.format(k8s_app_name))
         sys.exit(1)
     except Exception:
         error_msg = 'Failed to launch web application.'
@@ -115,11 +120,12 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool):
 @pass_state
 @click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                 'only proxy tunnel is created')
-def webui(state: State, no_launch: bool):
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
+def webui(state: State, no_launch: bool, port: int):
     """
     Subcommand for launching webUI with credentials
     """
-    launch_app(DLS4EAppNames.WEB_GUI, no_launch)
+    launch_app(DLS4EAppNames.WEB_GUI, no_launch, port)
 
 
 @click.command(cls=AliasCmd, alias='tb')
