@@ -19,51 +19,32 @@
  * and approved by Intel in writing.
  */
 
-import Vue from 'vue';
-import Router from 'vue-router';
-import ModelsTable from '../components/ModelsTable.vue';
-import Home from '../components/Home.vue';
-import InvalidToken from '../components/InvalidToken.vue';
-import SignedOut from '../components/SignedOut.vue';
+<template>
+  <v-layout row wrap>
+    <v-flex xs12 align-center>
+      <h1>YOU ARE SIGNED OUT.</h1>
+    </v-flex>
+    <v-flex xs12>
+      <h3>To log in, run <i>dlsctl launch webui</i> command again.</h3>
+    </v-flex>
+  </v-layout>
+</template>
 
-Vue.use(Router);
+<script>
+export default {
+  name: 'SignedOut'
+}
+</script>
 
-const router = new Router({
-  mode: 'history',
-  routes: [
-    {
-      path: '/',
-      name: 'Home',
-      component: Home,
-      meta: {
-        authorized: false
-      }
-    },
-    {
-      path: '/models',
-      name: 'Models',
-      component: ModelsTable,
-      meta: {
-        authorized: true
-      }
-    },
-    {
-      path: '/invalid_token',
-      name: 'InvalidToken',
-      component: InvalidToken,
-      meta: {
-        authorized: false
-      }
-    },
-    {
-      path: '/signed_out',
-      name: 'SignedOut',
-      component: SignedOut,
-      meta: {
-        authorized: false
-      }
-    }
-  ]
-});
-
-export default router;
+<style scoped>
+h1 {
+  font-family: 'Intel Clear Pro', sans-serif;
+  font-size: 64px;
+  margin-left: 100px;
+  margin-top: 100px;
+}
+h3 {
+  font-family: 'Intel Clear', sans-serif;
+  margin-left: 100px;
+}
+</style>

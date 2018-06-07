@@ -56,9 +56,9 @@ import {mapActions, mapGetters} from 'vuex';
 export default {
   name: 'Toolbar',
   methods: {
-    ...mapActions(['toggleMenu', 'clearAuthorityData']),
+    ...mapActions(['toggleMenu', 'handleLogOut']),
     onSingOutBtnClick: function () {
-      this.$store.dispatch('clearAuthorityData');
+      this.handleLogOut('/signed_out');
     }
   },
   computed: {

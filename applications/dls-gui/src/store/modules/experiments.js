@@ -19,7 +19,6 @@
  * and approved by Intel in writing.
  */
 
-import router from '../../router';
 import {getExperiments} from '../handlers/experiments';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
@@ -65,8 +64,7 @@ export const actions = {
       })
       .catch((err) => {
         if (err && err.response && err.response.status && err.response.status === 401) {
-          router.push({path: '/invalid_token'});
-          dispatch('clearAuthorityData');
+          dispatch('handleLogOut', '/invalid_token');
         } else {
           dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
         }

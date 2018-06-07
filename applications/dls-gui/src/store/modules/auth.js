@@ -61,10 +61,16 @@ export const actions = {
         }
       });
   },
-  clearAuthorityData: ({commit}) => {
+  handleLogOut: ({commit, dispatch}, redirectionPath) => {
     cookies.remove(TOKEN_COOKIE_KEY);
-    commit('setAuthority', {logged: false, username: ''});
-    location.reload();
+    dispatch('hideMenuToggleBtn')
+      .then(() => {
+        return dispatch('hideUserbox');
+      })
+      .then(() => {
+        commit('setAuthority', {logged: false, username: ''});
+        router.push({path: redirectionPath});
+      });
   }
 };
 

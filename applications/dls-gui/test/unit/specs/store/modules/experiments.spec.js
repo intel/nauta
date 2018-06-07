@@ -148,7 +148,7 @@ describe('VUEX modules experiments', () => {
           {type: 'setFetchingDataFlag', payload: {isActive: false}}
         ];
         expectedActions = [
-          {type: 'clearAuthorityData'}
+          {type: 'handleLogOut', payload: '/invalid_token'}
         ];
         mock.onGet('/api/experiments/list').reply(401, {response: {status: 401}});
         testAction(actions.getUserExperiments, {}, state, expectedMutations, expectedActions, done);

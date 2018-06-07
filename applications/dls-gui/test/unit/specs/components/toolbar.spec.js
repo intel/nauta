@@ -26,7 +26,7 @@ import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Toolbar from '../../../../src/components/Toolbar';
 
-describe('VUE components Home', () => {
+describe('VUE components Toolbar', () => {
   let wrapper, router, store, getters, actions, localVue;
   beforeEach(function () {
     getters = {
@@ -41,7 +41,7 @@ describe('VUE components Home', () => {
     };
     actions = {
       toggleMenu: sinon.spy(),
-      clearAuthorityData: sinon.spy()
+      handleLogOut: sinon.spy()
     };
     store = new Vuex.Store({
       actions,
@@ -57,6 +57,6 @@ describe('VUE components Home', () => {
 
   it('Should clear auth data on logout', function () {
     wrapper.vm.onSingOutBtnClick();
-    expect(actions.clearAuthorityData.calledOnce).to.equal(true);
+    expect(actions.handleLogOut.calledOnce).to.equal(true);
   });
 });

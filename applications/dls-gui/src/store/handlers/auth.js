@@ -19,7 +19,7 @@
  * and approved by Intel in writing.
  */
 
-import axios from 'axios'
+import axios from 'axios';
 
 const DECODE_TOKEN_ENDPOINT = '/api/auth/decode';
 
@@ -28,4 +28,4 @@ export function decodeAuthK8SToken (token) {
     token: token
   };
   return axios.post(DECODE_TOKEN_ENDPOINT, body);
-};
+}

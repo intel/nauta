@@ -26,6 +26,7 @@ import MockAdapter from 'axios-mock-adapter';
 import sinon from 'sinon';
 import RESPONSE_TYPES from '../../../../../src/utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../../../../src/utils/constants/messages';
+import Q from 'q';
 
 describe('VUEX modules auth', () => {
   const state = {
@@ -105,12 +106,20 @@ describe('VUEX modules auth', () => {
       });
 
       it('should remove user session if not authorized', (done) => {
-        sinon.stub(window.location, 'reload');
-        expectedMutations = [
-          {type: 'setAuthority', payload: {logged: false, username: ''}}
-        ];
-        expectedActions = [];
-        testAction(actions.clearAuthorityData, null, state, expectedMutations, expectedActions, done);
+        const redirectionPath = '/signed_out';
+        const deferred = Q.defer();
+        const dispatchMock = sinon.stub().returns(deferred.promise);
+        const commitMock = sinon.spy();
+        deferred.resolve();
+        actions.handleLogOut({commit: commitMock, dispatch: dispatchMock}, redirectionPath);
+        process.nextTick(() => {
+          expect(commitMock.calledOnce).to.equal(true);
+          expect(commitMock.calledWith('setAuthority', {logged: false, username: ''})).to.equal(true);
+          expect(dispatchMock.calledTwice).to.equal(true);
+          expect(dispatchMock.getCall(0).args[0]).to.equal('hideMenuToggleBtn');
+          expect(dispatchMock.getCall(1).args[0]).to.equal('hideUserbox');
+          done();
+        })
       });
     });
   });
