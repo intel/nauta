@@ -52,7 +52,7 @@ spec:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-      restartPolicy: Never
+      restartPolicy: OnFailure
       volumes:
         - name: input-home
           persistentVolumeClaim:
