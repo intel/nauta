@@ -4,6 +4,13 @@
   hosts: master[0]
   roles:
     - role: remote/init
+      when: "'master' in groups and groups['master'] | length > 0"
+
+- name: Init local workspace
+  hosts: master[0]
+  roles:
+    - role: local/init
+      when: "'master' not in groups or groups['master'] | length == 0"
 
 - name: Run provisioners preperation
   hosts: provisioners
