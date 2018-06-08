@@ -4,7 +4,7 @@
   docker_image:
     name: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
     pull: False
-    push: True
+    push: "{{ image.push | default(True) }}"
     timeout: "{{ docker_timeout }}"
   register: push_async
   failed_when: "'ansible_job_id' not in push_async"

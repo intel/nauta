@@ -14,8 +14,9 @@ dist/
 *.iml
 *.swp
 .DS_Store
-
+vendor/
 .compile
+glide.lock
 files/*.tar.gz
 
 .workspace

@@ -24,8 +24,8 @@ kubernetes_svc_subnet: 10.4.0.0/16
 
 kubernetes_network:
   external_ports:
-    - 6443
     - 8443
+    - 6443
   internal_port: 18554
   pod: "{{ kubernetes_pod_subnet }}"
   svc: "{{ kubernetes_svc_subnet }}"

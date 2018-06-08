@@ -5,6 +5,7 @@ include $(LIBS_DIRECTORY)/os-type-detect.mk
 ANSIBLE_PLAYBOOK:=$(LIBS_DIRECTORY)/../bin/$(DLSE_OS)/$(DLSE_OS_NAME)/$(DLSE_OS_VERSION)/ansible-playbook
 HELM:=$(LIBS_DIRECTORY)/../bin/$(DLSE_OS)/helm
 KUBECTL:=$(LIBS_DIRECTORY)/../bin/$(DLSE_OS)/kubectl
+LOADER:=$(LIBS_DIRECTORY)/../bin/$(DLSE_OS)/loader
 
 ENV_%:
 	@ if [ "${ENV_${*}}" = "" ]; then \

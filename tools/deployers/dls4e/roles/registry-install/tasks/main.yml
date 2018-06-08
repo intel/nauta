@@ -1,30 +1,29 @@
 ---
 
 - name: Check if image exists
-  shell: "helm status dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }}"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} status dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }}"
   register: chart
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
+  delegate_to: "{{ delegation_hostname }}"
 
-- name: Copy registry chart file
-  copy:
-    src: "dls4e-registry-{{ dls4e_version }}.tgz"
-    dest: "/tmp/dls4e-registry-{{ dls4e_version }}.tgz"
-  when: chart is changed
+- name: Ensure that dls4e registry chart exists
+  file:
+    path: "{{ runtime_registry_chart }}"
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Install helm chart
-  shell: "helm install -n dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }} --namespace dls4e  /tmp/dls4e-registry-{{ dls4e_version }}.tgz --wait"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} install -n dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }} --namespace dls4e  {{ runtime_registry_chart }} --wait"
   when: chart is changed
-
-- name: Remove image file
-  file:
-    path: "/tmp/dls4e-registry-{{ dls4e_version }}.tgz"
-    state: absent
-  when: chart is changed
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Fetch kubectl nodeport
-  shell: kubectl -n dls4e get svc dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }} -o 'jsonpath={.spec.ports[?(@.targetPort=='5000')].nodePort}'
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n dls4e get svc dls4enterprise-registry-{{ dls4e_version.replace('.', '-') }} -o 'jsonpath={.spec.ports[?(@.targetPort=='5000')].nodePort}'"
   register: nodeport
+  delegate_to: "{{ delegation_hostname }}"
 
 - set_fact:
     registry_nodeport: "{{ nodeport.stdout | int }}"

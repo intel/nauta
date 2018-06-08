@@ -1,10 +1,25 @@
 ---
 
-- name: Install node
-  hosts: master
-  become: True
+- name: Init remote workspace
+  hosts: master[0]
+  roles:
+    - role: remote/init
+
+- name: Run provisioners preperation
+  hosts: provisioners
   gather_facts: False
   roles:
-    - role: init
+    - role: workspace
+
+- name: Run provisioner pods
+  hosts: provisioner-pods
+  gather_facts: False
+  roles:
+    - role: workspace-prepare
+
+- name: Run provisioner registry
+  hosts: provisioners
+  gather_facts: False
+  roles:
     - role: registry-install
     - role: dls4e-install

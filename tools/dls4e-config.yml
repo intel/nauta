@@ -26,7 +26,7 @@ images:
       BASE_IMAGE: "dls4e/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/go-apiserver-builder"
-    push: True
+    push: False
   dls4e/etcd:
     version: "3.1.10"
     image: "gcr.io/google-containers/etcd-amd64:3.1.10"
@@ -102,10 +102,6 @@ images:
       BUILD_IMAGE: "dls4e/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tf-operator"
-  dls4e/tf/test:
-    version: "latest"
-    method: pull
-    image: "gcr.io/kubeflow-images-public/test-tf-image:latest"
 
 subcharts:
   dls4e-registry:

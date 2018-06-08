@@ -1,0 +1,81 @@
+---
+
+- name: Set paths fact
+  set_fact:
+    dls4e_img: "dls4e-{{ dls4e_version }}.img"
+    registry_chart: "dls4e-registry-{{ dls4e_version }}.tgz"
+    dls4e_chart: "dls4e-{{ dls4e_version }}.tgz"
+
+- name: Set local paths fact
+  set_fact:
+    workspace: ".workspace"
+    runtime_kubectl: ".workspace/kubectl"
+    runtime_helm: ".workspace/helm"
+    runtime_loader: ".workspace/loader"
+    runtime_img: ".workspace/dls4e-{{ dls4e_version }}.img"
+    runtime_dls4e_img: ".workspace/{{ dls4e_img }}"
+    runtime_registry_chart: ".workspace/{{ registry_chart }}"
+    runtime_dls4e_chart: ".workspace/{{ dls4e_chart }}"
+
+- name: Set interface name
+  set_fact:
+    external_interface_fact: "ansible_{{ external_interface | default('') }}"
+
+- name: Get external interface ip
+  set_fact:
+    instance_external_ip: "{{ hostvars[inventory_hostname][external_interface_fact].ipv4.address }}"
+  when: external_interface_fact in hostvars[inventory_hostname]
+
+- name: Calculate runtime external ip
+  set_fact:
+    runtime_external_ip: "{{ external_ip | default(instance_external_ip | default ('')) }}"
+
+- name: Fail if external ip is not calculated
+  fail:
+    msg: Unable to calculate external ip
+  when: not runtime_external_ip
+
+- name: Create workspace directory
+  file:
+    path: "{{ workspace }}"
+    state: directory
+
+- name: Copy bin paths
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    mode: 0755
+  with_items:
+    - src: "{{ kubectl }}"
+      dst: "{{ runtime_kubectl }}"
+    - src: "{{ helm }}"
+      dst: "{{ runtime_helm }}"
+    - src: "{{ loader }}"
+      dst: "{{ runtime_loader }}"
+
+- name: Copy data
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  with_items:
+    - src: "{{ dls4e_img }}"
+      dst: "{{ runtime_dls4e_img }}"
+    - src: "{{ registry_chart }}"
+      dst: "{{ runtime_registry_chart }}"
+    - src: "{{ dls4e_chart }}"
+      dst: "{{ runtime_dls4e_chart }}"
+
+- name: Add host
+  add_host:
+    name: provisioner
+    group: provisioners
+    delegation_hostname: "{{ inventory_hostname }}"
+    workspace: "{{ workspace }}"
+    runtime_kubectl: "{{ runtime_kubectl }}"
+    runtime_helm: "{{ runtime_helm }}"
+    runtime_loader: "{{ runtime_loader }}"
+    runtime_img: "{{ runtime_img }}"
+    runtime_dls4e_img: "{{ runtime_dls4e_img }}"
+    runtime_registry_chart: "{{ runtime_registry_chart }}"
+    runtime_dls4e_chart: "{{ runtime_dls4e_chart }}"
+    runtime_external_ip: "{{ runtime_external_ip }}"

@@ -1,29 +1,26 @@
 ---
 
 - name: Check if image exists
-  shell: "helm status dls4enterprise"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} status dls4enterprise"
   register: chart
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Fail if upgrade is not possible
   fail:
     msg: DLS4E is already installed and upgrade option is not selected
   when:
-    - not chart is changed
+    - chart is not changed
     - not (upgrade | default(False) | bool)
-
-- name: Copy registry chart file
-  copy:
-    src: "dls4e-{{ dls4e_version }}.tgz"
-    dest: "/tmp/dls4e-{{ dls4e_version }}.tgz"
 
 - name: Set global values in configuration
   set_fact:
     global_values:
       dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
       dls4e_configuration:
-        external_ip: "{{ dls_configuration.external_interface.ipv4_address }}"
+        external_ip: "{{ runtime_external_ip }}"
         registry: "127.0.0.1:{{ registry_nodeport }}"
       images:
         - name: tiller
@@ -39,29 +36,35 @@
       global: "{{ dls4e_configuration | default({}) | combine(global_values) }}"
       features: "{{ features | default({}) }}"
 
+- name: Ensure that dls4e registry chart exists
+  file:
+    path: "{{ runtime_dls4e_chart }}"
+  delegate_to: "{{ delegation_hostname }}"
+
 - name: Render values
   vars:
     rendered_values: "{{ features_config | default({}) | combine(dls4e_config_values) }}"
   copy:
     content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
-    dest: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
+    dest: "{{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Install helm chart
-  shell: "helm install -n dls4enterprise --namespace dls4e  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} install -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
   when: chart is changed
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Upgrade helm chart
-  shell: "helm upgrade dls4enterprise  /tmp/dls4e-{{ dls4e_version }}.tgz --wait -f /tmp/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} upgrade dls4enterprise {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
   when:
     - not chart is changed
     - upgrade | default(False) | bool
-
-- name: Remove image file
-  file:
-    path: "/tmp/dls4e-{{ dls4e_version }}.tgz"
-    state: absent
+  delegate_to: "{{ delegation_hostname }}"
 
 - name: Remove image values file
   file:
-    path: "/tmp/dls4e-{{ dls4e_version }}.values.yaml"
+    path: "{{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
     state: absent
+  delegate_to: "{{ delegation_hostname }}"
