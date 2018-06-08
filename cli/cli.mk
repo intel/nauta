@@ -56,6 +56,10 @@ test: $(DEV_VIRTUALENV_MARK)
 
 cli-check: venv-dev test style
 
+test-with-code-cov: $(DEV_VIRTUALENV_MARK)
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
+
+
 
 export CLI_ARTIFACT_DIRECTORY:=$(CURDIR)
 export CLI_ARTIFACT_VERSION_STRING:=$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(BUILD_ID)
