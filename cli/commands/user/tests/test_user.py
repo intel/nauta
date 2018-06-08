@@ -44,7 +44,7 @@ apiVersion: v1
 clusters:
 - cluster:
     api-version: v1
-    server: https://{test_address}:8443
+    server: https://{test_address}
     # certificate-authority-data: {test_cacert_encoded}
     # BUG/TASK: CAN-261
     insecure-skip-tls-verify: true

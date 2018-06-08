@@ -28,8 +28,8 @@ import click
 
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
-from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator
-from util.config import DLS4EConfigMap
+from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
+    get_kubectl_host
 from util.aliascmd import AliasCmd
 
 log = initialize_logger(__name__)
@@ -78,8 +78,7 @@ def mounts(state: State):
 
 def get_mount_command() -> str:
     try:
-        dls4e_config_map = DLS4EConfigMap()
-        adr = dls4e_config_map.external_ip
+        adr = get_kubectl_host()
         usr = get_current_user()
         psw = get_users_samba_password(usr)
 

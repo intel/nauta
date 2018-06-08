@@ -40,9 +40,13 @@ class PodStatus(Enum):
     UNKNOWN = 'UNKNOWN'
 
 
-def get_kubectl_host() -> str:
+def get_kubectl_host(with_port: bool=False) -> str:
     config.load_kube_config()
-    return configuration.Configuration().host.replace('https://', '').replace('http://', '').split(':')[0]
+    conf_with_port = configuration.Configuration().host.replace('https://', '').replace('http://', '')
+    if with_port:
+        return conf_with_port
+    else:
+        return conf_with_port.split(':')[0]
 
 
 def get_kubectl_port() -> int:

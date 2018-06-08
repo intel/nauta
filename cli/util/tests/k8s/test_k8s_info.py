@@ -145,10 +145,16 @@ def mocked_k8s_RbacAuthorizationV1Api(mocker):
     rbacAuthorizationV1_instance.list_cluster_role.return_value = v1_cluster_role_list
 
 
-def test_get_k8s_host(mocked_k8s_config):
+def test_get_k8s_host_wo_port(mocked_k8s_config):
     k8s_host = get_kubectl_host()
 
     assert k8s_host == '127.0.0.1'
+
+
+def test_get_k8s_host_w_port(mocked_k8s_config):
+    k8s_host = get_kubectl_host(with_port=True)
+
+    assert k8s_host == '127.0.0.1:8080'
 
 
 def test_get_k8s_port(mocked_k8s_config):

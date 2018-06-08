@@ -67,9 +67,7 @@ def test_mounts(mocker):
     mocker.patch("commands.mounts.is_current_user_administrator", return_value=False)
     gcu_mock = mocker.patch("commands.mounts.get_current_user", return_value=TEST_USR)
     gus_mock = mocker.patch("commands.mounts.get_users_samba_password", return_value=TEST_PSW)
-    cmp_mock = mocker.patch("commands.mounts.DLS4EConfigMap")
-
-    cmp_mock.return_value.external_ip = TEST_ADR
+    cmp_mock = mocker.patch("commands.mounts.get_kubectl_host", return_value=TEST_ADR)
 
     runner = CliRunner()
     # os library doesn't have getuid function on Windows

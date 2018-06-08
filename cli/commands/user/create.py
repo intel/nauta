@@ -28,7 +28,7 @@ import click
 from util.config import Config
 from util.logger import initialize_logger
 from util.system import execute_system_command
-from util.k8s.k8s_info import get_users_token, is_current_user_administrator
+from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
 from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -50,7 +50,7 @@ apiVersion: v1
 clusters:
 - cluster:
     api-version: v1
-    server: https://{address}:8443
+    server: https://{address}
     # certificate-authority-data: {cert_data}
     # BUG/TASK: CAN-261
     insecure-skip-tls-verify: true
@@ -145,7 +145,7 @@ def create(state: State, username: str):
     click.echo(f"User {username} has been added successfully.")
     click.echo("Please use the following kubectl config to connect to this user.")
     click.echo("----------------------------------------------------------------")
-    click.echo(generate_kubeconfig(username, username, dls4e_config_map.external_ip,
+    click.echo(generate_kubeconfig(username, username, get_kubectl_host(with_port=True),
                                    users_password, ""))
 
 
