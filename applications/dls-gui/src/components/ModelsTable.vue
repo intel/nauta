@@ -29,6 +29,7 @@
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
               :clearSort="clearSort"
               :hiddenColumns="hiddenColumns"
+              :alwaysVisibleColumns="alwaysVisibleColumns"
               :setHiddenColumnsHandler="setHiddenColumns"
               :onLaunchTensorHandler="launchTensorboard"
               :onDiscardTensorHandler="discardTensorboard"
@@ -73,8 +74,8 @@
                       panorama_fish_eye
                     </v-icon>
                   </td>
-                  <td v-for="attr in Object.keys(item)" v-bind:key="attr" v-if="isVisibleColumn(attr)">
-                    {{ item[attr] }}
+                  <td v-for="param in experimentsParams" v-bind:key="param" v-if="isVisibleColumn(param)">
+                    {{ parseValue(param, item[param]) || '-' }}
                   </td>
                 </tr>
                 </tbody>
@@ -117,6 +118,7 @@ export default {
       filterIcon: 'filter_list',
       searchPattern: '',
       hiddenColumns: [],
+      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name'],
       sorting: {
         order: SORTING_ORDER.ASC,
         iconAsc: 'arrow_upward',
@@ -162,7 +164,7 @@ export default {
     },
     visibleColumns: function () {
       return this.experimentsParams.map((header) => {
-        if (this.hiddenColumns.indexOf(header) === -1) {
+        if (!this.hiddenColumns.includes(header)) {
           return header;
         }
       });
@@ -265,6 +267,14 @@ export default {
         if (!this.fetchingDataActive) {
           this.getData();
         }
+      }
+    },
+    parseValue (key, value) {
+      switch (key) {
+        case 'creationTimestamp':
+          return new Date(value).toLocaleString();
+        default:
+          return value;
       }
     }
   }

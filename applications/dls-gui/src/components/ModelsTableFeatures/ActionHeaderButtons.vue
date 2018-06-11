@@ -42,85 +42,102 @@
     v-model="showColumnMgmtModal"
     max-width="600px"
   >
-    <v-card>
-      <v-card-title>
-        <h2>Add/Delete Columns</h2>
-      </v-card-title>
-      <v-card-text>
-        <v-layout row wrap>
-          <v-flex xs12>
-            <div v-for="header in headers" v-bind:key="header" class="input-group input-group--dirty checkbox input-group--selection-controls input-group--active accent--text">
-              <label :for="header">{{ getLabel(header) }}</label>
-              <div class="input-group__input">
-                <input :id="header" type="checkbox" v-model="visibilityDraft[header]"/>
-              </div>
-            </div>
-          </v-flex>
-          <v-flex md6 offset-md-3 xs6 offset-xs3>
-            <v-btn block color="intel_primary" dark small v-on:click="revertToDefault()">REVERT TO DEFAULT</v-btn>
-          </v-flex>
-          <v-flex xs5 v-on:click="showColumnMgmtModal = false">
-            <v-btn block color="intel_primary" dark small>CANCEL</v-btn>
-          </v-flex>
-          <v-spacer></v-spacer>
-          <v-flex xs5>
-            <v-btn block color="intel_primary" dark small v-on:click="applyHiddenHeaders()">APPLY</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-card-text>
-    </v-card>
+      <v-card>
+        <v-card-title>
+          <h2>Add/Delete Columns</h2>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout row wrap>
+              <v-flex xs12>
+                <div id="options" class="scroll-y">
+                  <div v-for="header in switchableColumns" v-bind:key="header" class="input-group input-group--selection-controls">
+                    <v-icon :id="header + '_on'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'success'" v-on:click="showColumn(header)">done</v-icon>
+                    <span class="label-box" v-on:click="showColumn(header)">{{ getLabel(header) }}</span>
+                    <v-icon :id="header + '_off'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'grey darken-2'" v-on:click="hideColumn(header)">delete</v-icon>
+                  </div>
+                </div>
+              </v-flex>
+              <v-flex md4 xs12 offset-md4>
+                <v-btn id="revert" block dark small v-on:click="revertToDefault()">REVERT TO DEFAULT</v-btn>
+              </v-flex>
+              <v-flex md6 xs12>
+                <v-btn color="intel_primary" block dark small v-on:click="discardHiddenHeaders()">CANCEL</v-btn>
+              </v-flex>
+              <v-flex md6 xs12>
+                <v-btn color="intel_primary" block dark small v-on:click="applyHiddenHeaders()">SAVE</v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+      </v-card>
   </v-dialog>
 </div>
 </template>
 
 <script>
 import {mapGetters} from 'vuex';
-import lodash from 'lodash';
 import LABELS from '../../utils/header-titles';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'setHiddenColumnsHandler', 'hiddenColumns', 'headers', 'onLaunchTensorHandler',
-    'onDiscardTensorHandler', 'disabled'],
+  props: ['clearSort', 'setHiddenColumnsHandler', 'hiddenColumns', 'alwaysVisibleColumns', 'headers',
+    'onLaunchTensorHandler', 'onDiscardTensorHandler', 'disabled'],
   data: () => {
     return {
       showColumnMgmtModal: false,
-      visibilityDraft: {}
+      draft: []
     }
   },
   watch: {
     hiddenColumns: function () {
-      this.headers.forEach((header) => {
-        this.visibilityDraft[header] = this.hiddenColumns.indexOf(header) === -1;
-      });
-    },
-    headers: function () {
-      this.headers.forEach((header) => {
-        this.visibilityDraft[header] = this.hiddenColumns.indexOf(header) === -1;
-      });
+      this.draft = [].concat(this.hiddenColumns)
     }
   },
   computed: {
     ...mapGetters({
       tensorModeViewState: 'tensorMode'
-    })
+    }),
+    switchableColumns: function () {
+      const options = this.headers.filter((header) => {
+        return !this.alwaysVisibleColumns.includes(header);
+      });
+      return Array.from(new Set(this.draft.concat(options))).reverse();
+    },
+    initialHiddenHeaders: function () {
+      return this.headers.filter((header) => {
+        return !this.alwaysVisibleColumns.includes(header);
+      });
+    }
+  },
+  created: function () {
+    this.setHiddenColumnsHandler(this.initialHiddenHeaders)
   },
   methods: {
     getLabel: function (header) {
       return LABELS[header] || header;
     },
     revertToDefault: function () {
-      this.setHiddenColumnsHandler([]);
+      this.setHiddenColumnsHandler(this.initialHiddenHeaders);
       this.showColumnMgmtModal = false;
     },
-    applyHiddenHeaders: function () {
-      const filteredColumns = lodash.mapKeys(this.visibilityDraft, (value, key) => {
-        if (!value) {
-          return key;
-        }
+    hideColumn: function (name) {
+      this.draft.push(name);
+    },
+    showColumn: function (name) {
+      this.draft = this.draft.filter((column) => {
+        return column !== name;
       });
-      const filteredColumnsNames = lodash.keys(filteredColumns);
-      this.setHiddenColumnsHandler(filteredColumnsNames);
+    },
+    isHidden: function (name) {
+      return this.draft.includes(name);
+    },
+    applyHiddenHeaders: function () {
+      this.setHiddenColumnsHandler(this.draft);
+      this.showColumnMgmtModal = false;
+    },
+    discardHiddenHeaders: function () {
+      this.draft = [].concat(this.hiddenColumns);
       this.showColumnMgmtModal = false;
     }
   }
@@ -134,7 +151,25 @@ export default {
   background-color: rgba(0, 113, 197, 0.12);
   width: 170px;
 }
+#revert {
+  color: rgb(0, 113, 197);
+  background-color: rgba(0, 113, 197, 0.12);
+}
 input {
   margin: 7px;
+}
+#options {
+  max-height: 180px;
+  border: 1px solid #000000;
+  padding: 10px 10px 10px 10px;
+}
+.label-box {
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-top: 3px;
+  min-width: 120px;
+}
+.pointer-btn {
+  cursor: pointer;
 }
 </style>

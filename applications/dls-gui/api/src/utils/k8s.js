@@ -29,7 +29,7 @@ const authApi = require('../../src/handlers/auth/auth');
 
 const K8S_TOKEN_USER_KEY = 'kubernetes.io/serviceaccount/namespace';
 const K8S_API_URL = process.env.NODE_ENV === 'dev' ? 'http://localhost:9090' : 'https://kubernetes.default';
-const API_GROUP_NAME = 'aipg.intel.com';
+const API_GROUP_NAME = 'aggregator.aipg.intel.com';
 const EXPERIMENTS_VERSION = 'v1';
 
 module.exports.listNamespacedCustomObject = function (token, resourceName) {

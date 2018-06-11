@@ -46,7 +46,33 @@ describe('Handlers | Experiments', function () {
       listNamespacedCustomObject: sinon.spy()
     };
     data = {
-      items: [{name: 'exp1'}]
+      items: [
+        {
+          metadata: {
+            creationTimestamp: '2018-06-11T07:35:06Z',
+            name: 'exp-mnist-sing-18-06-11-09-34-45-41',
+            namespace: 'andrzej',
+          },
+          spec: {
+            'experiment-name': 'experiment-name-will-be-added-soon',
+            metrics: {
+              accuracy: '52.322'
+            },
+            parameters: [
+              'mnist_single_node.py'
+            ],
+            'pod-count': 1,
+            'pod-selector': {
+              matchLabels: {
+                app: 'tf-training-tfjob',
+                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
+                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
+              }
+            },
+            state: 'FAILED'
+          }
+        }
+      ]
     };
     error = {
       status: 500,
@@ -81,23 +107,7 @@ describe('Handlers | Experiments', function () {
       });
     });
 
-    it('should return empty array without parsing if no data', function (done) {
-      data.items = [];
-      const parseExpMock = sinon.spy();
-      expApi.__set__('k8s', k8sMock);
-      expApi.__set__('parseExperiments', parseExpMock);
-      expApi.getUserExperiments(reqMock, resMock);
-      deferred.resolve(data);
-      process.nextTick(function () {
-        expect(resMock.send.calledOnce).to.equal(true);
-        expect(resMock.send.calledWith(data.items)).to.equal(true);
-        expect(k8sMock.listNamespacedCustomObject.calledOnce).to.equal(true);
-        expect(parseExpMock.called).to.equal(false);
-        done();
-      });
-    });
-
-    it('should return empty array without parsing if no data', function (done) {
+    it('should return data with parsing', function (done) {
       const parseExpMock = sinon.stub().returns(data.items);
       expApi.__set__('k8s', k8sMock);
       expApi.__set__('parseExperiments', parseExpMock);
@@ -115,31 +125,56 @@ describe('Handlers | Experiments', function () {
   });
 
   describe('parseExperiments', function () {
-    let dateMock;
     beforeEach(function () {
       data = [
         {
           metadata: {
-            creationTimestamp: '2018-05-23T11:50:27Z',
-            namespace: 'test'
+            creationTimestamp: '2018-06-11T07:35:06Z',
+            name: 'exp-mnist-sing-18-06-11-09-34-45-41',
+            namespace: 'andrzej',
           },
           spec: {
-            name: 'name1',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 0
+            'experiment-name': 'experiment-name-will-be-added-soon',
+            metrics: {
+              accuracy: '52.322'
+            },
+            parameters: [
+              'mnist_single_node.py'
+            ],
+            'pod-count': 1,
+            'pod-selector': {
+              matchLabels: {
+                app: 'tf-training-tfjob',
+                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
+                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
+              }
+            },
+            state: 'FAILED'
           }
         },
         {
           metadata: {
-            creationTimestamp: '2011-05-23T11:51:27Z',
-            namespace: 'test'
+            creationTimestamp: '2018-06-11T07:35:06Z',
+            name: 'exp-mnist-sing-18-06-11-09-34-45-42',
+            namespace: 'andrzej',
           },
           spec: {
-            name: 'name2',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 1
+            'experiment-name': 'experiment-name-will-be-added-soon',
+            metrics: {
+              accuracy: '52.322'
+            },
+            parameters: [
+              'mnist_single_node.py'
+            ],
+            'pod-count': 1,
+            'pod-selector': {
+              matchLabels: {
+                app: 'tf-training-tfjob',
+                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
+                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
+              }
+            },
+            state: 'FAILED'
           }
         }
       ];
@@ -165,27 +200,31 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: [
           {
-            creationTimestamp: 'Wed, 23 May 2018 11:50:27 GMT',
-            namespace: 'test',
-            name: 'name1',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 0
+            creationTimestamp: data[0].metadata.creationTimestamp,
+            name: data[0].metadata.name,
+            namespace: data[0].metadata.namespace,
+            podSelector: data[0].spec['pod-selector']['matchLabels'],
+            podCount: data[0].spec['pod-count'],
+            state: data[0].spec['state'],
+            parameters: data[0].spec['parameters'],
+            accuracy: data[0].spec['metrics']['accuracy']
           },
           {
-            creationTimestamp: 'Mon, 23 May 2011 11:51:27 GMT',
-            namespace: 'test',
-            name: 'name2',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 1
+            creationTimestamp: data[1].metadata.creationTimestamp,
+            name: data[1].metadata.name,
+            namespace: data[1].metadata.namespace,
+            podSelector: data[1].spec['pod-selector']['matchLabels'],
+            podCount: data[1].spec['pod-count'],
+            state: data[1].spec['state'],
+            parameters: data[1].spec['parameters'],
+            accuracy: data[1].spec['metrics']['accuracy']
           }
         ],
         stats: {
           total: 2,
           datetime: 1
         },
-        params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
+        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
       };
       const result = expApi.parseExperiments(data);
       expect(result.data).to.deep.equal(expectedResult.data);
@@ -194,23 +233,25 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return correct data if search pattern provided', function () {
-      const query = {searchBy: 'name1'};
+      const query = {searchBy: '09-34-45-41'};
       const expectedResult = {
         data: [
           {
-            creationTimestamp: 'Wed, 23 May 2018 11:50:27 GMT',
-            namespace: 'test',
-            name: 'name1',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 0
+            creationTimestamp: data[0].metadata.creationTimestamp,
+            name: data[0].metadata.name,
+            namespace: data[0].metadata.namespace,
+            podSelector: data[0].spec['pod-selector']['matchLabels'],
+            podCount: data[0].spec['pod-count'],
+            state: data[0].spec['state'],
+            parameters: data[0].spec['parameters'],
+            accuracy: data[0].spec['metrics']['accuracy']
           }
         ],
         stats: {
           total: 1,
           datetime: 1
         },
-        params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
+        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
       };
       const result = expApi.parseExperiments(data, query);
       expect(result.data).to.deep.equal(expectedResult.data);
@@ -219,31 +260,35 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return correct data if order params provided', function () {
-      const query = {order: 'desc', orderBy: 'param3'};
+      const query = {order: 'desc', orderBy: 'name'};
       const expectedResult = {
         data: [
           {
-            creationTimestamp: 'Mon, 23 May 2011 11:51:27 GMT',
-            namespace: 'test',
-            name: 'name2',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 1
+            creationTimestamp: data[1].metadata.creationTimestamp,
+            name: data[1].metadata.name,
+            namespace: data[1].metadata.namespace,
+            podSelector: data[1].spec['pod-selector']['matchLabels'],
+            podCount: data[1].spec['pod-count'],
+            state: data[1].spec['state'],
+            parameters: data[1].spec['parameters'],
+            accuracy: data[1].spec['metrics']['accuracy']
           },
           {
-            creationTimestamp: 'Wed, 23 May 2018 11:50:27 GMT',
-            namespace: 'test',
-            name: 'name1',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 0
+            creationTimestamp: data[0].metadata.creationTimestamp,
+            name: data[0].metadata.name,
+            namespace: data[0].metadata.namespace,
+            podSelector: data[0].spec['pod-selector']['matchLabels'],
+            podCount: data[0].spec['pod-count'],
+            state: data[0].spec['state'],
+            parameters: data[0].spec['parameters'],
+            accuracy: data[0].spec['metrics']['accuracy']
           }
         ],
         stats: {
           total: 2,
           datetime: 1
         },
-        params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
+        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
       };
       const result = expApi.parseExperiments(data, query);
       expect(result.data).to.deep.equal(expectedResult.data);
@@ -256,12 +301,14 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: [
           {
-            creationTimestamp: 'Mon, 23 May 2011 11:51:27 GMT',
-            namespace: 'test',
-            name: 'name2',
-            param1: 'param1',
-            param2: 'param2',
-            param3: 1
+            creationTimestamp: data[1].metadata.creationTimestamp,
+            name: data[1].metadata.name,
+            namespace: data[1].metadata.namespace,
+            podSelector: data[1].spec['pod-selector']['matchLabels'],
+            podCount: data[1].spec['pod-count'],
+            state: data[1].spec['state'],
+            parameters: data[1].spec['parameters'],
+            accuracy: data[1].spec['metrics']['accuracy']
           }
         ],
         stats: {
@@ -272,7 +319,7 @@ describe('Handlers | Experiments', function () {
           totalPagesCount: 2,
           datetime: 1
         },
-        params: ['creationTimestamp', 'namespace', 'name', 'param1', 'param2', 'param3']
+        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
       };
       const result = expApi.parseExperiments(data, query);
       expect(result.data).to.deep.equal(expectedResult.data);

@@ -24,22 +24,24 @@ const logger = require('../../utils/logger');
 const errMessages = require('../../utils/error-messages');
 const HttpStatus = require('http-status-codes');
 const k8s = require('../../utils/k8s');
-const datetimeUtils = require('../../utils/datetime-utils');
 
 const parseExperiments = function (experiments, queryParams) {
   let data = {};
   experiments.forEach(function (experiment) {
     let entity = {
-      creationTimestamp: datetimeUtils.parseStringToUTC(experiment.metadata.creationTimestamp),
-      namespace: experiment.metadata.namespace
+      creationTimestamp: experiment.metadata.creationTimestamp,
+      name: experiment.metadata.name,
+      namespace: experiment.metadata.namespace,
+      podSelector: experiment.spec['pod-selector']['matchLabels'],
+      podCount: experiment.spec['pod-count'],
+      state: experiment.spec['state'],
+      parameters: experiment.spec['parameters']
     };
-    Object.keys(experiment.spec).map(function (key) {
-      entity[key] = experiment.spec[key];
+    Object.keys(experiment.spec['metrics']).map((metricName) => {
+      entity[metricName] = experiment.spec['metrics'][metricName];
     });
     data[entity.name] = entity;
   });
-  // get metrics here
-  // placeholder
 
   let result = {
     stats: {
@@ -80,16 +82,19 @@ const parseExperiments = function (experiments, queryParams) {
       fullData = fullData.slice(a, b);
     }
   }
-
-  result.params = _.keys(fullData[0]);
+  let set = new Set();
+  fullData.map((exp) => {
+    _.keys(exp).forEach((p) => {
+      set.add(p);
+    })
+  });
+  result.params = Array.from(set);
   result.data = fullData;
   return result;
 };
 
 const getUserExperiments = function (req, res) {
-  const experimentsResourceName = 'experiments';
   const runsResourceName = 'runs';
-
   if (!req.headers.authorization) {
     logger.debug('Missing authorization token');
     res.status(HttpStatus.UNAUTHORIZED).send({message: errMessages.AUTH.MISSING_TOKEN});
@@ -97,17 +102,12 @@ const getUserExperiments = function (req, res) {
   const token = req.headers.authorization;
   const queryParams = req.query;
   logger.debug(queryParams);
-  k8s.listNamespacedCustomObject(token, experimentsResourceName)
+  k8s.listNamespacedCustomObject(token, runsResourceName)
     .then(function (data) {
       logger.info('Experiments retrieved');
-      if (data.items.length) {
-        logger.debug('Preparation data');
-        const experiments = parseExperiments(data.items, queryParams);
-        res.send(experiments);
-      } else {
-        logger.debug('Empty list of experiments');
-        res.send(data.items);
-      }
+      logger.debug('Preparation data');
+      const experiments = parseExperiments(data.items, queryParams);
+      res.send(experiments);
     })
     .catch(function (err) {
       logger.error('Cannot get experiments');

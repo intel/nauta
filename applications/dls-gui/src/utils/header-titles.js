@@ -23,8 +23,8 @@ export default {
   creationTimestamp: 'Submission Date',
   namespace: 'Owner',
   name: 'Experiment Name',
-  'parameters-spec': 'Submit Parameters',
-  state: 'Experiment State',
-  'template-name': 'Template Name',
-  'template-namespace': 'Template Namespace'
+  parameters: 'Parameters',
+  state: 'State',
+  podCount: 'Pod Count',
+  podSelector: 'Pod Selector'
 };
