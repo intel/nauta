@@ -128,7 +128,7 @@ rpm_ready_packages:
   - make
   - rsync
   - kubernetes-all-1.10.0
-  - kubernetes-helm-2.8.2
+  - kubernetes-helm-2.9.1
   - docker-distribution
   - pacemaker
   - pcs
@@ -157,8 +157,8 @@ images:
     image: "gcr.io/google-containers/pause-amd64:3.1"
     method: "pull"
   core/tiller:
-    version: "v2.8.1"
-    image: "gcr.io/kubernetes-helm/tiller:v2.8.1"
+    version: "v2.9.1"
+    image: "gcr.io/kubernetes-helm/tiller:v2.9.1"
     method: "pull"
   core/addon-resizer:
     version: "v1.7"

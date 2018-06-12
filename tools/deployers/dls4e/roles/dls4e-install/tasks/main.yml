@@ -24,7 +24,7 @@
         registry: "127.0.0.1:{{ registry_nodeport }}"
       images:
         - name: tiller
-          value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.8.1"
+          value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.9.1"
         - name: tensorflow
           value: "dls4e/tensorflow:1.8.0-py3"
         - name: tensorboard

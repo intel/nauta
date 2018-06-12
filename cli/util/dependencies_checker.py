@@ -33,7 +33,7 @@ log = initialize_logger(__name__)
 DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
 DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
-HELM_VERSION = LooseVersion('v2.8.1')
+HELM_VERSION = LooseVersion('v2.9.1')
 
 
 class InvalidDependencyError(Exception):

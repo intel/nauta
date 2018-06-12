@@ -26,9 +26,9 @@ import pytest
 from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_installed_version, check_dependency,\
     DependencySpec, check_all_binary_dependencies, DEPENDENCY_MAP, InvalidDependencyError
 
-TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.8.1",' \
-                  ' GitCommit:"6af75a8fd72e2aa18a2b278cfe5c7a1c5feca7f2", GitTreeState:"clean"}'
-TEST_VERSION = LooseVersion('v2.8.1')
+TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
+                  ' GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}'
+TEST_VERSION = LooseVersion('v2.9.1')
 
 
 @pytest.mark.parametrize('installed_version,expected_version', [(LooseVersion('v0.0.2'), LooseVersion('v0.0.1')),

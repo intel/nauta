@@ -2,6 +2,8 @@
 
 set -e
 
+yum-carbon clean all
+
 find $4 -maxdepth 1 -mindepth 1 -exec cp -ar {} /root/rpmbuild/SOURCES/ \;
 
 chown 0:0 -R /root/rpmbuild/SOURCES/

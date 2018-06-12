@@ -71,7 +71,7 @@ enabled=1
 
 [kubernetes]
 name=kubernetes
-baseurl=http://repository.toolbox.nervana.sclab.intel.com/yum/kubernetes/7.4.1708/x86_64
+baseurl=http://repository.toolbox.nervana.sclab.intel.com/yum/kubernetes/RHEL75/x86_64
 gpgcheck=0
 protect=0
 enabled=1

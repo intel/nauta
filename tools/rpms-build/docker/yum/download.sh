@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
+yum-carbon clean all
+
 mkdir -p /tmp_dir/packages /tmp_rpm
 
 DEST=$1

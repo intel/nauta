@@ -44,7 +44,7 @@ spec:
           value: kube-system
         - name: TILLER_HISTORY_MAX
           value: "0"
-        image: registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/tiller:v2.8.1
+        image: registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/tiller:v2.9.1
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -109,7 +109,7 @@ spec:
           value: kube-system
         - name: TILLER_HISTORY_MAX
           value: "0"
-        image: registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/tiller:v2.8.1
+        image: registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/tiller:v2.9.1
         livenessProbe:
           failureThreshold: 3
           httpGet:

@@ -25,8 +25,8 @@ downloads:
       url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/kubectl
       shasum: 49f7e5791d7cd91009c728eb4dc1dbf9ee1ae6a881be6b970e631116065384c3
     helm:
-      url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm-v2.8.2
-      shasum: 0521956fa22be33189cc825bb27b3f4178c5ce9a448368b5c81508d446472715
+      url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm-v2.9.1
+      shasum: 9c9b77b0aa9c25debcadd1b538e0f42311e8c2d60a356b256b552642fcd5c6d5
     loader:
       url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/loader
       shasum: 774a1af69d41454ed8b6dc0cc2b92ee7b35d18c8c32886fce9d2dff75362e8db
