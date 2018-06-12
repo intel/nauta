@@ -4,7 +4,7 @@ set -e
 mkdir -p /input/public
 mkdir -p /output/public
 
-chmod 0777 -R /input/public /output/public
+# chmod 0777 -R /input/public /output/public
 
 function create_user() {
     echo "(Re)Creating user $1"
