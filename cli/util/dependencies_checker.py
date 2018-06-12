@@ -109,10 +109,13 @@ def check_dependency(dependency_spec: DependencySpec) -> (bool, LooseVersion):
     :param dependency_spec: specification of dependency to check
     :return: a tuple of validation status and installed version
     """
-    output, exit_code = dependency_spec.version_command(dependency_spec.version_command_args)
-    if exit_code != 0:
+    try:
+        output, exit_code = dependency_spec.version_command(dependency_spec.version_command_args)
+        if exit_code != 0:
+            raise RuntimeError
+    except RuntimeError as e:
         raise RuntimeError(f'Failed to run {dependency_spec.version_command}'
-                           f' with args {dependency_spec.version_command_args}. Output: {output}')
+                           f' with args {dependency_spec.version_command_args}. Output: {output}') from e
 
     if dependency_spec.version_field:
         installed_version = _parse_installed_version(output, version_field=dependency_spec.version_field)
@@ -134,11 +137,11 @@ def check_all_binary_dependencies():
             if not valid:
                 raise InvalidDependencyError(f'{dependency_name} installed version: {installed_version}, does not match'
                                              f' expected version: {dependency_spec.expected_version}')
-        except RuntimeError as e:
-            error_msg = f'Failed to check {dependency_name} version.'
+        except FileNotFoundError as e:
+            error_msg = f'{dependency_name} is not installed.'
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e
-        except (ValueError, TypeError) as e:
-            error_msg = f'Failed to parse {dependency_name} version.'
+        except (RuntimeError, ValueError, TypeError) as e:
+            error_msg = f'Failed to get {dependency_name} version.'
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e

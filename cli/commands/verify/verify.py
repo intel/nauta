@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import sys
+
 import click
 
 from cli_state import common_options, pass_state, State
@@ -48,11 +50,13 @@ def verify(state: State):
                 click.echo(f'{dependency_name} installed version ({installed_version}) '
                            f'was not tested, supported version {supported_versions_sign}'
                            f' {dependency_spec.expected_version}')
-        except RuntimeError:
+        except FileNotFoundError:
             error_msg = f'{dependency_name} is not installed.'
             log.exception(error_msg)
             click.echo(error_msg)
-        except ValueError:
-            error_msg = f'Failed to parse {dependency_name} version.'
+            sys.exit(1)
+        except (RuntimeError, ValueError, TypeError):
+            error_msg = f'Failed to get {dependency_name} version.'
             log.exception(error_msg)
             click.echo(error_msg)
+            sys.exit(1)
