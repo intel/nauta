@@ -69,7 +69,6 @@ def update_configuration(experiment_folder: str, script_location: str,
 
 def modify_dockerfile(experiment_folder: str, internal_registry_port: str):
     log.debug("Modify dockerfile - start")
-    # TODO: CAN-387: we should use module 'tempfile' to generate unique temporary files, not constant one
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
     dockerfile_temp_content = ""
