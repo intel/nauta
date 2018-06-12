@@ -49,5 +49,8 @@ unit-tests:
 cli-style:
 	@(cd $(CURDIR)/cli && make style)
 
+unit-tests-with-code-cov:
+	@(cd $(CURDIR)/cli && make test-with-code-cov)
+
 gui-unit-tests:
 	@(cd $(CURDIR)/applications/dls-gui && make test)
