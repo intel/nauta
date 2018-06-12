@@ -144,6 +144,7 @@ release: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
 release: $(RELEASE_PACKAGE)
 release: export ENV_SRC := $(RELEASE_PACKAGE)
 release: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
+release: export BUILD_LOGS := $(BUILD_LOGS)
 release:
 	@$(PUSH_MAKE)
 
@@ -153,6 +154,6 @@ push: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
 push: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
 push: export ENV_SRC := $(ENV_SRC)
 push: export ENV_DEST := $(ENV_DEST)
-
+push: export BUILD_LOGS := $(BUILD_LOGS)
 push:
 	@$(PUSH_MAKE)

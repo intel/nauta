@@ -18,3 +18,12 @@
     task_id: "{{ item.value }}"
   include_tasks: wait.yml
   with_dict: "{{ docker_async_tasks }}"
+
+- name: Save image to a file {{ build_logs }}/container_images.txt for IP Plan report generator
+  lineinfile:
+    dest: '{{ build_logs }}/container_images.txt'
+    line: '{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ item.key }}:{{ docker_images_remote_tags[item.key] }}'
+    state: present
+    create: true
+  with_dict: "{{ images }}"
+
