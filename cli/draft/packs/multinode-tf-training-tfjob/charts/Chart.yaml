@@ -1,0 +1,4 @@
+name: multinode-tf-training-tfjob
+apiVersion: v1
+description: Tensorflow training chart for Kubernetes multi node
+version: 0.1.0

@@ -102,6 +102,18 @@ images:
       BUILD_IMAGE: "dls4e/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tf-operator"
+  dls4e/python36:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "dls4e/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/python36"
+  dls4e/ps-sidecar:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "dls4e/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
 
 subcharts:
   dls4e-registry:

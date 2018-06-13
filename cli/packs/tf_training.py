@@ -57,7 +57,7 @@ def update_configuration(experiment_folder: str, script_location: str,
 
     try:
         modify_values_yaml(experiment_folder, script_location, script_parameters,
-                           experiment_name=experiment_name, pack_type=pack_type)
+                           experiment_name=experiment_name, pack_type=pack_type, registry_port=internal_registry_port)
         modify_dockerfile(experiment_folder, internal_registry_port)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
@@ -91,7 +91,7 @@ def modify_dockerfile(experiment_folder: str, internal_registry_port: str):
 
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
-                       experiment_name: str, pack_type: str):
+                       experiment_name: str, pack_type: str, registry_port: str):
     log.debug("Modify values.yaml - start")
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
@@ -100,6 +100,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         v = yaml.load(values_yaml_file)
         v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
         v["experimentName"] = experiment_name
+        v["registry_port"] = str(registry_port)
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)

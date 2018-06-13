@@ -22,7 +22,6 @@
 import unittest.mock as mock
 import pytest
 
-import packs.common as common
 import packs.tf_training as tf_training
 from util.exceptions import KubectlIntError
 
@@ -68,7 +67,7 @@ def test_modify_values_yaml(mocker):
     yaml_dump_mock = mocker.patch("yaml.dump")
 
     tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
-                                   experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE)
+                                   experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE, registry_port="1111")
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
