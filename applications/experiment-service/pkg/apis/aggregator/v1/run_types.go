@@ -51,7 +51,7 @@ type Run struct {
 type RunSpec struct {
 	ExperimentName string               `json:"experiment-name,omitempty"`
 	PodSelector    metav1.LabelSelector `json:"pod-selector,omitempty"`
-	PodCount       int64                `json:"pod-count,omitempty"`
+	PodCount       int                  `json:"pod-count,omitempty"`
 	Parameters     []string             `json:"parameters,omitempty"`
 	Metrics        map[string]string    `json:"metrics,omitempty"`
 	State          common.RunState      `json:"state,omitempty"`

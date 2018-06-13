@@ -82,7 +82,7 @@ type Run struct {
 type RunSpec struct {
 	ExperimentName string
 	PodSelector    metav1.LabelSelector
-	PodCount       int64
+	PodCount       int
 	Parameters     []string
 	Metrics        map[string]string
 	State          aggregatorcommon.RunState

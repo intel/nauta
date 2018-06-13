@@ -19,14 +19,14 @@ images:
       BASE_IMAGE: "dls4e/build"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/build-go"
-    push: False
+    push: True
   dls4e/go-apiserver-builder:
     version: "v1.9-alpha.4"
     required:
       BASE_IMAGE: "dls4e/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/go-apiserver-builder"
-    push: False
+    push: True
   dls4e/etcd:
     version: "3.1.10"
     image: "gcr.io/google-containers/etcd-amd64:3.1.10"

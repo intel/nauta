@@ -47,7 +47,7 @@ spec:
               memory: 20Mi
             limits:
               cpu: 100m
-              memory: 30Mi
+              memory: 300Mi
           volumeMounts:
           - name: apiserver-certs-temp
             mountPath: /apiserver.local.config/certificates
@@ -63,7 +63,7 @@ spec:
               memory: 20Mi
             limits:
               cpu: 100m
-              memory: 30Mi
+              memory: 300Mi
       volumes:
         - name: apiserver-certs-temp
           persistentVolumeClaim:

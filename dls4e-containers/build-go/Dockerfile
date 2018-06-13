@@ -19,18 +19,18 @@ ENV GOROOT=/build/go
 ENV GOPATH=/build/work
 ENV PATH=${PATH}:${GOROOT}/bin
 
-ENV GLIDE_VERSION=v0.13.1
-ENV GLIDE_ARCH=amd64
-ENV GLIDE_OS=linux
-ENV GLIDE_CHECKSUM=c403933503ea40308ecfadcff581ff0dc3190c57958808bb9eed016f13f6f32c
-ENV GLIDE_FILE=glide-${GLIDE_VERSION}-${GLIDE_OS}-${GLIDE_ARCH}.tar.gz
-ENV GLIDE_URL=https://github.com/Masterminds/glide/releases/download/${GLIDE_VERSION}/${GLIDE_FILE}
+ENV DEP_VERSION=v0.4.1
+ENV DEP_ARCH=amd64
+ENV DEP_OS=linux
+ENV DEP_CHECKSUM=31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315
+ENV DEP_FILE=dep-${DEP_OS}-${DEP_ARCH}
+ENV DEP_URL=https://github.com/golang/dep/releases/download/${DEP_VERSION}/${DEP_FILE}
 
-RUN mkdir -p /build/glide
 
-RUN curl -Lf ${GLIDE_URL} -o /tmp/${GLIDE_FILE} && \
-    echo "${GLIDE_CHECKSUM} */tmp/${GLIDE_FILE}" | sha256sum -c - && \
-    tar -zvxf /tmp/${GLIDE_FILE} -C /build/glide && \
-    rm -rf /tmp/${GLIDE_FILE}
+RUN mkdir -p /build/dep
 
-ENV PATH=${PATH}:/build/glide/${GLIDE_OS}-${GLIDE_ARCH}
+RUN curl -Lf ${DEP_URL} -o /build/dep/dep && \
+    echo "${DEP_CHECKSUM} */build/dep/dep" | sha256sum -c - && \
+    chmod 0777 /build/dep/dep
+
+ENV PATH=${PATH}:/build/dep/

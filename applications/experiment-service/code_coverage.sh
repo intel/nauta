@@ -1,10 +1,10 @@
 min_code_coverage=80
 
-go test -coverprofile=cmd_cov.dat ./cmd/... >> /dev/null
+go test -coverprofile=cmd_cov.dat ./cmd/...
 cmd_coverage=`go tool cover -func=cmd_cov.dat | grep total | awk -F' '  '{print $NF}'`
 rm cmd_cov.dat
 
-go test -coverprofile=pkg_cov.dat ./pkg/... >> /dev/null
+go test -coverprofile=pkg_cov.dat ./pkg/...
 pkg_coverage=`go tool cover -func=pkg_cov.dat | grep total | awk -F' '  '{print $NF}'`
 rm pkg_cov.dat
 

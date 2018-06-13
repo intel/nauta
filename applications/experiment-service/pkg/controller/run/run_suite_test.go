@@ -18,7 +18,7 @@ otherwise. Any license under such intellectual property rights must be express
 and approved by Intel in writing.
 */
 
-package run_test
+package run
 
 import (
 	"testing"
@@ -30,7 +30,6 @@ import (
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/clientset_generated/clientset"
-	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/controller/run"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/controller/sharedinformers"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/openapi"
 )
@@ -39,7 +38,7 @@ var testenv *test.TestEnvironment
 var config *rest.Config
 var cs *clientset.Clientset
 var shutdown chan struct{}
-var controller *run.RunController
+var runCtrl *RunController
 var si *sharedinformers.SharedInformers
 
 func TestRun(t *testing.T) {
@@ -54,8 +53,8 @@ var _ = BeforeSuite(func() {
 
 	shutdown = make(chan struct{})
 	si = sharedinformers.NewSharedInformers(config, shutdown)
-	controller = run.NewRunController(config, si)
-	controller.Run(shutdown)
+	runCtrl = NewRunController(config, si)
+	runCtrl.Run(shutdown)
 })
 
 var _ = AfterSuite(func() {

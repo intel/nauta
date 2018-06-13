@@ -5,9 +5,9 @@ metadata:
 spec:
   pod-count: 2
   experiment-name: exp-test
-    pod-selector:
-      matchLabels:
-        app: test-app
+  pod-selector:
+    matchLabels:
+      app: test-app
   parameters:
     - param1
     - param2

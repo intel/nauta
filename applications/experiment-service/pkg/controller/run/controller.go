@@ -21,125 +21,152 @@ and approved by Intel in writing.
 package run
 
 import (
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/kubernetes-incubator/apiserver-builder/pkg/builders"
+	core_v1 "k8s.io/api/core/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	listers_v1 "k8s.io/client-go/listers/core/v1"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
-	v1client "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/clientset_generated/clientset/typed/aggregator/v1"
-	listers "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/listers_generated/aggregator/v1"
+	client_run "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/clientset_generated/clientset/typed/aggregator/v1"
+	listers_run "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/listers_generated/aggregator/v1"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/controller/sharedinformers"
-	v1core "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1listers "k8s.io/client-go/listers/core/v1"
 )
+
+// podLister indexes properties about Pods - it is class package variable, because is needed for tests purpose
+var podLister listers_v1.PodLister
 
 // +controller:group=aggregator,version=v1,kind=Run,resource=runs
 type RunControllerImpl struct {
 	builders.DefaultControllerFns
 
-	// lister indexes properties about Run
-	lister listers.RunLister
+	// runLister indexes properties about Run
+	runLister listers_run.RunLister
 
-	// lister indexes properties about Pods
-	podLister v1listers.PodLister
-
-	runClient *v1client.AggregatorV1Client
+	runClient *client_run.AggregatorV1Client
 }
 
 // Init initializes the controller and is called by the generated code
 // Register watches for additional resource types here.
 func (c *RunControllerImpl) Init(arguments sharedinformers.ControllerInitArguments) {
 	pi := arguments.GetSharedInformers().KubernetesFactory.Core().V1().Pods()
-	c.podLister = pi.Lister()
+	podLister = pi.Lister()
 
 	// For watching Pods
 	arguments.Watch("RunPod", pi.Informer(), c.getReconcileKey)
-	arguments.GetRestConfig()
 
-	// Use the lister for indexing runs labels
-	c.lister = arguments.GetSharedInformers().Factory.Aggregator().V1().Runs().Lister()
+	// Use the runLister for indexing runs labels
+	c.runLister = arguments.GetSharedInformers().Factory.Aggregator().V1().Runs().Lister()
 
 	var err error
-	c.runClient, err = v1client.NewForConfig(arguments.GetRestConfig())
+	c.runClient, err = client_run.NewForConfig(arguments.GetRestConfig())
 	if err != nil {
 		log.Fatalln("Client not created sucessfully:", err)
 	}
 }
 
-// Reconcile handles enqueued messages
+// Reconcile handles enqueued message
+// Create and Update events for RUN object are also handled. Delete hook has to be added manually.
 func (c *RunControllerImpl) Reconcile(run *v1.Run) error {
-	log.Printf("Processing Run: %s", run.Name)
+	log.Printf("Processing Run: %s. State: %v", run.Name, run.Spec.State)
 
-	if run.Spec.State == common.Complete || run.Spec.State == common.Failed || run.Spec.State == common.Cancelled {
-		log.Printf("Run object: %s already processed. Final status %v", run.Name, run.Spec.State)
-		return nil
-	}
-
-	if run.Spec.State == "" {
-		log.Printf("Run object: %s CREATE flow. Changing state to %v", run.Name, common.Queued)
-		run.Spec.State = common.Queued
-		_, err := c.runClient.Runs(run.Namespace).Update(run)
-		if err != nil {
-			log.Printf("Run %s update after Create - FALED! %v", run.Name, err)
-		}
-		return err
-	}
-
-	selector, err := metav1.LabelSelectorAsSelector(&run.Spec.PodSelector)
+	selector, err := meta_v1.LabelSelectorAsSelector(&run.Spec.PodSelector)
 	if err != nil {
 		log.Printf("Run: %s. Convert LabelSelector to Selector Fail: %v", run.Name, err)
 		return err
 	}
 
-	pods, err := c.podLister.Pods(run.Namespace).List(selector)
+	pods, err := podLister.Pods(run.Namespace).List(selector)
 	if err != nil {
 		log.Printf("Run: %s. List pod error: %v", run.Name, err)
 		return err
 	}
 
-	// TODO implement Run.Spec.PodCount - check '4.3.1.3.1. State FSM' section in doc
-
-	if len(pods) > 0 {
-		newState := calculateRunStatus(pods, run.Name)
-		run.Spec.State = newState
-		log.Printf("Run %s. New calculated state: %v", run.Name, newState)
-	} else {
-		log.Printf("No Pods found. Setting FAILED status for Run: %s", run.Name)
-		run.Spec.State = common.Failed
+	if run.Spec.State == common.Complete || run.Spec.State == common.Failed || run.Spec.State == common.Cancelled {
+		log.Printf("SKIPPING. Run: %s already processed. Final status %v", run.Name, run.Spec.State)
+		return nil
 	}
 
-	// TODO move Run.Spec.State to Run.Status and use UpdateStatus method
-	_, err = c.runClient.Runs(run.Namespace).Update(run)
-	if err != nil {
-		log.Printf("Run %s update - FALED! %v", run.Name, err)
-		return err
+	if run.Spec.State == "" && len(pods) < run.Spec.PodCount {
+		log.Printf("SKIPPING. Run: %s NOT READY to start yet. Not enough pods. Required %d, currently: %d",
+			run.Name, run.Spec.PodCount, len(pods))
+		return nil
+	}
+
+	stateToSet := calculateRunState(run, pods)
+	return c.saveWithRetries(run, stateToSet, pods)
+}
+
+func (c *RunControllerImpl) saveWithRetries(run *v1.Run, stateToSet common.RunState, pods []*core_v1.Pod) error {
+	for i := 3; i > 0; i-- {
+		if run.Spec.State != stateToSet {
+			run.Spec.State = stateToSet
+			_, err := c.runClient.Runs(run.Namespace).Update(run)
+			if err != nil {
+				// try to refresh Run instance
+				if i > 0 {
+					log.Printf("Run %s update - FALED! %d save tries left. Error: %v", run.Name, i-1, err)
+					run, err = c.runClient.Runs(run.Namespace).Get(run.Name, meta_v1.GetOptions{})
+					stateToSet = calculateRunState(run, pods)
+				} else {
+					errMsg := fmt.Sprintf("Run %s update FALED! No more save tries left! Error: %v",
+						run.Name, err)
+					log.Printf(errMsg)
+					return errors.New(errMsg)
+				}
+			} else {
+				log.Printf("Run: %s saved in state %v", run.Name, run.Spec.State)
+				return nil
+			}
+		} else {
+			log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
+			return nil
+		}
 	}
 	return nil
 }
 
-func calculateRunStatus(pods []*v1core.Pod, runName string) common.RunState {
-	statuses := map[v1core.PodPhase]int{
-		v1core.PodPending:   0,
-		v1core.PodUnknown:   0,
-		v1core.PodRunning:   0,
-		v1core.PodSucceeded: 0,
+func calculateRunState(run *v1.Run, pods []*core_v1.Pod) common.RunState {
+	var stateToSet common.RunState
+	if len(pods) == run.Spec.PodCount {
+		stateToSet = calculateRunStateFromPods(pods, run.Name)
+		log.Printf("Run %s. New calculated state: %v", run.Name, stateToSet)
+	} else if len(pods) == 0 {
+		log.Printf("No Pods found. Setting FAILED status for Run: %s", run.Name)
+		stateToSet = common.Failed
+	} else {
+		log.Printf("Incorrect number of Pods found: %d, expected: %d. Setting FAILED status for Run: %s",
+			len(pods), run.Spec.PodCount, run.Name)
+		stateToSet = common.Failed
+	}
+	return stateToSet
+}
+
+func calculateRunStateFromPods(pods []*core_v1.Pod, runName string) common.RunState {
+	statuses := map[core_v1.PodPhase]int{
+		core_v1.PodPending:   0,
+		core_v1.PodUnknown:   0,
+		core_v1.PodRunning:   0,
+		core_v1.PodSucceeded: 0,
 	}
 
 	for _, pod := range pods {
 		podPhase := pod.Status.Phase
-		if podPhase == v1core.PodFailed {
+		if podPhase == core_v1.PodFailed {
 			log.Printf("Run %s failed! Reason: pod Failed: %s", runName, pod.Status.Message)
 			return common.Failed
 		}
 		statuses[podPhase] = statuses[podPhase] + 1
 	}
 
-	if statuses[v1core.PodPending] > 0 || statuses[v1core.PodUnknown] > 0 {
+	if statuses[core_v1.PodPending] > 0 || statuses[core_v1.PodUnknown] > 0 {
 		return common.Queued
 	}
-	if statuses[v1core.PodSucceeded] == len(pods) {
+	if statuses[core_v1.PodSucceeded] == len(pods) {
 		return common.Complete
 	}
 	return common.Running
@@ -147,12 +174,12 @@ func calculateRunStatus(pods []*v1core.Pod, runName string) common.RunState {
 
 // this method is executed just before the Reconcile method to lookup the Run object.
 func (c *RunControllerImpl) Get(namespace, name string) (*v1.Run, error) {
-	return c.lister.Runs(namespace).Get(name)
+	return c.runClient.Runs(namespace).Get(name, meta_v1.GetOptions{})
 }
 
 // takes an instance of the watched resource (Pod) and returns a key for the reconciled resource type (Run) to enqueue
 func (c *RunControllerImpl) getReconcileKey(i interface{}) (string, error) {
-	p, _ := i.(*v1core.Pod)
+	p, _ := i.(*core_v1.Pod)
 	log.Printf("Pod change detected. Pod: %v", p.Name)
 
 	if label, ok := p.Labels["runName"]; ok {

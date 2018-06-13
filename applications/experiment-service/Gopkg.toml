@@ -21,12 +21,12 @@
 #  version = "2.4.0"
 
 # Uncomment to update deps with dep tool
-# ignored = ["github.com/kubernetes-incubator/apiserver-builder","github.com/kubernetes-incubator/apiserver-builder/cmd"]
+ignored = ["github.com/kubernetes-incubator/apiserver-builder","github.com/kubernetes-incubator/apiserver-builder/cmd"]
 
 # Comment to update deps with dep tool
-[[constraint]]
-  version = "v0.1-alpha.28"
-  name = "github.com/kubernetes-incubator/apiserver-builder"
+#[[constraint]]
+#  version = "v0.1-alpha.28"
+#  name = "github.com/kubernetes-incubator/apiserver-builder"
 
 [[constraint]]
   name = "github.com/emicklei/go-restful"

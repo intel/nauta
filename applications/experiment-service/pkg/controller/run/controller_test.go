@@ -18,7 +18,7 @@ otherwise. Any license under such intellectual property rights must be express
 and approved by Intel in writing.
 */
 
-package run_test
+package run
 
 import (
 	"time"
@@ -28,66 +28,115 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	core_v1 "k8s.io/api/core/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
+	"github.com/stretchr/testify/mock"
 )
+
+type runTester struct {
+	expectedKey string
+	actualKey   string
+	actualErr   error
+	before      chan struct{}
+	after       chan struct{}
+}
 
 var _ = Describe("Run controller", func() {
 	var instance Run
-	var expectedKey string
 	var client RunInterface
-	var before chan struct{}
-	var after chan struct{}
+	var rT *runTester
 
 	BeforeEach(func() {
-		instance = Run{}
-		instance.Name = "instance-1"
-		expectedKey = "run-controller-test-handler/instance-1"
+		rT = new(runTester)
+		instance = prepareRun()
+		rT.expectedKey = "run-controller-test-handler/instance-1"
+	})
+
+	JustBeforeEach(func() {
+		rT.before = make(chan struct{})
+		rT.after = make(chan struct{})
+		rT.prepareReconcileCallbacks()
 	})
 
 	AfterEach(func() {
-		client.Delete(instance.Name, &metav1.DeleteOptions{})
+		client.Delete(instance.Name, &meta_v1.DeleteOptions{})
 	})
 
-	Describe("when creating a new object", func() {
+	Describe("when creating a new Run", func() {
 		It("invoke the reconcile method", func() {
+			pod := preparePod()
+			testObj := setupPodListerFake()
+			testObj.lister.On("List", mock.Anything).Return([]*core_v1.Pod{pod}, nil)
+			//testObj.lister.AssertNumberOfCalls()
+
 			client = cs.AggregatorV1().Runs("run-controller-test-handler")
-			before = make(chan struct{})
-			after = make(chan struct{})
-
-			actualKey := ""
-			var actualErr error = nil
-
-			// Setup test callbacks to be called when the message is reconciled
-			controller.BeforeReconcile = func(key string) {
-				defer close(before)
-				actualKey = key
-			}
-			controller.AfterReconcile = func(key string, err error) {
-				defer close(after)
-				actualKey = key
-				actualErr = err
-			}
 
 			// Create an instance
 			_, err := client.Create(&instance)
 			Expect(err).ShouldNot(HaveOccurred())
+			rT.verifyReconcileCalls()
 
-			// Verify reconcile function is called against the correct key
-			select {
-			case <-before:
-				Expect(actualKey).To(Equal(expectedKey))
-				Expect(actualErr).ShouldNot(HaveOccurred())
-			case <-time.After(time.Second * 2):
-				Fail("reconcile never called")
-			}
-
-			select {
-			case <-after:
-				Expect(actualKey).To(Equal(expectedKey))
-				Expect(actualErr).ShouldNot(HaveOccurred())
-			case <-time.After(time.Second * 2):
-				Fail("reconcile never finished")
-			}
+			// Verify after reconcile
+			updatedRun, err := client.Get(instance.Name, meta_v1.GetOptions{})
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(updatedRun.Spec.State).To(Equal(common.Running))
 		})
 	})
 })
+
+// Setup test callbacks to be called when the message is reconciled
+func (r *runTester) prepareReconcileCallbacks() {
+	runCtrl.BeforeReconcile = func(key string) {
+		r.actualKey = key
+		r.before <- struct{}{}
+	}
+
+	runCtrl.AfterReconcile = func(key string, err error) {
+		r.actualKey = key
+		r.actualErr = err
+		r.after <- struct{}{}
+	}
+}
+
+// Verify reconcile function is called against the correct key
+func (r *runTester) verifyReconcileCalls() {
+	for i := 0; i < 2; i++ {
+		select {
+		case <-r.before:
+			Expect(r.actualKey).To(Equal(r.expectedKey))
+			Expect(r.actualErr).ShouldNot(HaveOccurred())
+		case <-time.After(time.Second * 2):
+			Fail("reconcile never called")
+		}
+
+		select {
+		case <-r.after:
+			Expect(r.actualKey).To(Equal(r.expectedKey))
+			Expect(r.actualErr).ShouldNot(HaveOccurred())
+		case <-time.After(time.Second * 2):
+			Fail("reconcile never finished")
+		}
+	}
+}
+
+func preparePod() *core_v1.Pod {
+	pod := core_v1.Pod{}
+	pod.Name = "kuba"
+	pod.Namespace = "run-controller-test-handler"
+	pod.Labels = map[string]string{"k": "b"}
+	return &pod
+}
+
+func prepareRun() Run {
+	run := Run{}
+	run.Name = "instance-1"
+	run.Spec.State = "" //common.Complete
+	//instance.Namespace = "run-controller-test-handler"
+	run.Spec.PodCount = 1
+	run.Spec.PodSelector = meta_v1.LabelSelector{
+		MatchLabels: map[string]string{"k": "b"},
+	}
+	return run
+}

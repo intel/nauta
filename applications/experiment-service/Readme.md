@@ -4,6 +4,9 @@
 Install:
 1. apiserver-builder v1.9-alpha.4: [info](https://github.com/kubernetes-incubator/apiserver-builder/blob/master/docs/installing.md)
 1. Go 1.10.2 https://golang.org/doc/install
+1. dep v.0.4.1 https://github.com/golang/dep
+1. Etcd v3.2.0 (for the local development and Test Run). You can use following script: https://github.com/kubernetes-incubator/apiserver-builder/blob/master/scripts/install_etcd.sh
+1. Mercurial `hg` https://www.mercurial-scm.org/wiki/Download
 
 ### Prepare Go project environment
 If `$GOPATH` is not set, Go will use following location as the default one: `$HOME/go`
@@ -18,10 +21,21 @@ This project should be placed under (only non-capitals letters!) `$HOME/go/src/g
 1. Update fields and methods in file: `pkg/apis/aggregator/v1/run_types.go`
 1. Regenerate code: `apiserver-boot build executables`
 
+### Significant files
+Most of the code is generated. Our logic has to be placed in specific files [doc](https://github.com/kubernetes-incubator/apiserver-builder/blob/master/docs/concepts/api_building_overview.md):
+1. Model: `pkg/apis/<api-group>/<api-version>/<kind>_types.go`
+1. Controller: `pkg/controller/<kind>/controller.go`
+1. Watchers configuration: `pkg/controller/sharedinformer/informers.go`
+
 ### Update code
 1. Make changes, ex. add new field
 1. Regenerate code: `apiserver-boot build executables`
 1. Commit
+
+### Update dependencies
+1. Add new dependency in the go file import
+1. call: `make dep_update`
+1. commit changes
 
 ## Deployment
 

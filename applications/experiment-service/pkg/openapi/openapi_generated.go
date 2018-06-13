@@ -151,7 +151,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						"pod-count": {
 							SchemaProps: spec.SchemaProps{
 								Type:   []string{"integer"},
-								Format: "int64",
+								Format: "int32",
 							},
 						},
 						"parameters": {

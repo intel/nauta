@@ -61,7 +61,7 @@ class Run(PlatformResource):
                    parameters=object_dict['spec']['parameters'],
                    creation_timestamp=object_dict['metadata']['creationTimestamp'],
                    submitter=object_dict['metadata']['namespace'],
-                   state=RunStatus[object_dict['spec']['state']],
+                   state=RunStatus[object_dict['spec']['state']] if 'state' in object_dict['spec'] else "",
                    pod_count=object_dict['spec']['pod-count'],
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
@@ -79,5 +79,5 @@ class Run(PlatformResource):
                                    width=30),
                                submission_date=self.creation_timestamp,
                                submitter=self.submitter,
-                               status=self.state.value,
+                               status=self.state.value if self.state else "",
                                template_name=self.template_name)

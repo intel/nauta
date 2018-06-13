@@ -8,8 +8,8 @@ WORKDIR ${EXP_SVC_PATH}
 
 ADD ./ ./
 
-# LOAD vendor data
-RUN apiserver-boot update vendor
+RUN yum -y install make
+RUN make dep_install
 
 # Build (generate step should be made before 'docker build' call)
 RUN apiserver-boot build executables --generate=false
