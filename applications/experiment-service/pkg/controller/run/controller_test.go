@@ -21,6 +21,7 @@ and approved by Intel in writing.
 package run
 
 import (
+	"log"
 	"time"
 
 	. "github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
@@ -103,6 +104,7 @@ func (r *runTester) prepareReconcileCallbacks() {
 // Verify reconcile function is called against the correct key
 func (r *runTester) verifyReconcileCalls() {
 	for i := 0; i < 2; i++ {
+		log.Printf("Processing reconcile %d call", i+1)
 		select {
 		case <-r.before:
 			Expect(r.actualKey).To(Equal(r.expectedKey))
