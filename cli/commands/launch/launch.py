@@ -47,8 +47,12 @@ FORWARDED_URL = 'http://localhost:{}'
 
 
 def is_gui_browser_available() -> bool:
-    browser = webbrowser.get()
-    return True if type(browser) not in {webbrowser.GenericBrowser, None} else False
+    try:
+        browser = webbrowser.get()
+        return True if type(browser) not in {webbrowser.GenericBrowser, None} else False
+    except webbrowser.Error:
+        logger.exception('Failed to get webbrowser.')
+        return False
 
 
 def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool, port: int = None):

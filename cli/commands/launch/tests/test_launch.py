@@ -19,9 +19,11 @@
 # and approved by Intel in writing.
 #
 
-import pytest
 from unittest.mock import Mock
+import webbrowser
+
 from click.testing import CliRunner
+import pytest
 
 from commands.launch import launch
 from util.system import get_current_os, OS
@@ -162,3 +164,24 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
         assert socat_mock.start.call_count == 0, "socat was started"
 
     assert result.exit_code == 1
+
+
+def test_is_gui_browser_available(mocker):
+    webbrowser_get_mock = mocker.patch('webbrowser.get')
+    webbrowser_get_mock.return_value = webbrowser.Opera()
+
+    assert launch.is_gui_browser_available() is True
+
+
+def test_is_gui_browser_available_text_browser(mocker):
+    webbrowser_get_mock = mocker.patch('webbrowser.get')
+    webbrowser_get_mock.return_value = webbrowser.GenericBrowser(name='')
+
+    assert launch.is_gui_browser_available() is False
+
+
+def test_is_gui_browser_available_no_browser(mocker):
+    webbrowser_get_mock = mocker.patch('webbrowser.get')
+    webbrowser_get_mock.side_effect = webbrowser.Error
+
+    assert launch.is_gui_browser_available() is False
