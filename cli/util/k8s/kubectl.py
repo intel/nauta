@@ -37,7 +37,8 @@ logger = initialize_logger('util.kubectl')
 MAX_NUMBER_OF_TRIES = 10
 
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None) -> (subprocess.Popen, Optional[int], int):
+def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True) \
+        -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -50,6 +51,8 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None) -> (sub
     :param k8s_app_name: name of kubernetes application for tunnel creation
                          value taken from DLS4EAppNames enum
     :param port: if given - the system will try to use it as a local port
+    :param configure_draft - if not set - procedure doesn't configure draft to use a docker through
+            newly created tunnel
     :return:
         instance of a process with proxy, tunneled port and container port
     """
@@ -76,7 +79,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None) -> (sub
             logger.error(f'Cannot find open ports for {k8s_app_name} app')
             raise KubectlIntError("Missing port during creation of port proxy.")
 
-        if k8s_app_name == DLS4EAppNames.DOCKER_REGISTRY:
+        if k8s_app_name == DLS4EAppNames.DOCKER_REGISTRY and configure_draft:
             # setting draft conf, only for docker-registry case
             dc_output, dc_exit_code = set_registry_port(service_node_port)
             if dc_exit_code:
@@ -106,6 +109,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None) -> (sub
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
                                 f'{service_node_port}:{service_container_port}']
+
         logger.debug(port_forward_command)
 
         process = system.execute_subprocess_command(port_forward_command)
@@ -145,3 +149,12 @@ def check_users_presence(username: str) -> bool:
         raise KubectlIntError(error_message) from exe
 
     return False
+
+
+def delete_k8s_object(kind: str, name: str):
+    delete_command = ['kubectl', 'delete', kind, name]
+    logger.debug(delete_command)
+    output, err_code = system.execute_system_command(delete_command)
+    logger.debug(f"delete_k8s_object - output : {err_code} - {output}")
+    if err_code:
+        raise RuntimeError(f"Error when deleting k8s object: {output}")

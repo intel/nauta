@@ -20,8 +20,11 @@
 #
 
 from abc import ABC
+from kubernetes import client
 from collections import namedtuple
-
+from marshmallow import Schema, fields, post_load, validates
+from marshmallow_enum import EnumField
+from platform_resources.custom_object_meta_model import V1ObjectMetaSchema, validate_kubernetes_name
 
 class PlatformResource(ABC):
     submitter: str
@@ -50,3 +53,20 @@ class PlatformResource(ABC):
         raise NotImplementedError
 
 
+class KubernetesObject(object):
+    def __init__(self, spec: PlatformResource, metadata: client.V1ObjectMeta, apiVersion: str='aipg.intel.com/v1',
+                 kind: str='') -> None:
+        self.apiVersion = apiVersion
+        self.kind = kind
+        self.metadata = metadata
+        self.spec = spec
+
+
+class KubernetesObjectSchema(Schema):
+    apiVersion = fields.String(required=True, allow_none=False)
+    kind = fields.String(required=True, allow_none=False)
+    metadata = fields.Nested(V1ObjectMetaSchema(), required=True, allow_none=False)
+
+    @post_load
+    def make_kubernetes_object(self, data):
+        return KubernetesObject(**data)

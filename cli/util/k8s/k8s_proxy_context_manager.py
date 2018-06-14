@@ -19,7 +19,7 @@
 # and approved by Intel in writing.
 #
 
-from util.k8s.kubectl import start_port_forwarding
+from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
@@ -29,15 +29,17 @@ logger = initialize_logger(__name__)
 
 class K8sProxy():
 
-    def __init__(self, app_name: DLS4EAppNames, port: int = None):
+    def __init__(self, app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True):
         self.app_name = app_name
         self.external_port = port
+        self.configure_draft = configure_draft
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
         try:
-            self.process, self.tunnel_port, self.container_port = start_port_forwarding(self.app_name,
-                                                                                        self.external_port)
+            self.process, self.tunnel_port, self.container_port = kubectl.start_port_forwarding(self.app_name,
+                                                                                                self.external_port,
+                                                                                                self.configure_draft)
         except LocalPortOccupiedError as exe:
             raise exe
         except Exception as exe:

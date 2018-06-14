@@ -26,8 +26,10 @@ import sre_constants
 import time
 
 from kubernetes import config, client
+from kubernetes.client.rest import ApiException
 
 import platform_resources.experiment_model as model
+from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.exceptions import InvalidRegularExpressionError
@@ -78,7 +80,7 @@ def list_experiments(namespace: str = None,
     return experiments
 
 
-def add_experiment(exp: model.Experiment, namespace: str) -> model.ExperimentKubernetes:
+def add_experiment(exp: model.Experiment, namespace: str) -> KubernetesObject:
     """
     Return list of experiments.
     :param exp model to save
@@ -89,7 +91,8 @@ def add_experiment(exp: model.Experiment, namespace: str) -> model.ExperimentKub
     config.load_kube_config()
     api = client.CustomObjectsApi(client.ApiClient())
 
-    exp_kubernetes = model.ExperimentKubernetes(exp, client.V1ObjectMeta(name=exp.name, namespace=namespace))
+    exp_kubernetes = KubernetesObject(exp, client.V1ObjectMeta(name=exp.name, namespace=namespace),
+                                            kind="Experiment", apiVersion=f"{API_GROUP_NAME}/{EXPERIMENTS_VERSION}")
     schema = model.ExperimentKubernetesSchema()
     body, err = schema.dump(exp_kubernetes)
     if err:
@@ -130,3 +133,32 @@ def generate_experiment_name(script_name: str, namespace: str, name: str = None)
         if experiments and len(experiments) > 0:
             return f'{result}-{len(experiments)}'
         return result
+
+
+def update_experiment(experiment: model.Experiment, namespace: str) -> KubernetesObject:
+    """
+    Updates an Experiment object given as a parameter.
+    :param experiment model to update
+    :param namespace where Experiment will be updated
+    :return: in case of any problems during update it throws an exception
+    """
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+
+    run_kubernetes = KubernetesObject(experiment, client.V1ObjectMeta(name=experiment.name, namespace=namespace),
+                                            kind="Experiment", apiVersion=f"{API_GROUP_NAME}/{EXPERIMENTS_VERSION}")
+    schema = model.ExperimentKubernetesSchema()
+    body, err = schema.dump(run_kubernetes)
+    if err:
+        raise RuntimeError(f'preparing dump of ExperimentKubernetes request object error - {err}')
+
+    try:
+        raw_exp = api.patch_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace,
+                                                     body = body, plural=EXPERIMENTS_PLURAL,
+                                                     version=EXPERIMENTS_VERSION, name=experiment.name)
+        logger.debug(f'Experiment patch response : {raw_exp}')
+    except ApiException as exe:
+        err_message = "Error during patching an Experiment"
+        logger.exception(err_message)
+        raise RuntimeError(err_message) from exe

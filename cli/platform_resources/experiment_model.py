@@ -26,15 +26,16 @@ from typing import List
 from kubernetes import client
 from marshmallow import Schema, fields, post_load, validates
 from marshmallow_enum import EnumField
-
-from platform_resources.custom_object_meta_model import V1ObjectMetaSchema, validate_kubernetes_name
-from platform_resources.platform_resource_model import PlatformResource
+from platform_resources.custom_object_meta_model import validate_kubernetes_name
+from platform_resources.platform_resource_model import PlatformResource, KubernetesObjectSchema
 
 
 class ExperimentStatus(Enum):
     CREATING = 'CREATING'
     SUBMITTED = 'SUBMITTED'
     FAILED = 'FAILED'
+    CANCELLING = 'CANCELLING'
+    CANCELLED = 'CANCELLED'
 
 
 class Experiment(PlatformResource):
@@ -88,21 +89,5 @@ class ExperimentSchema(Schema):
         validate_kubernetes_name(name)
 
 
-class ExperimentKubernetes(object):
-    def __init__(self, spec: Experiment, metadata: client.V1ObjectMeta, apiVersion: str='aipg.intel.com/v1',
-                 kind: str='Experiment') -> None:
-        self.apiVersion = apiVersion
-        self.kind = kind
-        self.metadata = metadata
-        self.spec = spec
-
-
-class ExperimentKubernetesSchema(Schema):
-    apiVersion = fields.String(required=True, allow_none=False)
-    kind = fields.String(required=True, allow_none=False)
+class ExperimentKubernetesSchema(KubernetesObjectSchema):
     spec = fields.Nested(ExperimentSchema(), required=True, allow_none=False)
-    metadata = fields.Nested(V1ObjectMetaSchema(), required=True, allow_none=False)
-
-    @post_load
-    def make_experiment_kubernetes(self, data):
-        return ExperimentKubernetes(**data)

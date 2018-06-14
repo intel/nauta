@@ -23,8 +23,10 @@ from collections import namedtuple
 from enum import Enum
 import textwrap
 from typing import List
+from marshmallow import Schema, fields, post_load, validates
+from marshmallow_enum import EnumField
 
-from platform_resources.platform_resource_model import PlatformResource
+from platform_resources.platform_resource_model import PlatformResource, KubernetesObjectSchema
 
 
 class RunStatus(Enum):
@@ -81,3 +83,11 @@ class Run(PlatformResource):
                                submitter=self.submitter,
                                status=self.state.value if self.state else "",
                                template_name=self.template_name)
+
+
+class RunSchema(Schema):
+    state = EnumField(RunStatus, required=True, allow_none=False, by_value=True)
+
+
+class RunKubernetesSchema(KubernetesObjectSchema):
+    spec = fields.Nested(RunSchema(), required=True, allow_none=False)

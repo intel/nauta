@@ -25,9 +25,12 @@ import sre_constants
 from typing import List
 
 from kubernetes import config, client
+from kubernetes.client.rest import ApiException
 
-from platform_resources.run_model import Run, RunStatus
-from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
+from platform_resources.platform_resource_model import KubernetesObject
+from platform_resources.run_model import Run, RunStatus, RunKubernetesSchema
+from platform_resources.resource_filters import filter_by_name_regex, filter_by_state, filter_by_excl_state, \
+    filter_by_experiment_name
 from util.logger import initialize_logger
 from util.exceptions import InvalidRegularExpressionError
 
@@ -39,12 +42,16 @@ RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
 
-def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None) -> List[Run]:
+def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None, exp_name_filter: str = None,
+              excl_state: RunStatus = None) \
+        -> List[Run]:
     """
     Return list of experiment runs.
     :param namespace: If provided, only runs from this namespace will be returned
     :param state: If provided, only runs with given state will be returned
     :param name_filter: If provided, only runs matching name_filter regular expression will be returned
+    :param exp_name_filter: If provided, list of runs is filtered by experiment name
+    :param excl_state: If provided, only runs with a state other than given will be returned
     :return: List of Run objects
     In case of problems during getting a list of runs - throws an error
     """
@@ -65,10 +72,41 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
         raise InvalidRegularExpressionError(error_msg) from e
 
     run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False),
-                   partial(filter_by_state, state=state)]
+                   partial(filter_by_state, state=state),
+                   partial(filter_by_excl_state, state=excl_state),
+                   partial(filter_by_experiment_name, exp_name=exp_name_filter)]
 
     runs = [Run.from_k8s_response_dict(run_dict)
             for run_dict in raw_runs['items']
             if all(f(run_dict) for f in run_filters)]
 
     return runs
+
+
+def update_run(run: Run, namespace: str) -> KubernetesObject:
+    """
+    Updates a Run object given as a parameter.
+    :param run model to update
+    :param namespace where Run will be updated
+    :return: in case of any problems during update it throws an exception
+    """
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+
+    run_kubernetes = KubernetesObject(run, client.V1ObjectMeta(name=run.name, namespace=namespace),
+                                            kind="Run", apiVersion=f"{API_GROUP_NAME}/{RUN_VERSION}")
+    schema = RunKubernetesSchema()
+    body, err = schema.dump(run_kubernetes)
+    if err:
+        raise RuntimeError(f'preparing dump of RunKubernetes request object error - {err}')
+
+    try:
+        raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body = body,
+                                                  plural=RUN_PLURAL, version=RUN_VERSION, name=run.name)
+
+        logger.debug(f"Run patch response : {raw_run}")
+    except ApiException as exe:
+        err_message = "Error during patching a Run"
+        logger.exception(err_message)
+        raise RuntimeError(err_message) from exe

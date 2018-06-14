@@ -22,9 +22,10 @@
 import pytest
 
 from kubernetes.client import CustomObjectsApi
+from kubernetes.client.rest import ApiException
 
 from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs
+from platform_resources.runs import list_runs, update_run
 from util.exceptions import InvalidRegularExpressionError
 
 
@@ -118,3 +119,17 @@ LIST_RUNS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'items': [
                              'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}}, 'state': 'COMPLETE'}}],
                           'kind': 'RunList', 'metadata': {'continue': '', 'resourceVersion': '436078',
                                                           'selfLink': '/apis/aipg.intel.com/v1/runs'}}
+
+
+def test_update_run_success(mock_k8s_api_client):
+    mock_k8s_api_client.patch_namespaced_custom_object.return_value = ""
+
+    update_run(TEST_RUNS[0], "namespace-1")
+
+    assert mock_k8s_api_client.patch_namespaced_custom_object.call_count == 1
+
+def test_update_run_failure(mock_k8s_api_client):
+    mock_k8s_api_client.patch_namespaced_custom_object.side_effect = ApiException()
+
+    with pytest.raises(RuntimeError):
+        update_run(TEST_RUNS[0], "namespace-1")

@@ -27,7 +27,7 @@ from util.exceptions import K8sProxyCloseError, K8sProxyOpenError
 
 def test_set_up_proxy(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             return_value=(spo_mock, "1000", "1001"))
 
     with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
@@ -37,7 +37,7 @@ def test_set_up_proxy(mocker):
 
 
 def test_set_up_proxy_open_failure(mocker):
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             side_effect=RuntimeError())
     spc_mock = mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError())
     with pytest.raises(K8sProxyOpenError):
@@ -51,7 +51,7 @@ def test_set_up_proxy_open_failure(mocker):
 def test_set_up_proxy_close_failure(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
     spc_mock = mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError())
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.start_port_forwarding",
+    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             return_value=(spo_mock, "1000", "1001"))
 
     with pytest.raises(K8sProxyCloseError):

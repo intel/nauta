@@ -198,7 +198,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         click.echo(error_msg)
         sys.exit(1)
     except Exception:
-        error_msg = 'Other error during submitting exepriments.'
+        error_msg = 'Other error during submitting experiments.'
         log.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
