@@ -28,8 +28,13 @@ const state = {
   experiments: {
     data: [],
     params: [],
+    filterByColumnValue: {
+      current: {},
+      options: {}
+    },
     stats: {
       total: 0,
+      filteredDataCount: 0,
       a: 0,
       b: 0,
       pageNumber: 0,
@@ -42,7 +47,10 @@ const state = {
 export const getters = {
   experimentsData: state => state.experiments.data,
   experimentsParams: state => state.experiments.params,
+  columnValuesOptions: state => state.experiments.filterByColumnValue.options,
+  columnValuesApplied: state => state.experiments.filterByColumnValue.current,
   experimentsTotal: state => state.experiments.stats.total,
+  filteredDataCount: state => state.experiments.stats.filteredDataCount,
   experimentsBegin: state => state.experiments.stats.a,
   experimentsEnd: state => state.experiments.stats.b,
   experimentsPageNumber: state => state.experiments.stats.pageNumber,
@@ -52,13 +60,14 @@ export const getters = {
 };
 
 export const actions = {
-  getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy}) => {
+  getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces}) => {
     commit('setFetchingDataFlag', {isActive: true});
-    getExperiments(limitPerPage, pageNo, orderBy, order, searchBy)
+    getExperiments(limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces)
       .then((res) => {
         const data = res.data;
         commit('setExperimentsData', {data: data.data});
         commit('setExperimentsParams', {data: data.params});
+        commit('setFilterColumnValues', {data: data.filterColumnValues});
         commit('setExperimentsStats', {data: data.stats});
         commit('setFetchingDataFlag', {isActive: false});
       })
@@ -79,6 +88,9 @@ export const mutations = {
   },
   setExperimentsParams: (state, {data}) => {
     state.experiments.params = data;
+  },
+  setFilterColumnValues: (state, {data}) => {
+    state.experiments.filterByColumnValue = data;
   },
   setExperimentsStats: (state, {data}) => {
     state.experiments.stats = data;

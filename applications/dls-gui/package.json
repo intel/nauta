@@ -8,7 +8,7 @@
     "start-prod": "node ./api/server.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "test-client": "npm run unit",
-    "test-api": "mocha ./api/test --recursive",
+    "test-api": "nyc mocha ./api/test --recursive",
     "test": "npm run test-client && npm run test-api",
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "node build/build.js"
@@ -75,6 +75,7 @@
     "mocha": "^3.2.0",
     "node-notifier": "^5.1.2",
     "nodemon": "^1.17.3",
+    "nyc": "^12.0.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
     "phantomjs-prebuilt": "^2.1.14",

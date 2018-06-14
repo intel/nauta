@@ -24,14 +24,17 @@ import cookies from 'js-cookie';
 
 const DECODE_TOKEN_ENDPOINT = '/api/experiments/list';
 
-export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy) {
+export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces) {
   const token = cookies.get('TOKEN');
   let queryParams = {
     limit: limitPerPage || 5,
     page: pageNo || 1,
     orderBy: orderBy || '',
     order: order || '',
-    searchBy: searchBy || ''
+    searchBy: searchBy || '',
+    names: Array.isArray(names) && names.length ? names : '*',
+    states: Array.isArray(states) && states.length ? states : '*',
+    namespaces: Array.isArray(namespaces) && namespaces.length ? namespaces : '*'
   };
   const options = {
     url: DECODE_TOKEN_ENDPOINT,

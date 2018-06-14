@@ -1,0 +1,10 @@
+{
+  "report-dir": "api/coverage",
+  "reporter": ["html", "text", "text-summary"],
+  "exclude": ["api/test/**/*"],
+  "check-coverage": true,
+  "lines": 90,
+  "statements": 80,
+  "functions": 80,
+  "branches": 80
+}

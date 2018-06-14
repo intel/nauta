@@ -32,12 +32,17 @@ describe('VUEX modules experiments', () => {
     experiments: {
       data: [],
       params: [],
+      filterByColumnValue: {
+        current: {},
+        options: {}
+      },
       stats: {
         total: 0,
         a: 0,
         b: 0,
         pageNumber: 0,
         totalPagesCount: 0,
+        filteredDataCount: 0,
         datetime: 1
       }
     }
@@ -88,6 +93,21 @@ describe('VUEX modules experiments', () => {
       const result = getters.fetchingDataActive(state);
       expect(result).to.equal(state.fetchingDataActive);
     });
+
+    it('columnValuesOptions', () => {
+      const result = getters.columnValuesOptions(state);
+      expect(result).to.equal(state.experiments.filterByColumnValue.options);
+    });
+
+    it('columnValuesApplied', () => {
+      const result = getters.columnValuesApplied(state);
+      expect(result).to.equal(state.experiments.filterByColumnValue.current);
+    });
+
+    it('filteredDataCount', () => {
+      const result = getters.filteredDataCount(state);
+      expect(result).to.equal(state.experiments.stats.filteredDataCount);
+    });
   });
 
   describe('Mutations', () => {
@@ -113,6 +133,12 @@ describe('VUEX modules experiments', () => {
       const data = {isActive: true};
       mutations.setFetchingDataFlag(state, data);
       expect(state.fetchingDataActive).to.equal(data.isActive);
+    });
+
+    it('setFilterColumnValues', () => {
+      const data = {options: [1], current: [2]};
+      mutations.setFilterColumnValues(state, {data});
+      expect(state.experiments.filterByColumnValue).to.deep.equal(data);
     });
   });
 
@@ -158,12 +184,14 @@ describe('VUEX modules experiments', () => {
         const data = {
           data: ['test1'],
           params: ['test2'],
-          stats: ['test3']
+          stats: ['test3'],
+          filterColumnValues: ['test4']
         };
         expectedMutations = [
           {type: 'setFetchingDataFlag', payload: {isActive: true}},
           {type: 'setExperimentsData', payload: {data: data.data}},
           {type: 'setExperimentsParams', payload: {data: data.params}},
+          {type: 'setFilterColumnValues', payload: {data: data.filterColumnValues}},
           {type: 'setExperimentsStats', payload: {data: data.stats}},
           {type: 'setFetchingDataFlag', payload: {isActive: false}}
         ];

@@ -28,7 +28,7 @@ const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
 
-  let resMock, reqMock, k8sMock, data, error, deferred;
+  let resMock, reqMock, k8sMock, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred;
 
   beforeEach(function () {
     resMock = {
@@ -45,35 +45,83 @@ describe('Handlers | Experiments', function () {
     k8sMock = {
       listNamespacedCustomObject: sinon.spy()
     };
-    data = {
-      items: [
-        {
-          metadata: {
-            creationTimestamp: '2018-06-11T07:35:06Z',
-            name: 'exp-mnist-sing-18-06-11-09-34-45-41',
-            namespace: 'andrzej',
+    k8sRunEntities = [
+      {
+        metadata: {
+          creationTimestamp: '2018-06-11T07:35:06Z',
+          name: 'exp-mnist-sing-18-06-11-09-34-45-41',
+          namespace: 'andrzej',
+        },
+        spec: {
+          'experiment-name': 'experiment-name-will-be-added-soon',
+          metrics: {
+            accuracy: '52.322'
           },
-          spec: {
-            'experiment-name': 'experiment-name-will-be-added-soon',
-            metrics: {
-              accuracy: '52.322'
-            },
-            parameters: [
-              'mnist_single_node.py'
-            ],
-            'pod-count': 1,
-            'pod-selector': {
-              matchLabels: {
-                app: 'tf-training-tfjob',
-                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
-                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
-              }
-            },
-            state: 'FAILED'
-          }
+          parameters: [
+            'mnist_single_node.py'
+          ],
+          'pod-count': 1,
+          'pod-selector': {
+            matchLabels: {
+              app: 'tf-training-tfjob',
+              draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
+              release: 'exp-mnist-sing-18-06-11-09-34-45-41'
+            }
+          },
+          state: 'FAILED'
         }
-      ]
+      },
+      {
+        metadata: {
+          creationTimestamp: '2018-06-11T07:35:06Z',
+          name: 'exp-mnist-sing-18-06-11-09-34-45-42',
+          namespace: 'andrzej',
+        },
+        spec: {
+          'experiment-name': 'experiment-name-will-be-added-soon',
+          metrics: {
+            accuracy: '52.322'
+          },
+          parameters: [
+            'mnist_single_node.py'
+          ],
+          'pod-count': 1,
+          'pod-selector': {
+            matchLabels: {
+              app: 'tf-training-tfjob',
+              draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
+              release: 'exp-mnist-sing-18-06-11-09-34-45-41'
+            }
+          },
+          state: 'SUCCESS'
+        }
+      }
+    ];
+    k8sRunsResponse = {
+      items: k8sRunEntities
     };
+    generatedEntities = [
+      {
+        creationTimestamp: k8sRunEntities[0].metadata.creationTimestamp,
+        name: k8sRunEntities[0].metadata.name,
+        namespace: k8sRunEntities[0].metadata.namespace,
+        podSelector: k8sRunEntities[0].spec['pod-selector']['matchLabels'],
+        podCount: k8sRunEntities[0].spec['pod-count'],
+        state: k8sRunEntities[0].spec['state'],
+        parameters: k8sRunEntities[0].spec['parameters'],
+        accuracy: k8sRunEntities[0].spec.metrics['accuracy']
+      },
+      {
+        creationTimestamp: k8sRunEntities[1].metadata.creationTimestamp,
+        name: k8sRunEntities[1].metadata.name,
+        namespace: k8sRunEntities[1].metadata.namespace,
+        podSelector: k8sRunEntities[1].spec['pod-selector']['matchLabels'],
+        podCount: k8sRunEntities[1].spec['pod-count'],
+        state: k8sRunEntities[1].spec['state'],
+        parameters: k8sRunEntities[1].spec['parameters'],
+        accuracy: k8sRunEntities[1].spec.metrics['accuracy']
+      }
+    ];
     error = {
       status: 500,
       message: 'error'
@@ -108,14 +156,14 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return data with parsing', function (done) {
-      const parseExpMock = sinon.stub().returns(data.items);
+      const parseExpMock = sinon.stub().returns(k8sRunsResponse.items);
       expApi.__set__('k8s', k8sMock);
       expApi.__set__('parseExperiments', parseExpMock);
       expApi.getUserExperiments(reqMock, resMock);
-      deferred.resolve(data);
+      deferred.resolve(k8sRunsResponse);
       process.nextTick(function () {
         expect(resMock.send.calledOnce).to.equal(true);
-        expect(resMock.send.calledWith(data.items)).to.equal(true);
+        expect(resMock.send.calledWith(k8sRunsResponse.items)).to.equal(true);
         expect(k8sMock.listNamespacedCustomObject.calledOnce).to.equal(true);
         expect(parseExpMock.calledOnce).to.equal(true);
         done();
@@ -124,208 +172,261 @@ describe('Handlers | Experiments', function () {
 
   });
 
-  describe('parseExperiments', function () {
-    beforeEach(function () {
-      data = [
-        {
-          metadata: {
-            creationTimestamp: '2018-06-11T07:35:06Z',
-            name: 'exp-mnist-sing-18-06-11-09-34-45-41',
-            namespace: 'andrzej',
-          },
-          spec: {
-            'experiment-name': 'experiment-name-will-be-added-soon',
-            metrics: {
-              accuracy: '52.322'
-            },
-            parameters: [
-              'mnist_single_node.py'
-            ],
-            'pod-count': 1,
-            'pod-selector': {
-              matchLabels: {
-                app: 'tf-training-tfjob',
-                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
-                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
-              }
-            },
-            state: 'FAILED'
-          }
-        },
-        {
-          metadata: {
-            creationTimestamp: '2018-06-11T07:35:06Z',
-            name: 'exp-mnist-sing-18-06-11-09-34-45-42',
-            namespace: 'andrzej',
-          },
-          spec: {
-            'experiment-name': 'experiment-name-will-be-added-soon',
-            metrics: {
-              accuracy: '52.322'
-            },
-            parameters: [
-              'mnist_single_node.py'
-            ],
-            'pod-count': 1,
-            'pod-selector': {
-              matchLabels: {
-                app: 'tf-training-tfjob',
-                draft: 'exp-mnist-sing-18-06-11-09-34-45-41',
-                release: 'exp-mnist-sing-18-06-11-09-34-45-41'
-              }
-            },
-            state: 'FAILED'
-          }
+  describe('generateExperimentEntities', function () {
+    it('should return empty array if not data', function () {
+      const result = expApi.generateExperimentEntities();
+      expect(result).to.deep.equal([]);
+    });
+
+    it('should return generated entities if data provided', function () {
+      const expectedResult = generatedEntities;
+      const result = expApi.generateExperimentEntities(k8sRunEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
+  describe('extractValuesForFilterableAttrs', function () {
+    it('should return correct object if not data', function () {
+      const expectedResult = {
+        name: [],
+        namespace: [],
+        state: []
+      };
+      const result = expApi.extractValuesForFilterableAttrs([]);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return correct object if data provided', function () {
+      const expectedResult = {
+        name: [generatedEntities[0].name, generatedEntities[1].name],
+        namespace: [generatedEntities[0].namespace],
+        state: [generatedEntities[0].state, generatedEntities[1].state]
+      };
+      const result = expApi.extractValuesForFilterableAttrs(generatedEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
+  describe('applyQueryFilters', function () {
+    it('should return throw exception if no array object', function () {
+      try {
+        expApi.applyQueryFilters();
+      } catch (err) {
+        expect(err).to.equal('Incorrect Array Data');
+      }
+    });
+
+    it('should return correct object if empty array provided', function () {
+      const expectedResult = {
+        data: [],
+        queryParams: {
+          name: [],
+          namespace: [],
+          state: [],
+          searchPattern: ''
         }
-      ];
+      };
+      const result = expApi.applyQueryFilters([]);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return not filtered data if empty query', function () {
+      const expectedResult = {
+        data: generatedEntities,
+        queryParams: {
+          name: [generatedEntities[0].name, generatedEntities[1].name],
+          namespace: [generatedEntities[0].namespace],
+          state: [generatedEntities[0].state, generatedEntities[1].state],
+          searchPattern: ''
+        }
+      };
+      const result = expApi.applyQueryFilters(generatedEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if query by name provided', function () {
+      const expectedResult = {
+        data: [generatedEntities[0]],
+        queryParams: {
+          name: [generatedEntities[0].name],
+          namespace: [generatedEntities[0].namespace],
+          state: [generatedEntities[0].state, generatedEntities[1].state],
+          searchPattern: ''
+        }
+      };
+      const queryParams = {name: [generatedEntities[0].name]}
+      const result = expApi.applyQueryFilters(generatedEntities, queryParams);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if query by name with wildcard provided', function () {
+      const expectedResult = {
+        data: generatedEntities,
+        queryParams: {
+          name: [generatedEntities[0].name, generatedEntities[1].name],
+          namespace: [generatedEntities[0].namespace],
+          state: [generatedEntities[0].state, generatedEntities[1].state],
+          searchPattern: ''
+        }
+      };
+      const queryParams = {name: '*'};
+      const result = expApi.applyQueryFilters(generatedEntities, queryParams);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if search pattern provided', function () {
+      const expectedResult = {
+        data: [generatedEntities[0]],
+        queryParams: {
+          name: [generatedEntities[0].name, generatedEntities[1].name],
+          namespace: [generatedEntities[0].namespace],
+          state: [generatedEntities[0].state, generatedEntities[1].state],
+          searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
+        }
+      };
+      const searchPattern = 'mnist-SING-18-06-11-09-34-45-41';
+      const result = expApi.applyQueryFilters(generatedEntities, null, searchPattern);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
+  describe('applyOrderParams', function () {
+    it('should throw exception if no array object', function () {
+      try {
+        expApi.applyOrderParams();
+      } catch (err) {
+        expect(err).to.equal('Incorrect Array Data');
+      }
+    });
+
+    it('should return sorted data if sorting params provided', function () {
+      const expectedResult = {
+        data: [generatedEntities[1], generatedEntities[0]],
+        a: 1,
+        b: 2,
+        totalPagesCount: 1,
+        pageNumber: 1
+      };
+      const result = expApi.applyOrderParams(generatedEntities, 'name', 'desc');
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return second page of data if pagination params provided', function () {
+      const limitPerPage = 1;
+      const pageNo = 2;
+      const expectedResult = {
+        data: [generatedEntities[1]],
+        a: 2,
+        b: 2,
+        totalPagesCount: 2,
+        pageNumber: 2
+      };
+      const result = expApi.applyOrderParams(generatedEntities, null, null, limitPerPage, pageNo);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return all data if pagination limit bigger than count of items', function () {
+      const limitPerPage = 10;
+      const pageNo = 1;
+      const expectedResult = {
+        data: [generatedEntities[0], generatedEntities[1]],
+        a: 1,
+        b: 2,
+        totalPagesCount: 1,
+        pageNumber: 1
+      };
+      const result = expApi.applyOrderParams(generatedEntities, null, null, limitPerPage, pageNo);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
+  describe('extractAttrsNames', function () {
+    it('should return throw exception if no array object', function () {
+      try {
+        expApi.extractAttrsNames();
+      } catch (err) {
+        expect(err).to.equal('Incorrect Array Data');
+      }
+    });
+
+    it('should return all params', function () {
+      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy'];
+      const result = expApi.extractAttrsNames(generatedEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
+  describe('parseExperiments', function () {
+    let generateExperimentEntitiesMock, extractValuesForFilterableAttrsMock, applyQueryFiltersMock,
+      applyOrderParamsMock, extractAttrsNamesMock;
+    beforeEach(function () {
+      generateExperimentEntitiesMock = sinon.stub().returns(generatedEntities);
+      extractValuesForFilterableAttrsMock = sinon.stub().returns({
+        name: [generatedEntities[0].name, generatedEntities[1].name],
+        namespace: [generatedEntities[0].namespace],
+        state: [generatedEntities[0].state, generatedEntities[1].state]
+      });
+      applyQueryFiltersMock = sinon.stub().returns({
+        data: generatedEntities,
+        queryParams: {
+          name: [generatedEntities[0].name, generatedEntities[1].name],
+          namespace: [generatedEntities[0].namespace],
+          state: [generatedEntities[0].state, generatedEntities[1].state],
+          searchPattern: ''
+        }
+      });
+      applyOrderParamsMock = sinon.stub().returns({
+        data: generatedEntities,
+        a: 1,
+        b: 2,
+        totalPagesCount: 1,
+        pageNumber: 1
+      });
+      extractAttrsNamesMock = sinon.stub().returns(['creationTimestamp', 'name', 'namespace',
+        'podSelector', 'podCount', 'state', 'parameters', 'accuracy']);
       Date.now = sinon.stub().returns(1);
     });
 
     it('should return correct data if no experiments provided', function () {
+      const queryParams = {};
+      expApi.__set__('generateExperimentEntities', generateExperimentEntitiesMock);
+      expApi.__set__('extractValuesForFilterableAttrs', extractValuesForFilterableAttrsMock);
+      expApi.__set__('applyQueryFilters', applyQueryFiltersMock);
+      expApi.__set__('applyOrderParams', applyOrderParamsMock);
+      expApi.__set__('extractAttrsNames', extractAttrsNamesMock);
       const expectedResult = {
-        data: [],
-        stats: {
-          total: 0,
-          datetime: 1
-        },
-        params: []
-      };
-      const result = expApi.parseExperiments([]);
-      expect(result.data).to.deep.equal(expectedResult.data);
-      expect(result.stats).to.deep.equal(expectedResult.stats);
-      expect(result.params).to.deep.equal(expectedResult.params);
-    });
-
-    it('should return correct data if no experiments provided', function () {
-      const expectedResult = {
-        data: [
-          {
-            creationTimestamp: data[0].metadata.creationTimestamp,
-            name: data[0].metadata.name,
-            namespace: data[0].metadata.namespace,
-            podSelector: data[0].spec['pod-selector']['matchLabels'],
-            podCount: data[0].spec['pod-count'],
-            state: data[0].spec['state'],
-            parameters: data[0].spec['parameters'],
-            accuracy: data[0].spec['metrics']['accuracy']
-          },
-          {
-            creationTimestamp: data[1].metadata.creationTimestamp,
-            name: data[1].metadata.name,
-            namespace: data[1].metadata.namespace,
-            podSelector: data[1].spec['pod-selector']['matchLabels'],
-            podCount: data[1].spec['pod-count'],
-            state: data[1].spec['state'],
-            parameters: data[1].spec['parameters'],
-            accuracy: data[1].spec['metrics']['accuracy']
-          }
-        ],
         stats: {
           total: 2,
-          datetime: 1
-        },
-        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
-      };
-      const result = expApi.parseExperiments(data);
-      expect(result.data).to.deep.equal(expectedResult.data);
-      expect(result.stats).to.deep.equal(expectedResult.stats);
-      expect(result.params).to.deep.equal(expectedResult.params);
-    });
-
-    it('should return correct data if search pattern provided', function () {
-      const query = {searchBy: '09-34-45-41'};
-      const expectedResult = {
-        data: [
-          {
-            creationTimestamp: data[0].metadata.creationTimestamp,
-            name: data[0].metadata.name,
-            namespace: data[0].metadata.namespace,
-            podSelector: data[0].spec['pod-selector']['matchLabels'],
-            podCount: data[0].spec['pod-count'],
-            state: data[0].spec['state'],
-            parameters: data[0].spec['parameters'],
-            accuracy: data[0].spec['metrics']['accuracy']
-          }
-        ],
-        stats: {
-          total: 1,
-          datetime: 1
-        },
-        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
-      };
-      const result = expApi.parseExperiments(data, query);
-      expect(result.data).to.deep.equal(expectedResult.data);
-      expect(result.stats).to.deep.equal(expectedResult.stats);
-      expect(result.params).to.deep.equal(expectedResult.params);
-    });
-
-    it('should return correct data if order params provided', function () {
-      const query = {order: 'desc', orderBy: 'name'};
-      const expectedResult = {
-        data: [
-          {
-            creationTimestamp: data[1].metadata.creationTimestamp,
-            name: data[1].metadata.name,
-            namespace: data[1].metadata.namespace,
-            podSelector: data[1].spec['pod-selector']['matchLabels'],
-            podCount: data[1].spec['pod-count'],
-            state: data[1].spec['state'],
-            parameters: data[1].spec['parameters'],
-            accuracy: data[1].spec['metrics']['accuracy']
-          },
-          {
-            creationTimestamp: data[0].metadata.creationTimestamp,
-            name: data[0].metadata.name,
-            namespace: data[0].metadata.namespace,
-            podSelector: data[0].spec['pod-selector']['matchLabels'],
-            podCount: data[0].spec['pod-count'],
-            state: data[0].spec['state'],
-            parameters: data[0].spec['parameters'],
-            accuracy: data[0].spec['metrics']['accuracy']
-          }
-        ],
-        stats: {
-          total: 2,
-          datetime: 1
-        },
-        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
-      };
-      const result = expApi.parseExperiments(data, query);
-      expect(result.data).to.deep.equal(expectedResult.data);
-      expect(result.stats).to.deep.equal(expectedResult.stats);
-      expect(result.params).to.deep.equal(expectedResult.params);
-    });
-
-    it('should return correct data if pagination params provided', function () {
-      const query = {limit: 1, page: 2};
-      const expectedResult = {
-        data: [
-          {
-            creationTimestamp: data[1].metadata.creationTimestamp,
-            name: data[1].metadata.name,
-            namespace: data[1].metadata.namespace,
-            podSelector: data[1].spec['pod-selector']['matchLabels'],
-            podCount: data[1].spec['pod-count'],
-            state: data[1].spec['state'],
-            parameters: data[1].spec['parameters'],
-            accuracy: data[1].spec['metrics']['accuracy']
-          }
-        ],
-        stats: {
-          total: 2,
-          a: 2,
+          datetime: 1,
+          filteredDataCount: 2,
+          a: 1,
           b: 2,
-          pageNumber: 2,
-          totalPagesCount: 2,
-          datetime: 1
+          totalPagesCount: 1,
+          pageNumber: 1
         },
-        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy']
+        filterColumnValues: {
+          options: {
+            name: [generatedEntities[0].name, generatedEntities[1].name],
+            namespace: [generatedEntities[0].namespace],
+            state: [generatedEntities[0].state, generatedEntities[1].state]
+          },
+          current: {
+            name: [generatedEntities[0].name, generatedEntities[1].name],
+            namespace: [generatedEntities[0].namespace],
+            state: [generatedEntities[0].state, generatedEntities[1].state],
+            searchPattern: ''
+          }
+        },
+        params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy'],
+        data: generatedEntities
       };
-      const result = expApi.parseExperiments(data, query);
-      expect(result.data).to.deep.equal(expectedResult.data);
-      expect(result.stats).to.deep.equal(expectedResult.stats);
-      expect(result.params).to.deep.equal(expectedResult.params);
+      const result = expApi.parseExperiments(k8sRunEntities, queryParams);
+      expect(result).to.deep.equal(expectedResult);
+      expect(generateExperimentEntitiesMock.calledOnce).to.equal(true);
+      expect(extractValuesForFilterableAttrsMock.calledOnce).to.equal(true);
+      expect(applyQueryFiltersMock.calledOnce).to.equal(true);
+      expect(applyOrderParamsMock.calledOnce).to.equal(true);
+      expect(extractAttrsNamesMock.calledOnce).to.equal(true);
     });
-
   });
 });

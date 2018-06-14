@@ -41,6 +41,7 @@ describe('VUE components ModelsTable', () => {
           b: 0,
           pageNumber: 0,
           totalPagesCount: 0,
+          filteredDataCount: 0,
           datetime: 0
         }
       },
@@ -51,6 +52,7 @@ describe('VUE components ModelsTable', () => {
       experimentsParams: state => state.experiments.params,
       experimentsBegin: state => state.experiments.stats.a,
       experimentsTotal: state => state.experiments.stats.total,
+      filteredDataCount: state => state.experiments.stats.filteredDataCount,
       experimentsEnd: state => state.experiments.stats.b,
       experimentsPageNumber: state => state.experiments.stats.pageNumber,
       experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount,
@@ -85,7 +87,7 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should return pagination stats correctly', function () {
-    const expectedResult = `${state.experiments.stats.a}-${state.experiments.stats.b} of ${state.experiments.stats.total}`;
+    const expectedResult = `${state.experiments.stats.a}-${state.experiments.stats.b} of ${state.experiments.stats.filteredDataCount}`;
     expect(wrapper.vm.paginationStats).to.equal(expectedResult);
   });
 
@@ -245,5 +247,31 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.timer();
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
     expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago.');
+  });
+
+  it('Should clear all filters on clear action', function () {
+    wrapper.vm.filterByValModals.name.params = [1,2,3,4];
+    wrapper.vm.clearFilter();
+    expect(wrapper.vm.filterByValModals.name.params).to.deep.equal([]);
+  });
+
+  it('Should not format unknown value', function () {
+    const value = 4;
+    const result = wrapper.vm.parseValue('test', value);
+    expect(result).to.deep.equal(value);
+  });
+
+  it('Should hide filter windows before showing others', function () {
+    wrapper.vm.filterByValModals.name.visible = true;
+    wrapper.vm.switchFilterWindow('namespace', true);
+    expect(wrapper.vm.filterByValModals.name.visible).to.deep.equal(false);
+  });
+
+  it('Should set filters on apply click', function () {
+    wrapper.vm.filterByValModals.name.visible = true;
+    const draft = [1, 2, 3, 4, 5];
+    wrapper.vm.onApplyValuesColumnFilter('name', draft);
+    expect(wrapper.vm.filterByValModals.name.params).to.deep.equal(draft);
+    expect(wrapper.vm.filterByValModals.name.visible).to.deep.equal(false);
   });
 });

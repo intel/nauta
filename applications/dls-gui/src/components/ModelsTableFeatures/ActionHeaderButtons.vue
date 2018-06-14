@@ -29,11 +29,8 @@
       <v-list-tile v-on:click="clearSort()">
         <v-list-tile-title>Clear sort</v-list-tile-title>
       </v-list-tile>
-      <v-list-tile>
+      <v-list-tile v-on:click="clearFilterHandler()">
         <v-list-tile-title>Clear filter</v-list-tile-title>
-      </v-list-tile>
-      <v-list-tile>
-        <v-list-tile-title>Revert models to original order</v-list-tile-title>
       </v-list-tile>
     </v-list>
   </v-menu>
@@ -81,7 +78,7 @@ import LABELS from '../../utils/header-titles';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'setHiddenColumnsHandler', 'hiddenColumns', 'alwaysVisibleColumns', 'headers',
+  props: ['clearSort', 'clearFilterHandler', 'setHiddenColumnsHandler', 'hiddenColumns', 'alwaysVisibleColumns', 'headers',
     'onLaunchTensorHandler', 'onDiscardTensorHandler', 'disabled'],
   data: () => {
     return {

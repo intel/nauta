@@ -28,6 +28,7 @@
             <v-spacer></v-spacer>
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
               :clearSort="clearSort"
+              :clearFilterHandler="clearFilter"
               :hiddenColumns="hiddenColumns"
               :alwaysVisibleColumns="alwaysVisibleColumns"
               :setHiddenColumnsHandler="setHiddenColumns"
@@ -41,7 +42,7 @@
               </v-card-title>
             </v-flex>
           </v-card-title>
-          <v-alert v-if="experimentsTotal === 0" :value="true" type="info">
+          <v-alert v-if="filteredDataCount === 0" :value="true" type="info">
             No data to display.
           </v-alert>
           <div class="elevation-3">
@@ -51,7 +52,15 @@
                   <th v-if="tensorMode"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
-                    <v-icon small class="pointer-btn">{{ filterIcon }}</v-icon>
+                    <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
+                    <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
+                      :column-name="header"
+                      :options="columnValuesOptions[header]"
+                      :onCloseClickHandler="switchFilterWindow"
+                      :onApplyClickHandler="onApplyValuesColumnFilter"
+                      :appliedOptions="columnValuesApplied[header]"
+                    >
+                    </FilterByValWindow>
                     <v-tooltip bottom>
                       <span slot="activator" v-bind:class="{active: activeColumnName === header}">
                         {{ cutLongText(getLabel(header)) }}
@@ -81,7 +90,7 @@
                 </tbody>
               </table>
             </div>
-            <FooterElements v-if="experimentsTotal"
+            <FooterElements v-if="filteredDataCount"
               :currentPage="pagination.currentPage"
               :pagesCount="experimentsTotalPagesCount"
               :nextPageAction="nextPage"
@@ -100,6 +109,7 @@
 import LABELS from '../utils/header-titles';
 import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
+import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 
 const SORTING_ORDER = {
@@ -111,6 +121,7 @@ export default {
   name: 'ModelsTable',
   components: {
     ActionHeaderButtons,
+    FilterByValWindow,
     FooterElements
   },
   data: () => {
@@ -119,6 +130,21 @@ export default {
       searchPattern: '',
       hiddenColumns: [],
       alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name'],
+      filterableByValColumns: ['name', 'namespace', 'state'],
+      filterByValModals: {
+        name: {
+          visible: false,
+          params: []
+        },
+        namespace: {
+          visible: false,
+          params: []
+        },
+        state: {
+          visible: false,
+          params: []
+        }
+      },
       sorting: {
         order: SORTING_ORDER.ASC,
         iconAsc: 'arrow_upward',
@@ -150,8 +176,11 @@ export default {
     ...mapGetters({
       experimentsData: 'experimentsData',
       experimentsParams: 'experimentsParams',
+      columnValuesOptions: 'columnValuesOptions',
+      columnValuesApplied: 'columnValuesApplied',
       experimentsBegin: 'experimentsBegin',
       experimentsTotal: 'experimentsTotal',
+      filteredDataCount: 'filteredDataCount',
       experimentsEnd: 'experimentsEnd',
       experimentsPageNumber: 'experimentsPageNumber',
       experimentsTotalPagesCount: 'experimentsTotalPagesCount',
@@ -160,7 +189,7 @@ export default {
       tensorMode: 'tensorMode'
     }),
     paginationStats: function () {
-      return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.experimentsTotal}`;
+      return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
     },
     visibleColumns: function () {
       return this.experimentsParams.map((header) => {
@@ -171,7 +200,7 @@ export default {
     },
     refreshTableDataTriggers: function () {
       return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
-      ${this.pagination.currentPage}`;
+      ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
     }
   },
   watch: {
@@ -202,7 +231,10 @@ export default {
       this.sorting.order = '';
     },
     clearFilter () {
-      console.log('clear filter');
+      Object.keys(this.filterByValModals).forEach((item) => {
+        this.filterByValModals[item].params = [];
+      });
+      this.searchPattern = '';
     },
     revertOrder () {
       console.log('revert order');
@@ -218,7 +250,10 @@ export default {
       this.pagination.currentPage--;
     },
     isVisibleColumn (column) {
-      return this.visibleColumns.indexOf(column) !== -1;
+      return this.visibleColumns.includes(column);
+    },
+    isFilterableByValColumn (column) {
+      return this.filterableByValColumns.includes(column);
     },
     setHiddenColumns (columns) {
       this.hiddenColumns = columns;
@@ -254,7 +289,10 @@ export default {
         pageNo: this.pagination.currentPage,
         orderBy: this.activeColumnName,
         order: this.sorting.order,
-        searchBy: this.searchPattern
+        searchBy: this.searchPattern,
+        names: this.filterByValModals.name.params,
+        namespaces: this.filterByValModals.namespace.params,
+        states: this.filterByValModals.state.params
       });
     },
     timer () {
@@ -276,6 +314,16 @@ export default {
         default:
           return value;
       }
+    },
+    switchFilterWindow (column, visible) {
+      Object.keys(this.filterByValModals).forEach((column) => {
+        this.filterByValModals[column].visible = false;
+      });
+      this.filterByValModals[column].visible = visible;
+    },
+    onApplyValuesColumnFilter (column, draft) {
+      this.switchFilterWindow(column, false);
+      this.filterByValModals[column].params = [].concat(draft);
     }
   }
 }

@@ -25,72 +25,141 @@ const errMessages = require('../../utils/error-messages');
 const HttpStatus = require('http-status-codes');
 const k8s = require('../../utils/k8s');
 
-const parseExperiments = function (experiments, queryParams) {
-  let data = {};
-  experiments.forEach(function (experiment) {
+const generateExperimentEntities = function (data) {
+  if (!Array.isArray(data)) {
+    return [];
+  }
+  return data.map(function (item) {
     let entity = {
-      creationTimestamp: experiment.metadata.creationTimestamp,
-      name: experiment.metadata.name,
-      namespace: experiment.metadata.namespace,
-      podSelector: experiment.spec['pod-selector']['matchLabels'],
-      podCount: experiment.spec['pod-count'],
-      state: experiment.spec['state'],
-      parameters: experiment.spec['parameters']
+      creationTimestamp: item.metadata.creationTimestamp,
+      name: item.metadata.name,
+      namespace: item.metadata.namespace,
+      podSelector: item.spec['pod-selector']['matchLabels'],
+      podCount: item.spec['pod-count'],
+      state: item.spec['state'],
+      parameters: item.spec['parameters']
     };
-    Object.keys(experiment.spec['metrics']).map((metricName) => {
-      entity[metricName] = experiment.spec['metrics'][metricName];
+    Object.keys(item.spec['metrics']).map((metricName) => {
+      entity[metricName] = item.spec['metrics'][metricName];
     });
-    data[entity.name] = entity;
+    return entity;
   });
+};
 
-  let result = {
-    stats: {
-      total: experiments.length,
-      datetime: Date.now()
-    }
+const extractValuesForFilterableAttrs = function (entities) {
+  let values = {
+    name: new Set(),
+    state: new Set(),
+    namespace: new Set()
+  };
+  entities.forEach((entity) => {
+    values.name.add(entity.name);
+    values.state.add(entity.state);
+    values.namespace.add(entity.namespace);
+  });
+  return {
+    name: Array.from(values.name),
+    namespace: Array.from(values.namespace),
+    state: Array.from(values.state)
+  };
+};
+
+const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
+  if (!Array.isArray(entities)) {
+    throw 'Incorrect Array Data';
+  }
+
+  let filterParams = {
+    name: Array.from(new Set(entities.map((entity) => entity.name))),
+    namespace: Array.from(new Set(entities.map((entity) => entity.namespace))),
+    state: Array.from(new Set(entities.map((entity) => entity.state))),
+    searchPattern: searchPattern ? searchPattern.toUpperCase() : ''
   };
 
-  let fullData = _.values(data);
-
-  if (queryParams) {
-    if (queryParams.searchBy) {
-      logger.debug('Filtering data by');
-      const pattern = queryParams.searchBy;
-      fullData = _.filter(fullData, (item) => {
-        if (item.name.toUpperCase().indexOf(pattern.toUpperCase()) !== -1) {
-          return item;
-        }
-      });
-      result.stats.total = fullData.length;
-    }
-    if (queryParams.orderBy && queryParams.order) {
-      logger.debug('Sorting by');
-      const orderByColumn = queryParams.orderBy;
-      const order = queryParams.order;
-      fullData = _.orderBy(fullData, [orderByColumn], [order]);
-    }
-    if (queryParams.limit && queryParams.page) {
-      logger.debug('Getting page limiting by number of rows');
-      const page = queryParams.page;
-      const limit = queryParams.limit;
-      const a = (page - 1) * limit;
-      const b = page * limit;
-      result.stats.a = a + 1;
-      result.stats.b = b > fullData.length ? fullData.length : b;
-      result.stats.totalPagesCount = Math.ceil(fullData.length / limit);
-      result.stats.pageNumber = page > result.stats.totalPagesCount ? result.stats.totalPagesCount : page;
-      fullData = fullData.slice(a, b);
-    }
+  if (valuesPattern) {
+    Object.keys(valuesPattern).forEach((attr) => {
+      if (Array.isArray(valuesPattern[attr])) {
+        filterParams[attr] = valuesPattern[attr];
+      }
+    });
   }
-  let set = new Set();
-  fullData.map((exp) => {
+
+  const filteredEntities = entities.filter((item) => {
+    return filterParams.name.includes(item.name) &&
+      filterParams.namespace.includes(item.namespace) &&
+      filterParams.state.includes(item.state) &&
+      item.name.toUpperCase().includes(filterParams.searchPattern);
+  });
+
+  return {
+    data: filteredEntities,
+    queryParams: filterParams
+  }
+};
+
+const applyOrderParams = function (entities, orderBy, order, limitPerPage, pageNo) {
+  if (!Array.isArray(entities)) {
+    throw 'Incorrect Array Data';
+  }
+  const orderParams = {
+    orderBy: orderBy || '',
+    order: order || '',
+    limitPerPage: limitPerPage || entities.length || 1,
+    pageNo: pageNo || 1
+  };
+  const sortedEntities = _.orderBy(entities, [orderParams.orderBy], [orderParams.order]);
+  const a = (orderParams.pageNo - 1) * orderParams.limitPerPage;
+  const b = orderParams.pageNo * orderParams.limitPerPage;
+  const slicedEntities = sortedEntities.slice(a, b);
+  const totalPages = Math.ceil(entities.length / orderParams.limitPerPage);
+  return {
+    data: slicedEntities,
+    a: slicedEntities.length ? a + 1 : 0,
+    b: b > entities.length ? entities.length : b,
+    totalPagesCount: Math.ceil(entities.length / orderParams.limitPerPage),
+    pageNumber: orderParams.pageNo > totalPages ? totalPages : orderParams.pageNo
+  }
+};
+
+const extractAttrsNames = function (data) {
+  if (!Array.isArray(data)) {
+    throw 'Incorrect Array Data';
+  }
+  let attrsSet = new Set();
+  data.map((exp) => {
     _.keys(exp).forEach((p) => {
-      set.add(p);
+      attrsSet.add(p);
     })
   });
-  result.params = Array.from(set);
-  result.data = fullData;
-  return result;
+  return Array.from(attrsSet);
+};
+
+const parseExperiments = function (experiments, queryParams) {
+  const entities = generateExperimentEntities(experiments);
+  const valuesForFilterableAttrs = extractValuesForFilterableAttrs(entities);
+  const filteredDataWithMetadata = applyQueryFilters(entities, {
+    name: queryParams.names,
+    namespace: queryParams.namespaces,
+    state: queryParams.states
+  }, queryParams.searchBy);
+  const orderedData = applyOrderParams(filteredDataWithMetadata.data, queryParams.orderBy, queryParams.order, queryParams.limit, queryParams.page);
+  return {
+    stats: {
+      total: entities.length,
+      datetime: Date.now(),
+      filteredDataCount: filteredDataWithMetadata.data.length,
+      a: orderedData.a,
+      b: orderedData.b,
+      totalPagesCount: orderedData.totalPagesCount,
+      pageNumber: orderedData.pageNumber
+    },
+    filterColumnValues: {
+      options: valuesForFilterableAttrs,
+      current: filteredDataWithMetadata.queryParams
+    },
+    params: extractAttrsNames(orderedData.data),
+    data: orderedData.data
+  };
 };
 
 const getUserExperiments = function (req, res) {
@@ -116,6 +185,11 @@ const getUserExperiments = function (req, res) {
 };
 
 module.exports = {
+  getUserExperiments: getUserExperiments,
   parseExperiments: parseExperiments,
-  getUserExperiments: getUserExperiments
+  extractAttrsNames: extractAttrsNames,
+  applyOrderParams: applyOrderParams,
+  applyQueryFilters: applyQueryFilters,
+  extractValuesForFilterableAttrs: extractValuesForFilterableAttrs,
+  generateExperimentEntities: generateExperimentEntities
 };
