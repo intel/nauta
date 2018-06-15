@@ -58,6 +58,7 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = AfterSuite(func() {
-	close(shutdown)
+	// causes: panic: close of closed channel
+	//close(shutdown)
 	testenv.Stop()
 })

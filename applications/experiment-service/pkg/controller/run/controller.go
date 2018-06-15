@@ -47,7 +47,7 @@ type RunControllerImpl struct {
 	// runLister indexes properties about Run
 	runLister listers_run.RunLister
 
-	runClient *client_run.AggregatorV1Client
+	runClient client_run.AggregatorV1Interface
 }
 
 // Init initializes the controller and is called by the generated code
@@ -108,12 +108,12 @@ func (c *RunControllerImpl) saveWithRetries(run *v1.Run, stateToSet common.RunSt
 			_, err := c.runClient.Runs(run.Namespace).Update(run)
 			if err != nil {
 				// try to refresh Run instance
-				if i > 0 {
+				if i > 1 {
 					log.Printf("Run %s update - FALED! %d save tries left. Error: %v", run.Name, i-1, err)
 					run, err = c.runClient.Runs(run.Namespace).Get(run.Name, meta_v1.GetOptions{})
 					stateToSet = calculateRunState(run, pods)
 				} else {
-					errMsg := fmt.Sprintf("Run %s update FALED! No more save tries left! Error: %v",
+					errMsg := fmt.Sprintf("Run %s update FAILED! No more save tries left! Error: %v",
 						run.Name, err)
 					log.Printf(errMsg)
 					return errors.New(errMsg)

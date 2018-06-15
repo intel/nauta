@@ -19,7 +19,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SHELL := /bin/bash # Use bash syntax
 
 clean:
 	rm -Rf vendor
@@ -37,8 +36,8 @@ build:
 	apiserver-boot build executables
 	go fmt ./...
 
-code_coverage:
-	./code_coverage.sh
-
 test:
 	go test -v ./...
+
+test_coverage:
+	./code_coverage.sh

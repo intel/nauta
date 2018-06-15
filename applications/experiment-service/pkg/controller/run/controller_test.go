@@ -21,19 +21,19 @@ and approved by Intel in writing.
 package run
 
 import (
+	"fmt"
 	"log"
 	"time"
 
-	. "github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
-	. "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/clientset_generated/clientset/typed/aggregator/v1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
+	"github.com/stretchr/testify/mock"
 	core_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
-	"github.com/stretchr/testify/mock"
+	run_v1 "github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
+	run_client_v1 "github.com/nervanasystems/carbon/applications/experiment-service/pkg/client/clientset_generated/clientset/typed/aggregator/v1"
 )
 
 type runTester struct {
@@ -42,17 +42,21 @@ type runTester struct {
 	actualErr   error
 	before      chan struct{}
 	after       chan struct{}
+	mock        *PodListenerFake
 }
 
 var _ = Describe("Run controller", func() {
-	var instance Run
-	var client RunInterface
 	var rT *runTester
+	var client run_client_v1.RunInterface
+	var instance *run_v1.Run
 
 	BeforeEach(func() {
+		instance = prepareRun(1)
+		client = cs.AggregatorV1().Runs(instance.Namespace)
+
 		rT = new(runTester)
-		instance = prepareRun()
-		rT.expectedKey = "run-controller-test-handler/instance-1"
+		rT.expectedKey = fmt.Sprintf("%s/%s", instance.Namespace, instance.Name)
+		rT.mock = setupPodListerFake()
 	})
 
 	JustBeforeEach(func() {
@@ -63,26 +67,55 @@ var _ = Describe("Run controller", func() {
 
 	AfterEach(func() {
 		client.Delete(instance.Name, &meta_v1.DeleteOptions{})
+		close(rT.before)
+		close(rT.after)
 	})
 
 	Describe("when creating a new Run", func() {
-		It("invoke the reconcile method", func() {
-			pod := preparePod()
-			testObj := setupPodListerFake()
-			testObj.lister.On("List", mock.Anything).Return([]*core_v1.Pod{pod}, nil)
-			//testObj.lister.AssertNumberOfCalls()
+		It("invoke the reconcile method twice and change the state to RUNNING", func() {
+			rT.mock.lister.On("List", mock.Anything).Return([]*core_v1.Pod{prepareRunningPod()}, nil).Twice()
 
-			client = cs.AggregatorV1().Runs("run-controller-test-handler")
-
-			// Create an instance
-			_, err := client.Create(&instance)
+			_, err := client.Create(instance)
 			Expect(err).ShouldNot(HaveOccurred())
-			rT.verifyReconcileCalls()
+			rT.verifyReconcileCalls(2, nil)
 
 			// Verify after reconcile
 			updatedRun, err := client.Get(instance.Name, meta_v1.GetOptions{})
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(updatedRun.Spec.State).To(Equal(common.Running))
+			rT.mock.lister.AssertExpectations(GinkgoT())
+		})
+
+		It("invoke the reconcile method once and don't change state, if pods are not spawn yet", func() {
+			rT.mock.lister.On("List", mock.Anything).Return([]*core_v1.Pod{}, nil).Once()
+
+			_, err := client.Create(instance)
+			Expect(err).ShouldNot(HaveOccurred())
+			rT.verifyReconcileCalls(1, nil)
+
+			// Verify after reconcile
+			updatedRun, err := client.Get(instance.Name, meta_v1.GetOptions{})
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(updatedRun.Spec.State).To(Equal(common.RunState("")))
+			rT.mock.lister.AssertExpectations(GinkgoT())
+		})
+	})
+
+	Describe("when updating a Run", func() {
+		It("invoke the reconcile method once and don't save it, if no state change", func() {
+			instance.Spec.State = common.Complete
+			rT.mock.lister.On("List", mock.Anything).
+				Return([]*core_v1.Pod{preparePod(core_v1.PodSucceeded)}, nil).Once()
+
+			_, err := client.Update(instance)
+			Expect(err).ShouldNot(HaveOccurred())
+			rT.verifyReconcileCalls(1, nil)
+
+			// Verify after reconcile
+			updatedRun, err := client.Get(instance.Name, meta_v1.GetOptions{})
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(updatedRun.Spec.State).To(Equal(common.Complete))
+			rT.mock.lister.AssertExpectations(GinkgoT())
 		})
 	})
 })
@@ -102,8 +135,8 @@ func (r *runTester) prepareReconcileCallbacks() {
 }
 
 // Verify reconcile function is called against the correct key
-func (r *runTester) verifyReconcileCalls() {
-	for i := 0; i < 2; i++ {
+func (r *runTester) verifyReconcileCalls(expectedCalls int, expectedErr error) {
+	for i := 0; i < expectedCalls; i++ {
 		log.Printf("Processing reconcile %d call", i+1)
 		select {
 		case <-r.before:
@@ -116,29 +149,14 @@ func (r *runTester) verifyReconcileCalls() {
 		select {
 		case <-r.after:
 			Expect(r.actualKey).To(Equal(r.expectedKey))
-			Expect(r.actualErr).ShouldNot(HaveOccurred())
+			if expectedErr == nil {
+				Expect(r.actualErr).ShouldNot(HaveOccurred())
+			} else {
+				Expect(r.actualErr).To(Equal(expectedErr))
+			}
+
 		case <-time.After(time.Second * 2):
 			Fail("reconcile never finished")
 		}
 	}
-}
-
-func preparePod() *core_v1.Pod {
-	pod := core_v1.Pod{}
-	pod.Name = "kuba"
-	pod.Namespace = "run-controller-test-handler"
-	pod.Labels = map[string]string{"k": "b"}
-	return &pod
-}
-
-func prepareRun() Run {
-	run := Run{}
-	run.Name = "instance-1"
-	run.Spec.State = "" //common.Complete
-	//instance.Namespace = "run-controller-test-handler"
-	run.Spec.PodCount = 1
-	run.Spec.PodSelector = meta_v1.LabelSelector{
-		MatchLabels: map[string]string{"k": "b"},
-	}
-	return run
 }
