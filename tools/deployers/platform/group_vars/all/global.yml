@@ -12,6 +12,11 @@ proxy: {}
 dns_servers: []
 dns_search_domains: []
 
+default_dns_search_domains:
+  - "node.{{ nodes_domain }}.{{ domain }}"
+  - "svc.{{ nodes_domain }}.{{ domain }}"
+
+global_dns_search_domains: "{{ dns_search_domains + default_dns_search_domains }}"
 ### Network
 
 domain: dlse

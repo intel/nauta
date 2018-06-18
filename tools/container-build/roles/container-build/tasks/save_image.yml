@@ -2,11 +2,10 @@
 
 - name: Push image "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}" as {{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}
   docker_image:
-    name: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
-    repository: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
     push: True
+    pull: False
     timeout: "{{ docker_timeout }}"
-    force: True
   register: push_async
   failed_when: "'ansible_job_id' not in push_async"
   async: 1800

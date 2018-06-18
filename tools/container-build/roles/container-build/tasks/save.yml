@@ -26,4 +26,5 @@
     state: present
     create: true
   with_dict: "{{ images }}"
+  when: build_logs | default(False)
 

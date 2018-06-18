@@ -1,9 +1,8 @@
 ---
 
-- name: Load image {{ name }} as "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
+- name: Load image {{ name }} as "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
   docker_image:
     name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
-    repository: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
     pull: True
     push: False
     timeout: "{{ docker_timeout }}"

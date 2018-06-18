@@ -5,7 +5,7 @@
 
 - name: Calculate base image
   vars:
-    image_to_add: "127.0.0.1:{{ registry_port }}/{{ item.value }}:{{ images[item.value].version }}"
+    image_to_add: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ item.value }}:{{ docker_images_remote_tags[item.value] }}"
   set_fact:
     base_image: "{{ base_image | combine({item.key: image_to_add}) }}"
   with_dict: "{{ image.required }}"

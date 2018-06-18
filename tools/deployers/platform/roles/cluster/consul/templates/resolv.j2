@@ -1,4 +1,6 @@
 {% for host in groups['master'] %}
 nameserver {{ hostvars[host].dls_configuration.internal_interface.ipv4_address }}
 {% endfor %}
-search {{ dns_search_domains | join(' ') }}
+{% if global_dns_search_domains | length > 0 %}
+search {{ global_dns_search_domains | join(' ') }}
+{% endif %}

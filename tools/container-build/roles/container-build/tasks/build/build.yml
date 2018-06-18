@@ -5,7 +5,7 @@
 
 - name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
-    name: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
+    name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
     pull: False
     push: False
     timeout: "{{ docker_timeout }}"

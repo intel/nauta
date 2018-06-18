@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-tf-push-upgrade
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+  annotations:
+    "helm.sh/hook": "post-upgrade"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      restartPolicy: Never
+      volumes:
+        - name: docker
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+      containers:
+        - name: post-push
+          image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E docker image is required" .Values.docker_image }}
+          command:
+            - "/push.sh"
+            - "{{ .Release.Name }}-registry-nginx"
+            - "$(IMAGE)"
+            - "cache/$(IMAGE)"
+          env:
+            - name: IMAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}
+                  key: image.tensorflow
+          volumeMounts:
+            - name: docker
+              mountPath: /var/run/docker.sock
