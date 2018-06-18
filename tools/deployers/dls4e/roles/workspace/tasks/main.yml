@@ -70,12 +70,6 @@
   changed_when: False
   delegate_to: "{{ delegation_hostname }}"
 
-- name: Remove old workspaces
-  environment: "{{ local_envs }}"
-  shell: "{{ runtime_kubectl }} --namespace=dls4e delete pods -l kind=bootstrap-dls4e-workspace"
-  changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
-
 - name: Wait for all workspaces to get ready
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} --namespace=dls4e get deployment dls4enterprise-workspace-pod -o jsonpath='{.status.readyReplicas}'"
