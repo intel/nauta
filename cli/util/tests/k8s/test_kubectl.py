@@ -47,12 +47,14 @@ def mock_k8s_svc(mocker):
 def test_start_port_forwarding_success(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=True)
+    urlopen_mock = mocker.patch("urllib.request.urlopen")
 
     process, _, _ = kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert process, "proxy process doesn't exist."
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert check_port_avail.call_count == 1, "port availability wasn't checked"
+    assert urlopen_mock.call_count == 1, "connection readiness wasn't checked"
 
 
 def test_start_port_forwarding_missing_port(mocker):
@@ -82,21 +84,25 @@ def test_set_registry_port_for_draft_if_docker_registry(mock_k8s_svc, mocker):
     app_name = DLS4EAppNames.DOCKER_REGISTRY
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port", side_effect=[("OK", 0)])
+    urlopen_mock = mocker.patch("urllib.request.urlopen")
 
     kubectl.start_port_forwarding(app_name)
 
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert srp_mock.call_count == 1, "draft.set_registry_port command wasn't called"
+    assert urlopen_mock.call_count == 1, "connection readiness wasn't checked"
 
 
 def test_set_registry_port_for_draft_if_not_docker_registry(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port")
+    urlopen_mock = mocker.patch("urllib.request.urlopen")
 
     kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert srp_mock.call_count == 0, "draft.set_registry_port command was called"
+    assert urlopen_mock.call_count == 1, "connection readiness wasn't checked"
 
 
 def test_start_port_forwarding_draft_config_fail(mock_k8s_svc, mocker):
@@ -126,17 +132,20 @@ def test_start_port_forwarding_first_two_occupied(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability")
     check_port_avail.side_effect = [False, False, True]
+    urlopen_mock = mocker.patch("urllib.request.urlopen")
 
     process, tunnel_port, container_port = kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME)
 
     assert tunnel_port == 33471
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert check_port_avail.call_count == 3, "port availability wasn't checked"
+    assert urlopen_mock.call_count == 1, "connection readiness wasn't checked"
 
 
 def test_start_port_forwarding_success_with_different_port(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=True)
+    urlopen_mock = mocker.patch("urllib.request.urlopen")
 
     process, tunnel_port, _ = kubectl.start_port_forwarding(AppNameEnum.TEST_APP_NAME, 9999)
 
@@ -144,3 +153,4 @@ def test_start_port_forwarding_success_with_different_port(mock_k8s_svc, mocker)
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert check_port_avail.call_count == 1, "port availability wasn't checked"
     assert tunnel_port == 9999, "port wasn't set properly"
+    assert urlopen_mock.call_count == 1, "connection readiness wasn't checked"

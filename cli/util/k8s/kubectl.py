@@ -20,7 +20,8 @@
 #
 
 import subprocess
-
+import time
+import urllib.request
 from typing import Optional
 
 import platform_resources.users as users_api
@@ -113,6 +114,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
         logger.debug(port_forward_command)
 
         process = system.execute_subprocess_command(port_forward_command)
+        wait_for_connection_readiness('127.0.0.1', service_node_port)
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)
@@ -123,6 +125,17 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
 
     logger.info("Port forwarding - proxy set up")
     return process, service_node_port, service_container_port
+
+
+def wait_for_connection_readiness(address: str, port: int, tries: int=5):
+    for x in range(tries):
+        try:
+            urllib.request.urlopen(f'http://{address}:{port}')
+            return
+        except ConnectionResetError as e:
+            logger.error(f'can not connet to {address}:{port}. Error: {e}')
+            time.sleep(1)
+    raise KubectlIntError(f'connection on {address}:{port} NOT READY!')
 
 
 def check_users_presence(username: str) -> bool:

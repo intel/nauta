@@ -73,7 +73,7 @@ func (RunStrategy) Validate(ctx request.Context, obj runtime.Object) field.Error
 
 // DefaultingFunction sets default Run field values
 func (RunSchemeFns) DefaultingFunction(o interface{}) {
-	obj := o.(*Run)
 	// set default field values here
-	log.Printf("Defaulting fields for Run %s\n", obj.Name)
+	// obj := o.(*Run)
+	//log.Printf("Defaulting fields for Run %s\n", obj.Name)
 }
