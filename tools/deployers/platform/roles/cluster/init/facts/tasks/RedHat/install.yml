@@ -24,3 +24,4 @@
     loop_var: package
   with_items:
     - firewall
+    - firewalld

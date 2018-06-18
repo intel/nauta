@@ -32,7 +32,7 @@
 
 - name: Verify helm access
   environment: "{{ {'http_proxy': '', 'HTTP_PROXY': '' } }}"
-  shell: helm --host "{{ kubernetes_network.svc_list.tiller.ip }}:{{ kubernetes_network.svc_list.tiller.port }}" ls
+  shell: helm ls
   changed_when: False
   register: helm_access
   until: helm_access|success
