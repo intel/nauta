@@ -18,7 +18,7 @@ service:
 
 resources:
   requests:
-    cpu: 1
+    cpu: 0.01
     memory: 1Gi
   #limits:
   #  cpu: 2
