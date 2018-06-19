@@ -29,7 +29,7 @@ from util.logger import initialize_logger
 
 log = initialize_logger(__name__)
 
-HELP = "Command for creating/deleting/listing users of the platform. Can be only " \
+HELP = "Command for creating/deleting/listing users of the platform. Can only be " \
        "run by a platform administrator."
 
 

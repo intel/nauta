@@ -26,13 +26,13 @@ from util.aliascmd import AliasCmd
 from cli_state import common_options
 from version import VERSION
 
-HELP = "Displays version of dlsctl application."
+HELP = "Displays the version of the installed dlsctl application."
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='v')
 @common_options(verify_dependencies=False, verify_config_path=False)
 def version():
     """
-    Returns a version of the dlsctl application
+    Returns the version of the installed dlsctl application.
     """
     click.echo(VERSION)

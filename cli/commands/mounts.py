@@ -34,7 +34,7 @@ from util.aliascmd import AliasCmd
 
 log = initialize_logger(__name__)
 
-HELP = "Command displays a command that should be used to mount client's" \
+HELP = "Command displays a command that can be used to mount client's" \
        " folders on his/her local machine."
 
 
@@ -42,15 +42,15 @@ MOUNT_MESSAGE = '''
 Use the following command to mount those folders:
  - replace <MOUNTPOINT> with a proper location on your local machine)
  - replace <DLS4E_FOLDER> with one of the following:
-        - input - user's private input folder (read/write)
-          (can be accessed as /mnt/input/home from training script)
-        - output - user's private output folder (read)
-          (can be accessed as /mnt/output/home from training script)
-        - input-shared - shared input folder (read/write)
-          (can be accessed as /mnt/input/root/public from training script)
-        - output-shared - shared output folder (read)
-          (can be accessed as /mnt/output/root/public from training script)
-Additionally each experiment has a special folder which can be accessed
+        - input - User's private input folder (read/write)
+          (can be accessed as /mnt/input/home from training script).
+        - output - User's private output folder (read)
+          (can be accessed as /mnt/output/home from training script).
+        - input-shared - Shared input folder (read/write)
+          (can be accessed as /mnt/input/root/public from training script).
+        - output-shared - Shared output folder (read)
+          (can be accessed as /mnt/output/root/public from training script).
+Additionally, each experiment has a special folder that can be accessed
 as /mnt/output/experiment from training script. This folder is shared by Samba
 as output/<EXPERIMENT_NAME>.
 --------------------------------------------------------------------
@@ -67,7 +67,7 @@ def mounts(state: State):
                        "a regular user.")
             sys.exit(1)
     except Exception:
-        error_msg = "Problems during verifying whether current user is an administrator."
+        error_msg = "Problems detected while verifying that current user is an administrator."
         log.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
@@ -89,7 +89,7 @@ def get_mount_command() -> str:
         else:  # OSX
             return get_mount_command_osx(usr, psw, adr)
     except Exception:
-        error_msg = "Error during gathering data needed for mounting samba share."
+        error_msg = "Error detected while gathering data needed for mounting Samba share."
         log.exception(error_msg)
         click.echo(error_msg)
 

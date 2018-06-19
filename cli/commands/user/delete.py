@@ -36,7 +36,8 @@ log = initialize_logger(__name__)
 
 HELP = "Command used to delete a user from the platform. Can be only " \
        "run by a platform administrator."
-HELP_PR = "If this option is added - command removes all client's artifacts."
+HELP_PR = "If this option is added, the command removes all of " \
+       "client's artifacts."
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='d')

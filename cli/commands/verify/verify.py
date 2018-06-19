@@ -29,9 +29,9 @@ from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 
 
-HELP = "Command used to verify whether all external components required by dlsctl are installed " \
-       "in proper versions. If something is missing - application displays a detailed information" \
-       " about it."
+HELP = "Command verifies whether all external components required by dlsctl are installed " \
+       "in proper versions. If something is missing, the application displays detailed " \
+       "information about it."
 
 log = initialize_logger(__name__)
 

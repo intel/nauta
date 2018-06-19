@@ -39,7 +39,7 @@ from platform_resources.users import validate_user_name
 
 log = initialize_logger(__name__)
 
-HELP = "Command used to create a new user on the platform. Can be only " \
+HELP = "Command used to create a new user on the platform. Can only be " \
        "run by a platform administrator."
 
 ADD_USER_CHART_NAME = "dls4e-user"
@@ -70,9 +70,9 @@ users:
     token: {token}
 '''
 
-ADD_USER_ERROR_DESCRIPTION = "User hasn't been created. To get more information about causes " \
-                             "of a problem - run command with -v option."
-REMOVE_USER_ERROR_DESCRIPTION = "Partially created user hasn't been removed successfully - " \
+ADD_USER_ERROR_DESCRIPTION = "User has not been created. To get more information about causes " \
+                             "of this problem - run command with -v option."
+REMOVE_USER_ERROR_DESCRIPTION = "Partially created user has not been removed successfully - " \
                                 "please remove the user manually."
 
 
@@ -90,7 +90,7 @@ def create(state: State, username: str):
         try:
             validate_user_name(username)
         except ValueError as exe:
-            log.exception("Error during validating user name.")
+            log.exception("Error detected while validating user name.")
             click.echo(exe)
             sys.exit(1)
 
@@ -102,7 +102,7 @@ def create(state: State, username: str):
             click.echo("User already exists.")
             sys.exit(1)
     except Exception:
-        error_msg = "Problems during verifying user with given user name."
+        error_msg = "Problems detected while verifying user with given user name."
         log.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
@@ -130,13 +130,13 @@ def create(state: State, username: str):
         try:
             users_password = get_users_token(username)
         except Exception:
-            error_msg = "The app encountered problems when gathering user's password."
+            error_msg = "The app encountered problems while gathering user's password."
             log.exception(error_msg)
             click.echo(error_msg)
             users_password = ""
 
     except Exception:
-        log.exception("Error during adding of a user.")
+        log.exception("Error detected while adding of a user.")
         click.echo(ADD_USER_ERROR_DESCRIPTION)
         if not delete_user(username):
             click.echo(REMOVE_USER_ERROR_DESCRIPTION)
