@@ -1,0 +1,22 @@
+---
+
+- name: Disable services
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: False
+  changed_when: False
+  failed_when: False
+  with_items:
+    - firewalld
+
+- name: Remove yum packages
+  environment: "{{ proxy }}"
+  yum:
+    name: "{{ package }}"
+    state: absent
+  loop_control:
+    loop_var: package
+  with_items:
+    - firewall
+    - firewalld

@@ -1,5 +1,6 @@
 ---
 
+- import_playbook: cluster.networking.yml
 - import_playbook: cluster.ca.yml
 - import_playbook: cluster.facts.yml
 - import_playbook: cluster.consul.yml

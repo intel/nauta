@@ -13,15 +13,3 @@
     loop_var: package
   with_items:
     - rsync
-
-- name: Remove yum packages
-  environment: "{{ proxy }}"
-  yum:
-    conf_file: /opt/carbon/yum/yum.conf
-    name: "{{ package }}"
-    state: absent
-  loop_control:
-    loop_var: package
-  with_items:
-    - firewall
-    - firewalld
