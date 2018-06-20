@@ -13,6 +13,7 @@ ignore: |
   /dls4e-user
   /dls4e-registry-charts
   /platform-charts
+  /tmp-go
 
 rules:
   braces:
