@@ -24,9 +24,9 @@ import click
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 
-HELP = "Launches a local browser with Jupyter notebook. If script name argument is given - script is put" \
-       "into opened notebook."
-HELP_N = "Name of a Jupyter notebook's session.."
+HELP = "Launches a local browser with Jupyter Notebook. If the script name argument " \
+       "is given, then script is put into the opened notebook."
+HELP_N = "The name of this Jupyter Notebook session."
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='i')
@@ -36,6 +36,6 @@ HELP_N = "Name of a Jupyter notebook's session.."
 @pass_state
 def interact(state: State, script_name: str, name: str):
     """
-    Starts an interactive session with Jupyter Notebook
+    Starts an interactive session with Jupyter Notebook.
     """
     click.echo("Interact command - under development")

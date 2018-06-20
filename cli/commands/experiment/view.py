@@ -33,8 +33,7 @@ import platform_resources.runs as runs_api
 
 
 HELP = "Displays details of experiment with a given name."
-HELP_T = "If given - exposes a tensorboard's instance with experiment's data."
-
+HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
 logger = initialize_logger(__name__)
 
 

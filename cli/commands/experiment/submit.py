@@ -51,12 +51,12 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 log = initialize_logger('commands.submit')
 
 HELP = "Command used to submitting training scripts for a single-node tensorflow training."
-HELP_N = "Experiment custom name"
-HELP_SFL = "Name of a folder with additional files used by a script - other .py files, data etc. " \
+HELP_N = "Name for this experiment."
+HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. " \
            "If not given - its content won't be copied into an image."
-HELP_T = "Name of a template used to create a delpoyment. By default a single-node tensorflow training" \
-         " template is chosen. List of available templates might be obtained by" \
-         " issuing dlsctl experiment template_list command."
+HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
+         " Template is chosen. List of available templates might be obtained by" \
+         " Issuing dlsctl experiment template_list command."
 HELP_PR = "Values (set or range) of a single parameter. "
 HELP_PS = "Set of values of one or several parameters."
 
@@ -198,7 +198,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         click.echo(error_msg)
         sys.exit(1)
     except Exception:
-        error_msg = 'Other error during submitting experiments.'
+        error_msg = 'Other error encountered while submitting exepriments.'
         log.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
@@ -260,7 +260,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
                                    pack_type: str, internal_registry_port: str) -> str:
     """
-    Prepares draft's environment for a certain run based on provided parameters
+    Prepares draft's environment for a certain run based on provided parameters.
     :param experiment_name: name of an experiment
     :param run_name: name of an experiment run
     :param script_location: location of a script used for training purposes
@@ -292,8 +292,8 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
 def submit_one_run(run_folder: str):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
-    :param run_folder: location of a folder with a description of an environment
-    In case of any problems it throws an exception with a description of a problem
+    :param run_folder: Location of a folder with a description of an environment.
+    In case of any problems it throws an exception with a description of a problem.
     """
     log.debug(f'Submit one run: {run_folder} - start')
 
@@ -311,7 +311,7 @@ def submit_one_run(run_folder: str):
 def delete_runs(runs_list: List[RunDescription]):
     """
     Removes folders with Runs from a list given as a parameter.
-    :param runs_list: list of runs to be removed.
+    :param runs_list: List of runs to be removed.
     """
     for run in runs_list:
         if run.folder:
@@ -321,11 +321,11 @@ def delete_runs(runs_list: List[RunDescription]):
 def values_range(start: str, stop: str, step: str) -> List[str]:
     """
     Returns a list containing values from start to stop with a step.
-    All params might be floats or ints.
+    All params can be floats or ints.
     :param start: first value of a range
     :param stop: last value of a range
     :param step: step
-    :return: lsit of values between start and stop with a given step
+    :return: list of values between start and stop with a given step
     """
     ret_range = []
     current_value = convert_to_number(start)

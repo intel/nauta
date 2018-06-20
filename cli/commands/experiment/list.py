@@ -36,11 +36,11 @@ logger = initialize_logger(__name__)
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
 @click.option('-a', '--all-users', is_flag=True,
-              help='Show all experiments, regardless of owner')
+              help='Show all experiments, regardless of the owner.')
 @click.option('-n', '--name', type=str,
-              help='A regular expression to narrow down list to experiments that are matching this expression')
+              help='A regular expression to narrow down list to experiments that match this expression.')
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]),
-              help='List experiments with matching status')
+              help='List experiments with matching status.')
 @common_options()
 @pass_state
 def list_experiments(state: State, all_users: bool, name: str, status: RunStatus):

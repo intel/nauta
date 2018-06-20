@@ -24,7 +24,7 @@ import click
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 
-HELP = "Runs inference on previously trained model."
+HELP = "Runs inference on a previously trained model."
 HELP_N = "Name of prediction session."
 
 

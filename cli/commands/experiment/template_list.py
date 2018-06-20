@@ -32,7 +32,7 @@ from util.logger import initialize_logger
 
 log = initialize_logger('commands.template_list')
 
-HELP = "Command returns a list of available templates that can be used to submit training jobs."
+HELP = "Returns a list of available templates that can be used to submit training jobs."
 
 CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"

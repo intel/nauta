@@ -41,21 +41,21 @@ logger = initialize_logger(__name__)
 @click.command(cls=AliasCmd, alias='lg')
 @click.argument('experiment-name')
 @click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
-              help='Minimal severity of logs')
+              help='Show all events with this specified minimal and greater severity.')
 @click.option('-sd', '--start-date', default=None,
-              help='Retrieve logs produced from this date (use ISO 8601 date format)')
+              help='Retrieve all logs produced on and after this date (use ISO 8601 date format).')
 @click.option('-ed', '--end-date', default=None,
-              help='Retrieve logs produced until this date (use ISO 8601 date format)')
+              help='Retrieve all logs produced on and before this date (use ISO 8601 date format).')
 @click.option('-i', '--pod-ids', default=None,
-              help='Comma separated list of pod IDs, if provided, only logs from these pods will be returned')
+              help='Comma separated list of pod IDs. If provided, only logs from these pods will be returned.')
 @click.option('-p', '--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
-              help='Get logs only for pods with given status')
+              help='Get logs only for pods with given status.')
 @common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus):
     """
-    Show logs for given experiment.
+    Show logs for a given experiment.
     """
     try:
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:

@@ -42,7 +42,8 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.logger import initialize_logger
 
 HELP = "Cancels experiment/s chosen based on criteria given as a parameter."
-HELP_P = "If given - all information concerning experiments is removed from the system."
+HELP_P = "If given, then all information concerning all experiments, completed and currently running, " \
+         "is removed from the system."
 
 log = initialize_logger(__name__)
 

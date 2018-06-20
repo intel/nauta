@@ -27,7 +27,7 @@ from util.aliascmd import AliasGroup
 
 logger = initialize_logger(__name__)
 
-HELP = "Command for training and managing training jobs"
+HELP = "Command for starting, stopping, and managing training jobs."
 
 
 @click.group(short_help=HELP, cls=AliasGroup, alias='exp')
