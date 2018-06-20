@@ -42,11 +42,14 @@ log = initialize_logger(__name__)
 def verify(state: State):
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
+            supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             valid, installed_version = check_dependency(dependency_spec)
+            log.info(f'Checking version of {dependency_name}. '
+                     f'Installed version: ({installed_version}). '
+                     f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
             if valid:
                 click.echo(f'{dependency_name} verified successfully.')
             else:
-                supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
                 click.echo(f'{dependency_name} installed version ({installed_version}) '
                            f'was not tested, supported version {supported_versions_sign}'
                            f' {dependency_spec.expected_version}')

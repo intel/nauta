@@ -133,7 +133,11 @@ def check_all_binary_dependencies():
     """
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
+            supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             valid, installed_version = check_dependency(dependency_spec)
+            log.info(f'Checking version of {dependency_name}. '
+                     f'Installed version: ({installed_version}). '
+                     f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
             if not valid:
                 raise InvalidDependencyError(f'{dependency_name} installed version: {installed_version}, does not match'
                                              f' expected version: {dependency_spec.expected_version}')
