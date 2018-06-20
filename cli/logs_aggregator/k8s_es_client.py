@@ -125,3 +125,19 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         output = self.delete_by_query(index=index, body=delete_query)
 
         log.debug(f"Deleting logs - result :{str(output)}")
+
+
+    def delete_logs_for_run(self, run: str, index='_all'):
+        """
+        Removes logs for a given run.
+        :param run: run for which logs should be deleted
+        :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
+        Throws exception in case of any errors during removing of logs.
+        """
+        log.debug(f'Deleting logs for {run} run.')
+
+        delete_query = {"query": {"match": {'kubernetes.labels.runName': run}}}
+
+        output = self.delete_by_query(index=index, body=delete_query)
+
+        log.debug(f"Deleting logs - result :{str(output)}")

@@ -171,3 +171,15 @@ def test_delete_logs_for_namespace(mocker):
     client.delete_logs_for_namespace("namespace")
 
     assert mocked_delete_logs.call_count == 1
+
+
+def test_delete_logs_for_run(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    mocked_delete_logs = mocker.patch.object(client, 'delete_by_query')
+
+    run_name = 'test_run'
+
+    client.delete_logs_for_run(run_name)
+
+    mocked_delete_logs.assert_called_with(index='_all',
+                                          body={"query": {"match": {'kubernetes.labels.runName': run_name}}})
