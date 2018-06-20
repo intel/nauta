@@ -1,0 +1,19 @@
+---
+
+- name: Create filesystem on device
+  filesystem:
+    dev: "{{ local_data_device }}"
+    fstype: xfs
+    force: True
+
+- name: Create mount path
+  file:
+    path: "{{ local_data_path }}"
+    state: directory
+
+- name: Mount data
+  mount:
+    fstype: xfs
+    path: "{{ local_data_path }}"
+    src: "{{ local_data_device }}"
+    state: mounted

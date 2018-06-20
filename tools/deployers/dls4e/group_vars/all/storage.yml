@@ -1,0 +1,7 @@
+---
+
+storage_type: auto
+
+master_storage_selector: {}
+
+master_storage_path: /data

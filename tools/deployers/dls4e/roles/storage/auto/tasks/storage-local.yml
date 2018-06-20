@@ -1,0 +1,14 @@
+---
+
+- name: Calculate facts for local deployment
+  set_fact:
+    detected_storage_path: "{{ hostvars[master_instance_data].local_data_path | default(master_storage_path) }}"
+    detected_storage_selector:
+      kubernetes.io/hostname: "{{ hostvars[master_instance_data].ansible_nodename }}"
+
+- name: Set storage fact
+  set_fact:
+    calculated_storage:
+      type: "{{ detected_storage_type }}"
+      local_path: "{{ detected_storage_path }}"
+      local_selector: "{{ detected_storage_selector }}"

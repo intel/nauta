@@ -28,6 +28,11 @@ spec:
         heritage: {{ .Release.Service }}
         apiserver: "true"
     spec:
+{{- if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
+{{- else }}
+      nodeSelector:
+{{ toYaml (required "DLS4E Storage Node Label Selector" .Values.global.dls4e_storage.local_selector) | indent 8 }}
+{{- end }}
       serviceAccount: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
         - name: apiserver
@@ -65,6 +70,13 @@ spec:
               cpu: 100m
               memory: 300Mi
       volumes:
+{{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
         - name: apiserver-certs-temp
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-{{ .Chart.Name }}
+{{ else }}
+        - name: apiserver-certs-temp
+          hostPath:
+            path: {{ required "DLS4E Storage Path" .Values.global.dls4e_storage.local_path }}/{{ .Release.Name }}/{{ .Chart.Name }}/main
+            type: DirectoryOrCreate
+{{ end }}

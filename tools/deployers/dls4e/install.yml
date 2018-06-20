@@ -7,10 +7,18 @@
       when: "'master' in groups and groups['master'] | length > 0"
 
 - name: Init local workspace
-  hosts: master[0]
+  hosts: localhost
+  connection: local
+  gather_facts: False
   roles:
     - role: local/init
       when: "'master' not in groups or groups['master'] | length == 0"
+
+- name: Load storage
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: "storage/{{ storage_type | default('auto') }}"
 
 - name: Run provisioners preperation
   hosts: provisioners

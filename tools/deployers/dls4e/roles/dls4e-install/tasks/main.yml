@@ -22,6 +22,7 @@
       dls4e_configuration:
         external_ip: "{{ runtime_external_ip }}"
         registry: "127.0.0.1:{{ registry_nodeport }}"
+      dls4e_storage: "{{ calculated_storage }}"
       images:
         - name: tiller
           value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tiller:v2.9.1"

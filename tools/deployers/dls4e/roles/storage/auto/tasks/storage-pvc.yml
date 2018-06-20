@@ -1,0 +1,6 @@
+---
+
+- name: Set storage fact
+  set_fact:
+    calculated_storage:
+      type: "{{ detected_storage_type }}"
