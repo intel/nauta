@@ -1,10 +1,11 @@
 #!/bin/bash -e
 set -e
 
-mkdir -p /input/public
-mkdir -p /output/public
-
-# chmod 0777 -R /input/public /output/public
+echo "Ensuring /input/public and /output public exist and have proper permissions..."
+mkdir -vp /input/public
+mkdir -vp /output/public
+chmod -v 0777 /input/public /output/public
+echo "OK."
 
 function create_user() {
     echo "(Re)Creating user $1"
