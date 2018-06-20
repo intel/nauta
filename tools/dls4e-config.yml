@@ -121,6 +121,18 @@ images:
       BASE_IMAGE: "dls4e/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
+  dls4e/ingress:
+    version: "0.14.0"
+    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
+    method: "pull"
+  dls4e/defaultbackend:
+    version: "1.4"
+    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
+    method: "pull"
+  dls4e/dashboard:
+    version: "v1.8.3"
+    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
+    method: "pull"
 
 subcharts:
   dls4e-registry:
@@ -190,3 +202,14 @@ subcharts:
       chart_values:
         image: dls4e/tf/operator:v2
         tfimage: dls4e/tensorflow:1.8.0-py3
+    dls-ingress:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/dls-ingress"
+      chart_values:
+        image: dls4e/ingress:0.14.0
+        defaultbackend_image: dls4e/defaultbackend:1.4
+    dashboard:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/dashboard"
+      chart_values:
+        image: dls4e/dashboard:v1.8.3

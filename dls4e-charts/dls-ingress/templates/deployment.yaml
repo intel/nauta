@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    dls4e_app_name: ingress
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      release: {{ .Release.Name }}
+      heritage: {{ .Release.Service }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+      annotations:
+        prometheus.io/port: '10254'
+        prometheus.io/scrape: 'true'
+    spec:
+      serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
+      containers:
+        - name: nginx-ingress-controller
+          image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E ingress image is required" .Values.image }}
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256m
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-defaultbackend
+            - --configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}
+            - --tcp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-tcp
+            - --udp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-udp
+            - --annotations-prefix=dls.ingress.kubernetes.io
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+          - name: http
+            containerPort: 80
+          - name: https
+            containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1

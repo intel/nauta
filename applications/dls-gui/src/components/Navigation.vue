@@ -22,7 +22,7 @@
 <template>
   <v-navigation-drawer v-if="!tensorMode" app clipped fixed v-model="visible">
     <v-list dense>
-      <v-list-tile @click="test">
+      <v-list-tile>
         <v-list-tile-action>
           <v-icon>track_changes</v-icon>
         </v-list-tile-action>
@@ -30,7 +30,7 @@
           <v-list-tile-title>Models</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <v-list-tile @click="test">
+      <v-list-tile v-on:click="goToK8sDashboard()">
         <v-list-tile-action>
           <v-icon>dashboard</v-icon>
         </v-list-tile-action>
@@ -60,8 +60,10 @@ export default {
     }
   },
   methods: {
-    test: () => {
-      console.log('test');
+    goToK8sDashboard: () => {
+      const hostname = window.location.origin;
+      const k8sDashboardUrl = hostname + '/dashboard/';
+      window.open(k8sDashboardUrl, '_blank');
     }
   }
 }

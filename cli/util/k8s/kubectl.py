@@ -36,6 +36,7 @@ from util.system import check_port_availability
 logger = initialize_logger('util.kubectl')
 
 MAX_NUMBER_OF_TRIES = 10
+PORT_FROM_FREE_POOL = 3000
 
 
 def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True) \
@@ -98,7 +99,8 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
                 service_node_port = port
             else:
                 if not service_node_port:
-                    service_node_port = service_container_port
+                    service_node_port = service_container_port if service_container_port >= PORT_FROM_FREE_POOL \
+                        else PORT_FROM_FREE_POOL
                 count = 0
                 while not check_port_availability(service_node_port):
                     service_node_port = service_node_port + 10
@@ -114,7 +116,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
         logger.debug(port_forward_command)
 
         process = system.execute_subprocess_command(port_forward_command)
-        wait_for_connection_readiness('127.0.0.1', service_node_port)
+        wait_for_connection_readiness('localhost', service_node_port)
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)

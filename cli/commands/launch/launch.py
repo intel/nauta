@@ -69,7 +69,7 @@ def launch_app(k8s_app_name: DLS4EAppNames, no_launch: bool, port: int = None):
                     click.echo("Error during creation of a local docker-host tunnel.")
                     sys.exit(1)
 
-            if k8s_app_name == DLS4EAppNames.WEB_GUI:
+            if k8s_app_name == DLS4EAppNames.INGRESS:
                 config.load_kube_config()
                 user_token = configuration.Configuration().api_key.get('authorization')
                 prepared_user_token = user_token.replace('Bearer ', '')
@@ -128,7 +128,7 @@ def webui(state: State, no_launch: bool, port: int):
     """
     Subcommand for launching webUI with credentials
     """
-    launch_app(DLS4EAppNames.WEB_GUI, no_launch, port)
+    launch_app(DLS4EAppNames.INGRESS, no_launch, port)
 
 
 @click.command(cls=AliasCmd, alias='tb')
