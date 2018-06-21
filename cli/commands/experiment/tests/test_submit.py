@@ -19,10 +19,13 @@
 # and approved by Intel in writing.
 #
 
+import os
+
 from click.testing import CliRunner
 import pytest
 
-from commands.experiment.submit import submit
+from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
+    validate_script_folder_location, get_default_script_location
 from commands.experiment.common import RunDescription, RunStatus
 from util.exceptions import SubmitExperimentError
 
@@ -34,42 +37,37 @@ SUBMITTED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.4
 
 
 class SubmitMocks:
-    def __init__(self, mocker, submit_experiment=None, isfile=None,
-                 isdir=None) -> None:
+    def __init__(self, mocker):
         self.mocker = mocker
-        self.submit_experiment = submit_experiment
-        self.isfile = isfile
-        self.isdir = isdir
+        self.submit_experiment = mocker.patch("commands.experiment.submit.submit_experiment",
+                                              return_value=SUBMITTED_RUNS)
+        self.isfile = mocker.patch("os.path.isfile", return_value=True)
+        self.isdir = mocker.patch("os.path.isdir", return_value=False)
+        self.validate_experiment_name = mocker.patch("commands.experiment.submit.validate_experiment_name")
+        self.validate_script_location = mocker.patch("commands.experiment.submit.validate_script_location")
+        self.validate_script_folder_location = mocker.patch(
+            "commands.experiment.submit.validate_script_folder_location")
+        self.get_default_script_location = mocker.patch(
+            "commands.experiment.submit.get_default_script_location")
 
 
 @pytest.fixture
 def prepare_mocks(mocker) -> SubmitMocks:
-    submit_experiment_mock = mocker.patch("commands.experiment.submit.submit_experiment",
-                                          return_value=SUBMITTED_RUNS)
-    isfile_mock = mocker.patch("os.path.isfile", return_value=True)
-    isdir_mock = mocker.patch("os.path.isdir", return_value=True)
-
-    return SubmitMocks(mocker=mocker, submit_experiment=submit_experiment_mock, isfile=isfile_mock, isdir=isdir_mock)
-
-
-def check_asserts(prepare_mocks: SubmitMocks, submit_experiment_count=1, isfile_count=1, isdir_count=1):
-    assert prepare_mocks.isfile.call_count == isfile_count, "Script location was not checked"
-    assert prepare_mocks.get_namespace.call_count == submit_experiment_count, "Experiment wasn't submitted"
-    assert prepare_mocks.isdir.call_count == isdir_count, "Dir wasn't checked"
+    return SubmitMocks(mocker=mocker)
 
 
 def test_missing_file(prepare_mocks: SubmitMocks):
-    prepare_mocks.isfile.return_value = False
+    prepare_mocks.validate_script_location.side_effect = SystemExit(2)
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
-    assert 'Cannot find script:' in result.output
+    assert result.exit_code == 2
 
 
 def test_missing_folder(prepare_mocks: SubmitMocks):
-    prepare_mocks.isdir.return_value = False
+    prepare_mocks.validate_script_folder_location.side_effect = SystemExit(2)
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-sfl", SCRIPT_FOLDER])
-    assert 'Cannot find script folder:' in result.output
+    assert result.exit_code == 2
 
 
 def test_submit_experiment_failure(prepare_mocks: SubmitMocks):
@@ -79,6 +77,7 @@ def test_submit_experiment_failure(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert f"Problems during submitting experiment:{exe_message}" in result.output
+    assert result.exit_code == 1
 
 
 def test_submit_experiment_success(prepare_mocks: SubmitMocks):
@@ -91,3 +90,72 @@ def test_submit_experiment_success(prepare_mocks: SubmitMocks):
 def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '-n', 'Wrong_&name'])
     assert 'name must consist of lower case alphanumeric characters' in result.output
+    assert result.exit_code == 2
+
+
+def test_submit_default_script_name(prepare_mocks: SubmitMocks):
+    script_location = 'some-dir/'
+    prepare_mocks.get_default_script_location.return_value = os.path.join(script_location,
+                                                                          DEFAULT_SCRIPT_NAME)
+
+    runner = CliRunner()
+    parameters = [script_location]
+
+    result = runner.invoke(submit, parameters, input="y")
+
+    assert result.exit_code == 0
+
+
+def test_submit_default_script_name_wrong_dir(prepare_mocks: SubmitMocks):
+    script_location = 'wrong-dir/'
+    prepare_mocks.isdir.return_value = True
+    prepare_mocks.get_default_script_location.side_effect = SystemExit(2)
+
+    runner = CliRunner()
+    parameters = [script_location]
+
+    result = runner.invoke(submit, parameters, input="y")
+
+    assert result.exit_code == 2
+
+
+def test_submit_invalid_script_folder_location(prepare_mocks: SubmitMocks):
+    prepare_mocks.isdir.return_value = True
+    prepare_mocks.validate_script_folder_location.side_effect = SystemExit(2)
+
+    script_folder_location = '/wrong-directory'
+
+    runner = CliRunner()
+    parameters = [SCRIPT_LOCATION, '--script_folder_location', script_folder_location]
+
+    result = runner.invoke(submit, parameters, input="y")
+    assert result.exit_code == 2
+
+
+def test_validate_script_location(prepare_mocks: SubmitMocks):
+    prepare_mocks.isdir.return_value = False
+    prepare_mocks.isfile.return_value = False
+
+    with pytest.raises(SystemExit):
+        validate_script_location('bla.py')
+
+
+def test_validate_script_folder_location(prepare_mocks: SubmitMocks):
+    prepare_mocks.isdir.return_value = False
+
+    with pytest.raises(SystemExit):
+        validate_script_folder_location('/bla')
+
+
+def test_get_default_script_location_missing_file(prepare_mocks: SubmitMocks):
+    prepare_mocks.isfile.return_value = False
+    with pytest.raises(SystemExit):
+        get_default_script_location('/bla')
+
+
+def test_get_default_script_location(prepare_mocks: SubmitMocks):
+    prepare_mocks.isfile.return_value = True
+
+    test_dir = '/bla'
+
+    assert get_default_script_location(test_dir) == os.path.join(test_dir, DEFAULT_SCRIPT_NAME)

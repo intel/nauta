@@ -36,6 +36,8 @@ from commands.experiment.common import validate_experiment_name
 
 log = initialize_logger('commands.submit')
 
+DEFAULT_SCRIPT_NAME = "experiment.py"
+
 HELP = "Command used to submitting training scripts for a single-node tensorflow training."
 HELP_N = "Name for this experiment."
 HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. " \
@@ -45,6 +47,30 @@ HELP_T = "Name of a template used to create a deployment. By default, this is a 
          " Issuing dlsctl experiment template_list command."
 HELP_PR = "Values (set or range) of a single parameter. "
 HELP_PS = "Set of values of one or several parameters."
+
+
+def validate_script_location(script_location: str):
+    if not (os.path.isfile(script_location) or os.path.isdir(script_location)):
+        click.echo(f'Cannot find: {script_location}. Make sure that provided path is correct.')
+        sys.exit(2)
+
+
+def get_default_script_location(script_directory: str) -> str:
+    default_script_location = os.path.join(script_directory, DEFAULT_SCRIPT_NAME)
+    if not os.path.isfile(default_script_location):
+        click.echo(f'Cannot find script: {DEFAULT_SCRIPT_NAME} in directory: {script_directory}. '
+                   f'If path to directory was passed as submit command argument, then {DEFAULT_SCRIPT_NAME} file '
+                   f'has to exist in that directory.')
+        sys.exit(2)
+    else:
+        return default_script_location
+
+
+def validate_script_folder_location(script_folder_location: str):
+    if not os.path.isdir(script_folder_location):
+        click.echo(f'Cannot find: {script_folder_location}.'
+                   f' script_folder_location must be a path to existing directory.')
+        sys.exit(2)
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='s')
@@ -61,14 +87,13 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
            parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
+    validate_script_location(script_location)
 
-    if not os.path.isfile(script_location):
-        click.echo(f'Cannot find script: {script_location}. Make sure that provided path is correct.')
-        sys.exit(1)
+    if os.path.isdir(script_location):
+        script_location = get_default_script_location(script_directory=script_location)
 
-    if script_folder_location and not os.path.isdir(script_folder_location):
-        click.echo(f'Cannot find script folder: {script_folder_location}. Make sure that provided path is correct.')
-        sys.exit(1)
+    if script_folder_location:
+        validate_script_folder_location(script_folder_location)
 
     click.echo("Submitting experiments.")
 
