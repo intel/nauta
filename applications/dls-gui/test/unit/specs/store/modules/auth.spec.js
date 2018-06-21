@@ -31,7 +31,8 @@ import Q from 'q';
 describe('VUEX modules auth', () => {
   const state = {
     logged: false,
-    username: 'anonymous'
+    username: 'anonymous',
+    authLoadingState: false
   };
 
   describe('Getters', () => {
@@ -44,6 +45,11 @@ describe('VUEX modules auth', () => {
       const result = getters.username(state);
       expect(result).to.equal(state.username);
     });
+
+    it('authLoadingState', () => {
+      const result = getters.authLoadingState(state);
+      expect(result).to.equal(state.authLoadingState);
+    });
   });
 
   describe('Mutations', () => {
@@ -53,6 +59,12 @@ describe('VUEX modules auth', () => {
       mutations.setAuthority(state, {logged, username});
       expect(state.logged).to.deep.equal(logged);
       expect(state.username).to.deep.equal(username);
+    });
+
+    it('setAuthLoadingState', () => {
+      const isActive = true;
+      mutations.setAuthLoadingState(state, isActive);
+      expect(state.authLoadingState).to.equal(isActive);
     });
   });
 
@@ -72,9 +84,10 @@ describe('VUEX modules auth', () => {
       });
 
       it('should show error if internal server error occurs', (done) => {
-        expectedMutations = [];
+        expectedMutations = [
+          {type: 'setAuthLoadingState', payload: true}
+        ];
         expectedActions = [
-          {type: 'hideSpinner'},
           {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
         ];
         mock.onPost('/api/auth/decode').reply(500, 'Internal Server Error');
@@ -82,20 +95,21 @@ describe('VUEX modules auth', () => {
       });
 
       it('should show invalid token page if token is invalid', (done) => {
-        expectedMutations = [];
-        expectedActions = [
-          {type: 'hideSpinner'}
+        expectedMutations = [
+          {type: 'setAuthLoadingState', payload: true}
         ];
+        expectedActions = [];
         mock.onPost('/api/auth/decode').reply(400, {response: {status: 400}});
         testAction(actions.loadAuthority, token, state, expectedMutations, expectedActions, done);
       });
 
       it('should set user session if authorized', (done) => {
         expectedMutations = [
-          {type: 'setAuthority', payload: {logged: true, username: 'test'}}
+          {type: 'setAuthLoadingState', payload: true},
+          {type: 'setAuthority', payload: {logged: true, username: 'test'}},
+          {type: 'setAuthLoadingState', payload: false}
         ];
         expectedActions = [
-          {type: 'hideSpinner'},
           {type: 'showMenuToggleBtn'},
           {type: 'showUserbox'}
         ];

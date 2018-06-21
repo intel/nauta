@@ -21,10 +21,10 @@
 
 <template>
   <div>
-    <v-container v-if="spinnerParams.visible" fill-height justify-center>
+    <v-container v-if="isLoadingAuth" fill-height justify-center>
       <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
     </v-container>
-    <v-layout row wrap v-if="!spinnerParams.visible">
+    <v-layout row wrap v-if="!isLoadingAuth">
       <v-flex xs12 align-center>
         <h1>WE'RE SORRY, UNEXPECTED ERROR OCCURRED</h1>
       </v-flex>
@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      spinnerParams: 'getSpinnerParams'
+      isLoadingAuth: 'authLoadingState'
     })
   }
 }

@@ -25,6 +25,7 @@ import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
 const state = {
   fetchingDataActive: false,
+  initialized: false,
   experiments: {
     data: [],
     params: [],
@@ -56,7 +57,8 @@ export const getters = {
   experimentsPageNumber: state => state.experiments.stats.pageNumber,
   experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount,
   lastUpdate: state => state.experiments.stats.datetime,
-  fetchingDataActive: state => state.fetchingDataActive
+  fetchingDataActive: state => state.fetchingDataActive,
+  initializedDataFlag: state => state.initialized
 };
 
 export const actions = {
@@ -70,6 +72,7 @@ export const actions = {
         commit('setFilterColumnValues', {data: data.filterColumnValues});
         commit('setExperimentsStats', {data: data.stats});
         commit('setFetchingDataFlag', {isActive: false});
+        commit('setInitializedData');
       })
       .catch((err) => {
         if (err && err.response && err.response.status && err.response.status === 401) {
@@ -97,6 +100,9 @@ export const mutations = {
   },
   setFetchingDataFlag: (state, {isActive}) => {
     state.fetchingDataActive = isActive;
+  },
+  setInitializedData: (state) => {
+    state.initialized = true;
   }
 };
 

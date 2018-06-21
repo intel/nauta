@@ -21,7 +21,10 @@
 
 <template>
     <v-layout row wrap>
-      <v-flex xs12>
+      <v-container v-if="!isLogged || (!isInitializedData && fetchingDataActive)" fill-height justify-center>
+        <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
+      </v-container>
+      <v-flex v-if="isLogged && isInitializedData" xs12>
         <v-card>
           <v-card-title>
             <h2>Models</h2>
@@ -186,7 +189,10 @@ export default {
       experimentsTotalPagesCount: 'experimentsTotalPagesCount',
       lastUpdate: 'lastUpdate',
       fetchingDataActive: 'fetchingDataActive',
-      tensorMode: 'tensorMode'
+      tensorMode: 'tensorMode',
+      isCheckingAuth: 'authLoadingState',
+      isInitializedData: 'initializedDataFlag',
+      isLogged: 'isLogged'
     }),
     paginationStats: function () {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;

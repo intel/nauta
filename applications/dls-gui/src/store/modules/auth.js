@@ -30,30 +30,33 @@ const TOKEN_COOKIE_KEY = 'TOKEN';
 
 const state = {
   logged: false,
-  username: 'anonymous'
+  username: 'anonymous',
+  authLoadingState: false
 };
 
 export const getters = {
   isLogged: state => state.logged,
-  username: state => state.username
+  username: state => state.username,
+  authLoadingState: state => state.authLoadingState
 };
 
 export const actions = {
   loadAuthority: ({commit, dispatch}, token) => {
     const savedToken = token || cookies.get(TOKEN_COOKIE_KEY);
-    decodeAuthK8SToken(savedToken)
+    commit('setAuthLoadingState', true);
+    return decodeAuthK8SToken(savedToken)
       .then((res) => {
         const logged = true;
         const username = res.data.decoded.username;
         cookies.set(TOKEN_COOKIE_KEY, savedToken);
         commit('setAuthority', {logged, username});
-        dispatch('hideSpinner');
         dispatch('showMenuToggleBtn');
         dispatch('showUserbox');
+        commit('setAuthLoadingState', false);
         router.push({path: '/models'})
       })
       .catch((err) => {
-        dispatch('hideSpinner');
+        commit('setAuthLoadingState', false);
         if (err && err.response && err.response.status && Math.round(err.response.status / 100) === INVALID_TOKEN_STATUS_GROUP) {
           router.push({path: '/invalid_token'});
         } else {
@@ -78,6 +81,9 @@ export const mutations = {
   setAuthority: (state, {logged, username}) => {
     state.logged = logged;
     state.username = username;
+  },
+  setAuthLoadingState: (state, isActive) => {
+    state.authLoadingState = isActive;
   }
 };
 

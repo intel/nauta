@@ -29,6 +29,7 @@ import RESPONSE_MESSAGES from '../../../../../src/utils/constants/messages';
 describe('VUEX modules experiments', () => {
   const state = {
     fetchingDataActive: false,
+    initialized: false,
     experiments: {
       data: [],
       params: [],
@@ -108,6 +109,11 @@ describe('VUEX modules experiments', () => {
       const result = getters.filteredDataCount(state);
       expect(result).to.equal(state.experiments.stats.filteredDataCount);
     });
+
+    it('initializedDataFlag', () => {
+      const result = getters.initializedDataFlag(state);
+      expect(result).to.equal(state.initialized);
+    });
   });
 
   describe('Mutations', () => {
@@ -139,6 +145,11 @@ describe('VUEX modules experiments', () => {
       const data = {options: [1], current: [2]};
       mutations.setFilterColumnValues(state, {data});
       expect(state.experiments.filterByColumnValue).to.deep.equal(data);
+    });
+
+    it('setInitializedData', () => {
+      mutations.setInitializedData(state);
+      expect(state.initialized).to.equal(true);
     });
   });
 

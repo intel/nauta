@@ -31,9 +31,6 @@ describe('VUEX modules app', () => {
     userbox: {
       visible: false
     },
-    spinner: {
-      visible: true
-    },
     error: {
       content: '',
       type: 'warning',
@@ -56,11 +53,6 @@ describe('VUEX modules app', () => {
     it('getUserboxParams', () => {
       const result = getters.getUserboxParams(state);
       expect(result).to.deep.equal(state.userbox);
-    });
-
-    it('getSpinnerParams', () => {
-      const result = getters.getSpinnerParams(state);
-      expect(result).to.deep.equal(state.spinner);
     });
 
     it('errorType', () => {
@@ -113,11 +105,6 @@ describe('VUEX modules app', () => {
       expect(state.error.visible).to.deep.equal(false);
     });
 
-    it('setSpinnerVisibility', () => {
-      const visibility = true;
-      mutations.setSpinnerVisibility(state, visibility);
-      expect(state.spinner.visible).to.deep.equal(visibility);
-    });
   });
 
   describe('Actions', () => {
@@ -162,18 +149,6 @@ describe('VUEX modules app', () => {
     it('hideError', (done) => {
       testAction(actions.hideError, null, state, [
         { type: 'removeError' }
-      ], [], done);
-    });
-
-    it('showSpinner', (done) => {
-      testAction(actions.showSpinner, null, state, [
-        { type: 'setSpinnerVisibility', payload: true }
-      ], [], done);
-    });
-
-    it('hideSpinner', (done) => {
-      testAction(actions.hideSpinner, null, state, [
-        { type: 'setSpinnerVisibility', payload: false }
       ], [], done);
     });
 

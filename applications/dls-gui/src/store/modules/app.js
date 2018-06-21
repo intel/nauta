@@ -30,9 +30,6 @@ const state = {
   userbox: {
     visible: false
   },
-  spinner: {
-    visible: true
-  },
   error: {
     content: '',
     type: DEFAULT_BANNER_TYPE,
@@ -45,7 +42,6 @@ export const getters = {
   tensorMode: state => state.tensorMode,
   getMenuParams: state => state.menu,
   getUserboxParams: state => state.userbox,
-  getSpinnerParams: state => state.spinner,
   errorType: state => state.error.type,
   errorContent: state => state.error.content
 };
@@ -71,12 +67,6 @@ export const actions = {
   },
   hideError: ({commit}) => {
     commit('removeError');
-  },
-  showSpinner: ({commit}) => {
-    commit('setSpinnerVisibility', true);
-  },
-  hideSpinner: ({commit}) => {
-    commit('setSpinnerVisibility', false);
   },
   enableTensorMode: ({commit}) => {
     commit('setTensorMode', true)
@@ -105,9 +95,6 @@ export const mutations = {
     state.error.type = '';
     state.error.content = '';
     state.error.visible = false;
-  },
-  setSpinnerVisibility: (state, visibility) => {
-    state.spinner.visible = visibility;
   },
   setTensorMode: (state, enabled) => {
     state.tensorMode = enabled;
