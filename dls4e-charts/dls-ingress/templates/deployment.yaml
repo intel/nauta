@@ -43,6 +43,7 @@ spec:
             - --tcp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-tcp
             - --udp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-udp
             - --annotations-prefix=dls.ingress.kubernetes.io
+            - --ingress-class=dls-ingress
           env:
             - name: POD_NAME
               valueFrom:
