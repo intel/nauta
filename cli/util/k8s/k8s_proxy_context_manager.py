@@ -29,17 +29,22 @@ logger = initialize_logger(__name__)
 
 class K8sProxy():
 
-    def __init__(self, app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True):
-        self.app_name = app_name
+    def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
+                 app_name: str = None, number_of_retries: int = 0):
+        self.dls4e_app_name = dls4e_app_name
         self.external_port = port
         self.configure_draft = configure_draft
+        self.app_name = app_name
+        self.number_of_retries = number_of_retries
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
         try:
-            self.process, self.tunnel_port, self.container_port = kubectl.start_port_forwarding(self.app_name,
+            self.process, self.tunnel_port, self.container_port = kubectl.start_port_forwarding(self.dls4e_app_name,
                                                                                                 self.external_port,
-                                                                                                self.configure_draft)
+                                                                                                self.configure_draft,
+                                                                                                self.app_name,
+                                                                                                self.number_of_retries)
         except LocalPortOccupiedError as exe:
             raise exe
         except Exception as exe:

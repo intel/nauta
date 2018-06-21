@@ -58,7 +58,7 @@ def update_configuration(experiment_folder: str, script_location: str,
     try:
         modify_values_yaml(experiment_folder, script_location, script_parameters,
                            experiment_name=experiment_name, pack_type=pack_type, registry_port=internal_registry_port)
-        modify_dockerfile(experiment_folder, internal_registry_port)
+        modify_dockerfile(experiment_folder, script_location, internal_registry_port)
         modify_draft_toml(experiment_folder)
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
@@ -67,7 +67,7 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - end")
 
 
-def modify_dockerfile(experiment_folder: str, internal_registry_port: str):
+def modify_dockerfile(experiment_folder: str, script_location: str, internal_registry_port: str):
     log.debug("Modify dockerfile - start")
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
@@ -76,7 +76,8 @@ def modify_dockerfile(experiment_folder: str, internal_registry_port: str):
     with open(dockerfile_name, "r") as dockerfile:
         for line in dockerfile:
             if line.startswith("ADD training.py"):
-                dockerfile_temp_content = dockerfile_temp_content + common.prepare_list_of_files(experiment_folder)
+                if script_location:
+                    dockerfile_temp_content = dockerfile_temp_content + common.prepare_list_of_files(experiment_folder)
             elif line.startswith("FROM dls4e/tensorflow:1.8.0-py3"):
                 dockerfile_temp_content = dockerfile_temp_content + \
                                           f"FROM 127.0.0.1:{internal_registry_port}/dls4e/tensorflow:1.8.0-py3"
@@ -98,7 +99,9 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
 
     with open(values_yaml_filename, "r") as values_yaml_file:
         v = yaml.load(values_yaml_file)
-        v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
+
+        if "commandline" in v:
+            v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
         v["experimentName"] = experiment_name
         v["registry_port"] = str(registry_port)
 

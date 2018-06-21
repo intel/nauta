@@ -49,3 +49,17 @@ class K8sProxyCloseError(ExceptionWithMessage):
 class LocalPortOccupiedError(ExceptionWithMessage):
     """Error raised in case when app is not able to use a local port"""
     pass
+
+
+class SubmitExperimentError(ExceptionWithMessage):
+    """Error raised in case of any problems during experiment's submitting"""
+    pass
+
+
+class LaunchError(ExceptionWithMessage):
+    """Error raised in case of any problems with launching other apps"""
+    pass
+
+
+class ProxyClosingError(ExceptionWithMessage):
+    """Error raised in case of problems with closing local proxy"""

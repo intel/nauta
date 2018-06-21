@@ -75,9 +75,19 @@ def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
 
 
-def get_app_services(app_name: str) -> List[client.V1Service]:
+def get_app_services(dls4e_app_name: str = None, namespace: str = None,
+                     app_name: str = None) -> List[client.V1Service]:
     api = get_k8s_api()
-    return api.list_service_for_all_namespaces(label_selector='dls4e_app_name={}'.format(app_name)).items
+    selector = f'dls4e_app_name={dls4e_app_name}'
+    field_selector = ""
+    if app_name:
+        field_selector = f'metadata.name={app_name}'
+
+    if namespace:
+        return api.list_namespaced_service(namespace=namespace, label_selector=selector,
+                                           field_selector=field_selector).items
+    else:
+        return api.list_service_for_all_namespaces(label_selector=selector, field_selector=field_selector).items
 
 
 def get_app_namespace(app_name: str) -> str:

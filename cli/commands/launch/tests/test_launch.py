@@ -25,6 +25,7 @@ import webbrowser
 from click.testing import CliRunner
 import pytest
 
+from util import launcher
 from commands.launch import launch
 from util.system import get_current_os, OS
 
@@ -43,7 +44,7 @@ def mocked_k8s_config(mocker):
 
 @pytest.fixture()
 def mocked_browser_check(mocker):
-    browser_check_mock = mocker.patch('commands.launch.launch.is_gui_browser_available')
+    browser_check_mock = mocker.patch('util.launcher.is_gui_browser_available')
     browser_check_mock.return_value = True
     return browser_check_mock
 
@@ -51,12 +52,12 @@ def mocked_browser_check(mocker):
 def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_check, mocker):
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             side_effect=[(Mock, 1000, 2000)])
-    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.launch.input")
+    wfc_mock = mocker.patch("util.launcher.wait_for_connection")
+    browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
+    input_mock = mocker.patch("util.launcher.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.launch.socat")
+        socat_mock = mocker.patch("util.launcher.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
@@ -75,12 +76,12 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
                             side_effect=[(Mock, 1000, 2000)])
     kube_config_mock = mocker.patch('util.k8s.k8s_info.config.load_kube_config')
     kube_client_mock = mocker.patch('kubernetes.client.configuration.Configuration')
-    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.launch.input")
+    wfc_mock = mocker.patch("util.launcher.wait_for_connection")
+    browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
+    input_mock = mocker.patch("util.launcher.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.launch.socat")
+        socat_mock = mocker.patch("util.launcher.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
@@ -99,12 +100,12 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
 def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_check, mocker):
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             side_effect=[(Mock, 1000, 2000)])
-    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.launch.input")
+    wfc_mock = mocker.patch("util.launcher.wait_for_connection")
+    browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
+    input_mock = mocker.patch("util.launcher.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.launch.socat")
+        socat_mock = mocker.patch("util.launcher.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME, DISABLE_BROWSER_ARG])
@@ -121,12 +122,12 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_
 def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check, mocker):
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
     spf_mock.return_value = 0
-    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    wfc_mock = mocker.patch("util.launcher.wait_for_connection")
+    browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.launch.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.launch.socat")
+        socat_mock = mocker.patch("util.launcher.socat")
 
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
@@ -145,12 +146,12 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
 
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
     spf_mock.return_value = 0
-    wfc_mock = mocker.patch("commands.launch.launch.wait_for_connection")
-    browser_mock = mocker.patch("commands.launch.launch.webbrowser.open_new")
+    wfc_mock = mocker.patch("util.launcher.wait_for_connection")
+    browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("commands.launch.launch.input")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("commands.launch.launch.socat")
+        socat_mock = mocker.patch("util.launcher.socat")
 
     runner = CliRunner()
     result = runner.invoke(launch.launch, [APP_NAME])
@@ -170,18 +171,18 @@ def test_is_gui_browser_available(mocker):
     webbrowser_get_mock = mocker.patch('webbrowser.get')
     webbrowser_get_mock.return_value = webbrowser.Opera()
 
-    assert launch.is_gui_browser_available() is True
+    assert launcher.is_gui_browser_available() is True
 
 
 def test_is_gui_browser_available_text_browser(mocker):
     webbrowser_get_mock = mocker.patch('webbrowser.get')
     webbrowser_get_mock.return_value = webbrowser.GenericBrowser(name='')
 
-    assert launch.is_gui_browser_available() is False
+    assert launcher.is_gui_browser_available() is False
 
 
 def test_is_gui_browser_available_no_browser(mocker):
     webbrowser_get_mock = mocker.patch('webbrowser.get')
     webbrowser_get_mock.side_effect = webbrowser.Error
 
-    assert launch.is_gui_browser_available() is False
+    assert launcher.is_gui_browser_available() is False

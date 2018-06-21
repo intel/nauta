@@ -60,7 +60,7 @@ class Run(PlatformResource):
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
         return cls(name=object_dict['metadata']['name'],
-                   parameters=object_dict['spec']['parameters'],
+                   parameters=object_dict.get('spec').get('parameters'),
                    creation_timestamp=object_dict['metadata']['creationTimestamp'],
                    submitter=object_dict['metadata']['namespace'],
                    state=RunStatus[object_dict['spec']['state']] if 'state' in object_dict['spec'] else "",
@@ -73,9 +73,7 @@ class Run(PlatformResource):
     @property
     def cli_representation(self):
         return Run.RunCliModel(name=self.name,
-                               parameters=textwrap.fill(
-                                   ' '.join(self.parameters),
-                                   width=30),
+                               parameters=textwrap.fill(' '.join(self.parameters), width=30) if self.parameters else "",
                                metrics=textwrap.fill(
                                    ' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
                                    width=30),

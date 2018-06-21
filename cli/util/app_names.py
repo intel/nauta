@@ -29,3 +29,4 @@ class DLS4EAppNames(Enum):
     WEB_GUI = "gui"
     TENSORBOARD = "tensorboard"
     INGRESS = "ingress"
+    JUPYTER = "jupyter"

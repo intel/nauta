@@ -22,6 +22,7 @@
 import subprocess
 import time
 import urllib.request
+
 from typing import Optional
 
 import platform_resources.users as users_api
@@ -39,8 +40,8 @@ MAX_NUMBER_OF_TRIES = 10
 PORT_FROM_FREE_POOL = 3000
 
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True) \
-        -> (subprocess.Popen, Optional[int], int):
+def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
+                          app_name: str = None, number_of_retries: int = 0) -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -63,7 +64,12 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
     try:
         service_node_port = None
         namespace = None
-        app_services = get_app_services(k8s_app_name.value)
+        k8s_app_name_value = None
+
+        if k8s_app_name:
+            k8s_app_name_value = k8s_app_name.value
+        app_services = get_app_services(k8s_app_name_value, namespace, app_name)
+
         if app_services:
             service_node_port = app_services[0].spec.ports[0].node_port
             if service_node_port:
@@ -115,7 +121,20 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
 
         logger.debug(port_forward_command)
 
-        process = system.execute_subprocess_command(port_forward_command)
+        process = None
+        if number_of_retries:
+            for i in range(number_of_retries-1):
+                try:
+                    process = system.execute_subprocess_command(port_forward_command)
+                except Exception:
+                    logger.exception("Error during setting up proxy - retrying.")
+                else:
+                    break
+                time.sleep(5)
+
+        if not process:
+            process = system.execute_subprocess_command(port_forward_command)
+
         wait_for_connection_readiness('localhost', service_node_port)
 
     except KubectlIntError as exe:

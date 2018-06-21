@@ -1,0 +1,22 @@
+# Default values for charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+JupyterPort: 8888
+
+image:
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+
+resources:
+  requests:
+    cpu: 0.01
+    memory: 1Gi
+  #limits:
+  #  cpu: 2
+  #  memory: 4Gi
+
+
+experimentName: ''

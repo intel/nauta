@@ -94,7 +94,7 @@ def test_modify_dockerfile(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_DOCKERFILE)
     sh_move_mock = mocker.patch("shutil.move")
 
-    tf_training.modify_dockerfile(EXPERIMENT_FOLDER, "12345")
+    tf_training.modify_dockerfile(EXPERIMENT_FOLDER, "script_location", "12345")
 
     assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"

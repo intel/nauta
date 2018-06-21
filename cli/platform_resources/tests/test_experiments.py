@@ -108,8 +108,8 @@ def test_generate_experiment_name_if_name_provided_and_exp_no_exists(mock_k8s_ap
 
 def test_generate_experiment_name_if_exp_exists_and_name_provided(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_namespaced_custom_object.return_value = LIST_EXPERIMENTS_RESPONSE_RAW
-    result = generate_experiment_name('script', NAMESPACE, 'experiment-2')
-    assert result == 'experiment-2-1'
+    result = generate_experiment_name('script', NAMESPACE, 'test-experiment')
+    assert result == 'test-experiment-1'
     assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 1
 
 

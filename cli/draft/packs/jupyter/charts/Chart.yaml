@@ -1,0 +1,4 @@
+name: jupyter
+apiVersion: v1
+description: Pack with Jupyter Notebook for purpose of interactive sessions
+version: 0.1.0

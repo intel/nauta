@@ -1,0 +1,16 @@
+apiVersion: "aggregator.aipg.intel.com/v1"
+kind: Run
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  experiment-name: {{ .Values.experimentName }}
+  pod-selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      draft: {{ .Values.draft }}
+      release: {{ .Release.Name }}
+  pod-count: 1
+  parameters:
+  metrics:
+    accuracy: "52.322"
+  state: ""
