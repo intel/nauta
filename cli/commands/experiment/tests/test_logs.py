@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-from unittest.mock import Mock
-
 from click.testing import CliRunner
 
 from commands.experiment import logs
@@ -43,9 +41,8 @@ def test_show_logs_success(mocker):
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
 
-    port_forwarding_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
+    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
-    port_forwarding_mock.return_value = Mock(), 123, 123
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
     runner = CliRunner()
@@ -53,7 +50,7 @@ def test_show_logs_success(mocker):
 
     print(result)
 
-    assert port_forwarding_mock.call_count == 1, "port forwarding was not initiated"
+    assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs were not retrieved"
 
@@ -63,8 +60,8 @@ def test_show_logs_failure(mocker):
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs.side_effect = RuntimeError
 
-    port_forwarding_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
-    port_forwarding_mock.return_value = Mock(), 123, 123
+    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
     mocker.patch("commands.experiment.logs.sys.exit")
@@ -73,7 +70,7 @@ def test_show_logs_failure(mocker):
 
     result = runner.invoke(logs.logs, ['fake-experiment'])
 
-    assert port_forwarding_mock.call_count == 1, "port forwarding was not initiated"
+    assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs retrieval was not called"
     assert result.output == 'Failed to get experiment logs.\n'

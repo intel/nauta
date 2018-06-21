@@ -19,6 +19,10 @@
 # and approved by Intel in writing.
 #
 
+import urllib.request
+from urllib.error import URLError
+import time
+
 from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
@@ -27,8 +31,11 @@ from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccu
 logger = initialize_logger(__name__)
 
 
-class K8sProxy():
+class TunnelSetupError(RuntimeError):
+    pass
 
+
+class K8sProxy:
     def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
                  app_name: str = None, number_of_retries: int = 0):
         self.dls4e_app_name = dls4e_app_name
@@ -45,6 +52,11 @@ class K8sProxy():
                                                                                                 self.configure_draft,
                                                                                                 self.app_name,
                                                                                                 self.number_of_retries)
+            try:
+                K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port)
+            except Exception as ex:
+                self.process.kill()
+                raise ex
         except LocalPortOccupiedError as exe:
             raise exe
         except Exception as exe:
@@ -62,3 +74,14 @@ class K8sProxy():
             error_message = "k8s_proxy - exit - error"
             logger.exception(error_message)
             raise K8sProxyCloseError(error_message) from exe
+
+    @staticmethod
+    def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
+        for _ in range(tries):
+            try:
+                urllib.request.urlopen(f'http://{address}:{port}')
+                return
+            except (ConnectionError, URLError) as e:
+                logger.error(f'can not connect to {address}:{port}. Error: {e}')
+                time.sleep(1)
+        raise TunnelSetupError(f'connection on {address}:{port} NOT READY!')

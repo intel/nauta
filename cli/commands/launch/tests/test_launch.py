@@ -19,7 +19,6 @@
 # and approved by Intel in writing.
 #
 
-from unittest.mock import Mock
 import webbrowser
 
 from click.testing import CliRunner
@@ -49,9 +48,9 @@ def mocked_browser_check(mocker):
     return browser_check_mock
 
 
+# noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_check, mocker):
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
-                            side_effect=[(Mock, 1000, 2000)])
+    spf_mock = mocker.patch("util.launcher.K8sProxy")
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.input")
@@ -68,12 +67,13 @@ def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_che
     assert input_mock.call_count == 1, "enter wasn't prompted"
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyUnboundLocalVariable
         assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
+# noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, mocker):
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
-                            side_effect=[(Mock, 1000, 2000)])
+    spf_mock = mocker.patch("util.launcher.K8sProxy")
     kube_config_mock = mocker.patch('util.k8s.k8s_info.config.load_kube_config')
     kube_client_mock = mocker.patch('kubernetes.client.configuration.Configuration')
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
@@ -94,12 +94,13 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
     assert input_mock.call_count == 1, "enter wasn't prompted"
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyUnboundLocalVariable
         assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
+# noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_check, mocker):
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
-                            side_effect=[(Mock, 1000, 2000)])
+    spf_mock = mocker.patch("util.launcher.K8sProxy")
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.input")
@@ -116,11 +117,13 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_
     assert input_mock.call_count == 1, "enter wasn't prompted"
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyUnboundLocalVariable
         assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
+# noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check, mocker):
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
+    spf_mock = mocker.patch("util.launcher.K8sProxy")
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
@@ -138,13 +141,15 @@ def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check,
     assert input_mock.call_count == 0, "enter was prompted"
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyUnboundLocalVariable
         assert socat_mock.start.call_count == 0, "socat was started"
 
 
+# noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_check, mocker):
     mocked_browser_check.return_value = False
 
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding")
+    spf_mock = mocker.patch("util.launcher.K8sProxy")
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
@@ -162,6 +167,7 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
     assert input_mock.call_count == 0, "enter was prompted"
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        # noinspection PyUnboundLocalVariable
         assert socat_mock.start.call_count == 0, "socat was started"
 
     assert result.exit_code == 1
