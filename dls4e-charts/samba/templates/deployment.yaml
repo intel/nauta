@@ -42,6 +42,13 @@ spec:
         resources:
           limits:
             memory: 512Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/samba-health.sh
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
         env:
         - name: INPUT_PVC
           value: {{ .Release.Name }}-{{ .Chart.Name }}-input

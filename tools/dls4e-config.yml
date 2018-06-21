@@ -58,7 +58,7 @@ images:
   dls4e/samba:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/kubectl"
+      BASE_IMAGE: "dls4e/python36"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
   dls4e/tiller:
