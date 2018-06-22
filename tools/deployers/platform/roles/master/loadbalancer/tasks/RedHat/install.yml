@@ -18,6 +18,20 @@
     - Reload Systemd
     - Restart Nginx
 
-- name: Disable SELinux
-  selinux:
-    state: disabled
+- seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  with_items: "{{ kubernetes_network.external_ports }}"
+
+- seport:
+    ports: 443-449
+    proto: tcp
+    setype: http_port_t
+    state: present
