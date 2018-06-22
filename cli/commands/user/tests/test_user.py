@@ -23,12 +23,11 @@ import base64
 
 import pytest
 from click.testing import CliRunner
+from unittest.mock import patch, mock_open
 
 from platform_resources.user_model import User, UserStatus
-
 from commands.user.create import check_users_presence, generate_kubeconfig, create
 from util.helm import delete_user, delete_helm_release
-
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -176,3 +175,115 @@ def test_create_user_incorrect_name(mocker):  # noqa: F811
 
     assert vun_mock.call_count == 1, "username wasn't validated"
     assert icu_mock.call_count == 0, "admin wasn't checked"
+
+
+class CreateUserMock():
+    def __init__(self, cup: None, esc: None, gut: None, vun: None, icu: None, opj: None, ccl: None,
+                 cnm: None, gkh: None):
+        self.cup = cup
+        self.esc = esc
+        self.gut = gut
+        self.vun = vun
+        self.icu = icu
+        self.opj = opj
+        self.ccl = ccl
+        self.cnm = cnm
+        self.gkh = gkh
+
+
+@pytest.fixture
+def prepare_mocks(mocker) -> CreateUserMock:
+    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=False)
+    esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
+    gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
+    vun_mock = mocker.patch("commands.user.create.validate_user_name")
+    icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=True)
+    opj_mock = mocker.patch("os.path.join", return_value="folder")
+    config_class_mock = mocker.patch('commands.user.create.Config')
+    config_instance_mock = config_class_mock.return_value
+    config_instance_mock.config_path = "test"
+    config_map_class_mock = mocker.patch("commands.user.create.DLS4EConfigMap")
+    config_map_instance = config_map_class_mock.return_value
+    config_map_instance.tiller_location = "image_tiller"
+
+    gkh_mock = mocker.patch("commands.user.create.get_kubectl_host")
+    gkh_mock.return_value = "localhost"
+
+    return CreateUserMock(cup=cup_mock, esc=esc_mock, gut=gut_mock, vun=vun_mock, icu=icu_mock, opj=opj_mock,
+                          ccl=config_instance_mock, cnm=config_map_instance, gkh=gkh_mock)
+
+
+def check_asserts(prepare_mocks: CreateUserMock, cup_count=1, esc_count=1, gut_count=1, vun_count=1, icu_count=1,
+                  opj_count=1, gkh_count=1):
+    assert prepare_mocks.cup.call_count == cup_count, "User presence wasn't verified."
+    assert prepare_mocks.esc.call_count == esc_count, "User wasn't created."
+    assert prepare_mocks.gut.call_count == gut_count, "Token wasn't taken."
+    assert prepare_mocks.vun.call_count == vun_count, "User wasn't validated."
+    assert prepare_mocks.icu.call_count == icu_count, "Users wasn't checked as an admin."
+    assert prepare_mocks.opj.call_count == opj_count, "Folder wasn't generated."
+    assert prepare_mocks.gkh.call_count == gkh_count, "Kubectl host wasn't taken"
+
+
+def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username])
+
+    assert f"Configuration has been saved to the config.{test_username} file." in result.output
+
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_success_display_config(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username, "-l"])
+
+    assert "Please use the following kubectl config to connect" in result.output
+
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_success_with_filename(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+    filename = "test-filename"
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username, "-f", filename])
+
+    assert f"Configuration has been saved to the {filename} file." in result.output
+
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_success_with_error_saving_file(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+    filename = "test-filename"
+    m = mock_open()
+    with patch("builtins.open", m) as mocked_file:
+        mocked_file.return_value.__enter__.side_effect = RuntimeError()
+        result = runner.invoke(create, [test_username, "-f", filename])
+
+    assert "Content of the generated config file is as follows. Please copy it to a file manually." in result.output
+
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_success_with_error_creating_file(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+
+    gkc_mock = mocker.patch("commands.user.create.generate_kubeconfig", side_effect=RuntimeError)
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username])
+
+    assert "Problems during creation of the file with user's configuration." in result.output
+    assert gkc_mock.call_count == 1
+    check_asserts(prepare_mocks)

@@ -75,12 +75,16 @@ ADD_USER_ERROR_DESCRIPTION = "User has not been created. To get more information
 REMOVE_USER_ERROR_DESCRIPTION = "Partially created user has not been removed successfully - " \
                                 "please remove the user manually."
 
+DEFAULT_FILENAME = "config.{}"
 
-@click.argument('username')
+
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
+@click.argument('username')
+@click.option("-l", "--list_only", is_flag=True)
+@click.option("-f", "--filename")
 @common_options()
 @pass_state
-def create(state: State, username: str):
+def create(state: State, username: str, list_only: bool, filename: str):
     """
     Adds a new user with a name given as a parameter.
 
@@ -143,10 +147,35 @@ def create(state: State, username: str):
         sys.exit(1)
 
     click.echo(f"User {username} has been added successfully.")
-    click.echo("Please use the following kubectl config to connect to this user.")
-    click.echo("----------------------------------------------------------------")
-    click.echo(generate_kubeconfig(username, username, get_kubectl_host(with_port=True),
-                                   users_password, ""))
+
+    try:
+        kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(with_port=True),
+                                         users_password, "")
+    except Exception:
+        error_msg = "Problems during creation of the file with user's configuration."
+        log.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
+
+    if list_only:
+        click.echo("Please use the following kubectl config to connect to this user.")
+        click.echo("----------------------------------------------------------------")
+        click.echo(kubeconfig)
+    else:
+        if not filename:
+            filename = DEFAULT_FILENAME.format(username)
+        try:
+            with open(filename, "w") as file:
+                file.write(kubeconfig)
+
+            click.echo(f"Configuration has been saved to the {filename} file.")
+        except Exception:
+            error_msg = "File with configuration wasn't saved."
+            log.exception(error_msg)
+            click.echo(error_msg)
+            click.echo("Content of the generated config file is as follows. Please copy it to a file manually.")
+            click.echo(kubeconfig)
+            sys.exit(1)
 
 
 def generate_kubeconfig(username: str, namespace: str, address: str, token: str, cacrt: str) -> str:
