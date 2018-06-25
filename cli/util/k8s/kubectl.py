@@ -27,7 +27,7 @@ from typing import Optional
 import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
-from util.exceptions import KubectlIntError, LocalPortOccupiedError
+from util.exceptions import KubectlIntError, KubectlConnectionError, LocalPortOccupiedError
 from draft.cmd import set_registry_port
 from util.k8s.k8s_info import get_app_services, find_namespace
 from util.app_names import DLS4EAppNames
@@ -176,3 +176,12 @@ def delete_k8s_object(kind: str, name: str):
     logger.debug(f"delete_k8s_object - output : {err_code} - {output}")
     if err_code:
         raise RuntimeError(f"Error when deleting k8s object: {output}")
+
+
+def check_connection_to_cluster():
+    check_connection_cmd = ['kubectl', 'get', 'pods']
+    logger.debug(check_connection_cmd)
+    output, err_code = system.execute_system_command(check_connection_cmd)
+    logger.debug(f"check_connection_to_cluster - output : {err_code} - {output}")
+    if err_code:
+        raise KubectlConnectionError(f"Cannot connect to K8S cluster: {output}")

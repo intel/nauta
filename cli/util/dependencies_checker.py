@@ -34,6 +34,7 @@ DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
 DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
 HELM_VERSION = LooseVersion('v2.9.1')
+HELM_SERVER_CONNECTION_TIMEOUT = 30
 
 
 class InvalidDependencyError(Exception):
@@ -69,7 +70,9 @@ DEPENDENCY_MAP = {'draft': DependencySpec(expected_version=DRAFT_MIN_VERSION,
                                                 match_exact_version=True),
                   'helm server': DependencySpec(expected_version=HELM_VERSION,
                                                 version_command=execute_system_command,
-                                                version_command_args=['helm', 'version', '--server'],
+                                                version_command_args=['helm', 'version', '--server', '--debug',
+                                                                      '--tiller-connection-timeout',
+                                                                      f'{HELM_SERVER_CONNECTION_TIMEOUT}'],
                                                 version_field='SemVer',
                                                 match_exact_version=True),
                   'docker client': DependencySpec(expected_version=DOCKER_MIN_VERSION,

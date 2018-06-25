@@ -27,6 +27,8 @@ from cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, DEPENDENCY_MAP
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
+from util.k8s.kubectl import check_connection_to_cluster
+from util.exceptions import KubectlConnectionError
 
 
 HELP = "Command verifies whether all external components required by dlsctl are installed " \
@@ -40,6 +42,13 @@ log = initialize_logger(__name__)
 @common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):
+    try:
+        check_connection_to_cluster()
+    except KubectlConnectionError as e:
+        log.exception(e)
+        click.echo(e)
+        sys.exit(1)
+
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='

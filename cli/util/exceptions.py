@@ -25,6 +25,10 @@ class KubectlIntError(Exception):
     pass
 
 
+class KubectlConnectionError(Exception):
+    """Error raised in case of problems with closing local proxy"""
+
+
 class InvalidRegularExpressionError(RuntimeError):
     """Error raised when user provided regular expression is invalid"""
     pass

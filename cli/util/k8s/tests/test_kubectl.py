@@ -23,7 +23,7 @@ from pytest import raises, fixture
 from kubernetes.client import V1ObjectMeta, V1ServiceList, V1Service, V1ServiceSpec, V1ServicePort
 import util.k8s.kubectl as kubectl
 from util.app_names import DLS4EAppNames
-from util.exceptions import LocalPortOccupiedError
+from util.exceptions import KubectlConnectionError, LocalPortOccupiedError
 
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
@@ -139,3 +139,18 @@ def test_start_port_forwarding_success_with_different_port(mock_k8s_svc, mocker)
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert check_port_avail.call_count == 1, "port availability wasn't checked"
     assert tunnel_port == 9999, "port wasn't set properly"
+
+
+def test_check_connection_to_cluster_with_success(mocker):
+    error_code = 0
+    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code))
+    kubectl.check_connection_to_cluster()
+    assert subprocess_command_mock.call_count == 1, "kubectl get pods command wasn't called"
+
+
+def test_check_connection_to_cluster_with_error(mocker):
+    error_code = 1
+    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code))
+    with raises(KubectlConnectionError):
+        kubectl.check_connection_to_cluster()
+    assert subprocess_command_mock.call_count == 1, "kubectl get pods command wasn't called"
