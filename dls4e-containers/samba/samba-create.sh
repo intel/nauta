@@ -1,10 +1,10 @@
 #!/bin/bash -e
 set -e
 
-echo "Ensuring /input/public and /output public exist and have proper permissions..."
-mkdir -vp /input/public
-mkdir -vp /output/public
-chmod -v 0777 /input/public /output/public
+echo "Ensuring /smb/input/public and /smb/output public exist and have proper permissions..."
+mkdir -vp /smb/input/public
+mkdir -vp /smb/output/public
+chmod -v 0777 /smb/input/public /smb/output/public
 echo "OK."
 
 function create_user() {

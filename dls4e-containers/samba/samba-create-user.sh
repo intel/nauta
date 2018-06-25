@@ -96,11 +96,11 @@ if [ X"$kUID" == X"" ]; then
 fi
 create_user $user $kUID $PASSWORD
 echo "Create input and output directories"
-mkdir -p /input/$user
-mkdir -p /output/$user
+mkdir -p /smb/input/$user
+mkdir -p /smb/output/$user
 
 echo "Adjusting permissions..."
-chown -R $kUID:$kUID /input/$user /output/$user
+chown -R $kUID:$kUID /smb/input/$user /smb/output/$user
 
 if [ X"$STATE" != X"CREATED" ]; then
     echo "Update user state to CREATED"

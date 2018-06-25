@@ -50,6 +50,7 @@ Use the following command to mount those folders:
           (can be accessed as /mnt/input/root/public from training script).
         - output-shared - Shared output folder (read)
           (can be accessed as /mnt/output/root/public from training script).
+        - input-output-ro - Full input and output directories, read only.
 Additionally, each experiment has a special folder that can be accessed
 as /mnt/output/experiment from training script. This folder is shared by Samba
 as output/<EXPERIMENT_NAME>.

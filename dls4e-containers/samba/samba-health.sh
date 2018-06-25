@@ -17,10 +17,10 @@ function create_user() {
   echo "Setting samba password for ${USER}"
   ( echo ${PASSWORD} ; echo ${PASSWORD}; ) | smbpasswd -a "${USER}"
 
-  mkdir -vp /output/$USER || true
-  chmod 777 /output/$USER || true
-  echo "OK `date`" > /output/$USER/ok.txt || true
-  chmod 777 /output/$USER/ok.txt || true
+  mkdir -vp /smb/output/$USER || true
+  chmod 777 /smb/output/$USER || true
+  echo "OK `date`" > /smb/output/$USER/ok.txt || true
+  chmod 777 /smb/output/$USER/ok.txt || true
 }
 
 function delete_user() {

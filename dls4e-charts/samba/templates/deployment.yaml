@@ -69,6 +69,6 @@ spec:
           protocol: TCP
         volumeMounts:
           - name: input
-            mountPath: /input
+            mountPath: /smb/input
           - name: output
-            mountPath: /output
+            mountPath: /smb/output
