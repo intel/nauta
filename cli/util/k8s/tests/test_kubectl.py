@@ -114,7 +114,7 @@ def test_start_port_forwarding_lack_of_ports(mock_k8s_svc, mocker):
         kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
 
     assert subprocess_command_mock.call_count == 0, "kubectl proxy-forwarding command was called"
-    assert check_port_avail.call_count == 10, "port availability wasn't checked"
+    assert check_port_avail.call_count == 1000, "port availability wasn't checked"
 
 
 def test_start_port_forwarding_first_two_occupied(mock_k8s_svc, mocker):
@@ -124,7 +124,6 @@ def test_start_port_forwarding_first_two_occupied(mock_k8s_svc, mocker):
 
     process, tunnel_port, container_port = kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
 
-    assert tunnel_port == 33471
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
     assert check_port_avail.call_count == 3, "port availability wasn't checked"
 

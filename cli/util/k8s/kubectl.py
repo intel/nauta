@@ -21,6 +21,7 @@
 
 import subprocess
 import time
+import random
 
 from typing import Optional
 
@@ -35,8 +36,9 @@ from util.system import check_port_availability
 
 logger = initialize_logger('util.kubectl')
 
-MAX_NUMBER_OF_TRIES = 10
-PORT_FROM_FREE_POOL = 3000
+MAX_NUMBER_OF_TRIES = 1000
+START_PORT = 3000
+END_PORT = 65535
 
 
 def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
@@ -103,17 +105,14 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
                     raise LocalPortOccupiedError(error_msg)
                 service_node_port = port
             else:
-                if not service_node_port:
-                    service_node_port = service_container_port if service_container_port >= PORT_FROM_FREE_POOL \
-                        else PORT_FROM_FREE_POOL
-                count = 0
-                while not check_port_availability(service_node_port):
-                    service_node_port = service_node_port + 10
-                    count = count + 1
-                    if count >= MAX_NUMBER_OF_TRIES:
-                        error_msg = "Available port cannot be found."
-                        logger.error(error_msg)
-                        raise LocalPortOccupiedError(error_msg)
+                for port in random.sample(range(START_PORT, END_PORT), k=MAX_NUMBER_OF_TRIES):
+                    if check_port_availability(port):
+                        service_node_port = port
+                        break
+                else:
+                    error_msg = "Available port cannot be found."
+                    logger.error(error_msg)
+                    raise LocalPortOccupiedError(error_msg)
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
                                 f'{service_node_port}:{service_container_port}']
