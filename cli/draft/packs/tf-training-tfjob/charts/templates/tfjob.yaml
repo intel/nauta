@@ -51,7 +51,7 @@ spec:
                   mountPath: /mnt/output/root
                 - name: output-home
                   mountPath: /mnt/output/experiment
-                  subPath: {{ .Values.experimentName }}
+                  subPath: {{ .Release.Name }}
               securityContext:
                 privileged: true
               resources:
@@ -72,7 +72,7 @@ spec:
           initContainers:
             - name: init-experiment-pod
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+              command: ['mkdir', '-p', '/mnt/output/home/{{ .Release.Name }}']
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home

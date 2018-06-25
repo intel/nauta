@@ -86,12 +86,15 @@ class DLS4EConfigMap:
     """
     IMAGE_TILLER_FIELD = 'image.tiller'
     EXTERNAL_IP_FIELD = 'external_ip'
+    IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
 
     __shared_state = {}
 
     def __init__(self):
         self.__dict__ = self.__shared_state
-        if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip'):
+        if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip') \
+                or not hasattr(self, 'image_tensorboard_service'):
             config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE)
             self.image_tiller = config_map_data[self.IMAGE_TILLER_FIELD]
             self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]
+            self.image_tensorboard_service = config_map_data[self.IMAGE_TENSORBOARD_SERVICE_FIELD]

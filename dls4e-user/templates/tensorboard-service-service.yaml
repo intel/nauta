@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+  name: tensorboard-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 80
+    targetPort: http
+  selector:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}

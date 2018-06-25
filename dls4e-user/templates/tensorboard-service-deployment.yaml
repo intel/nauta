@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorboard-service
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Chart.Name }}"
+      release: "{{ .Release.Name }}"
+      chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+      heritage: "{{ .Release.Service }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Chart.Name }}"
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      containers:
+      - image: {{ required "DLS4E user tensorboard-service image is required" .Values.TensorboardServiceImage }}
+        name: app
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+      restartPolicy: Always

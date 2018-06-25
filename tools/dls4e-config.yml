@@ -133,6 +133,12 @@ images:
     version: "v1.8.3"
     image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
     method: "pull"
+  dls4e/tensorboard-service:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "dls4e/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/tensorboard-service"
 
 subcharts:
   dls4e-registry:

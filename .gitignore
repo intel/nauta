@@ -18,6 +18,7 @@ vendor/
 .compile
 glide.lock
 files/*.tar.gz
+.pytest_cache
 
 .workspace
 htmlcov/

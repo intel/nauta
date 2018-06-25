@@ -119,10 +119,12 @@ def create(state: State, username: str, list_only: bool, filename: str):
         dls4e_config_map = DLS4EConfigMap()
 
         tiller_location = dls4e_config_map.image_tiller
+        tensorboard_service_location = dls4e_config_map.image_tensorboard_service
 
         add_user_command = ["helm", "install", "--namespace", username, "--name", username,
                             chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
-                            f"username={username}", "--set", "TillerImage={}".format(tiller_location)]
+                            f"username={username}", "--set", "TillerImage={}".format(tiller_location),
+                            "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
 
         output, err_code = execute_system_command(add_user_command)
 

@@ -30,6 +30,8 @@
           value: "dls4e/tensorflow:1.8.0-py3"
         - name: tensorboard
           value: "dls4e/tensorflow:1.8.0-py3"
+        - name: tensorboard_service
+          value: "127.0.0.1:{{ registry_nodeport }}/dls4e/tensorboard-service:v1.0.0"
 
 - name: Render configuration
   set_fact:
