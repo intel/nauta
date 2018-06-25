@@ -22,6 +22,7 @@
 import os
 import base64
 import sys
+import getpass
 
 import click
 
@@ -79,7 +80,7 @@ DEFAULT_FILENAME = "config.{}"
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
-@click.argument('username')
+@click.argument('username', required=False)
 @click.option("-l", "--list_only", is_flag=True)
 @click.option("-f", "--filename")
 @common_options()
@@ -92,6 +93,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
     """
     try:
         try:
+            username = username if username else getpass.getuser()
             validate_user_name(username)
         except ValueError as exe:
             log.exception("Error detected while validating user name.")

@@ -236,6 +236,35 @@ def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
     check_asserts(prepare_mocks)
 
 
+def test_create_user_with_empty_username(mocker, prepare_mocks):  # noqa: F811
+    os_username = 'dls_user'
+    getpass_mock = mocker.patch('getpass.getuser')
+    getpass_mock.return_value = os_username
+
+    runner = CliRunner()
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [])
+
+    assert f"Configuration has been saved to the config.{os_username} file." in result.output
+    assert getpass_mock.call_count == 1
+    prepare_mocks.vun.assert_called_once_with(os_username)
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_with_non_empty_username(mocker, prepare_mocks):  # noqa: F811
+    getpass_mock = mocker.patch('getpass.getuser')
+
+    runner = CliRunner()
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username])
+
+    assert f"Configuration has been saved to the config.{test_username} file." in result.output
+    assert getpass_mock.call_count == 0
+    check_asserts(prepare_mocks)
+
+
 def test_create_user_success_display_config(mocker, prepare_mocks):  # noqa: F811
 
     runner = CliRunner()
