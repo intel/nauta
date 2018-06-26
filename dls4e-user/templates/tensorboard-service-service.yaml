@@ -14,7 +14,8 @@ spec:
     port: 80
     targetPort: http
   selector:
-    app: {{ .Release.Name }}
+    app: {{ .Chart.Name }}
+    type: tensorboard-service
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}

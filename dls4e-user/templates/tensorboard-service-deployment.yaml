@@ -4,6 +4,7 @@ metadata:
   name: tensorboard-service
   labels:
     app: "{{ .Chart.Name }}"
+    type: tensorboard-service
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     heritage: "{{ .Release.Service }}"
@@ -12,6 +13,7 @@ spec:
   selector:
     matchLabels:
       app: "{{ .Chart.Name }}"
+      type: tensorboard-service
       release: "{{ .Release.Name }}"
       chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
       heritage: "{{ .Release.Service }}"
@@ -19,6 +21,7 @@ spec:
     metadata:
       labels:
         app: "{{ .Chart.Name }}"
+        type: tensorboard-service
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
         heritage: "{{ .Release.Service }}"
