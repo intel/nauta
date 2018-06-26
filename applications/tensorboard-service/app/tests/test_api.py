@@ -35,6 +35,9 @@ class ManagerMock():
     def create(self, run_name):
         return "url"
 
+    def get(self, run_name):
+        return None
+
     @classmethod
     def incluster_init(cls):
         return cls()

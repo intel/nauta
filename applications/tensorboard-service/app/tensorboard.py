@@ -21,10 +21,11 @@
 
 from datetime import datetime, timedelta, timezone
 import logging as log
-from typing import List
+from typing import List, Optional
 
 from kubernetes import client, config
 from kubernetes.client import V1DeploymentList, V1Deployment, V1ObjectMeta, V1Service, V1beta1Ingress, V1DeleteOptions
+from kubernetes.client.rest import ApiException
 
 import models
 
@@ -46,6 +47,18 @@ class K8SAPIClient:
         )
         deployments_list: List[V1Deployment] = deployments.items
         return deployments_list
+
+    def get_deployment(self, name: str, namespace: str, **kwargs) -> Optional[V1Deployment]:
+
+        try:
+            deployment = self.apps_api_client.read_namespaced_deployment(name=name, namespace=namespace, **kwargs)
+        except ApiException as ex:
+            log.warning("deployment not found!")
+            if ex.status == 404:
+                return None
+            raise ex
+
+        return deployment
 
     def delete_deployment(self, name: str, namespace: str, **kwargs):
         self.apps_api_client.delete_namespaced_deployment(name=name, namespace=namespace, body=V1DeleteOptions(),
@@ -106,6 +119,10 @@ class TensorboardManager:
 
     def list(self) -> List[V1Deployment]:
         return self.client.list_deployments(namespace=self.namespace, label_selector='type=dls4e-tensorboard')
+
+    def get(self, run_name: str) -> Optional[V1Deployment]:
+        name = 'tensorboard-' + run_name
+        return self.client.get_deployment(name=name, namespace=self.namespace)
 
     def delete(self, tensorboard_deployment: V1Deployment):
         common_name = tensorboard_deployment.metadata.name

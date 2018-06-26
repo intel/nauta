@@ -20,10 +20,13 @@
 #
 
 import json
+import logging as log
 
 from flask import Flask
 
 from tensorboard import TensorboardManager
+
+log.basicConfig(level=log.DEBUG)
 
 app = Flask(__name__)
 
@@ -32,6 +35,15 @@ app = Flask(__name__)
 def create(run_name: str):
 
     tensb_mgr = TensorboardManager.incluster_init()
+
+    current_tensorboard_instance = tensb_mgr.get(run_name)
+
+    if current_tensorboard_instance:
+        response = {
+            "url": "/tb/" + run_name + "/"
+        }
+        return json.dumps(response), 409
+
     url = tensb_mgr.create(run_name)
 
     response = {
