@@ -28,9 +28,12 @@ spec:
     spec:
       containers:
       - image: {{ required "DLS4E user tensorboard-service image is required" .Values.TensorboardServiceImage }}
-        name: app
+        name: api
         ports:
         - containerPort: 80
           name: http
           protocol: TCP
+      - image: {{ required "DLS4E user tensorboard-service image is required" .Values.TensorboardServiceImage }}
+        name: garbage-collector
+        command: ["python3.6", "daemon.py"]
       restartPolicy: Always
