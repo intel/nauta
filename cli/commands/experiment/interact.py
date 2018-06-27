@@ -73,8 +73,8 @@ def interact(state: State, name: str, filename: str):
                        f"Please choose another one")
             sys.exit(1)
 
-        if not jupyters_list and not click.confirm(click.echo("Experiment with a given name doesn't exist. "
-                                                              "Should the app continue and create a new one? ")):
+        if not jupyters_list and not click.confirm("Experiment with a given name doesn't exist. "
+                                                   "Should the app continue and create a new one? "):
             sys.exit(0)
 
         if jupyters_list:

@@ -9,7 +9,7 @@ spec:
       app: {{ template "name" . }}
       draft: {{ .Values.draft }}
       release: {{ .Release.Name }}
-  pod-count: 1
+  pod-count: 4
   parameters:
   {{- range .Values.commandline.args }}
     - "{{ . }}"
