@@ -19,20 +19,20 @@
  * and approved by Intel in writing.
  */
 
-module.exports = {
-  GENERAL: {
-    INTERNAL_SERVER_ERROR: 'Internal server error',
-    BAD_REQUEST: 'Missing data'
-  },
-  AUTH: {
-    INVALID_TOKEN: 'Provided token is invalid.',
-    MISSING_TOKEN: 'Missing authorization token',
-    FORBIDDEN_OPERATION: 'Forbidden operation.',
-    UNAUTHORIZED_OPERATION: 'Unauthorized operation.'
-  },
-  K8S: {
-    CUSTOM_OBJECT: {
-      CANNOT_LIST: 'Cannot list custom objects'
-    }
-  }
-};
+import axios from 'axios';
+import cookies from 'js-cookie';
+
+const LAUNCH_TENSORBOARD_ENDPOINT = '/api/tensorboard/create';
+
+export function launchTensorBoard (runsList) {
+  const token = cookies.get('TOKEN');
+  const options = {
+    url: LAUNCH_TENSORBOARD_ENDPOINT,
+    headers: {'Authorization': token},
+    data: {
+      items: runsList
+    },
+    method: 'POST'
+  };
+  return axios(options);
+}

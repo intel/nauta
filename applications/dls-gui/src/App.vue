@@ -64,12 +64,13 @@ export default {
   computed: {
     ...mapGetters({
       isLogged: 'isLogged',
+      errorTime: 'errorTime',
       errorType: 'errorType',
       errorContent: 'errorContent',
       tensorMode: 'tensorMode'
     }),
     combinedError: function () {
-      return {type: this.errorType, content: this.errorContent};
+      return {type: this.errorType, content: this.errorContent, time: this.errorTime};
     }
   },
   watch: {

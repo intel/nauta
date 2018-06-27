@@ -34,7 +34,8 @@ describe('VUEX modules app', () => {
     error: {
       content: '',
       type: 'warning',
-      visible: false
+      visible: false,
+      time: 1
     },
     tensorMode: false
   };
@@ -63,6 +64,11 @@ describe('VUEX modules app', () => {
     it('errorContent', () => {
       const result = getters.errorContent(state);
       expect(result).to.deep.equal(state.error.content);
+    });
+
+    it('errorTime', () => {
+      const result = getters.errorTime(state);
+      expect(result).to.deep.equal(state.error.time);
     });
   });
 

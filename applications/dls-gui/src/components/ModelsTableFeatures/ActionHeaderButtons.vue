@@ -21,7 +21,7 @@
 
 <template>
 <div id="buttons_block">
-  <v-btn dark small v-on:click="onLaunchTensorHandler()">LAUNCH TENSORBOARD</v-btn>
+  <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">LAUNCH TENSORBOARD</v-btn>
   <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">EXIT</v-btn>
   <v-menu v-if="!tensorModeViewState" bottom offset-y>
     <v-btn slot="activator" dark small>RESET</v-btn>
@@ -79,7 +79,7 @@ import LABELS from '../../utils/header-titles';
 export default {
   name: 'ActionHeaderButtons',
   props: ['clearSort', 'clearFilterHandler', 'setHiddenColumnsHandler', 'hiddenColumns', 'alwaysVisibleColumns', 'headers',
-    'onLaunchTensorHandler', 'onDiscardTensorHandler', 'disabled'],
+    'onLaunchTensorHandler', 'launchTensorDisabled', 'onDiscardTensorHandler', 'disabled'],
   data: () => {
     return {
       showColumnMgmtModal: false,

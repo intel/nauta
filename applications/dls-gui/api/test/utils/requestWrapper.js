@@ -35,7 +35,7 @@ describe('Utils | requestWrapper', function () {
     options = {};
     error = {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'error'
+      message: 'Internal server error'
     };
     response = {
       statusCode: HttpStatus.OK
@@ -43,12 +43,22 @@ describe('Utils | requestWrapper', function () {
     body = JSON.stringify({test: 'test'});
   });
 
-  it('should return error if cannot decode token', function () {
+  it('should return error if cannot perform request', function () {
     requestMock = sinon.stub().callsArgWith(1, error, null, null);
     reqWrp.__set__('request', requestMock);
     return reqWrp(options)
       .catch(function (err) {
         expect(err.message).to.equal(error)
+      });
+  });
+
+  it('should return error if response with 500 status code', function () {
+    response.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    requestMock = sinon.stub().callsArgWith(1, null, response, null);
+    reqWrp.__set__('request', requestMock);
+    return reqWrp(options)
+      .catch(function (err) {
+        expect(err.message).to.equal(error.message)
       });
   });
 

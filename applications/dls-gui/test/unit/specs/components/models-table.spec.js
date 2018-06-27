@@ -63,6 +63,7 @@ describe('VUE components ModelsTable', () => {
     actions = {
       getUserExperiments: sinon.spy(),
       enableTensorMode: sinon.spy(),
+      launchTensorboard: sinon.spy(),
       disableTensorMode: sinon.spy()
     };
     store = new Vuex.Store({
@@ -187,9 +188,16 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.hiddenColumns).to.deep.equal(hiddenColumns);
   });
 
-  it('Should call enableTensorMode on launch btn click', function () {
-    wrapper.vm.launchTensorboard();
+  it('Should call enableTensorMode on launch btn first click', function () {
+    wrapper.vm.onLaunchTensorboardClick();
     expect(actions.enableTensorMode.calledOnce).to.equal(true);
+  });
+
+  it('Should call enableTensorMode on launch btn second click', function () {
+    wrapper.vm.$store.state.tensorMode = true;
+    wrapper.vm.onLaunchTensorboardClick();
+    expect(actions.launchTensorboard.calledOnce).to.equal(true);
+    expect(actions.disableTensorMode.calledOnce).to.equal(true);
   });
 
   it('Should call disableTensorMode on exit btn click', function () {

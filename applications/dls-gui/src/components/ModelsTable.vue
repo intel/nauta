@@ -21,10 +21,12 @@
 
 <template>
     <v-layout row wrap>
-      <v-container v-if="!isLogged || (!isInitializedData && fetchingDataActive)" fill-height justify-center>
+      <v-container
+        v-if="!isLogged || (!isInitializedData && fetchingDataActive) || (isInitializedData && tensorboardLaunching)"
+        fill-height justify-center>
         <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
       </v-container>
-      <v-flex v-if="isLogged && isInitializedData" xs12>
+      <v-flex v-if="isLogged && isInitializedData && !tensorboardLaunching" xs12>
         <v-card>
           <v-card-title>
             <h2>Models</h2>
@@ -35,7 +37,8 @@
               :hiddenColumns="hiddenColumns"
               :alwaysVisibleColumns="alwaysVisibleColumns"
               :setHiddenColumnsHandler="setHiddenColumns"
-              :onLaunchTensorHandler="launchTensorboard"
+              :onLaunchTensorHandler="onLaunchTensorboardClick"
+              :launchTensorDisabled="!tensorBtnAvailable"
               :onDiscardTensorHandler="discardTensorboard"
               :headers="experimentsParams"
             ></ActionHeaderButtons>
@@ -189,6 +192,7 @@ export default {
       experimentsTotalPagesCount: 'experimentsTotalPagesCount',
       lastUpdate: 'lastUpdate',
       fetchingDataActive: 'fetchingDataActive',
+      tensorboardLaunching: 'tensorboardLaunching',
       tensorMode: 'tensorMode',
       isCheckingAuth: 'authLoadingState',
       isInitializedData: 'initializedDataFlag',
@@ -207,6 +211,9 @@ export default {
     refreshTableDataTriggers: function () {
       return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
       ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
+    },
+    tensorBtnAvailable: function () {
+      return !this.tensorMode || (this.tensorMode && this.selected.length);
     }
   },
   watch: {
@@ -218,7 +225,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode']),
+    ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
     getLabel: function (header) {
       return LABELS[header] || header;
     },
@@ -242,9 +249,6 @@ export default {
       });
       this.searchPattern = '';
     },
-    revertOrder () {
-      console.log('revert order');
-    },
     updateCountPerPage (count) {
       this.pagination.itemsCountPerPage = count;
       this.pagination.currentPage = 1;
@@ -264,9 +268,10 @@ export default {
     setHiddenColumns (columns) {
       this.hiddenColumns = columns;
     },
-    launchTensorboard () {
+    onLaunchTensorboardClick () {
       if (this.tensorMode) {
-        alert('Now tensorboard should be run with params: ' + JSON.stringify(this.selected));
+        this.launchTensorboard(this.selected);
+        this.discardTensorboard();
       } else {
         this.enableTensorMode();
       }

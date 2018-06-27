@@ -34,6 +34,10 @@ module.exports = function (options) {
         reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, err));
       }
       if (response) {
+        if (response.statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+          logger.debug('Internal Server Error');
+          reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.GENERAL.INTERNAL_SERVER_ERROR));
+        }
         if (response.statusCode === HttpStatus.UNAUTHORIZED) {
           logger.debug('Unauthorized request to API');
           reject(errHandler(HttpStatus.UNAUTHORIZED, errMessages.AUTH.UNAUTHORIZED_OPERATION));

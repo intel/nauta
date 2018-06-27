@@ -20,11 +20,13 @@
  */
 
 import {getExperiments} from '../handlers/experiments';
+import {launchTensorBoard} from '../handlers/tensorboard';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
 const state = {
   fetchingDataActive: false,
+  tensorboardLaunching: false,
   initialized: false,
   experiments: {
     data: [],
@@ -58,6 +60,7 @@ export const getters = {
   experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount,
   lastUpdate: state => state.experiments.stats.datetime,
   fetchingDataActive: state => state.fetchingDataActive,
+  tensorboardLaunching: state => state.tensorboardLaunching,
   initializedDataFlag: state => state.initialized
 };
 
@@ -82,6 +85,21 @@ export const actions = {
         }
         commit('setFetchingDataFlag', {isActive: false});
       });
+  },
+  launchTensorboard: ({dispatch, commit}, expList) => {
+    commit('setTensorboardLaunchingFlag', {isActive: true});
+    launchTensorBoard(expList)
+      .then(function (tb) {
+        setTimeout(() => {
+          tb.data.forEach((url) => {
+            window.open(url, '_blank');
+          });
+          commit('setTensorboardLaunchingFlag', {isActive: false});
+        }, 5000);
+      })
+      .catch(() => {
+        dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
+      });
   }
 };
 
@@ -100,6 +118,9 @@ export const mutations = {
   },
   setFetchingDataFlag: (state, {isActive}) => {
     state.fetchingDataActive = isActive;
+  },
+  setTensorboardLaunchingFlag: (state, {isActive}) => {
+    state.tensorboardLaunching = isActive;
   },
   setInitializedData: (state) => {
     state.initialized = true;

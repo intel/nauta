@@ -33,7 +33,8 @@ const state = {
   error: {
     content: '',
     type: DEFAULT_BANNER_TYPE,
-    visible: false
+    visible: false,
+    time: null
   },
   tensorMode: false
 };
@@ -43,6 +44,7 @@ export const getters = {
   getMenuParams: state => state.menu,
   getUserboxParams: state => state.userbox,
   errorType: state => state.error.type,
+  errorTime: state => state.error.time,
   errorContent: state => state.error.content
 };
 
@@ -90,6 +92,7 @@ export const mutations = {
     state.error.type = type;
     state.error.content = content;
     state.error.visible = true;
+    state.error.time = Date.now();
   },
   removeError: (state) => {
     state.error.type = '';
