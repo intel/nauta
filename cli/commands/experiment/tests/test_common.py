@@ -147,8 +147,8 @@ class SubmitExperimentMocks:
 def prepare_mocks(mocker) -> SubmitExperimentMocks:
     get_namespace_mock = mocker.patch("commands.experiment.common.get_kubectl_current_context_namespace",
                                       side_effect=[EXPERIMENT_NAMESPACE])
-    gen_exp_name_mock = mocker.patch("platform_resources.experiments.generate_experiment_name",
-                                     side_effect=[EXPERIMENT_NAME])
+    gen_exp_name_mock = mocker.patch("platform_resources.experiments.generate_exp_name_and_labels",
+                                     side_effect=[(EXPERIMENT_NAME, {})])
     add_exp_mock = mocker.patch("platform_resources.experiments.add_experiment")
     cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
     submit_one_mock = mocker.patch("commands.experiment.common.submit_draft_pack")
@@ -380,7 +380,7 @@ def test_check_enclosing_brackets():
 
 def test_create_list_of_runs_pr_only(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     two_params_list_result = \
@@ -398,7 +398,7 @@ def test_create_list_of_runs_pr_only(mocker):
 
 def test_create_list_of_runs_ps_only(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     multiple_two_params = ("{param1:0, param2:1}", "{param1:2,param3:3}")
     multiple_two_params_list_result = \
@@ -411,7 +411,7 @@ def test_create_list_of_runs_ps_only(mocker):
 
 def test_create_list_of_runs_pr_and_ps(mocker):
     experiment_name = "experiment_name"
-    mocker.patch("platform_resources.experiments.generate_experiment_name", side_effect=[experiment_name])
+    mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     multiple_two_params = ("{param3:0, param4:1}", "{param3:2,param4:3}")

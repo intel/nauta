@@ -66,6 +66,7 @@ class KubernetesObjectSchema(Schema):
     apiVersion = fields.String(required=True, allow_none=False)
     kind = fields.String(required=True, allow_none=False)
     metadata = fields.Nested(V1ObjectMetaSchema(), required=True, allow_none=False)
+    spec = fields.Raw(allow_none=True)
 
     @post_load
     def make_kubernetes_object(self, data):

@@ -159,13 +159,12 @@ class RunDescription:
 
 def submit_experiment(state: State, script_location: str, script_folder_location: str, template: str, name: str,
                       parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
-                      script_parameters: Tuple[str, ...], name_prefix: str = "exp"):
+                      script_parameters: Tuple[str, ...]):
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()
-        experiment_name = experiments_api.generate_experiment_name(script_name=script_location,
-                                                                   namespace=namespace, name=name,
-                                                                   name_prefix=name_prefix)
+        experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
+                                                                               namespace=namespace, name=name)
         runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
                                          parameter_set=parameter_set)
     except KubectlIntError as exe:
@@ -238,7 +237,7 @@ def submit_experiment(state: State, script_location: str, script_folder_location
             experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
                                                                         parameters_spec=experiment_parameters_spec,
                                                                         template_namespace="template-namespace"),
-                                           namespace)
+                                           namespace, labels=labels)
 
             # submit runs
             for run in runs_list:
@@ -521,6 +520,7 @@ def validate_experiment_name(ctx, param, value):
     try:
         if value:
             if len(value) > 30:
+                # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit this
                 raise ValidationError("Name cannot be longer than 30 characters.")
             validate_kubernetes_name(value)
             return value
