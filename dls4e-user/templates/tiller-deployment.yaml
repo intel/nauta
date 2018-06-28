@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tiller
+  name: tiller-deploy
   labels:
-    app: "{{ .Chart.Name }}"
+    name: tiller
+    app: helm
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     heritage: "{{ .Release.Service }}"
@@ -11,14 +12,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "{{ .Chart.Name }}"
+      name: tiller
+      app: helm
       release: "{{ .Release.Name }}"
       chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
       heritage: "{{ .Release.Service }}"
   template:
     metadata:
       labels:
-        app: "{{ .Chart.Name }}"
+        name: tiller
+        app: helm
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
         heritage: "{{ .Release.Service }}"
@@ -26,7 +29,7 @@ spec:
       containers:
       - env:
         - name: TILLER_NAMESPACE
-          value: kube-system
+          value: "{{ .Release.Namespace }}"
         - name: TILLER_HISTORY_MAX
           value: "0"
         image: {{ required "DLS4E user tiller image is required" .Values.TillerImage }}

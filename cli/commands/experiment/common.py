@@ -243,7 +243,7 @@ def submit_experiment(state: State, script_location: str, script_folder_location
             # submit runs
             for run in runs_list:
                 try:
-                    submit_draft_pack(run.folder)
+                    submit_draft_pack(run.folder, namespace)
                     run.status = RunStatus.QUEUED
                 except Exception as exe:
                     delete_environment(run.folder)
@@ -352,16 +352,17 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
     return run_folder
 
 
-def submit_draft_pack(run_folder: str):
+def submit_draft_pack(run_folder: str, namespace: str = None):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
     :param run_folder: location of a folder with a description of an environment
+    :param namespace: namespace where tiller used during deployment is located
     In case of any problems it throws an exception with a description of a problem
     """
     log.debug(f'Submit one run: {run_folder} - start')
 
     # run training
-    output, exit_code = cmd.up(working_directory=run_folder)
+    output, exit_code = cmd.up(working_directory=run_folder, namespace=namespace)
 
     if exit_code:
         error_message = "Job hasn't been deployed. Reason - {}".format(output)

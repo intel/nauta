@@ -35,7 +35,7 @@ DRAFT_HOME_FOLDER = ".draft"
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
-def call_draft(args: List[str], cwd: str = None) -> (str, int):
+def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str, int):
     config_path = Config().config_path
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
@@ -44,6 +44,8 @@ def call_draft(args: List[str], cwd: str = None) -> (str, int):
 
     env = os.environ.copy()
     env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)
+    if namespace:
+        env['TILLER_NAMESPACE'] = namespace
     return execute_system_command(full_command, env=env, cwd=cwd)
 
 
@@ -61,8 +63,8 @@ def create(working_directory: str = None, pack_type: str = None) -> (str, int):
     return output, exit_code
 
 
-def up(working_directory: str = None) -> (str, int):
-    output, exit_code = call_draft(args=['up'], cwd=working_directory)
+def up(working_directory: str = None, namespace: str = None) -> (str, int):
+    output, exit_code = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
     if not exit_code:
         output, exit_code = check_up_status(output)
 
