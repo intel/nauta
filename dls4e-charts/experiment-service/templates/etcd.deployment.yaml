@@ -33,12 +33,9 @@ spec:
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E etcd image is required" .Values.etcd_image }}
         imagePullPolicy: Always
         resources:
-          requests:
-            cpu: 100m
-            memory: 20Mi
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 500m
+            memory: 256Mi
         env:
         - name: ETCD_DATA_DIR
           value: /etcd-data-dir
@@ -115,12 +112,9 @@ spec:
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E etcd image is required" .Values.etcd_image }}
         imagePullPolicy: Always
         resources:
-          requests:
-            cpu: 100m
-            memory: 20Mi
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 500m
+            memory: 256Mi
         env:
         - name: ETCD_DATA_DIR
           value: /etcd-data-dir

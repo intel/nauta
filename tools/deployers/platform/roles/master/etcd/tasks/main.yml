@@ -37,7 +37,7 @@
       ETCD_PEER_CERT_FILE: /ca/node.crt
       ETCD_PEER_KEY_FILE: /ca/node.key
     volumes:
-      - "/var/lib/etcd:/etcd-data"
+      - "/data/local/etcd:/etcd-data"
       - "/etc/dls-cluster/client/ca.pem:/ca/CA.pem:ro"
       - "/etc/dls-cluster/client/node.crt:/ca/node.crt:ro"
       - "/etc/dls-cluster/client/node.key:/ca/node.key:ro"

@@ -4,3 +4,128 @@ proxy:
   http_proxy: http://proxy-mu.intel.com:911
   https_proxy: http://proxy-mu.intel.com:912
   no_proxy: .intel.com,127.0.0.1,localhost
+
+images: "{{ shared_images | combine(local_images | default({})) }}"
+
+shared_images:
+  shared/centos:
+    version: "7.5.1804"
+    method: "build"
+    push: False
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
+    required: {}
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/centos/centos-docker-0001.tar.xz
+        dest: centos-docker.tar.xz
+        checksum: 8f3ce3f0c6b8d1cbc45c93f72c8c02425cda154d19230a66732778767f1daf80
+  shared/centos/rpm-packer:
+    version: "7.5.1804"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
+    push: False
+  shared/centos/build:
+    version: "7.5.1804"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/build"
+    push: False
+  shared/centos/build/gcc/7.2.0:
+    version: "7.2.0"
+    required:
+      BASE_IMAGE: "shared/centos/build"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/build-gcc-7.2.0"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/gcc/gcc-7.2.0.tar.gz
+        dest: gcc-7.2.0.tar.gz
+        checksum: 0153a003d3b433459336a91610cca2995ee0fb3d71131bd72555f2231a6efcfc
+  shared/centos/python27:
+    version: "2.7"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/python27"
+    push: False
+  shared/centos/python36:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/python36"
+    push: False
+  shared/centos/build-go:
+    version: "1.10.2"
+    required:
+      BASE_IMAGE: "shared/centos/build"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/go/go1.10.2.linux-amd64.tar.gz
+        dest: go1.10.2.linux-amd64.tar.gz
+        checksum: 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/godep/dep-linux-amd64
+        dest: dep-linux-amd64
+        checksum: 31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/glide/glide-v0.13.1-linux-amd64
+        dest: glide-v0.13.1-linux-amd64
+        checksum: b3e126a0034ab41005b51fc9542997b632f2802ee64ad0e3850c0353ba2867cf
+  shared/centos/go-apiserver-builder:
+    version: "v1.9-alpha.4"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/go-apiserver-builder"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/apiserver-builder/apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
+        dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
+        checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
+  shared/build/kubernetes:
+    version: "v1.10.3"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.3.tar.gz
+        dest: kubernetes.tar.gz
+        checksum: f3750b19d6d7471ea33230f96a420c53df46d8a060a4f14722992c5c7bdd9055
+  shared/build/helm:
+    version: "v2.9.1"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/helm"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/helm-v2.9.1-linux-amd64
+        dest: helm
+        checksum: 9c9b77b0aa9c25debcadd1b538e0f42311e8c2d60a356b256b552642fcd5c6d5
+  shared/build/cni:
+    version: "v0.7.1"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/cni"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/cni-plugins/v0.7.1.tar.gz
+        dest: cni-plugins.tar.gz
+        checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
+  shared/build/consul:
+    version: "v1.1.0"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/consul-linux-amd64-1.1.0
+        dest: consul
+        checksum: 027630ce1aaa4af5e966d0467d20638cada2bda5ceacd09ff3429daff965ddc0

@@ -1,22 +1,26 @@
 ---
 
-- name: Stop all images
-  vars:
-    name: "{{ item.key }}"
-    data: "{{ item.value }}"
-  with_dict: "{{ supported_os_versions }}"
-  docker_container:
-    name: "release-builder-{{ version }}-{{ name }}-{{ data.type }}"
-    state: absent
+- name: Ensure release directories exists
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - bin
+    - tmp
+  notify:
+    - Remove build dir
 
-- name: Get all types
-  vars:
-    name: "{{ type.key }}"
-    spec: "{{ type.value }}"
-  with_dict: "{{ downloads }}"
-  loop_control:
-    loop_var: type
-  include_tasks: type.yml
+- name: Unarchive input package
+  shell: "tar -I pigz -xf {{ package }} ./artifacts"
+  args:
+    chdir: "{{ build_dir }}/tmp"
+  notify:
+    - Remove build dir
+
+- name: Synchronize bin dir
+  synchronize:
+    src: "{{ build_dir }}/tmp/artifacts/"
+    dest: "{{ build_dir }}/bin/"
 
 - name: Create package
   shell: tar -cf {{ output }} -I pigz ./

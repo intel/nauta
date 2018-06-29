@@ -1,22 +1,14 @@
 ---
 
-- name: Chekc if local repo file exists
-  stat:
-    path: /opt/carbon/yum/yum.conf
-
-- name: Install yum kubernetes server
-  environment: "{{ proxy }}"
-  yum:
-    conf_file: /opt/carbon/yum/yum.conf
-    name: "{{ package_yum }}"
-  loop_control:
-    loop_var: package_yum
-  with_items:
-    - kubernetes-server
-    - kubernetes-client
-    - kubernetes-helm-2.9.1
-  notify:
-    - Reload Systemd
-    - Restart Kubernetes Apiserver
-    - Restart Kubernetes Scheduler
-    - Restart Kubernetes Controller
+- name: Install package
+  include_tasks: yum_dls4e_install.yml
+  vars:
+    packages:
+      - dls4e-kubernetes-server-1.10.3
+      - dls4e-kubernetes-client-1.10.3
+      - dls4e-helm-2.9.1
+    handlers:
+      - Reload Systemd
+      - Restart Kubernetes Apiserver
+      - Restart Kubernetes Scheduler
+      - Restart Kubernetes Controller

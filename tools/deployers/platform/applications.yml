@@ -5,5 +5,3 @@
   any_errors_fatal: True
   roles:
     - role: applications
-      tags:
-        - install

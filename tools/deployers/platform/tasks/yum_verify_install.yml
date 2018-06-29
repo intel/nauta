@@ -1,0 +1,11 @@
+---
+
+- name: Ensure existence of {{ packages | join(', ') }}
+  environment: "{{ proxy }}"
+  yum:
+    disable_plugin: "*"
+    update_cache: "False"
+    disablerepo: "*"
+    name: "{{ item }}"
+    state: "present"
+  with_items: "{{ packages }}"

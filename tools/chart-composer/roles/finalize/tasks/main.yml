@@ -8,6 +8,7 @@
     - "charts"
     - "helm-cache"
     - "output"
+    - "tmp"
 
 - name: Download helm bin
   environment: "{{ proxy }}"
@@ -19,6 +20,34 @@
 
 - name: Init helm
   shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache"
+
+- name: Unarchive input package
+  shell: "tar -I pigz -xf {{ input_package }} ./facts"
+  args:
+    chdir: "{{ build_dir }}/tmp"
+  when: input_package | default(False)
+
+- name: Set Default fact
+  set_fact:
+    build_facts: {}
+  when: not input_package | default(False)
+
+- name: Load variables
+  include_vars:
+    dir: "{{ build_dir }}/tmp/facts"
+    extensions:
+      - yaml
+      - yml
+    name: build_facts
+  when: input_package | default(False)
+
+- name: Set local url paths
+  vars:
+    name: "{{ item.key }}"
+    url: "{{ item.value.local_url }}"
+  set_fact:
+    image_local_url: "{{ image_local_url | default({}) | combine({name: url}) }}"
+  with_dict: "{{ build_facts.package_attached_images | default({}) }}"
 
 - name: Include charts
   vars:

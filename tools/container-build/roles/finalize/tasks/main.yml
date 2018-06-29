@@ -3,7 +3,7 @@
 - name: Create tar
   shell: tar -cf {{ output }} --use-compress-program=pigz ./
   args:
-    chdir: "{{ build_dir }}"
+    chdir: "{{ build_dir }}/data"
   when: create_package | default(True)
 
 - name: Touch file

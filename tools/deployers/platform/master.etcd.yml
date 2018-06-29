@@ -19,5 +19,3 @@
     - 100%
   roles:
     - role: master/etcd
-      tags:
-        - install

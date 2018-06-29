@@ -1,5 +1,0 @@
----
-
-- name: Fail on unknown distribution
-  fail:
-    msg: "Distribution {{ ansible_distribution }} {{ ansible_distribution_version }} is not supported"

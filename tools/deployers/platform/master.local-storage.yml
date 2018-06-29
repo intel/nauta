@@ -5,6 +5,3 @@
   any_errors_fatal: True
   roles:
     - role: master/local-storage
-      tags:
-        - install
-      when: local_data_device | default(False)

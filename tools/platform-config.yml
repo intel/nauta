@@ -1,149 +1,6 @@
 ---
 
-rpm_pre_packages:
-  carbon-python:
-    summary: Python precompiled carbon package
-    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-    release: "{{ VERSION_ID }}"
-    requires:
-      - python
-    sections:
-      install: |
-        rm -rf %{buildroot}
-        mkdir -p  %{buildroot}
-
-        mkdir -p %{buildroot}/opt/carbon
-        virtualenv -p python2 --clear --prompt=carbon --system-site-packages %{buildroot}/opt/carbon/python
-        %{buildroot}/opt/carbon/python/bin/pip install -U ansible==2.5.0.0 docker-py==1.10.6 pyOpenSSL==17.5.0
-        virtualenv -p python2 --relocatable %{buildroot}/opt/carbon/python
-        find %{buildroot} -name '*.pyc' -type f -exec rm -rf {} \;
-        find %{buildroot} -name '__pycache__' -type f -exec rm -rf {} \;
-
-        exit 0
-    files:
-      - /opt/carbon/python/*
-
-rpm_packages:
-  carbon-yum-repository:
-    summary: Carbon CentOS7 yum package repository
-    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-    release: "{{ VERSION_ID }}"
-    sections:
-      prep: |
-        cd %{_topdir}/BUILD
-        rm -rf %{name}
-        mkdir %{name}
-        tar xf /in/package.tar.gz --use-compress-program=pigz -C %{name}
-        cd %{name}
-        chown -R root:root .
-        chmod -R a+rX,g-w,o-w .
-      install: |
-        rm -rf %{buildroot}
-        mkdir -p  %{buildroot}
-
-        mkdir -p %{buildroot}/opt/carbon/repository/
-        cp -a %{name}/* %{buildroot}/opt/carbon/repository/
-        exit 0
-    files:
-      - /opt/carbon/repository/*
-  carbon-registry-repository:
-    summary: Carbon docker registry repository
-    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-    release: "{{ VERSION_ID }}"
-    sections:
-      prep: |
-        cd %{_topdir}/BUILD
-        rm -rf %{name}
-        mkdir %{name}
-        tar xf /in/docker.tar.gz --use-compress-program=pigz -C %{name}
-        cd %{name}
-        chown -R root:root .
-        chmod -R a+rX,g-w,o-w .
-      install: |
-        rm -rf %{buildroot}
-        mkdir -p  %{buildroot}
-
-        mkdir -p %{buildroot}/opt/carbon/registry
-        cp -a %{name}/* %{buildroot}/opt/carbon/registry/
-        exit 0
-    files:
-      - /opt/carbon/registry/docker/*
-  carbon-yum-local:
-    summary: Carbon user package
-    version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-    release: "{{ VERSION_ID }}"
-    requires:
-      - carbon-yum-repository = %{version}-%{release}
-    sections:
-      install: |
-        rm -rf %{buildroot}
-        mkdir -p  %{buildroot}
-
-        mkdir -p %{buildroot}/opt/carbon/yum/yum.repos.d
-        mkdir -p %{buildroot}%{_bindir}
-
-        echo "[main]
-        cachedir=/var/cache/yum-carbon/$basearch/$releasever
-        keepcache=0
-        debuglevel=2
-        logfile=/var/log/yum.log
-        exactarch=1
-        obsoletes=1
-        gpgcheck=0
-        plugins=0
-        installonly_limit=5
-        distroverpkg=centos-release
-        reposdir=/opt/carbon/yum/yum.repos.d
-        proxy=_none_" > %{buildroot}/opt/carbon/yum/yum.conf
-
-        echo "[CarbonLocal]
-        name=Carbon Local Repository
-        gpgcheck=0
-        enabled=1
-        baseurl=file:///opt/carbon/repository" > %{buildroot}/opt/carbon/yum/yum.repos.d/local.repo
-
-        echo '#!/usr/bin/env bash
-        set -e
-        yum -c /opt/carbon/yum/yum.conf $@' > %{buildroot}%{_bindir}/yum-carbon
-        chmod +x %{buildroot}%{_bindir}/yum-carbon
-        exit 0
-    files:
-      - "%{_bindir}/yum-carbon"
-      - /opt/carbon/yum/yum.conf
-      - /opt/carbon/yum/yum.repos.d/local.repo
-
-rpm_ready_packages:
-  - libffi-dev
-  - byacc
-  - gcc
-  - gcc-c++
-  - openssl-devel
-  - vim
-  - git
-  - nfs-utils
-  - cifs-utils
-  - python
-  - python-pip
-  - python-dev
-  - make
-  - rsync
-  - kubernetes-all-1.10.0
-  - kubernetes-helm-2.9.1
-  - docker-distribution
-  - pacemaker
-  - pcs
-  - resource-agents
-  - nginx
-  - consul-1.0.6
-  - socat
-
-
-images:
-  core/centos:
-    version: "7.4.1708"
-    image: "centos:7.4.1708"
-    method: "pull"
-    push: False
+local_images:
   core/flannel:
     version: "v0.9.1"
     image: "quay.io/coreos/flannel:v0.9.1-amd64"
@@ -215,18 +72,18 @@ subcharts:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/dashboard"
       chart_values:
-        image: core/dashboard:v1.8.3
+        image: "{{ image_local_url['core/dashboard'] }}"
     flannel:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/flannel"
       chart_values:
-        image: core/flannel:v0.9.1
+        image: "{{ image_local_url['core/flannel'] }}"
     heapster:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/heapster"
       chart_values:
-        image: core/heapster:v1.4.2
-        nanny_image: core/addon-resizer:v1.7
+        image: "{{ image_local_url['core/heapster'] }}"
+        nanny_image: "{{ image_local_url['core/addon-resizer'] }}"
     samba-forward:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../platform-charts/samba-forward"
@@ -237,20 +94,20 @@ subcharts:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/nfs"
       chart_values:
-        image: core/nfs-provisioner:v1.0.8
+        image: "{{ image_local_url['core/nfs-provisioner'] }}"
       conditions: features.nfs
       feature_enabled: True
     skydns:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/skydns"
       chart_values:
-        kubedns_image: core/kube-dns:1.14.8
-        nanny_image: core/dnsmasq-nanny:1.14.8
-        sidecar_image: core/dns-sidecar:1.14.8
+        kubedns_image: "{{ image_local_url['core/kube-dns'] }}"
+        nanny_image: "{{ image_local_url['core/dnsmasq-nanny'] }}"
+        sidecar_image: "{{ image_local_url['core/dns-sidecar'] }}"
     ingress:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/ingress"
       chart_values:
-        ingress_image: core/ingress:0.14.0
-        defaultbackend_image: core/defaultbackend:1.4
+        ingress_image: "{{ image_local_url['core/ingress'] }}"
+        defaultbackend_image: "{{ image_local_url['core/defaultbackend'] }}"
 

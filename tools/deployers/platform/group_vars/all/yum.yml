@@ -1,0 +1,15 @@
+---
+
+enabled_plugins: []
+disabled_plugins: []
+use_system_enabled_plugins: False
+calculated_enabled_plugins: "{{ enabled_plugins }}"
+calculated_disabled_plugins: "{% if use_system_enabled_plugins %}{{ disabled_plugins }}{% else %}*{% endif %}"
+
+enabled_repos: []
+disabled_repos: []
+use_system_enabled_repos: False
+calculated_enabled_repos: "{{ enabled_repos }}"
+calculated_disabled_repos: "{% if use_system_enabled_repos %}{{ disabled_repos }}{% else %}*{% endif %}"
+
+dls4e_calculated_enabled_repos: "{{ calculated_enabled_repos + ['DLS4ERepository'] }}"

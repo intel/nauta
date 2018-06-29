@@ -1,0 +1,30 @@
+Summary: DLS4E Common {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
+Name: dls4e-commons
+Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
+Release: {{ VERSION_ID }}
+License: Apache-2.0
+Group: Tools
+
+%define  debug_package %{nil}
+
+{% for requirement in common_required %}
+Requires: {{ requirement }}
+{% endfor %}
+
+%description
+%{summary}
+
+%prep
+# Empty
+
+%build
+# Empty section.
+
+%install
+# Empty
+
+%clean
+# Empty
+
+%files
+# Empty

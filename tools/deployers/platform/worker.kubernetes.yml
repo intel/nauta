@@ -5,16 +5,12 @@
   any_errors_fatal: True
   roles:
     - role: worker/kubernetes/worker.install
-      tags:
-        - install
 
 - hosts: master[0]
   become: True
   any_errors_fatal: True
   roles:
     - role: worker/kubernetes/worker.add
-      tags:
-        - install
 
 - hosts: all
   become: True
@@ -22,11 +18,13 @@
   handlers:
     - name: Reload Systemd
       shell: systemctl daemon-reload
+    - name: Restart CG
+      service:
+        name: cgconfig
+        state: restarted
     - name: Restart Kubelet
       service:
         name: kubelet
         state: restarted
   roles:
     - role: worker/kubernetes/worker.init
-      tags:
-        - install

@@ -1,0 +1,226 @@
+---
+
+common_required:
+  - iptables
+  - libcgroup
+  - libcgroup-tools
+  - libcgroup-devel
+  - selinux-policy >= 3.13.1-23
+  - libseccomp-devel
+  - libtool-ltdl-devel
+  - policycoreutils-python
+  - selinux-policy-targeted >= 3.13.1-102
+  - selinux-policy-base >= 3.13.1-102
+  - libffi-devel
+  - byacc
+  - gcc
+  - gcc-c++
+  - openssl-devel
+  - openssl
+  - vim
+  - git
+  - ebtables
+  - byacc
+  - cifs-utils
+  - ebtables
+  - ethtool
+  - gcc
+  - gcc-c++
+  - git
+  - iproute
+  - iptables
+  - iptables >= 1.4.21
+  - libcgroup
+  - libcgroup-devel
+  - libcgroup-tools
+  - libffi-devel
+  - libseccomp-devel
+  - libtool-ltdl-devel
+  - make
+  - nfs-utils
+  - openssh
+  - openssh-clients
+  - openssl
+  - openssl-devel
+  - policycoreutils-python
+  - python
+  - python-backports
+  - python-backports-ssl_match_hostname
+  - python-devel
+  - python-ipaddress
+  - python-setuptools
+  - rsync
+  - selinux-policy >= 3.13.1-23
+  - selinux-policy-base >= 3.13.1-102
+  - selinux-policy-targeted >= 3.13.1-102
+  - socat
+  - systemd-libs
+  - util-linux
+  - vim
+  - wget
+
+local_images:
+  rpm/python:
+    version: "2.7"
+    required:
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/python"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/python/python2-pip-8.1.2-6.el7.noarch.rpm
+        dest: python2-pip-8.1.2-6.el7.noarch.rpm
+        checksum: d99bbd6fd197597da392019f62cb982113cfa6d359e916abc3844a138d807377
+  rpm/docker:
+    version: "18.03.1-ce"
+    required:
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/docker"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.03.1.ce-1.el7.centos.x86_64.rpm
+        dest: docker-ce-18.03.1.ce-1.el7.centos.x86_64.rpm
+        checksum: 31ae9527c7332deae38088acc2bb139ed0ebe23a4c6f90575944e0a532e7355d
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/pigz-2.3.3-1.el7.centos.x86_64.rpm
+        dest: pigz-2.3.3-1.el7.centos.x86_64.rpm
+        checksum: b95f8ffa8beae245197eda2b019cfbe05480ae6bc9c0e860bc54d58522f6b522
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/container-selinux-2.55-1.el7.noarch.rpm
+        dest: container-selinux-2.55-1.el7.noarch.rpm
+        checksum: 9a047c389a1401168171bf7c5f4eef3da40f0d9b9edc3ea075a9fb447c043630
+  rpm/docker-distribution:
+    version: "2.6.2"
+    required:
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/docker-distribution"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker-distribution/docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
+        dest: docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
+        checksum: 52b2c48b9bb4d0d5357057127799e4d71129fe8997dd0f770a9fe68ee7f3eff0
+  rpm/cni:
+    version: "v0.7.1"
+    required:
+      CNI_DATA_IMAGE: "shared/build/cni"
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/cni/prepare"
+    push: False
+  rpm/cni/rpm:
+    version: "v0.7.1"
+    required:
+      BASE_IMAGE: "rpm/cni"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/cni/rpm"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/helm:
+    version: "v2.9.1"
+    required:
+      HELM_DATA_IMAGE: "shared/build/helm"
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/helm/prepare"
+    push: False
+  rpm/helm/rpm/client:
+    version: "v2.9.1"
+    required:
+      BASE_IMAGE: "rpm/helm"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/helm/rpm/client"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/kubernetes:
+    version: "v1.10.3"
+    required:
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/prepare"
+    push: False
+  rpm/kubernetes/rpm/server:
+    version: "v1.10.3"
+    required:
+      BASE_IMAGE: "rpm/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/rpm/server"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/kubernetes/rpm/worker:
+    version: "v1.10.3"
+    required:
+      BASE_IMAGE: "rpm/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/rpm/worker"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/kubernetes/rpm/client:
+    version: "v1.10.3"
+    required:
+      BASE_IMAGE: "rpm/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/rpm/client"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/kubernetes/rpm/all:
+    version: "v1.10.3"
+    required:
+      BASE_IMAGE: "rpm/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/rpm/all"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+  rpm/nginx/rpm:
+    version: "1.13.9"
+    required:
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/nginx"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.x86_64.rpm
+        dest: nginx-1.13.9-1.el7_4.ngx.x86_64.rpm
+        checksum: 169be987c4a291ed8b9699da7c59f96700a0b178dcc55cd7dd835d4253128e07
+  rpm/consul:
+    version: "1.0.0"
+    required:
+      CONSUL_DATA_IMAGE: "shared/build/consul"
+      BASE_IMAGE: "shared/centos/rpm-packer"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/consul/prepare"
+    push: False
+  rpm/consul/rpm:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "rpm/consul"
+    method: build
+    directory: "{{ playbook_dir }}/../../rpm-containers/consul/rpm"
+    push: False
+    artifacts:
+      - src: /out/*
+        dest: rpms

@@ -1,14 +1,10 @@
 ---
 
-- name: Install local repo python installation
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}/install.yml"
-        - "default_distribution.yml"
-      paths:
-        - ""
-        - "{{ playbook_dir }}/tasks"
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
+
+- meta: flush_handlers
 
 - name: Create http configuration path
   file:

@@ -1,0 +1,5 @@
+---
+
+- name: Calculate base images for all images
+  include_tasks: "{{ image.method }}/base.yml"
+  when: not docker_defined_images[name]

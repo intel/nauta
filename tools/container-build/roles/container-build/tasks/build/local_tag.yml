@@ -1,5 +1,16 @@
 ---
 
+- name: Ensure directory exists
+  file:
+    path: "{{ image.directory }}"
+
+- name: Download all required files
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ image.directory }}/{{ item.dest }}"
+    checksum: "sha256:{{ item.checksum }}"
+  with_items: "{{ image.fetch_files | default([]) }}"
+
 - name: List files in directory
   find:
     path: "{{ image.directory }}"

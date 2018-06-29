@@ -1,0 +1,10 @@
+ARG CONSUL_DATA_IMAGE
+ARG BASE_IMAGE
+FROM ${CONSUL_DATA_IMAGE} as data
+
+FROM ${BASE_IMAGE}
+
+COPY --from=data /build-output/consul.tar.gz ./SOURCES/consul.tar.gz
+
+ENV RPM_VERSION=1.1.0
+ENV RPM_RELEASE=0

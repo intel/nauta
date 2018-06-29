@@ -1,22 +1,22 @@
 [Unit]
 Description=Kubernetes worker
-After=docker.service
-Requires=docker.service
+After=docker.service cgconfig.service
+Requires=docker.service cgconfig.service
 
 [Service]
 TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
-ExecStart=/opt/carbon/kubernetes/kubelet \
+ExecStart=/opt/dls4e/kubernetes/kubelet \
                   --address {{ dls_configuration.internal_interface.ipv4_address }} \
                   --network-plugin cni --cloud-provider "" --node-ip {{ dls_configuration.internal_interface.ipv4_address }} \
                   --cluster-dns {{ kubernetes_network.svc_list.dns.ip }} --cluster-domain {{ k8s_domain }}.{{ domain }} \
                   --node-labels {{ labels }} --pod-manifest-path=/etc/kubelet/static \
                   --allow-privileged=True --kubeconfig /etc/kubelet/kubelet \
                   {{ feature_gates }} \
-                  --cert-dir /etc/kubelet/ssl --system-reserved cpu=1,memory=1Gi \
+                  --cert-dir /etc/kubelet/ssl --system-reserved cpu={{ host_reserved.cpus }},memory={{ host_reserved.memory }}M \
                   --fail-swap-on=false \
-                  --cni-bin-dir /opt/carbon/cni \
+                  --cni-bin-dir /opt/dls4e/cni-plugins \
                   --pod-infra-container-image registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/pause:3.1 \
                   --serialize-image-pulls=True --image-pull-progress-deadline=30m0s \
                   --tls-cert-file /etc/dls-cluster/client/node.crt \

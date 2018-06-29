@@ -7,7 +7,14 @@
     status_code: 200,404
     validate_certs: False
   register: image_present
+  when: not docker_defined_images[name]
 
 - name: Add image definition
   set_fact:
     docker_images_remote_exists: "{{ docker_images_remote_exists | combine({ name: image_present.status == 200 }) }}"
+  when: not docker_defined_images[name]
+
+- name: Add image definition
+  set_fact:
+    docker_images_remote_exists: "{{ docker_images_remote_exists | combine({ name: True }) }}"
+  when: docker_defined_images[name]

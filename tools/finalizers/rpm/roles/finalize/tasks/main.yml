@@ -1,0 +1,174 @@
+---
+
+- name: Set default facts
+  set_fact:
+    async_tasks: {}
+
+- name: Create build dir
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - tmp
+    - platform
+    - rpm
+    - arch
+
+- name: Unpack package
+  shell: tar -xf {{ rpm_package }} -I pigz
+  args:
+    chdir: "{{ build_dir }}/tmp"
+  notify:
+    - Remove build dir
+
+- name: Unpack package
+  shell: tar -xf {{ platform_package }} -I pigz
+  args:
+    chdir: "{{ build_dir }}/platform"
+  notify:
+    - Remove build dir
+
+- name: Load variables
+  include_vars:
+    dir: "{{ build_dir }}/tmp/facts"
+    extensions:
+      - yaml
+      - yml
+    name: build_facts
+
+- set_fact:
+    centor_rpm_packer_image: "{{ build_facts.package_attached_images['shared/centos/rpm-packer'].remote_url }}"
+    container_name: "finalizer-{{ build_name }}-{{ user }}-{{ version }}"
+
+- name: Start artifact container
+  docker_container:
+    name: "{{ container_name }}"
+    image: "{{ centor_rpm_packer_image }}"
+    stop_timeout: 0
+    recreate: True
+    restart_policy: no
+    user: "{{ user_id }}:{{ group_id }}"
+    command: "bash -c 'while true; do sleep 1; done'"
+    env:
+      HOME: "/data"
+    volumes:
+      - "{{ build_dir }}/tmp:/in:ro"
+      - "{{ build_dir }}/platform:/platform:ro"
+      - "{{ build_dir }}/rpm:/out"
+      - "{{ build_dir }}/arch:/data"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/group:/etc/group:ro"
+  notify:
+    - Remove finalizer container
+
+- name: Register docker container
+  add_host:
+    name: "{{ container_name }}"
+    group: docker
+    ansible_connection: docker
+
+- name: Create directories
+  file:
+    path: "/data/rpmbuild/{{ item }}"
+    state: directory
+  with_items:
+    - SOURCES
+    - RPMS
+    - SRPMS
+    - SPECS
+    - BUILD
+  delegate_to: "{{ container_name }}"
+
+- name: Create directories
+  file:
+    path: "/out/{{ item }}"
+    state: directory
+  with_items:
+    - artifacts/packages
+    - final
+  delegate_to: "{{ container_name }}"
+
+- name: Create archive directory for build
+  shell: tar -cf /data/rpmbuild/SOURCES/registry.tar.gz registry/ -I pigz
+  args:
+    chdir: "/platform"
+  delegate_to: "{{ container_name }}"
+
+- name: Find all artifacts files
+  find:
+    path: "/in/artifacts/rpms"
+    patterns: "*.rpm"
+  register: rpms
+  delegate_to: "{{ container_name }}"
+
+- name: Copy all rpms
+  copy:
+    src: "{{ item.path }}"
+    dest: "/out/artifacts/packages/{{ item.path | basename }}"
+    remote_src: True
+  with_items: "{{ rpms.files }}"
+  delegate_to: "{{ container_name }}"
+
+- name: Create repo
+  shell: createrepo .
+  args:
+    chdir: "/out/artifacts"
+  delegate_to: "{{ container_name }}"
+
+- name: Create archive directory for build
+  shell: tar -cf /data/rpmbuild/SOURCES/artifacts.tar.gz artifacts/ -I pigz
+  args:
+    chdir: "/out"
+  delegate_to: "{{ container_name }}"
+
+- name: Render templates for specs
+  template:
+    src: "{{ item }}.spec.j2"
+    dest: "/data/rpmbuild/SPECS/{{ item }}.spec"
+  delegate_to: "{{ container_name }}"
+  with_items:
+    - commons
+    - yum
+    - registry
+    - yum-repository
+
+- name: Create rpms
+  include_tasks: build_rpm.yml
+  with_items:
+    - commons
+    - yum
+    - registry
+    - yum-repository
+
+- name: Wait for build tasks
+  vars:
+    name: "{{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ async_tasks }}"
+
+- name: Copy rpm
+  copy:
+    src: "/data/rpmbuild/RPMS/x86_64/dls4e-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.x86_64.rpm"
+    dest: "/out/final/dls4e-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.x86_64.rpm"
+    remote_src: True
+  delegate_to: "{{ container_name }}"
+  with_items:
+    - commons
+    - yum
+    - registry
+    - yum-repository
+
+- name: Create tar
+  shell: tar -cf /out/release-rpm.tar.gz --use-compress-program=pigz ./
+  delegate_to: "{{ container_name }}"
+  args:
+    chdir: "/out/final"
+  when: create_package | default(True)
+
+- name: Fetch tar
+  fetch:
+    flat: True
+    src: /out/release-rpm.tar.gz
+    dest: "{{ output }}"
+  delegate_to: "{{ container_name }}"

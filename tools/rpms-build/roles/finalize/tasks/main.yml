@@ -1,6 +1,0 @@
----
-
-- name: Create tar
-  shell: tar -cf {{ output }} --use-compress-program=pigz ./
-  args:
-    chdir: "{{ build_dir }}/out"

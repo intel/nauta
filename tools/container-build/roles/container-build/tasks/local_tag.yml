@@ -1,0 +1,10 @@
+---
+
+- name: Calculate remote repository tags for all images
+  include_tasks: "{{ image.method }}/local_tag.yml"
+  when: not docker_defined_images[name]
+
+- name: Add image definition
+  set_fact:
+    docker_images_local_tags: "{{ docker_images_local_tags | combine({ name: docker_defined_data[name].local_checksum }) }}"
+  when: docker_defined_images[name]

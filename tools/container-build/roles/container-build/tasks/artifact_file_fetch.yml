@@ -1,0 +1,17 @@
+---
+
+- name: Calculate dest
+  set_fact:
+    file_dest: "{{ artifacts_dir }}/{{ path.dest }}/{{ file | regex_replace('^' + path.src + '/', '') }}"
+
+- name: Ensure directory exists
+  file:
+    path: "{{ file_dest | dirname }}"
+    state: directory
+
+- name: Fetch file from remote
+  fetch:
+    src: "{{ file }}"
+    dest: "{{ file_dest }}"
+    flat: True
+  delegate_to: "{{ artifact_container }}"

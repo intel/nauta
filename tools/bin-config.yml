@@ -1,0 +1,36 @@
+---
+
+local_images:
+  bin/kubectl:
+    version: "1.10.3"
+    required:
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/kubectl"
+    artifacts:
+      - src: /out/*
+        dest: Linux/amd64
+    push: False
+  bin/loader:
+    version: "1.0.0"
+    required:
+      BUILD_IMAGE: "shared/centos/build-go"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/loader"
+    artifacts:
+      - src: /loader
+        dest: Linux/amd64
+    push: False
+  bin/helm:
+    version: "2.9.1"
+    required:
+      HELM_DATA_IMAGE: "shared/build/helm"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/helm"
+    artifacts:
+      - src: /out/*
+        dest: Linux/amd64
+    push: False

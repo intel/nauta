@@ -11,12 +11,8 @@
     - firewalld
 
 - name: Remove yum packages
-  environment: "{{ proxy }}"
-  yum:
-    name: "{{ package }}"
-    state: absent
-  loop_control:
-    loop_var: package
-  with_items:
-    - firewall
-    - firewalld
+  include_tasks: yum_remove.yml
+  vars:
+    packages:
+      - firewall
+      - firewalld

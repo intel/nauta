@@ -1,0 +1,36 @@
+Summary: DLS4E Yum Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
+Name: dls4e-yum-repository
+Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
+Release: {{ VERSION_ID }}
+License: Apache-2.0
+SOURCE0: artifacts.tar.gz
+Group: Tools
+AutoReqProv: no
+
+%define  debug_package %{nil}
+
+Requires: dls4e-commons
+
+%description
+%{summary}
+
+%prep
+%setup -q -n artifacts
+
+%build
+# Empty section.
+
+%install
+rm -rf %{buildroot}
+mkdir -p  %{buildroot}
+
+mkdir -p %{buildroot}/opt/dls4e/repository
+cp -ar ./* %{buildroot}/opt/dls4e/repository/
+
+exit 0
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(0755,root,root,-)
+/opt/dls4e/repository/*

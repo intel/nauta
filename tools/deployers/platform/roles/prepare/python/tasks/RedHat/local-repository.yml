@@ -1,0 +1,8 @@
+---
+
+- name: Install package
+  include_tasks: yum_dls4e_install.yml
+  vars:
+    packages:
+      - "dls4e-pip-repository-2.7"
+      - "python2-pip"

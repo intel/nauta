@@ -1,0 +1,13 @@
+---
+
+- name: Install packages {{ packages | join(', ') }}
+  environment: "{{ proxy }}"
+  yum:
+    disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
+    enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"
+    update_cache: "{{ update_cache | default(False) }}"
+    disablerepo: "{{ calculated_disabled_repos | join(',') }}"
+    enablerepo: "{{ calculated_enabled_repos | join(',') }}"
+    name: "{{ item }}"
+    state: "{{ state | default('present') }}"
+  with_items: "{{ packages }}"

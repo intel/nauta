@@ -1,0 +1,12 @@
+---
+
+- name: Create rpms
+  shell: rpmbuild -bb  /data/rpmbuild/SPECS/{{ item }}.spec
+  delegate_to: "{{ container_name }}"
+  register: build_async
+  failed_when: "'ansible_job_id' not in build_async"
+  async: 1800
+  poll: 0
+
+- set_fact:
+    async_tasks: "{{ async_tasks | combine({item: build_async.ansible_job_id}) }}"

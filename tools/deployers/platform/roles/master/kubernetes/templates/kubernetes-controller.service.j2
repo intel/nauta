@@ -7,7 +7,7 @@ Requires=docker.service kubernetes-apiserver.target
 TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
-ExecStart=/opt/carbon/kubernetes/kube-controller-manager \
+ExecStart=/opt/dls4e/kubernetes/kube-controller-manager \
       --service-account-private-key-file /etc/dls-cluster/master/key/service.key \
       --node-sync-period 2m \
       --v 0 --leader-elect \

@@ -1,19 +1,29 @@
 ---
 
-- name: Create filesystem on device
-  filesystem:
-    dev: "{{ local_data_device }}"
-    fstype: xfs
-    force: True
+- name: Ensure that .done file does not exists
+  stat:
+    path: "{{ local_data_path }}/.done"
+  register: data_done_file
 
 - name: Create mount path
   file:
     path: "{{ local_data_path }}"
     state: directory
 
-- name: Mount data
-  mount:
-    fstype: xfs
-    path: "{{ local_data_path }}"
-    src: "{{ local_data_device }}"
-    state: mounted
+- include_tasks: mount.yml
+  when:
+    - local_data_device | default(False)
+    - not data_done_file.stat.exists
+
+- name: Touch done file
+  file:
+    path: "{{ local_data_path }}/.done"
+    state: touch
+
+- name: Create directories
+  file:
+    path: "{{ local_data_path }}/{{ item }}"
+    state: directory
+  with_items:
+    - local/nfs
+    - local/etcd

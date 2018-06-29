@@ -1,18 +1,10 @@
 ---
 
-- name: Chekc if local repo file exists
-  stat:
-    path: /opt/carbon/yum/yum.conf
-
-- name: Install yum docker
-  environment: "{{ proxy }}"
-  yum:
-    conf_file: /opt/carbon/yum/yum.conf
-    name: "{{ package_yum }}"
-  loop_control:
-    loop_var: package_yum
-  with_items:
-    - docker-engine
-  notify:
-    - Reload Systemd
-    - Restart Docker
+- name: Verify rsync
+  include_tasks: yum_dls4e_install.yml
+  vars:
+    packages:
+      - docker-ce-18.03.1.ce
+    task_handlers:
+      - Reload Systemd
+      - Restart Docker

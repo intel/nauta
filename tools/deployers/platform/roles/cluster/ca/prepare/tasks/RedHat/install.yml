@@ -1,0 +1,7 @@
+---
+
+- name: Verify rsync
+  include_tasks: yum_verify_install.yml
+  vars:
+    packages:
+      - rsync

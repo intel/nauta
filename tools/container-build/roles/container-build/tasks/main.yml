@@ -6,8 +6,32 @@
     docker_images_remote_exists: {}
     docker_images_base: {}
     docker_images_organized: "{{ images | organize_images }}"
+    docker_defined_images: {}
+    docker_defined_data: {}
 
-- debug: var=docker_images_organized
+- name: Register each image if defined in parent build
+  vars:
+    name: "{{ image_def.key }}"
+    image: "{{ image_def.value }}"
+    defined: "{{ image_def.key in build_facts.package_attached_images | default({}) }}"
+  loop_control:
+    loop_var: image_def
+  set_fact:
+    docker_defined_images: "{{ docker_defined_images | combine({name: defined}) }}"
+  with_dict: "{{ images }}"
+
+- name: Register each defined image
+  vars:
+    name: "{{ image_def.key }}"
+    image: "{{ image_def.value }}"
+  loop_control:
+    loop_var: image_def
+  set_fact:
+    docker_defined_data: "{{ docker_defined_data | combine({name: build_facts.package_attached_images[name]}) }}"
+  with_dict: "{{ images }}"
+  when: docker_defined_images[name]
+
+- debug: var=docker_defined_images
 
 - name: Calculate local repository tags for all images
   vars:
@@ -15,7 +39,7 @@
     image: "{{ image_def.value }}"
   loop_control:
     loop_var: image_def
-  include_tasks: "{{ image.method }}/local_tag.yml"
+  include_tasks: "local_tag.yml"
   with_dict: "{{ images }}"
 
 - name: Calculate remote repository tags for all images
@@ -30,7 +54,7 @@
     image: "{{ image_def.value }}"
   loop_control:
     loop_var: image_def
-  include_tasks: "{{ image.method }}/base.yml"
+  include_tasks: "base.yml"
   with_dict: "{{ images }}"
 
 - name: Check if image exists
@@ -58,6 +82,12 @@
   include_tasks: push.yml
   when: push_local | default(True)
 
-- name: Tag image layers
-  include_tasks: tag.yml
-  when: tag_local | default(False)
+- name: Fetch artifacts
+  include_tasks: artifact.yml
+
+- name: Render facts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ facts_dir }}/{{ item }}"
+  with_items:
+    - images.yaml

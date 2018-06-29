@@ -19,8 +19,6 @@
     - 100%
   roles:
     - role: cluster/docker
-      tags:
-        - install
 
 - hosts: all:!master
   become: True
@@ -34,5 +32,3 @@
         state: restarted
   roles:
     - role: cluster/docker
-      tags:
-        - install

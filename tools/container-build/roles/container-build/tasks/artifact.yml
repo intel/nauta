@@ -1,0 +1,17 @@
+---
+
+- name: Synchronize all files
+  synchronize:
+    src: "{{ build_dir }}/tmp/artifacts/"
+    dest: "{{ artifacts_dir }}/"
+  when: input_package | default(False)
+
+- name: Start artifact process if image have any artifacts
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "artifact_prepare.yml"
+  with_dict: "{{ images }}"
+  when:
+    - image.artifacts | default([]) | length > 0
+    - not docker_defined_images[name]

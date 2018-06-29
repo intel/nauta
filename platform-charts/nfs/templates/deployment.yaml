@@ -69,5 +69,5 @@ spec:
       volumes:
         - name: export-volume
           hostPath:
-            path: /export
+            path: /data/local/nfs
             type: Directory

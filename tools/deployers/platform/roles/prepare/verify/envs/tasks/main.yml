@@ -1,5 +1,20 @@
 ---
 
+- name: Calculate usage values
+  set_fact:
+    current_memory: "{{ ansible_memory_mb.real.total }}"
+    current_cpus: "{{ ansible_processor_vcpus }}"
+    reserved_memory: "{% if ansible_memory_mb.real.total / 50 > 1024 %}{{ (ansible_memory_mb.real.total / 50) | int }}{% else %}1024{% endif %}"
+
+- name: Set usage values
+  set_fact:
+    host_reserved:
+      memory: "{{ reserved_memory }}"
+      cpus: "1"
+    docker_reserved:
+      memory: "{{ current_memory | int - reserved_memory | int }}"
+      cpus: "{{ current_cpus | int - 1 }}"
+
 - name: Set facts for host definition
   set_fact:
     dls_configuration:

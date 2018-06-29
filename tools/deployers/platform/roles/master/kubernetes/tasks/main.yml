@@ -8,21 +8,14 @@
     # yamllint disable-line rule:line-length
     runtime_config: "{% if kubernetes_calculated_runtime_config != {} %}--runtime-config {% for key,value in kubernetes_calculated_runtime_config.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
 
-
-- name: Install local repo python installation
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}/install.yml"
-        - "default_distribution.yml"
-      paths:
-        - ""
-        - "{{ playbook_dir }}/tasks"
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
 
 - name: Render healthz script
   template:
     src: kubernetes-check.sh.j2
-    dest: /opt/carbon/kubernetes/check.sh
+    dest: /opt/dls4e/kubernetes/check.sh
     mode: 0755
 
 ### Apiserver

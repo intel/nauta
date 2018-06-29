@@ -4,15 +4,11 @@
   become: True
   any_errors_fatal: True
   roles:
-    - role: cluster/init/ca.prepare
-      tags:
-        - install
+    - role: cluster/ca/prepare
 
 - hosts: master[0]
   become: True
   become_user: cluster-master
   any_errors_fatal: True
   roles:
-    - role: cluster/init/ca.init
-      tags:
-        - install
+    - role: cluster/ca/init

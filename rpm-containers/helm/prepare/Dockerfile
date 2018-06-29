@@ -1,0 +1,10 @@
+ARG HELM_DATA_IMAGE
+ARG BASE_IMAGE
+FROM ${HELM_DATA_IMAGE} as data
+
+FROM ${BASE_IMAGE}
+
+COPY --from=data /build-output/helm.tar.gz ./SOURCES/helm.tar.gz
+
+ENV RPM_VERSION=2.9.1
+ENV RPM_RELEASE=0

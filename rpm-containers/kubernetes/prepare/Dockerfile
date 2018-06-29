@@ -1,0 +1,10 @@
+ARG KUBERNETES_DATA_IMAGE
+ARG BASE_IMAGE
+FROM ${KUBERNETES_DATA_IMAGE} as data
+
+FROM ${BASE_IMAGE}
+
+COPY --from=data /build-output/kubernetes.tar.gz ./SOURCES/kubernetes.tar.gz
+
+ENV RPM_VERSION=1.10.3
+ENV RPM_RELEASE=0

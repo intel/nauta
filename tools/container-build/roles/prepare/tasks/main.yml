@@ -1,11 +1,51 @@
 ---
 
+- name: Create docker registry directories
+  file:
+    path: "{{ build_dir }}/data/{{ item }}"
+    state: directory
+  with_items:
+    - registry
+    - artifacts
+    - facts
+
+- name: Create docker registry directories
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - tmp
+
+- name: Unarchive input package
+  shell: "tar -xf {{ input_package }} -C {{ build_dir }}/tmp"
+  when: input_package | default(False)
+
+- name: Set Default fact
+  set_fact:
+    build_facts: {}
+  when: not input_package | default(False)
+
+- name: Load variables
+  include_vars:
+    dir: "{{ build_dir }}/tmp/facts"
+    extensions:
+      - yaml
+      - yml
+    name: build_facts
+  when: input_package | default(False)
+
+- name: Set dir facts
+  set_fact:
+    registry_dir: "{{ build_dir }}/data/registry"
+    artifacts_dir: "{{ build_dir }}/data/artifacts"
+    facts_dir: "{{ build_dir }}/data/facts"
+
 - name: Start registry container
   docker_container:
     name: "yum-registry-{{ build_name }}-{{ user }}-{{ version }}"
     env: "{{ proxy }}"
     volumes:
-      - "{{ build_dir }}:/var/lib/registry"
+      - "{{ registry_dir }}:/var/lib/registry"
     ports:
       - 5000
     image: "registry:2"

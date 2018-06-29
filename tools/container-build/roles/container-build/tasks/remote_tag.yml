@@ -8,3 +8,14 @@
     image: "{{ images[image_def] }}"
   include_tasks: "{{ image.method }}/remote_tag.yml"
   with_items: "{{ layer }}"
+  when: not docker_defined_images[name]
+
+- name: Add image definition
+  loop_control:
+    loop_var: image_def
+  vars:
+    name: "{{ image_def }}"
+  set_fact:
+    docker_images_remote_tags: "{{ docker_images_remote_tags | combine({ name: docker_defined_data[name].remote_checksum }) }}"
+  with_items: "{{ layer }}"
+  when: docker_defined_images[name]

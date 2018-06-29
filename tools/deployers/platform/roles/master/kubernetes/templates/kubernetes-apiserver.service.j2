@@ -7,7 +7,7 @@ Requires=docker.service
 TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
-ExecStart=/opt/carbon/kubernetes/kube-apiserver \
+ExecStart=/opt/dls4e/kubernetes/kube-apiserver \
             --advertise-address {{ dls_configuration.internal_interface.ipv4_address }} \
             --apiserver-count 1 \
             --secure-port {{ kubernetes_network.internal_port }} \

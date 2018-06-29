@@ -12,5 +12,3 @@
         state: restarted
   roles:
     - role: master/loadbalancer
-      tags:
-        - install

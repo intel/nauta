@@ -1,5 +1,9 @@
-ARG BASE_IMAGE=centos:7.4.1708
+ARG BASE_IMAGE
+ARG KUBERNETES_DATA_IMAGE
+FROM ${KUBERNETES_DATA_IMAGE} as data
+
 FROM ${BASE_IMAGE}
 
-ADD http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/kubectl /bin/kubectl
+COPY --from=data /build-output/kubernetes/kubectl /bin/kubectl
+
 RUN chmod +x /bin/kubectl

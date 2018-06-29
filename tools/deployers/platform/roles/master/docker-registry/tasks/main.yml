@@ -1,19 +1,12 @@
 ---
 
-- name: Install local repo python installation
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}/install.yml"
-        - "default_distribution.yml"
-      paths:
-        - ""
-        - "{{ playbook_dir }}/tasks"
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
 
-- name: Create registry directory
+- name: Ensure registry directory exists
   file:
-    path: /opt/carbon/registry
-    state: directory
+    path: /opt/dls4e/registry
 
 - name: Replace configuration
   template:

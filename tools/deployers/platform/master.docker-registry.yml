@@ -14,5 +14,3 @@
     - 1
   roles:
     - role: master/docker-registry
-      tags:
-        - install

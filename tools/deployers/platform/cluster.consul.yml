@@ -12,5 +12,3 @@
         state: restarted
   roles:
     - role: cluster/consul
-      tags:
-        - install

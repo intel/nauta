@@ -10,7 +10,9 @@
     image: "{{ item.value }}"
   include_tasks: "load_image.yml"
   with_dict: "{{ images }}"
-  when: docker_images_remote_exists[name]
+  when:
+    - docker_images_remote_exists[name]
+    - not docker_defined_images[name]
 
 - name: Wait for tasks
   vars:

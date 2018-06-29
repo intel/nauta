@@ -1,6 +1,0 @@
----
-
-- name: Render spec for {{ name }}
-  template:
-    src: spec.j2
-    dest: "{{ build_dir }}/spec/{{ name }}"

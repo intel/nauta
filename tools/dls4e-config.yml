@@ -1,46 +1,31 @@
 ---
 
-images:
-  dls4e/centos:
-    version: "7.4.1708"
-    image: "centos:7.4.1708"
-    method: "pull"
-    push: False
-  dls4e/build:
-    version: "7.4.1708"
-    required:
-      BASE_IMAGE: "dls4e/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/build"
-    push: False
-  dls4e/build-go:
-    version: "1.10.2"
-    required:
-      BASE_IMAGE: "dls4e/build"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/build-go"
-    push: False
-  dls4e/go-apiserver-builder:
-    version: "v1.9-alpha.4"
-    required:
-      BASE_IMAGE: "dls4e/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/go-apiserver-builder"
-    push: False
+export_images:
+  - name: tiller
+    value: "{{ image_local_url['dls4e/tiller'] }}"
+  - name: tensorflow
+    value: "{{ image_local_url['dls4e/tensorflow'] }}"
+  - name: tensorboard
+    value: "{{ image_local_url['dls4e/tensorflow'] }}"
+  - name: tensorboard_service
+    value: "{{ image_local_url['dls4e/tensorboard-service'] }}"
+
+local_images:
   dls4e/etcd:
     version: "3.1.10"
     image: "gcr.io/google-containers/etcd-amd64:3.1.10"
     method: "pull"
   dls4e/kubectl:
-    version: "1.10.0"
+    version: "1.10.3"
     required:
-      BASE_IMAGE: "dls4e/centos"
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
   dls4e/gui:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/centos"
+      BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
@@ -58,7 +43,7 @@ images:
   dls4e/samba:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/python36"
+      BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
   dls4e/tiller:
@@ -68,15 +53,15 @@ images:
   dls4e/redsocks:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/centos"
-      BUILD_IMAGE: "dls4e/build"
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/build"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
   dls4e/experiment-service:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/centos"
-      BUILD_IMAGE: "dls4e/go-apiserver-builder"
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
   dls4e/tensorflow:
@@ -98,17 +83,10 @@ images:
   dls4e/tf/operator:
     version: "v2"
     required:
-      BASE_IMAGE: "dls4e/centos"
-      BUILD_IMAGE: "dls4e/build-go"
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tf-operator"
-  dls4e/python36:
-    version: "3.6"
-    required:
-      BASE_IMAGE: "dls4e/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/python36"
-    push: False
   dls4e/docker:
     version: "18.03"
     required:
@@ -118,7 +96,7 @@ images:
   dls4e/ps-sidecar:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "dls4e/python36"
+      BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
   dls4e/ingress:
@@ -136,7 +114,7 @@ images:
   dls4e/tensorboard-service:
     version: "v1.0.0"
     required:
-      BASE_IMAGE: "dls4e/python36"
+      BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/tensorboard-service"
 
@@ -150,7 +128,7 @@ subcharts:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/dls-gui"
       chart_values:
-        image: dls4e/gui:1.0.0
+        image: "{{ image_local_url['dls4e/gui'] }}"
     dls-experiments:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/dls-experiments"
@@ -161,61 +139,61 @@ subcharts:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/dls-commons"
       chart_values:
-        docker_image: dls4e/docker:18.03
+        docker_image: "{{ image_local_url['dls4e/docker'] }}"
     docker-registry:
       version: 1.1.1
       path: "{{ playbook_dir }}/../../dls4e-charts/docker-registry"
       chart_values:
-        image: dls4e/registry:2.6.2
+        image: "{{ image_local_url['dls4e/registry'] }}"
     elasticsearch:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/elasticsearch"
       chart_values:
-        image: dls4e/elasticsearch:5.6.9
+        image: "{{ image_local_url['dls4e/elasticsearch'] }}"
     fluentd:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/fluentd"
       chart_values:
-        image: dls4e/fluentd:v0.12
+        image: "{{ image_local_url['dls4e/fluentd'] }}"
     samba:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/samba"
       chart_values:
-        image: dls4e/samba:1.0.0
+        image: "{{ image_local_url['dls4e/samba'] }}"
     redsocks:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/redsocks"
       conditions: features.redsocks
       feature_enabled: False
       chart_values:
-        image: dls4e/redsocks:1.0.0
+        image: "{{ image_local_url['dls4e/redsocks'] }}"
         Interfaces: cni0
     registry-nginx:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/registry-nginx"
       chart_values:
-        image: dls4e/nginx:1.14.0
+        image: "{{ image_local_url['dls4e/nginx'] }}"
     experiment-service:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/experiment-service"
       chart_values:
-        image: dls4e/postgres:10.4
-        service_image: dls4e/experiment-service:1.0.0
-        etcd_image: dls4e/etcd:3.1.10
+        image: "{{ image_local_url['dls4e/postgres'] }}"
+        service_image: "{{ image_local_url['dls4e/experiment-service'] }}"
+        etcd_image: "{{ image_local_url['dls4e/etcd'] }}"
     tf:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../dls4e-charts/tf"
       chart_values:
-        image: dls4e/tf/operator:v2
-        tfimage: dls4e/tensorflow:1.8.0-py3
+        image: "{{ image_local_url['dls4e/tf/operator'] }}"
+        tfimage: "{{ image_local_url['dls4e/tensorflow'] }}"
     dls-ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/dls-ingress"
       chart_values:
-        image: dls4e/ingress:0.14.0
-        defaultbackend_image: dls4e/defaultbackend:1.4
+        image: "{{ image_local_url['dls4e/ingress'] }}"
+        defaultbackend_image: "{{ image_local_url['dls4e/defaultbackend'] }}"
     dashboard:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../dls4e-charts/dashboard"
       chart_values:
-        image: dls4e/dashboard:v1.8.3
+        image: "{{ image_local_url['dls4e/dashboard'] }}"

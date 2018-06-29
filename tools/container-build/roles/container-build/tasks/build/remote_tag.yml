@@ -4,7 +4,7 @@
     required_image_sha: []
 
 - set_fact:
-    required_image_sha: "{{ (required_image_sha | default([])) + [docker_images_local_tags[item.value]] }}"
+    required_image_sha: "{{ (required_image_sha | default([])) + [docker_images_remote_tags[item.value]] }}"
   with_dict: "{{ image.required | default({}) }}"
 
 - set_fact:

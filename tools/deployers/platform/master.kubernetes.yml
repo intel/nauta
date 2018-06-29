@@ -55,5 +55,3 @@
     - 100%
   roles:
     - role: master/kubernetes
-      tags:
-        - install

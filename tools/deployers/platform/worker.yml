@@ -1,5 +1,4 @@
 ---
 
 - import_playbook: worker.kubernetes.yml
-- import_playbook: worker.nfs.yml
 

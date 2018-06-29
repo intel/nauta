@@ -1,0 +1,11 @@
+---
+
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
+
+- name: Start and enable cgroup service
+  service:
+    name: cgconfig
+    state: started
+    enabled: True

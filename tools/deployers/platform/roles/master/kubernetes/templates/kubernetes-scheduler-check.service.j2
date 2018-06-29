@@ -7,7 +7,7 @@ Requires=kubernetes-scheduler.service
 TimeoutStartSec=0
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/opt/carbon/kubernetes/check.sh http://127.0.0.1:10251/healthz
+ExecStart=/opt/dls4e/kubernetes/check.sh http://127.0.0.1:10251/healthz
 
 [Install]
 WantedBy=multi-user.target

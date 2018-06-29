@@ -1,43 +1,74 @@
 ---
 
+- name: Create build dir directories
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - repository
+    - tmp
+
 - name: Copy all deployer files
   synchronize:
     src: "{{ deployer }}/"
-    dest: "{{ build_dir }}/"
+    dest: "{{ build_dir }}/repository/"
   notify:
     - Remove build dir
 
+- name: Unarchive input package
+  shell: "tar -I pigz -xf {{ package }} ./facts"
+  args:
+    chdir: "{{ build_dir }}/tmp"
+  notify:
+    - Remove build dir
+
+- name: Load variables
+  include_vars:
+    dir: "{{ build_dir }}/tmp/facts"
+    extensions:
+      - yaml
+      - yml
+    name: build_facts
+
+- name: Set local url paths
+  vars:
+    name: "{{ item.key }}"
+    url: "{{ item.value.local_url }}"
+  set_fact:
+    image_local_url: "{{ image_local_url | default({}) | combine({name: url}) }}"
+  with_dict: "{{ build_facts.package_attached_images | default({}) }}"
+
 - name: Ensure files directory exists
   file:
-    path: "{{ build_dir }}/files"
+    path: "{{ build_dir }}/repository/files"
     state: directory
 
 - name: Ensure that config directory exist
   file:
-    path: "{{ build_dir }}/group_vars/all"
+    path: "{{ build_dir }}/repository/group_vars/all"
     state: directory
 
-- name: Unpack deployer bins
-  shell: tar -xf {{ package }} -I pigz
+- name: Unpack rpms
+  shell: "tar -xf {{ rpms }} -I pigz"
   args:
-    chdir: "{{ build_dir }}/files"
+    chdir: "{{ build_dir }}/repository/files"
 
 - name: Get charts
-  shell: tar -xf {{ chart }} -I pigz
+  shell: "tar -xf {{ chart }} -I pigz"
   args:
-    chdir: "{{ build_dir }}/files"
+    chdir: "{{ build_dir }}/repository/files"
 
 - name: Generate file with configuration
   vars:
     configuration:
-      carbon_release_package_installation: file
-      carbon_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-      carbon_release_package_release: "{{ VERSION_ID }}"
+      dls4e_release_package_installation: file
+      dls4e_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+      dls4e_release_package_release: "{{ VERSION_ID }}"
   copy:
-    dest: "{{ build_dir }}/group_vars/all/repository.yml"
+    dest: "{{ build_dir }}/repository/group_vars/all/repository.yml"
     content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
 
 - name: Create package
   shell: tar -cf {{ output }} -I pigz ./
   args:
-    chdir: "{{ build_dir }}"
+    chdir: "{{ build_dir }}/repository"

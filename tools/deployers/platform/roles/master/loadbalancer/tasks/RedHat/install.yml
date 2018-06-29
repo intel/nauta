@@ -1,27 +1,19 @@
 ---
 
-- name: Chekc if local repo file exists
-  stat:
-    path: /opt/carbon/yum/yum.conf
-
-- name: Install yum nginx server
-  environment: "{{ proxy }}"
-  yum:
-    conf_file: /opt/carbon/yum/yum.conf
-    name: "{{ package_yum }}"
-  loop_control:
-    loop_var: package_yum
-  with_items:
-    - nginx
-    - libselinux-python
-  notify:
-    - Reload Systemd
-    - Restart Nginx
+- name: Install package
+  include_tasks: yum_dls4e_install.yml
+  vars:
+    packages:
+      - nginx-1.13.9
+    handlers:
+      - Reload Systemd
+      - Restart Nginx
 
 - seboolean:
     name: httpd_can_network_connect
     state: yes
     persistent: yes
+  when: ansible_selinux.status == "enabled"
 
 - seport:
     ports: "{{ item }}"
@@ -29,9 +21,11 @@
     setype: http_port_t
     state: present
   with_items: "{{ kubernetes_network.external_ports }}"
+  when: ansible_selinux.status == "enabled"
 
 - seport:
     ports: 443-449
     proto: tcp
     setype: http_port_t
     state: present
+  when: ansible_selinux.status == "enabled"

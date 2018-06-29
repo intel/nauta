@@ -1,14 +1,8 @@
 ---
 
-- name: Install local repo python installation
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}/install.yml"
-        - "default_distribution.yml"
-      paths:
-        - ""
-        - "{{ playbook_dir }}/tasks"
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
 
 - name: Create consul group
   group:
@@ -110,7 +104,7 @@
 - name: Remove chattr -x from resolver
   file:
     path: /etc/resolv.conf
-    attr: e
+    attr: ""
 
 - name: Override resolver
   template:
@@ -120,4 +114,4 @@
 - name: Add chattr +x to resolver
   file:
     path: /etc/resolv.conf
-    attr: ie
+    attr: "i"

@@ -6,6 +6,15 @@
     # yamllint disable-line rule:line-length
     feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
 
+- name: Install cgroup file
+  template:
+    src: kubelet.cgroup.conf.j2
+    dest: /etc/cgconfig.d/50-DLS4E.conf
+  notify:
+    - Restart CG
+
+- meta: flush_handlers
+
 - name: Create kubelet config dir
   file:
     path: /etc/kubelet/static

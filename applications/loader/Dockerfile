@@ -24,5 +24,3 @@ RUN go build -o /loader main.go
 FROM ${BASE_IMAGE}
 
 COPY --from=build /loader /loader
-
-ENTRYPOINT /loader

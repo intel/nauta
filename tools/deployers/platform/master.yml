@@ -5,5 +5,4 @@
 - import_playbook: master.etcd.yml
 - import_playbook: master.kubernetes.yml
 - import_playbook: master.loadbalancer.yml
-- import_playbook: master.nfs.yml
 

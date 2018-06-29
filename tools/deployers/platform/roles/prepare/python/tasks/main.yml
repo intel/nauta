@@ -1,0 +1,44 @@
+---
+
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: local-repository.yml
+
+- name: Render pip.ini file
+  template:
+    src: pip.ini.j2
+    dest: /opt/dls4e/pip.ini
+
+- name: Install pip core
+  environment:
+    PIP_CONFIG_FILE: /opt/dls4e/pip.ini
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - pip
+    - virtualenv
+    - setuptools
+    - wheel
+
+- name: Install pip apps
+  environment:
+    PIP_CONFIG_FILE: /opt/dls4e/pip.ini
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: /opt/dls4e/python
+    virtualenv_site_packages: True
+    virtualenv_python: "{{ ansible_python_interpreter }}"
+  with_items:
+    - ansible
+    - docker
+    - pyOpenSSL
+
+- name: Ensure that python exists
+  file:
+    path: "/opt/dls4e/python/bin/python2"
+
+- name: Override python variable
+  set_fact:
+    ansible_python_interpreter: "/opt/dls4e/python/bin/python2"

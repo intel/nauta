@@ -3,39 +3,3 @@
 helm_url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm
 helm_sha: 422c1378c2c4fa99cf436c077a50ec54158173f100117763338cf7f2df5de0b9
 helm_local: "{{ build_dir }}/helm"
-
-subcharts_list:
-  dls-gui:
-    version: 0.0.1
-    path: "{{ playbook_dir }}/../../../dls4e-charts/dls-gui"
-    chart_values:
-      image: dls4e/gui:1.0.0
-  dls-experiments:
-    version: 1.0.0
-    path: "{{ playbook_dir }}/../../../dls4e-charts/dls-experiments"
-  dls-configuration:
-    version: 1.0.0
-    path: "{{ playbook_dir }}/../../../dls4e-charts/dls-configuration"
-  dls-commons:
-    version: 1.0.0
-    path: "{{ playbook_dir }}/../../../dls4e-charts/dls-commons"
-  docker-registry:
-    version: 1.1.1
-    path: "{{ playbook_dir }}/../../../dls4e-charts/docker-registry"
-    chart_values:
-      image: dls4e/registry:2.6.2
-  elasticsearch:
-    version: 0.0.1
-    path: "{{ playbook_dir }}/../../../dls4e-charts/elasticsearch"
-    chart_values:
-      image: dls4e/elasticsearch:5.6.9
-  fluentd:
-    version: 0.0.1
-    path: "{{ playbook_dir }}/../../../dls4e-charts/fluentd"
-    chart_values:
-      image: dls4e/fluentd:v0.12
-  samba:
-    version: 1.0.0
-    path: "{{ playbook_dir }}/../../../dls4e-charts/samba"
-    chart_values:
-      image: dls4e/samba:1.0.0

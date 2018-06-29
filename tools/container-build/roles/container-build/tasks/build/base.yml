@@ -13,7 +13,3 @@
 - name: Add image definition
   set_fact:
     docker_images_base: "{{ docker_images_base | combine({ name: base_image }) }}"
-
-- name: Ensure directory exists
-  file:
-    path: "{{ image.directory }}"

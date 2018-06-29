@@ -41,8 +41,8 @@
 
 - name: Copy chart
   copy:
-    src: dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz
-    dest: /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz
+    src: dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
+    dest: /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
 
 - name: Fetch all interfaces names
   set_fact:
@@ -68,11 +68,11 @@
         ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
   copy:
     content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
-    dest: "/tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.values.yaml"
+    dest: "/tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml"
 
 - name: Install helm chart
   shell: >
     helm upgrade dls4enterprise-k8s-platform
     --namespace kube-system -i
-    /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.tgz --wait
-    -f /tmp/dls4e-platform-{{ carbon_release_package_version }}-{{ carbon_release_package_release }}.values.yaml
+    /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz --wait
+    -f /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml

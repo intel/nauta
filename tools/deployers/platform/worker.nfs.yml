@@ -1,9 +1,0 @@
----
-
-- hosts: all
-  become: True
-  any_errors_fatal: True
-  roles:
-    - role: worker/nfs
-      tags:
-        - install

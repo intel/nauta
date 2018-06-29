@@ -1,0 +1,15 @@
+---
+
+- name: Find all files to copy
+  find:
+    path: "{{ path.src | dirname }}"
+    patterns: "{{ path.src | basename }}"
+    recurse: True
+  register: files
+  delegate_to: "{{ artifact_container }}"
+
+- name: Copy all files
+  vars:
+    file: "{{ item.path }}"
+  include_tasks: artifact_file_fetch.yml
+  with_items: "{{ files.files }}"

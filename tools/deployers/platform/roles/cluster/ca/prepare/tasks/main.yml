@@ -1,0 +1,91 @@
+---
+
+- name: Create required groups for cluster synchronization
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+  with_items:
+    - name: cluster-master
+      gid: 3500
+    - name: cluster-client
+      gid: 3501
+    - name: cluster
+      gid: 3502
+
+- name: Ensure that home dir exists
+  file:
+    path: /opt/dls4e/home
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Create required users for cluster synchronization
+  user:
+    name: "{{ item.name }}"
+    create_home: True
+    generate_ssh_key: True
+    group: "{{ item.name }}"
+    groups: cluster
+    uid: "{{ item.uid }}"
+    home: "/opt/dls4e/home/{{ item.name }}"
+  with_items:
+    - name: cluster-master
+      uid: 3500
+    - name: cluster-client
+      uid: 3501
+
+- include_tasks: include_distribution.yml
+  vars:
+    distribution_file: install.yml
+
+- name: Fetch public keys from hosts
+  slurp:
+    src: "/opt/dls4e/home/cluster-master/.ssh/id_rsa.pub"
+  register: cluster_master_key
+
+- name: Add authorized master keys to client users
+  authorized_key:
+    user: cluster-client
+    key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
+  with_items: "{{ groups['master'] }}"
+
+- name: Add authorized master keys to master users
+  authorized_key:
+    user: cluster-master
+    key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
+  with_items: "{{ groups['master'] }}"
+  when: inventory_hostname in groups['master']
+
+- name: Render master key config
+  template:
+    src: config.j2
+    dest: /opt/dls4e/home/cluster-master/.ssh/config
+    mode: 0600
+    owner: cluster-master
+    group: cluster-master
+  when: inventory_hostname in groups['master']
+
+- name: Create cluster directory
+  file:
+    path: /etc/dls-cluster
+    state: directory
+    owner: root
+    group: cluster
+    mode: 0750
+
+- name: Create cluster directory
+  file:
+    path: /etc/dls-cluster/master
+    state: directory
+    owner: cluster-master
+    group: cluster-master
+    mode: 0750
+
+- name: Create cluster directory
+  file:
+    path: /etc/dls-cluster/client
+    state: directory
+    owner: cluster-client
+    group: cluster
+    mode: 0750

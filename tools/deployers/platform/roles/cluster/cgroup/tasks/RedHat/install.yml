@@ -1,0 +1,8 @@
+---
+
+- name: Verify libcgroup
+  include_tasks: yum_verify_install.yml
+  vars:
+    packages:
+      - libcgroup
+      - libcgroup-tools

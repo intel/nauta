@@ -10,6 +10,7 @@
     image: "{{ item.value }}"
   include_tasks: "push_image.yml"
   with_dict: "{{ images }}"
+  when: image.push | default(True)
 
 - name: Wait for tasks
   vars:

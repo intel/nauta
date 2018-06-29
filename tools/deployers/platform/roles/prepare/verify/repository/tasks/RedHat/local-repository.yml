@@ -1,34 +1,36 @@
 ---
 
-- name: Check if carbon-yum-local is installed
-  environment: "{{ proxy }}"
-  tags:
-    - verify
-    - init
-  yum:
-    disable_plugin: '*'
-    disablerepo: '*'
-    list: carbon-yum-local
-  register: package
+- set_fact:
+    repo_local_path: "/root/dls4e/repo/{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}"
 
-- name: Check if carbon-registry-repository is installed on master
-  environment: "{{ proxy }}"
-  tags:
-    - verify
-    - init
-  yum:
-    disable_plugin: '*'
-    disablerepo: '*'
-    list: carbon-registry-repository
-  register: package_registry
-  when: inventory_hostname in groups['master']
+- name: Ensure repo directory is present
+  file:
+    path: "{{ repo_local_path }}"
+    state: directory
 
-- tags:
-    - verify
-    - init
+- name: Copy repository files
   vars:
-    query: "[?release=='{{ carbon_release_package_release | string }}']"
-    version_query: "[?version=='{{ carbon_release_package_version | string }}']"
-  set_fact:
-    local_repository: "{{ package.results | json_query(query) | json_query(version_query) | length == 1 }}"
-    local_registry: "{{ inventory_hostname in groups['master'] and package_registry.results | json_query(query) | json_query(version_query) | length == 1 }}"
+    file_name: "dls4e-{{ item }}-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
+  copy:
+    src: "{{ file_name }}"
+    dest: "{{ repo_local_path }}/{{ file_name }}"
+  with_items:
+    - commons
+    - registry
+    - yum
+    - yum-repository
+
+- name: Install package
+  include_tasks: yum_static_install.yml
+  vars:
+    packages:
+      - "{{ repo_local_path }}/dls4e-commons-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
+    update_cache: True
+
+- name: Install data
+  include_tasks: yum_static_install.yml
+  vars:
+    packages:
+      - "{{ repo_local_path }}/dls4e-yum-repository-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
+      - "{{ repo_local_path }}/dls4e-yum-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
+      - "{{ repo_local_path }}/dls4e-registry-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"

@@ -1,0 +1,36 @@
+---
+
+- name: Generate artifact container name
+  set_fact:
+    artifact_container: "artifact-{{ build_name }}-{{ user }}-{{ version }}-{{ name.replace('/', '-') }}"
+
+- block:
+    - name: Start artifact container
+      docker_container:
+        name: "{{ artifact_container }}"
+        image: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+        stop_timeout: 0
+        recreate: True
+        restart_policy: no
+        user: "{{ user_id }}"
+        command: "bash -c 'while true; do sleep 1; done'"
+    - name: Register node
+      add_host:
+        name: "{{ artifact_container }}"
+        group: docker
+        ansible_connection: docker
+      changed_when: False
+    - name: Verify access
+      shell: ls /
+      delegate_to: "{{ artifact_container }}"
+    - name: Fetch all files
+      include_tasks: artifact_list_fetch.yml
+      with_items: "{{ image.artifacts }}"
+      loop_control:
+        loop_var: path
+  always:
+    - name: Cleanup artifacts container
+      docker_container:
+        name: "{{ artifact_container }}"
+        state: absent
+        force_kill: True
