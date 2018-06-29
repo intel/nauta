@@ -38,15 +38,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         env:
         - name: ES_JAVA_OPTS
-          value: "-Xmx256m -Xms256m -XX:+UnlockDiagnosticVMOptions -XX:+PrintCompressedOopsMode"
-        - name: PROCESSORS
-          value: "1"
-        - name: NODE_MASTER
-          value: "true"
-        - name: NODE_DATA
-          value: "true"
-        - name: NETWORK_HOST
-          value: "_local_,_site_"
+          value: "-Xmx512m -Xms512m"
         resources:
           requests:
             memory: 1Gi
@@ -57,15 +49,9 @@ spec:
         ports:
         - containerPort: 9200
           protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /_cluster/health
-            port: 9200
-          initialDelaySeconds: 20
-          timeoutSeconds: 5
-        volumeMounts:
-        - name: data
-          mountPath: /data
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
       volumes:
 {{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
         - name: data
