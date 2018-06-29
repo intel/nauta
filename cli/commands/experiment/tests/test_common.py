@@ -26,7 +26,7 @@ import pytest
 
 from commands.experiment.common import submit_experiment, RunDescription, values_range, delete_run_environments, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
-    check_enclosing_brackets, delete_environment, create_environment
+    check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment
 
 from util.exceptions import KubectlIntError, SubmitExperimentError
 import util.config
@@ -47,7 +47,6 @@ TEMPLATE_PARAM = "--template"
 TEMPLATE_NAME = "non-existing-template"
 FAKE_NODE_PORT = 345678
 FAKE_CONTAINER_PORT = 5000
-
 
 FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
 FAKE_CLI_EXPERIMENT_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, util.config.EXPERIMENTS_DIR_NAME, EXPERIMENT_NAME)
@@ -124,49 +123,42 @@ def test_create_environment_copy_error(config_mock, mocker):
     assert sh_copy_mock.call_count == 1, "files were copied"
 
 
+def test_get_run_environment_path(config_mock):
+    assert get_run_environment_path(EXPERIMENT_NAME) == os.path.join(FAKE_CLI_EXPERIMENT_PATH)
+
+
 class SubmitExperimentMocks:
-    def __init__(self, mocker, get_namespace=None, gen_exp_name=None, add_exp=None, cmd_create=None, submit_one=None,
-                 update_conf=None, create_env=None, del_env=None, k8s_proxy=None, socat=None, isfile=None,
-                 isdir=None) -> None:
+    def __init__(self, mocker) -> None:
         self.mocker = mocker
-        self.get_namespace = get_namespace
-        self.gen_exp_name = gen_exp_name
-        self.add_exp = add_exp
-        self.cmd_create = cmd_create
-        self.submit_one = submit_one
-        self.update_conf = update_conf
-        self.create_env = create_env
-        self.del_env = del_env
-        self.k8s_proxy = k8s_proxy
-        self.socat = socat
-        self.isfile = isfile
-        self.isdir = isdir
+        self.get_namespace = mocker.patch("commands.experiment.common.get_kubectl_current_context_namespace",
+                                          side_effect=[EXPERIMENT_NAMESPACE])
+        self.gen_exp_name = mocker.patch("platform_resources.experiments.generate_exp_name_and_labels",
+                                         side_effect=[(EXPERIMENT_NAME, {})])
+        self.add_exp = mocker.patch("platform_resources.experiments.add_experiment")
+        self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
+        self.submit_one = mocker.patch("commands.experiment.common.submit_draft_pack")
+        self.update_conf = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
+        self.create_env = mocker.patch("commands.experiment.common.create_environment",
+                                       side_effect=[(EXPERIMENT_FOLDER, "")])
+        self.check_run_env = mocker.patch("commands.experiment.common.check_run_environment",
+                                          side_effect=[(EXPERIMENT_FOLDER, "")])
+        self.del_env = mocker.patch("commands.experiment.common.delete_environment")
+
+        self.k8s_proxy = mocker.patch("commands.experiment.common.K8sProxy")
+        self.k8s_proxy.return_value.__enter__.return_value.tunnel_port = FAKE_NODE_PORT
+
+        self.socat = mocker.patch("commands.experiment.common.socat") \
+            if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
+        self.isdir = mocker.patch("os.path.isdir", return_value=True)
+        self.isfile = mocker.patch("os.path.isfile", return_value=True)
+
+        self.config_mock = mocker.patch('commands.experiment.common.Config')
+        self.config_mock.return_value.config_path = FAKE_CLI_CONFIG_DIR_PATH
 
 
 @pytest.fixture
 def prepare_mocks(mocker) -> SubmitExperimentMocks:
-    get_namespace_mock = mocker.patch("commands.experiment.common.get_kubectl_current_context_namespace",
-                                      side_effect=[EXPERIMENT_NAMESPACE])
-    gen_exp_name_mock = mocker.patch("platform_resources.experiments.generate_exp_name_and_labels",
-                                     side_effect=[(EXPERIMENT_NAME, {})])
-    add_exp_mock = mocker.patch("platform_resources.experiments.add_experiment")
-    cmd_create_mock = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
-    submit_one_mock = mocker.patch("commands.experiment.common.submit_draft_pack")
-
-    update_conf_mock = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
-    create_env_mock = mocker.patch("commands.experiment.common.create_environment",
-                                   side_effect=[(EXPERIMENT_FOLDER, "")])
-    del_env_mock = mocker.patch("commands.experiment.common.delete_environment")
-    socat_mock = mocker.patch("commands.experiment.common.socat") \
-        if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
-    isdir_mock = mocker.patch("os.path.isdir", return_value=True)
-    k8s_proxy_mock = mocker.patch("commands.experiment.common.K8sProxy")
-    k8s_proxy_mock.return_value.__enter__.return_value.tunnel_port = FAKE_NODE_PORT
-
-    return SubmitExperimentMocks(mocker=mocker, get_namespace=get_namespace_mock, gen_exp_name=gen_exp_name_mock,
-                                 add_exp=add_exp_mock, cmd_create=cmd_create_mock, submit_one=submit_one_mock,
-                                 update_conf=update_conf_mock, create_env=create_env_mock, del_env=del_env_mock,
-                                 k8s_proxy=k8s_proxy_mock, socat=socat_mock, isdir=isdir_mock)
+    return SubmitExperimentMocks(mocker=mocker)
 
 
 def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
@@ -188,28 +180,28 @@ def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, g
 
 
 def test_submit_success(prepare_mocks: SubmitExperimentMocks):
-    submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
+    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
                       name=None, parameter_range=[], parameter_set=[], script_parameters=[])
     check_asserts(prepare_mocks)
 
 
 def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.experiment.common.create_environment",
-                                                          side_effect=[KubectlIntError()])
+                                                          side_effect=KubectlIntError)
 
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
                           name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0,
-                  submit_one_count=0, socat_start_count=0)
+                  submit_one_count=0, socat_start_count=0, del_env_count=1)
 
 
 def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.cmd_create = prepare_mocks.mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None,
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
@@ -222,7 +214,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
                                                            side_effect=[KubectlIntError])
 
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None,
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
@@ -232,24 +224,27 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.submit_one.side_effect = KubectlIntError()
 
-    runs_list = submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None,
+    runs_list = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
                                   template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert runs_list[0].status == RunStatus.FAILED
     check_asserts(prepare_mocks, del_env_count=1)
 
 
-def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, capsys):
+def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, capsys, caplog):
+    import logging
+    caplog.set_level(logging.CRITICAL)
     prepare_mocks.mocker.patch("click.confirm", return_value=True)
     prepare_mocks.create_env.side_effect = [(EXPERIMENT_FOLDER), (EXPERIMENT_FOLDER)]
     prepare_mocks.cmd_create.side_effect = [("", 0), ("", 0)]
     prepare_mocks.update_conf.side_effect = [0, 0]
+    prepare_mocks.check_run_env.side_effect = [None, None]
 
     parameters = [SCRIPT_LOCATION]
     parameters.extend(PR_PARAMETER)
     parameters.extend(PS_PARAMETER)
 
-    submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None,
+    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
                       template=None, name=None, parameter_range=PR_PARAMETER, parameter_set=PS_PARAMETER,
                       script_parameters=[])
 
@@ -261,7 +256,7 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
 
 
 def test_submit_with_name_success(prepare_mocks: SubmitExperimentMocks):
-    submit_experiment(state=None, script_location=SCRIPT_LOCATION, script_folder_location=None,
+    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
                       template=None, name=EXPERIMENT_NAME, parameter_range=[],
                       parameter_set=[], script_parameters=[])
 
@@ -447,10 +442,44 @@ def test_create_list_of_runs_pr_and_ps(mocker):
 
 
 def test_submit_experiment_without_file(prepare_mocks: SubmitExperimentMocks):
-    runs_list = submit_experiment(state=None, script_location=None, script_folder_location=None,
+    runs_list = submit_experiment(script_location=None, script_folder_location=None,
                                   template=None, name=None, parameter_range=[],
                                   parameter_set=[], script_parameters=[])
     assert len(runs_list) == 1
     assert runs_list[0].name == "experiment_name"
 
     check_asserts(prepare_mocks)
+
+
+def test_check_run_environment(mocker):
+    del_env = mocker.patch("commands.experiment.common.delete_environment")
+    mocker.patch("click.confirm", return_value=True)
+
+    mocker.patch('os.path.isdir').return_value = False
+    mocker.patch('os.listdir').return_value = False
+
+    check_run_environment(FAKE_CLI_EXPERIMENT_PATH)
+
+    assert del_env.call_count == 0
+
+
+def test_check_run_environment_clear(mocker):
+    del_env = mocker.patch("commands.experiment.common.delete_environment")
+    mocker.patch("click.confirm", return_value=True)
+
+    mocker.patch('os.path.isdir').return_value = True
+    mocker.patch('os.listdir').return_value = True
+
+    check_run_environment(FAKE_CLI_EXPERIMENT_PATH)
+
+    assert del_env.call_count == 1
+
+
+def test_check_run_environment_clear_not_confirmed(mocker):
+    mocker.patch("click.confirm", return_value=False)
+
+    mocker.patch('os.path.isdir').return_value = True
+    mocker.patch('os.listdir').return_value = True
+
+    with pytest.raises(SystemExit):
+        check_run_environment(FAKE_CLI_EXPERIMENT_PATH)

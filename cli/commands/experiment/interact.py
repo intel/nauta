@@ -84,7 +84,7 @@ def interact(state: State, name: str, filename: str):
     if create_new_notebook:
         number_of_retries = 5
         try:
-            runs = submit_experiment(state=state, script_location=filename, script_folder_location=None,
+            runs = submit_experiment(script_location=filename, script_folder_location=None,
                                      template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
                                      name=name, parameter_range=[], parameter_set=[], script_parameters=[])
             if runs:

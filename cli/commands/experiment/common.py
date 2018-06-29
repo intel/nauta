@@ -44,7 +44,6 @@ from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseErr
     SubmitExperimentError
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
-from cli_state import State
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 
 # definitions of headers content for different commands
@@ -54,6 +53,26 @@ RUN_MESSAGE = "Message"
 RUN_PARAMETERS = "Parameters used"
 
 log = initialize_logger('commands.common')
+
+
+def get_run_environment_path(run_name: str) -> str:
+    return os.path.join(Config().config_path, EXPERIMENTS_DIR_NAME, run_name)
+
+
+def check_run_environment(run_environment_path: str):
+    """
+    If Run environment is not empty, ask user if it should be deleted in order to proceed with Run environment creation.
+    """
+    if os.path.isdir(run_environment_path) and os.listdir(run_environment_path):
+        if click.confirm(f'Experiment data directory: {run_environment_path} already exists. '
+                         f'It will be deleted in order to proceed with experiment submission. '
+                         f'Do you want to continue?'):
+            delete_environment(run_environment_path)
+        else:
+            click.echo(f"Cannot continue experiment submission. "
+                       f"Please delete experiment's data directory "
+                       f"{run_environment_path} manually or use different name for experiment.")
+            sys.exit(1)
 
 
 def create_environment(experiment_name: str, file_location: str, folder_location: str) -> str:
@@ -73,34 +92,34 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     message_prefix = "Experiment's environment hasn't been created. Reason - {}"
 
     # create a folder for experiment's purposes
-    experiment_path = os.path.join(Config().config_path, EXPERIMENTS_DIR_NAME, experiment_name)
+    run_environment_path = get_run_environment_path(experiment_name)
 
     # copy folder content
     if folder_location:
         try:
-            shutil.copytree(folder_location, experiment_path)
-        except Exception as exe:
+            shutil.copytree(folder_location, run_environment_path)
+        except Exception:
             log.exception("Create environment - copying training folder error.")
             raise KubectlIntError(message_prefix.format("Additional folder cannot"
                                                         " be copied into experiment's folder."))
 
     try:
-        if not os.path.exists(experiment_path):
-            os.makedirs(experiment_path)
-    except Exception as exe:
+        if not os.path.exists(run_environment_path):
+            os.makedirs(run_environment_path)
+    except Exception:
         log.exception("Create environment - creating experiment folder error.")
         raise KubectlIntError(message_prefix.format("Folder with experiments' data cannot be created."))
 
     # copy training script - it overwrites the file taken from a folder_location
     if file_location:
         try:
-            shutil.copy2(file_location, experiment_path)
-        except Exception as exe:
+            shutil.copy2(file_location, run_environment_path)
+        except Exception:
             log.exception("Create environment - copying training script error.")
             raise KubectlIntError(message_prefix.format("Training script cannot be created."))
 
     log.debug("Create environment - end")
-    return experiment_path
+    return run_environment_path
 
 
 def delete_environment(experiment_folder: str):
@@ -157,7 +176,7 @@ class RunDescription:
         return self.status.name
 
 
-def submit_experiment(state: State, script_location: str, script_folder_location: str, template: str, name: str,
+def submit_experiment(script_location: str, script_folder_location: str, template: str, name: str,
                       parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
                       script_parameters: Tuple[str, ...]):
     log.debug("Submit experiment - start")
@@ -201,7 +220,7 @@ def submit_experiment(state: State, script_location: str, script_folder_location
                                                                            script_parameters=current_script_parameters,
                                                                            pack_type=template,
                                                                            internal_registry_port=proxy.tunnel_port)
-            except Exception as exe:
+            except Exception:
                 # any error in this step breaks execution of this command
                 message = "Problems during creation of environments."
                 log.exception(message)
@@ -330,9 +349,12 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
     In case of any problems - an exception with a description of a problem is thrown
     """
     log.debug(f'Prepare run {run_name} environment - start')
+    run_folder = get_run_environment_path(run_name)
     try:
+        # check environment directory
+        check_run_environment(run_folder)
         # create an environment
-        run_folder = create_environment(run_name, script_location, script_folder_location)
+        create_environment(run_name, script_location, script_folder_location)
         # generate draft's data
         output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
@@ -346,7 +368,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
                              pack_type=pack_type)
     except Exception as exe:
         delete_environment(run_folder)
-        raise KubectlIntError(exe)
+        raise KubectlIntError(exe) from exe
     log.debug(f'Prepare run {run_name} environment - finish')
     return run_folder
 
