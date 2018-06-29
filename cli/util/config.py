@@ -96,8 +96,8 @@ class DLS4EConfigMap:
         if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip') \
                 or not hasattr(self, 'image_tensorboard_service'):
             config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE)
-            self.image_tiller = '{}:{}'.join(config_map_data[self.REGISTRY_FIELD],
-                                             config_map_data[self.IMAGE_TILLER_FIELD])
+            self.image_tiller = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
+                                               config_map_data[self.IMAGE_TILLER_FIELD])
             self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]
-            self.image_tensorboard_service = '{}:{}'.join(config_map_data[self.REGISTRY_FIELD],
-                                                          config_map_data[self.IMAGE_TENSORBOARD_SERVICE_FIELD])
+            self.image_tensorboard_service = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
+                                                            config_map_data[self.IMAGE_TENSORBOARD_SERVICE_FIELD])
