@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapGetters, mapActions} from 'vuex';
+
 export default {
   name: 'Navigation',
   computed: {
@@ -60,10 +61,14 @@ export default {
     }
   },
   methods: {
-    goToK8sDashboard: () => {
-      const hostname = window.location.origin;
-      const k8sDashboardUrl = hostname + '/dashboard/';
-      window.open(k8sDashboardUrl, '_blank');
+    ...mapActions(['logIntoK8SDashboard']),
+    goToK8sDashboard () {
+      this.logIntoK8SDashboard()
+        .then(() => {
+          const hostname = window.location.origin;
+          const k8sDashboardUrl = hostname + '/dashboard/';
+          window.open(k8sDashboardUrl, '_blank');
+        });
     }
   }
 }

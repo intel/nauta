@@ -136,5 +136,33 @@ describe('VUEX modules auth', () => {
         })
       });
     });
+
+    describe('logIntoK8SDashboard', () => {
+      beforeEach(() => {
+        expectedMutations = [];
+        expectedActions = [];
+        mock = new MockAdapter(axios);
+        mock.reset();
+      });
+
+      it('should show error if internal server error occurs', (done) => {
+        expectedMutations = [];
+        expectedActions = [
+          {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
+        ];
+        mock.onGet('/dashboard/api/v1/csrftoken/login').reply(500, 'Internal Server Error');
+        testAction(actions.logIntoK8SDashboard, token, state, expectedMutations, expectedActions, done);
+      });
+
+      it('should show error if internal server error occurs', (done) => {
+        expectedMutations = [];
+        expectedActions = [
+          {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
+        ];
+        mock.onGet('/dashboard/api/v1/csrftoken/login').reply(200, {token: 'token'});
+        mock.onPost('/dashboard/api/v1/login').reply(500, 'Internal Server Error');
+        testAction(actions.logIntoK8SDashboard, token, state, expectedMutations, expectedActions, done);
+      });
+    });
   });
 });

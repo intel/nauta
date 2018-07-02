@@ -29,3 +29,24 @@ export function decodeAuthK8SToken (token) {
   };
   return axios.post(DECODE_TOKEN_ENDPOINT, body);
 }
+
+export function getK8SDashboardCsrfToken () {
+  const CSRF_TOKEN_ENDPOINT = '/dashboard/api/v1/csrftoken/login';
+  return axios.get(CSRF_TOKEN_ENDPOINT);
+}
+
+export function getK8SDashboardCookieContent (csrfToken, authToken) {
+  const LOGIN_ENDPOINT = '/dashboard/api/v1/login';
+  const options = {
+    url: LOGIN_ENDPOINT,
+    headers: {'X-CSRF-TOKEN': csrfToken},
+    data: {
+      kubeConfig: '',
+      password: '',
+      token: authToken,
+      username: ''
+    },
+    method: 'POST'
+  };
+  return axios(options);
+}

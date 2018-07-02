@@ -21,7 +21,7 @@
 
 import cookies from 'js-cookie';
 import router from '../../router';
-import {decodeAuthK8SToken} from '../handlers/auth';
+import {decodeAuthK8SToken, getK8SDashboardCsrfToken, getK8SDashboardCookieContent} from '../handlers/auth';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
@@ -73,6 +73,21 @@ export const actions = {
       .then(() => {
         commit('setAuthority', {logged: false, username: ''});
         router.push({path: redirectionPath});
+      });
+  },
+  logIntoK8SDashboard: ({dispatch}) => {
+    getK8SDashboardCsrfToken()
+      .then((res) => {
+        const csrfToken = res.data.token;
+        const authToken = cookies.get(TOKEN_COOKIE_KEY);
+        return getK8SDashboardCookieContent(csrfToken, authToken);
+      })
+      .then((res) => {
+        const jweToken = res.data.jweToken;
+        cookies.set('jweToken', jweToken, {domain: 'localhost', path: '/dashboard'});
+      })
+      .catch(() => {
+        dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
       });
   }
 };
