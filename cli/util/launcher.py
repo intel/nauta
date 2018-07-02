@@ -50,10 +50,10 @@ def is_gui_browser_available() -> bool:
 
 
 def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port: int = None, app_name: str = None,
-               number_of_retries: int = 0, url_end: str = ""):
+               number_of_retries: int = 0, url_end: str = "", namespace: str = None):
     try:
         with K8sProxy(dls4e_app_name=k8s_app_name, port=port, app_name=app_name,
-                      number_of_retries=number_of_retries) as proxy:
+                      number_of_retries=number_of_retries, namespace=namespace) as proxy:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
             # run socat if on Windows or Mac OS
             if get_current_os() in (OS.WINDOWS, OS.MACOS):

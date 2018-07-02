@@ -6,6 +6,7 @@ metadata:
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     heritage: "{{ .Release.Service }}"
+    dls4e_app_name: tensorboard-service
   name: tensorboard-service
 spec:
   type: ClusterIP

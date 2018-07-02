@@ -19,14 +19,16 @@
 # and approved by Intel in writing.
 #
 
-import urllib.request
-from urllib.error import URLError
+import signal
+import requests
+from requests.exceptions import ConnectionError
 import time
 
 from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
+from util.system import get_current_os, OS
 
 logger = initialize_logger(__name__)
 
@@ -37,25 +39,28 @@ class TunnelSetupError(RuntimeError):
 
 class K8sProxy:
     def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
-                 app_name: str = None, number_of_retries: int = 0):
+                 app_name: str = None, number_of_retries: int = 0, namespace: str = None):
         self.dls4e_app_name = dls4e_app_name
         self.external_port = port
         self.configure_draft = configure_draft
         self.app_name = app_name
         self.number_of_retries = number_of_retries
+        self.namespace = namespace
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
         try:
-            self.process, self.tunnel_port, self.container_port = kubectl.start_port_forwarding(self.dls4e_app_name,
-                                                                                                self.external_port,
-                                                                                                self.configure_draft,
-                                                                                                self.app_name,
-                                                                                                self.number_of_retries)
+            self.process, self.tunnel_port, self.container_port \
+                = kubectl.start_port_forwarding(self.dls4e_app_name,
+                                                self.external_port,
+                                                self.configure_draft,
+                                                self.app_name,
+                                                self.number_of_retries,
+                                                namespace=self.namespace)
             try:
                 K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port)
             except Exception as ex:
-                self.process.kill()
+                self._close_tunnel()
                 raise ex
         except LocalPortOccupiedError as exe:
             raise exe
@@ -69,7 +74,7 @@ class K8sProxy:
     def __exit__(self, *args):
         logger.debug("k8s_proxy - exiting")
         try:
-            self.process.kill()
+            self._close_tunnel()
         except Exception as exe:
             error_message = "k8s_proxy - exit - error"
             logger.exception(error_message)
@@ -79,9 +84,16 @@ class K8sProxy:
     def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
         for _ in range(tries):
             try:
-                urllib.request.urlopen(f'http://{address}:{port}')
+                requests.get(f'http://{address}:{port}')
                 return
-            except (ConnectionError, URLError) as e:
+            except ConnectionError as e:
                 logger.error(f'can not connect to {address}:{port}. Error: {e}')
                 time.sleep(1)
         raise TunnelSetupError(f'connection on {address}:{port} NOT READY!')
+
+    def _close_tunnel(self):
+        if get_current_os() == OS.WINDOWS:
+            self.process.terminate()
+        else:
+            self.process.send_signal(signal.SIGINT)
+        self.process.wait()

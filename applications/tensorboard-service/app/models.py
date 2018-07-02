@@ -38,7 +38,8 @@ class K8STensorboardInstance:
                                           name=name,
                                           labels={
                                               'name': name,
-                                              'type': 'dls4e-tensorboard'
+                                              'type': 'dls4e-tensorboard',
+                                              'dls4e_app_name': 'tensorboard'
                                           }
                                       ),
                                       spec=k8s.V1DeploymentSpec(
@@ -46,14 +47,16 @@ class K8STensorboardInstance:
                                           selector=k8s.V1LabelSelector(
                                               match_labels={
                                                   'name': name,
-                                                  'type': 'dls4e-tensorboard'
+                                                  'type': 'dls4e-tensorboard',
+                                                  'dls4e_app_name': 'tensorboard'
                                               }
                                           ),
                                           template=k8s.V1PodTemplateSpec(
                                               metadata=k8s.V1ObjectMeta(
                                                   labels={
                                                       'name': name,
-                                                      'type': 'dls4e-tensorboard'
+                                                      'type': 'dls4e-tensorboard',
+                                                      'dls4e_app_name': 'tensorboard'
                                                   }
                                               ),
                                               spec=k8s.V1PodSpec(
@@ -100,7 +103,8 @@ class K8STensorboardInstance:
                                     name=name,
                                     labels={
                                         'name': name,
-                                        'type': 'dls4e-tensorboard'
+                                        'type': 'dls4e-tensorboard',
+                                        'dls4e_app_name': 'tensorboard'
                                     }
                                 ),
                                 spec=k8s.V1ServiceSpec(
@@ -114,7 +118,8 @@ class K8STensorboardInstance:
                                     ],
                                     selector={
                                         'name': name,
-                                        'type': 'dls4e-tensorboard'
+                                        'type': 'dls4e-tensorboard',
+                                        'dls4e_app_name': 'tensorboard'
                                     }
                                 ))
 
@@ -124,7 +129,8 @@ class K8STensorboardInstance:
                                          name=name,
                                          labels={
                                              'name': name,
-                                             'type': 'dls4e-tensorboard'
+                                             'type': 'dls4e-tensorboard',
+                                             'dls4e_app_name': 'tensorboard'
                                          },
                                          annotations={
                                              'dls.ingress.kubernetes.io/rewrite-target': '/',

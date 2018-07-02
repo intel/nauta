@@ -25,6 +25,7 @@ spec:
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
         heritage: "{{ .Release.Service }}"
+        dls4e_app_name: tensorboard-service
     spec:
       containers:
       - image: {{ required "DLS4E user tensorboard-service image is required" .Values.TensorboardServiceImage }}

@@ -42,7 +42,9 @@ END_PORT = 65535
 
 
 def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
-                          app_name: str = None, number_of_retries: int = 0) -> (subprocess.Popen, Optional[int], int):
+                          app_name: str = None, number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen,
+                                                                                                       Optional[int],
+                                                                                                       int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -64,8 +66,8 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
 
     try:
         service_node_port = None
-        namespace = None
         k8s_app_name_value = None
+        service_container_port = None
 
         if k8s_app_name:
             k8s_app_name_value = k8s_app_name.value

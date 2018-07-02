@@ -19,20 +19,25 @@
 # and approved by Intel in writing.
 #
 
+from http import HTTPStatus
 import webbrowser
+from unittest.mock import MagicMock
 
 from click.testing import CliRunner
 import pytest
+import requests
 
 from util import launcher
+import commands
 from commands.launch import launch
 from util.system import get_current_os, OS
+
 
 APP_NAME = 'webui'
 DISABLE_BROWSER_ARG = '--no-launch'
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_k8s_config(mocker):
     mocker.patch('kubernetes.config.load_kube_config')
     mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
@@ -41,7 +46,7 @@ def mocked_k8s_config(mocker):
     return conf_instance
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_browser_check(mocker):
     browser_check_mock = mocker.patch('util.launcher.is_gui_browser_available')
     browser_check_mock.return_value = True
@@ -192,3 +197,74 @@ def test_is_gui_browser_available_no_browser(mocker):
     webbrowser_get_mock.side_effect = webbrowser.Error
 
     assert launcher.is_gui_browser_available() is False
+
+
+class K8sProxyMock:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __enter__(self, *args, **kwargs):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    tunnel_port = 1234
+
+
+@pytest.fixture
+def launch_tensorboard_command_mock(mocker):
+    mocker.patch.object(launch, 'K8sProxy', new=K8sProxyMock)
+    mocker.spy(launch, 'K8sProxy')
+    mocker.patch.object(launch, 'get_kubectl_current_context_namespace').return_value = "current-namespace"
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.OK)
+    mocker.patch.object(launch, 'sleep')
+    mocker.patch('commands.launch.launch.launch_app_with_proxy')
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command(launch_tensorboard_command_mock):
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
+    assert launch.K8sProxy.call_count == 1
+    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
+    assert launch.sleep.call_count == 1
+    assert result.exit_code == 0
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command_no_sleep_when_conflict(mocker, launch_tensorboard_command_mock):
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.CONFLICT)
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
+    assert launch.K8sProxy.call_count == 1
+    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
+    assert launch.sleep.call_count == 0
+    assert result.exit_code == 0
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command_bad_response(mocker, launch_tensorboard_command_mock):
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
+    assert result.exit_code == 1
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command_failed_request(mocker, launch_tensorboard_command_mock):
+    mocker.patch('requests.post').side_effect = requests.ConnectionError
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
+    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 0
+    assert result.exit_code == 1

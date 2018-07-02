@@ -19,14 +19,17 @@
 # and approved by Intel in writing.
 #
 
+
 import subprocess
-import urllib.request
 
 import pytest
+import requests
+from requests.exceptions import ConnectionError
 
 from util.k8s.k8s_proxy_context_manager import K8sProxy, TunnelSetupError
 from util.app_names import DLS4EAppNames
 from util.exceptions import K8sProxyCloseError, K8sProxyOpenError
+from util.k8s.k8s_proxy_context_manager import kubectl
 
 
 def test_set_up_proxy(mocker):
@@ -60,9 +63,11 @@ def test_set_up_proxy_open_failure(mocker):
 
 def test_set_up_proxy_close_failure(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
-    spc_mock = mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError())
-    spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
-                            return_value=(spo_mock, 1000, 1001))
+    mocker.patch("subprocess.Popen.send_signal", side_effect=RuntimeError)
+    mocker.patch("subprocess.Popen.terminate", side_effect=RuntimeError)
+    mocker.patch("subprocess.Popen.wait")
+    mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
+                 return_value=(spo_mock, 1000, 1001))
 
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
 
@@ -70,15 +75,19 @@ def test_set_up_proxy_close_failure(mocker):
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
             pass
 
-    assert spf_mock.call_count == 1
-    assert spc_mock.call_count == 1
+    # noinspection PyUnresolvedReferences
+    assert kubectl.start_port_forwarding.call_count == 1
+    # noinspection PyUnresolvedReferences
+    assert subprocess.Popen.send_signal.call_count == 1 or subprocess.Popen.terminate.call_count == 1
     # noinspection PyProtectedMember,PyUnresolvedReferences
     assert K8sProxy._wait_for_connection_readiness.call_count == 1
 
 
 def test_set_up_proxy_open_readiness_failure(mocker):
     popen_mock = mocker.patch("subprocess.Popen")
-    mocker.patch("subprocess.Popen.kill")
+    mocker.patch("subprocess.Popen.send_signal")
+    mocker.patch("subprocess.Popen.terminate")
+    mocker.patch("subprocess.Popen.wait")
     mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                  return_value=(popen_mock, 1000, 1001))
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness",
@@ -89,11 +98,13 @@ def test_set_up_proxy_open_readiness_failure(mocker):
             pass
 
     # noinspection PyUnresolvedReferences
-    assert subprocess.Popen.kill.call_count == 1
+    assert subprocess.Popen.send_signal.call_count == 1 or subprocess.Popen.terminate.call_count == 1
+    # noinspection PyUnresolvedReferences
+    assert subprocess.Popen.wait.call_count == 1
 
 
 def test_wait_for_connection_readiness(mocker):
-    mocker.patch('urllib.request.urlopen')
+    mocker.patch('requests.get')
     fake_address = 'localhost'
     fake_port = 1234
 
@@ -101,31 +112,31 @@ def test_wait_for_connection_readiness(mocker):
     K8sProxy._wait_for_connection_readiness(fake_address, fake_port)
 
     # noinspection PyUnresolvedReferences
-    urllib.request.urlopen.assert_called_once_with(f'http://{fake_address}:{fake_port}')
+    requests.get.assert_called_once_with(f'http://{fake_address}:{fake_port}')
 
 
 def test_wait_for_connection_readiness_many_tries(mocker):
-    effect = [ConnectionResetError for _ in range(10)]
+    effect = [ConnectionError for _ in range(10)]
     # noinspection PyTypeChecker
     effect.append(None)
     fake_address = 'localhost'
     fake_port = 1234
 
-    mocker.patch('urllib.request.urlopen', side_effect=effect)
+    mocker.patch('requests.get', side_effect=effect)
     mocker.patch('time.sleep')
 
     # noinspection PyProtectedMember
     K8sProxy._wait_for_connection_readiness(fake_address, fake_port, 15)
 
     # noinspection PyUnresolvedReferences
-    assert urllib.request.urlopen.call_count == 11
+    assert requests.get.call_count == 11
 
 
 def test_wait_for_connection_readiness_many_tries_failure(mocker):
     fake_address = 'localhost'
     fake_port = 1234
 
-    mocker.patch('urllib.request.urlopen', side_effect=ConnectionResetError)
+    mocker.patch('requests.get', side_effect=ConnectionError)
     mocker.patch('time.sleep')
 
     with pytest.raises(TunnelSetupError):
@@ -133,4 +144,4 @@ def test_wait_for_connection_readiness_many_tries_failure(mocker):
         K8sProxy._wait_for_connection_readiness(fake_address, fake_port, 15)
 
     # noinspection PyUnresolvedReferences
-    assert urllib.request.urlopen.call_count == 15
+    assert requests.get.call_count == 15

@@ -28,5 +28,6 @@ class DLS4EAppNames(Enum):
     DOCKER_REGISTRY = "docker-registry"
     WEB_GUI = "gui"
     TENSORBOARD = "tensorboard"
+    TENSORBOARD_SERVICE = "tensorboard-service"
     INGRESS = "ingress"
     JUPYTER = "jupyter"
