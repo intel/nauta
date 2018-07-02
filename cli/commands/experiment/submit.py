@@ -45,7 +45,9 @@ HELP_SFL = "Name of a folder with additional files used by a script, e.g., other
 HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
          " Template is chosen. List of available templates might be obtained by" \
          " Issuing dlsctl experiment template_list command."
-HELP_PR = "Values (set or range) of a single parameter. "
+HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value' " \
+         "For lists use: 'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+HELP_PR = "Values (set or range) of a single parameter."
 HELP_PS = "Set of values of one or several parameters."
 
 
@@ -78,13 +80,14 @@ def validate_script_folder_location(script_folder_location: str):
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.option("-t", "--template", help=HELP_T, default="tf-training-tfjob")
 @click.option("-n", "--name", help=HELP_N, callback=validate_experiment_name)
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=HELP_PS)
 @click.argument("script_parameters", nargs=-1)
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
-           parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
+           pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
     log.debug("Submit - start")
     validate_script_location(script_location)
@@ -101,7 +104,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     try:
         runs_list = submit_experiment(script_location=script_location,
                                       script_folder_location=script_folder_location,
-                                      template=template, name=name,
+                                      template=template, name=name, pack_params=pack_param,
                                       parameter_range=parameter_range, parameter_set=parameter_set,
                                       script_parameters=script_parameters)
     except K8sProxyCloseError as exe:

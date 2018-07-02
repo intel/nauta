@@ -27,6 +27,7 @@ from util.exceptions import KubectlIntError
 
 
 SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
+PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']")]
 SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
 
@@ -66,15 +67,35 @@ def test_modify_values_yaml(mocker):
     sh_move_mock = mocker.patch("shutil.move")
     yaml_dump_mock = mocker.patch("yaml.dump")
 
-    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
+    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
                                    experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE, registry_port="1111")
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
     compare_yaml(output["commandline"]["args"], SCRIPT_LOCATION)
+    assert 'key1' and 'key2' in output
+    assert output['key1'] == 'val1'
+    assert output['key2'] == ["a", "b"]
 
     assert yaml_dump_mock.call_count == 1, "job yaml wasn't modified"
     assert open_mock.call_count == 2, "files weren't read/written"
+    assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
+
+
+def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
+    open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
+    sh_move_mock = mocker.patch("shutil.move")
+    yaml_dump_mock = mocker.patch("yaml.dump")
+
+    wrong_pack_params = [("key1", "{ bad list")]
+
+    with pytest.raises(AttributeError):
+        tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
+                                       pack_params=wrong_pack_params, experiment_name='test-experiment',
+                                       pack_type=EXAMPLE_PACK_TYPE, registry_port="1111")
+
+    assert sh_move_mock.call_count == 0, "job yaml should not be moved."
+    assert yaml_dump_mock.call_count == 0, "yaml should not be modified."
     assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
 
 
@@ -107,7 +128,7 @@ def test_update_configuration_success(mocker):
 
     output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
                                               experiment_name='test-experiment', internal_registry_port="12345",
-                                              pack_type=EXAMPLE_PACK_TYPE)
+                                              pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
@@ -123,7 +144,7 @@ def test_update_configuration_failure(mocker):
     with pytest.raises(KubectlIntError):
         tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
                                          experiment_name='test-experiment', internal_registry_port="12345",
-                                         pack_type=EXAMPLE_PACK_TYPE)
+                                         pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"

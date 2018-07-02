@@ -19,10 +19,12 @@
 # and approved by Intel in writing.
 #
 
+import ast
 import yaml
 import os
+import re
 import shutil
-from typing import Tuple
+from typing import Tuple, List
 import toml
 
 from util.k8s import k8s_info
@@ -30,6 +32,7 @@ from util.logger import initialize_logger
 
 import packs.common as common
 from util.exceptions import KubectlIntError
+import dpath.util as dutil
 
 
 log = initialize_logger('packs.tf_training')
@@ -40,7 +43,8 @@ def update_configuration(experiment_folder: str, script_location: str,
                          script_parameters: Tuple[str, ...],
                          experiment_name: str,
                          internal_registry_port: str,
-                         pack_type: str):
+                         pack_type: str,
+                         pack_params: List[Tuple[str, str]]):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -56,7 +60,7 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - start")
 
     try:
-        modify_values_yaml(experiment_folder, script_location, script_parameters,
+        modify_values_yaml(experiment_folder, script_location, script_parameters, pack_params=pack_params,
                            experiment_name=experiment_name, pack_type=pack_type, registry_port=internal_registry_port)
         modify_dockerfile(experiment_folder, script_location, internal_registry_port)
         modify_draft_toml(experiment_folder)
@@ -92,7 +96,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, internal_reg
 
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
-                       experiment_name: str, pack_type: str, registry_port: str):
+                       experiment_name: str, pack_type: str, registry_port: str, pack_params: List[Tuple[str, str]]):
     log.debug("Modify values.yaml - start")
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
@@ -104,6 +108,15 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
         v["experimentName"] = experiment_name
         v["registry_port"] = str(registry_port)
+
+        regex = re.compile("^\[.*|^\{.*")
+        for key, value in pack_params:
+            if re.match(regex, value):
+                try:
+                    value = ast.literal_eval(value)
+                except Exception as e:
+                    raise AttributeError(f'Can not parse value: \"{value}\" to list/dict. Error: {e}')
+            dutil.new(v, key, value, '.')
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)

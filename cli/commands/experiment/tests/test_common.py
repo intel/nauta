@@ -181,7 +181,7 @@ def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, g
 
 def test_submit_success(prepare_mocks: SubmitExperimentMocks):
     submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
-                      name=None, parameter_range=[], parameter_set=[], script_parameters=[])
+                      name=None, parameter_range=[], parameter_set=[], script_parameters=[], pack_params=[])
     check_asserts(prepare_mocks)
 
 
@@ -191,7 +191,7 @@ def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
 
     with pytest.raises(SubmitExperimentError) as exe:
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
-                          name=None, parameter_range=[], parameter_set=[], script_parameters=[])
+                          name=None, parameter_range=[], parameter_set=[], script_parameters=[], pack_params=[])
 
     assert "Problems during creation of environments" in str(exe)
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0,
@@ -201,7 +201,7 @@ def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
 def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.cmd_create = prepare_mocks.mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
@@ -214,7 +214,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
                                                            side_effect=[KubectlIntError])
 
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
@@ -224,7 +224,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.submit_one.side_effect = KubectlIntError()
 
-    runs_list = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
+    runs_list = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                                   template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert runs_list[0].status == RunStatus.FAILED
@@ -244,7 +244,7 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
     parameters.extend(PR_PARAMETER)
     parameters.extend(PS_PARAMETER)
 
-    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
+    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                       template=None, name=None, parameter_range=PR_PARAMETER, parameter_set=PS_PARAMETER,
                       script_parameters=[])
 
@@ -256,7 +256,7 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
 
 
 def test_submit_with_name_success(prepare_mocks: SubmitExperimentMocks):
-    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None,
+    submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                       template=None, name=EXPERIMENT_NAME, parameter_range=[],
                       parameter_set=[], script_parameters=[])
 
@@ -444,7 +444,7 @@ def test_create_list_of_runs_pr_and_ps(mocker):
 def test_submit_experiment_without_file(prepare_mocks: SubmitExperimentMocks):
     runs_list = submit_experiment(script_location=None, script_folder_location=None,
                                   template=None, name=None, parameter_range=[],
-                                  parameter_set=[], script_parameters=[])
+                                  parameter_set=[], script_parameters=[], pack_params=[])
     assert len(runs_list) == 1
     assert runs_list[0].name == "experiment_name"
 

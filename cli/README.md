@@ -113,3 +113,12 @@ Step-by-step instruction to run example training:
     ```
     dlsctl submit mnist_single_node.py -sfl data -- --data_dir /app/
     ```
+
+### Additional parameters on submit
+1. We can adjust existing or add new pack parameters, which will be put into [values.yaml](cli/draft/packs/multinode-tf-training-tfjob/charts/values.yaml) 
+during submitting experiment and use by template files like `pod.yaml, service.yaml, job.yaml` etc.
+1. Keys have to be passed in format `-p key_name value` or `-p key_name.sub_key.sub_sub_key value`
+1. Values can be passed as simple types like int or string e.g `-p key_str "test value" -p key_num 007`.
+1. Values can handle also list and map types: `-p key_list "['val1', 'val2']" -p key_map "{'a': 'b'}"`
+1. `-p` flag can be use multiple times e.g. `dlsctl submit mnist.py -p multinode.workers_count 2 -p my_param my_value`
+1. Default keys and values can be find in `charts/values.yaml` file of every pack.

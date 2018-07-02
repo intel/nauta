@@ -178,7 +178,7 @@ class RunDescription:
 
 def submit_experiment(script_location: str, script_folder_location: str, template: str, name: str,
                       parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
-                      script_parameters: Tuple[str, ...]):
+                      script_parameters: Tuple[str, ...], pack_params: List[Tuple[str, str]]):
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()
@@ -220,7 +220,7 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
                                                                            script_location=script_location,
                                                                            script_folder_location=script_folder_location,  # noqa: E501
                                                                            script_parameters=current_script_parameters,
-                                                                           pack_type=template,
+                                                                           pack_type=template, pack_params=pack_params,
                                                                            internal_registry_port=proxy.tunnel_port)
             except Exception:
                 # any error in this step breaks execution of this command
@@ -338,7 +338,8 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, script_location: str,
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
-                                   pack_type: str, internal_registry_port: str) -> str:
+                                   pack_type: str, internal_registry_port: str,
+                                   pack_params: List[Tuple[str, str]]) -> str:
     """
     Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
@@ -347,6 +348,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
     :param script_folder_location: location of an additional folder used in training
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
+    :param pack_params: additional pack params
     :return: name of folder with an environment created for this run
     In case of any problems - an exception with a description of a problem is thrown
     """
@@ -367,7 +369,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
         # reconfigure draft's templates
         update_configuration(run_folder, script_location, script_folder_location, script_parameters,
                              experiment_name=experiment_name, internal_registry_port=internal_registry_port,
-                             pack_type=pack_type)
+                             pack_type=pack_type, pack_params=pack_params)
     except Exception as exe:
         delete_environment(run_folder)
         raise KubectlIntError(exe) from exe
