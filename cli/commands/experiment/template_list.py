@@ -25,6 +25,7 @@ import sys
 import click
 from tabulate import tabulate
 
+from cli_state import common_options
 from util.aliascmd import AliasCmd
 from draft.cmd import DRAFT_HOME_FOLDER
 from util.config import Config
@@ -39,6 +40,7 @@ TEMPL_FOLDER_NAME = "templates"
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='t')
+@common_options()
 def template_list():
     path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")
 
