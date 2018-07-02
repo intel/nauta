@@ -22,11 +22,11 @@
 import pytest
 
 from kubernetes.client import CustomObjectsApi
-from marshmallow import ValidationError
 
 from platform_resources.experiment_model import ExperimentStatus, Experiment
 from platform_resources.experiments import list_experiments, InvalidRegularExpressionError, \
     add_experiment, generate_exp_name_and_labels
+from util.exceptions import SubmitExperimentError
 
 EXPERIMENT_NAME = 'test-exp'
 NAMESPACE = 'test-env'
@@ -108,7 +108,7 @@ def test_generate_experiment_name_if_name_provided_and_exp_no_exists(mock_k8s_ap
 
 def test_generate_experiment_name_if_exp_exists_and_name_provided(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_namespaced_custom_object.return_value = LIST_EXPERIMENTS_RESPONSE_RAW
-    with pytest.raises(RuntimeError):
+    with pytest.raises(SubmitExperimentError):
         generate_exp_name_and_labels('script', NAMESPACE, 'test-experiment-old')
     assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 1
 

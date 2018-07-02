@@ -32,7 +32,7 @@ from kubernetes.client.rest import ApiException
 import platform_resources.experiment_model as model
 from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
-from util.exceptions import InvalidRegularExpressionError
+from util.exceptions import InvalidRegularExpressionError, SubmitExperimentError
 from util.logger import initialize_logger
 
 logger = initialize_logger(__name__)
@@ -143,7 +143,7 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
         # CASE 1: If user pass name as param, then use it. If experiment with this name exists - return error
         experiments = list_experiments(namespace=namespace, name_filter=f'^{name}$')
         if experiments and len(experiments) > 0:
-            raise RuntimeError(f'experiment with name: {name} already exist!')
+            raise SubmitExperimentError(f' experiment with name: {name} already exist!')
         return name, prepare_label(script_name, name, name)
     else:
         # CASE 2: If user submit exp without name, but there is already exp with the same script name, then:

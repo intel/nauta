@@ -189,7 +189,9 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
     except KubectlIntError as exe:
         log.exception(str(exe))
         raise SubmitExperimentError(str(exe))
-
+    except SubmitExperimentError as exe:
+        log.exception(str(exe))
+        raise exe
     except Exception:
         message = "Problem during preparation of experiments' data."
         log.exception(message)
