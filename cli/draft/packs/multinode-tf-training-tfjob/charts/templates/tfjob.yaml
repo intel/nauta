@@ -12,7 +12,7 @@ metadata:
 spec:
   tfReplicaSpecs:
     Worker:
-      replicas: 3
+      replicas: {{ .Values.workersCount }}
       restartPolicy: OnFailure
       template:
         metadata:
@@ -78,7 +78,7 @@ spec:
                   mountPath: /mnt/output/home
       backoffLimit: 5
     PS:
-      replicas: 1
+      replicas: {{ .Values.pServersCount }}
       restartPolicy: OnFailure
       template:
         metadata:
