@@ -28,6 +28,7 @@ from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_in
 
 TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
                   ' GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}'
+TEST_SHORT_VERSION_OUTPUT = 'Client Version: v2.9.0\nServer Version: v2.9.1\n'
 TEST_VERSION = LooseVersion('v2.9.1')
 
 
@@ -65,6 +66,11 @@ def test_is_version_valid_strict_wrong_versions(installed_version, expected_vers
 
 def test_parse_installed_version():
     assert _parse_installed_version(version_output=TEST_VERSION_OUTPUT, version_field='SemVer') == TEST_VERSION
+
+
+def test_parse_installed_version_without_quotes():
+    assert _parse_installed_version(version_output=TEST_SHORT_VERSION_OUTPUT,
+                                    version_field='Server Version') == TEST_VERSION
 
 
 def test_parse_installed_version_failure():

@@ -32,6 +32,7 @@ log = initialize_logger(__name__)
 
 DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
+KUBECTL_SERVER_MIN_VERSION = LooseVersion('v1.10')
 DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
 HELM_VERSION = LooseVersion('v2.9.1')
 HELM_SERVER_CONNECTION_TIMEOUT = 30
@@ -63,6 +64,11 @@ DEPENDENCY_MAP = {'draft': DependencySpec(expected_version=DRAFT_MIN_VERSION,
                                             version_command_args=['kubectl', 'version', '--client'],
                                             version_field='GitVersion',
                                             match_exact_version=False),
+                  'kubectl server': DependencySpec(expected_version=KUBECTL_SERVER_MIN_VERSION,
+                                                   version_command=execute_system_command,
+                                                   version_command_args=['kubectl', 'version', '--short'],
+                                                   version_field='Server Version',
+                                                   match_exact_version=False),
                   'helm client': DependencySpec(expected_version=HELM_VERSION,
                                                 version_command=execute_system_command,
                                                 version_command_args=['helm', 'version', '--client'],
@@ -94,14 +100,14 @@ def _is_version_valid(installed_version: LooseVersion, expected_version: LooseVe
 
 
 def _parse_installed_version(version_output: str, version_field='SemVer') -> LooseVersion:
-    regex = r"{version_field}:\"([\w.]+)\"".format(version_field=version_field)
+    regex = r"{version_field}:(?:\"([\w.]+)\"| ([\w.]+)$)".format(version_field=version_field)
     matches = re.findall(regex, version_output)
 
     if len(matches) != 1:
         raise ValueError(f'Failed to parse version({version_field}) '
                          f'from following input: {version_output}')
 
-    installed_version = LooseVersion(matches[0])
+    installed_version = LooseVersion(matches[0][0] or matches[0][1])
 
     return installed_version
 
