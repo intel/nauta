@@ -29,6 +29,7 @@ import toml
 
 from util.k8s import k8s_info
 from util.logger import initialize_logger
+from util.config import FOLDER_DIR_NAME
 
 import packs.common as common
 from util.exceptions import KubectlIntError
@@ -81,7 +82,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, internal_reg
         for line in dockerfile:
             if line.startswith("ADD training.py"):
                 if script_location:
-                    dockerfile_temp_content = dockerfile_temp_content + common.prepare_list_of_files(experiment_folder)
+                    dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM dls4e/tensorflow:1.8.0-py3"):
                 dockerfile_temp_content = dockerfile_temp_content + \
                                           f"FROM 127.0.0.1:{internal_registry_port}/dls4e/tensorflow:1.8.0-py3"

@@ -52,17 +52,6 @@ PARAMETERS = ("--param1=value1", "-param2=value2", "param3=value3")
 SCRIPT_LOCATION = "training_script.py"
 
 
-def test_prepare_list_of_files(mocker):
-    os_walk_mock = mocker.patch("os.walk")
-
-    os_walk_mock.return_value = PREP_LIST_INPUT
-
-    output = common.prepare_list_of_files('/.dlsctl/tmp/t20180416164609672/')
-
-    assert output.strip() == PREP_LIST_OUTPUT, "result is different than desired one."
-    assert os_walk_mock.call_count == 1, "data wasn't get"
-
-
 def compare_list(param_list, str, script_name):
     if script_name:
         assert param_list[0] == script_name, "missing script name in list of arguments"

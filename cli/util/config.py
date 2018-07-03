@@ -31,6 +31,8 @@ DLS_CTL_CONFIG_DIR_NAME = 'dls_ctl_config'
 
 # name of a directory with EXPERIMENT's data
 EXPERIMENTS_DIR_NAME = 'experiments'
+# name of a directory with data copied from script folder location
+FOLDER_DIR_NAME = 'folder'
 
 DLS4E_NAMESPACE = "dls4e"
 DLS4E_CONFIGURATION_CM = "dls4enterprise"

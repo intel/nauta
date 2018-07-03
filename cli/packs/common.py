@@ -27,39 +27,6 @@ from typing import List, Tuple
 draft_files = ['.draftignore', 'dockerignore', 'Dockerfile', 'draft.toml']
 
 
-def prepare_list_of_files(experiment_folder: str) -> str:
-    """
-    Creates dockerfile commands that copy content of a folder with
-    experiment's data into docker image. Omits folders created by
-    helm/draft.
-
-    :param experiment_folder: name of a folder with experiment
-    :return: a part of a dockerfile with generated commands
-    """
-    content = ""
-    if experiment_folder.endswith("/"):
-        experiment_folder = experiment_folder[:-1]
-    main_folder_copied = False
-    for root_directory, directories, files in os.walk(experiment_folder):
-        if not main_folder_copied:
-            main_folder_copied = True
-            for file_name in files:
-                if file_name not in draft_files:
-                    cp = "COPY {} {} \n".format(file_name, file_name)
-                    content = content + cp
-        # on windows paths with \ cannot be copied into docker image
-        folder = (root_directory).replace(experiment_folder, '').replace("\\","/")
-
-        if folder and not folder[1:].startswith("charts"):
-
-            folder_wts = folder[1:]
-            mkdir = "RUN mkdir {} \n".format(folder_wts)
-            cp = "COPY {}/* {}/ \n".format(folder_wts, folder_wts)
-            content = content + mkdir + cp
-
-    return content
-
-
 def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_location: str,
                               script_name_as_a_first_element: bool=True) -> List[str]:
     """

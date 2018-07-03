@@ -36,7 +36,7 @@ from packs.tf_training import update_configuration
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
 from platform_resources.run_model import RunStatus
-from util.config import EXPERIMENTS_DIR_NAME, Config
+from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
@@ -93,28 +93,28 @@ def create_environment(experiment_name: str, file_location: str, folder_location
 
     # create a folder for experiment's purposes
     run_environment_path = get_run_environment_path(experiment_name)
-
+    folder_path = os.path.join(run_environment_path, FOLDER_DIR_NAME)
     # copy folder content
     if folder_location:
         try:
-            shutil.copytree(folder_location, run_environment_path)
+            shutil.copytree(folder_location, folder_path)
         except Exception:
             log.exception("Create environment - copying training folder error.")
             raise KubectlIntError(message_prefix.format("Additional folder cannot"
                                                         " be copied into experiment's folder."))
 
     try:
-        if not os.path.exists(run_environment_path):
-            os.makedirs(run_environment_path)
-    except Exception:
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+    except Exception as exe:
         log.exception("Create environment - creating experiment folder error.")
         raise KubectlIntError(message_prefix.format("Folder with experiments' data cannot be created."))
 
     # copy training script - it overwrites the file taken from a folder_location
     if file_location:
         try:
-            shutil.copy2(file_location, run_environment_path)
-        except Exception:
+            shutil.copy2(file_location, folder_path)
+        except Exception as exe:
             log.exception("Create environment - copying training script error.")
             raise KubectlIntError(message_prefix.format("Training script cannot be created."))
 
