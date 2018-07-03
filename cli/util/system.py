@@ -27,6 +27,7 @@ import sys
 from typing import List
 import errno
 import socket
+import signal
 
 from util.exceptions import KubectlIntError
 from util.logger import initialize_logger
@@ -112,3 +113,16 @@ def check_port_availability(port: int) -> bool:
             raise KubectlIntError(error_msg) from e
 
     return ret_value
+
+
+def wait_for_ctrl_c():
+    """ Waits for pressing Ctrl-C key by a user. If Ctrl-C key has been pressed - finishes execution """
+    continue_loop = True
+
+    def signal_handler(signal, frame):
+        nonlocal continue_loop
+        continue_loop = False
+
+    signal.signal(signal.SIGINT, signal_handler)
+    while (continue_loop):
+        time.sleep(0.1)

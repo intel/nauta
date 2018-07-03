@@ -28,7 +28,7 @@ from util.system import get_current_os, OS
 from util import socat
 from util.network import wait_for_connection
 from util.logger import initialize_logger
-
+from util.system import wait_for_ctrl_c
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, LaunchError, \
@@ -84,7 +84,8 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
 
             click.echo('Go to {}'.format(url))
 
-            input('Proxy connection created.\nPress ENTER key to close a port forwarding process...')
+            click.echo('Proxy connection created.\nPress Ctrl-C key to close a port forwarding process...')
+            wait_for_ctrl_c()
     except K8sProxyCloseError:
         err_message = 'Error during closing of a proxy for a {}'.format(k8s_app_name)
         raise ProxyClosingError(err_message)

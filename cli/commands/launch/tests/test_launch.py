@@ -58,7 +58,7 @@ def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_che
     spf_mock = mocker.patch("util.launcher.K8sProxy")
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
-    input_mock = mocker.patch("util.launcher.input")
+    input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         socat_mock = mocker.patch("util.launcher.socat")
@@ -83,7 +83,7 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
     kube_client_mock = mocker.patch('kubernetes.client.configuration.Configuration')
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
-    input_mock = mocker.patch("util.launcher.input")
+    input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         socat_mock = mocker.patch("util.launcher.socat")
@@ -108,7 +108,7 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_
     spf_mock = mocker.patch("util.launcher.K8sProxy")
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
-    input_mock = mocker.patch("util.launcher.input")
+    input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         socat_mock = mocker.patch("util.launcher.socat")
@@ -132,7 +132,7 @@ def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check,
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.launch.input")
+    input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         socat_mock = mocker.patch("util.launcher.socat")
@@ -158,7 +158,7 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
     spf_mock.return_value = 0
     wfc_mock = mocker.patch("util.launcher.wait_for_connection")
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
-    input_mock = mocker.patch("commands.launch.launch.input")
+    input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         socat_mock = mocker.patch("util.launcher.socat")
