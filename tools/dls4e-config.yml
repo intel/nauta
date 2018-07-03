@@ -11,6 +11,13 @@ export_images:
     value: "{{ image_local_url['dls4e/tensorboard-service'] }}"
 
 local_images:
+  dls4e/centos:
+    version: "7.5.1804"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/centos"
+    required:
+      BASE_IMAGE: "shared/centos"
+    push: True
   dls4e/etcd:
     version: "3.1.10"
     image: "gcr.io/google-containers/etcd-amd64:3.1.10"
@@ -29,8 +36,8 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
-    version: "5.6.9"
-    image: "elasticsearch:5.6.9"
+    version: "6.2.3"
+    image: "quay.io/pires/docker-elasticsearch-kubernetes:6.2.3"
     method: pull
   dls4e/fluentd:
     version: "v0.12"
@@ -150,6 +157,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/elasticsearch"
       chart_values:
         image: "{{ image_local_url['dls4e/elasticsearch'] }}"
+        init_image: "{{ image_local_url['dls4e/centos'] }}"
     fluentd:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/fluentd"

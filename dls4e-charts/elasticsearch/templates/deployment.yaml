@@ -32,13 +32,32 @@ spec:
       nodeSelector:
 {{ toYaml (required "DLS4E Storage Node Label Selector" .Values.global.dls4e_storage.local_selector) | indent 8 }}
 {{- end }}
+      initContainers:
+      - command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E elasticsearch init image is required" .Values.init_image }}
+        imagePullPolicy: IfNotPresent
+        name: init-sysctl
+        resources: {}
+        securityContext:
+          privileged: true
       containers:
       - name: {{ .Chart.Name }}
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E elasticsearch image is required" .Values.image }}
         imagePullPolicy: "IfNotPresent"
         env:
         - name: ES_JAVA_OPTS
-          value: "-Xmx512m -Xms512m"
+          value: "-Xmx256m -Xms256m -XX:+UnlockDiagnosticVMOptions -XX:+PrintCompressedOopsMode"
+        - name: PROCESSORS
+          value: "1"
+        - name: NODE_MASTER
+          value: "true"
+        - name: NODE_DATA
+          value: "true"
+        - name: NETWORK_HOST
+          value: "_local_,_site_"
         resources:
           requests:
             memory: 1Gi
@@ -49,9 +68,15 @@ spec:
         ports:
         - containerPort: 9200
           protocol: TCP
-          volumeMounts:
-            - name: data
-              mountPath: /usr/share/elasticsearch/data
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: data
+          mountPath: /data
       volumes:
 {{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
         - name: data
