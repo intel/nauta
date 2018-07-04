@@ -31,10 +31,9 @@ from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment
 from util.exceptions import SubmitExperimentError
 from util.logger import initialize_logger
-from platform_resources.experiments import list_experiments
+from platform_resources.experiments import get_experiment
 from commands.experiment.common import validate_experiment_name
 from util.exceptions import K8sProxyCloseError
-
 
 HELP = "Launches a local browser with Jupyter Notebook. If the script name argument " \
        "is given, then script is put into the opened notebook."
@@ -60,7 +59,7 @@ def interact(state: State, name: str, filename: str):
 
     if name:
         try:
-            jupyters_list = list_experiments(namespace=current_namespace, name_filter=f'^{name}$')
+            jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
         except Exception:
             err_message = "Problems during loading a list of experiments."
             log.exception(err_message)
@@ -68,16 +67,16 @@ def interact(state: State, name: str, filename: str):
             sys.exit(1)
 
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
-        if jupyters_list and jupyters_list[0].template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
+        if jupyter_experiment and jupyter_experiment.template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
             click.echo(f"The chosen name ({name}) is already used by an experiment other than Jupyter Notebook. "
                        f"Please choose another one")
             sys.exit(1)
 
-        if not jupyters_list and not click.confirm("Experiment with a given name doesn't exist. "
-                                                   "Should the app continue and create a new one? "):
+        if not jupyter_experiment and not click.confirm("Experiment with a given name doesn't exist. "
+                                                        "Should the app continue and create a new one? "):
             sys.exit(0)
 
-        if jupyters_list:
+        if jupyter_experiment:
             create_new_notebook = False
 
     number_of_retries = 0

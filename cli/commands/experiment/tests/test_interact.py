@@ -43,31 +43,25 @@ NON_JUPYTER_EXPERIMENT = Experiment(name='test-experiment-2', parameters_spec=['
 
 
 class InteractMocks:
-    def __init__(self, mocker, get_namespace, list_experiments, submit_experiment, launch_app) -> None:
+    def __init__(self, mocker):
         self.mocker = mocker
-        self.get_namespace = get_namespace
-        self.list_experiments = list_experiments
-        self.submit_experiment = submit_experiment
-        self.launch_app = launch_app
+        self.get_namespace = mocker.patch("commands.experiment.interact.get_kubectl_current_context_namespace",
+                                          side_effect=[EXPERIMENT_NAMESPACE])
+        self.get_experiment = mocker.patch("commands.experiment.interact.get_experiment",
+                                           return_value=None)
+        self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment")
+        self.launch_app = mocker.patch("commands.experiment.interact.launch_app")
 
 
 @pytest.fixture
 def prepare_mocks(mocker) -> InteractMocks:
-    get_namespace_mock = mocker.patch("commands.experiment.interact.get_kubectl_current_context_namespace",
-                                      side_effect=[EXPERIMENT_NAMESPACE])
-    list_experiments_mock = mocker.patch("commands.experiment.interact.list_experiments",
-                                         return_value=[])
-    submit_experiment_mock = mocker.patch("commands.experiment.interact.submit_experiment")
-    launch_app_mock = mocker.patch("commands.experiment.interact.launch_app")
-
-    return InteractMocks(mocker=mocker, get_namespace=get_namespace_mock, list_experiments=list_experiments_mock,
-                         submit_experiment=submit_experiment_mock, launch_app=launch_app_mock)
+    return InteractMocks(mocker=mocker)
 
 
-def check_asserts(prepare_mocks: InteractMocks, get_namespace_count=1, list_experiments_count=1,
+def check_asserts(prepare_mocks: InteractMocks, get_namespace_count=1, get_experiment_count=1,
                   submit_experiment_count=1, launch_app_count=1):
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "Namespace wasn't gathered."
-    assert prepare_mocks.list_experiments.call_count == list_experiments_count, "Experiments weren't listed."
+    assert prepare_mocks.get_experiment.call_count == get_experiment_count, "Experiment wasn't gathered."
     assert prepare_mocks.submit_experiment.call_count == submit_experiment_count, "Experiment wasn't submitted."
     assert prepare_mocks.launch_app.call_count == launch_app_count, "App wasn't launched."
 
@@ -76,60 +70,60 @@ def test_interact_incorrect_name(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact, ["-n", INCORRECT_INTERACT_NAME])
 
     assert "name must consist of lower case alphanumeric characters" in result.output
-    check_asserts(prepare_mocks, get_namespace_count=0, list_experiments_count=0, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=0, get_experiment_count=0, submit_experiment_count=0,
                   launch_app_count=0)
 
     result = CliRunner().invoke(interact.interact, ["-n", TOO_LONG_INTERACT_NAME])
 
     assert "Name cannot be longer than 30 characters" in result.output
-    check_asserts(prepare_mocks, get_namespace_count=0, list_experiments_count=0, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=0, get_experiment_count=0, submit_experiment_count=0,
                   launch_app_count=0)
 
 
 def test_error_when_listing_experiments(prepare_mocks: InteractMocks):
-    prepare_mocks.list_experiments.side_effect = RuntimeError("error")
+    prepare_mocks.get_experiment.side_effect = RuntimeError("error")
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
     assert "Problems during loading a list of experiments" in result.output
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=1, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
 
 def test_incorrect_experiment_type(prepare_mocks: InteractMocks):
-    prepare_mocks.list_experiments.return_value = [NON_JUPYTER_EXPERIMENT]
+    prepare_mocks.get_experiment.return_value = NON_JUPYTER_EXPERIMENT
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
     assert "is already used by an experiment other than Jupyter Notebook." in result.output
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=1, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
 
 def test_dont_continue_if_exp_doesnt_exist(prepare_mocks: InteractMocks):
     CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="n")
 
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=1, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
 
 def test_launch_app_only(prepare_mocks: InteractMocks):
-    prepare_mocks.list_experiments.return_value = [JUPYTER_EXPERIMENT]
+    prepare_mocks.get_experiment.return_value = JUPYTER_EXPERIMENT
     CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=1, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=1)
 
 
 def test_full_interact_success(prepare_mocks: InteractMocks):
     CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="y")
 
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=1, submit_experiment_count=1,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=1,
                   launch_app_count=1)
 
 
 def test_full_interact_without_name(prepare_mocks: InteractMocks):
     CliRunner().invoke(interact.interact)
 
-    check_asserts(prepare_mocks, get_namespace_count=1, list_experiments_count=0, submit_experiment_count=1,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=1)

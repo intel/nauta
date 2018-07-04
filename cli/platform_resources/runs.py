@@ -43,8 +43,7 @@ RUN_VERSION = 'v1'
 
 
 def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None, exp_name_filter: str = None,
-              excl_state: RunStatus = None) \
-        -> List[Run]:
+              excl_state: RunStatus = None) -> List[Run]:
     """
     Return list of experiment runs.
     :param namespace: If provided, only runs from this namespace will be returned

@@ -22,10 +22,11 @@
 import pytest
 
 from kubernetes.client import CustomObjectsApi
+from kubernetes.client.rest import ApiException
 
 from platform_resources.experiment_model import ExperimentStatus, Experiment
 from platform_resources.experiments import list_experiments, InvalidRegularExpressionError, \
-    add_experiment, generate_exp_name_and_labels
+    add_experiment, generate_exp_name_and_labels, get_experiment
 from util.exceptions import SubmitExperimentError
 
 EXPERIMENT_NAME = 'test-exp'
@@ -127,8 +128,38 @@ def test_generate_experiment_name_if_name_not_provided_and_exp_no_exists(mock_k8
     assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 2
 
 
+def test_get_experiment(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.return_value = GET_EXPERIMENT_RESPONSE_RAW
+    experiment = get_experiment(name=EXPERIMENT_NAME)
+    assert experiment is not None and type(experiment) is Experiment
+
+
+def test_get_experiment_from_namespace(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_namespaced_custom_object.return_value = GET_EXPERIMENT_RESPONSE_RAW
+    experiment = get_experiment(name=EXPERIMENT_NAME, namespace=NAMESPACE)
+    assert experiment is not None and type(experiment) is Experiment
+
+
+def test_get_experiment_not_found(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=404)
+    experiment = get_experiment(name=EXPERIMENT_NAME)
+    assert experiment is None
+
+
+def test_get_experiment_failure(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=500)
+    with pytest.raises(ApiException):
+        get_experiment(name=EXPERIMENT_NAME)
+
+
 ADD_EXPERIMENT_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment',
                                'metadata': {'name': EXPERIMENT_NAME, 'namespace': NAMESPACE},
+                               'spec': {'name': EXPERIMENT_NAME, 'parameters-spec': [], 'state': 'CREATING',
+                                        'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE}}
+
+GET_EXPERIMENT_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment',
+                               'metadata': {'name': EXPERIMENT_NAME, 'namespace': NAMESPACE,
+                                            'creationTimestamp': '2018-04-26T13:43:01Z'},
                                'spec': {'name': EXPERIMENT_NAME, 'parameters-spec': [], 'state': 'CREATING',
                                         'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE}}
 

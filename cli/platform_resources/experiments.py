@@ -20,7 +20,7 @@
 #
 
 from functools import partial
-from typing import List, Dict
+from typing import Dict, List, Optional
 import re
 import sre_constants
 import time
@@ -40,6 +40,34 @@ logger = initialize_logger(__name__)
 API_GROUP_NAME = 'aipg.intel.com'
 EXPERIMENTS_PLURAL = 'experiments'
 EXPERIMENTS_VERSION = 'v1'
+
+
+def get_experiment(name: str, namespace: str = None) -> Optional[model.Experiment]:
+    """
+    Return Experiment of given name. If Experiment is not found, function returns None.
+    :param namespace: If provided, only experiments from this namespace will be returned
+    :return: Experiment object or None
+    """
+    logger.debug(f'Getting experiment {name}.')
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+    try:
+        if namespace:
+            raw_experiment = api.get_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace,
+                                                              plural=EXPERIMENTS_PLURAL, version=EXPERIMENTS_VERSION,
+                                                              name=name)
+        else:
+            raw_experiment = api.get_cluster_custom_object(group=API_GROUP_NAME, plural=EXPERIMENTS_PLURAL,
+                                                           version=EXPERIMENTS_VERSION, name=name)
+    except ApiException as e:
+        logger.exception(f'Failed to find experiment {name}.')
+        if e.status == 404:
+            raw_experiment = None
+        else:
+            raise
+
+    return model.Experiment.from_k8s_response_dict(raw_experiment) if raw_experiment else None
 
 
 def list_experiments(namespace: str = None,

@@ -34,7 +34,7 @@ from util.k8s.k8s_info import get_current_namespace
 from platform_resources.run_model import Run, RunStatus
 from platform_resources.runs import list_runs, update_run
 from platform_resources.experiment_model import ExperimentStatus
-from platform_resources.experiments import list_experiments, update_experiment
+from platform_resources.experiments import update_experiment, get_experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from util.app_names import DLS4EAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
@@ -115,38 +115,51 @@ def cancel(state: State, name: str, purge: bool):
         exp_with_runs[run.experiment_name].append(run)
 
     config.load_kube_config()
-    v1 = client.CoreV1Api()
+    k8s_api = client.CoreV1Api()
 
     deleted_runs = []
     not_deleted_runs = []
 
-    try:
-        with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                               verify_certs=False, use_ssl=False)
-            for exp_name, run_list in exp_with_runs.items():
-                try:
-                    del_runs, not_del_runs = cancel_experiment(exp_name=exp_name, run_list=run_list, v1=v1,
-                                                               namespace=current_namespace, purge=purge,
-                                                               k8s_es_client=es_client)
-                    deleted_runs.extend(del_runs)
-                    not_deleted_runs.extend(not_del_runs)
-                except Exception:
-                    log.exception("Error during cancelling an experiment.")
-                    not_deleted_runs.extend(run_list)
-    except K8sProxyCloseError:
-        log.exception("Error during closing of a proxy for elasticsearch.")
-        click.echo("Elasticsearch proxy hasn't been closed properly. "
-                   "Check whether it still exists, if yes - close it manually.")
-        sys.exit(1)
-    except LocalPortOccupiedError as exe:
-        log.exception("Error during creation of proxy - port is occupied.")
-        click.echo(f"Error during creation of a proxy for elasticsearch. {exe.message}")
-        sys.exit(1)
-    except K8sProxyOpenError:
-        log.exception("Error during creation of a proxy for elasticsearch.")
-        click.echo("Error during creation of a proxy for elasticsearch.")
-        sys.exit(1)
+    if purge:
+        # Connect to elasticsearch in order to purge run logs
+        try:
+            with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
+                es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
+                                                   verify_certs=False, use_ssl=False)
+                for exp_name, run_list in exp_with_runs.items():
+                    try:
+                        exp_del_runs, exp_not_del_runs = purge_experiment(exp_name=exp_name,
+                                                                          runs_to_purge=run_list, k8s_api=k8s_api,
+                                                                          namespace=current_namespace,
+                                                                          k8s_es_client=es_client)
+                        deleted_runs.extend(exp_del_runs)
+                        not_deleted_runs.extend(exp_not_del_runs)
+                    except Exception:
+                        log.exception("Error during cancelling an experiment.")
+                        not_deleted_runs.extend(run_list)
+        except K8sProxyCloseError:
+            log.exception("Error during closing of a proxy for elasticsearch.")
+            click.echo("Elasticsearch proxy hasn't been closed properly. "
+                       "Check whether it still exists, if yes - close it manually.")
+            sys.exit(1)
+        except LocalPortOccupiedError as exe:
+            log.exception("Error during creation of proxy - port is occupied.")
+            click.echo(f"Error during creation of a proxy for elasticsearch. {exe.message}")
+            sys.exit(1)
+        except K8sProxyOpenError:
+            log.exception("Error during creation of a proxy for elasticsearch.")
+            click.echo("Error during creation of a proxy for elasticsearch.")
+            sys.exit(1)
+    else:
+        for exp_name, run_list in exp_with_runs.items():
+            try:
+                exp_del_runs, exp_not_del_runs = cancel_experiment(exp_name=exp_name, runs_to_cancel=run_list,
+                                                                   k8s_api=k8s_api, namespace=current_namespace)
+                deleted_runs.extend(exp_del_runs)
+                not_deleted_runs.extend(exp_not_del_runs)
+            except Exception:
+                log.exception("Error during cancelling an experiment.")
+                not_deleted_runs.extend(run_list)
 
     if deleted_runs:
         click.echo("The following experiments were cancelled succesfully:")
@@ -160,18 +173,84 @@ def cancel(state: State, name: str, purge: bool):
         sys.exit(1)
 
 
-def cancel_experiment(exp_name: str, run_list: List[Run], v1: client.CoreV1Api,
-                      k8s_es_client: K8sElasticSearchClient,
-                      purge: bool=False, namespace: str="") -> Tuple[List[Run], List[Run]]:
+def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.CoreV1Api,
+                     k8s_es_client: K8sElasticSearchClient, namespace: str="") -> Tuple[List[Run], List[Run]]:
+    """
+       Purge experiment with a given name by cancelling runs given as a parameter. If given experiment
+       contains more runs than is in the list of runs - experiment's state remains intact.
+
+       :param exp_name: name of an experiment to which belong runs passed in run_list parameter
+       :param runs_to_purge: list of runs that should be purged, they have to belong to exp_name experiment
+       :param k8s_api: K8s api object
+       :param k8s_es_client: Kubernetes ElasticSearch client
+       :param namespace: namespace where experiment is located
+       :return: two list - first contains runs that were cancelled successfully, second - those which weren't
+       """
+    log.debug(f"Purging {exp_name} experiment ...")
+
+    purged_runs = []
+    not_purged_runs = []
+
+    experiment = get_experiment(name=exp_name, namespace=namespace)
+    if not experiment:
+        raise RuntimeError("Error during loading experiment's data.")
+
+    experiment_runs = list_runs(namespace=namespace, exp_name_filter=exp_name)
+    # check whether experiment has more runs that should be cancelled
+    cancel_whole_experiment = (len(experiment_runs) == len(runs_to_purge))
+    if cancel_whole_experiment:
+        experiment.state = ExperimentStatus.CANCELLING
+        update_experiment(experiment, namespace)
+
+    try:
+        cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge,
+                                                                    k8s_api=k8s_api, namespace=namespace)
+        not_purged_runs = not_cancelled_runs
+        for run in cancelled_runs:
+            log.debug(f"Purging {run.name} run ...")
+            click.echo(f"Purging {run.name} experiment ...")
+            try:
+                # delete run
+                kubectl.delete_k8s_object("run", run.name)
+                purged_runs.append(run)
+            except Exception as exe:
+                not_purged_runs.append(run)
+                log.exception("Error during purging runs.")
+                # occurence of NotFound error may mean, that run has been removed earlier
+                if "NotFound" not in str(exe):
+                    click.echo("Not all experiment's components were removed properly.")
+                    raise exe
+            try:
+                # clear run logs
+                log.debug(f"Clearing logs for {run.name} run.")
+                k8s_es_client.delete_logs_for_run(run=run.name)
+            except Exception:
+                log.exception("Error during clearing run logs.")
+
+        if cancel_whole_experiment and not not_purged_runs:
+            try:
+                kubectl.delete_k8s_object("experiment", exp_name)
+            except Exception:
+                # problems during deleting experiments are hidden as if runs were
+                # cancelled user doesn't have a possibility to remove them
+                log.exception("Error during purging experiment.")
+
+    except Exception:
+        log.exception("Error during purging experiment.")
+        return purged_runs, not_purged_runs
+
+    return purged_runs, not_purged_runs
+
+
+def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
+                      namespace: str="") -> Tuple[List[Run], List[Run]]:
     """
     Cancel experiment with a given name by cancelling runs given as a parameter. If given experiment
     contains more runs than is in the list of runs - experiment's state remains intact.
 
     :param exp_name: name of an experiment to which belong runs passed in run_list parameter
-    :param run_list: list of runs that should be deleted, they have to belong to exp_name experiment
-    :param v1: K8s api object
-    :param k8s_es_client: Kubernetes ElasticSearch client
-    :param purge: if True - function removes all data related to an experiment
+    :param runs_to_cancel: list of runs that should be deleted, they have to belong to exp_name experiment
+    :param k8s_api: K8s api object
     :param namespace: namespace where experiment is located
     :return: two list - first contains runs that were cancelled successfully, second - those which weren't
     """
@@ -179,30 +258,57 @@ def cancel_experiment(exp_name: str, run_list: List[Run], v1: client.CoreV1Api,
 
     deleted_runs = []
     not_deleted_runs = []
+
+    experiment = get_experiment(name=exp_name, namespace=namespace)
+    if not experiment:
+        raise RuntimeError("Error during loading experiment's data.")
+
+    experiment_runs = list_runs(namespace=namespace, exp_name_filter=exp_name, excl_state=RunStatus.CANCELLED)
     # check whether experiment has more runs that should be cancelled
-    if purge:
-        exp_runs_list = list_runs(namespace=namespace, exp_name_filter=exp_name)
-    else:
-        exp_runs_list = list_runs(namespace=namespace, exp_name_filter=exp_name, excl_state=RunStatus.CANCELLED)
-
-    cancel_experiment = (len(exp_runs_list) == len(run_list))
-
-    if cancel_experiment:
-        experiment_list = list_experiments(namespace=namespace, name_filter=exp_name)
-
-        if not experiment_list:
-            raise RuntimeError("Error during loading experiment's data")
-
-        experiment = experiment_list[0]
+    cancel_whole_experiment = (len(experiment_runs) == len(runs_to_cancel))
+    if cancel_whole_experiment:
         experiment.state = ExperimentStatus.CANCELLING
         update_experiment(experiment, namespace)
 
     try:
-        for run in run_list:
+        deleted_runs, not_deleted_runs = cancel_experiment_runs(runs_to_cancel=runs_to_cancel,
+                                                                k8s_api=k8s_api, namespace=namespace)
+
+        if cancel_whole_experiment and not not_deleted_runs:
+            try:
+                # change an experiment state to CANCELLED
+                experiment.state = ExperimentStatus.CANCELLED
+                update_experiment(experiment, namespace)
+            except Exception:
+                # problems during deleting experiments are hidden as if runs were
+                # cancelled user doesn't have a possibility to remove them
+                log.exception("Error during cancelling Experiment resource.")
+
+    except Exception as e:
+        log.exception("Error during cancelling experiment.")
+        return deleted_runs, not_deleted_runs
+
+    return deleted_runs, not_deleted_runs
+
+
+def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
+                           namespace: str="") -> Tuple[List[Run], List[Run]]:
+    """
+    Cancel given list of Runs belonging to a single namespace.
+    :param runs_to_cancel: Runs to be cancelled
+    :param k8s_api: k8s API client instance
+    :param namespace: namespace where Run instances reside
+    :return: tuple of  list containing successfully Runs and list containing Runs that were not cancelled
+    """
+    deleted_runs = []
+    not_deleted_runs = []
+    try:
+        for run in runs_to_cancel:
+            log.debug(f"Cancelling {run.name} run ...")
             click.echo(f"Cancelling {run.name} experiment ...")
             # delete all main objects related to run
-            list_of_pods = v1.list_namespaced_pod(watch=False, namespace=namespace,
-                                                  label_selector=f"runName={run.name}")
+            list_of_pods = k8s_api.list_namespaced_pod(watch=False, namespace=namespace,
+                                                       label_selector=f"runName={run.name}")
 
             already_deleted = set()
             click.echo(f"Deleting objects related to {run.name} experiment ...")
@@ -214,58 +320,20 @@ def cancel_experiment(exp_name: str, run_list: List[Run], v1: client.CoreV1Api,
                     try:
                         kubectl.delete_k8s_object(owner_kind, owner_name)
                         already_deleted.add(owner_key)
-                    except Exception as exe:
+                    except Exception:
                         log.exception("Error during removal of a k8s object.")
                         all_objects_deleted = False
 
             if all_objects_deleted:
-                # purge - only if all previous steps were successful
-                if purge:
-                    # remove docker images related to experiment
-
-                    try:
-                        # delete run
-                        kubectl.delete_k8s_object("run", run.name)
-                    except Exception as exe:
-                        not_deleted_runs.append(run)
-                        log.exception("Error during purging runs.")
-                        # occurence of NotFound error may mean, that run has been removed earlier
-                        if "NotFound" not in str(exe):
-                            click.echo("Not all experiment's components were removed properly.")
-                            raise exe
-
-                    try:
-                        # clear run logs
-                        log.debug(f"Clearing logs for {run.name} run.")
-                        k8s_es_client.delete_logs_for_run(run=run.name)
-                    except Exception:
-                        log.exception("Error during clearing run logs.")
-
-                else:
-                    # change a run state to CANCELLED
-                    click.echo(f"Setting experiment status to CANCELLED ...")
-                    run.state = RunStatus.CANCELLED
-                    update_run(run, namespace)
-
+                # change a run state to CANCELLED
+                click.echo(f"Setting experiment status to CANCELLED ...")
+                run.state = RunStatus.CANCELLED
+                update_run(run, namespace)
                 deleted_runs.append(run)
             else:
                 click.echo(f"Not all components of {run.name} experiment were deleted ...")
                 click.echo("Experiment remains in its previous state.")
                 not_deleted_runs.append(run)
-
-        if cancel_experiment and not not_deleted_runs:
-            try:
-                if purge:
-                    # delete experiment
-                    kubectl.delete_k8s_object("experiment", exp_name)
-                else:
-                    # change an experiment state to CANCELLED
-                    experiment.state = ExperimentStatus.CANCELLED
-                    update_experiment(experiment, namespace)
-            except Exception as exe:
-                # problems during deleting experiments are hidden as if runs were
-                # cancelled user doesn't have a possibility to remove them
-                log.exception("Error during purging experiments.")
 
     except Exception:
         log.exception("Error during cancelling experiments")

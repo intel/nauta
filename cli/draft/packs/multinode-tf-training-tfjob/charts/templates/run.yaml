@@ -3,7 +3,7 @@ kind: Run
 metadata:
   name: {{ .Release.Name }}
 spec:
-  experiment-name: experiment-name-will-be-added-soon
+  experiment-name: {{ .Values.experimentName }}
   pod-selector:
     matchLabels:
       app: {{ template "name" . }}
