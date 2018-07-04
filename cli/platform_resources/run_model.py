@@ -84,7 +84,21 @@ class Run(PlatformResource):
 
 
 class RunSchema(Schema):
+    name = fields.String(required=True, allow_none=False, load_from='experiment-name')
+    experiment_name = fields.String(required=True, allow_none=False, dump_to='experiment-name',
+                                    load_from='experiment-name')
+    parameters = fields.List(fields.String, required=False, missing=None, allow_none=True)
+    metrics = fields.Dict(fields.String, required=False, missing=None, allow_none=True)
+    pod_count = fields.Int(required=False, missing=None, allow_none=True, dump_to='pod-count', load_from='pod-count')
+    pod_selector = fields.Dict(fields.String, required=False, missing=None, allow_none=True, dump_to='pod-selector',
+                               load_from='pod-selector')
     state = EnumField(RunStatus, required=True, allow_none=False, by_value=True)
+
+    @post_load
+    def make_run(self, data):
+        result = Run(**data)
+        result.template_name = result.pod_selector['matchLabels']['app']
+        return result
 
 
 class RunKubernetesSchema(KubernetesObjectSchema):

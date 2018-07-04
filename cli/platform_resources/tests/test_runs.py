@@ -122,7 +122,7 @@ LIST_RUNS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'items': [
 
 
 def test_update_run_success(mock_k8s_api_client):
-    mock_k8s_api_client.patch_namespaced_custom_object.return_value = ""
+    mock_k8s_api_client.patch_namespaced_custom_object.return_value = LIST_RUNS_RESPONSE_RAW['items'][0]
 
     update_run(TEST_RUNS[0], "namespace-1")
 

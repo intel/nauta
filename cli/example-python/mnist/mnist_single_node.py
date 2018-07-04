@@ -49,6 +49,7 @@ import os
 import sys
 
 from tensorflow.examples.tutorials.mnist import input_data
+from experiment_metrics.api import publish
 
 import tensorflow as tf
 
@@ -172,8 +173,10 @@ def main(_):
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-        print('Validation accuracy %g' % accuracy.eval(feed_dict={
-            x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0}))
+        validation_accuracy = accuracy.eval(feed_dict={
+            x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0})
+        print('Validation accuracy %g' % validation_accuracy)
+        publish({'accuracy': str(validation_accuracy)})
 
 
 if __name__ == '__main__':

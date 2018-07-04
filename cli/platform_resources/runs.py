@@ -22,7 +22,7 @@
 from functools import partial
 import re
 import sre_constants
-from typing import List
+from typing import List, Dict
 
 from kubernetes import config, client
 from kubernetes.client.rest import ApiException
@@ -82,29 +82,59 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     return runs
 
 
-def update_run(run: Run, namespace: str) -> KubernetesObject:
+def update_run(run: Run, namespace: str) -> (KubernetesObject, Run):
     """
     Updates a Run object given as a parameter.
     :param run model to update
     :param namespace where Run will be updated
     :return: in case of any problems during update it throws an exception
     """
-
-    config.load_kube_config()
-    api = client.CustomObjectsApi(client.ApiClient())
-
     run_kubernetes = KubernetesObject(run, client.V1ObjectMeta(name=run.name, namespace=namespace),
                                             kind="Run", apiVersion=f"{API_GROUP_NAME}/{RUN_VERSION}")
     schema = RunKubernetesSchema()
     body, err = schema.dump(run_kubernetes)
     if err:
         raise RuntimeError(f'preparing dump of RunKubernetes request object error - {err}')
+    return _update(run.name, namespace, body)
+
+
+def patch_run(name: str, namespace: str, metrics: Dict[str,str]) -> (KubernetesObject, Run):
+    """
+    Patch a Run object for a given data
+    :param name run name to update
+    :param namespace where Run will be updated
+    :param metrics dict to be merged into Run object
+    :return: in case of any problems during update it throws an exception
+    """
+    body = {
+        "spec": {
+            "metrics": metrics
+        }
+    }
+    return _update(name, namespace, body)
+
+
+def _update(name: str, namespace: str, body: object) -> (KubernetesObject, Run):
+    """
+    Patch a Run object for a given data
+    :param name run name to update
+    :param namespace where Run will be updated
+    :param body: patch object to apply
+    :return: in case of any problems during update it throws an exception
+    """
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
 
     try:
-        raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body = body,
-                                                  plural=RUN_PLURAL, version=RUN_VERSION, name=run.name)
-
+        raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body=body,
+                                                     plural=RUN_PLURAL, version=RUN_VERSION, name=name)
+        schema = RunKubernetesSchema()
+        run, err = schema.load(raw_run)
+        if err:
+            raise RuntimeError(f'preparing load of RunKubernetes update response object error - {err}')
         logger.debug(f"Run patch response : {raw_run}")
+        return run, Run.from_k8s_response_dict(raw_run)
     except ApiException as exe:
         err_message = "Error during patching a Run"
         logger.exception(err_message)

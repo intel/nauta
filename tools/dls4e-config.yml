@@ -71,14 +71,17 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
+  dls4e/tensorflow/base:
+    version: "1.8.0-py3"
+    method: pull
+    push: false
+    image: "tensorflow/tensorflow:1.8.0-py3"
   dls4e/tensorflow:
     version: "1.8.0-py3"
-    method: pull
-    image: "tensorflow/tensorflow:1.8.0-py3"
-  dls4e/tensorboard:
-    version: "1.8.0-py3"
-    method: pull
-    image: "tensorflow/tensorflow:1.8.0-py3"
+    required:
+      BASE_IMAGE: "dls4e/tensorflow/base"
+    method: build
+    directory: "{{ playbook_dir }}/../../cli/experiment_metrics"
   dls4e/nginx:
     version: "1.14.0"
     method: pull
