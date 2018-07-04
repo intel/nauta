@@ -1,22 +1,5 @@
 ---
 
-- name: Set paths fact
-  set_fact:
-    dls4e_img: "dls4e-{{ dls4e_version }}.img"
-    registry_chart: "dls4e-registry-{{ dls4e_version }}.tgz"
-    dls4e_chart: "dls4e-{{ dls4e_version }}.tgz"
-
-- name: Set local paths fact
-  set_fact:
-    workspace: ".workspace"
-    runtime_kubectl: "{{ kubectl }}"
-    runtime_helm: "{{ helm }}"
-    runtime_loader: "{{ loader }}"
-    runtime_img: "{{ playbook_dir }}/files/dls4e-{{ dls4e_version }}.img"
-    runtime_dls4e_img: "{{ playbook_dir }}/files/{{ dls4e_img }}"
-    runtime_registry_chart: "{{ playbook_dir }}/files/{{ registry_chart }}"
-    runtime_dls4e_chart: "{{ playbook_dir }}/files/{{ dls4e_chart }}"
-
 - name: Calculate runtime external ip
   set_fact:
     runtime_external_ip: "{{ external_ip |  default ('') }}"
@@ -25,36 +8,3 @@
   fail:
     msg: Unable to calculate external ip
   when: not runtime_external_ip
-
-- name: Create workspace directory
-  file:
-    path: "{{ workspace }}"
-    state: directory
-
-- name: Check if kubeconfig exists
-  file:
-    path: "{{ kubeconfig }}"
-
-- name: Allow to execute bins
-  file:
-    path: "{{ item }}"
-    mode: 0755
-  with_items:
-    - "{{ runtime_kubectl }}"
-    - "{{ runtime_helm }}"
-    - "{{ runtime_loader }}"
-
-- name: Add host
-  add_host:
-    name: provisioner
-    group: provisioners
-    delegation_hostname: "{{ inventory_hostname }}"
-    workspace: "{{ workspace }}"
-    runtime_kubectl: "{{ runtime_kubectl }}"
-    runtime_helm: "{{ runtime_helm }}"
-    runtime_loader: "{{ runtime_loader }}"
-    runtime_img: "{{ runtime_img }}"
-    runtime_dls4e_img: "{{ runtime_dls4e_img }}"
-    runtime_registry_chart: "{{ runtime_registry_chart }}"
-    runtime_dls4e_chart: "{{ runtime_dls4e_chart }}"
-    runtime_external_ip: "{{ runtime_external_ip }}"

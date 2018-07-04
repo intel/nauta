@@ -6,7 +6,6 @@
   register: chart
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Fail if upgrade is not possible
   fail:
@@ -34,7 +33,6 @@
 - name: Ensure that dls4e registry chart exists
   file:
     path: "{{ runtime_dls4e_chart }}"
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Render values
   vars:
@@ -42,13 +40,11 @@
   copy:
     content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "{{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Install helm chart
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} install -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
   when: chart is changed
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Upgrade helm chart
   environment: "{{ local_envs }}"
@@ -56,10 +52,8 @@
   when:
     - not chart is changed
     - upgrade | default(False) | bool
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Remove image values file
   file:
     path: "{{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
     state: absent
-  delegate_to: "{{ delegation_hostname }}"

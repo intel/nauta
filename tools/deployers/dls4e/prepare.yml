@@ -1,0 +1,28 @@
+---
+
+- name: Init remote workspace
+  hosts: master[0]
+  roles:
+    - role: remote/init
+      when: "'master' in groups and groups['master'] | length > 0"
+
+- name: Init local workspace
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  roles:
+    - role: local/init
+      when: "'master' not in groups or groups['master'] | length == 0"
+
+- name: Define local workspace
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  roles:
+    - role: define
+
+- name: Load storage
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: verify

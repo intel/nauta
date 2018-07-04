@@ -131,20 +131,23 @@ subcharts:
       version: 2.6.2
       path: "{{ playbook_dir }}/../../dls4e-registry-charts/registry"
   dls4e:
-    dls-gui:
+    gui:
       version: 0.0.1
-      path: "{{ playbook_dir }}/../../dls4e-charts/dls-gui"
+      path: "{{ playbook_dir }}/../../dls4e-charts/gui"
       chart_values:
         image: "{{ image_local_url['dls4e/gui'] }}"
-    dls-experiments:
+    admin-account:
       version: 1.0.0
-      path: "{{ playbook_dir }}/../../dls4e-charts/dls-experiments"
-    dls-configuration:
+      path: "{{ playbook_dir }}/../../dls4e-charts/admin-account"
+    experiments:
       version: 1.0.0
-      path: "{{ playbook_dir }}/../../dls4e-charts/dls-configuration"
-    dls-commons:
+      path: "{{ playbook_dir }}/../../dls4e-charts/experiments"
+    configuration:
       version: 1.0.0
-      path: "{{ playbook_dir }}/../../dls4e-charts/dls-commons"
+      path: "{{ playbook_dir }}/../../dls4e-charts/configuration"
+    commons:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/commons"
       chart_values:
         docker_image: "{{ image_local_url['dls4e/docker'] }}"
     docker-registry:
@@ -194,9 +197,9 @@ subcharts:
       chart_values:
         image: "{{ image_local_url['dls4e/tf/operator'] }}"
         tfimage: "{{ image_local_url['dls4e/tensorflow'] }}"
-    dls-ingress:
+    ingress:
       version: 1.0.0
-      path: "{{ playbook_dir }}/../../dls4e-charts/dls-ingress"
+      path: "{{ playbook_dir }}/../../dls4e-charts/ingress"
       chart_values:
         image: "{{ image_local_url['dls4e/ingress'] }}"
         defaultbackend_image: "{{ image_local_url['dls4e/defaultbackend'] }}"

@@ -91,6 +91,7 @@
       DNS.4: "kubernetes.default.svc"
       DNS.5: "kubernetes.default.svc.{{ k8s_domain }}.{{ domain }}"
       IP.1: "{{ kubernetes_network.svc_list.apiservice.ip }}"
+      IP.2: "{{ dls_configuration.external_interface.ipv4_address }}"
     key_usage:
       - digitalSignature
       - keyEncipherment

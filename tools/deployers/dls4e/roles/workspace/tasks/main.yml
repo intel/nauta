@@ -1,37 +1,19 @@
 ---
 
-- name: Ensure exec mod on files
-  file:
-    path: "{{ item }}"
-    mode: +x
-  with_items:
-    - "{{ runtime_kubectl }}"
-    - "{{ runtime_helm }}"
-    - "{{ runtime_loader }}"
-  delegate_to: "{{ delegation_hostname }}"
-
-- name: Render envs
-  set_fact:
-    local_envs: "{{ proxy | default({}) | combine({'KUBECONFIG': kubeconfig}) }}"
-  delegate_to: "{{ delegation_hostname }}"
-
 - name: Verify helm access
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} init -c --skip-refresh"
   changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Verify helm access
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} ls"
   changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Verify kubernetes access
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} get pods"
   changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Check if kubernetes namespace exists
   environment: "{{ local_envs }}"
@@ -39,20 +21,17 @@
   register: namespace
   changed_when: namespace.rc in [1]
   failed_when: namespace.rc not in [0, 1]
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Create kubernetes namespace if not exists
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} create ns dls4e"
   changed_when: False
   when: namespace is changed
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Fetch all pods
   shell: "{{ runtime_kubectl }} get nodes -o 'jsonpath={.items[*].status.images[*].names[*]}'"
   environment: "{{ local_envs }}"
   changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
   register: images
 
 - set_fact:
@@ -62,13 +41,11 @@
   template:
     src: workspace-deployment.yml
     dest: "{{ workspace }}/workspace-deployment.yml"
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Apply kubernetes workspace pod deployment
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} apply -f {{ workspace }}/workspace-deployment.yml"
   changed_when: False
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Wait for all workspaces to get ready
   environment: "{{ local_envs }}"
@@ -78,7 +55,6 @@
   until: workspace_ready.stdout | int == 2
   retries: 60
   delay: 1
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Fetch all instance names
   environment: "{{ local_envs }}"
@@ -88,14 +64,13 @@
   delay: 1
   changed_when: False
   register: workspaces
-  delegate_to: "{{ delegation_hostname }}"
 
 - name: Register provisioner pods
   add_host:
     name: "{{ item }}"
     pod: "{{ item }}"
     groups: provisioner-pods
-    delegation_hostname: "{{ delegation_hostname }}"
+    ansible_connection: "local"
     workspace: "{{ workspace }}"
     runtime_kubectl: "{{ runtime_kubectl }}"
     runtime_helm: "{{ runtime_helm }}"

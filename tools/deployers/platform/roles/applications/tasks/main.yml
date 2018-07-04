@@ -1,6 +1,9 @@
 ---
 
 - name: Create a k8s dls4e namespace
+  changed_when: False
+  environment:
+    KUBECONFIG: /dev/null
   shell: "kubectl get namespace dls4e || kubectl create namespace dls4e"
 
 - name: Create kubernetes configuration directory
@@ -15,9 +18,13 @@
 
 - name: Apply tiller release
   changed_when: False
+  environment:
+    KUBECONFIG: /dev/null
   shell: kubectl apply -f /root/kubernetes/apps/tiller.yml
 
 - name: Wait for at least one tiller instances to get ready
+  environment:
+    KUBECONFIG: /dev/null
   shell: "kubectl --namespace=kube-system get ds tiller -o jsonpath='{.status.numberReady}'"
   changed_when: False
   register: tiller_ready
@@ -31,7 +38,8 @@
   when: tiller_ready.stdout == '0'
 
 - name: Verify helm access
-  environment: "{{ {'http_proxy': '', 'HTTP_PROXY': '' } }}"
+  environment:
+    KUBECONFIG: /dev/null
   shell: helm ls
   changed_when: False
   register: helm_access
@@ -66,13 +74,60 @@
         Domain: "{{ k8s_domain }}.{{ domain }}"
       ingress:
         ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
+      features: "{{ features | default({}) }}"
   copy:
     content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "/tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml"
 
 - name: Install helm chart
+  environment:
+    KUBECONFIG: /dev/null
   shell: >
     helm upgrade dls4enterprise-k8s-platform
     --namespace kube-system -i
     /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz --wait
     -f /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml
+
+- name: Load informations about admin user
+  environment:
+    KUBECONFIG: /dev/null
+  shell: "kubectl -n kube-system get serviceaccounts dls4enterprise-k8s-platform-admin -o jsonpath='{.secrets[0].name}'"
+  register: dlsenterprise_admin_account
+
+- name: Load informations about admin token
+  environment:
+    KUBECONFIG: /dev/null
+  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.token}'"
+  register: dlsenterprise_admin_token
+
+- name: Load informations about admin namespace
+  environment:
+    KUBECONFIG: /dev/null
+  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
+  register: dlsenterprise_admin_namespace
+
+- name: Load informations about admin crt
+  environment:
+    KUBECONFIG: /dev/null
+  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
+  register: dlsenterprise_admin_crt
+
+- name: Create kubeconfig directory
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: Render kubeconfig
+  template:
+    src: kubeconfig.j2
+    dest: /root/.kube/config
+
+- name: Create a k8s dls4e namespace
+  changed_when: False
+  shell: "kubectl get pods"
+
+- name: Fetch kubeconfig
+  fetch:
+    src: "/root/.kube/config"
+    dest: "{{ root }}/platform-admin.config"
+    flat: True

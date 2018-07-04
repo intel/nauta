@@ -1,0 +1,7 @@
+---
+
+- name: Run provisioner registry
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: fetch-admin

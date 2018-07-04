@@ -1,0 +1,45 @@
+---
+
+- name: Set paths fact
+  set_fact:
+    dls4e_img: "dls4e-{{ dls4e_version }}.img"
+    registry_chart: "dls4e-registry-{{ dls4e_version }}.tgz"
+    dls4e_chart: "dls4e-{{ dls4e_version }}.tgz"
+
+- name: Set local paths fact
+  set_fact:
+    workspace: ".workspace"
+    runtime_kubectl: "{{ kubectl }}"
+    runtime_helm: "{{ helm }}"
+    runtime_loader: "{{ loader }}"
+    runtime_img: "{{ playbook_dir }}/files/dls4e-{{ dls4e_version }}.img"
+    runtime_dls4e_img: "{{ playbook_dir }}/files/{{ dls4e_img }}"
+    runtime_registry_chart: "{{ playbook_dir }}/files/{{ registry_chart }}"
+    runtime_dls4e_chart: "{{ playbook_dir }}/files/{{ dls4e_chart }}"
+    runtime_kubeconfig: "{{ kubeconfig }}"
+
+- name: Fail if external ip is not defined
+  fail:
+    msg: External IP is not defined
+  when: runtime_external_ip is not defined
+
+- name: Add host
+  add_host:
+    name: provisioner
+    group: provisioners
+    ansible_connection: local
+    workspace: "{{ workspace }}"
+    runtime_kubectl: "{{ runtime_kubectl }}"
+    runtime_helm: "{{ runtime_helm }}"
+    runtime_loader: "{{ runtime_loader }}"
+    runtime_img: "{{ runtime_img }}"
+    runtime_dls4e_img: "{{ runtime_dls4e_img }}"
+    runtime_registry_chart: "{{ runtime_registry_chart }}"
+    runtime_dls4e_chart: "{{ runtime_dls4e_chart }}"
+    runtime_external_ip: "{{ runtime_external_ip }}"
+    runtime_kubeconfig: "{{ runtime_kubeconfig }}"
+
+- name: Create directory
+  file:
+    path: "{{ workspace }}"
+    state: directory

@@ -15,6 +15,8 @@
 
 - name: Apply all node privileges directories
   changed_when: False
+  environment:
+    KUBECONFIG: /dev/null
   shell: kubectl apply -f /root/kubernetes/nodes/{{ host }}.yml
   with_items: "{{ groups['all'] }}"
   loop_control:

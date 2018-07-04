@@ -26,11 +26,23 @@ config() {
     fi
 }
 
+kubeconfig() {
+    if [ X"${KUBECONFIG}" != X"" ]; then
+        echo "${KUBECONFIG}"
+    elif [ -f "${CURDIR}/platform-admin.config" ]; then
+        echo "${CURDIR}/platform-admin.config"
+    else
+        echo "${HOME}/.kube/config"
+    fi
+}
+
 ansible_run() {
     export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
     ansible $(inventory) $(config) \
     -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \
-    -e "kubeconfig=$(realpath ${KUBECONFIG:-${HOME}/.kube/config})" -e "loader=${LOADER}" $@
+    -e "kubeconfig=$(realpath $(kubeconfig))" -e "loader=${LOADER}" \
+    -e "root=${CURDIR}" \
+    $@
     return $?
 }
 
@@ -41,6 +53,11 @@ platform_ansible_run() {
 
 dls4e_ansible_run() {
     ansible_run ${CURDIR}/dls4e/install.yml
+    return $?
+}
+
+dls4e_fetch_ansible_run() {
+    ansible_run ${CURDIR}/dls4e/fetch.yml
     return $?
 }
 
@@ -59,6 +76,8 @@ case "${COMMAND}" in
   dls4e-install) dls4e_ansible_run
      ;;
   dls4e-upgrade) UPGRADE=True dls4e_ansible_run
+     ;;
+  dls4e-fetch) dls4e_fetch_ansible_run
      ;;
   *) echo "Unknown command"
      ;;
