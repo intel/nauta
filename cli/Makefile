@@ -46,10 +46,10 @@ clean:
 
 full_clean: clean
 	@rm -rf $(VIRTUALENV_DIR)
+	@rm -rf vendor
 
 venv: $(ACTIVATE)
 $(ACTIVATE): requirements.txt
-
 ifeq (Windows,$(OS))
 	@python -m venv $(VIRTUALENV_DIR)
 endif
@@ -59,7 +59,11 @@ ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	@chmod +x $(ACTIVATE)
 endif
 	@. $(ACTIVATE); python -m pip install -U pip
-	@. $(ACTIVATE); pip install -r requirements.txt;
+	@echo "downloading dependencies to ./vendor/ ..."
+	@. $(ACTIVATE); mkdir -p vendor
+	@. $(ACTIVATE); cd vendor && pip download -r ../requirements.txt;
+	@echo "installing vendored packages from ./vendor/*"
+	@. $(ACTIVATE); cd vendor && pip install *;
 
 venv-dev: $(DEV_VIRTUALENV_MARK)
 $(DEV_VIRTUALENV_MARK): requirements-dev.txt $(ACTIVATE)
