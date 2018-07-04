@@ -65,8 +65,11 @@ export const getters = {
 };
 
 export const actions = {
-  getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces}) => {
-    commit('setFetchingDataFlag', {isActive: true});
+  getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy, names, states,
+    namespaces, refreshMode}) => {
+    if (!refreshMode) {
+      commit('setFetchingDataFlag', {isActive: true});
+    }
     getExperiments(limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces)
       .then((res) => {
         const data = res.data;
@@ -74,7 +77,9 @@ export const actions = {
         commit('setExperimentsParams', {data: data.params});
         commit('setFilterColumnValues', {data: data.filterColumnValues});
         commit('setExperimentsStats', {data: data.stats});
-        commit('setFetchingDataFlag', {isActive: false});
+        if (!refreshMode) {
+          commit('setFetchingDataFlag', {isActive: false});
+        }
         commit('setInitializedData');
       })
       .catch((err) => {
@@ -83,7 +88,9 @@ export const actions = {
         } else {
           dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
         }
-        commit('setFetchingDataFlag', {isActive: false});
+        if (!refreshMode) {
+          commit('setFetchingDataFlag', {isActive: false});
+        }
       });
   },
   launchTensorboard: ({dispatch, commit}, expList) => {

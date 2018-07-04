@@ -35,7 +35,19 @@
       </v-container>
     </v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-icon v-if="userboxParams.visible">ic_help_outline</v-icon>
+    <v-menu bottom offset-y>
+      <v-btn flat slot="activator">
+        <v-icon>import_contacts</v-icon>
+      </v-btn>
+      <v-list>
+        <v-list-tile>
+          <v-list-tile-title>USER GUIDE</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-title>RELEASE NOTES</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-menu>
     <v-menu v-if="userboxParams.visible" bottom offset-y>
       <v-btn flat slot="activator">
         {{ username }}
@@ -80,6 +92,9 @@ export default {
 }
 .toolbar__title img {
   margin-top: 14px;
+}
+.list__tile__title {
+  font-size: 14px;
 }
 .transparent {
   background-color: rgba(0, 113, 197, 0.12) !important;

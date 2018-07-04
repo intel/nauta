@@ -92,6 +92,16 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.paginationStats).to.equal(expectedResult);
   });
 
+  it('Should return tensorBtnAvailable correctly', function () {
+    expect(wrapper.vm.tensorMode).to.equal(false);
+    expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
+    wrapper.vm.$store.state.tensorMode = true;
+    expect(wrapper.vm.tensorBtnAvailable).to.equal(false);
+    wrapper.vm.$store.state.tensorMode = true;
+    wrapper.vm.selected = [1];
+    expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
+  });
+
   it('Should return visible columns (default)', function () {
     expect(wrapper.vm.visibleColumns).to.deep.equal(state.experiments.params);
   });
@@ -108,7 +118,7 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should get data if sorting order updated', function () {
-    wrapper.vm.sorting.order = 'desc';
+    wrapper.vm.sorting.order = 'asc';
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
   });
 
@@ -157,8 +167,8 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.activeColumnIdx = 999;
     wrapper.vm.activeColumnName = '999';
     wrapper.vm.clearSort();
-    expect(wrapper.vm.activeColumnIdx).to.equal(null);
-    expect(wrapper.vm.activeColumnName).to.equal(null);
+    expect(wrapper.vm.activeColumnIdx).to.equal(0);
+    expect(wrapper.vm.activeColumnName).to.equal('creationTimestamp');
   });
 
   it('Should set pagination params if count of rows per page updated', function () {
@@ -281,5 +291,43 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.onApplyValuesColumnFilter('name', draft);
     expect(wrapper.vm.filterByValModals.name.params).to.deep.equal(draft);
     expect(wrapper.vm.filterByValModals.name.visible).to.deep.equal(false);
+  });
+
+  it('Should return label for header if key is known', function () {
+    const headerKey = 'name';
+    const label = wrapper.vm.getLabel(headerKey);
+    expect(label).to.not.equal(headerKey);
+  });
+
+  it('Should return headerKey for header if key is unknown', function () {
+    const headerKey = 'xyz';
+    const label = wrapper.vm.getLabel(headerKey);
+    expect(label).to.equal(headerKey);
+  });
+
+  it('Should return true if column is visible', function () {
+    const columnName = 'param3';
+    wrapper.vm.hiddenColumns = [];
+    const result = wrapper.vm.isVisibleColumn(columnName);
+    expect(result).to.equal(true);
+  });
+
+  it('Should return false if column is invisible', function () {
+    const columnName = 'param3';
+    wrapper.vm.hiddenColumns = [columnName];
+    const result = wrapper.vm.isVisibleColumn(columnName);
+    expect(result).to.equal(false);
+  });
+
+  it('Should return true if column is filterable by value', function () {
+    const columnName = 'name';
+    const result = wrapper.vm.isFilterableByValColumn(columnName);
+    expect(result).to.equal(true);
+  });
+
+  it('Should return false if column is filterable by value', function () {
+    const columnName = 'xyz';
+    const result = wrapper.vm.isFilterableByValColumn(columnName);
+    expect(result).to.equal(false);
   });
 });

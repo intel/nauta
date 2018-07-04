@@ -45,7 +45,7 @@
             </div>
           </div>
         </v-flex>
-        <v-flex xs12>
+        <v-flex xs12 pl-3>
           <v-btn dark small color="intel_primary" v-on:click="onCloseAction()">CANCEL</v-btn>
           <v-btn dark small color="intel_primary" v-on:click="onApplyAction()">OK</v-btn>
         </v-flex>
@@ -112,7 +112,7 @@ export default {
 <style scoped>
 .filter-box {
   height: 415px;
-  width: 250px;
+  width: 280px;
   border: 1px solid rgba(0, 0, 0, 0.4);
   background-color: #ffffff;
   z-index: 10;

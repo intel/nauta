@@ -23,8 +23,8 @@
 <div id="buttons_block">
   <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">LAUNCH TENSORBOARD</v-btn>
   <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">EXIT</v-btn>
-  <v-menu v-if="!tensorModeViewState" bottom offset-y>
-    <v-btn slot="activator" dark small>RESET</v-btn>
+  <v-menu :disabled="tensorModeViewState" bottom offset-y>
+    <v-btn :disabled="tensorModeViewState" slot="activator" dark small>RESET</v-btn>
     <v-list>
       <v-list-tile v-on:click="clearSort()">
         <v-list-tile-title>Clear sort</v-list-tile-title>
@@ -34,7 +34,7 @@
       </v-list-tile>
     </v-list>
   </v-menu>
-  <v-btn v-if="!tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
+  <v-btn :disabled="tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
   <v-dialog
     v-model="showColumnMgmtModal"
     max-width="600px"
@@ -147,6 +147,10 @@ export default {
   color: rgb(0, 113, 197);
   background-color: rgba(0, 113, 197, 0.12);
   width: 170px;
+}
+#buttons_block button:disabled {
+  color: rgb(255, 255, 255) !important;
+  background-color: rgba(0, 113, 197, 0.12) !important;
 }
 #revert {
   color: rgb(0, 113, 197);

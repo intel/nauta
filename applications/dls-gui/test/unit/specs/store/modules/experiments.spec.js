@@ -29,6 +29,7 @@ import RESPONSE_MESSAGES from '../../../../../src/utils/constants/messages';
 describe('VUEX modules experiments', () => {
   const state = {
     fetchingDataActive: false,
+    tensorboardLaunching: false,
     initialized: false,
     experiments: {
       data: [],
@@ -95,6 +96,11 @@ describe('VUEX modules experiments', () => {
       expect(result).to.equal(state.fetchingDataActive);
     });
 
+    it('tensorboardLaunching', () => {
+      const result = getters.tensorboardLaunching(state);
+      expect(result).to.equal(state.tensorboardLaunching);
+    });
+
     it('columnValuesOptions', () => {
       const result = getters.columnValuesOptions(state);
       expect(result).to.equal(state.experiments.filterByColumnValue.options);
@@ -139,6 +145,12 @@ describe('VUEX modules experiments', () => {
       const data = {isActive: true};
       mutations.setFetchingDataFlag(state, data);
       expect(state.fetchingDataActive).to.equal(data.isActive);
+    });
+
+    it('setTensorboardLaunchingFlag', () => {
+      const data = {isActive: true};
+      mutations.setTensorboardLaunchingFlag(state, data);
+      expect(state.tensorboardLaunching).to.equal(data.isActive);
     });
 
     it('setFilterColumnValues', () => {
@@ -209,6 +221,33 @@ describe('VUEX modules experiments', () => {
         expectedActions = [];
         mock.onGet('/api/experiments/list').reply(200, data);
         testAction(actions.getUserExperiments, {}, state, expectedMutations, expectedActions, done);
+      });
+
+      it('should not set flag about fetching data if refresh data mode triggered [success]', (done) => {
+        const data = {
+          data: ['test1'],
+          params: ['test2'],
+          stats: ['test3'],
+          filterColumnValues: ['test4']
+        };
+        expectedMutations = [
+          {type: 'setExperimentsData', payload: {data: data.data}},
+          {type: 'setExperimentsParams', payload: {data: data.params}},
+          {type: 'setFilterColumnValues', payload: {data: data.filterColumnValues}},
+          {type: 'setExperimentsStats', payload: {data: data.stats}},
+        ];
+        expectedActions = [];
+        mock.onGet('/api/experiments/list').reply(200, data);
+        testAction(actions.getUserExperiments, {refreshMode: true}, state, expectedMutations, expectedActions, done);
+      });
+
+      it('should not set flag about fetching data if refresh data mode triggered [error]', (done) => {
+        expectedMutations = [];
+        expectedActions = [
+          {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
+        ];
+        mock.onGet('/api/experiments/list').reply(500, 'Internal Server Error');
+        testAction(actions.getUserExperiments, {refreshMode: true}, state, expectedMutations, expectedActions, done);
       });
     });
 

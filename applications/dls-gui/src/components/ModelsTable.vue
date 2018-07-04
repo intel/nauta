@@ -55,16 +55,17 @@
             <div class="table__overflow">
               <table class="datatable table">
                 <thead>
+                <tr>
                   <th v-if="tensorMode"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
                     <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
                     <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
-                      :column-name="header"
-                      :options="columnValuesOptions[header]"
-                      :onCloseClickHandler="switchFilterWindow"
-                      :onApplyClickHandler="onApplyValuesColumnFilter"
-                      :appliedOptions="columnValuesApplied[header]"
+                                       :column-name="header"
+                                       :options="columnValuesOptions[header]"
+                                       :onCloseClickHandler="switchFilterWindow"
+                                       :onApplyClickHandler="onApplyValuesColumnFilter"
+                                       :appliedOptions="columnValuesApplied[header]"
                     >
                     </FilterByValWindow>
                     <v-tooltip bottom>
@@ -78,6 +79,12 @@
                       {{ sorting.currentSortIcon }}
                     </v-icon>
                   </th>
+                </tr>
+                <tr v-if="fetchingDataActive" class="datatable__progress">
+                  <th class="column" colspan="1000">
+                    <v-progress-linear indeterminate></v-progress-linear>
+                  </th>
+                </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in experimentsData" v-bind:key="item.name" :id="item.name">
@@ -123,6 +130,13 @@ const SORTING_ORDER = {
   DESC: 'desc'
 };
 
+const DEFAULT_ORDER = {
+  key: 0,
+  orderBy: 'creationTimestamp',
+  order: SORTING_ORDER.DESC,
+  sortIcon: 'arrow_downward'
+};
+
 export default {
   name: 'ModelsTable',
   components: {
@@ -152,17 +166,17 @@ export default {
         }
       },
       sorting: {
-        order: SORTING_ORDER.ASC,
+        order: DEFAULT_ORDER.order,
         iconAsc: 'arrow_upward',
         iconDesc: 'arrow_downward',
-        currentSortIcon: 'arrow_upward'
+        currentSortIcon: 'arrow_downward'
       },
       pagination: {
         itemsCountPerPage: 5,
         currentPage: 1
       },
-      activeColumnIdx: 0,
-      activeColumnName: null,
+      activeColumnIdx: DEFAULT_ORDER.key,
+      activeColumnName: DEFAULT_ORDER.orderBy,
       hoveredColumnIdx: null,
       selected: [],
       refresh: {
@@ -172,7 +186,8 @@ export default {
     }
   },
   created: function () {
-    this.getData();
+    const refreshMode = false;
+    this.getData(refreshMode);
     this.intervalId = setInterval(this.timer, 1000);
   },
   beforeDestroy: function () {
@@ -213,12 +228,13 @@ export default {
       ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
     },
     tensorBtnAvailable: function () {
-      return !this.tensorMode || (this.tensorMode && this.selected.length);
+      return !this.tensorMode || (this.tensorMode && this.selected.length !== 0);
     }
   },
   watch: {
     refreshTableDataTriggers: function () {
-      this.getData();
+      const refreshMode = false;
+      this.getData(refreshMode);
     },
     experimentsPageNumber: function () {
       this.pagination.currentPage = this.experimentsPageNumber;
@@ -239,9 +255,10 @@ export default {
       this.sorting.currentSortIcon = this.sorting.order === SORTING_ORDER.ASC ? this.sorting.iconAsc : this.sorting.iconDesc;
     },
     clearSort () {
-      this.activeColumnName = null;
-      this.activeColumnIdx = null;
-      this.sorting.order = '';
+      this.activeColumnName = DEFAULT_ORDER.orderBy;
+      this.activeColumnIdx = DEFAULT_ORDER.key;
+      this.sorting.order = DEFAULT_ORDER.order;
+      this.sorting.currentSortIcon = DEFAULT_ORDER.sortIcon;
     },
     clearFilter () {
       Object.keys(this.filterByValModals).forEach((item) => {
@@ -294,7 +311,7 @@ export default {
       });
       return filtered.length !== 0;
     },
-    getData () {
+    getData (refreshMode) {
       this.getUserExperiments({
         limitPerPage: this.pagination.itemsCountPerPage,
         pageNo: this.pagination.currentPage,
@@ -303,7 +320,8 @@ export default {
         searchBy: this.searchPattern,
         names: this.filterByValModals.name.params,
         namespaces: this.filterByValModals.namespace.params,
-        states: this.filterByValModals.state.params
+        states: this.filterByValModals.state.params,
+        refreshMode: refreshMode
       });
     },
     timer () {
@@ -314,7 +332,8 @@ export default {
       } else {
         this.refresh.lastUpdateLabel = `Last updated over ${this.refresh.interval} seconds ago.`;
         if (!this.fetchingDataActive) {
-          this.getData();
+          const refreshMode = true;
+          this.getData(refreshMode);
         }
       }
     },

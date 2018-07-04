@@ -89,10 +89,19 @@ export const mutations = {
     state.userbox.visible = visibility;
   },
   setError: (state, {type, content}) => {
+    const currentTime = Date.now();
+    const lastErrorTimeDiffer = currentTime - state.error.time;
+    const updateTheSameErrorInterval = 10000;
+    if (state.error.content === content && state.error.type === type) {
+      if (lastErrorTimeDiffer > updateTheSameErrorInterval) {
+        state.error.time = currentTime;
+      }
+    } else {
+      state.error.time = currentTime;
+    }
     state.error.type = type;
     state.error.content = content;
     state.error.visible = true;
-    state.error.time = Date.now();
   },
   removeError: (state) => {
     state.error.type = '';

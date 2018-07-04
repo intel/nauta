@@ -106,6 +106,40 @@ describe('VUEX modules app', () => {
       expect(state.error.type).to.deep.equal(type);
     });
 
+    it('setError with the same content and small time difference', (done) => {
+      const type = 'success';
+      const content = 'content';
+      mutations.setError(state, {type, content});
+      const currentErrorTime = state.error.time;
+      setTimeout(() => {
+        mutations.setError(state, {type, content});
+        expect(state.error.visible).to.deep.equal(true);
+        expect(state.error.content).to.deep.equal(content);
+        expect(state.error.type).to.deep.equal(type);
+        expect(state.error.time).to.equal(currentErrorTime);
+        done();
+      }, 100);
+    });
+
+    it('setError with the same content and small time difference', () => {
+      const type = 'success';
+      const content = 'content';
+      const currentErrorTime = 1;
+      const state = {
+        error: {
+          content: content,
+          type: type,
+          visible: true,
+          time: currentErrorTime
+        }
+      };
+      mutations.setError(state, {type, content});
+      expect(state.error.visible).to.deep.equal(true);
+      expect(state.error.content).to.deep.equal(content);
+      expect(state.error.type).to.deep.equal(type);
+      expect(state.error.time).to.not.equal(currentErrorTime);
+    });
+
     it('removeError', () => {
       mutations.removeError(state);
       expect(state.error.visible).to.deep.equal(false);
