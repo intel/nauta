@@ -24,6 +24,7 @@ const sinon = require('sinon');
 const rewire = require('rewire');
 const Q = require('q');
 const k8sApi = rewire('../../src/utils/k8s');
+const errMessages = require('../../src/utils/error-messages');
 const HttpStatus = require('http-status-codes');
 
 describe('Utils | k8s', function () {
@@ -39,13 +40,13 @@ describe('Utils | k8s', function () {
     };
     error = {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'error'
+      message: errMessages.K8S.CUSTOM_OBJECT
     };
     token = 'token';
     resourceName = 'experiment';
   });
 
-  describe('getUserExperiments', function () {
+  describe('listNamespacedCustomObject', function () {
     beforeEach(function () {
       deferred = Q.defer();
     });
@@ -85,6 +86,78 @@ describe('Utils | k8s', function () {
       return k8sApi.listNamespacedCustomObject(token, resourceName)
         .then(function (res) {
           expect(res).to.equal(data)
+        });
+    });
+
+    it('should not return data if request to api with success but string in response', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve('string');
+      return k8sApi.listNamespacedCustomObject(token, resourceName)
+        .catch(function (err) {
+          expect(err).to.deep.equal(error);
+        });
+    });
+  });
+
+  describe('listClusterCustomObject', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+    });
+
+    it('should return error if cannot decode token', function () {
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      deferred.reject(error);
+      return k8sApi.listClusterCustomObject(token, resourceName)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return error if request to api failed', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.reject(error);
+      return k8sApi.listClusterCustomObject(token, resourceName)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return data if request to api with success', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve(data);
+      return k8sApi.listClusterCustomObject(token, resourceName)
+        .then(function (res) {
+          expect(res).to.equal(data)
+        });
+    });
+
+    it('should not return data if request to api with success but string in response', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve('string');
+      return k8sApi.listClusterCustomObject(token, resourceName)
+        .catch(function (err) {
+          expect(err).to.deep.equal(error);
         });
     });
   });

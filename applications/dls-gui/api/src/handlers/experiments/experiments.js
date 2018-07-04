@@ -171,7 +171,7 @@ const getUserExperiments = function (req, res) {
   const token = req.headers.authorization;
   const queryParams = req.query;
   logger.debug(queryParams);
-  k8s.listNamespacedCustomObject(token, runsResourceName)
+  k8s.listClusterCustomObject(token, runsResourceName)
     .then(function (data) {
       logger.info('Experiments retrieved');
       logger.debug('Preparation data');

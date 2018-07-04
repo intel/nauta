@@ -57,3 +57,28 @@ module.exports.listNamespacedCustomObject = function (token, resourceName) {
       });
   });
 };
+
+module.exports.listClusterCustomObject = function (token, resourceName) {
+  return Q.Promise(function (resolve, reject) {
+    authApi.decodeToken(token)
+      .then(function () {
+        const options = {
+          url: `${K8S_API_URL}/apis/${API_GROUP_NAME}/${EXPERIMENTS_VERSION}/${resourceName}`,
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        };
+        logger.debug('Performing request to kubernetes API for fetching all experiments data');
+        return request(options);
+      })
+      .then(function (data) {
+        if (typeof (data) === 'object') {
+          resolve(data);
+        }
+        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT));
+      })
+      .catch(function (err) {
+        reject(err);
+      });
+  });
+};

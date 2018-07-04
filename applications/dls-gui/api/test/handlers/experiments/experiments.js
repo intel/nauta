@@ -132,7 +132,7 @@ describe('Handlers | Experiments', function () {
     beforeEach(function () {
       deferred = Q.defer();
       k8sMock = {
-        listNamespacedCustomObject: sinon.stub().returns(deferred.promise)
+        listClusterCustomObject: sinon.stub().returns(deferred.promise)
       };
     });
 
@@ -150,7 +150,7 @@ describe('Handlers | Experiments', function () {
       process.nextTick(function () {
         expect(resMock.status.calledOnce).to.equal(true);
         expect(resMock.status.calledWith(error.status)).to.equal(true);
-        expect(k8sMock.listNamespacedCustomObject.calledOnce).to.equal(true);
+        expect(k8sMock.listClusterCustomObject.calledOnce).to.equal(true);
         done();
       });
     });
@@ -164,7 +164,7 @@ describe('Handlers | Experiments', function () {
       process.nextTick(function () {
         expect(resMock.send.calledOnce).to.equal(true);
         expect(resMock.send.calledWith(k8sRunsResponse.items)).to.equal(true);
-        expect(k8sMock.listNamespacedCustomObject.calledOnce).to.equal(true);
+        expect(k8sMock.listClusterCustomObject.calledOnce).to.equal(true);
         expect(parseExpMock.calledOnce).to.equal(true);
         done();
       });

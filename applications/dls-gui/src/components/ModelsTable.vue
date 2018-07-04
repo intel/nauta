@@ -149,7 +149,7 @@ export default {
       filterIcon: 'filter_list',
       searchPattern: '',
       hiddenColumns: [],
-      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name'],
+      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name', 'state'],
       filterableByValColumns: ['name', 'namespace', 'state'],
       filterByValModals: {
         name: {
