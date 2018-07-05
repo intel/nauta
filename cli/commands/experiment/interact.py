@@ -22,10 +22,12 @@
 import sys
 import time
 from pathlib import Path
+from typing import List, Tuple
 
 import click
 
 from cli_state import common_options, pass_state, State
+from commands.experiment.submit import HELP_P
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
@@ -33,7 +35,7 @@ from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment
 from util.exceptions import SubmitExperimentError
 from util.logger import initialize_logger
-from platform_resources.experiments import get_experiment
+from platform_resources.experiments import get_experiment, generate_name
 from commands.experiment.common import validate_experiment_name
 from util.exceptions import K8sProxyCloseError
 
@@ -43,6 +45,7 @@ HELP_N = "The name of this Jupyter Notebook session."
 HELP_F = "File with a notebook that should be opened in Jupyter notebook."
 
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
+JUPYTER_CHECK_POD_READY_TRIES = 60
 
 log = initialize_logger(__name__)
 
@@ -50,9 +53,10 @@ log = initialize_logger(__name__)
 @click.command(short_help=HELP, cls=AliasCmd, alias='i')
 @click.option('-n', '--name', default=None, help=HELP_N, callback=validate_experiment_name)
 @click.option('-f', '--filename', default=None, help=HELP_F)
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
 @common_options()
 @pass_state
-def interact(state: State, name: str, filename: str):
+def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]]):
     """
     Starts an interactive session with Jupyter Notebook.
     """
@@ -85,10 +89,13 @@ def interact(state: State, name: str, filename: str):
     if create_new_notebook:
         number_of_retries = 5
         try:
+            exp_name = name
+            if not name and not filename:
+                exp_name = generate_name('jup')
             runs = submit_experiment(script_location=filename, script_folder_location=None,
                                      template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
-                                     name=name, parameter_range=[], parameter_set=[], script_parameters=[],
-                                     pack_params=[])
+                                     name=exp_name, parameter_range=[], parameter_set=[], script_parameters=[],
+                                     pack_params=pack_param)
             if runs:
                 name = runs[0].name
             else:
@@ -121,7 +128,7 @@ def interact(state: State, name: str, filename: str):
         url_end = url_end + Path(filename).name
 
     # wait until all jupyter pods are ready
-    for i in range(60):
+    for i in range(JUPYTER_CHECK_POD_READY_TRIES):
         try:
             if check_pods_status(run_name=name, namespace=current_namespace, status=PodStatus.RUNNING):
                 break

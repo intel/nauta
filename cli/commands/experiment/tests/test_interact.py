@@ -128,9 +128,11 @@ def test_full_interact_without_name(prepare_mocks: InteractMocks):
 
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=1)
+    assert prepare_mocks.submit_experiment.call_args[1]['name'].startswith('jup')
 
 
 def test_interact_pods_not_created(prepare_mocks: InteractMocks):
+    interact.JUPYTER_CHECK_POD_READY_TRIES = 1
     prepare_mocks.check_pods_status.return_value = False
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="y")

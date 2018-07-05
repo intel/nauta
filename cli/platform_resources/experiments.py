@@ -182,19 +182,22 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
 
         # CASE 3: If user submit exp without name and there is no existing exps with matching script name,then:
         # --> generate new name
-
-        # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit script name,
-        # so user cannot pass script name with any number of chars
-        formatter = re.compile(r'[^a-z0-9-]')
-        normalized_script_name = script_name.lower().replace('_', '-').replace('.', '-')[:10]
-        formatted_name = formatter.sub('', normalized_script_name)
-        result = f'{formatted_name}-{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
+        result = generate_name(script_name)
 
         experiments = list_experiments(namespace=namespace, name_filter=result)
         if experiments and len(experiments) > 0:
             result = f'{result}-{len(experiments)}'
             return result, prepare_label(script_name, result)
         return result, prepare_label(script_name, result)
+
+
+def generate_name(name: str) -> str:
+    # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit script name,
+    # so user cannot pass script name with any number of chars
+    formatter = re.compile(r'[^a-z0-9-]')
+    normalized_script_name = name.lower().replace('_', '-').replace('.', '-')[:10]
+    formatted_name = formatter.sub('', normalized_script_name)
+    return f'{formatted_name}-{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
 
 
 def prepare_label(script_name, calculated_name: str, name: str=None) -> Dict[str, str]:
