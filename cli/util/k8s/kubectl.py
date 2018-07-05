@@ -164,7 +164,6 @@ def check_users_presence(username: str) -> bool:
 
         return user_data and user_data.name == username
     except Exception as exe:
-        print(exe)
         error_message = "Error during checking user's presence."
         logger.error(error_message)
         raise KubectlIntError(error_message) from exe

@@ -22,12 +22,13 @@
 import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
                                      V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
-                                     V1PolicyRule
+                                     V1PolicyRule, V1PodList, V1Pod, V1PodStatus
 from kubernetes.client.rest import ApiException
 
 from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, get_app_namespace, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
-                              get_cluster_roles, is_current_user_administrator
+                              get_cluster_roles, is_current_user_administrator, check_pods_status, \
+                              PodStatus
 from util.config import DLS4EConfigMap
 
 test_namespace = "test_namespace"
@@ -70,6 +71,10 @@ TEST_TOKEN_ENCODED = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL
                      "Y--MYvR2mcz9M4vvWofEF6DDVzWsh0Ltr7NG8ZsNzShiwFu3p9HlS1t7Q682sBbpL8b_ee5YLj9XrEIE51m"\
                      "3i9qc3ZcxFOpX8ssWN-VzGq5v4k34Wt1Ephzv8nnKYHkf3tfdpqcaWEFYZMs4o5uwXtzfQbazURhmGDTZHZ"\
                      "CXACwxB3gTkK1tZ4xs"
+
+K8S_RUNNING_POD_STATUS = "Running"
+
+K8S_PENDING_POD_STATUS = "Pending"
 
 
 @pytest.fixture()
@@ -127,6 +132,12 @@ def mocked_k8s_CoreV1Api(mocker):
     v1_secret_list = V1SecretList(items=[v1_secret])
 
     coreV1API_instance.list_namespaced_secret.return_value = v1_secret_list
+
+    v1_pod_status = V1PodStatus(phase=K8S_RUNNING_POD_STATUS)
+    v1_pod = V1Pod(status=v1_pod_status)
+    v1_pod_lists = V1PodList(items=[v1_pod])
+
+    coreV1API_instance.list_namespaced_pod.return_value = v1_pod_lists
 
     return coreV1API_instance
 
@@ -238,3 +249,20 @@ def test_is_current_user_administrator_(mocker):
         is_current_user_administrator()
 
     assert gcr_mock.call_count == 1
+
+
+def test_check_pods_status_success(mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    assert check_pods_status("run_name", test_namespace, PodStatus.RUNNING, None)
+
+
+def test_check_pods_status_failure(mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.list_namespaced_pod.return_value.items[0].status.phase = K8S_PENDING_POD_STATUS
+    assert not check_pods_status("run_name", test_namespace, PodStatus.RUNNING, None)
+    mocked_k8s_CoreV1Api.list_namespaced_pod.return_value.items[0].status.phase = K8S_RUNNING_POD_STATUS
+
+
+def test_check_pods_status_failure_empty_list(mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    ret_value = mocked_k8s_CoreV1Api.list_namespaced_pod.return_value
+    mocked_k8s_CoreV1Api.list_namespaced_pod.return_value = None
+    assert not check_pods_status("run_name", test_namespace, PodStatus.RUNNING, None)
+    mocked_k8s_CoreV1Api.list_namespaced_pod.return_value = ret_value

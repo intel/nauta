@@ -28,6 +28,7 @@ from kubernetes import config, client
 from kubernetes.client import configuration, V1DeleteOptions
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
+from util.app_names import DLS4EAppNames
 
 logger = initialize_logger('util.kubectl')
 
@@ -73,6 +74,33 @@ def get_k8s_api() -> client.CoreV1Api:
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     api = get_k8s_api()
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
+
+
+def check_pods_status(run_name: str, namespace: str, status: PodStatus, app_name: DLS4EAppNames=None) -> bool:
+    """
+    Returns true if all pods related to a given run have given status.
+    :param run_name: name of a run - obligatory
+    :param namespace: namespace where run is located - obligatory
+    :param status: status which will be compared with pods' statuses
+    :param app_name: name of an app - if None - pods are not limited to any application
+    :return: True if all pods related to <run_name> have <status> status. False otherwise
+    """
+    api = get_k8s_api()
+
+    label_selector = f"runName={run_name}"
+    if app_name:
+        label_selector = label_selector + f",app={app_name}"
+
+    pods_list = api.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
+
+    if not pods_list:
+        return False
+
+    for pod in pods_list.items:
+        if PodStatus(pod.status.phase.upper()) != status:
+            return False
+
+    return True
 
 
 def get_app_services(dls4e_app_name: str = None, namespace: str = None,

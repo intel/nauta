@@ -20,12 +20,14 @@
 #
 
 import sys
+import time
+from pathlib import Path
 
 import click
 
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment
@@ -85,7 +87,8 @@ def interact(state: State, name: str, filename: str):
         try:
             runs = submit_experiment(script_location=filename, script_folder_location=None,
                                      template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
-                                     name=name, parameter_range=[], parameter_set=[], script_parameters=[])
+                                     name=name, parameter_range=[], parameter_set=[], script_parameters=[],
+                                     pack_params=[])
             if runs:
                 name = runs[0].name
             else:
@@ -110,6 +113,25 @@ def interact(state: State, name: str, filename: str):
 
     url_end = ""
     if filename:
-        url_end = f"/notebooks/{filename}"
+        # only Jupyter notebooks are opened directly, other files are opened in edit mode
+        if ".ipynb" in filename:
+            url_end = "/notebooks/"
+        else:
+            url_end = "/edit/"
+        url_end = url_end + Path(filename).name
+
+    # wait until all jupyter pods are ready
+    for i in range(60):
+        try:
+            if check_pods_status(run_name=name, namespace=current_namespace, status=PodStatus.RUNNING):
+                break
+        except Exception:
+            log.exception("Error during checking state of Jupyter notebook.")
+        time.sleep(1)
+    else:
+        click.echo("Jupyter notebook is still not ready. Please try to connect to it by running"
+                   "interact command another time passing a name of a current Jupyter notebook session")
+        sys.exit(1)
+
     launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=False, number_of_retries=number_of_retries,
                url_end=url_end)
