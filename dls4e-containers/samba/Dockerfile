@@ -1,19 +1,27 @@
+ARG KUBERNETES_DATA_IMAGE
+ARG DUMBINIT_DATA_IMAGE
+ARG JQ_DATA_IMAGE
 ARG BASE_IMAGE=dls4e/python36
-#ARG BASE_IMAGE=centos:7.4.1708
+FROM ${JQ_DATA_IMAGE} as jqdata
+FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
+FROM ${KUBERNETES_DATA_IMAGE} as kubectldata
 FROM ${BASE_IMAGE}
+
+
+
 
 RUN yum clean all
 RUN yum update -y
 RUN yum install -y samba
 RUN pip install pysmb
 
-RUN curl http://repository.toolbox.nervana.sclab.intel.com/files/dumb-init -o /bin/dumb-init
+COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
 RUN chmod +x /bin/dumb-init
 
-RUN curl http://repository.toolbox.nervana.sclab.intel.com/files/jq-linux64 -o /bin/jq
+COPY --from=jqdata /build-output/jq /bin/jq
 RUN chmod +x /bin/jq
 
-ADD http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/kubectl /bin/kubectl
+COPY --from=kubectldata /build-output/kubernetes/kubectl /bin/kubectl
 RUN chmod +x /bin/kubectl
 
 COPY samba-init.sh /bin

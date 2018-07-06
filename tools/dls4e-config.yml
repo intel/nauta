@@ -51,6 +51,9 @@ local_images:
     version: "1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
+      JQ_DATA_IMAGE: "shared/build/jq"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
   dls4e/tiller:

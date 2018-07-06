@@ -14,7 +14,7 @@
     force: True
   register: build_async
   failed_when: "'ansible_job_id' not in build_async"
-  async: 1800
+  async: 9800
   poll: 0
 
 - set_fact:

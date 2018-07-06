@@ -19,7 +19,7 @@
     mode: 0755
 
 - name: Init helm
-  shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache"
+  shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache --skip-refresh"
 
 - name: Unarchive input package
   shell: "tar -I pigz -xf {{ input_package }} ./facts"
