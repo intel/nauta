@@ -3,6 +3,9 @@
 - set_fact:
     local_buildargs: "{{ docker_images_base[name] }}"
 
+- debug:
+    var: local_buildargs
+
 - name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
     name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"

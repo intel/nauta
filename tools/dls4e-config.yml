@@ -75,12 +75,14 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
   dls4e/tensorflow/base:
-    version: "1.8.0-py3"
-    method: pull
-    push: false
-    image: "tensorflow/tensorflow:1.8.0-py3"
+    version: "1.9.0-rc2-py3"
+    required:
+      BASE_IMAGE: "shared/ubuntu"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow:
-    version: "1.8.0-py3"
+    version: "1.9.0-rc2-py3"
     required:
       BASE_IMAGE: "dls4e/tensorflow/base"
     method: build

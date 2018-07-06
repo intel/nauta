@@ -8,6 +8,11 @@ proxy:
 images: "{{ shared_images | combine(local_images | default({})) }}"
 
 shared_images:
+  shared/ubuntu:
+    version: "16.04"
+    method: "pull"
+    push: False
+    image: "ubuntu:16.04"
   shared/centos:
     version: "7.5.1804"
     method: "build"
@@ -96,6 +101,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.3.tar.gz
         dest: kubernetes.tar.gz
         checksum: f3750b19d6d7471ea33230f96a420c53df46d8a060a4f14722992c5c7bdd9055
+  shared/build/tensorflow:
+    version: "1.9.0-rc2-py3"
+    required:
+      BASE_IMAGE: "shared/ubuntu"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0-rc2.tar.gz
+        dest: tensorflow-v1.9.0-rc2.tar.gz
+        checksum: 0ecfea51cf4e14c082d1d42d54cb23371d3d46e86549435c8f6c5ff694287a76
   shared/build/helm:
     version: "v2.9.1"
     required:
