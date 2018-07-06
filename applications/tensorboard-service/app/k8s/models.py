@@ -19,44 +19,56 @@
 # and approved by Intel in writing.
 #
 
+from typing import List
+
 from kubernetes import client as k8s
 
 
 class K8STensorboardInstance:
-    def __init__(self, deployment: k8s.V1Deployment, service: k8s.V1Service, ingress: k8s.V1beta1Ingress):
+    def __init__(self, deployment: k8s.V1Deployment, service: k8s.V1Service, ingress: k8s.V1beta1Ingress,
+                 pod: k8s.V1Pod = None):
         self.deployment = deployment
         self.service = service
         self.ingress = ingress
+        self.pod = pod
 
     @classmethod
-    def from_run_name(cls, run_name: str):
-        name = 'tensorboard-' + run_name
+    def from_run_name(cls, id: str, run_names_list: List[str]):
+        k8s_name = 'tensorboard-' + id
+        run_names_list.sort()
+        run_names = ",".join(run_names_list)
 
         deployment = k8s.V1Deployment(api_version='apps/v1',
                                       kind='Deployment',
                                       metadata=k8s.V1ObjectMeta(
-                                          name=name,
+                                          name=k8s_name,
                                           labels={
-                                              'name': name,
+                                              'name': k8s_name,
                                               'type': 'dls4e-tensorboard',
-                                              'dls4e_app_name': 'tensorboard'
+                                              'dls4e_app_name': 'tensorboard',
+                                              'run-names': run_names,
+                                              'id': id
                                           }
                                       ),
                                       spec=k8s.V1DeploymentSpec(
                                           replicas=1,
                                           selector=k8s.V1LabelSelector(
                                               match_labels={
-                                                  'name': name,
+                                                  'name': k8s_name,
                                                   'type': 'dls4e-tensorboard',
-                                                  'dls4e_app_name': 'tensorboard'
+                                                  'dls4e_app_name': 'tensorboard',
+                                                  'run-names': run_names,
+                                                  'id': id
                                               }
                                           ),
                                           template=k8s.V1PodTemplateSpec(
                                               metadata=k8s.V1ObjectMeta(
                                                   labels={
-                                                      'name': name,
+                                                      'name': k8s_name,
                                                       'type': 'dls4e-tensorboard',
-                                                      'dls4e_app_name': 'tensorboard'
+                                                      'dls4e_app_name': 'tensorboard',
+                                                      'run-names': run_names,
+                                                      'id': id
                                                   }
                                               ),
                                               spec=k8s.V1PodSpec(
@@ -73,7 +85,7 @@ class K8STensorboardInstance:
                                                               k8s.V1VolumeMount(
                                                                   name='output-home',
                                                                   mount_path='/mnt/exp',
-                                                                  sub_path=run_name
+                                                                  sub_path=run_names_list[0]
                                                               )
                                                           ],
                                                           ports=[
@@ -86,7 +98,7 @@ class K8STensorboardInstance:
                                                   volumes=[
                                                       k8s.V1Volume(
                                                           name='output-home',
-                                                          persistent_volume_claim=
+                                                          persistent_volume_claim= # noqa
                                                           k8s.V1PersistentVolumeClaimVolumeSource(
                                                               claim_name='output-home',
                                                               read_only=True
@@ -100,11 +112,12 @@ class K8STensorboardInstance:
         service = k8s.V1Service(api_version='v1',
                                 kind='Service',
                                 metadata=k8s.V1ObjectMeta(
-                                    name=name,
+                                    name=k8s_name,
                                     labels={
-                                        'name': name,
+                                        'name': k8s_name,
                                         'type': 'dls4e-tensorboard',
-                                        'dls4e_app_name': 'tensorboard'
+                                        'dls4e_app_name': 'tensorboard',
+                                        'id': id
                                     }
                                 ),
                                 spec=k8s.V1ServiceSpec(
@@ -117,20 +130,22 @@ class K8STensorboardInstance:
                                         )
                                     ],
                                     selector={
-                                        'name': name,
+                                        'name': k8s_name,
                                         'type': 'dls4e-tensorboard',
-                                        'dls4e_app_name': 'tensorboard'
+                                        'dls4e_app_name': 'tensorboard',
+                                        'id': id
                                     }
                                 ))
 
         ingress = k8s.V1beta1Ingress(api_version='extensions/v1beta1',
                                      kind='Ingress',
                                      metadata=k8s.V1ObjectMeta(
-                                         name=name,
+                                         name=k8s_name,
                                          labels={
-                                             'name': name,
+                                             'name': k8s_name,
                                              'type': 'dls4e-tensorboard',
-                                             'dls4e_app_name': 'tensorboard'
+                                             'dls4e_app_name': 'tensorboard',
+                                             'id': id
                                          },
                                          annotations={
                                              'dls.ingress.kubernetes.io/rewrite-target': '/',
@@ -144,9 +159,9 @@ class K8STensorboardInstance:
                                                  http=k8s.V1beta1HTTPIngressRuleValue(
                                                      paths=[
                                                          k8s.V1beta1HTTPIngressPath(
-                                                             path='/tb/' + run_name,
+                                                             path='/tb/' + id,
                                                              backend=k8s.V1beta1IngressBackend(
-                                                                 service_name=name,
+                                                                 service_name=k8s_name,
                                                                  service_port=80
                                                              )
                                                          )

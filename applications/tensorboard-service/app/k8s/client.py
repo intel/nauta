@@ -19,15 +19,24 @@
 # and approved by Intel in writing.
 #
 
-from datetime import datetime, timedelta, timezone
+from enum import Enum
 import logging as log
+from http import HTTPStatus
 from typing import List, Optional
 
-from kubernetes import client, config
-from kubernetes.client import V1DeploymentList, V1Deployment, V1ObjectMeta, V1Service, V1beta1Ingress, V1DeleteOptions
+from kubernetes import client
+from kubernetes.client import V1DeploymentList, V1Deployment, V1Service, V1beta1Ingress, V1DeleteOptions, V1Pod, \
+    V1beta1IngressList, V1PodList
 from kubernetes.client.rest import ApiException
 
-import models
+
+# taken from https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+class K8SPodPhase(Enum):
+    PENDING = 'PENDING'
+    RUNNING = 'RUNNING'
+    SUCCEEDED = 'SUCCEEDED'
+    FAILED = 'FAILED'
+    UNKNOWN = 'UNKNOWN'
 
 
 class K8SAPIClient:
@@ -49,12 +58,11 @@ class K8SAPIClient:
         return deployments_list
 
     def get_deployment(self, name: str, namespace: str, **kwargs) -> Optional[V1Deployment]:
-
         try:
             deployment = self.apps_api_client.read_namespaced_deployment(name=name, namespace=namespace, **kwargs)
         except ApiException as ex:
             log.warning("deployment not found!")
-            if ex.status == 404:
+            if ex.status == HTTPStatus.NOT_FOUND:
                 return None
             raise ex
 
@@ -79,69 +87,35 @@ class K8SAPIClient:
     def get_ingress(self, name: str, namespace: str, **kwargs) -> V1beta1Ingress:
         return self.extensions_v1beta1_api_client.read_namespaced_ingress(name=name, namespace=namespace, **kwargs)
 
+    def list_ingresses(self, namespace: str, label_selector: str = None, **kwargs) -> List[V1beta1Ingress]:
+        ingresses: V1beta1IngressList = self.extensions_v1beta1_api_client.list_namespaced_ingress(
+            namespace=namespace,
+            label_selector=label_selector,
+            **kwargs
+        )
+
+        ingresses_list: List[V1beta1Ingress] = ingresses.items
+        return ingresses_list
+
     def delete_ingress(self, name: str, namespace: str, **kwargs):
         self.extensions_v1beta1_api_client.delete_namespaced_ingress(name=name,
                                                                      namespace=namespace,
                                                                      body=V1DeleteOptions(),
                                                                      **kwargs)
 
+    def get_pod(self, namespace: str, label_selector: str = None, **kwargs) -> Optional[V1Pod]:
+        try:
+            pods: V1PodList = self.v1_api_client.list_namespaced_pod(namespace=namespace,
+                                                                     label_selector=label_selector,
+                                                                     **kwargs)
+        except ApiException as ex:
+            if ex.status == HTTPStatus.NOT_FOUND:
+                return None
+            raise ex
 
-class TensorboardManager:
-    def __init__(self, namespace: str, api_client: K8SAPIClient):
-        self.client = api_client
-        self.namespace = namespace
+        pods_list: List[V1Pod] = pods.items
 
-    @classmethod
-    def incluster_init(cls):
-        config.load_incluster_config()
+        if len(pods_list) < 1:
+            return None
 
-        with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", mode='r') as file:
-            my_current_namespace = file.read()
-
-        return cls(namespace=my_current_namespace, api_client=K8SAPIClient())
-
-    @staticmethod
-    def _get_current_datetime() -> datetime:
-        return datetime.now(timezone.utc)
-
-    def create(self, run_name: str) -> str:
-        """
-        :param run_name:
-        :return: URL postfix fo accessing Tensorboard instance
-        """
-        k8s_tensorboard_model = models.K8STensorboardInstance.from_run_name(run_name)
-
-        self.client.create_deployment(namespace=self.namespace, body=k8s_tensorboard_model.deployment)
-        self.client.create_service(namespace=self.namespace, body=k8s_tensorboard_model.service)
-        self.client.create_ingress(namespace=self.namespace, body=k8s_tensorboard_model.ingress)
-
-        return k8s_tensorboard_model.ingress.spec.rules[0].http.paths[0].path
-
-    def list(self) -> List[V1Deployment]:
-        return self.client.list_deployments(namespace=self.namespace, label_selector='type=dls4e-tensorboard')
-
-    def get(self, run_name: str) -> Optional[V1Deployment]:
-        name = 'tensorboard-' + run_name
-        return self.client.get_deployment(name=name, namespace=self.namespace)
-
-    def delete(self, tensorboard_deployment: V1Deployment):
-        common_name = tensorboard_deployment.metadata.name
-
-        self.client.delete_service(name=common_name, namespace=self.namespace)
-
-        self.client.delete_ingress(name=common_name, namespace=self.namespace)
-
-        self.client.delete_deployment(name=common_name, namespace=self.namespace)
-
-    def delete_garbage(self):
-        log.debug("searching for garbage...")
-        tensorboards = self.list()
-
-        for deployment in tensorboards:
-            meta: V1ObjectMeta = deployment.metadata
-            creation_timestamp: datetime = meta.creation_timestamp
-            delta = TensorboardManager._get_current_datetime() - creation_timestamp
-            if delta >= timedelta(seconds=1800):
-                log.debug(f'garbage detected: {meta.name} , removing...')
-                self.delete(deployment)
-                log.debug(f'garbage removed: {meta.name}')
+        return pods_list[0]

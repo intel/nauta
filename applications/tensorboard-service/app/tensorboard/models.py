@@ -19,10 +19,24 @@
 # and approved by Intel in writing.
 #
 
-from models import K8STensorboardInstance
+from enum import Enum
+from typing import Dict
 
 
-def test_generate_tensorboard_deployment():
-    model_instance = K8STensorboardInstance.from_run_name("some-run")
+class TensorboardStatus(Enum):
+    CREATING = 'CREATING'
+    RUNNING = 'RUNNING'
 
-    assert model_instance.deployment.metadata.name == "tensorboard-some-run"
+
+class Tensorboard:
+    def __init__(self, id: str, status: TensorboardStatus = TensorboardStatus.CREATING, url: str = ''):
+        self.id = id
+        self.status = status
+        self.url = url
+
+    def to_dict(self) -> Dict[str, str]:
+        return {
+            'id': self.id,
+            'status': self.status.value,
+            'url': self.url
+        }

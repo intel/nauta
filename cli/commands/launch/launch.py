@@ -20,6 +20,7 @@
 #
 
 from http import HTTPStatus
+import json
 import sys
 from time import sleep
 from typing import Optional
@@ -90,12 +91,15 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
             click.echo('Error during requesting new tensorboard instance.')
             sys.exit(1)
 
+    response_body = json.loads(response.content.decode('utf-8'))
+    tensorboard_id = response_body['id']
+
     if response.status_code == HTTPStatus.OK:
         # TODO: remove sleep after implementing Tensorboard instance's status polling from tensorboard-service
         sleep(10)
 
     launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch, namespace=current_namespace,
-                          app_name="tensorboard-"+experiment_name)
+                          app_name="tensorboard-"+tensorboard_id)
 
 
 @click.group(short_help=HELP, cls=AliasGroup, alias='l')

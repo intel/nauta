@@ -19,19 +19,11 @@
 # and approved by Intel in writing.
 #
 
-import logging as log
-from time import sleep
-
-from tensorboard.tensorboard import TensorboardManager
+from k8s.models import K8STensorboardInstance
 
 
-log.basicConfig(level=log.DEBUG)
+def test_generate_tensorboard_deployment():
+    model_instance = K8STensorboardInstance.from_run_name(id='a7db5449-6168-4010-9ce6-cbaefbbfa4a1',
+                                                          run_names_list=["some-run"])
 
-log.debug('daemon started!')
-
-mgr = TensorboardManager.incluster_init()
-
-while True:
-    mgr.delete_garbage()
-    log.debug('sleeping for 5 seconds...')
-    sleep(5)
+    assert model_instance.deployment.metadata.name == "tensorboard-a7db5449-6168-4010-9ce6-cbaefbbfa4a1"

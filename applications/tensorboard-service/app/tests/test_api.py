@@ -20,9 +20,16 @@
 #
 
 from flask.testing import FlaskClient
+from http import HTTPStatus
+import json
+from unittest.mock import MagicMock
+
+
 import pytest
+from pytest_mock import MockFixture
 
 import api
+from tensorboard.models import Tensorboard, TensorboardStatus
 
 
 @pytest.fixture
@@ -31,11 +38,15 @@ def flask_client():
     yield client
 
 
-class ManagerMock():
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class ManagerMock:
     def create(self, run_name):
-        return "url"
+        return Tensorboard(
+            id='1ba42a59-993f-4874-9854-a808bc941728',
+            url='/test/url'
+        )
 
-    def get(self, run_name):
+    def get_by_run_names(self, run_name):
         return None
 
     @classmethod
@@ -46,6 +57,125 @@ class ManagerMock():
 # noinspection PyShadowingNames
 def test_create(mocker, flask_client: FlaskClient):
     mocker.patch.object(api, 'TensorboardManager', new=ManagerMock)
-    body = flask_client.post('/create/some-run')
+    response = flask_client.post('/create/some-run')
 
-    assert b'url/' in body.data
+    response_body = response.data.decode('utf-8')
+
+    response_body_json = json.loads(response_body)
+
+    assert response_body_json['id'] == '1ba42a59-993f-4874-9854-a808bc941728'
+    assert response_body_json['status'] == 'CREATING'
+    assert response_body_json['url'] == '/test/url'
+
+
+# noinspection PyShadowingNames
+def test_create_v2(mocker: MockFixture, flask_client: FlaskClient):
+    tensorboard_mgr = MagicMock(
+        incluster_init=lambda *args, **kwargs: MagicMock(
+            get_by_run_names=lambda *args, **kwargs: None,
+            create=lambda *args, **kwargs: Tensorboard(id='0c13c567-378e-4582-9ae3-3a40f2ca7e21',
+                                                       url='/test/url')
+        )
+    )
+    mocker.patch.object(api, 'TensorboardManager', new=tensorboard_mgr)
+    request_body = {
+        'runNames': ['run-name-1']
+    }
+
+    response = flask_client.post('/tensorboard', data=json.dumps(request_body))
+
+    assert response.status_code == HTTPStatus.ACCEPTED
+
+    response_body = response.data.decode('utf-8')
+    response_body_json = json.loads(response_body)
+
+    assert response_body_json['id'] == '0c13c567-378e-4582-9ae3-3a40f2ca7e21'
+    assert response_body_json['status'] == 'CREATING'
+    assert response_body_json['url'] == '/test/url'
+
+
+# noinspection PyShadowingNames
+@pytest.mark.parametrize('request_body', [
+    {},
+    {'runNames': []},
+    {'badValue': 'badvalue'}
+])
+def test_create_v2_bad_request(flask_client: FlaskClient, request_body: dict):
+    response = flask_client.post('/tensorboard', data=json.dumps(request_body))
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
+# noinspection PyShadowingNames
+def test_create_v2_many_experiments_not_implemented_yet(flask_client: FlaskClient):
+    request_body = {
+        'runNames': ['run-name-1', 'run-name-2']
+    }
+
+    response = flask_client.post('/tensorboard', data=json.dumps(request_body))
+
+    assert response.status_code == HTTPStatus.NOT_IMPLEMENTED
+
+
+def test_create_v2_conflict(mocker: MockFixture, flask_client: FlaskClient):
+    tensorboard_mgr = MagicMock(
+        incluster_init=lambda *args, **kwargs: MagicMock(
+            get_by_run_names=lambda *args, **kwargs: Tensorboard(id='3cf769b5-436e-42ca-9710-c0a61b6c075d',
+                                                                 url='/test/url',
+                                                                 status=TensorboardStatus.RUNNING)
+        )
+    )
+    mocker.patch.object(api, 'TensorboardManager', new=tensorboard_mgr)
+    request_body = {
+        'runNames': ['run-name-1']
+    }
+
+    response = flask_client.post('/tensorboard', data=json.dumps(request_body))
+
+    assert response.status_code == HTTPStatus.CONFLICT
+
+    response_body = response.data.decode('utf-8')
+    response_body_json = json.loads(response_body)
+
+    assert response_body_json['id'] == '3cf769b5-436e-42ca-9710-c0a61b6c075d'
+    assert response_body_json['status'] == 'RUNNING'
+    assert response_body_json['url'] == '/test/url'
+
+
+# noinspection PyShadowingNames
+def test_get_v2(mocker: MockFixture, flask_client: FlaskClient):
+    fake_tensorboard = Tensorboard(id='3cf769b5-436e-42ca-9710-c0a61b6c075d',
+                                   url='/test/url',
+                                   status=TensorboardStatus.RUNNING)
+
+    tensorboard_mgr = MagicMock(
+        incluster_init=lambda *args, **kwargs: MagicMock(
+            get_by_id=lambda *args, **kwargs: fake_tensorboard
+        )
+    )
+    mocker.patch.object(api, 'TensorboardManager', new=tensorboard_mgr)
+
+    response = flask_client.get(f'/tensorboard/{fake_tensorboard.id}')
+
+    assert response.status_code == HTTPStatus.OK
+
+    response_body = response.data.decode('utf-8')
+    response_body_json = json.loads(response_body)
+
+    assert response_body_json['id'] == fake_tensorboard.id
+    assert response_body_json['status'] == fake_tensorboard.status.value
+    assert response_body_json['url'] == fake_tensorboard.url
+
+
+# noinspection PyShadowingNames
+def test_get_v2_not_found(mocker: MockFixture, flask_client: FlaskClient):
+    tensorboard_mgr = MagicMock(
+        incluster_init=lambda *args, **kwargs: MagicMock(
+            get_by_id=lambda *args, **kwargs: None
+        )
+    )
+    mocker.patch.object(api, 'TensorboardManager', new=tensorboard_mgr)
+
+    response = flask_client.get(f'/tensorboard/some-id')
+
+    assert response.status_code == HTTPStatus.NOT_FOUND

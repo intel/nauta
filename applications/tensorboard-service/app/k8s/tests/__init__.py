@@ -19,19 +19,4 @@
 # and approved by Intel in writing.
 #
 
-import logging as log
-from time import sleep
-
-from tensorboard.tensorboard import TensorboardManager
-
-
-log.basicConfig(level=log.DEBUG)
-
-log.debug('daemon started!')
-
-mgr = TensorboardManager.incluster_init()
-
-while True:
-    mgr.delete_garbage()
-    log.debug('sleeping for 5 seconds...')
-    sleep(5)
+#

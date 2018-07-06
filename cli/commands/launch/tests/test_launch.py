@@ -217,7 +217,8 @@ def launch_tensorboard_command_mock(mocker):
     mocker.patch.object(launch, 'K8sProxy', new=K8sProxyMock)
     mocker.spy(launch, 'K8sProxy')
     mocker.patch.object(launch, 'get_kubectl_current_context_namespace').return_value = "current-namespace"
-    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.OK)
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.OK,
+                                                           content=b'{ "id": "e017442b-f328-47f9-b79d-36c29d9f5494"}')
     mocker.patch.object(launch, 'sleep')
     mocker.patch('commands.launch.launch.launch_app_with_proxy')
 
@@ -236,7 +237,8 @@ def test_tensorboard_command(launch_tensorboard_command_mock):
 
 # noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
 def test_tensorboard_command_no_sleep_when_conflict(mocker, launch_tensorboard_command_mock):
-    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.CONFLICT)
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.CONFLICT,
+                                                           content=b'{ "id": "e017442b-f328-47f9-b79d-36c29d9f5494"}')
 
     runner = CliRunner()
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])

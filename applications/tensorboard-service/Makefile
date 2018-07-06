@@ -4,13 +4,13 @@ DEV_VIRTUALENV_MARK := $(VIRTUALENV_DIR)/dev
 ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
 
 clean:
-	@rm -rf __pycache__ $(VIRTUALENV_DIR) .pytest_cache app/tests/.pytest_cache
+	@rm -rf __pycache__ $(VIRTUALENV_DIR) .pytest_cache app/tests/.pytest_cache .coverage
 
 venv: $(ACTIVATE)
 $(ACTIVATE): requirements.txt
 	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
-	@. $(ACTIVATE); python -m pip install -U pip
+	@. $(ACTIVATE); python -m pip install -U pip setuptools
 	@. $(ACTIVATE); pip install -r requirements.txt;
 
 venv-dev: $(DEV_VIRTUALENV_MARK)
@@ -22,4 +22,4 @@ style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 .
 
 test: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); py.test
+	@. $(ACTIVATE); py.test --cov=app .
