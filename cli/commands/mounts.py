@@ -44,11 +44,11 @@ Use the following command to mount those folders:
  - replace <DLS4E_FOLDER> with one of the following:
         - input - User's private input folder (read/write)
           (can be accessed as /mnt/input/home from training script).
-        - output - User's private output folder (read)
+        - output - User's private output folder (read/write)
           (can be accessed as /mnt/output/home from training script).
         - input-shared - Shared input folder (read/write)
           (can be accessed as /mnt/input/root/public from training script).
-        - output-shared - Shared output folder (read)
+        - output-shared - Shared output folder (read/write)
           (can be accessed as /mnt/output/root/public from training script).
         - input-output-ro - Full input and output directories, read only.
 Additionally, each experiment has a special folder that can be accessed
