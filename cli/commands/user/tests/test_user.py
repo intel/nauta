@@ -179,7 +179,7 @@ def test_create_user_incorrect_name(mocker):  # noqa: F811
 
 class CreateUserMock():
     def __init__(self, cup: None, esc: None, gut: None, vun: None, icu: None, opj: None, ccl: None,
-                 cnm: None, gkh: None):
+                 cnm: None, gkh: None, iuc: None):
         self.cup = cup
         self.esc = esc
         self.gut = gut
@@ -189,6 +189,7 @@ class CreateUserMock():
         self.ccl = ccl
         self.cnm = cnm
         self.gkh = gkh
+        self.iuc = iuc
 
 
 @pytest.fixture
@@ -199,6 +200,7 @@ def prepare_mocks(mocker) -> CreateUserMock:
     vun_mock = mocker.patch("commands.user.create.validate_user_name")
     icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=True)
     opj_mock = mocker.patch("os.path.join", return_value="folder")
+    iuc_mock = mocker.patch("commands.user.create.is_user_created", return_value=True)
     config_class_mock = mocker.patch('commands.user.create.Config')
     config_instance_mock = config_class_mock.return_value
     config_instance_mock.config_path = "test"
@@ -210,11 +212,11 @@ def prepare_mocks(mocker) -> CreateUserMock:
     gkh_mock.return_value = "localhost"
 
     return CreateUserMock(cup=cup_mock, esc=esc_mock, gut=gut_mock, vun=vun_mock, icu=icu_mock, opj=opj_mock,
-                          ccl=config_instance_mock, cnm=config_map_instance, gkh=gkh_mock)
+                          ccl=config_instance_mock, cnm=config_map_instance, gkh=gkh_mock, iuc=iuc_mock)
 
 
 def check_asserts(prepare_mocks: CreateUserMock, cup_count=1, esc_count=1, gut_count=1, vun_count=1, icu_count=1,
-                  opj_count=1, gkh_count=1):
+                  opj_count=1, gkh_count=1, iuc_count=1):
     assert prepare_mocks.cup.call_count == cup_count, "User presence wasn't verified."
     assert prepare_mocks.esc.call_count == esc_count, "User wasn't created."
     assert prepare_mocks.gut.call_count == gut_count, "Token wasn't taken."
@@ -222,6 +224,7 @@ def check_asserts(prepare_mocks: CreateUserMock, cup_count=1, esc_count=1, gut_c
     assert prepare_mocks.icu.call_count == icu_count, "Users wasn't checked as an admin."
     assert prepare_mocks.opj.call_count == opj_count, "Folder wasn't generated."
     assert prepare_mocks.gkh.call_count == gkh_count, "Kubectl host wasn't taken"
+    assert prepare_mocks.iuc.call_count == iuc_count, "User's state wasn't checked"
 
 
 def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
@@ -231,7 +234,7 @@ def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert f"Configuration has been saved to the config.{test_username} file." in result.output
+    assert f"Configuration has been saved to the {test_username}.config file." in result.output
 
     check_asserts(prepare_mocks)
 
@@ -246,7 +249,7 @@ def test_create_user_with_empty_username(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [])
 
-    assert f"Configuration has been saved to the config.{os_username} file." in result.output
+    assert f"Configuration has been saved to the {os_username}.config file." in result.output
     assert getpass_mock.call_count == 1
     prepare_mocks.vun.assert_called_once_with(os_username)
     check_asserts(prepare_mocks)
@@ -260,7 +263,7 @@ def test_create_user_with_non_empty_username(mocker, prepare_mocks):  # noqa: F8
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert f"Configuration has been saved to the config.{test_username} file." in result.output
+    assert f"Configuration has been saved to the {test_username}.config file." in result.output
     assert getpass_mock.call_count == 0
     check_asserts(prepare_mocks)
 
@@ -315,4 +318,17 @@ def test_create_user_success_with_error_creating_file(mocker, prepare_mocks):  #
 
     assert "Problems during creation of the file with user's configuration." in result.output
     assert gkc_mock.call_count == 1
+    check_asserts(prepare_mocks)
+
+
+def test_create_user_with_defined_status_only(mocker, prepare_mocks):  # noqa: F811
+    runner = CliRunner()
+    m = mock_open()
+    prepare_mocks.iuc.return_value = False
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username])
+
+    assert f"Configuration has been saved to the {test_username}.config file." in result.output
+    assert f"User {test_username} is still not ready." in result.output
+
     check_asserts(prepare_mocks)

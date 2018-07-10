@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import time
+
 from typing import List
 
 from kubernetes import config, client
@@ -140,3 +142,27 @@ def validate_user_name(username: str) -> bool:
         validate_kubernetes_name(username)
     except ValidationError as exe:
         raise ValueError("Incorrect k8s user name.")
+
+
+def is_user_created(username: str, timeout: int = 1) -> bool:
+    """
+    Waits until a user has been created (got CREATED status). If during a given timeout user hasn't been created
+    it returns False. Otherwise - it return True.
+    :param username: name of a user to be checked
+    :param timeout: timeout expressed in second, default value = 1. If 0 is passed as timeout - the function
+           doesn't wait for setting CREATED status - it just checks the current status of a given user
+    :return: True if user has received CREATED status, False otherwise
+    It raises an exception in case of any unexpected situation.
+    """
+    user = get_user_data(username)
+    if user and model.UserStatus.CREATED == user.state:
+        return True
+
+    for i in range(timeout):
+        time.sleep(1)
+        user = get_user_data(username)
+        logger.debug(f"Users state : {user.state}")
+        if user and model.UserStatus.CREATED == user.state:
+            return True
+
+    return False

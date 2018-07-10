@@ -24,7 +24,7 @@ import pytest
 from kubernetes.client import CustomObjectsApi
 
 from platform_resources.user_model import User, UserStatus
-from platform_resources.users import list_users, get_user_data, validate_user_name
+from platform_resources.users import list_users, get_user_data, validate_user_name, is_user_created
 
 TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
                    creation_timestamp='2018-05-17T12:49:04Z',
@@ -33,6 +33,9 @@ TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
                    state=UserStatus.DEFINED, creation_timestamp='2018-05-17T11:42:22Z',
                    experiment_runs=[])]
 
+USER_CREATED = User(name='user-created', uid=1, state=UserStatus.CREATED,
+                   creation_timestamp='2018-05-17T12:49:04Z',
+                   experiment_runs=[])
 
 @pytest.fixture()
 def mock_k8s_api_client(mocker) -> CustomObjectsApi:
@@ -112,3 +115,27 @@ def test_validate_user_name_incorrect_k8s_string():
     with pytest.raises(ValueError) as exe:
         validate_user_name(username)
     assert str(exe.value) == "Incorrect k8s user name."
+
+
+def test_is_user_created_success(mocker):
+    gud_mock = mocker.patch("platform_resources.users.get_user_data", return_value = USER_CREATED)
+    result = is_user_created("test_user", timeout=10)
+
+    assert result
+    assert gud_mock.call_count == 1
+
+
+def test_is_user_created_failure(mocker):
+    gud_mock = mocker.patch("platform_resources.users.get_user_data", return_value = TEST_USERS[0])
+    result = is_user_created("test_user", timeout=1)
+
+    assert not result
+    assert gud_mock.call_count == 2
+
+
+def test_is_user_created_success_with_wait(mocker):
+    gud_mock = mocker.patch("platform_resources.users.get_user_data", side_effect = [TEST_USERS[0], USER_CREATED])
+    result = is_user_created("test_user", timeout=1)
+
+    assert result
+    assert gud_mock.call_count == 2

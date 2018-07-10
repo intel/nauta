@@ -35,7 +35,7 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence
-from platform_resources.users import validate_user_name
+from platform_resources.users import validate_user_name, is_user_created
 
 
 log = initialize_logger(__name__)
@@ -76,7 +76,7 @@ ADD_USER_ERROR_DESCRIPTION = "User has not been created. To get more information
 REMOVE_USER_ERROR_DESCRIPTION = "Partially created user has not been removed successfully - " \
                                 "please remove the user manually."
 
-DEFAULT_FILENAME = "config.{}"
+DEFAULT_FILENAME = "{}.config"
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
@@ -121,7 +121,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
         tiller_location = dls4e_config_map.image_tiller
         tensorboard_service_location = dls4e_config_map.image_tensorboard_service
 
-        add_user_command = ["helm", "install", "--namespace", username, "--name", username,
+        add_user_command = ["helm", "install", "--wait", "--namespace", username, "--name", username,
                             chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
                             f"username={username}", "--set", "TillerImage={}".format(tiller_location),
                             "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
@@ -150,7 +150,13 @@ def create(state: State, username: str, list_only: bool, filename: str):
             click.echo(REMOVE_USER_ERROR_DESCRIPTION)
         sys.exit(1)
 
-    click.echo(f"User {username} has been added successfully.")
+    if is_user_created(username, 90):
+        click.echo(f"User {username} has been added successfully.")
+    else:
+        # if during 90 seconds a user hasn't been created - app displays information about it
+        # but don't step processing the command - config file generated here my be useful later
+        # when user has been created
+        click.echo(f"User {username} is still not ready.")
 
     try:
         kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(with_port=True),
