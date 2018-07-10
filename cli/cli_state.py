@@ -42,8 +42,7 @@ pass_state = click.make_pass_decorator(State, ensure=True)
 
 def verbosity_option(f):
     def callback(ctx, param, value):
-        logging_level = set_verbosity_level(value)
-        logging.getLogger().setLevel(logging_level)
+        set_verbosity_level(value)
         return value
 
     return click.option('-v', '--verbose', count=True,
@@ -84,6 +83,7 @@ def common_options(verify_dependencies=True, verify_config_path=True):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            logger.debug(f'Running command {func.__name__} with following arguments: {kwargs}')
             if verify_config_path:
                 verify_cli_config_path()
             if verify_dependencies:

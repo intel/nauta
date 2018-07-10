@@ -28,15 +28,18 @@ import util.logger as logger
 
 def test_initialize_logger():
     mock_package_name = 'mock_package'
-    default_log_level = logging.CRITICAL
+    default_log_level = logging.DEBUG
+    default_stream_handler_log_level = logging.CRITICAL
 
     mock_logger = logger.initialize_logger(mock_package_name)
 
     assert mock_logger
     assert logging.getLogger(mock_package_name).getEffectiveLevel() == default_log_level
+    assert logger.STREAM_HANDLER.level == default_stream_handler_log_level
 
 
 @pytest.mark.parametrize('mock_verbosity,expected_log_level', [(0, logging.CRITICAL), (1, logging.INFO),
                                                                (2, logging.DEBUG), (5, logging.DEBUG)])
 def test_set_verbosity_level(mock_verbosity, expected_log_level):
-    assert logger.set_verbosity_level(mock_verbosity) == expected_log_level
+    logger.set_verbosity_level(mock_verbosity)
+    assert logger.get_verbosity_level() == expected_log_level

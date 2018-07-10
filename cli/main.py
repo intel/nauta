@@ -24,6 +24,7 @@ import urllib3
 import sys
 import traceback
 import click
+import logging
 
 from commands.experiment import experiment
 from commands.launch import launch
@@ -33,7 +34,9 @@ from commands.verify import verify
 from commands.mounts import mounts
 from commands.version import version
 from util.aliascmd import AliasGroup
-from util.logger import initialize_logger
+from util.logger import initialize_logger, setup_log_file
+from util.config import Config
+from cli_state import verify_cli_config_path
 
 
 logger = initialize_logger(__name__)
@@ -45,9 +48,27 @@ DEFAULT_LANG = "en_US.UTF-8"
 ERROR_MESSAGE = "Other error during starting application."
 
 
+def configure_cli_logs():
+    if os.environ.get('DLS_CTL_LOG_DISABLE'):
+        return
+
+    log_level = os.environ.get('DLS_CTL_LOG_LEVEL', default=logging.DEBUG)
+    log_retention = os.environ.get('DLS_CTL_LOG_RETENTION', default=30)
+
+    log_file_directory = os.environ.get('DLS_CTL_LOG_DIRECTORY')
+    if not log_file_directory:
+        verify_cli_config_path()
+        log_file_directory = '{}/logs'.format(Config().config_path)
+
+    if not os.path.isdir(log_file_directory):
+        os.mkdir(log_file_directory)
+
+    setup_log_file(log_file_directory=log_file_directory, log_level=log_level, log_backup_count=log_retention)
+
+
 @click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup)
 def entry_point():
-    pass
+    configure_cli_logs()
 
 
 entry_point.add_command(experiment.experiment)

@@ -25,7 +25,7 @@ from typing import List
 
 from util.config import Config
 from util.system import execute_system_command
-from util.logger import initialize_logger
+from util.logger import initialize_logger, get_verbosity_level
 
 log = initialize_logger('draft.cmd')
 
@@ -39,7 +39,7 @@ def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str,
     config_path = Config().config_path
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
-    if log.getEffectiveLevel() == logging.DEBUG:
+    if get_verbosity_level() == logging.DEBUG:
         full_command.append('--debug')
 
     env = os.environ.copy()

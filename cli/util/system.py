@@ -30,7 +30,7 @@ import socket
 import signal
 
 from util.exceptions import KubectlIntError
-from util.logger import initialize_logger
+from util.logger import initialize_logger, get_verbosity_level
 
 
 log = initialize_logger('util.system')
@@ -52,8 +52,8 @@ def execute_subprocess_command(command: List[str], timeout: int or None = 1, std
                                cwd=None) -> subprocess.Popen:
 
     # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
-    std_output_destination = None if log.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
-    std_error_destination = subprocess.STDOUT if log.getEffectiveLevel() == logging.DEBUG else subprocess.DEVNULL
+    std_output_destination = None if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
+    std_error_destination = subprocess.STDOUT if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
 
     log.debug(f'executing COMMAND in subprocess: {command}')
     process = subprocess.Popen(args=command, stdout=std_output_destination, stderr=std_error_destination,

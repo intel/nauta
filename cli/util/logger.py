@@ -19,13 +19,23 @@
 # and approved by Intel in writing.
 #
 
+import sys
 import logging
+from logging.handlers import TimedRotatingFileHandler
+
+
+STREAM_HANDLER = logging.StreamHandler(stream=sys.stdout)
 
 
 def initialize_logger(package_name) -> logging.Logger:
+    STREAM_HANDLER.setLevel(logging.CRITICAL)
     logger = logging.getLogger(package_name)
-    logging.basicConfig(level=logging.CRITICAL)
+    logging.basicConfig(level=logging.DEBUG, handlers=[STREAM_HANDLER])
     return logger
+
+
+def get_verbosity_level():
+    return STREAM_HANDLER.level
 
 
 # ALWAYS called on CLI command init
@@ -37,4 +47,14 @@ def set_verbosity_level(verbosity):
     elif verbosity >= 2:
         logging_level = logging.DEBUG
 
-    return logging_level
+    STREAM_HANDLER.setLevel(logging_level)
+
+
+def setup_log_file(log_file_directory: str, log_level=logging.DEBUG, log_backup_count=30):
+    root_logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s  - %(message)s')
+    file_handler = TimedRotatingFileHandler(filename=f'{log_file_directory}/dlsctl_logs',
+                                            when='d', interval=1, backupCount=log_backup_count)
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(log_level)
+    root_logger.addHandler(file_handler)
