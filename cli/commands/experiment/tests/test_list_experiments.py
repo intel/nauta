@@ -23,7 +23,7 @@ from click.testing import CliRunner
 
 from commands.experiment import list
 from platform_resources.run_model import Run, RunStatus
-
+from platform_resources.experiment_model import Experiment
 
 TEST_RUNS = [Run(name='test-experiment', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
                  creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
@@ -31,6 +31,36 @@ TEST_RUNS = [Run(name='test-experiment', parameters=['a 1', 'b 2'], metrics={'ac
              Run(name='test-experiment-2', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
                  creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
                  state=RunStatus.COMPLETE, experiment_name='test-experiment', pod_count=0, pod_selector={})]
+
+
+TEST_RUNS_CREATING = [Run(name='test-experiment-1', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                          state=RunStatus.QUEUED, experiment_name='test-experiment-1', pod_count=0, pod_selector={}),
+                      Run(name='test-experiment-2', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                          state=RunStatus.COMPLETE, experiment_name='test-experiment-1', pod_count=0, pod_selector={}),
+                      Run(name='test-experiment-3', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                          state="", experiment_name='test-experiment-2', pod_count=0, pod_selector={}),
+                      Run(name='test-experiment-4', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                          state="", experiment_name='test-experiment-3', pod_count=0, pod_selector={}),
+                      Run(name='test-experiment-5', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                          state="", experiment_name='test-experiment-2', pod_count=0, pod_selector={}),
+                      Run(name='test-experiment-6', parameters=['a 1', 'b 2'], metrics={'acc': 52.2, 'loss': 1.62345},
+                          creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                          state=RunStatus.COMPLETE, experiment_name='test-experiment-4', pod_count=0, pod_selector={})]
+
+
+TEST_EXPERIMENT = Experiment(name="test-experiment", parameters_spec=["param1"],
+                             submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
+                             template_name="template_name", template_namespace="template_namespace")
+
+TEST_RUN = Run(name="test-experiment", experiment_name="test-experiment", metrics={},
+               parameters=["param1"], pod_count=0, pod_selector={}, state=RunStatus.CREATING,
+               submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
+               template_name="template_name")
 
 
 def test_list_experiments_success(mocker):
@@ -73,3 +103,17 @@ def test_list_experiments_failure(mocker):
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs retrieval was not called"
     assert sys_exit_mock.called_once_with(1)
+
+
+def test_create_fake_run():
+    assert TEST_RUN == list.create_fake_run(TEST_EXPERIMENT)
+
+
+def test_replace_initalizing_runs_no_changes():
+    assert len(list.replace_initalizing_runs(TEST_RUNS)) == 2
+
+
+def test_replace_initializing_runs_two_not_ready(mocker):
+    get_experiment_mock = mocker.patch("platform_resources.experiments.get_experiment", return_value=TEST_EXPERIMENT)
+    assert len(list.replace_initalizing_runs(TEST_RUNS_CREATING)) == 5
+    assert get_experiment_mock.call_count == 2

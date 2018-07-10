@@ -35,6 +35,8 @@ class RunStatus(Enum):
     COMPLETE = 'COMPLETE'
     CANCELLED = 'CANCELLED'
     FAILED = 'FAILED'
+    # state taken from an experiment - CAN-732
+    CREATING = 'CREATING'
 
 
 

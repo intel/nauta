@@ -22,6 +22,8 @@
 from enum import Enum
 from typing import Pattern
 
+from platform_resources.run_model import RunStatus
+
 
 def filter_by_name_regex(resource_object_dict: dict, name_regex: Pattern = None, spec_location: bool = True):
     if spec_location:
@@ -36,8 +38,30 @@ def filter_by_state(resource_object_dict: dict, state: Enum = None):
     return resource_object_dict['spec']['state'] == state.value if state else True
 
 
+def filter_run_by_state(resource_object_dict: dict, state: Enum = None):
+    if not state:
+        return True
+
+    current_state = resource_object_dict['spec'].get('state')
+
+    if current_state:
+        return current_state == state.value
+    else:
+        if state == RunStatus.CREATING:
+            return True
+        else:
+            return False
+
+
 def filter_by_excl_state(resource_object_dict: dict, state: Enum = None):
     return resource_object_dict['spec']['state'] != state.value if state else True
+
+
+def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
+    if not state:
+        return True
+
+    return not filter_run_by_state(resource_object_dict, state)
 
 
 def filter_by_experiment_name(resource_object_dict: dict, exp_name: str = None):

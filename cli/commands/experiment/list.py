@@ -23,13 +23,16 @@ import sys
 
 import click
 from tabulate import tabulate
+from typing import List
 
 from cli_state import common_options, pass_state, State
 import platform_resources.runs as runs_api
-from platform_resources.run_model import RunStatus
+import platform_resources.experiments as experiments_api
+from platform_resources.run_model import RunStatus, Run
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from platform_resources.experiment_model import Experiment
 
 logger = initialize_logger(__name__)
 
@@ -52,8 +55,10 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
         namespace = None if all_users else get_kubectl_current_context_namespace()
         status = RunStatus[status] if status else None
 
-        # List experiments command is actually listing Run resources instead of Experiment resources
-        runs = runs_api.list_runs(namespace=namespace, state=status, name_filter=name)
+        # List experiments command is actually listing Run resources instead of Experiment resources with one
+        # exception - if run is initialized - dlsctl displays data of an experiment instead of data of a run
+        runs = replace_initalizing_runs(runs_api.list_runs(namespace=namespace, state=status, name_filter=name))
+
         click.echo(tabulate([run.cli_representation for run in runs],
                             headers=['Name', 'Parameters', 'Metrics', 'Submission date',
                                      'Submitter', 'Status', 'Template name'], tablefmt="orgtbl"))
@@ -67,3 +72,33 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
         logger.exception(error_msg)
         click.echo(error_msg)
         sys.exit(1)
+
+
+def replace_initalizing_runs(run_list: List[Run]):
+    """
+    Creates a list of runs with initializing runs replaced by fake runs created based
+    on experiment data. If there is at least one initializing run within a certain
+    experiment - none of runs creating this experiment is displayed.
+    :param run_list: list of runs to be checked
+    :return: list without runs that are initialized at the moment
+    """
+    initializing_experiments = set()
+    ret_list = []
+    for run in run_list:
+        exp_name = run.experiment_name
+        if (run.state is None or run.state == '') and exp_name not in initializing_experiments:
+            experiment = experiments_api.get_experiment(exp_name, run.submitter)
+            ret_list.append(create_fake_run(experiment))
+            initializing_experiments.add(exp_name)
+        elif exp_name not in initializing_experiments:
+            ret_list.append(run)
+
+    return ret_list
+
+
+def create_fake_run(experiment: Experiment) -> Run:
+    return Run(name=experiment.name, experiment_name=experiment.name, metrics={},
+               parameters=experiment.parameters_spec, pod_count=0,
+               pod_selector={}, state=RunStatus.CREATING, submitter=experiment.submitter,
+               creation_timestamp=experiment.creation_timestamp,
+               template_name=experiment.template_name)

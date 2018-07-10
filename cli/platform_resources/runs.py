@@ -29,8 +29,8 @@ from kubernetes.client.rest import ApiException
 
 from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.run_model import Run, RunStatus, RunKubernetesSchema
-from platform_resources.resource_filters import filter_by_name_regex, filter_by_state, filter_by_excl_state, \
-    filter_by_experiment_name
+from platform_resources.resource_filters import filter_by_name_regex, filter_run_by_excl_state, \
+    filter_by_experiment_name, filter_run_by_state
 from util.logger import initialize_logger
 from util.exceptions import InvalidRegularExpressionError
 
@@ -71,8 +71,8 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
         raise InvalidRegularExpressionError(error_msg) from e
 
     run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False),
-                   partial(filter_by_state, state=state),
-                   partial(filter_by_excl_state, state=excl_state),
+                   partial(filter_run_by_state, state=state),
+                   partial(filter_run_by_excl_state, state=excl_state),
                    partial(filter_by_experiment_name, exp_name=exp_name_filter)]
 
     runs = [Run.from_k8s_response_dict(run_dict)
