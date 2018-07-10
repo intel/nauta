@@ -2,40 +2,87 @@
 
 set -e
 
-find_python() {
-    for python in "$@"
+find_bin() {
+    for bin in "$@"
     do
-        if which ${python} > /dev/null 2>&1; then
-          which ${python}
+        if which ${bin} > /dev/null 2>&1; then
+          which ${bin}
           return
         fi
     done
     >&2 echo "Unable to find $@ on your system"
-    exit 1
+    return 1
 }
 
-PYTHON=$(find_python python3.5 python3.6)
+find_file() {
+    PREFIX=$1
+    shift 1
+    for file in "$@"
+    do
+        if [ -f "${PREFIX}/${file}" ]; then
+            echo "${PREFIX}/${file}"
+            return
+        fi
+    done
+    >&2 echo "Unable to find file $@ under ${PREFIX}"
+    return 1
+}
 
-echo "Python found: ${PYTHON}"
+if [ X"${VIRTUAL_ENV}" = X"" ]; then
+    echo "Running inside user space"
+    PYTHON=$(find_bin python3.5 python3.6)
 
-if ! ${PYTHON} -m pip > /dev/null 2>&1; then
-    >&2 echo "Unable to find pip in ${PYTHON}"
-    exit 1
+    echo "Python found: ${PYTHON}"
+
+    if ! ${PYTHON} -m pip > /dev/null 2>&1; then
+        >&2 echo "Unable to find pip in ${PYTHON}. Trying to find pip binary file installed in system PATH"
+        PIP=$(find_bin pip3.5 pip3.6)
+    else
+        PIP="${PYTHON} -m pip"
+    fi
+
+    export PYTHONUSERBASE=${CURDIR}/.venv/
+
+    export VIRTUALENV_ENABLED=0
+    export DLS_VIRTUALENV="${CURDIR}/.venv"
+else
+    echo "Running inside virtualenv space"
+    if find_file "${VIRTUAL_ENV}/bin" python3.5 python3.6 > /dev/null 2>&1; then
+        PYTHON=$(find_file "${VIRTUAL_ENV}/bin" python3.5 python3.6)
+
+        export VIRTUALENV_ENABLED=1
+        export DLS_VIRTUALENV="${VIRTUAL_ENV}"
+    else
+        echo "Unable to find proper python in virtualenv. Retrying with system one"
+        PYTHON=$(find_bin python3.5 python3.6)
+
+        export VIRTUALENV_ENABLED=0
+        export DLS_VIRTUALENV="${CURDIR}/.venv"
+    fi
+
+    if ! ${PYTHON} -m pip > /dev/null 2>&1; then
+        >&2 echo "Unable to find pip in ${PYTHON}. Trying to find pip binary file installed in system PATH"
+        PIP=$(find_bin pip3.5 pip3.6)
+
+        export VIRTUALENV_ENABLED=0
+        export DLS_VIRTUALENV="${CURDIR}/.venv"
+    else
+        PIP="${PYTHON} -m pip"
+    fi
 fi
 
-PIP="${PYTHON} -m pip"
+if [ ! -f "${DLS_VIRTUALENV}/.done" ]; then
+    mkdir -p "${DLS_VIRTUALENV}"
 
-export PYTHONUSERBASE=${CURDIR}/.venv/
+    if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
+        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --isolated --ignore-installed --no-cache-dir
+    else
+        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --user --isolated --ignore-installed --no-cache-dir
+    fi
 
-if [ ! -f "${CURDIR}/.venv/.done" ]; then
-    rm -rf "${CURDIR}/.venv"
-    mkdir -p ~/.venv
+    touch "${DLS_VIRTUALENV}/.done"
 
-    ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --user --isolated --ignore-installed --no-cache-dir
-
-    touch "${CURDIR}/.venv/.done"
-
-    echo "Virtualenv ready"
+    echo "Local python packages ready"
 fi
-ANSIBLE_PATH="${CURDIR}/.venv/bin/ansible-playbook"
-PATH=${CURDIR}/.venv/bin:${PATH}
+ANSIBLE_PATH="${DLS_VIRTUALENV}/bin/ansible-playbook"
+PATH=${DLS_VIRTUALENV}/bin:${PATH}

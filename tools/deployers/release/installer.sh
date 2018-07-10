@@ -7,12 +7,17 @@ LIBDIR=${CURDIR}/libs
 BINDIR=${CURDIR}/bin
 
 . ${LIBDIR}/os-detect.sh
+. ${LIBDIR}/locale.sh
 . ${LIBDIR}/bins-detect.sh
 . ${LIBDIR}/ansible.sh
 
 inventory() {
     if [ X"${ENV_INVENTORY}" = X"" ]; then
-        echo "-c local -i localhost"
+        echo "-c local -i localhost,"
+        if [ ! -f "${ENV_INVENTORY}" ]; then
+            >@2 echo "Could not find or access inventory file: ${ENV_INVENTORY}"
+            exit 1
+        fi
     else
         echo "--inventory-file=$(realpath ${ENV_INVENTORY})"
     fi
@@ -22,6 +27,10 @@ config() {
     if [ X"${ENV_CONFIG}" = X"" ]; then
         echo ""
     else
+        if [ ! -f "${ENV_CONFIG}" ]; then
+            >@2 echo "Could not find or access config file: ${ENV_INVENTORY}"
+            exit 1
+        fi
         echo "-e @$(realpath ${ENV_CONFIG})"
     fi
 }
@@ -47,6 +56,10 @@ ansible_run() {
 }
 
 platform_ansible_run() {
+    if [ X"${ENV_INVENTORY}" = X"" ]; then
+        >@2 echo "Inventory file should be provided for platform installation"
+        exit 1
+    fi
     ansible_run ${CURDIR}/platform/dls.yml
     return $?
 }
@@ -58,6 +71,11 @@ dls4e_ansible_run() {
 
 dls4e_fetch_ansible_run() {
     ansible_run ${CURDIR}/dls4e/fetch.yml
+    return $?
+}
+
+platform_verify_ansible_run() {
+    ansible_run ${CURDIR}/platform/verification.yml
     return $?
 }
 
@@ -78,6 +96,8 @@ case "${COMMAND}" in
   dls4e-upgrade) UPGRADE=True dls4e_ansible_run
      ;;
   dls4e-fetch) dls4e_fetch_ansible_run
+     ;;
+  platform-verify) platform_verify_ansible_run
      ;;
   *) echo "Unknown command"
      ;;

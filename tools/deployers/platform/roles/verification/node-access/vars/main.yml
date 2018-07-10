@@ -1,0 +1,9 @@
+---
+
+verification_checks:
+  - message: "Can not find ansible_host or ansible_ssh_host on host."
+    condition:
+      - "{{ 'ansible_ssh_host' not in hostvars[inventory_hostname] }}"
+      - "{{ 'ansible_host' not in hostvars[inventory_hostname] }}"
+
+required_parameters: []

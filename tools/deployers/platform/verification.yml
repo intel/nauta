@@ -1,0 +1,39 @@
+---
+
+- name: Precheck platform installation
+  hosts: localhost
+  connection: local
+  become: False
+  any_errors_fatal: True
+  gather_facts: False
+  roles:
+    - role: verification/pre
+
+- name: Precheck nodes access
+  hosts: all
+  become: False
+  any_errors_fatal: True
+  gather_facts: False
+  roles:
+    - role: verification/node-access
+
+- name: Precheck nodes
+  hosts: all
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: verification/node
+
+- name: Precheck master nodes
+  hosts: master
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: verification/master
+
+- name: Precheck worker nodes
+  hosts: worker
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: verification/worker

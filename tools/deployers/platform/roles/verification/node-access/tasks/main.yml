@@ -1,0 +1,26 @@
+---
+
+- include_tasks: condition.yml
+
+- name: Wait for node connection
+  wait_for_connection:
+    connect_timeout: 5
+    delay: 0
+    sleep: 1
+    timeout: 15
+  register: node_access
+  ignore_errors: True
+
+- name: Fail if node is not accessible
+  fail:
+    msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - {{ node_access.msg }}"
+  when: node_access is failed
+
+- name: Check if regular user is accessible
+  shell: echo
+  changed_when: False
+
+- name: Check if admin user is accessible
+  become: True
+  shell: echo
+  changed_when: False
