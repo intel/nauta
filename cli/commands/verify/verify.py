@@ -77,3 +77,6 @@ def verify(state: State):
             log.exception(error_msg)
             click.echo(error_msg)
             sys.exit(1)
+        except Exception:
+            log.exception("Exception during verficiation.")
+            sys.exit(1)

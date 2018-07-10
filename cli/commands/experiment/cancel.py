@@ -44,24 +44,49 @@ from util.logger import initialize_logger
 HELP = "Cancels experiment/s chosen based on criteria given as a parameter."
 HELP_P = "If given, then all information concerning all experiments, completed and currently running, " \
          "is removed from the system."
+HELP_M = "If given, command searches for experiments matching the value of this option."
 
 log = initialize_logger(__name__)
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
-@click.argument("name")
+@click.argument("name", required=False)
+@click.option('-m', '--match', default=None, help=HELP_M)
 @click.option('-p', '--purge', default=None, help=HELP_P, is_flag=True)
 @common_options()
 @pass_state
-def cancel(state: State, name: str, purge: bool):
+def cancel(state: State, name: str, match: str, purge: bool):
     """
     Cancels chosen experiments based on a name provided as a parameter.
     """
 
     # check whether we have runs with a given name
+
+    if name and match:
+        click.echo("Both name and -m option cannot be given. Please choose one of them.")
+        sys.exit(1)
+    elif not name and not match:
+        click.echo("Name or -m option must be given. Please pass one of them.")
+        sys.exit(1)
+
     current_namespace = get_current_namespace()
+    search_for_experiment = False
+
+    if name:
+        exp_to_be_cancelled = get_experiment(namespace=current_namespace, name=name)
+
+        if exp_to_be_cancelled:
+            search_for_experiment = True
+        else:
+            name = f"^{name}$"
+    else:
+        name = match
+
     try:
-        list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name)
+        if search_for_experiment:
+            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=name)
+        else:
+            list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name)
     except Exception:
         err_message = "Problems during loading a list of experiments."
         log.exception(err_message)

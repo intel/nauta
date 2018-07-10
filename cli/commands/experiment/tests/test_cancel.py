@@ -84,6 +84,7 @@ class CancelMocks:
         self.k8s_core_api = mocker.patch('kubernetes.client.CoreV1Api')
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
         self.k8s_proxy = mocker.patch('commands.experiment.cancel.K8sProxy')
+        self.get_experiment = mocker.patch('commands.experiment.cancel.get_experiment')
 
 
 @pytest.fixture
@@ -92,12 +93,13 @@ def prepare_command_mocks(mocker) -> CancelMocks:
 
 
 def check_command_asserts(prepare_mocks: CancelMocks, gcn_count=1, lor_count=1, cne_count=1,
-                          lkc_count=1, acl_count=1):
+                          lkc_count=1, acl_count=1, gex_count=1):
     assert prepare_mocks.get_current_namespace.call_count == gcn_count, "namespace wasn't taken"
     assert prepare_mocks.list_runs.call_count == lor_count, "list of runs wasn't gathered"
     assert prepare_mocks.cancel_experiment.call_count == cne_count, "experiment wasn't cancelled"
     assert prepare_mocks.load_kube_config.call_count == lkc_count, "kube config wasn't loaded"
     assert prepare_mocks.k8s_core_api.call_count == acl_count, "kubernetes api wasn't created"
+    assert prepare_mocks.get_experiment.call_count == gex_count, "experiment data wasn't gathered"
 
 
 def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
@@ -180,6 +182,30 @@ def test_exception_during_exp_cancellation(prepare_command_mocks: CancelMocks):
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert "The following experiments weren't cancelled properly:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
+
+
+def test_cancel_missing_parameters(prepare_command_mocks: CancelMocks):
+    result = CliRunner().invoke(cancel.cancel)
+    check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, lkc_count=0,
+                          acl_count=0, gex_count=0)
+
+    assert "Name or -m option must be given. Please pass one of them." in result.output
+
+
+def test_cancel_too_many_parameters(prepare_command_mocks: CancelMocks):
+    result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
+    check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, lkc_count=0,
+                          acl_count=0, gex_count=0)
+
+    assert "Both name and -m option cannot be given. Please choose one of them." in result.output
+
+
+def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CANCELLED
+    result = CliRunner().invoke(cancel.cancel, ["-m", EXPERIMENT_NAME])
+
+    check_command_asserts(prepare_command_mocks, cne_count=0, lkc_count=0, acl_count=0, gex_count=0)
+    assert "Experiments fulfilling given criteria have been cancelled already." in result.output
 
 
 class CancelExperimentMocks:
@@ -300,3 +326,10 @@ def test_cancel_experiment_one_cancelled_one_not(prepare_cancel_experiment_mocks
     assert len(del_list) == 1
     assert len(not_del_list) == 1
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2)
+
+
+def test_cancel_match_and_name(prepare_command_mocks: CancelMocks):
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
+    result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
+
+    assert "Both name and -m option cannot be given. Please choose one of them." in result.output
