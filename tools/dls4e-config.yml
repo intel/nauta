@@ -78,7 +78,7 @@ local_images:
     version: "1.9.0-rc2-py3"
     required:
       BASE_IMAGE: "shared/ubuntu"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/haswell"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow:
