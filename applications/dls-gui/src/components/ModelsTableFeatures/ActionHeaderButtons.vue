@@ -37,7 +37,7 @@
   <v-btn :disabled="tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
   <v-dialog
     v-model="showColumnMgmtModal"
-    max-width="600px"
+    max-width="320px"
   >
       <v-card>
         <v-card-title>
@@ -48,14 +48,19 @@
             <v-layout row wrap>
               <v-flex xs12>
                 <div id="options" class="scroll-y">
-                  <div v-for="header in switchableColumns" v-bind:key="header" class="input-group input-group--selection-controls">
+                  <div v-for="header in switchableColumns" v-bind:key="header" class="option">
                     <v-icon :id="header + '_on'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'success'" v-on:click="showColumn(header)">done</v-icon>
-                    <span class="label-box" v-on:click="showColumn(header)">{{ getLabel(header) }}</span>
+                    <v-tooltip bottom class="label-box">
+                      <span slot="activator" v-on:click="showColumn(header)">
+                        {{ cutLongText(getLabel(header), 20) }}
+                      </span>
+                      <span>{{ getLabel(header) }}</span>
+                    </v-tooltip>
                     <v-icon :id="header + '_off'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'grey darken-2'" v-on:click="hideColumn(header)">delete</v-icon>
                   </div>
                 </div>
               </v-flex>
-              <v-flex md4 xs12 offset-md4>
+              <v-flex md8 xs12 offset-md2>
                 <v-btn id="revert" block dark small v-on:click="revertToDefault()">REVERT TO DEFAULT</v-btn>
               </v-flex>
               <v-flex md6 xs12>
@@ -114,6 +119,9 @@ export default {
     getLabel: function (header) {
       return LABELS[header] || header;
     },
+    cutLongText (str, limit) {
+      return str.length > limit ? `${str.substr(0, limit)}...` : str;
+    },
     revertToDefault: function () {
       this.setHiddenColumnsHandler(this.initialHiddenHeaders);
       this.showColumnMgmtModal = false;
@@ -164,11 +172,16 @@ input {
   border: 1px solid #000000;
   padding: 10px 10px 10px 10px;
 }
+.option {
+  white-space: nowrap;
+  display: flex;
+}
 .label-box {
   margin-left: 20px;
   margin-right: 20px;
   padding-top: 3px;
-  min-width: 120px;
+  min-width: 150px;
+  cursor: help;
 }
 .pointer-btn {
   cursor: pointer;

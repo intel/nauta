@@ -228,7 +228,7 @@ export default {
       ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
     },
     tensorBtnAvailable: function () {
-      return !this.tensorMode || (this.tensorMode && this.selected.length !== 0);
+      return !this.tensorMode || (this.tensorMode && this.selected.length === 1);
     }
   },
   watch: {
@@ -287,7 +287,10 @@ export default {
     },
     onLaunchTensorboardClick () {
       if (this.tensorMode) {
-        this.launchTensorboard(this.selected);
+        const experiments = this.selected.map((exp) => {
+          return `experiments=${encodeURIComponent(exp.name)}`;
+        }).join('&');
+        window.open(`/tensorboard?${experiments}`);
         this.discardTensorboard();
       } else {
         this.enableTensorMode();
@@ -328,7 +331,7 @@ export default {
       const currentTime = Date.now();
       const lastUpdateTimeDiffer = Math.ceil((currentTime - this.lastUpdate) / 1000); // in seconds
       if (lastUpdateTimeDiffer <= this.refresh.interval) {
-        this.refresh.lastUpdateLabel = 'Last updated moment ago.';
+        this.refresh.lastUpdateLabel = 'Last updated a moment ago.';
       } else {
         this.refresh.lastUpdateLabel = `Last updated over ${this.refresh.interval} seconds ago.`;
         if (!this.fetchingDataActive) {

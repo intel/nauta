@@ -88,4 +88,48 @@ describe('Utils | k8s', function () {
         });
     });
   });
+
+  describe('getTensorboardInstanceState', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+    });
+
+    it('should return error if cannot decode token', function () {
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      dls4e.__set__('authApi', authApiMock);
+      deferred.reject(error);
+      return dls4e.getTensorboardInstanceState(token, expName)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return error if request to api failed', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      dls4e.__set__('authApi', authApiMock);
+      dls4e.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.reject(error);
+      return dls4e.getTensorboardInstanceState(token, expName)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return data if request to api with success', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      dls4e.__set__('authApi', authApiMock);
+      dls4e.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve(data);
+      return dls4e.getTensorboardInstanceState(token, expName)
+        .then(function (res) {
+          expect(res).to.equal(data)
+        });
+    });
+  });
 });

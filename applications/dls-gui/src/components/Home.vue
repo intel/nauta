@@ -45,7 +45,10 @@ export default {
   },
   created: function () {
     const token = this.$route.query.token;
-    this.$store.dispatch('loadAuthority', token);
+    this.$store.dispatch('loadAuthority', token)
+      .then(() => {
+        this.$router.push({path: '/models'});
+      });
   },
   methods: {
     ...mapActions(['loadAuthority'])

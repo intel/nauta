@@ -250,37 +250,5 @@ describe('VUEX modules experiments', () => {
         testAction(actions.getUserExperiments, {refreshMode: true}, state, expectedMutations, expectedActions, done);
       });
     });
-
-    describe('launchTensorboard', () => {
-      beforeEach(() => {
-        expectedMutations = [];
-        expectedActions = [];
-        mock = new MockAdapter(axios);
-        mock.reset();
-      });
-
-      it('should show error if internal server error occurs in launching tensorboard launching', (done) => {
-        expectedMutations = [
-          {type: 'setTensorboardLaunchingFlag', payload: {isActive: true}},
-          {type: 'setTensorboardLaunchingFlag', payload: {isActive: false}}
-        ];
-        expectedActions = [
-          {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
-        ];
-        mock.onPost('/api/tensorboard/create').reply(500, 'Internal Server Error');
-        testAction(actions.launchTensorboard, [], state, expectedMutations, expectedActions, done);
-      });
-
-      it('should launch tensorboard if req with success', (done) => {
-        const data = ['url1', 'url2'];
-        expectedMutations = [
-          {type: 'setTensorboardLaunchingFlag', payload: {isActive: true}},
-          {type: 'setTensorboardLaunchingFlag', payload: {isActive: false}}
-        ];
-        expectedActions = [];
-        mock.onPost('/api/tensorboard/create').reply(200, data);
-        testAction(actions.launchTensorboard, [], state, expectedMutations, expectedActions, done);
-      }).timeout(8000);
-    });
   });
 });

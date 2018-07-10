@@ -25,5 +25,6 @@ const tbApi = require('./tensorboard');
 const router = express.Router();
 
 router.post('/create', tbApi.createTensorBoardInstance);
+router.get('/status/:id', tbApi.getTensorBoardInstanceState);
 
 module.exports = router;

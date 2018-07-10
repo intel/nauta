@@ -20,7 +20,6 @@
  */
 
 import {getExperiments} from '../handlers/experiments';
-import {launchTensorBoard} from '../handlers/tensorboard';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
@@ -91,21 +90,6 @@ export const actions = {
         if (!refreshMode) {
           commit('setFetchingDataFlag', {isActive: false});
         }
-      });
-  },
-  launchTensorboard: ({dispatch, commit}, expList) => {
-    commit('setTensorboardLaunchingFlag', {isActive: true});
-    launchTensorBoard(expList)
-      .then(function (tb) {
-        setTimeout(() => {
-          tb.data.forEach((url) => {
-            window.open(url, '_blank');
-          });
-          commit('setTensorboardLaunchingFlag', {isActive: false});
-        }, 5000);
-      })
-      .catch(() => {
-        dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
       });
   }
 };

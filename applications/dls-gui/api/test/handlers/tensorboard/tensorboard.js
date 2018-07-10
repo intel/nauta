@@ -28,13 +28,16 @@ const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Tensorboard', function () {
 
-  let resMock, reqMock, dls4eMock, error, deferred, urls;
+  let resMock, reqMock, dls4eMock, error, deferred, instance;
 
   beforeEach(function () {
     urls = ['1', '2', '3'];
     error = {
       status: 500,
       message: 'error'
+    };
+    instance = {
+      id: '1'
     };
   });
 
@@ -81,23 +84,6 @@ describe('Handlers | Tensorboard', function () {
       expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
     });
 
-    it('should return error if empty list of experiments provided', function () {
-      reqMock.body.items = [];
-      tensorboardApi.createTensorBoardInstance(reqMock, resMock);
-      expect(resMock.status.calledOnce).to.equal(true);
-      expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
-    });
-
-    it('should return empty list if experiments without names provided', function (done) {
-      reqMock.body.items = [1, 2, 3];
-      tensorboardApi.createTensorBoardInstance(reqMock, resMock);
-      setTimeout(() => {
-        expect(resMock.send.calledOnce).to.equal(true);
-        expect(resMock.send.calledWith([])).to.deep.equal(true);
-        done();
-      }, 200);
-    });
-
     it('should return error if cannot create tensorboard instance', function (done) {
       tensorboardApi.__set__('dls4e', dls4eMock);
       deferred.reject(error);
@@ -111,14 +97,72 @@ describe('Handlers | Tensorboard', function () {
 
     it('should return url if list of experiments provided', function (done) {
       tensorboardApi.__set__('dls4e', dls4eMock);
-      deferred.resolve(error);
+      deferred.resolve(instance);
       tensorboardApi.createTensorBoardInstance(reqMock, resMock);
-      setTimeout(() => {
+      process.nextTick(() => {
         expect(resMock.send.calledOnce).to.equal(true);
-        expect(resMock.send.calledWith(reqMock.body.items.map((item) => item.url))).to.deep.equal(true);
+        expect(resMock.send.calledWith(instance)).to.deep.equal(true);
+        done();
+      });
+    });
+  });
+
+  describe('getTensorBoardInstanceState', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+      dls4eMock = {
+        getTensorboardInstanceState: sinon.stub().returns(deferred.promise)
+      };
+      resMock = {
+        status: sinon.stub().returns({
+          send: sinon.spy()
+        }),
+        send: sinon.spy()
+      };
+      reqMock = {
+        headers: {
+          authorization: 'token'
+        },
+        params: {
+          id: 1
+        }
+      };
+    });
+
+    it('should return error if invalid request headers', function () {
+      delete reqMock.headers.authorization;
+      tensorboardApi.getTensorBoardInstanceState(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.UNAUTHORIZED)).to.equal(true);
+    });
+
+    it('should return error if instance id in param not provided', function () {
+      delete reqMock.params.id;
+      tensorboardApi.getTensorBoardInstanceState(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
+    });
+
+    it('should return error if cannot get tensorboard instance', function (done) {
+      tensorboardApi.__set__('dls4e', dls4eMock);
+      deferred.reject(error);
+      tensorboardApi.getTensorBoardInstanceState(reqMock, resMock);
+      setTimeout(() => {
+        expect(resMock.status.calledOnce).to.equal(true);
+        expect(resMock.status.calledWith(error.status)).to.equal(true);
         done();
       }, 200);
     });
 
+    it('should return instance if request for getting data with success', function (done) {
+      tensorboardApi.__set__('dls4e', dls4eMock);
+      deferred.resolve(instance);
+      tensorboardApi.getTensorBoardInstanceState(reqMock, resMock);
+      process.nextTick(() => {
+        expect(resMock.send.calledOnce).to.equal(true);
+        expect(resMock.send.calledWith(instance)).to.deep.equal(true);
+        done();
+      });
+    });
   });
 });

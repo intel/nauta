@@ -38,10 +38,36 @@ module.exports.createTensorBoardInstance = function (token, experimentName) {
     authApi.decodeToken(token)
       .then(function (decoded) {
         const namespace = decoded[K8S_TOKEN_USER_KEY];
-        const url = `${getTensorBoardServiceUrl(namespace)}/create/${experimentName}`;
+        const url = `${getTensorBoardServiceUrl(namespace)}/tensorboard`;
         const options = {
           url: url,
+          body: {
+            runNames: experimentName
+          },
+          json: true,
           method: 'POST'
+        };
+        logger.debug('Performing request to tensorboard service');
+        return request(options);
+      })
+      .then(function (data) {
+        resolve(data);
+      })
+      .catch(function (err) {
+        reject(err);
+      });
+  });
+};
+
+module.exports.getTensorboardInstanceState = function (token, instanceId) {
+  return Q.Promise(function (resolve, reject) {
+    authApi.decodeToken(token)
+      .then(function (decoded) {
+        const namespace = decoded[K8S_TOKEN_USER_KEY];
+        const url = `${getTensorBoardServiceUrl(namespace)}/tensorboard/${instanceId}`;
+        const options = {
+          url: url,
+          method: 'GET'
         };
         logger.debug('Performing request to tensorboard service');
         return request(options);

@@ -40,28 +40,46 @@ const createTensorBoardInstance = function (req, res) {
   const experiments = req.body.items;
   logger.debug('Experiments data received');
 
-  let p = [];
-  experiments.forEach((exp) => {
-    if (exp.name) {
-      p.push(dls4e.createTensorBoardInstance(token, exp.name));
-    }
-  });
-
-  Promise.all(p)
-    .then((values) => {
-      logger.debug('Received tensorboard instances urls', values);
-      const urls = values.map((item) => {
-        return item.url;
-      });
-      logger.info('Tensorboard instances have been created');
-      res.send(urls);
+  dls4e.createTensorBoardInstance(token, experiments)
+    .then((instance) => {
+      logger.debug('Received tensorboard instance url', instance);
+      logger.info('Tensorboard instance has been created');
+      res.send(instance);
     })
     .catch(function (err) {
-      logger.error('Cannot create all required tensorboard instances', err);
+      logger.error('Cannot create required tensorboard instance', err);
+      res.status(err.status).send({message: err.message});
+    });
+};
+
+const getTensorBoardInstanceState = function (req, res) {
+  if (!req.headers.authorization) {
+    logger.debug('Missing authorization token');
+    res.status(HttpStatus.UNAUTHORIZED).send({message: errMessages.AUTH.MISSING_TOKEN});
+    return;
+  }
+  if (!req.params.id) {
+    logger.debug('Missing request param with instance id');
+    res.status(HttpStatus.BAD_REQUEST).send({message: errMessages.GENERAL.BAD_REQUEST});
+    return;
+  }
+  const token = req.headers.authorization;
+  const instanceId = req.params.id;
+  logger.debug('Instance ID received: ', instanceId);
+
+  dls4e.getTensorboardInstanceState(token, instanceId)
+    .then((data) => {
+      logger.debug('Received status of TB instance', data);
+      logger.info(`Status for ${instanceId} TB instance received`);
+      res.send(data);
+    })
+    .catch(function (err) {
+      logger.error('Cannot get status of tensorboard instance', err);
       res.status(err.status).send({message: err.message});
     });
 };
 
 module.exports = {
-  createTensorBoardInstance: createTensorBoardInstance
+  createTensorBoardInstance: createTensorBoardInstance,
+  getTensorBoardInstanceState: getTensorBoardInstanceState
 };

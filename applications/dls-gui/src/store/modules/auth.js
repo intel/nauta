@@ -53,7 +53,6 @@ export const actions = {
         dispatch('showMenuToggleBtn');
         dispatch('showUserbox');
         commit('setAuthLoadingState', false);
-        router.push({path: '/models'})
       })
       .catch((err) => {
         commit('setAuthLoadingState', false);

@@ -23,6 +23,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import ModelsTable from '../components/ModelsTable.vue';
 import Home from '../components/Home.vue';
+import TensorBoardCreator from '../components/TensorBoardCreator';
 import InvalidToken from '../components/InvalidToken.vue';
 import SignedOut from '../components/SignedOut.vue';
 
@@ -43,6 +44,14 @@ const router = new Router({
       path: '/models',
       name: 'Models',
       component: ModelsTable,
+      meta: {
+        authorized: true
+      }
+    },
+    {
+      path: '/tensorboard',
+      name: 'TensorBoardCreator',
+      component: TensorBoardCreator,
       meta: {
         authorized: true
       }

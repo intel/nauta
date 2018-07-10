@@ -36,3 +36,32 @@ export function launchTensorBoard (runsList) {
   };
   return axios(options);
 }
+
+const TENSORBOARD_STATE_ENDPOINT = '/api/tensorboard/status';
+const TB_INSTANCE_STATE = {
+  CREATING: 'CREATING',
+  RUNNING: 'RUNNING'
+};
+
+export function checkIsTBInstanceReady (instanceId) {
+  const token = cookies.get('TOKEN');
+  const options = {
+    url: `${TENSORBOARD_STATE_ENDPOINT}/${instanceId}`,
+    headers: {'Authorization': token},
+    method: 'GET'
+  };
+  return new Promise((resolve, reject) => {
+    axios(options)
+      .then((data) => {
+        const instanceState = data.data.status;
+        if (instanceState === TB_INSTANCE_STATE.RUNNING) {
+          resolve(data);
+        } else {
+          reject(data);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      })
+  });
+}

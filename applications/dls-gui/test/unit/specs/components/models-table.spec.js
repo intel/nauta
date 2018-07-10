@@ -203,17 +203,10 @@ describe('VUE components ModelsTable', () => {
     expect(actions.enableTensorMode.calledOnce).to.equal(true);
   });
 
-  it('Should call enableTensorMode on launch btn second click', function () {
+  it('Should call disableTensorMode on launch btn second click', function () {
     wrapper.vm.$store.state.tensorMode = true;
     wrapper.vm.onLaunchTensorboardClick();
-    expect(actions.launchTensorboard.calledOnce).to.equal(true);
     expect(actions.disableTensorMode.calledOnce).to.equal(true);
-  });
-
-  it('Should call disableTensorMode on exit btn click', function () {
-    wrapper.vm.discardTensorboard();
-    expect(actions.disableTensorMode.calledOnce).to.equal(true);
-    expect(wrapper.vm.selected).to.deep.equal([]);
   });
 
   it('Should call disableTensorMode on exit btn click', function () {
@@ -247,7 +240,7 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.$store.state.experiments.stats.datetime = 1528190409842;
     wrapper.vm.timer();
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated moment ago.');
+    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated a moment ago.');
   });
 
   it('Should refresh data if older than 30s', function () {
