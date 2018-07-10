@@ -48,6 +48,11 @@ def verify(state: State):
         log.exception(e)
         click.echo(e)
         sys.exit(1)
+    except FileNotFoundError:
+        error_msg = 'kubectl is not installed.'
+        log.exception(error_msg)
+        click.echo(error_msg)
+        sys.exit(1)
 
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:

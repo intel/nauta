@@ -28,14 +28,33 @@ from util.exceptions import KubectlConnectionError
 def test_verify_with_kubectl_connection_error(mocker):
     mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
-    check_connection_mock.side_effect = KubectlConnectionError
+    check_connection_mock.side_effect = KubectlConnectionError("Cannot connect to K8S cluster")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
 
     runner = CliRunner()
-    runner.invoke(verify.verify, [])
+    result = runner.invoke(verify.verify, [])
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
+
+    assert "Cannot connect to K8S cluster" in result.output, \
+        "Bad output. Connection error should be indicated in console output."
+
+
+def test_verify_with_kubectl_not_found_error(mocker):
+    mocker.patch("cli_state.verify_cli_config_path")
+    check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_connection_mock.side_effect = FileNotFoundError
+    check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+
+    runner = CliRunner()
+    result = runner.invoke(verify.verify, [])
+
+    assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_dependency_mock.call_count == 0, "dependency was checked"
+
+    assert "kubectl is not installed" in result.output, \
+        "Bad output. FileNotFoundError indicates that kubectl is not installed."
 
 
 def test_verify_with_kubectl_connection_success(mocker):
