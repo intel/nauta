@@ -30,7 +30,9 @@ logger = initialize_logger(__name__)
 HELP = "Command for starting, stopping, and managing training jobs."
 
 
-@click.group(short_help=HELP, cls=AliasGroup, alias='exp')
+@click.group(short_help=HELP, cls=AliasGroup, alias='exp',
+             help="To get further help on commands use COMMAND with -h or --help option.",
+             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def experiment():
     pass
 

@@ -64,3 +64,8 @@ class AliasGroup(click.Group):
         if helper:
             with formatter.section('Commands'):
                 formatter.write_dl(helper)
+
+    def collect_usage_pieces(self, ctx):
+        # Skip first element of usage pieces of this command. This will be "[OPTIONS]".
+        rv = super(AliasGroup, self).collect_usage_pieces(ctx)[1:]
+        return rv

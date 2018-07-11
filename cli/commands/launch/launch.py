@@ -39,7 +39,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace
 
 logger = initialize_logger('commands.launch')
 
-HELP = "Command for launching web user-interface or tensorboard"
+HELP = "Command for launching web user-interface or tensorboard."
 HELP_P = "Port on which service will be exposed locally."
 
 FORWARDED_URL = 'http://localhost:{}'
@@ -102,7 +102,9 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
                           app_name="tensorboard-"+tensorboard_id)
 
 
-@click.group(short_help=HELP, cls=AliasGroup, alias='l')
+@click.group(short_help=HELP, cls=AliasGroup, alias='l',
+             help="To get further help on commands use COMMAND with -h or --help option.",
+             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def launch():
     pass
 

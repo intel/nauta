@@ -66,7 +66,9 @@ def configure_cli_logs():
     setup_log_file(log_file_directory=log_file_directory, log_level=log_level, log_backup_count=log_retention)
 
 
-@click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup)
+@click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup,
+             help="To get further help on commands use COMMAND with -h or --help option.",
+             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def entry_point():
     configure_cli_logs()
 
