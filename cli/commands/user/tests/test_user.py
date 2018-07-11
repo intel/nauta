@@ -332,3 +332,17 @@ def test_create_user_with_defined_status_only(mocker, prepare_mocks):  # noqa: F
     assert f"User {test_username} is still not ready." in result.output
 
     check_asserts(prepare_mocks)
+
+
+def test_create_user_with_l_and_f(mocker, prepare_mocks):  # noqa: F811
+
+    runner = CliRunner()
+
+    m = mock_open()
+    with patch("builtins.open", m):
+        result = runner.invoke(create, [test_username, "-l", "-f", "test-filename"])
+
+    assert "Both -f/--filename and -l/--list_only options cannot be given." in result.output
+    assert result.exit_code == 1
+    check_asserts(prepare_mocks, cup_count=0, esc_count=0, gut_count=0, vun_count=0, icu_count=0,
+                  opj_count=0, gkh_count=0, iuc_count=0)

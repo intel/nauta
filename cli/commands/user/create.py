@@ -42,6 +42,9 @@ log = initialize_logger(__name__)
 
 HELP = "Command used to create a new user on the platform. Can only be " \
        "run by a platform administrator."
+HELP_L = "If given - content of the generated user's config file is displayed on the screen only."
+HELP_F = "Name of file where user's configuration will be stored. If not given configuration " \
+         "is stored in the config. file."
 
 ADD_USER_CHART_NAME = "dls4e-user"
 
@@ -81,8 +84,8 @@ DEFAULT_FILENAME = "{}.config"
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
 @click.argument('username', required=False)
-@click.option("-l", "--list_only", is_flag=True)
-@click.option("-f", "--filename")
+@click.option("-l", "--list_only", is_flag=True, help=HELP_L)
+@click.option("-f", "--filename", help=HELP_F)
 @common_options()
 @pass_state
 def create(state: State, username: str, list_only: bool, filename: str):
@@ -91,6 +94,11 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
     :param username: name of a new user
     """
+
+    if list_only and filename:
+        click.echo("Both -f/--filename and -l/--list_only options cannot be given. Please choose one of them.")
+        sys.exit(1)
+
     try:
         try:
             username = username if username else getpass.getuser()
