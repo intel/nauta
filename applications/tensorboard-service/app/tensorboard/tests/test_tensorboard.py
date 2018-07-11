@@ -26,8 +26,10 @@ from kubernetes.client import V1Deployment, V1ObjectMeta, V1beta1Ingress, V1Pod,
     V1beta1IngressRule, V1beta1HTTPIngressRuleValue, V1beta1HTTPIngressPath, V1PodStatus, V1beta1IngressBackend
 import pytest
 from pytest_mock import MockFixture
+import kubernetes
 
 from k8s.models import K8STensorboardInstance
+import tensorboard.tensorboard
 from tensorboard.tensorboard import TensorboardManager
 from tensorboard.models import TensorboardStatus
 
@@ -42,9 +44,24 @@ def tensorboard_manager_mocked() -> TensorboardManager:
     return mgr
 
 
+def test_incluster_init(mocker: MockFixture):
+    fake_namespace = 'some-namespace'
+    mocker.patch.object(tensorboard.tensorboard, 'config')
+    mocker.patch('builtins.open', new=lambda *args, **kwargs: mock.MagicMock(
+        __enter__=lambda *args, **kwargs: mock.MagicMock(
+            read=lambda: fake_namespace
+        )
+    )
+    )
+    mgr = TensorboardManager.incluster_init()
+
+    assert mgr.namespace == fake_namespace
+    assert mgr.client
+
+
 # noinspection PyShadowingNames
 def test_create(tensorboard_manager_mocked: TensorboardManager):
-    tensorboard_manager_mocked.create("fake-run")
+    tensorboard_manager_mocked.create(["fake-run"])
 
     tensorboard_manager_mocked.client.create_deployment.assert_called_once_with(namespace=FAKE_NAMESPACE,
                                                                                 body=mock.ANY)

@@ -44,6 +44,7 @@ class K8SAPIClient:
         self.apps_api_client = client.AppsV1Api()
         self.extensions_v1beta1_api_client = client.ExtensionsV1beta1Api()
         self.v1_api_client = client.CoreV1Api()
+        self.custom_objects_client = client.CustomObjectsApi()
 
     def create_deployment(self, namespace: str, body: V1Deployment, **kwargs):
         self.apps_api_client.create_namespaced_deployment(namespace=namespace, body=body, **kwargs)

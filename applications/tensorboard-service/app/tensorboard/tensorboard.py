@@ -51,10 +51,10 @@ class TensorboardManager:
     def _get_current_datetime() -> datetime:
         return datetime.now(timezone.utc)
 
-    def create(self, run_name: str) -> Tensorboard:
+    def create(self, run_names: List[str]) -> Tensorboard:
         new_tensorboard = Tensorboard(id=str(uuid4()))
 
-        k8s_tensorboard_model = k8s.models.K8STensorboardInstance.from_run_name(run_names_list=[run_name],
+        k8s_tensorboard_model = k8s.models.K8STensorboardInstance.from_run_name(run_names_list=run_names,
                                                                                 id=new_tensorboard.id)
 
         self.client.create_deployment(namespace=self.namespace, body=k8s_tensorboard_model.deployment)
@@ -105,11 +105,10 @@ class TensorboardManager:
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
     def get_by_run_names(self, run_names: List[str]) -> Optional[Tensorboard]:
-        run_names.sort()
-        run_names_str = ",".join(run_names)
+        run_names_hash = k8s.models.K8STensorboardInstance.generate_run_names_hash(run_names)
 
         deployments = self.client.list_deployments(namespace=self.namespace,
-                                                   label_selector=f'run-names={run_names_str}')
+                                                   label_selector=f'run-names-hash={run_names_hash}')
 
         if len(deployments) == 0:
             return None

@@ -19,12 +19,17 @@
 # and approved by Intel in writing.
 #
 
-from typing import List
+from hashlib import sha1
+import os
+from typing import Dict, List
 
 from kubernetes import client as k8s
 
 
 class K8STensorboardInstance:
+    EXPERIMENTS_OUTPUT_VOLUME_NAME = 'output-home'
+    TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX = '/mnt/exp'
+
     def __init__(self, deployment: k8s.V1Deployment, service: k8s.V1Service, ingress: k8s.V1beta1Ingress,
                  pod: k8s.V1Pod = None):
         self.deployment = deployment
@@ -32,44 +37,50 @@ class K8STensorboardInstance:
         self.ingress = ingress
         self.pod = pod
 
+    @staticmethod
+    def generate_run_names_hash(run_names: List[str]) -> str:
+        run_names.sort()
+        run_names_str = ",".join(run_names)
+        run_names_hash = sha1(run_names_str.encode('utf-8')).hexdigest()
+        return run_names_hash
+
     @classmethod
     def from_run_name(cls, id: str, run_names_list: List[str]):
         k8s_name = 'tensorboard-' + id
-        run_names_list.sort()
-        run_names = ",".join(run_names_list)
+        run_names_hash = K8STensorboardInstance.generate_run_names_hash(run_names_list)
+
+        volume_mounts = []
+
+        for run_name in run_names_list:
+            mount = k8s.V1VolumeMount(
+                name=cls.EXPERIMENTS_OUTPUT_VOLUME_NAME,
+                mount_path=os.path.join(cls.TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX, run_name),
+                sub_path=run_name
+            )
+            volume_mounts.append(mount)
+
+        deployment_labels = {
+            'name': k8s_name,
+            'type': 'dls4e-tensorboard',
+            'dls4e_app_name': 'tensorboard',
+            'id': id,
+            'run-names-hash': run_names_hash
+        }
 
         deployment = k8s.V1Deployment(api_version='apps/v1',
                                       kind='Deployment',
                                       metadata=k8s.V1ObjectMeta(
                                           name=k8s_name,
-                                          labels={
-                                              'name': k8s_name,
-                                              'type': 'dls4e-tensorboard',
-                                              'dls4e_app_name': 'tensorboard',
-                                              'run-names': run_names,
-                                              'id': id
-                                          }
+                                          labels=deployment_labels
                                       ),
                                       spec=k8s.V1DeploymentSpec(
                                           replicas=1,
                                           selector=k8s.V1LabelSelector(
-                                              match_labels={
-                                                  'name': k8s_name,
-                                                  'type': 'dls4e-tensorboard',
-                                                  'dls4e_app_name': 'tensorboard',
-                                                  'run-names': run_names,
-                                                  'id': id
-                                              }
+                                              match_labels=deployment_labels
                                           ),
                                           template=k8s.V1PodTemplateSpec(
                                               metadata=k8s.V1ObjectMeta(
-                                                  labels={
-                                                      'name': k8s_name,
-                                                      'type': 'dls4e-tensorboard',
-                                                      'dls4e_app_name': 'tensorboard',
-                                                      'run-names': run_names,
-                                                      'id': id
-                                                  }
+                                                  labels=deployment_labels
                                               ),
                                               spec=k8s.V1PodSpec(
                                                   containers=[
@@ -81,13 +92,7 @@ class K8STensorboardInstance:
                                                                    "--port", "80",
                                                                    "--host", "0.0.0.0"
                                                                    ],
-                                                          volume_mounts=[
-                                                              k8s.V1VolumeMount(
-                                                                  name='output-home',
-                                                                  mount_path='/mnt/exp',
-                                                                  sub_path=run_names_list[0]
-                                                              )
-                                                          ],
+                                                          volume_mounts=volume_mounts,
                                                           ports=[
                                                               k8s.V1ContainerPort(
                                                                   container_port=80
@@ -98,7 +103,7 @@ class K8STensorboardInstance:
                                                   volumes=[
                                                       k8s.V1Volume(
                                                           name='output-home',
-                                                          persistent_volume_claim= # noqa
+                                                          persistent_volume_claim=  # noqa
                                                           k8s.V1PersistentVolumeClaimVolumeSource(
                                                               claim_name='output-home',
                                                               read_only=True

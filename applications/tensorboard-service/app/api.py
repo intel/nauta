@@ -49,7 +49,7 @@ def create(run_name: str):
     if current_tensorboard_instance:
         return json.dumps(current_tensorboard_instance.to_dict()), HTTPStatus.CONFLICT
 
-    tensorboard = tensb_mgr.create(run_name)
+    tensorboard = tensb_mgr.create([run_name])
 
     response = tensorboard.to_dict()
 
@@ -70,20 +70,14 @@ def create_v2():
     if len(run_names) < 1:
         return _generate_error_response(HTTPStatus.BAD_REQUEST, 'at least 1 run name is needed!')
 
-    # TODO: remove when CAN-630 is done
-    if len(run_names) > 1:
-        return _generate_error_response(HTTPStatus.NOT_IMPLEMENTED, 'many experiments not implemented yet!')
-
-    run_name = run_names[0]
-
     tensb_mgr = TensorboardManager.incluster_init()
 
-    current_tensorboard_instance = tensb_mgr.get_by_run_names([run_name])
+    current_tensorboard_instance = tensb_mgr.get_by_run_names(run_names)
 
     if current_tensorboard_instance:
         return json.dumps(current_tensorboard_instance.to_dict()), HTTPStatus.CONFLICT
 
-    tensorboard = tensb_mgr.create(run_name)
+    tensorboard = tensb_mgr.create(run_names)
 
     return json.dumps(tensorboard.to_dict()), HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
 
@@ -98,7 +92,3 @@ def get_v2(id: str):
         return _generate_error_response(HTTPStatus.NOT_FOUND, 'Tensorboard instance with provided id does not exist.')
 
     return json.dumps(current_tensorboard_instance.to_dict()), {'Content-Type': 'application/json'}
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)

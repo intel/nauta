@@ -19,11 +19,23 @@
 # and approved by Intel in writing.
 #
 
+
+from typing import List
+
 from k8s.models import K8STensorboardInstance
+from kubernetes import client as kube_models
 
 
 def test_generate_tensorboard_deployment():
+    fake_run_names_list = ["some-run-3", "some-run-2", "some-run-1"]
     model_instance = K8STensorboardInstance.from_run_name(id='a7db5449-6168-4010-9ce6-cbaefbbfa4a1',
-                                                          run_names_list=["some-run"])
+                                                          run_names_list=fake_run_names_list)
 
     assert model_instance.deployment.metadata.name == "tensorboard-a7db5449-6168-4010-9ce6-cbaefbbfa4a1"
+
+    volume_mounts: List[kube_models.V1VolumeMount] = model_instance.deployment.spec.template.spec.containers[0].volume_mounts
+
+    assert len(volume_mounts) == len(fake_run_names_list)
+
+    for mount in volume_mounts:
+        mount.mount_path == '/mnt/exp/'
