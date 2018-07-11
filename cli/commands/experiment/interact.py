@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 import click
+from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
 from commands.experiment.submit import HELP_P
@@ -32,7 +33,7 @@ from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
-from commands.experiment.common import submit_experiment
+from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS
 from util.exceptions import SubmitExperimentError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
@@ -92,10 +93,16 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             exp_name = name
             if not name and not filename:
                 exp_name = generate_name('jup')
+            click.echo("Submitting interactive experiment.")
             runs = submit_experiment(script_location=filename, script_folder_location=None,
                                      template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
-                                     name=exp_name, parameter_range=[], parameter_set=[], script_parameters=[],
+                                     name=exp_name, parameter_range=[], parameter_set=(), script_parameters=(),
                                      pack_params=pack_param)
+            click.echo(tabulate({RUN_NAME: [run.name for run in runs],
+                                 RUN_PARAMETERS: [run.formatted_parameters() for run in runs],
+                                 RUN_STATUS: [run.formatted_status() for run in runs],
+                                 RUN_MESSAGE: [run.error_message for run in runs]},
+                                headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
             if runs:
                 name = runs[0].name
             else:
