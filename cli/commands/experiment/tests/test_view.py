@@ -20,6 +20,9 @@
 #
 
 from click.testing import CliRunner
+import pytest
+from unittest.mock import MagicMock
+from kubernetes.client import V1Pod
 
 from commands.experiment import view
 from platform_resources.run_model import Run, RunStatus
@@ -35,7 +38,7 @@ TEST_RUNS = [
         metrics={'any metrics': 'a'},
         experiment_name='experiment_name',
         pod_count=1,
-        pod_selector=""),
+        pod_selector={}),
     Run(
         name='test-experiment-2',
         parameters=['a 1', 'b 2'],
@@ -46,155 +49,97 @@ TEST_RUNS = [
         metrics={'any metrics': 'a'},
         experiment_name='experiment_name',
         pod_count=1,
-        pod_selector="")
+        pod_selector={})
 ]
 
-
-class obj(object):
-    def __init__(self, d):
-        for a, b in d.items():
-            if isinstance(b, (list, tuple)):
-                setattr(self, a,
-                        [obj(x) if isinstance(x, dict) else x for x in b])
-            else:
-                setattr(self, a, obj(b) if isinstance(b, dict) else b)
+TEST_PODS = [MagicMock(spec=V1Pod)]
 
 
-pod_list = {
-    "items": [{
-        "metadata": {
-            "name": "mocked_name",
-            "uid": "mocked_uid"
-        },
-        "spec": {
-            "containers": []
-        },
-        "status": {
-            "conditions": [],
-            "container_statuses": []
-        }
-    }]
-}
+class ViewMocks:
+    def __init__(self, mocker):
+        self.get_run = mocker.patch('commands.experiment.view.runs_api.get_run')
+        self.get_run.return_value = TEST_RUNS[0]
+        self.get_pods = mocker.patch('commands.experiment.view.get_pods')
+        self.get_pods.return_value = TEST_PODS
+        self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
 
 
-class KubernetesClientListPodsMock():
-    def list_pod_for_all_namespaces(*args, **kwargs):
-        return obj(pod_list)
+@pytest.fixture
+def prepare_mocks(mocker) -> ViewMocks:
+    return ViewMocks(mocker=mocker)
 
 
-class KubernetesClientEmptyListPodsMock():
-    def list_pod_for_all_namespaces(*args, **kwargs):
-        return obj({"items": []})
-
-
-def test_view_experiment_success(mocker):
-    api_list_experiments_mock = mocker.patch(
-        "commands.experiment.view.runs_api.list_runs")
-    api_list_experiments_mock.return_value = TEST_RUNS
-
-    mocker.patch(
-        "commands.experiment.view.get_kubectl_current_context_namespace")
-
-    kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
-    kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
-
-    kubernetes_config_mock = mocker.patch("kubernetes.config.load_kube_config")
-    kubernetes_config_mock.return_value = None
-
+def test_view_experiment_success(prepare_mocks: ViewMocks):
     runner = CliRunner()
-    result = runner.invoke(view.view, [TEST_RUNS[0].name])
+    result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
 
-    assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
-    assert kubernetes_client_mock.call_count == 1, "Kubernetes client not called"
+    assert prepare_mocks.get_run.call_count == 1, "Run was not retrieved"
 
     assert TEST_RUNS[0].name in result.output, "Bad output."
     assert TEST_RUNS[0].submitter in result.output, "Bad output."
-    assert TEST_RUNS[
-        0].creation_timestamp in result.output, "Bad output."
+    assert TEST_RUNS[0].creation_timestamp in result.output, "Bad output."
 
     assert result.exit_code == 0
 
 
-def test_view_experiments_not_found(mocker):
-    api_list_experiments_mock = mocker.patch(
-        "commands.experiment.view.runs_api.list_runs")
-    api_list_experiments_mock.return_value = []
-
-    sys_exit_mock = mocker.patch("sys.exit")
-
-    mocker.patch(
-        "commands.experiment.view.get_kubectl_current_context_namespace")
-
-    kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
-    kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
-
-    kubernetes_config_mock = mocker.patch("kubernetes.config.load_kube_config")
-    kubernetes_config_mock.return_value = None
-
+def test_view_experiments_not_found(prepare_mocks: ViewMocks):
+    prepare_mocks.get_run.return_value = None
     runner = CliRunner()
     result = runner.invoke(view.view, ["missing"])
 
-    assert api_list_experiments_mock.call_count == 1, "Experiments retrieval was not called"
-    assert sys_exit_mock.called_once_with(1)
+    assert prepare_mocks.get_run.call_count == 1, "Run retrieval was not called"
+    assert result.exit_code == 2
     assert "Experiment \"missing\" not found" in result.output, "Bad output."
-    assert result.exit_code == 0
 
 
-def test_view_experiments_no_argument(mocker):
-    api_list_experiments_mock = mocker.patch(
-        "commands.experiment.view.runs_api.list_runs")
-    api_list_experiments_mock.return_value = []
-
-    mocker.patch(
-        "commands.experiment.view.get_kubectl_current_context_namespace")
-
-    kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
-    kubernetes_client_mock.return_value = KubernetesClientListPodsMock()
-
-    kubernetes_config_mock = mocker.patch("kubernetes.config.load_kube_config")
-    kubernetes_config_mock.return_value = None
-
+def test_view_experiments_no_argument(prepare_mocks: ViewMocks):
     runner = CliRunner()
     result = runner.invoke(view.view, [])  # missing argument
 
-    assert api_list_experiments_mock.call_count == 0, "Experiments retrieval was not called"
+    assert prepare_mocks.get_run.call_count == 0, "Experiments retrieval was not called"
     assert "Usage:" in result.output, "Bad output."
 
 
-def test_view_experiment_failure(mocker):
-    api_list_experiments_mock = mocker.patch(
-        "commands.experiment.view.runs_api.list_runs")
-    api_list_experiments_mock.side_effect = RuntimeError
-
-    mocker.patch(
-        "commands.experiment.view.get_kubectl_current_context_namespace")
-
-    sys_exit_mock = mocker.patch("sys.exit")
-
+def test_view_experiment_failure(prepare_mocks: ViewMocks):
+    prepare_mocks.get_run.side_effect = RuntimeError
     runner = CliRunner()
-    runner.invoke(view.view, ["missing"])
+    result = runner.invoke(view.view, ["missing"])
 
-    assert api_list_experiments_mock.call_count == 1, "Experiments retrieval was not called"
-    assert sys_exit_mock.called_once_with(1)
+    assert prepare_mocks.get_run.call_count == 1, "Experiments retrieval was not called"
+    assert result.exit_code == 1
 
 
-def test_view_experiment_no_pods(mocker):
-    api_list_experiments_mock = mocker.patch(
-        "commands.experiment.view.runs_api.list_runs")
-    api_list_experiments_mock.return_value = TEST_RUNS
-
-    mocker.patch(
-        "commands.experiment.view.get_kubectl_current_context_namespace")
-
-    kubernetes_client_mock = mocker.patch("kubernetes.client.CoreV1Api")
-    kubernetes_client_mock.return_value = KubernetesClientEmptyListPodsMock()
-
-    kubernetes_config_mock = mocker.patch("kubernetes.config.load_kube_config")
-    kubernetes_config_mock.return_value = None
-
+def test_view_experiment_no_pods(prepare_mocks: ViewMocks):
+    prepare_mocks.get_pods.return_value = []
     runner = CliRunner()
     result = runner.invoke(view.view, [TEST_RUNS[0].name])
 
-    assert api_list_experiments_mock.call_count == 1, "Experiments were not retrieved"
-    assert kubernetes_client_mock.call_count == 1, "Kubernetes client not called"
+    assert prepare_mocks.get_run.call_count == 1, "Experiments were not retrieved"
     assert "At this moment there are no pods connected with this experiment." in result.output, "Bad output."
+
+
+def test_container_volume_mounts_to_msg():
+    volume_mount = MagicMock()
+    volume_mount.name = 'mount_name'
+    volume_mount.mount_path = 'mount_path'
+    volume_mounts = [volume_mount]
+
+    msg = view.container_volume_mounts_to_msg(volume_mounts=volume_mounts)
+
+    assert f'{volume_mount.name} @ {volume_mount.mount_path}' in msg
+
+
+def test_container_resources_to_msg():
+    resources = MagicMock()
+    resources.requests = {'cpu': 1.0, 'mem': '1Gi'}
+    resources.limits = {'cpu': 4.0, 'mem': '2gi'}
+
+    msg = view.container_resources_to_msg(resources=resources)
+
+    assert '- Requests:' in msg
+    assert f'cpu: {resources.requests["cpu"]}' in msg
+    assert f'mem: {resources.requests["mem"]}' in msg
+
+    assert '- Limits:' in msg
+    assert f'cpu: {resources.limits["cpu"]}' in msg
+    assert f'mem: {resources.limits["mem"]}' in msg

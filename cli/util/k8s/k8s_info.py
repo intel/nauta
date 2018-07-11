@@ -103,6 +103,22 @@ def check_pods_status(run_name: str, namespace: str, status: PodStatus, app_name
     return True
 
 
+def get_pods(label_selector: str) -> List[client.V1Pod]:
+    logger.debug(f'Getting pods with label selector: {label_selector}')
+    api = get_k8s_api()
+
+    pods = []
+    try:
+        pods_response = api.list_pod_for_all_namespaces(watch=False, label_selector=label_selector)
+        pods = pods_response.items
+    except ApiException as e:
+        logger.exception(f'Failed to find pods with label selector: {label_selector}')
+        if e.status != 404:
+            raise
+
+    return pods
+
+
 def get_app_services(dls4e_app_name: str = None, namespace: str = None,
                      app_name: str = None) -> List[client.V1Service]:
     api = get_k8s_api()

@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+from unittest.mock import MagicMock
+
 import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
                                      V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
@@ -27,8 +29,7 @@ from kubernetes.client.rest import ApiException
 
 from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, get_app_namespace, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
-                              get_cluster_roles, is_current_user_administrator, check_pods_status, \
-                              PodStatus
+                              check_pods_status, PodStatus, get_cluster_roles, is_current_user_administrator, get_pods
 from util.config import DLS4EConfigMap
 
 test_namespace = "test_namespace"
@@ -85,18 +86,6 @@ def mocked_k8s_config(mocker):
     conf_instance.host = 'https://127.0.0.1:8080'
 
 
-class K8SPodsListMock(object):
-
-    def __init__(self, items):
-        self.items = items
-
-
-class K8SServicesListMock(object):
-
-    def __init__(self, items):
-        self.items = items
-
-
 def test_config_map_data():
     return {DLS4EConfigMap.EXTERNAL_IP_FIELD: TEST_EXTERNAL_IP,
             DLS4EConfigMap.IMAGE_TILLER_FIELD: TEST_IMAGE_TILLER}
@@ -112,8 +101,14 @@ def mocked_k8s_CoreV1Api(mocker):
     mocked_coreV1Api_class = mocker.patch('kubernetes.client.CoreV1Api')
     mocker.patch('kubernetes.client.ApiClient')
     coreV1API_instance = mocked_coreV1Api_class.return_value
-    coreV1API_instance.list_pod_for_all_namespaces.return_value = K8SPodsListMock([1, 2, 3])
-    coreV1API_instance.list_service_for_all_namespaces.return_value = K8SServicesListMock([4, 5, 6])
+
+    pods_mock = MagicMock()
+    pods_mock.items = [MagicMock(spec=V1Pod), MagicMock(spec=V1Pod), MagicMock(spec=V1Pod)]
+    coreV1API_instance.list_pod_for_all_namespaces.return_value = pods_mock
+
+    services_mock = MagicMock()
+    services_mock.items = [MagicMock(spec=V1Service), MagicMock(spec=V1Service), MagicMock(spec=V1Service)]
+    coreV1API_instance.list_service_for_all_namespaces.return_value = services_mock
 
     v1_namespace = V1Namespace()
     v1_metadata_namespace = V1ObjectMeta(name=test_namespace)
@@ -178,7 +173,7 @@ def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
     app_name = 'test-app'
     services = get_app_services(app_name)
 
-    assert services == [4, 5, 6]
+    assert services
 
 
 def test_get_app_namespace(mocker):
@@ -220,6 +215,23 @@ def test_get_users_token(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     token = get_users_token(test_namespace)
 
     assert token == TEST_TOKEN_ENCODED
+
+
+def test_get_pods(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    pods = get_pods(label_selector='')
+    assert pods
+
+
+def test_get_pods_not_found(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.list_pod_for_all_namespaces.side_effect = ApiException(status=404)
+    pods = get_pods(label_selector='')
+    assert pods == []
+
+
+def test_get_pods_error(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.list_pod_for_all_namespaces.side_effect = ApiException(status=500)
+    with pytest.raises(ApiException):
+        get_pods(label_selector='')
 
 
 def test_get_cluster_roles(mocked_k8s_config, mocked_k8s_RbacAuthorizationV1Api):

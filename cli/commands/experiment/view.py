@@ -23,21 +23,30 @@ import sys
 
 from tabulate import tabulate
 import click
-from kubernetes import client, config
 
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods
 from util.logger import initialize_logger
 import platform_resources.runs as runs_api
 
 
-HELP = "Displays details of experiment with a given name."
-HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
 logger = initialize_logger(__name__)
 
+HELP = "Displays details of experiment with a given name."
+HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
 
-def container_status_to_msg(state):
+CONTAINER_DETAILS = '''
+- Name: {name}
+   - Status: {status}
+   - Volumes:
+       {volumes}
+   - Resources:
+{resources}
+'''
+
+
+def container_status_to_msg(state) -> str:
     if state.running is not None:
         return "Running, " + str(state.running)
     if state.terminated is not None:
@@ -46,24 +55,27 @@ def container_status_to_msg(state):
         return "Waiting, " + str(state.waiting)
 
 
-def container_volume_mounts_to_msg(volume_mounts):
-    ret = "\n"
-    for mount in volume_mounts:
-        ret += "       " + mount.name + " @ " + mount.mount_path + "\n"
-    return ret[:-1]
+def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
+    indent = ' ' * spaces
+    return indent.join([f'{mount.name} @ {mount.mount_path}\n' for mount in volume_mounts]) if volume_mounts else ''
 
 
-def container_resources_to_msg(resources):
-    ret = "\n"
-    if resources.requests is not None:
-        ret += "    - Requests:\n"
-        for k, v in resources.requests.items():
-            ret += "       " + k + ": " + str(v) + "\n"
-    if resources.limits is not None:
-        ret = ret[:-1] + "\n    - Limits:\n"
-        for k, v in resources.limits.items():
-            ret += "      " + k + ": " + str(v) + "\n"
-    return ret[:-1]
+def container_resources_to_msg(resources, spaces=9) -> str:
+    msg = ''
+    header_indent = ' ' * (spaces - 4)
+    indent = ' ' * spaces
+    if resources.requests:
+        msg += header_indent
+        msg += '- Requests:\n{}'.format(indent)
+        msg += indent.join([f'{request_name}: {request_value}\n' for request_name, request_value
+                            in resources.requests.items()])
+    if resources.limits:
+        msg += header_indent
+        msg += '- Limits:\n{}'.format(indent)
+        msg += indent.join([f'{limit_name}: {limit_value}\n' for limit_name, limit_value
+                            in resources.limits.items()])
+
+    return msg
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='v')
@@ -77,14 +89,12 @@ def view(state: State, experiment_name: str, tensorboard: bool):
     """
     try:
         namespace = get_kubectl_current_context_namespace()
-        runs = runs_api.list_runs(name_filter=experiment_name,
-                                  namespace=namespace)
-
-        if not runs:
+        run = runs_api.get_run(name=experiment_name,
+                               namespace=namespace)
+        if not run:
             click.echo(f"Experiment \"{experiment_name}\" not found.")
             sys.exit(2)
 
-        run = runs[0]
         click.echo(
             tabulate(
                 [run.cli_representation],
@@ -96,37 +106,37 @@ def view(state: State, experiment_name: str, tensorboard: bool):
 
         click.echo("\nPods participating in the execution:\n")
 
-        config.load_kube_config()
-        v1 = client.CoreV1Api()
-        ret = v1.list_pod_for_all_namespaces(
-            watch=False, label_selector="runName=" + experiment_name)
-        containers_details = {}
+        pods = get_pods(label_selector="runName=" + experiment_name)
+
         tabular_output = []
-        for i in ret.items:
+
+        for pod in pods:
             status_string = ""
-            for cond in i.status.conditions:
-                msg = "" if cond.reason is None else ", reason: " + cond.reason
+            for cond in pod.status.conditions:
+                msg = "" if not cond.reason else ", reason: " + cond.reason
                 status_string = "     " + cond.type + ": " + cond.status + msg
-            for container in i.spec.containers:
-                containers_details[container.name] = {
-                    "container_spec": container,
-                    "status": None
-                }
-            for st in i.status.container_statuses:
-                containers_details[st.name]["status"] = st
-            container_details = ""
-            for c_k, c_v in containers_details.items():
-                container_details += f"- Name: {c_k}\n   - Status: " + container_status_to_msg(
-                    c_v["status"].state
-                ) + "\n   - Volumes: " + container_volume_mounts_to_msg(
-                    c_v["container_spec"].volume_mounts
-                ) + "\n   - Resources: " + container_resources_to_msg(
-                    c_v["container_spec"].resources) + "\n\n"
+
+            container_statuses = {}
+            for container_status in pod.status.container_statuses:
+                container_statuses[container_status.name] = container_status.state
+
+            container_details = []
+            for container in pod.spec.containers:
+                container_description = CONTAINER_DETAILS.format(name=container.name,
+                                                                 status=container_status_to_msg(
+                                                                     container_statuses[container.name]),
+                                                                 volumes=container_volume_mounts_to_msg(
+                                                                     container.volume_mounts),
+                                                                 resources=container_resources_to_msg(
+                                                                     container.resources))
+                container_details.append(container_description)
+
+            container_details = ''.join(container_details)
             tabular_output.append([
-                i.metadata.name, i.metadata.uid, status_string,
+                pod.metadata.name, pod.metadata.uid, status_string,
                 container_details
             ])
-        if ret.items:
+        if pods:
             click.echo(
                 tabulate(
                     tabular_output,

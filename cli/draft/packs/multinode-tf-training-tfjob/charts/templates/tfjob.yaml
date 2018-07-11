@@ -140,7 +140,7 @@ spec:
               securityContext:
                 privileged: true
               resources:
-    {{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.resources | indent 16 }}
           volumes:
             - name: input-home
               persistentVolumeClaim:

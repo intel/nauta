@@ -22,7 +22,7 @@
 from functools import partial
 import re
 import sre_constants
-from typing import List, Dict
+from typing import Dict, List, Optional
 
 from kubernetes import config, client
 from kubernetes.client.rest import ApiException
@@ -40,6 +40,34 @@ logger = initialize_logger(__name__)
 API_GROUP_NAME = 'aggregator.aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
+
+
+def get_run(name: str, namespace: str = None) -> Optional[Run]:
+    """
+    Return Run of given name. If Run is not found, function returns None.
+    :param namespace: If provided, only experiments from this namespace will be returned
+    :return: Experiment object or None
+    """
+    logger.debug(f'Getting run {name}.')
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+    try:
+        if namespace:
+            raw_run = api.get_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace,
+                                                              plural=RUN_PLURAL, version=RUN_VERSION,
+                                                              name=name)
+        else:
+            raw_run = api.get_cluster_custom_object(group=API_GROUP_NAME, plural=RUN_PLURAL,
+                                                           version=RUN_VERSION, name=name)
+    except ApiException as e:
+        logger.exception(f'Failed to find run {name}.')
+        if e.status == 404:
+            raw_run = None
+        else:
+            raise
+
+    return Run.from_k8s_response_dict(raw_run) if raw_run else None
 
 
 def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None, exp_name_filter: str = None,

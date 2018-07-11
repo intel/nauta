@@ -25,7 +25,7 @@ from kubernetes.client import CustomObjectsApi
 from kubernetes.client.rest import ApiException
 
 from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs, update_run
+from platform_resources.runs import list_runs, update_run, get_run
 from util.exceptions import InvalidRegularExpressionError
 
 
@@ -121,6 +121,22 @@ LIST_RUNS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'items': [
                                                           'selfLink': '/apis/aipg.intel.com/v1/runs'}}
 
 
+NAMESPACE = 'test-env'
+RUN_NAME = 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training'
+GET_RUN_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Run',
+     'metadata': {'clusterName': '', 'creationTimestamp': '2018-05-17T14:06:03Z', 'generation': 1,
+                  'name': 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training', 'namespace': 'mciesiel-dev',
+                  'resourceVersion': '436010',
+                  'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-dev/runs/'
+                              'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
+                  'uid': '6f13b47c-59db-11e8-b5db-527100001250'},
+     'spec': {'experiment-name': 'experiment-name-will-be-added-soon', 'metrics': {'accuracy': 52.322},
+              'name': 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
+              'parameters': ['mnist_single_node.py', '--data_dir', '/app'], 'pod-count': 1, 'pod-selector': {
+             'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
+                             'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}}, 'state': 'COMPLETE'}}
+
+
 def test_update_run_success(mock_k8s_api_client):
     mock_k8s_api_client.patch_namespaced_custom_object.return_value = LIST_RUNS_RESPONSE_RAW['items'][0]
 
@@ -133,3 +149,27 @@ def test_update_run_failure(mock_k8s_api_client):
 
     with pytest.raises(RuntimeError):
         update_run(TEST_RUNS[0], "namespace-1")
+
+
+def test_get_run(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.return_value = GET_RUN_RESPONSE_RAW
+    run = get_run(name=RUN_NAME)
+    assert run is not None and type(run) is Run
+
+
+def test_get_run_from_namespace(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
+    run = get_run(name=RUN_NAME, namespace=NAMESPACE)
+    assert run is not None and type(run) is Run
+
+
+def test_get_run_not_found(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=404)
+    run = get_run(name=RUN_NAME)
+    assert run is None
+
+
+def test_get_run_failure(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=500)
+    with pytest.raises(ApiException):
+        get_run(name=RUN_NAME)
