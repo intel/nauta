@@ -19,16 +19,19 @@
 # and approved by Intel in writing.
 #
 
+from http import HTTPStatus
 import logging
 import os
 
 from kubernetes import config, client
+from kubernetes.client.rest import ApiException
 
 
 API_GROUP_NAME = 'aggregator.aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
+MAX_RETRIES_COUNT = 5
 
 logger = logging.getLogger()
 
@@ -56,6 +59,13 @@ def publish(metrics):
     config.load_incluster_config()
     api = client.CustomObjectsApi(client.ApiClient())
 
-    raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body=body,
-                                                 plural=RUN_PLURAL, version=RUN_VERSION, name=name)
-    logger.info('Run patch response : {}'.format(raw_run))
+    for i in range(MAX_RETRIES_COUNT):
+        try:
+            raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace,
+                                                         body=body, plural=RUN_PLURAL, version=RUN_VERSION, name=name)
+            logger.info('Run patch response : {}'.format(raw_run))
+            break
+        except ApiException as e:
+            if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
+                logger.exception("Exception during storing metrics.")
+                raise e

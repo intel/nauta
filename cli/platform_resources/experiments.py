@@ -25,6 +25,7 @@ import re
 import sre_constants
 import time
 from pathlib import Path
+import random
 
 from kubernetes import config, client
 from kubernetes.client.rest import ApiException
@@ -197,7 +198,8 @@ def generate_name(name: str) -> str:
     formatter = re.compile(r'[^a-z0-9-]')
     normalized_script_name = name.lower().replace('_', '-').replace('.', '-')[:10]
     formatted_name = formatter.sub('', normalized_script_name)
-    return f'{formatted_name}-{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
+    return f'{formatted_name}-{str(random.randrange(1,999)).zfill(3)}-' \
+           f'{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
 
 
 def prepare_label(script_name, calculated_name: str, name: str=None) -> Dict[str, str]:
