@@ -44,6 +44,7 @@ HELP = "Launches a local browser with Jupyter Notebook. If the script name argum
        "is given, then script is put into the opened notebook."
 HELP_N = "The name of this Jupyter Notebook session."
 HELP_F = "File with a notebook that should be opened in Jupyter notebook."
+HELP_PO = "Port on which service will be exposed locally."
 
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
 JUPYTER_CHECK_POD_READY_TRIES = 60
@@ -55,9 +56,12 @@ log = initialize_logger(__name__)
 @click.option('-n', '--name', default=None, help=HELP_N, callback=validate_experiment_name)
 @click.option('-f', '--filename', default=None, help=HELP_F)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
+@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
+                                                'only proxy tunnel is created')
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_PO)
 @common_options()
 @pass_state
-def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]]):
+def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool, port: int):
     """
     Starts an interactive session with Jupyter Notebook.
     """
@@ -147,5 +151,5 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                    "interact command another time passing a name of a current Jupyter notebook session")
         sys.exit(1)
 
-    launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=False, number_of_retries=number_of_retries,
-               url_end=url_end)
+    launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
+               number_of_retries=number_of_retries, url_end=url_end, port=port)

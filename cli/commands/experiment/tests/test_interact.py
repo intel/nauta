@@ -24,6 +24,7 @@ import pytest
 
 from platform_resources.experiment_model import Experiment, ExperimentStatus
 from commands.experiment import interact
+from util.exceptions import SubmitExperimentError
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -138,3 +139,21 @@ def test_interact_pods_not_created(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="y")
 
     assert "Jupyter notebook is still not ready. Please try to connect" in result.output
+
+
+def test_interact_error_when_submitting(prepare_mocks: InteractMocks):
+
+    prepare_mocks.submit_experiment.side_effect = SubmitExperimentError("error")
+    result = CliRunner().invoke(interact.interact)
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
+                  launch_app_count=0)
+    assert "Error during starting jupyter notebook session:" in result.output
+
+
+def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
+
+    prepare_mocks.submit_experiment.side_effect = RuntimeError("error")
+    result = CliRunner().invoke(interact.interact)
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
+                  launch_app_count=0)
+    assert "Other error during starting jupyter notebook session." in result.output
