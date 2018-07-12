@@ -33,6 +33,7 @@ from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
 from commands.experiment.common import validate_experiment_name
+from platform_resources.run_model import RunStatus
 
 log = initialize_logger('commands.submit')
 
@@ -122,3 +123,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                          RUN_STATUS: [run.formatted_status() for run in runs_list],
                          RUN_MESSAGE: [run.error_message for run in runs_list]},
                         headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
+
+    # if there is at least one FAILED experiment - application has to return exit code != 0
+    if any(run.status == RunStatus.FAILED for run in runs_list):
+        log.error("There are failed runs.")
+        sys.exit(1)

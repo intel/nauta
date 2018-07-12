@@ -35,6 +35,12 @@ SCRIPT_FOLDER = "/a/b/c"
 SUBMITTED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
                                  status=RunStatus.QUEUED)]
 
+FAILED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                              status=RunStatus.QUEUED),
+               RunDescription(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
+                              status=RunStatus.FAILED)
+               ]
+
 
 class SubmitMocks:
     def __init__(self, mocker):
@@ -159,3 +165,15 @@ def test_get_default_script_location(prepare_mocks: SubmitMocks):
     test_dir = '/bla'
 
     assert get_default_script_location(test_dir) == os.path.join(test_dir, DEFAULT_SCRIPT_NAME)
+
+
+def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
+    prepare_mocks.submit_experiment.return_value = FAILED_RUNS
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
+
+    assert FAILED_RUNS[0].name in result.output
+    assert FAILED_RUNS[0].status.value in result.output
+    assert FAILED_RUNS[1].name in result.output
+    assert FAILED_RUNS[1].status.value in result.output
+
+    assert result.exit_code == 1
