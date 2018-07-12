@@ -25,7 +25,7 @@
       <h1>YOU ARE SIGNED OUT.</h1>
     </v-flex>
     <v-flex xs12>
-      <h3>To sign in, run <i>dlsctl launch webui</i> command again.</h3>
+      <h3>To sign in, please return to the CLI and run the <i>dlsctl launch webui</i> command.</h3>
     </v-flex>
   </v-layout>
 </template>
