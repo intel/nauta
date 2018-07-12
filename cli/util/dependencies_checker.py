@@ -100,7 +100,7 @@ def _is_version_valid(installed_version: LooseVersion, expected_version: LooseVe
 
 
 def _parse_installed_version(version_output: str, version_field='SemVer') -> LooseVersion:
-    regex = r"{version_field}:(?:\"([\w.]+)\"| ([\w.]+)$)".format(version_field=version_field)
+    regex = r"{version_field}:(?:\"([\w.-]+)\"| ([\w.-]+)$)".format(version_field=version_field)
     matches = re.findall(regex, version_output)
 
     if len(matches) != 1:
