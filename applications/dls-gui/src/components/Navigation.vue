@@ -49,7 +49,8 @@ export default {
   name: 'Navigation',
   computed: {
     ...mapGetters({
-      tensorMode: 'tensorMode'
+      tensorMode: 'tensorMode',
+      username: 'username'
     }),
     visible: {
       get () {
@@ -66,7 +67,7 @@ export default {
       this.logIntoK8SDashboard()
         .then(() => {
           const hostname = window.location.origin;
-          const k8sDashboardUrl = hostname + '/dashboard/';
+          const k8sDashboardUrl = `${hostname}/dashboard/#!/overview?namespace=${this.username}`;
           window.open(k8sDashboardUrl, '_blank');
         });
     }
