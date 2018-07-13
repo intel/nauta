@@ -21,13 +21,14 @@
 
 from hashlib import sha1
 import os
-from typing import Dict, List
+from typing import List
 
 from kubernetes import client as k8s
+from tensorboard.models import Run
 
 
 class K8STensorboardInstance:
-    EXPERIMENTS_OUTPUT_VOLUME_NAME = 'output-home'
+    EXPERIMENTS_OUTPUT_VOLUME_NAME = 'output-public'
     TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX = '/mnt/exp'
 
     def __init__(self, deployment: k8s.V1Deployment, service: k8s.V1Service, ingress: k8s.V1beta1Ingress,
@@ -38,24 +39,29 @@ class K8STensorboardInstance:
         self.pod = pod
 
     @staticmethod
-    def generate_run_names_hash(run_names: List[str]) -> str:
-        run_names.sort()
-        run_names_str = ",".join(run_names)
+    def generate_run_names_hash(runs: List[Run]) -> str:
+        run_names_condensed = []
+
+        for run in runs:
+            run_names_condensed.append(run.owner+":"+run.name)
+
+        run_names_condensed.sort()
+        run_names_str = ",".join(run_names_condensed)
         run_names_hash = sha1(run_names_str.encode('utf-8')).hexdigest()
         return run_names_hash
 
     @classmethod
-    def from_run_name(cls, id: str, run_names_list: List[str]):
+    def from_runs(cls, id: str, runs: List[Run]):
         k8s_name = 'tensorboard-' + id
-        run_names_hash = K8STensorboardInstance.generate_run_names_hash(run_names_list)
+        run_names_hash = K8STensorboardInstance.generate_run_names_hash(runs)
 
         volume_mounts = []
 
-        for run_name in run_names_list:
+        for run in runs:
             mount = k8s.V1VolumeMount(
                 name=cls.EXPERIMENTS_OUTPUT_VOLUME_NAME,
-                mount_path=os.path.join(cls.TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX, run_name),
-                sub_path=run_name
+                mount_path=os.path.join(cls.TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX, run.owner, run.name),
+                sub_path=os.path.join(run.owner, run.name)
             )
             volume_mounts.append(mount)
 
@@ -64,8 +70,15 @@ class K8STensorboardInstance:
             'type': 'dls4e-tensorboard',
             'dls4e_app_name': 'tensorboard',
             'id': id,
-            'run-names-hash': run_names_hash
+            'runs-hash': run_names_hash
         }
+
+        tensorboard_command = [
+            "tensorboard",
+            "--logdir", cls.TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX,
+            "--port", "80",
+            "--host", "0.0.0.0"
+        ]
 
         deployment = k8s.V1Deployment(api_version='apps/v1',
                                       kind='Deployment',
@@ -87,11 +100,7 @@ class K8STensorboardInstance:
                                                       k8s.V1Container(
                                                           name='app',
                                                           image='tensorflow/tensorflow:1.8.0-py3',
-                                                          command=["tensorboard",
-                                                                   "--logdir", "/mnt/exp",
-                                                                   "--port", "80",
-                                                                   "--host", "0.0.0.0"
-                                                                   ],
+                                                          command=tensorboard_command,
                                                           volume_mounts=volume_mounts,
                                                           ports=[
                                                               k8s.V1ContainerPort(
@@ -102,10 +111,10 @@ class K8STensorboardInstance:
                                                   ],
                                                   volumes=[
                                                       k8s.V1Volume(
-                                                          name='output-home',
+                                                          name=cls.EXPERIMENTS_OUTPUT_VOLUME_NAME,
                                                           persistent_volume_claim=  # noqa
                                                           k8s.V1PersistentVolumeClaimVolumeSource(
-                                                              claim_name='output-home',
+                                                              claim_name=cls.EXPERIMENTS_OUTPUT_VOLUME_NAME,
                                                               read_only=True
                                                           )
                                                       )
@@ -164,7 +173,7 @@ class K8STensorboardInstance:
                                                  http=k8s.V1beta1HTTPIngressRuleValue(
                                                      paths=[
                                                          k8s.V1beta1HTTPIngressPath(
-                                                             path='/tb/' + id,
+                                                             path='/tb/' + id + "/",
                                                              backend=k8s.V1beta1IngressBackend(
                                                                  service_name=k8s_name,
                                                                  service_port=80

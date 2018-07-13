@@ -22,14 +22,33 @@
 from http import HTTPStatus
 import json
 import logging as log
+from typing import List
 
 from flask import Flask, request
 
 from tensorboard.tensorboard import TensorboardManager
+from tensorboard.models import Run
 
 log.basicConfig(level=log.DEBUG)
 
 app = Flask(__name__)
+
+
+class TensorboardCreationRequestBody:
+    def __init__(self, run_names: List[Run]):
+        self.run_names = run_names
+
+    @classmethod
+    def from_dict(cls, body):
+        runs_from_json = body['runNames']
+        runs = []
+        for json_run in runs_from_json:
+            name = json_run['name']
+            owner = json_run['owner']
+            new_run = Run(name=name, owner=owner)
+            runs.append(new_run)
+
+        return cls(run_names=runs)
 
 
 def _generate_error_response(error_code: HTTPStatus, message: str) -> (str, HTTPStatus, dict):
@@ -40,50 +59,37 @@ def _generate_error_response(error_code: HTTPStatus, message: str) -> (str, HTTP
     return json.dumps(response), error_code, {'Content-Type': 'application/json'}
 
 
-@app.route('/create/<run_name>', methods=['POST'])
-def create(run_name: str):
-    tensb_mgr = TensorboardManager.incluster_init()
-
-    current_tensorboard_instance = tensb_mgr.get_by_run_names([run_name])
-
-    if current_tensorboard_instance:
-        return json.dumps(current_tensorboard_instance.to_dict()), HTTPStatus.CONFLICT
-
-    tensorboard = tensb_mgr.create([run_name])
-
-    response = tensorboard.to_dict()
-
-    response['DEPRECATED'] = 'This endpoint is deprecated! Use "POST /tensorboard" instead!'
-
-    return json.dumps(response), {'Content-Type': 'application/json'}
-
-
 @app.route('/tensorboard', methods=['POST'])
-def create_v2():
+def create():
     request_json_body = request.get_json(force=True)
 
     try:
         run_names = request_json_body['runNames']
-    except KeyError:
+    except (KeyError, TypeError):
         return _generate_error_response(HTTPStatus.BAD_REQUEST, "missing required 'runNames' field in request body!")
 
     if len(run_names) < 1:
         return _generate_error_response(HTTPStatus.BAD_REQUEST, 'at least 1 run name is needed!')
 
+    try:
+        request_body = TensorboardCreationRequestBody.from_dict(request_json_body)
+    except KeyError:
+        return _generate_error_response(HTTPStatus.BAD_REQUEST, 'incorrect request body!')
+
     tensb_mgr = TensorboardManager.incluster_init()
 
-    current_tensorboard_instance = tensb_mgr.get_by_run_names(run_names)
+    current_tensorboard_instance = tensb_mgr.get_by_runs(request_body.run_names)
 
     if current_tensorboard_instance:
         return json.dumps(current_tensorboard_instance.to_dict()), HTTPStatus.CONFLICT
 
-    tensorboard = tensb_mgr.create(run_names)
+    tensorboard = tensb_mgr.create(request_body.run_names)
 
     return json.dumps(tensorboard.to_dict()), HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
 
 
 @app.route('/tensorboard/<id>', methods=['GET'])
-def get_v2(id: str):
+def get(id: str):
     tensb_mgr = TensorboardManager.incluster_init()
 
     current_tensorboard_instance = tensb_mgr.get_by_id(id)

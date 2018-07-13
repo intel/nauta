@@ -22,6 +22,7 @@ vendor/
 glide.lock
 files/*.tar.gz
 .pytest_cache
+.vscode
 
 .workspace
 htmlcov/

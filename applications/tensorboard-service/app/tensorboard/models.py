@@ -40,3 +40,9 @@ class Tensorboard:
             'status': self.status.value,
             'url': self.url
         }
+
+
+class Run:
+    def __init__(self, name: str, owner: str):
+        self.name = name
+        self.owner = owner

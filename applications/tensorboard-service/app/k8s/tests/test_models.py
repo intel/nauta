@@ -24,18 +24,30 @@ from typing import List
 
 from k8s.models import K8STensorboardInstance
 from kubernetes import client as kube_models
+from tensorboard.models import Run
 
 
 def test_generate_tensorboard_deployment():
-    fake_run_names_list = ["some-run-3", "some-run-2", "some-run-1"]
-    model_instance = K8STensorboardInstance.from_run_name(id='a7db5449-6168-4010-9ce6-cbaefbbfa4a1',
-                                                          run_names_list=fake_run_names_list)
+    fake_runs = [
+        Run(
+            name="some-run-3",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-2",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-1",
+            owner='bob'
+        ),
+    ]
+
+    model_instance = K8STensorboardInstance.from_runs(id='a7db5449-6168-4010-9ce6-cbaefbbfa4a1', runs=fake_runs)
 
     assert model_instance.deployment.metadata.name == "tensorboard-a7db5449-6168-4010-9ce6-cbaefbbfa4a1"
 
-    volume_mounts: List[kube_models.V1VolumeMount] = model_instance.deployment.spec.template.spec.containers[0].volume_mounts
+    volume_mounts: List[kube_models.V1VolumeMount] = \
+        model_instance.deployment.spec.template.spec.containers[0].volume_mounts
 
-    assert len(volume_mounts) == len(fake_run_names_list)
-
-    for mount in volume_mounts:
-        mount.mount_path == '/mnt/exp/'
+    assert len(volume_mounts) == len(fake_runs)

@@ -26,12 +26,11 @@ from kubernetes.client import V1Deployment, V1ObjectMeta, V1beta1Ingress, V1Pod,
     V1beta1IngressRule, V1beta1HTTPIngressRuleValue, V1beta1HTTPIngressPath, V1PodStatus, V1beta1IngressBackend
 import pytest
 from pytest_mock import MockFixture
-import kubernetes
 
 from k8s.models import K8STensorboardInstance
 import tensorboard.tensorboard
 from tensorboard.tensorboard import TensorboardManager
-from tensorboard.models import TensorboardStatus
+from tensorboard.models import TensorboardStatus, Run
 
 FAKE_NAMESPACE = "fake-namespace"
 
@@ -61,7 +60,21 @@ def test_incluster_init(mocker: MockFixture):
 
 # noinspection PyShadowingNames
 def test_create(tensorboard_manager_mocked: TensorboardManager):
-    tensorboard_manager_mocked.create(["fake-run"])
+    fake_runs = [
+        Run(
+            name="some-run-3",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-2",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-1",
+            owner='bob'
+        )
+    ]
+    tensorboard = tensorboard_manager_mocked.create(fake_runs)
 
     tensorboard_manager_mocked.client.create_deployment.assert_called_once_with(namespace=FAKE_NAMESPACE,
                                                                                 body=mock.ANY)
@@ -69,6 +82,8 @@ def test_create(tensorboard_manager_mocked: TensorboardManager):
                                                                              body=mock.ANY)
     tensorboard_manager_mocked.client.create_ingress.assert_called_once_with(namespace=FAKE_NAMESPACE,
                                                                              body=mock.ANY)
+
+    assert tensorboard
 
 
 # noinspection PyShadowingNames
@@ -167,14 +182,27 @@ def test_get_by_id_pod_not_created_yet(mocker: MockFixture, tensorboard_manager_
 
 
 # noinspection PyShadowingNames
-def test_get_by_run_names(mocker: MockFixture, tensorboard_manager_mocked: TensorboardManager):
+def test_get_by_runs(mocker: MockFixture, tensorboard_manager_mocked: TensorboardManager):
     fake_tensorboard_id = '5c0b46de-4017-4062-9ac8-94698cc0c513'
-    fake_tensorboard_path = '/tb/' + fake_tensorboard_id
+    fake_tensorboard_path = '/tb/' + fake_tensorboard_id + '/'
     fake_tensorboard_pod_phase = 'RUNNING'
     expected_tensorboard_status = TensorboardStatus.RUNNING
-    run_names = ['run-name-1', 'run-name-2', 'run-name-3']
+    runs = [
+        Run(
+            name='run-name-1',
+            owner='sigfrid'
+        ),
+        Run(
+            name='run-name-2',
+            owner='schreck'
+        ),
+        Run(
+            name='run-name-3',
+            owner='jacek'
+        )
+    ]
 
-    k8s_tensorboard = K8STensorboardInstance.from_run_name(id=fake_tensorboard_id, run_names_list=run_names)
+    k8s_tensorboard = K8STensorboardInstance.from_runs(id=fake_tensorboard_id, runs=runs)
 
     # mocking manually this method is done because we want to mock Kubernetes behaviour to check, if our code
     # requests Kubernetes API server for deployment with proper label_selector. If label_selector matches
@@ -202,9 +230,22 @@ def test_get_by_run_names(mocker: MockFixture, tensorboard_manager_mocked: Tenso
     mocker.patch.object(tensorboard_manager_mocked.client, 'list_ingresses').return_value = [k8s_tensorboard.ingress]
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_pod').return_value = fake_pod
 
-    get_run_names = ['run-name-3', 'run-name-1', 'run-name-2']
+    get_runs = [
+        Run(
+            name='run-name-2',
+            owner='schreck'
+        ),
+        Run(
+            name='run-name-3',
+            owner='jacek'
+        ),
+        Run(
+            name='run-name-1',
+            owner='sigfrid'
+        )
+    ]
 
-    tensorboard = tensorboard_manager_mocked.get_by_run_names(get_run_names)
+    tensorboard = tensorboard_manager_mocked.get_by_runs(get_runs)
 
     assert tensorboard.id == fake_tensorboard_id
     assert tensorboard.status == expected_tensorboard_status
@@ -215,24 +256,52 @@ def test_get_by_run_names(mocker: MockFixture, tensorboard_manager_mocked: Tenso
 def test_get_by_run_names_not_found(mocker: MockFixture, tensorboard_manager_mocked: TensorboardManager):
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_deployment').return_value = None
 
-    tensorboard = tensorboard_manager_mocked.get_by_run_names(run_names=['run-name-3', 'run-name-1', 'run-name-2'])
+    get_runs = [
+        Run(
+            name='run-name-2',
+            owner='schreck'
+        ),
+        Run(
+            name='run-name-3',
+            owner='jacek'
+        ),
+        Run(
+            name='run-name-1',
+            owner='sigfrid'
+        )
+    ]
+
+    tensorboard = tensorboard_manager_mocked.get_by_runs(runs=get_runs)
 
     assert tensorboard is None
 
 
-def test_get_by_run_names_not_created_yet(mocker: MockFixture, tensorboard_manager_mocked: TensorboardManager):
+def test_get_by_runs_not_created_yet(mocker: MockFixture, tensorboard_manager_mocked: TensorboardManager):
     fake_tensorboard_id = '72a5cabc-548c-4a66-8ea9-645736569dfd'
-    fake_tensorboard_path = '/tb/' + fake_tensorboard_id
-    run_names = ['run-name-3', 'run-name-1', 'run-name-2']
+    fake_tensorboard_path = '/tb/' + fake_tensorboard_id + '/'
+    runs = [
+        Run(
+            name='run-name-1',
+            owner='sigfrid'
+        ),
+        Run(
+            name='run-name-2',
+            owner='schreck'
+        ),
+        Run(
+            name='run-name-3',
+            owner='jacek'
+        )
+    ]
 
-    k8s_tensorboard = K8STensorboardInstance.from_run_name(id=fake_tensorboard_id, run_names_list=run_names)
+    k8s_tensorboard = K8STensorboardInstance.from_runs(id=fake_tensorboard_id, runs=runs)
 
     mocker.patch.object(tensorboard_manager_mocked.client, 'list_deployments').return_value = \
         [k8s_tensorboard.deployment]
     mocker.patch.object(tensorboard_manager_mocked.client, 'list_ingresses').return_value = [k8s_tensorboard.ingress]
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_pod').return_value = None
 
-    tensorboard = tensorboard_manager_mocked.get_by_run_names(run_names=['run-name-3', 'run-name-1', 'run-name-2'])
+    tensorboard = tensorboard_manager_mocked.get_by_runs(runs)
 
     assert tensorboard.id == fake_tensorboard_id
     assert tensorboard.status == TensorboardStatus.CREATING

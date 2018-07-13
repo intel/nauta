@@ -30,7 +30,7 @@ from kubernetes.client import V1Deployment, V1ObjectMeta
 
 from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
-from tensorboard.models import Tensorboard, TensorboardStatus
+from tensorboard.models import Tensorboard, TensorboardStatus, Run
 
 
 class TensorboardManager:
@@ -51,11 +51,10 @@ class TensorboardManager:
     def _get_current_datetime() -> datetime:
         return datetime.now(timezone.utc)
 
-    def create(self, run_names: List[str]) -> Tensorboard:
+    def create(self, runs: List[Run]) -> Tensorboard:
         new_tensorboard = Tensorboard(id=str(uuid4()))
 
-        k8s_tensorboard_model = k8s.models.K8STensorboardInstance.from_run_name(run_names_list=run_names,
-                                                                                id=new_tensorboard.id)
+        k8s_tensorboard_model = k8s.models.K8STensorboardInstance.from_runs(runs=runs, id=new_tensorboard.id)
 
         self.client.create_deployment(namespace=self.namespace, body=k8s_tensorboard_model.deployment)
         self.client.create_service(namespace=self.namespace, body=k8s_tensorboard_model.service)
@@ -104,11 +103,11 @@ class TensorboardManager:
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
-    def get_by_run_names(self, run_names: List[str]) -> Optional[Tensorboard]:
-        run_names_hash = k8s.models.K8STensorboardInstance.generate_run_names_hash(run_names)
+    def get_by_runs(self, runs: List[Run]) -> Optional[Tensorboard]:
+        runs_hash = k8s.models.K8STensorboardInstance.generate_run_names_hash(runs)
 
         deployments = self.client.list_deployments(namespace=self.namespace,
-                                                   label_selector=f'run-names-hash={run_names_hash}')
+                                                   label_selector=f'runs-hash={runs_hash}')
 
         if len(deployments) == 0:
             return None

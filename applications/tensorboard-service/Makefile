@@ -22,4 +22,4 @@ style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 .
 
 test: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); py.test --cov=app .
+	@. $(ACTIVATE); py.test --cov-report term-missing --cov-config tox.ini --cov=app .
