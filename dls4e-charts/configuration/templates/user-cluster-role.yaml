@@ -3,27 +3,18 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter username" .Values.username }}-user"
+  name: "{{ .Release.Name }}-{{ .Chart.Name }}-user"
   labels:
     app: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+    {{ .Values.api_group_name }}/view: "true"
 rules:
 - apiGroups:
     - "{{ .Values.api_group_name }}"
   resources:
     - users
-  verbs:
-    - list
-    - get
-    - watch
-- apiGroups:
-    - "*"
-  resources:
-    - runs
-    - experiments
-    - tfjobs
   verbs:
     - list
     - get

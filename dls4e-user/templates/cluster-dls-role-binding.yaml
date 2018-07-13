@@ -1,7 +1,9 @@
+---
+
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter user" .Values.username }}-user"
+  name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter user" .Values.username }}-user-common"
   labels:
     app: "{{ .Chart.Name }}"
     release: "{{ .Release.Name }}"
@@ -10,7 +12,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter username" .Values.username }}-user"
+  name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-common"
 subjects:
 - kind: ServiceAccount
   name: default

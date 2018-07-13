@@ -36,8 +36,8 @@ config() {
 }
 
 kubeconfig() {
-    if [ X"${KUBECONFIG}" != X"" ]; then
-        echo "${KUBECONFIG}"
+    if [ X"${DLS_KUBECONFIG}" != X"" ]; then
+        echo "${DLS_KUBECONFIG}"
     elif [ -f "${CURDIR}/platform-admin.config" ]; then
         echo "${CURDIR}/platform-admin.config"
     else
