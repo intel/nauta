@@ -67,8 +67,10 @@ def test_modify_values_yaml(mocker):
     sh_move_mock = mocker.patch("shutil.move")
     yaml_dump_mock = mocker.patch("yaml.dump")
 
-    tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
-                                   experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE, registry_port="1111")
+    tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
+                                   script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
+                                   experiment_name='test-experiment', run_name='test-experiment',
+                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -90,9 +92,10 @@ def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
     wrong_pack_params = [("key1", "{ bad list")]
 
     with pytest.raises(AttributeError):
-        tf_training.modify_values_yaml(EXPERIMENT_FOLDER, SCRIPT_LOCATION, SCRIPT_PARAMETERS,
-                                       pack_params=wrong_pack_params, experiment_name='test-experiment',
-                                       pack_type=EXAMPLE_PACK_TYPE, registry_port="1111")
+        tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
+                                       script_parameters=SCRIPT_PARAMETERS, pack_params=wrong_pack_params,
+                                       experiment_name='test-experiment', run_name='test-experiment',
+                                       pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
 
     assert sh_move_mock.call_count == 0, "job yaml should not be moved."
     assert yaml_dump_mock.call_count == 0, "yaml should not be modified."
@@ -126,8 +129,10 @@ def test_update_configuration_success(mocker):
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
     modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
-    output = tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                              experiment_name='test-experiment', internal_registry_port="12345",
+    output = tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
+                                              script_parameters=SCRIPT_PARAMETERS,
+                                              experiment_name='test-experiment', run_name='test-experiment',
+                                              cluster_registry_port=12345, local_registry_port=12345,
                                               pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
 
     assert not output, "configuration wasn't updated"
@@ -142,8 +147,10 @@ def test_update_configuration_failure(mocker):
 
     modify_values_yaml_mock.side_effect = Exception("Test error")
     with pytest.raises(KubectlIntError):
-        tf_training.update_configuration(EXPERIMENT_FOLDER, SCRIPT_LOCATION,"", SCRIPT_PARAMETERS,
-                                         experiment_name='test-experiment', internal_registry_port="12345",
+        tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
+                                         script_parameters=SCRIPT_PARAMETERS,
+                                         experiment_name='test-experiment', run_name='test-experiment',
+                                         cluster_registry_port= 12345, local_registry_port=12345,
                                          pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"

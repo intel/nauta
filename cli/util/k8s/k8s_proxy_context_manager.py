@@ -38,11 +38,10 @@ class TunnelSetupError(RuntimeError):
 
 
 class K8sProxy:
-    def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
+    def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None,
                  app_name: str = None, number_of_retries: int = 0, namespace: str = None):
         self.dls4e_app_name = dls4e_app_name
         self.external_port = port
-        self.configure_draft = configure_draft
         self.app_name = app_name
         self.number_of_retries = number_of_retries
         self.namespace = namespace
@@ -51,11 +50,10 @@ class K8sProxy:
         logger.debug("k8s_proxy - entering")
         try:
             self.process, self.tunnel_port, self.container_port \
-                = kubectl.start_port_forwarding(self.dls4e_app_name,
-                                                self.external_port,
-                                                self.configure_draft,
-                                                self.app_name,
-                                                self.number_of_retries,
+                = kubectl.start_port_forwarding(k8s_app_name=self.dls4e_app_name,
+                                                port=self.external_port,
+                                                app_name=self.app_name,
+                                                number_of_retries=self.number_of_retries,
                                                 namespace=self.namespace)
             try:
                 K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port)

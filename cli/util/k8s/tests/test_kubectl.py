@@ -73,39 +73,6 @@ def test_start_port_forwarding_other_error(mock_k8s_svc, mocker):
     assert check_port_avail.call_count == 1, "port availability wasn't checked"
 
 
-def test_set_registry_port_for_draft_if_docker_registry(mock_k8s_svc, mocker):
-    app_name = DLS4EAppNames.DOCKER_REGISTRY
-    subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
-    srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port", side_effect=[("OK", 0)])
-
-    kubectl.start_port_forwarding(app_name)
-
-    assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
-    assert srp_mock.call_count == 1, "draft.set_registry_port command wasn't called"
-
-
-def test_set_registry_port_for_draft_if_not_docker_registry(mock_k8s_svc, mocker):
-    subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
-    srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port")
-
-    kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
-
-    assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"
-    assert srp_mock.call_count == 0, "draft.set_registry_port command was called"
-
-
-def test_start_port_forwarding_draft_config_fail(mock_k8s_svc, mocker):
-    app_name = DLS4EAppNames.DOCKER_REGISTRY
-    subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
-    srp_mock = mocker.patch("util.k8s.kubectl.set_registry_port", side_effect=[("Error message", 1)])
-
-    with raises(RuntimeError, message="Setting draft config failed."):
-        kubectl.start_port_forwarding(app_name)
-
-    assert subprocess_command_mock.call_count == 0, "kubectl proxy-forwarding command was called"
-    assert srp_mock.call_count == 1, "draft.set_registry_port command wasn't called"
-
-
 def test_start_port_forwarding_lack_of_ports(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=False)

@@ -29,7 +29,6 @@ import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError, KubectlConnectionError, LocalPortOccupiedError
-from draft.cmd import set_registry_port
 from util.k8s.k8s_info import get_app_services, find_namespace
 from util.app_names import DLS4EAppNames
 from util.system import check_port_availability
@@ -41,10 +40,8 @@ START_PORT = 3000
 END_PORT = 65535
 
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configure_draft: bool = True,
-                          app_name: str = None, number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen,
-                                                                                                       Optional[int],
-                                                                                                       int):
+def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_name: str = None,
+                          number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -57,8 +54,6 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
     :param k8s_app_name: name of kubernetes application for tunnel creation
                          value taken from DLS4EAppNames enum
     :param port: if given - the system will try to use it as a local port
-    :param configure_draft - if not set - procedure doesn't configure draft to use a docker through
-            newly created tunnel
     :return:
         instance of a process with proxy, tunneled port and container port
     """
@@ -66,12 +61,9 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
 
     try:
         service_node_port = None
-        k8s_app_name_value = None
         service_container_port = None
 
-        if k8s_app_name:
-            k8s_app_name_value = k8s_app_name.value
-        app_services = get_app_services(k8s_app_name_value, namespace, app_name)
+        app_services = get_app_services(dls4e_app_name=k8s_app_name, namespace=namespace, app_name=app_name)
 
         if app_services:
             service_node_port = app_services[0].spec.ports[0].node_port
@@ -90,34 +82,24 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
             logger.error(f'Cannot find open ports for {k8s_app_name} app')
             raise KubectlIntError("Missing port during creation of port proxy.")
 
-        if k8s_app_name == DLS4EAppNames.DOCKER_REGISTRY and configure_draft:
-            # setting draft conf, only for docker-registry case
-            dc_output, dc_exit_code = set_registry_port(service_node_port)
-            if dc_exit_code:
-                logger.error("Port forwarding - exception - setting draft config failed : {}".format(
-                    dc_output
-                ))
-                raise KubectlIntError("Setting draft config failed.")
+        if port:
+            if not check_port_availability(port):
+                error_msg = f"Port {port} is occupied. Please try to use another one."
+                logger.error(error_msg)
+                raise LocalPortOccupiedError(error_msg)
+            tunnel_port = port
         else:
-            # local port might be set only for services other than DOCKER_REGISTRY
-            if port:
-                if not check_port_availability(port):
-                    error_msg = f"Port {port} is occupied. Please try to use another one."
-                    logger.error(error_msg)
-                    raise LocalPortOccupiedError(error_msg)
-                service_node_port = port
+            for port in random.sample(range(START_PORT, END_PORT), k=MAX_NUMBER_OF_TRIES):
+                if check_port_availability(port):
+                    tunnel_port = port
+                    break
             else:
-                for port in random.sample(range(START_PORT, END_PORT), k=MAX_NUMBER_OF_TRIES):
-                    if check_port_availability(port):
-                        service_node_port = port
-                        break
-                else:
-                    error_msg = "Available port cannot be found."
-                    logger.error(error_msg)
-                    raise LocalPortOccupiedError(error_msg)
+                error_msg = "Available port cannot be found."
+                logger.error(error_msg)
+                raise LocalPortOccupiedError(error_msg)
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
-                                f'{service_node_port}:{service_container_port}']
+                                f'{tunnel_port}:{service_container_port}']
 
         logger.debug(port_forward_command)
 
@@ -143,7 +125,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, configu
         raise RuntimeError("Other error during creation of port proxy.")
 
     logger.info("Port forwarding - proxy set up")
-    return process, service_node_port, service_container_port
+    return process, tunnel_port, service_container_port
 
 
 def check_users_presence(username: str) -> bool:

@@ -6,6 +6,7 @@ JupyterPort: 8888
 
 image:
   pullPolicy: IfNotPresent
+  clusterRepository: '' # Filled by dlsctl
 
 service:
   type: ClusterIP

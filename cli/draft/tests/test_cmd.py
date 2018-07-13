@@ -71,14 +71,6 @@ def test_up(draft_mock, mocker):
     draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'], env=ANY, cwd=None)])
 
 
-def test_set_registry_port(draft_mock):
-    draft_mock.set_registry_port("5000")
-
-    assert draft_mock.execute_system_command.call_count == 1
-    assert draft_mock.execute_system_command.call_args == call([FAKE_DRAFT_BIN_PATH, 'config', 'set', 'registry',
-                                                                '127.0.0.1:5000'], env=ANY, cwd=None)
-
-
 def test_check_up_status_success():
     output, exit_code = cmd.check_up_status('{} {} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
                                                               CORRECT_UP_OUTPUT_PUSH_IMAGE,

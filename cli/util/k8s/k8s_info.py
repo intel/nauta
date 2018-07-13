@@ -119,10 +119,10 @@ def get_pods(label_selector: str) -> List[client.V1Pod]:
     return pods
 
 
-def get_app_services(dls4e_app_name: str = None, namespace: str = None,
+def get_app_services(dls4e_app_name: DLS4EAppNames, namespace: str = None,
                      app_name: str = None) -> List[client.V1Service]:
     api = get_k8s_api()
-    selector = f'dls4e_app_name={dls4e_app_name}'
+    selector = f'dls4e_app_name={dls4e_app_name.value}'
     field_selector = ""
     if app_name:
         field_selector = f'metadata.name={app_name}'
@@ -134,15 +134,9 @@ def get_app_services(dls4e_app_name: str = None, namespace: str = None,
         return api.list_service_for_all_namespaces(label_selector=selector, field_selector=field_selector).items
 
 
-def get_app_namespace(app_name: str) -> str:
-    namespace = ""
-
-    app_services = get_app_services(app_name)
-
-    if app_services:
-        namespace = app_services[0].metadata.namespace
-
-    return namespace
+def get_app_service_node_port(dls4e_app_name: DLS4EAppNames, namespace: str = None, app_name: str = None) -> int:
+    services = get_app_services(dls4e_app_name=dls4e_app_name, namespace=namespace, app_name=app_name)
+    return services[0].spec.ports[0].node_port
 
 
 def find_namespace(namespace: str) -> bool:

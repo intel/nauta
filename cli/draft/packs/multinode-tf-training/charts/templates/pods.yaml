@@ -26,7 +26,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: training-container
-    image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+    image: "{{ $.Values.image.clusterRepository }}:{{ $.Values.image.tag }}"
     command: ["python"]
     args: ["-u", {{ $.Values.training.script_name }}, "{{ $.Values.training.task_id_param_name }}={{ $i }}",  "{{ $.Values.training.job_name_param }}=ps", "{{ $.Values.training.ps_list_param_name }}={{ $ps_names }}", "{{ $.Values.training.workers_list_param_name }}={{ $worker_names }}", "{{ $command_args }}" ]
     ports:
@@ -49,7 +49,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: training-container
-    image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+    image: "{{ $.Values.image.clusterRepository }}:{{ $.Values.image.tag }}"
     command: ["python"]
     args: ["-u", {{ $.Values.training.script_name }}, "{{ $.Values.training.task_id_param_name }}={{ $i }}",  "{{ $.Values.training.job_name_param }}=worker", "{{ $.Values.training.ps_list_param_name }}={{ $ps_names }}", "{{ $.Values.training.workers_list_param_name }}={{ $worker_names }}", "{{ $command_args }}" ]
     ports:

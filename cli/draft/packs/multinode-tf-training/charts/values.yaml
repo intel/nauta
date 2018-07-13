@@ -57,3 +57,6 @@ training:
 # name of a user used to differentiate pods between users
 user:
   name: username
+
+image:
+  clusterRepository: '' # Filled by dlsctl

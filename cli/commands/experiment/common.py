@@ -44,6 +44,7 @@ from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseErr
     SubmitExperimentError
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.k8s.k8s_info import get_app_service_node_port
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 
 # definitions of headers content for different commands
@@ -197,11 +198,10 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
         log.exception(message)
         raise SubmitExperimentError(message)
 
-    k8s_app_name = DLS4EAppNames.DOCKER_REGISTRY
     try:
         # start port forwarding
         # noinspection PyBroadException
-        with K8sProxy(k8s_app_name) as proxy:
+        with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY) as proxy:
 
             try:
                 # prepare environments for all experiment's runs
@@ -215,13 +215,15 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
                     else:
                         current_script_parameters = ""
 
+                    cluster_registry_port = get_app_service_node_port(dls4e_app_name=DLS4EAppNames.DOCKER_REGISTRY)
                     experiment_run.folder = prepare_experiment_environment(experiment_name=experiment_name,
                                                                            run_name=experiment_run.name,
                                                                            script_location=script_location,
                                                                            script_folder_location=script_folder_location,  # noqa: E501
                                                                            script_parameters=current_script_parameters,
                                                                            pack_type=template, pack_params=pack_params,
-                                                                           internal_registry_port=proxy.tunnel_port)
+                                                                           local_registry_port=proxy.tunnel_port,
+                                                                           cluster_registry_port=cluster_registry_port)
             except Exception:
                 # any error in this step breaks execution of this command
                 message = "Problems during creation of environments."
@@ -274,7 +276,7 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
         click.echo(exe.message)
         raise SubmitExperimentError(exe.message)
     except K8sProxyCloseError:
-        log.exception('Error during closing of a proxy for a {}'.format(k8s_app_name))
+        log.exception('Error during closing of a proxy for a {}'.format(DLS4EAppNames.DOCKER_REGISTRY))
         raise K8sProxyCloseError('Docker proxy hasn\'t been closed properly. '
                                  'Check whether it still exists, if yes - close it manually.')
     except K8sProxyOpenError:
@@ -338,7 +340,7 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, script_location: str,
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
-                                   pack_type: str, internal_registry_port: str,
+                                   pack_type: str, local_registry_port: int, cluster_registry_port: int,
                                    pack_params: List[Tuple[str, str]]) -> str:
     """
     Prepares draft's environment for a certain run based on provided parameters
@@ -348,6 +350,8 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
     :param script_folder_location: location of an additional folder used in training
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
+    :param local_registry_port: port on which docker registry is accessible locally
+    :param cluster_registry_port: port on which docker registry is accessible within dls4e cluster
     :param pack_params: additional pack params
     :return: name of folder with an environment created for this run
     In case of any problems - an exception with a description of a problem is thrown
@@ -367,8 +371,10 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
         if script_location:
             script_location = Path(script_location).name
         # reconfigure draft's templates
-        update_configuration(run_folder, script_location, script_folder_location, script_parameters,
-                             experiment_name=experiment_name, internal_registry_port=internal_registry_port,
+        update_configuration(run_folder=run_folder, script_location=script_location,
+                             script_parameters=script_parameters,
+                             experiment_name=experiment_name, run_name=run_name,
+                             local_registry_port=local_registry_port, cluster_registry_port=cluster_registry_port,
                              pack_type=pack_type, pack_params=pack_params)
     except Exception as exe:
         delete_environment(run_folder)

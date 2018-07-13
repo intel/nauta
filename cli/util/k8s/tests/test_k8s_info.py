@@ -24,13 +24,15 @@ from unittest.mock import MagicMock
 import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
                                      V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
-                                     V1PolicyRule, V1PodList, V1Pod, V1PodStatus
+                                     V1PolicyRule, V1PodList, V1Pod, V1PodStatus, V1ServiceSpec, V1ServicePort
 from kubernetes.client.rest import ApiException
 
-from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, get_app_namespace, \
+from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
-                              check_pods_status, PodStatus, get_cluster_roles, is_current_user_administrator, get_pods
+                              get_cluster_roles, is_current_user_administrator, check_pods_status, \
+                              PodStatus, get_app_service_node_port, get_pods
 from util.config import DLS4EConfigMap
+from util.app_names import DLS4EAppNames
 
 test_namespace = "test_namespace"
 
@@ -170,24 +172,9 @@ def test_get_k8s_port(mocked_k8s_config):
 
 
 def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
-    app_name = 'test-app'
-    services = get_app_services(app_name)
+    services = get_app_services(dls4e_app_name=DLS4EAppNames.DOCKER_REGISTRY)
 
     assert services
-
-
-def test_get_app_namespace(mocker):
-    get_app_svc_mock = mocker.patch('util.k8s.k8s_info.get_app_services')
-
-    v1_service = V1Service()
-    metadata = V1ObjectMeta(namespace=test_namespace)
-    v1_service.metadata = metadata
-
-    get_app_svc_mock.return_value = [v1_service]
-
-    namespace = get_app_namespace('app_name')
-
-    assert namespace == test_namespace
 
 
 def test_find_namespace_success(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig) -> bool:
@@ -278,3 +265,17 @@ def test_check_pods_status_failure_empty_list(mocked_k8s_CoreV1Api, mocked_kubec
     mocked_k8s_CoreV1Api.list_namespaced_pod.return_value = None
     assert not check_pods_status("run_name", test_namespace, PodStatus.RUNNING, None)
     mocked_k8s_CoreV1Api.list_namespaced_pod.return_value = ret_value
+
+
+def test_get_app_service_node_port(mocker):
+    test_node_port = 1234
+    get_app_services_mock = mocker.patch('util.k8s.k8s_info.get_app_services')
+    get_app_services_mock.return_value = [
+        V1Service(spec=V1ServiceSpec(
+            ports=[
+                V1ServicePort(node_port=test_node_port,
+                              port=test_node_port)
+            ]
+        ))
+    ]
+    assert get_app_service_node_port(DLS4EAppNames.DOCKER_REGISTRY) == test_node_port

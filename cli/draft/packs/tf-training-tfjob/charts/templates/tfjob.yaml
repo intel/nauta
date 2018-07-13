@@ -26,7 +26,7 @@ spec:
         spec:
           containers:
             - name: tensorflow
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["python"]
               args:
@@ -74,7 +74,7 @@ spec:
                 claimName: output-public
           initContainers:
             - name: init-experiment-pod
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
               command: ['mkdir', '-p', '/mnt/output/home/{{ .Release.Name }}']
               volumeMounts:
                 - name: output-home

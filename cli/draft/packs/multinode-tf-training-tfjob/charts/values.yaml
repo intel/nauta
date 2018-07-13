@@ -12,6 +12,7 @@ commandline:
 
 image:
   pullPolicy: IfNotPresent
+  clusterRepository: ''
 
 service:
   type: ClusterIP

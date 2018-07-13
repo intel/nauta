@@ -147,6 +147,9 @@ class SubmitExperimentMocks:
         self.k8s_proxy = mocker.patch("commands.experiment.common.K8sProxy")
         self.k8s_proxy.return_value.__enter__.return_value.tunnel_port = FAKE_NODE_PORT
 
+        self.k8s_get_node_port = mocker.patch("commands.experiment.common.get_app_service_node_port")
+        self.k8s_get_node_port.return_value = FAKE_NODE_PORT
+
         self.socat = mocker.patch("commands.experiment.common.socat") \
             if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
         self.isdir = mocker.patch("os.path.isdir", return_value=True)

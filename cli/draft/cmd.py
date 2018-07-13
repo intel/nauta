@@ -71,23 +71,6 @@ def up(working_directory: str = None, namespace: str = None) -> (str, int):
     return output, exit_code
 
 
-def set_registry_port(registry_port: str) -> (str, int):
-    """
-    Sets port of docker's registry used by draft instance.
-
-    :param registry_port: port under which local k8s registry is available
-    :return: (output, exit_code)
-    - output - message from execution of a command returned by the system
-    - exit_code - 0 - operation was a success, otherwise some error occurred during
-                its execution
-    """
-    docker_location = f'{DOCKER_IP_ADDRESS}:{registry_port}'
-
-    configure_draft_port_command = ["config", "set", "registry", docker_location]
-
-    return call_draft(configure_draft_port_command)
-
-
 def check_up_status(output: str) -> (str, int):
     """
     Checks whether up command was finished with success.

@@ -39,11 +39,12 @@ import dpath.util as dutil
 log = initialize_logger('packs.tf_training')
 
 
-def update_configuration(experiment_folder: str, script_location: str,
-                         script_folder_location: str,
+def update_configuration(run_folder: str, script_location: str,
                          script_parameters: Tuple[str, ...],
                          experiment_name: str,
-                         internal_registry_port: str,
+                         run_name: str,
+                         local_registry_port: int,
+                         cluster_registry_port: int,
                          pack_type: str,
                          pack_params: List[Tuple[str, str]]):
     """
@@ -61,10 +62,11 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - start")
 
     try:
-        modify_values_yaml(experiment_folder, script_location, script_parameters, pack_params=pack_params,
-                           experiment_name=experiment_name, pack_type=pack_type, registry_port=internal_registry_port)
-        modify_dockerfile(experiment_folder, script_location, internal_registry_port)
-        modify_draft_toml(experiment_folder)
+        modify_values_yaml(run_folder, script_location, script_parameters, pack_params=pack_params,
+                           experiment_name=experiment_name, run_name=run_name,
+                           pack_type=pack_type, cluster_registry_port=cluster_registry_port)
+        modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port)
+        modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
         raise KubectlIntError("Configuration hasn't been updated.")
@@ -72,7 +74,7 @@ def update_configuration(experiment_folder: str, script_location: str,
     log.debug("Update configuration - end")
 
 
-def modify_dockerfile(experiment_folder: str, script_location: str, internal_registry_port: str):
+def modify_dockerfile(experiment_folder: str, script_location: str, local_registry_port: int):
     log.debug("Modify dockerfile - start")
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
@@ -85,7 +87,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, internal_reg
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM dls4e/tensorflow:1.9.0-rc2-py3"):
                 dockerfile_temp_content = dockerfile_temp_content + \
-                                          f"FROM 127.0.0.1:{internal_registry_port}/dls4e/tensorflow:1.9.0-rc2-py3"
+                                          f"FROM 127.0.0.1:{local_registry_port}/dls4e/tensorflow:1.9.0-rc2-py3"
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
@@ -97,7 +99,8 @@ def modify_dockerfile(experiment_folder: str, script_location: str, internal_reg
 
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
-                       experiment_name: str, pack_type: str, registry_port: str, pack_params: List[Tuple[str, str]]):
+                       experiment_name: str, run_name: str, pack_type: str,
+                       cluster_registry_port: int, pack_params: List[Tuple[str, str]]):
     log.debug("Modify values.yaml - start")
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
@@ -108,7 +111,8 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         if "commandline" in v:
             v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
         v["experimentName"] = experiment_name
-        v["registry_port"] = str(registry_port)
+        v["registry_port"] = str(cluster_registry_port)
+        v["image"]["clusterRepository"] = f'127.0.0.1:{cluster_registry_port}/{run_name}'
 
         regex = re.compile("^\[.*|^\{.*")
         for key, value in pack_params:
@@ -126,19 +130,22 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
     log.debug("Modify values.yaml - end")
 
 
-def modify_draft_toml(experiment_folder: str):
+def modify_draft_toml(experiment_folder: str, registry: str):
     log.debug("Modify draft.toml - start")
     draft_toml_filename = os.path.join(experiment_folder, "draft.toml")
     draft_toml_temp_filename = os.path.join(experiment_folder, "draft_temp.toml")
     namespace = k8s_info.get_kubectl_current_context_namespace()
 
     with open(draft_toml_filename, "r") as draft_toml_file:
-        t = toml.load(draft_toml_file)
-        log.debug(t["environments"])
-        t["environments"]["development"]["namespace"] = namespace
+        draft_toml_yaml = toml.load(draft_toml_file)
+
+    log.debug(draft_toml_yaml["environments"])
+    draft_toml_yaml["environments"]["development"]["namespace"] = namespace
+    draft_toml_yaml["environments"]["development"]["registry"] = registry
+
 
     with open(draft_toml_temp_filename, "w") as draft_toml_file:
-        toml.dump(t, draft_toml_file)
+        toml.dump(draft_toml_yaml, draft_toml_file)
 
     shutil.move(draft_toml_temp_filename, draft_toml_filename)
     log.debug("Modify draft.toml - end")
