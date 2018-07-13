@@ -157,7 +157,7 @@ const parseExperiments = function (experiments, queryParams) {
       options: valuesForFilterableAttrs,
       current: filteredDataWithMetadata.queryParams
     },
-    params: extractAttrsNames(orderedData.data),
+    params: extractAttrsNames(entities),
     data: orderedData.data
   };
 };
