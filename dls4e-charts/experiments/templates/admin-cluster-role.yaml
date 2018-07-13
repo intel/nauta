@@ -15,5 +15,6 @@ rules:
     resources:
       - experiments
       - runs
+      - tfjobs
     verbs:
       - "*"
