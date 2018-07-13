@@ -66,6 +66,10 @@ local_images:
       BASE_IMAGE: "shared/centos"
       BUILD_IMAGE: "shared/centos/build"
     method: build
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/redsocks/release-0.5.tar.gz
+        dest: redsocks-0.5.tar.gz
+        checksum: bbeb531d7f1986d7102f1bd6733dacce41d3f3ba7d604f1aab61c63e0ba2ee62
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
   dls4e/experiment-service:
     version: "1.0.0"

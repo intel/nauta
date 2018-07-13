@@ -153,9 +153,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/consul-linux-amd64-1.1.0
-        dest: consul
-        checksum: 027630ce1aaa4af5e966d0467d20638cada2bda5ceacd09ff3429daff965ddc0
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/v1.1.0.tar.gz
+        dest: consul-1.1.0.tar.gz
+        checksum: 8e2539561eb07b2623d9828587e68f5ef46cee882227c7331ff26dddcdc0e9df
   shared/build/jq:
     version: "v1.5"
     required:
@@ -178,3 +178,14 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/dumb-init/dumb-init-1.2.1.tar.gz
         dest: dumb-init-1.2.1.tar.gz
         checksum: 56858088d9d6c911c227d196fcbfca06aff31fbe83e1519f9cabe5cf6f11b242
+  shared/build/draft:
+    version: "v0.15.0"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/draft"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/draft/draft-0.15.0.tar.gz
+        dest: draft-0.15.0.tar.gz
+        checksum: 666746985d9e2dd37d28f410afdd2831af131804d2c35d62caaf4f7a9555e726
