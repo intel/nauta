@@ -131,9 +131,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/helm"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/helm-v2.9.1-linux-amd64
-        dest: helm
-        checksum: 9c9b77b0aa9c25debcadd1b538e0f42311e8c2d60a356b256b552642fcd5c6d5
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/v2.9.1.tar.gz
+        dest: helm.tar.gz
+        checksum: 2fee31764117024d1cc4f597d23791c60feef7c3ceedd143cfdbbafca7a7e126
   shared/build/cni:
     version: "v0.7.1"
     required:
