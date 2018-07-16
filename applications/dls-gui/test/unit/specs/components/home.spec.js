@@ -30,9 +30,7 @@ describe('VUE components Home', () => {
   let wrapper, router, store, getters, actions, localVue;
   beforeEach(function () {
     getters = {
-      getSpinnerParams: () => {
-        return {visible: true}
-      }
+      authLoadingState: () => true
     };
     actions = {
       loadAuthority: sinon.spy()

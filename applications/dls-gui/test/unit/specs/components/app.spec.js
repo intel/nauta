@@ -33,12 +33,14 @@ describe('VUE components App', () => {
     state = {
       isLogged: true,
       errorType: 'type',
+      errorTime: 'time',
       errorContent: 'content',
       tensorMode: false
     };
     getters = {
       isLogged: (state) => state.isLogged,
       errorType: (state) => state.errorType,
+      errorTime: (state) => state.errorTime,
       errorContent: (state) => state.errorContent,
       tensorMode: (state) => state.tensorMode
     };

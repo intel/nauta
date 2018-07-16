@@ -228,7 +228,7 @@ export default {
       ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
     },
     tensorBtnAvailable: function () {
-      return !this.tensorMode || (this.tensorMode && this.selected.length === 1);
+      return !this.tensorMode || (this.tensorMode && this.selected.length > 0);
     }
   },
   watch: {
@@ -288,7 +288,7 @@ export default {
     onLaunchTensorboardClick () {
       if (this.tensorMode) {
         const experiments = this.selected.map((exp) => {
-          return `experiments=${encodeURIComponent(exp.name)}`;
+          return `${exp.namespace}=${encodeURIComponent(exp.name)}`;
         }).join('&');
         window.open(`/tensorboard?${experiments}`);
         this.discardTensorboard();

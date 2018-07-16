@@ -41,10 +41,23 @@ export default {
     };
   },
   created: function () {
-    let experimentsList = this.$route.query.experiments;
-    if (!Array.isArray(experimentsList)) {
-      experimentsList = [experimentsList];
-    }
+    const tensorboardParams = this.$route.query;
+    let experimentsList = [];
+    Object.keys(tensorboardParams).forEach((owner) => {
+      if (Array.isArray(tensorboardParams[owner])) {
+        tensorboardParams[owner].forEach((exp) => {
+          experimentsList.push({
+            name: exp,
+            owner: owner
+          });
+        })
+      } else {
+        experimentsList.push({
+          name: tensorboardParams[owner],
+          owner: owner
+        })
+      }
+    });
     const this2 = this;
     this.launch(experimentsList)
       .then((tb) => {
@@ -54,7 +67,7 @@ export default {
           this2.check(instanceId)
             .then(() => {
               clearInterval(this2.timerId);
-              window.location.pathname = tb.data.url;
+              window.location.assign(tb.data.url);
             })
             .catch(() => {
               this2.retry++;

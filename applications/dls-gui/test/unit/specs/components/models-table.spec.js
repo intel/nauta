@@ -45,7 +45,10 @@ describe('VUE components ModelsTable', () => {
           datetime: 0
         }
       },
-      tensorMode: false
+      tensorMode: false,
+      isLogged: true,
+      initializedDataFlag: true,
+      tensorboardLaunching: false
     };
     getters = {
       experimentsData: state => state.experiments.data,
@@ -59,6 +62,9 @@ describe('VUE components ModelsTable', () => {
       lastUpdate: state => state.experiments.stats.datetime,
       fetchingDataActive: state => state.fetchingDataActive,
       tensorMode: state => state.tensorMode,
+      isLogged: state => state.isLogged,
+      initializedDataFlag: state => state.initializedDataFlag,
+      tensorboardLaunching: state => state.tensorboardLaunching
     };
     actions = {
       getUserExperiments: sinon.spy(),
