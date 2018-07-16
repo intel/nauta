@@ -69,6 +69,7 @@
         ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
       nfs:
         node: "{{ ansible_nodename }}"
+        path: "{{ local_data_path }}"
       skydns:
         ClusterIP: "{{ kubernetes_network.svc_list.dns.ip }}"
         Domain: "{{ k8s_domain }}.{{ domain }}"

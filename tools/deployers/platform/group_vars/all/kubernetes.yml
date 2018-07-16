@@ -7,10 +7,14 @@ kubernetes_default_admission_control:
   - LimitRanger
   - ResourceQuota
   - DefaultStorageClass
+  - Priority
 
-kubernetes_default_feature_gates: {}
+kubernetes_default_feature_gates:
+  PodPriority: true # enable POD prioritizing
+  TaintBasedEvictions: true # secured schedule
 
-kubernetes_default_runtime_config: {}
+kubernetes_default_runtime_config:
+  scheduling.k8s.io/v1alpha1: true
 
 kubernetes_calculated_admission_control: "{{ (kubernetes_default_admission_control + kubernetes_admission_control | default([])) | unique }}"
 kubernetes_calculated_feature_gates: "{{ (kubernetes_default_feature_gates | combine(kubernetes_feature_gates | default({}))) }}"

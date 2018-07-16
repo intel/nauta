@@ -14,11 +14,11 @@ BINDIR=${CURDIR}/bin
 inventory() {
     if [ X"${ENV_INVENTORY}" = X"" ]; then
         echo "-c local -i localhost,"
+    else
         if [ ! -f "${ENV_INVENTORY}" ]; then
-            >@2 echo "Could not find or access inventory file: ${ENV_INVENTORY}"
+            >&2 echo "Could not find or access inventory file: ${ENV_INVENTORY}"
             exit 1
         fi
-    else
         echo "--inventory-file=$(realpath ${ENV_INVENTORY})"
     fi
 }
@@ -28,7 +28,7 @@ config() {
         echo ""
     else
         if [ ! -f "${ENV_CONFIG}" ]; then
-            >@2 echo "Could not find or access config file: ${ENV_INVENTORY}"
+            >&2 echo "Could not find or access config file: ${ENV_INVENTORY}"
             exit 1
         fi
         echo "-e @$(realpath ${ENV_CONFIG})"
@@ -57,7 +57,7 @@ ansible_run() {
 
 platform_ansible_run() {
     if [ X"${ENV_INVENTORY}" = X"" ]; then
-        >@2 echo "Inventory file should be provided for platform installation"
+        >&2 echo "Inventory file should be provided for platform installation"
         exit 1
     fi
     ansible_run ${CURDIR}/platform/dls.yml
