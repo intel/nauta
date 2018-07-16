@@ -21,15 +21,14 @@
 
 from http import HTTPStatus
 import webbrowser
-from unittest.mock import MagicMock
 
 from click.testing import CliRunner
 import pytest
-import requests
 
-from util import launcher
 import commands
 from commands.launch import launch
+from tensorboard.client import Tensorboard, TensorboardStatus, TensorboardServiceAPIException
+from util import launcher
 from util.system import get_current_os, OS
 
 
@@ -217,56 +216,86 @@ def launch_tensorboard_command_mock(mocker):
     mocker.patch.object(launch, 'K8sProxy', new=K8sProxyMock)
     mocker.spy(launch, 'K8sProxy')
     mocker.patch.object(launch, 'get_kubectl_current_context_namespace').return_value = "current-namespace"
-    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.OK,
-                                                           content=b'{ "id": "e017442b-f328-47f9-b79d-36c29d9f5494"}')
+
     mocker.patch.object(launch, 'sleep')
     mocker.patch('commands.launch.launch.launch_app_with_proxy')
 
 
+FAKE_TENSORBOARD_ID = 'd846ed7d-3d17-4c65-9430-40729b27afec'
+FAKE_CREATING_TENSORBOARD = Tensorboard(
+    id=FAKE_TENSORBOARD_ID,
+    status=TensorboardStatus.CREATING,
+    url=f'/tb/{FAKE_TENSORBOARD_ID}/'
+)
+FAKE_RUNNING_TENSORBOARD = Tensorboard(
+    id=FAKE_TENSORBOARD_ID,
+    status=TensorboardStatus.RUNNING,
+    url=f'/tb/{FAKE_TENSORBOARD_ID}/'
+)
+
+
 # noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
-def test_tensorboard_command(launch_tensorboard_command_mock):
+def test_tensorboard_command(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
+
+    mocker.patch('tensorboard.client.TensorboardServiceClient.get_tensorboard').return_value = FAKE_RUNNING_TENSORBOARD
+
     runner = CliRunner()
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
 
     assert launch.K8sProxy.call_count == 1
-    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
-    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
-    assert launch.sleep.call_count == 1
-    assert result.exit_code == 0
-
-
-# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
-def test_tensorboard_command_no_sleep_when_conflict(mocker, launch_tensorboard_command_mock):
-    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.CONFLICT,
-                                                           content=b'{ "id": "e017442b-f328-47f9-b79d-36c29d9f5494"}')
-
-    runner = CliRunner()
-    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
-
-    assert launch.K8sProxy.call_count == 1
-    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 1
     assert commands.launch.launch.launch_app_with_proxy.call_count == 1
     assert launch.sleep.call_count == 0
     assert result.exit_code == 0
 
 
 # noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
-def test_tensorboard_command_bad_response(mocker, launch_tensorboard_command_mock):
-    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+def test_tensorboard_command_retries(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
+
+    get_tensorboard_side_effect = [FAKE_CREATING_TENSORBOARD for _ in range(3)]
+    get_tensorboard_side_effect.append(FAKE_RUNNING_TENSORBOARD)
+
+    mocker.patch('tensorboard.client.TensorboardServiceClient.get_tensorboard').side_effect = \
+        get_tensorboard_side_effect
 
     runner = CliRunner()
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
 
-    assert result.exit_code == 1
+    assert launch.K8sProxy.call_count == 1
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 4
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
+    assert launch.sleep.call_count == 3
+    assert result.exit_code == 0
 
 
 # noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
-def test_tensorboard_command_failed_request(mocker, launch_tensorboard_command_mock):
-    mocker.patch('requests.post').side_effect = requests.ConnectionError
+def test_tensorboard_command_too_many_retries(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
+
+    mocker.patch('tensorboard.client.TensorboardServiceClient.get_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
 
     runner = CliRunner()
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
 
-    requests.post.assert_called_once_with('http://127.0.0.1:1234/create/some-exp')
+    assert launch.K8sProxy.call_count == 1
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 10
     assert commands.launch.launch.launch_app_with_proxy.call_count == 0
+    assert launch.sleep.call_count == 10
+    assert result.exit_code == 2
+
+
+# noinspection PyUnusedLocal,PyShadowingNames
+def test_tensorboard_command_create_exception(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').side_effect = \
+        TensorboardServiceAPIException(error_code=HTTPStatus.INTERNAL_SERVER_ERROR.value, message='error')
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
     assert result.exit_code == 1

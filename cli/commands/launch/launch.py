@@ -19,23 +19,22 @@
 # and approved by Intel in writing.
 #
 
-from http import HTTPStatus
-import json
 import sys
 from time import sleep
 from typing import Optional
 
 import click
-import requests
 
-from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
-from util.launcher import launch_app
+from tensorboard.client import TensorboardServiceClient, TensorboardRun, TensorboardStatus
 from util.aliascmd import AliasCmd, AliasGroup
-from util.exceptions import LaunchError, ProxyClosingError
-from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.app_names import DLS4EAppNames
+from util.exceptions import LaunchError, ProxyClosingError
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
+from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.launcher import launch_app
+from util.logger import initialize_logger
+
 
 logger = initialize_logger('commands.launch')
 
@@ -76,30 +75,32 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
 
     with K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
                   namespace=current_namespace, port=port) as proxy:
+
+        tensorboard_service_client = TensorboardServiceClient(address=f'http://127.0.0.1:{proxy.tunnel_port}')
+
+        requested_run = TensorboardRun(name=experiment_name, owner=current_namespace)
+
         # noinspection PyBroadException
         try:
-            response = requests.post('http://127.0.0.1:' + str(proxy.tunnel_port) + "/create/" + experiment_name)
+            tb = tensorboard_service_client.create_tensorboard([requested_run])
         except Exception:
-            logger.exception('failed sending request to tensorboard-service!')
-            click.echo('Error during requesting new tensorboard instance.')
+            click.echo('failed to create tensorboard!')
+            logger.exception('failed to create tensorboard!')
             sys.exit(1)
 
-        expected_status_code_from_tensorboard_service = (HTTPStatus.OK, HTTPStatus.CONFLICT)
-        if response.status_code not in expected_status_code_from_tensorboard_service:
-            logger.error(f'bad status code returned from tensorboard-service - got: {response.status_code} , '
-                         f'expected one of: {expected_status_code_from_tensorboard_service}')
-            click.echo('Error during requesting new tensorboard instance.')
-            sys.exit(1)
+        click.echo('Please wait for Tensorboard to run...')
+        for i in range(10):
+            tb = tensorboard_service_client.get_tensorboard(tb.id)
+            if tb.status == TensorboardStatus.RUNNING:
+                launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
+                                      namespace=current_namespace,
+                                      app_name=f"tensorboard-{tb.id}")
+                return
+            logger.warning(f'Tensorboard instance: {tb.id} still in {tb.status.value} status, waiting for RUNNING...')
+            sleep(5)
 
-    response_body = json.loads(response.content.decode('utf-8'))
-    tensorboard_id = response_body['id']
-
-    if response.status_code == HTTPStatus.OK:
-        # TODO: remove sleep after implementing Tensorboard instance's status polling from tensorboard-service
-        sleep(10)
-
-    launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch, namespace=current_namespace,
-                          app_name="tensorboard-"+tensorboard_id)
+        click.echo('Tensorboard failed to run - timeout.')
+        sys.exit(2)
 
 
 @click.group(short_help=HELP, cls=AliasGroup, alias='l',

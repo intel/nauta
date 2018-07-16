@@ -73,7 +73,7 @@ def create():
 
     try:
         request_body = TensorboardCreationRequestBody.from_dict(request_json_body)
-    except KeyError:
+    except (KeyError, TypeError):
         return _generate_error_response(HTTPStatus.BAD_REQUEST, 'incorrect request body!')
 
     tensb_mgr = TensorboardManager.incluster_init()
