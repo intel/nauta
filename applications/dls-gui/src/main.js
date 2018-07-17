@@ -54,10 +54,13 @@ router.beforeEach((to, from, next) => {
       const authorized = store.getters.isLogged;
       if (!authorized) {
         next({path: '/invalid_token'});
+      } else {
+        next();
       }
     });
+  } else {
+    next();
   }
-  next();
 });
 
 /* eslint-disable no-new */

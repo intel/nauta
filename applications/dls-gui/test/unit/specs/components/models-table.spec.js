@@ -48,7 +48,8 @@ describe('VUE components ModelsTable', () => {
       tensorMode: false,
       isLogged: true,
       initializedDataFlag: true,
-      tensorboardLaunching: false
+      tensorboardLaunching: false,
+      username: 'anonymous'
     };
     getters = {
       experimentsData: state => state.experiments.data,
@@ -64,7 +65,8 @@ describe('VUE components ModelsTable', () => {
       tensorMode: state => state.tensorMode,
       isLogged: state => state.isLogged,
       initializedDataFlag: state => state.initializedDataFlag,
-      tensorboardLaunching: state => state.tensorboardLaunching
+      tensorboardLaunching: state => state.tensorboardLaunching,
+      username: state => state.username
     };
     actions = {
       getUserExperiments: sinon.spy(),

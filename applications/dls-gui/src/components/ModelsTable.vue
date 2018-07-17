@@ -48,9 +48,6 @@
               </v-card-title>
             </v-flex>
           </v-card-title>
-          <v-alert v-if="filteredDataCount === 0" :value="true" type="info">
-            No data to display.
-          </v-alert>
           <div class="elevation-3">
             <div class="table__overflow">
               <table class="datatable table">
@@ -102,6 +99,16 @@
                 </tr>
                 </tbody>
               </table>
+            </div>
+            <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length === 0">
+              <v-alert :value="true" type="info">
+                No data to display.
+              </v-alert>
+            </div>
+            <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length !== 0">
+              <v-alert :value="true" type="info">
+                Currently signed in user does not have any models. To display models that belong to other users, use filters for the <i>owner</i> column.
+              </v-alert>
             </div>
             <FooterElements v-if="filteredDataCount"
               :currentPage="pagination.currentPage"
@@ -186,6 +193,7 @@ export default {
     }
   },
   created: function () {
+    this.filterByValModals.namespace.params.push(this.username);
     const refreshMode = false;
     this.getData(refreshMode);
     this.intervalId = setInterval(this.timer, 1000);
@@ -211,7 +219,8 @@ export default {
       tensorMode: 'tensorMode',
       isCheckingAuth: 'authLoadingState',
       isInitializedData: 'initializedDataFlag',
-      isLogged: 'isLogged'
+      isLogged: 'isLogged',
+      username: 'username'
     }),
     paginationStats: function () {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
@@ -233,6 +242,9 @@ export default {
   },
   watch: {
     refreshTableDataTriggers: function () {
+      if (this.filterByValModals.namespace.params.length === 0) {
+        this.filterByValModals.namespace.params.push(this.username);
+      }
       const refreshMode = false;
       this.getData(refreshMode);
     },
@@ -373,5 +385,8 @@ th {
 }
 .active {
   font-weight: bold;
+}
+#nodata {
+  height: 80px;
 }
 </style>
