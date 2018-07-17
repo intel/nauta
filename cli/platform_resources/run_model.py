@@ -27,6 +27,7 @@ from marshmallow import Schema, fields, post_load, validates
 from marshmallow_enum import EnumField
 
 from platform_resources.platform_resource_model import PlatformResource, KubernetesObjectSchema
+from util.system import format_timestamp_for_cli
 
 
 class RunStatus(Enum):
@@ -79,7 +80,7 @@ class Run(PlatformResource):
                                metrics=textwrap.fill(
                                    ' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
                                    width=30),
-                               submission_date=self.creation_timestamp,
+                               submission_date=format_timestamp_for_cli(self.creation_timestamp),
                                submitter=self.submitter,
                                status=self.state.value if self.state else "",
                                template_name=self.template_name)

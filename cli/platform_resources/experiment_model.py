@@ -28,6 +28,7 @@ from marshmallow import Schema, fields, post_load, validates
 from marshmallow_enum import EnumField
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from platform_resources.platform_resource_model import PlatformResource, KubernetesObjectSchema
+from util.system import format_timestamp_for_cli
 
 
 class ExperimentStatus(Enum):
@@ -67,8 +68,8 @@ class Experiment(PlatformResource):
     @property
     def cli_representation(self):
         return Experiment.ExperimentCliModel(name=self.name, parameters_spec=' '.join(self.parameters_spec),
-                                             creation_timestamp=self.creation_timestamp, submitter=self.submitter,
-                                             status=self.state.value)
+                                             creation_timestamp=format_timestamp_for_cli(self.creation_timestamp),
+                                             submitter=self.submitter, status=self.state.value)
 
 
 class ExperimentSchema(Schema):

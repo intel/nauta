@@ -62,6 +62,8 @@ class ViewMocks:
         self.get_pods = mocker.patch('commands.experiment.view.get_pods')
         self.get_pods.return_value = TEST_PODS
         self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
+        self.format_timestamp = mocker.patch('platform_resources.run_model.format_timestamp_for_cli')
+        self.format_timestamp.return_value = '2018-04-26 13:43:01'
 
 
 @pytest.fixture
@@ -77,7 +79,7 @@ def test_view_experiment_success(prepare_mocks: ViewMocks):
 
     assert TEST_RUNS[0].name in result.output, "Bad output."
     assert TEST_RUNS[0].submitter in result.output, "Bad output."
-    assert TEST_RUNS[0].creation_timestamp in result.output, "Bad output."
+    assert "2018-04-26 13:43:01" in result.output, result.output
 
     assert result.exit_code == 0
 

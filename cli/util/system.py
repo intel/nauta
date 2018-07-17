@@ -27,6 +27,7 @@ import sys
 from typing import List
 import errno
 import socket
+import dateutil
 import signal
 
 from util.exceptions import KubectlIntError
@@ -113,6 +114,17 @@ def check_port_availability(port: int) -> bool:
             raise KubectlIntError(error_msg) from e
 
     return ret_value
+
+
+def format_timestamp_for_cli(timestamp: str) -> str:
+    """
+    Change timestamp from e.g. "2018-10-11T20:20:30Z" to "2018-10-11 21:20:30" (assuming that local timezone is +01:00).
+
+    :param timestamp: timestamp which will be converted
+    :return: formatted version of the timestamp
+    """
+    cli_timestamp = dateutil.parser.parse(timestamp).astimezone(dateutil.tz.tzlocal()).strftime("%Y-%m-%d %H:%M:%S")
+    return cli_timestamp
 
 
 def wait_for_ctrl_c():

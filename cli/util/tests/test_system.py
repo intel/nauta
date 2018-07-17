@@ -21,10 +21,11 @@
 
 import subprocess
 import errno
+import datetime
 
 import pytest
 
-from util.system import execute_system_command, check_port_availability
+from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli
 from util.exceptions import KubectlIntError
 
 
@@ -81,3 +82,12 @@ def test_check_port_availability_occupied(mocker):
     socket_local.side_effect = OSError(errno.EADDRINUSE, "Address in use")
 
     assert not check_port_availability(9000)
+
+
+def test_format_timestamp_for_cli(mocker):
+    tzlocal_mock = mocker.patch("dateutil.tz.tzlocal")
+    tzlocal_mock.return_value = datetime.timezone(datetime.timedelta(hours=1))
+
+    cli_timestamp = format_timestamp_for_cli("2018-10-11T20:30:30Z")
+
+    assert cli_timestamp == "2018-10-11 21:30:30"
