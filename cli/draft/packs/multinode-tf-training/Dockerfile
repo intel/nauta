@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM dls4e/tensorflow:1.9.0-rc2-py3
+FROM dls4e/tensorflow:1.9.0-py3
 
 RUN mkdir /data
 COPY ./data/* /data/

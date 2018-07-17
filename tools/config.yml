@@ -101,28 +101,39 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.3.tar.gz
         dest: kubernetes.tar.gz
         checksum: f3750b19d6d7471ea33230f96a420c53df46d8a060a4f14722992c5c7bdd9055
-  shared/build/tensorflow/haswell:
-    version: "1.9.0-rc2-py3"
+  shared/build/tensorflow/1.9.0py2/haswell:
+    version: "1.9.0-py2"
     required:
       BASE_IMAGE: "shared/ubuntu"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py2/haswell"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0-rc2.tar.gz
-        dest: tensorflow-v1.9.0-rc2.tar.gz
-        checksum: 0ecfea51cf4e14c082d1d42d54cb23371d3d46e86549435c8f6c5ff694287a76
-  shared/build/tensorflow/skx:
-    version: "1.9.0-rc2-py3"
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+        dest: tensorflow-v1.9.0.tar.gz
+        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
+  shared/build/tensorflow/1.9.0py3/haswell:
+    version: "1.9.0-py3"
     required:
       BASE_IMAGE: "shared/ubuntu"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/haswell"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0-rc2.tar.gz
-        dest: tensorflow-v1.9.0-rc2.tar.gz
-        checksum: 0ecfea51cf4e14c082d1d42d54cb23371d3d46e86549435c8f6c5ff694287a76
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+        dest: tensorflow-v1.9.0.tar.gz
+        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
+  shared/build/tensorflow/1.9.0py3/skylake:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/ubuntu"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/skylake"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+        dest: tensorflow-v1.9.0.tar.gz
+        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
   shared/build/helm:
     version: "v2.9.1"
     required:

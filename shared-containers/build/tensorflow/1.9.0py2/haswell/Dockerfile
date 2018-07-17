@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libzmq3-dev \
         pkg-config \
         python-dev \
-        python3-dev \
-        python3-pip \
+        python-pip \
+        python-setuptools \
         rsync \
         software-properties-common \
         unzip \
@@ -27,11 +27,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN mkdir /tensorflow /build-output -p
 
-ENV PYTHON=python3
-ENV PIP=pip3
-ENV TENSORFLOW_VERSION=1.9.0-rc2
+ENV PYTHON=python2
+ENV PIP=pip2
+ENV TENSORFLOW_VERSION=1.9.0
 
-RUN ${PIP} install -U pip setuptools
+RUN ${PIP} install --force-reinstall -U setuptools
+RUN ${PIP} install --force-reinstall -U pip
 
 RUN ${PIP} install \
         Pillow \
@@ -68,19 +69,22 @@ WORKDIR /tensorflow/tensorflow-${TENSORFLOW_VERSION}/
 
 RUN yes "" | ${PYTHON} configure.py
 RUN bazel build \
-        --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 \
-        --copt=-march=broadwell \
-        --copt=-mclflushopt \
-        --copt=-mxsavec \
-        --copt=-mxsaves \
-        --copt=-mavx512f \
-        --copt=-mavx512vl \
-        --copt=-mavx512bw \
-        --copt=-mavx512dq \
-        --copt=-mavx512cd \
-        --copt=-O3 \
-        --config=mkl \
-        --jobs=64 \
-        -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
+      --config=mkl \
+      --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 \
+      --copt=-march=haswell \
+      --copt=-mtune=broadwell \
+      --copt=-O3 \
+      --copt=-Wformat \
+      --copt=-Wformat-security \
+      --copt=-fstack-protector \
+      --copt=-fPIC \
+      --copt=-fpic \
+      --linkopt=-znoexecstack \
+      --linkopt=-zrelro \
+      --linkopt=-znow \
+      --linkopt=-fstack-protector \
+      --linkopt=-pie \
+      --jobs=64 \
+      -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
 
 RUN bazel-bin/tensorflow/tools/pip_package/build_pip_package /build-output/

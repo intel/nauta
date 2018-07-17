@@ -85,9 +85,9 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
             if line.startswith("ADD training.py"):
                 if script_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
-            elif line.startswith("FROM dls4e/tensorflow:1.9.0-rc2-py3"):
+            elif line.startswith("FROM dls4e/tensorflow:1.9.0-py3"):
                 dockerfile_temp_content = dockerfile_temp_content + \
-                                          f"FROM 127.0.0.1:{local_registry_port}/dls4e/tensorflow:1.9.0-rc2-py3"
+                                          f"FROM 127.0.0.1:{local_registry_port}/dls4e/tensorflow:1.9.0-py3"
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 

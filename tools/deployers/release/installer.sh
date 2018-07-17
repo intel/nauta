@@ -10,6 +10,13 @@ BINDIR=${CURDIR}/bin
 . ${LIBDIR}/locale.sh
 . ${LIBDIR}/bins-detect.sh
 . ${LIBDIR}/ansible.sh
+. ${LIBDIR}/logs.sh
+
+
+hide_output() {
+    $@ > /dev/null 2&>1
+    return $?
+}
 
 inventory() {
     if [ X"${ENV_INVENTORY}" = X"" ]; then
@@ -47,6 +54,8 @@ kubeconfig() {
 
 ansible_run() {
     export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
+    hide_output inventory || exit 1
+    hide_output config || exit 1
     ansible $(inventory) $(config) \
     -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \
     -e "kubeconfig=$(realpath $(kubeconfig))" -e "loader=${LOADER}" \

@@ -29,7 +29,7 @@ RUN mkdir /tensorflow /build-output -p
 
 ENV PYTHON=python3
 ENV PIP=pip3
-ENV TENSORFLOW_VERSION=1.9.0-rc2
+ENV TENSORFLOW_VERSION=1.9.0
 
 RUN ${PIP} install -U pip setuptools
 

@@ -78,17 +78,37 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  dls4e/tensorflow/base:
-    version: "1.9.0-rc2-py3"
+  dls4e/tensorflow/1.9.0py2/haswell/base:
+    version: "1.9.0-py2"
     required:
       BASE_IMAGE: "shared/ubuntu"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/haswell"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py2/haswell"
+    args:
+      PYTHON_VERSION: 2
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
+  dls4e/tensorflow/1.9.0py3/haswell/base:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/ubuntu"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/haswell"
+    args:
+      PYTHON_VERSION: 3
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
+  dls4e/tensorflow/1.9.0py3/skylake/base:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/ubuntu"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/skylake"
+    args:
+      PYTHON_VERSION: 3
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow:
-    version: "1.9.0-rc2-py3"
+    version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "dls4e/tensorflow/base"
+      BASE_IMAGE: "dls4e/tensorflow/1.9.0py3/haswell/base"
     method: build
     directory: "{{ playbook_dir }}/../../cli/experiment_metrics"
   dls4e/nginx:

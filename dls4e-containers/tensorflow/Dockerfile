@@ -3,9 +3,9 @@ ARG BASE_IMAGE
 FROM ${TENSORFLOW_BUILD_IMAGE} as data
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_VERSION=1.9.0rc0
-
-COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-cp35-cp35m-linux_x86_64.whl /
+ENV TENSORFLOW_VERSION=1.9.0
+ARG PYTHON_VERSION
+ENV PYTHON=python${PYTHON_VERSION} PIP=pip${PYTHON_VERSION}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -16,8 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libzmq3-dev \
         pkg-config \
         python \
-        python3-dev \
         python3-pip \
+        python-pip \
+        python3-dev \
+        python-dev \
+        python-setuptools \
         rsync \
         software-properties-common \
         unzip \
@@ -25,8 +28,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PYTHON=python3
-ENV PIP=pip3
+COPY jupyter_notebook_config.py /root/.jupyter/
+
+COPY notebooks /notebooks
+
+COPY run_jupyter.sh /
+RUN chmod +x /run_jupyter.sh
+
+# TensorBoard
+EXPOSE 6006
+# IPython
+EXPOSE 8888
+
+WORKDIR "/notebooks"
+
+CMD ["/run_jupyter.sh", "--allow-root"]
 
 RUN ln -s -f /usr/bin/${PYTHON} /usr/bin/python && \
     ln -s -f /usr/bin/${PIP} /usr/bin/pip
@@ -48,20 +64,7 @@ RUN ${PIP} install \
 
 RUN ${PYTHON} -m ipykernel.kernelspec
 
-RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-cp35-cp35m-linux_x86_64.whl && \
-    rm -rf /tensorflow-${TENSORFLOW_VERSION}-cp35-cp35m-linux_x86_64.whl
+COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
 
-COPY jupyter_notebook_config.py /root/.jupyter/
-
-COPY notebooks /notebooks
-
-COPY run_jupyter.sh /
-
-# TensorBoard
-EXPOSE 6006
-# IPython
-EXPOSE 8888
-
-WORKDIR "/notebooks"
-
-CMD ["/run_jupyter.sh", "--allow-root"]
+RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
+    rm -rf /tensorflow-${TENSORFLOW_VERSION}-*.whl

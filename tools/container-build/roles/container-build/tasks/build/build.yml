@@ -3,8 +3,9 @@
 - set_fact:
     local_buildargs: "{{ docker_images_base[name] }}"
 
-- debug:
-    var: local_buildargs
+- set_fact:
+    local_buildargs: "{{ local_buildargs | combine(image.args) }}"
+  when: "'args' in image"
 
 - name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
