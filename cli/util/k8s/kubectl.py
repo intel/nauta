@@ -40,6 +40,19 @@ START_PORT = 3000
 END_PORT = 65535
 
 
+def find_random_available_port() -> int:
+    for port in random.sample(range(START_PORT, END_PORT), k=MAX_NUMBER_OF_TRIES):
+        if check_port_availability(port):
+            tunnel_port = port
+            break
+    else:
+        error_msg = "Available port cannot be found."
+        logger.error(error_msg)
+        raise LocalPortOccupiedError(error_msg)
+
+    return tunnel_port
+
+
 def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_name: str = None,
                           number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen, Optional[int], int):
     """
@@ -53,7 +66,8 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
 
     :param k8s_app_name: name of kubernetes application for tunnel creation
                          value taken from DLS4EAppNames enum
-    :param port: if given - the system will try to use it as a local port
+    :param port: if given - the system will try to use it as a local port. Random port will be used
+     if that port is not available
     :return:
         instance of a process with proxy, tunneled port and container port
     """
@@ -83,20 +97,12 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
             raise KubectlIntError("Missing port during creation of port proxy.")
 
         if port:
-            if not check_port_availability(port):
-                error_msg = f"Port {port} is occupied. Please try to use another one."
-                logger.error(error_msg)
-                raise LocalPortOccupiedError(error_msg)
-            tunnel_port = port
-        else:
-            for port in random.sample(range(START_PORT, END_PORT), k=MAX_NUMBER_OF_TRIES):
-                if check_port_availability(port):
-                    tunnel_port = port
-                    break
+            if check_port_availability(port):
+                tunnel_port = port
             else:
-                error_msg = "Available port cannot be found."
-                logger.error(error_msg)
-                raise LocalPortOccupiedError(error_msg)
+                tunnel_port = find_random_available_port()
+        else:
+            tunnel_port = find_random_available_port()
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
                                 f'{tunnel_port}:{service_container_port}']

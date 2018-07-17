@@ -199,9 +199,14 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
         raise SubmitExperimentError(message)
 
     try:
+        config = Config()
+
         # start port forwarding
         # noinspection PyBroadException
-        with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY) as proxy:
+        with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+            # Save port that was actually used in configuration
+            if proxy.tunnel_port != config.local_registry_port:
+                config.local_registry_port = proxy.tunnel_port
 
             try:
                 # prepare environments for all experiment's runs

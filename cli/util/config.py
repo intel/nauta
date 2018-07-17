@@ -21,6 +21,9 @@
 
 import os
 import sys
+from typing import Optional
+
+import yaml
 
 from util.k8s.k8s_info import get_config_map_data
 from util.logger import initialize_logger
@@ -33,6 +36,9 @@ DLS_CTL_CONFIG_DIR_NAME = 'dls_ctl_config'
 EXPERIMENTS_DIR_NAME = 'experiments'
 # name of a directory with data copied from script folder location
 FOLDER_DIR_NAME = 'folder'
+
+# registry config file
+DOCKER_REGISTRY_CONFIG_FILE = 'docker_registry.yaml'
 
 DLS4E_NAMESPACE = "dls4e"
 DLS4E_CONFIGURATION_CM = "dls4enterprise"
@@ -78,6 +84,28 @@ class Config:
                       f'{user_local_config_dir_path}. Use {DLS_CTL_CONFIG_ENV_NAME} env to point ' \
                       f'{DLS_CTL_CONFIG_DIR_NAME} directory location'
             raise ConfigInitError(message)
+
+    @property
+    def local_registry_port(self) -> Optional[int]:
+        docker_registry_config_file_path = os.path.join(self.config_path, DOCKER_REGISTRY_CONFIG_FILE)
+        if not os.path.isfile(docker_registry_config_file_path):
+            log.debug(f'Docker registry config file not found ({docker_registry_config_file_path}).')
+            return None
+
+        with open(docker_registry_config_file_path, mode='r', encoding='utf-8') as docker_registry_config_file:
+            docker_registry_config = yaml.load(docker_registry_config_file) or {}
+
+        return docker_registry_config.get('local_registry_port')
+
+    @local_registry_port.setter
+    def local_registry_port(self, port: int):
+        docker_registry_config_file_path = os.path.join(self.config_path, DOCKER_REGISTRY_CONFIG_FILE)
+        log.debug(f'Saving local registry port ({port}) to {docker_registry_config_file_path}.')
+
+        with open(docker_registry_config_file_path, mode='w+', encoding='utf-8') as docker_registry_config_file:
+            docker_registry_config = yaml.load(docker_registry_config_file) or {}
+            docker_registry_config['local_registry_port'] = port
+            yaml.dump(docker_registry_config, docker_registry_config_file, default_flow_style=False)
 
 
 class DLS4EConfigMap:
