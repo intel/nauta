@@ -136,8 +136,8 @@ def test_get_experiment_logs(mocker):
     experiment_logs = client.get_experiment_logs(run_name=experiment_name, namespace=namespace)
 
     assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName:"{experiment_name}" ' \
-                                                      f'AND kubernetes.namespace_name:"{namespace}"',
+    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName.keyword:"{experiment_name}" ' \
+                                                      f'AND kubernetes.namespace_name.keyword:"{namespace}"',
                                          filters=[], index='_all')
 
 
@@ -158,8 +158,8 @@ def test_get_experiment_logs_time_range(mocker):
                                                  end_date=end_date)
 
     assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName:"{experiment_name}" ' \
-                                                      f'AND kubernetes.namespace_name:"{namespace}" ' \
+    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName.keyword:"{experiment_name}" ' \
+                                                      f'AND kubernetes.namespace_name.keyword:"{namespace}" ' \
                                                       f'AND @timestamp:[{start_date} TO {end_date}]',
                                          filters=[], index='_all')
 
@@ -182,4 +182,4 @@ def test_delete_logs_for_run(mocker):
     client.delete_logs_for_run(run_name)
 
     mocked_delete_logs.assert_called_with(index='_all',
-                                          body={"query": {"match": {'kubernetes.labels.runName': run_name}}})
+                                          body={"query": {"term": {'kubernetes.labels.runName.keyword': run_name}}})

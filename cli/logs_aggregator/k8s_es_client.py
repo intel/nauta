@@ -46,7 +46,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 
-    def full_log_search(self, lucene_query: str=None, index='_all',
+    def full_log_search(self, lucene_query: str = None, index='_all',
                         scroll='1m', filters: List[Callable] = None) -> Generator[LogEntry, None, None]:
         """
         A generator that yields LogEntry objects constructed from Kubernetes resource logs.
@@ -84,15 +84,13 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         """
         log.debug(f'Searching for {run_name} experiment logs.')
 
+        lucene_query = f'kubernetes.labels.runName.keyword:\"{run_name}\" ' \
+                       f'AND kubernetes.namespace_name.keyword:\"{namespace}\"'
+
         if start_date or end_date:
             start_date = start_date or '*'
             end_date = end_date or '*'
-            lucene_query = f'kubernetes.labels.runName:"{run_name}" ' \
-                           f'AND kubernetes.namespace_name:"{namespace}" ' \
-                           f'AND @timestamp:[{start_date} TO {end_date}]'
-        else:
-            lucene_query = f'kubernetes.labels.runName:"{run_name}" ' \
-                           f'AND kubernetes.namespace_name:"{namespace}"'
+            lucene_query += f' AND @timestamp:[{start_date} TO {end_date}]'
 
         filters = []
         if min_severity:
@@ -120,11 +118,10 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         """
         log.debug(f'Deleting logs for {namespace} namespace.')
 
-        delete_query = {"query": {"match": {'kubernetes.namespace_name': namespace}}}
-
+        delete_query = {"query": {"term": {'kubernetes.namespace_name.keyword': namespace}}}
         output = self.delete_by_query(index=index, body=delete_query)
 
-        log.debug(f"Deleting logs - result :{str(output)}")
+        log.debug(f"Deleting logs - result: {str(output)}")
 
 
     def delete_logs_for_run(self, run: str, index='_all'):
@@ -136,8 +133,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         """
         log.debug(f'Deleting logs for {run} run.')
 
-        delete_query = {"query": {"match": {'kubernetes.labels.runName': run}}}
-
+        delete_query = {"query": {"term": {'kubernetes.labels.runName.keyword': run}}}
         output = self.delete_by_query(index=index, body=delete_query)
 
-        log.debug(f"Deleting logs - result :{str(output)}")
+        log.debug(f"Deleting logs - result: {str(output)}")
