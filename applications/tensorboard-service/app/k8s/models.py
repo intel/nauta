@@ -106,7 +106,14 @@ class K8STensorboardInstance:
                                                               k8s.V1ContainerPort(
                                                                   container_port=80
                                                               )
-                                                          ]
+                                                          ],
+                                                          readiness_probe=k8s.V1Probe(
+                                                              period_seconds=5,
+                                                              http_get=k8s.V1HTTPGetAction(
+                                                                  path='/',
+                                                                  port=80
+                                                              )
+                                                          )
                                                       )
                                                   ],
                                                   volumes=[
