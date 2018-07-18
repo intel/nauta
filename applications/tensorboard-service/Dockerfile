@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 ADD app/ .
 
-ENTRYPOINT gunicorn -w 4 -b 0.0.0.0:80 api:app
+ENTRYPOINT gunicorn -w 4 -b 0.0.0.0:80 api.main:app

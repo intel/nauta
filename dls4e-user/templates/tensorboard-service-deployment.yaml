@@ -34,7 +34,15 @@ spec:
         - containerPort: 80
           name: http
           protocol: TCP
+        volumeMounts:
+        - mountPath: /mnt/output
+          name: output-public
       - image: {{ required "DLS4E user tensorboard-service image is required" .Values.TensorboardServiceImage }}
         name: garbage-collector
         command: ["python3.6", "daemon.py"]
       restartPolicy: Always
+      volumes:
+      - name: output-public
+        persistentVolumeClaim:
+          claimName: output-public
+          readOnly: true

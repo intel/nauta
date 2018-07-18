@@ -19,36 +19,4 @@
 # and approved by Intel in writing.
 #
 
-from enum import Enum
-from typing import Dict
-
-
-class TensorboardStatus(Enum):
-    CREATING = 'CREATING'
-    RUNNING = 'RUNNING'
-
-
-class Tensorboard:
-    def __init__(self, id: str, status: TensorboardStatus = TensorboardStatus.CREATING, url: str = ''):
-        self.id = id
-        self.status = status
-        self.url = url
-
-    def to_dict(self) -> Dict[str, str]:
-        return {
-            'id': self.id,
-            'status': self.status.value,
-            'url': self.url
-        }
-
-
-class Run:
-    def __init__(self, name: str, owner: str):
-        self.name = name
-        self.owner = owner
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'owner': self.owner
-        }
+#

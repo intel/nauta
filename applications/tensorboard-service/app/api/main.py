@@ -22,33 +22,18 @@
 from http import HTTPStatus
 import json
 import logging as log
-from typing import List
 
 from flask import Flask, request
 
 from tensorboard.tensorboard import TensorboardManager
-from tensorboard.models import Run
+from api.models import TensorboardCreationRequestBody, TensorboardResponse, TensorboardResponsePreconditionFailed
 
 log.basicConfig(level=log.DEBUG)
 
 app = Flask(__name__)
 
-
-class TensorboardCreationRequestBody:
-    def __init__(self, run_names: List[Run]):
-        self.run_names = run_names
-
-    @classmethod
-    def from_dict(cls, body):
-        runs_from_json = body['runNames']
-        runs = []
-        for json_run in runs_from_json:
-            name = json_run['name']
-            owner = json_run['owner']
-            new_run = Run(name=name, owner=owner)
-            runs.append(new_run)
-
-        return cls(run_names=runs)
+# TODO: change to decorator
+CONTENT_TYPE_SLUG = {'Content-Type': 'application/json'}
 
 
 def _generate_error_response(error_code: HTTPStatus, message: str) -> (str, HTTPStatus, dict):
@@ -56,7 +41,7 @@ def _generate_error_response(error_code: HTTPStatus, message: str) -> (str, HTTP
         'code': error_code,
         'message': message
     }
-    return json.dumps(response), error_code, {'Content-Type': 'application/json'}
+    return json.dumps(response), error_code, CONTENT_TYPE_SLUG
 
 
 @app.route('/tensorboard', methods=['POST'])
@@ -78,14 +63,32 @@ def create():
 
     tensb_mgr = TensorboardManager.incluster_init()
 
-    current_tensorboard_instance = tensb_mgr.get_by_runs(request_body.run_names)
+    valid_runs, invalid_runs = tensb_mgr.validate_runs(request_body.run_names)
+
+    if not valid_runs:
+        response = TensorboardResponsePreconditionFailed(code=HTTPStatus.UNPROCESSABLE_ENTITY.value,
+                                                         invalid_runs=invalid_runs)
+
+        return json.dumps(response.to_dict()), HTTPStatus.UNPROCESSABLE_ENTITY, CONTENT_TYPE_SLUG
+
+    current_tensorboard_instance = tensb_mgr.get_by_runs(valid_runs)
 
     if current_tensorboard_instance:
-        return json.dumps(current_tensorboard_instance.to_dict()), HTTPStatus.CONFLICT
+        response = TensorboardResponse.from_tensorboard(current_tensorboard_instance)
 
-    tensorboard = tensb_mgr.create(request_body.run_names)
+        if invalid_runs:
+            response.invalid_runs = invalid_runs
 
-    return json.dumps(tensorboard.to_dict()), HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
+        return json.dumps(response.to_dict()), HTTPStatus.CONFLICT, CONTENT_TYPE_SLUG
+
+    tensorboard = tensb_mgr.create(valid_runs)
+
+    response = TensorboardResponse.from_tensorboard(tensorboard)
+
+    if invalid_runs:
+        response.invalid_runs = invalid_runs
+
+    return json.dumps(response.to_dict()), HTTPStatus.ACCEPTED, CONTENT_TYPE_SLUG
 
 
 @app.route('/tensorboard/<id>', methods=['GET'])
@@ -97,4 +100,4 @@ def get(id: str):
     if current_tensorboard_instance is None:
         return _generate_error_response(HTTPStatus.NOT_FOUND, 'Tensorboard instance with provided id does not exist.')
 
-    return json.dumps(current_tensorboard_instance.to_dict()), {'Content-Type': 'application/json'}
+    return json.dumps(current_tensorboard_instance.to_dict()), CONTENT_TYPE_SLUG

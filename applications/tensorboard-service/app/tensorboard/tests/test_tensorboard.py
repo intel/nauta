@@ -343,3 +343,20 @@ def test_delete_garbage(mocker, tensorboard_manager_mocked: TensorboardManager,
 
     # noinspection PyUnresolvedReferences
     assert tensorboard_manager_mocked.delete.call_count == delete_count
+
+
+# noinspection PyShadowingNames
+def test_validate_runs(mocker, tensorboard_manager_mocked: TensorboardManager):
+    def fake_isdir(path: str):
+        return path in (TensorboardManager.OUTPUT_PUBLIC_MOUNT_PATH + '/jeanne/training1',
+                        TensorboardManager.OUTPUT_PUBLIC_MOUNT_PATH + '/abbie/training2')
+
+    mocker.patch('os.path.isdir', new=fake_isdir)
+    fake_runs = [Run(name='training1', owner='jeanne'),
+                 Run(name='training2', owner='abbie'),
+                 Run(name='training3', owner='harold')]
+
+    valid, invalid = tensorboard_manager_mocked.validate_runs(fake_runs)
+
+    assert valid == [fake_runs[0], fake_runs[1]]
+    assert invalid == [fake_runs[2]]

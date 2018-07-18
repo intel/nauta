@@ -21,12 +21,12 @@
 
 from datetime import datetime, timedelta, timezone
 import logging as log
+from os import path
 from typing import List, Optional
 from uuid import uuid4
 
 from kubernetes import config
 from kubernetes.client import V1Deployment, V1ObjectMeta
-
 
 from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
@@ -34,6 +34,8 @@ from tensorboard.models import Tensorboard, TensorboardStatus, Run
 
 
 class TensorboardManager:
+    OUTPUT_PUBLIC_MOUNT_PATH = '/mnt/output'
+
     def __init__(self, namespace: str, api_client: K8SAPIClient):
         self.client = api_client
         self.namespace = namespace
@@ -152,3 +154,21 @@ class TensorboardManager:
                 log.debug(f'garbage detected: {meta.name} , removing...')
                 self.delete(deployment)
                 log.debug(f'garbage removed: {meta.name}')
+
+    def validate_runs(self, runs: List[Run]) -> (List[Run], List[Run]):
+        """
+        :param runs: runs to validate
+        :return: (valid_runs: List[Run], invalid_runs: List[Run])
+        """
+
+        valid = []
+        invalid = []
+
+        for run in runs:
+            expected_output_dir = path.join(TensorboardManager.OUTPUT_PUBLIC_MOUNT_PATH, run.owner, run.name)
+            if path.isdir(expected_output_dir):
+                valid.append(run)
+            else:
+                invalid.append(run)
+
+        return valid, invalid
