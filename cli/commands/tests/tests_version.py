@@ -19,26 +19,37 @@
 # and approved by Intel in writing.
 #
 
-import click
-from tabulate import tabulate
+import pytest
+from kubernetes.client.models import V1ConfigMap
+from click.testing import CliRunner
 
-from util.aliascmd import AliasCmd
-from cli_state import common_options
+from commands import version
 from version import VERSION
 from util.config import DLS4EConfigMap
 
-HELP = "Displays the version of the installed dlsctl application."
+PLATFORM_VERSION = "1.2"
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='v')
-@common_options(verify_dependencies=False, verify_config_path=False)
-def version():
-    """
-    Returns the version of the installed dlsctl application.
-    """
-    version_table = [["dlsctl application", VERSION],
-                     ["dls4e platform", DLS4EConfigMap().platform_version]]
+@pytest.fixture()
+def mocked_k8s_CoreV1Api(mocker):
+    mocked_coreV1Api_class = mocker.patch('kubernetes.client.CoreV1Api')
+    mocker.patch('kubernetes.client.ApiClient')
+    coreV1API_instance = mocked_coreV1Api_class.return_value
 
-    click.echo(tabulate(version_table,
-                        headers=['Component', 'Version'],
-                        tablefmt="orgtbl"))
+    v1_config_map = V1ConfigMap(data={DLS4EConfigMap.PLATFORM_VERSION: PLATFORM_VERSION,
+                                      DLS4EConfigMap.IMAGE_TILLER_FIELD: "",
+                                      DLS4EConfigMap.EXTERNAL_IP_FIELD: "",
+                                      DLS4EConfigMap.IMAGE_TENSORBOARD_SERVICE_FIELD: "",
+                                      DLS4EConfigMap.REGISTRY_FIELD: ""})
+
+    coreV1API_instance.read_namespaced_config_map.return_value = v1_config_map
+
+    return coreV1API_instance
+
+
+def test_version(mocked_k8s_CoreV1Api):
+    runner = CliRunner()
+    result = runner.invoke(version.version, [])
+
+    assert f"dlsctl application version: {VERSION}" in result.output
+    assert f"dls4e platform version: {PLATFORM_VERSION}" in result.output
