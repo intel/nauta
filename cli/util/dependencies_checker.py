@@ -36,6 +36,7 @@ KUBECTL_SERVER_MIN_VERSION = LooseVersion('v1.10')
 DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
 HELM_VERSION = LooseVersion('v2.9.1')
 HELM_SERVER_CONNECTION_TIMEOUT = 30
+NAMESPACE_PLACEHOLDER = '<namespace>'
 
 
 class InvalidDependencyError(Exception):
@@ -57,7 +58,8 @@ DependencySpec = namedtuple('DependencySpec', ['expected_version', 'version_comm
 
 DEPENDENCY_MAP = {'draft': DependencySpec(expected_version=DRAFT_MIN_VERSION,
                                           version_command=call_draft,
-                                          version_command_args=['version'], version_field='SemVer',
+                                          version_command_args=['version', '--tiller-namespace', NAMESPACE_PLACEHOLDER],
+                                          version_field='SemVer',
                                           match_exact_version=False),
                   'kubectl': DependencySpec(expected_version=KUBECTL_MIN_VERSION,
                                             version_command=execute_system_command,
@@ -78,7 +80,8 @@ DEPENDENCY_MAP = {'draft': DependencySpec(expected_version=DRAFT_MIN_VERSION,
                                                 version_command=execute_system_command,
                                                 version_command_args=['helm', 'version', '--server', '--debug',
                                                                       '--tiller-connection-timeout',
-                                                                      f'{HELM_SERVER_CONNECTION_TIMEOUT}'],
+                                                                      f'{HELM_SERVER_CONNECTION_TIMEOUT}',
+                                                                      '--tiller-namespace', NAMESPACE_PLACEHOLDER],
                                                 version_field='SemVer',
                                                 match_exact_version=True),
                   'docker client': DependencySpec(expected_version=DOCKER_MIN_VERSION,
@@ -112,12 +115,17 @@ def _parse_installed_version(version_output: str, version_field='SemVer') -> Loo
     return installed_version
 
 
-def check_dependency(dependency_spec: DependencySpec) -> (bool, LooseVersion):
+def check_dependency(dependency_spec: DependencySpec, namespace: str = None) -> (bool, LooseVersion):
     """
     Check if dependency defined by given DependencySpec is valid
     :param dependency_spec: specification of dependency to check
+    :param namespace: k8s namespace where server component of checked dependency is located
     :return: a tuple of validation status and installed version
     """
+
+    if namespace:
+        for i, arg in enumerate(dependency_spec.version_command_args):
+            dependency_spec.version_command_args[i] = arg.replace(NAMESPACE_PLACEHOLDER, namespace)
     try:
         output, exit_code = dependency_spec.version_command(dependency_spec.version_command_args)
         if exit_code != 0:
@@ -135,15 +143,16 @@ def check_dependency(dependency_spec: DependencySpec) -> (bool, LooseVersion):
                              match_exact_version=dependency_spec.match_exact_version), installed_version
 
 
-def check_all_binary_dependencies():
+def check_all_binary_dependencies(namespace: str):
     """
     Check versions for all dependencies of carbon CLI. In case of version validation failure,
      an InvalidDependencyError is raised.
+    :param namespace: k8s namespace where server components of checked dependencies are located
     """
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            valid, installed_version = check_dependency(dependency_spec)
+            valid, installed_version = check_dependency(dependency_spec, namespace=namespace)
             log.info(f'Checking version of {dependency_name}. '
                      f'Installed version: ({installed_version}). '
                      f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')

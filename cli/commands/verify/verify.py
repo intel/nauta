@@ -28,6 +28,7 @@ from util.dependencies_checker import check_dependency, DEPENDENCY_MAP
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.exceptions import KubectlConnectionError
 
 
@@ -46,18 +47,23 @@ def verify(state: State):
         check_connection_to_cluster()
     except KubectlConnectionError as e:
         log.exception(e)
-        click.echo(e)
-        sys.exit(1)
+        sys.exit(e)
     except FileNotFoundError:
         error_msg = 'kubectl is not installed.'
         log.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        sys.exit(error_msg)
+
+    try:
+        namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
+    except Exception:
+        error_msg = f'Failed to get current Kubernetes namespace.'
+        log.exception(error_msg)
+        sys.exit(error_msg)
 
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            valid, installed_version = check_dependency(dependency_spec)
+            valid, installed_version = check_dependency(dependency_spec, namespace=namespace)
             log.info(f'Checking version of {dependency_name}. '
                      f'Installed version: ({installed_version}). '
                      f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
@@ -70,13 +76,12 @@ def verify(state: State):
         except FileNotFoundError:
             error_msg = f'{dependency_name} is not installed.'
             log.exception(error_msg)
-            click.echo(error_msg)
-            sys.exit(1)
+            sys.exit(error_msg)
         except (RuntimeError, ValueError, TypeError):
             error_msg = f'Failed to get {dependency_name} version.'
             log.exception(error_msg)
-            click.echo(error_msg)
-            sys.exit(1)
+            sys.exit(error_msg)
         except Exception:
-            log.exception("Exception during verficiation.")
-            sys.exit(1)
+            error_msg = "Exception during verification."
+            log.exception(error_msg)
+            sys.exit(error_msg)

@@ -20,9 +20,16 @@
 #
 
 from click.testing import CliRunner
+import pytest
 
 from commands.verify import verify
 from util.exceptions import KubectlConnectionError
+
+
+@pytest.fixture(autouse=True)
+def mock_kubectl_calls(mocker):
+    mocker.patch("commands.verify.verify.get_kubectl_current_context_namespace")
+    mocker.patch("commands.verify.verify.is_current_user_administrator")
 
 
 def test_verify_with_kubectl_connection_error(mocker):

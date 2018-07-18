@@ -20,7 +20,6 @@
 #
 
 from functools import wraps
-import logging
 import sys
 
 import click
@@ -28,6 +27,7 @@ import click
 from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
 from util.dependencies_checker import check_all_binary_dependencies, InvalidDependencyError
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 
 logger = initialize_logger(__name__)
 
@@ -53,7 +53,8 @@ def verbosity_option(f):
 
 def verify_cli_dependencies():
     try:
-        check_all_binary_dependencies()
+        namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
+        check_all_binary_dependencies(namespace=namespace)
     except InvalidDependencyError:
         error_msg = 'Dependency check failed. Run "dlsctl verify -vv" for more detailed information.'
         logger.exception(error_msg)

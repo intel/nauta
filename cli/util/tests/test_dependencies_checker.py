@@ -24,7 +24,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_installed_version, check_dependency,\
-    DependencySpec, check_all_binary_dependencies, DEPENDENCY_MAP, InvalidDependencyError
+    DependencySpec, check_all_binary_dependencies, DEPENDENCY_MAP, InvalidDependencyError, NAMESPACE_PLACEHOLDER
 
 TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
                   ' GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}'
@@ -88,6 +88,19 @@ def test_check_dependency():
     assert check_dependency(test_dependency) == (True, LooseVersion(test_version))
 
 
+def test_check_dependency_namespace():
+    test_namespace = 'test-namespace'
+    test_version = '0.0.1'
+    version_command_mock = MagicMock()
+    version_command_mock.return_value = test_version, 0
+    test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
+                                     version_command_args=[NAMESPACE_PLACEHOLDER], version_field=None,
+                                     match_exact_version=False)
+
+    assert check_dependency(test_dependency, namespace=test_namespace) == (True, LooseVersion(test_version))
+    version_command_mock.assert_called_with([test_namespace])
+
+
 def test_check_dependency_parse():
     test_version = LooseVersion('0.0.1')
     test_version_output = 'version:"0.0.1"'
@@ -103,7 +116,7 @@ def test_check_all_binary_dependencies(mocker):
     check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
     check_dependency_mock.return_value = True, LooseVersion('0.0.0')
 
-    check_all_binary_dependencies()
+    check_all_binary_dependencies(namespace='fake')
 
     assert check_dependency_mock.call_count == len(DEPENDENCY_MAP), 'Not all dependencies were checked.'
 
@@ -113,7 +126,7 @@ def test_check_all_binary_dependencies_invalid_version(mocker):
     check_dependency_mock.return_value = False, LooseVersion('0.0.0')
 
     with pytest.raises(InvalidDependencyError):
-        check_all_binary_dependencies()
+        check_all_binary_dependencies(namespace='fake')
 
 
 def test_check_all_binary_dependencies_parsing_error(mocker):
@@ -121,7 +134,7 @@ def test_check_all_binary_dependencies_parsing_error(mocker):
     check_dependency_mock.side_effect = ValueError
 
     with pytest.raises(InvalidDependencyError):
-        check_all_binary_dependencies()
+        check_all_binary_dependencies(namespace='fake')
 
 
 def test_check_all_binary_dependencies_version_check_error(mocker):
@@ -129,4 +142,4 @@ def test_check_all_binary_dependencies_version_check_error(mocker):
     check_dependency_mock.side_effect = RuntimeError
 
     with pytest.raises(InvalidDependencyError):
-        check_all_binary_dependencies()
+        check_all_binary_dependencies(namespace='fake')
