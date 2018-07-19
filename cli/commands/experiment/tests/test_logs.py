@@ -44,6 +44,7 @@ def test_show_logs_success(mocker):
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
+    get_run_mock = mocker.patch("commands.experiment.logs.get_run")
 
     runner = CliRunner()
     result = runner.invoke(logs.logs, ['fake-experiment'])
@@ -52,6 +53,7 @@ def test_show_logs_success(mocker):
 
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
+    assert get_run_mock.call_count == 1, "run was not retrieved"
     assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs were not retrieved"
 
 
@@ -63,8 +65,7 @@ def test_show_logs_failure(mocker):
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
-
-    mocker.patch("commands.experiment.logs.sys.exit")
+    get_run_mock = mocker.patch("commands.experiment.logs.get_run")
 
     runner = CliRunner()
 
@@ -72,5 +73,6 @@ def test_show_logs_failure(mocker):
 
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
+    assert get_run_mock.call_count == 1, "run was not retrieved"
     assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs retrieval was not called"
-    assert result.output == 'Failed to get experiment logs.\n'
+    assert result.exit_code == 1

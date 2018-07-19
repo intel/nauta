@@ -25,6 +25,7 @@ import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.log_filters import SeverityLevel
+from platform_resources.runs import get_run
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
@@ -62,11 +63,15 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             namespace = get_kubectl_current_context_namespace()
+            run = get_run(name=experiment_name, namespace=namespace)
+            if not run:
+                raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
 
             pod_ids = pod_ids.split(',') if pod_ids else None
             min_severity = SeverityLevel[min_severity] if min_severity else None
             pod_status = PodStatus[pod_status] if pod_status else None
-            experiment_logs = es_client.get_experiment_logs(run_name=experiment_name,
+
+            experiment_logs = es_client.get_experiment_logs(run=run,
                                                             namespace=namespace,
                                                             min_severity=min_severity,
                                                             start_date=start_date, end_date=end_date, pod_ids=pod_ids,
@@ -76,19 +81,21 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             click.echo(experiment_logs)
     except K8sProxyCloseError:
         logger.exception("Error during closing of a proxy for elasticsearch.")
-        click.echo("Elasticsearch proxy hasn't been closed properly. "
-                   "Check whether it still exists, if yes - close it manually.")
-        sys.exit(1)
+        sys.exit("Elasticsearch proxy hasn't been closed properly. "
+                 "Check whether it still exists, if yes - close it manually.")
     except LocalPortOccupiedError as exe:
-        logger.exception("Error during creation of proxy - port is occupied.")
-        click.echo(f"Error during creation of a proxy for elasticsearch. {exe.message}")
-        sys.exit(1)
+        msg = f"Error during creation of a proxy for elasticsearch. {exe.message}"
+        logger.exception(msg)
+        sys.exit(msg)
     except K8sProxyOpenError:
-        logger.exception("Error during creation of a proxy for elasticsearch.")
-        click.echo("Error during creation of a proxy for elasticsearch.")
-        sys.exit(1)
+        msg = "Error during creation of a proxy for elasticsearch."
+        logger.exception(msg)
+        sys.exit(msg)
+    except ValueError:
+        msg = f"Experiment with name {experiment_name} does not exist."
+        logger.exception(msg)
+        sys.exit(msg)
     except Exception:
         error_msg = 'Failed to get experiment logs.'
         logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        sys.exit(error_msg)

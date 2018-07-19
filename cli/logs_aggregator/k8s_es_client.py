@@ -32,6 +32,7 @@ from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity,\
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
+from platform_resources.run_model import Run
 
 
 log = initialize_logger(__name__)
@@ -66,13 +67,13 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             if not filters or all(f(log_entry) for f in filters):
                 yield log_entry
 
-    def get_experiment_logs(self, run_name: str, namespace: str, index='_all',
+    def get_experiment_logs(self, run: Run, namespace: str, index='_all',
                             start_date: str = None, end_date: str = None,
                             pod_ids: List[str] = None, pod_status: PodStatus = None,
                             min_severity: SeverityLevel = None) -> List[LogEntry]:
         """
         Return logs for given experiment.
-        :param run_name: Name of experiment to search
+        :param run: instance of Run resource
         :param namespace: Name of namespace where experiment was started
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         :param start_date: if provided, only logs produced after this date will be returned
@@ -82,9 +83,9 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param min_severity: return logs with minimum provided severity
         :return: List of LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
-        log.debug(f'Searching for {run_name} experiment logs.')
+        log.debug(f'Searching for {run.name} Run logs.')
 
-        lucene_query = f'kubernetes.labels.runName.keyword:\"{run_name}\" ' \
+        lucene_query = f'kubernetes.labels.runName.keyword:\"{run.name}\" ' \
                        f'AND kubernetes.namespace_name.keyword:\"{namespace}\"'
 
         if start_date or end_date:
@@ -104,9 +105,9 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                                  key=lambda log_entry: dateutil.parser.parse(log_entry.date))
 
         if experiment_logs:
-            log.debug(f'Logs found for {run_name}.')
+            log.debug(f'Logs found for Run {run.name}.')
         else:
-            log.debug(f'Logs not found for {run_name}.')
+            log.debug(f'Logs not found for Run {run.name}.')
         return experiment_logs
 
     def delete_logs_for_namespace(self, namespace: str, index='_all'):

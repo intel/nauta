@@ -19,11 +19,13 @@
 # and approved by Intel in writing.
 #
 
-from functools import partial
+from unittest.mock import MagicMock
+
+import pytest
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
-from logs_aggregator.log_filters import SeverityLevel, PodStatus
+from platform_resources.run_model import Run
 
 TEST_SCAN_OUTPUT = [{'_index': 'fluentd-20180417',
                                     '_type': 'access_log',
@@ -133,7 +135,10 @@ def test_get_experiment_logs(mocker):
     experiment_name = 'fake-experiment'
     namespace = 'fake-namespace'
 
-    experiment_logs = client.get_experiment_logs(run_name=experiment_name, namespace=namespace)
+    run_mock = MagicMock(spec=Run)
+    run_mock.name = experiment_name
+
+    experiment_logs = client.get_experiment_logs(run=run_mock, namespace=namespace)
 
     assert experiment_logs == TEST_LOG_ENTRIES
     mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName.keyword:"{experiment_name}" ' \
@@ -149,10 +154,13 @@ def test_get_experiment_logs_time_range(mocker):
     experiment_name = 'fake-experiment'
     namespace = 'fake-namespace'
 
+    run_mock = MagicMock(spec=Run)
+    run_mock.name = experiment_name
+
     start_date = '2018-04-17T09:28:39+00:00'
     end_date = '2018-04-17T09:28:49+00:00'
 
-    experiment_logs = client.get_experiment_logs(run_name=experiment_name,
+    experiment_logs = client.get_experiment_logs(run=run_mock,
                                                  namespace=namespace,
                                                  start_date=start_date,
                                                  end_date=end_date)
