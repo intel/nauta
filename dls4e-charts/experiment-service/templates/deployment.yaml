@@ -49,10 +49,7 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 20Mi
-            limits:
-              cpu: 100m
-              memory: 300Mi
+              memory: 200Mi
           volumeMounts:
           - name: apiserver-certs-temp
             mountPath: /apiserver.local.config/certificates
@@ -65,10 +62,7 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 20Mi
-            limits:
-              cpu: 100m
-              memory: 300Mi
+              memory: 200Mi
       volumes:
 {{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
         - name: apiserver-certs-temp
