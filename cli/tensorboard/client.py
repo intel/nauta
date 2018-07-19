@@ -66,8 +66,8 @@ class TensorboardRun:
 
 
 class TensorboardCreationRequest:
-    def __init__(self, runs: List[TensorboardRun]):
-        self.runs = runs
+    def __init__(self, tr_list: List[TensorboardRun]):
+        self.runs = tr_list
 
     def to_dict(self) -> dict:
         result = {
@@ -115,7 +115,6 @@ class TensorboardServiceClient:
         request = TensorboardCreationRequest(runs)
 
         response = requests.post(self.address + '/tensorboard', json=request.to_dict())
-
         if response.status_code in (HTTPStatus.ACCEPTED, HTTPStatus.CONFLICT):
             response_body = json.loads(response.content.decode('utf-8'))
             tensorboard = Tensorboard.from_dict(tensorboard_dict=response_body)
@@ -124,3 +123,17 @@ class TensorboardServiceClient:
             response_body = json.loads(response.content.decode('utf-8'))
             error = TensorboardServiceAPIErrorResponse.from_dict(response_body)
             raise TensorboardServiceAPIException(error_code=error.error_code, message=error.message)
+
+
+def build_tensorboard_run_list(exp_list: List[str], current_namespace: str) -> List[TensorboardRun]:
+    ret_list = []
+
+    for item in exp_list:
+        split_experiment = item.split("/", 1)
+
+        if len(split_experiment) == 1:
+            ret_list.append(TensorboardRun(name=split_experiment[0], owner=current_namespace))
+        else:
+            ret_list.append(TensorboardRun(name=split_experiment[1], owner=split_experiment[0]))
+
+    return ret_list

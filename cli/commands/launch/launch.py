@@ -21,12 +21,12 @@
 
 import sys
 from time import sleep
-from typing import Optional
+from typing import Optional, List
 
 import click
 
 from cli_state import common_options, pass_state, State
-from tensorboard.client import TensorboardServiceClient, TensorboardRun, TensorboardStatus
+from tensorboard.client import TensorboardServiceClient, TensorboardStatus, build_tensorboard_run_list
 from util.aliascmd import AliasCmd, AliasGroup
 from util.app_names import DLS4EAppNames
 from util.exceptions import LaunchError, ProxyClosingError
@@ -65,8 +65,8 @@ def webui(state: State, no_launch: bool, port: int):
 @click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                       'only proxy tunnel is created')
 @click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
-@click.argument("experiment_name", type=str, required=True)
-def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_name: str):
+@click.argument("experiment_name", type=str, required=True, nargs=-1)
+def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_name: List[str]):
     """
     Subcommand for launching tensorboard with credentials
 
@@ -78,11 +78,11 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
 
         tensorboard_service_client = TensorboardServiceClient(address=f'http://127.0.0.1:{proxy.tunnel_port}')
 
-        requested_run = TensorboardRun(name=experiment_name, owner=current_namespace)
+        requested_runs = build_tensorboard_run_list(exp_list=experiment_name, current_namespace=current_namespace)
 
         # noinspection PyBroadException
         try:
-            tb = tensorboard_service_client.create_tensorboard([requested_run])
+            tb = tensorboard_service_client.create_tensorboard(requested_runs)
         except Exception:
             click.echo('failed to create tensorboard!')
             logger.exception('failed to create tensorboard!')

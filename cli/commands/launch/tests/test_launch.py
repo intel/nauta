@@ -299,3 +299,20 @@ def test_tensorboard_command_create_exception(mocker, launch_tensorboard_command
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
 
     assert result.exit_code == 1
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command_many_experiments(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
+
+    mocker.patch('tensorboard.client.TensorboardServiceClient.get_tensorboard').return_value = FAKE_RUNNING_TENSORBOARD
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp', 'another-exp', 'next-exp'])
+
+    assert launch.K8sProxy.call_count == 1
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 1
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
+    assert launch.sleep.call_count == 0
+    assert result.exit_code == 0

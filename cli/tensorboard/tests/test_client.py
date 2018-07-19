@@ -27,7 +27,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, TensorboardServiceAPIException, \
-    TensorboardRun
+    TensorboardRun, build_tensorboard_run_list
 
 
 def test_get_tensorboard(mocker):
@@ -95,12 +95,7 @@ def test_create_tensorboard(mocker, requests_post_return_status_code: int):
         'url': fake_url
     }
 
-    fake_runs = [
-        TensorboardRun(
-            name='some-run',
-            owner='bob'
-        )
-    ]
+    fake_runs_list = [TensorboardRun(name='some-run', owner='c_namespace')]
 
     content_bytes = json.dumps(content).encode('utf-8')
     mocker.patch('requests.post').return_value = MagicMock(status_code=requests_post_return_status_code,
@@ -108,7 +103,7 @@ def test_create_tensorboard(mocker, requests_post_return_status_code: int):
 
     client = TensorboardServiceClient(address='fake-address')
 
-    tensorboard = client.create_tensorboard(runs=fake_runs)
+    tensorboard = client.create_tensorboard(runs=fake_runs_list)
 
     assert tensorboard.id == fake_id
     assert tensorboard.status == TensorboardStatus.RUNNING
@@ -118,12 +113,8 @@ def test_create_tensorboard(mocker, requests_post_return_status_code: int):
 @pytest.mark.parametrize('requests_post_return_status_code', [HTTPStatus.BAD_REQUEST.value,
                                                               HTTPStatus.INTERNAL_SERVER_ERROR.value])
 def test_create_tensorboard_error(mocker, requests_post_return_status_code: int):
-    fake_runs = [
-        TensorboardRun(
-            name='some-run',
-            owner='bob'
-        )
-    ]
+
+    fake_runs_list = [TensorboardRun(name='some-run', owner='c_namespace')]
 
     content = {
         'code': HTTPStatus.INTERNAL_SERVER_ERROR.value,
@@ -138,4 +129,21 @@ def test_create_tensorboard_error(mocker, requests_post_return_status_code: int)
     client = TensorboardServiceClient(address='fake-address')
 
     with pytest.raises(TensorboardServiceAPIException):
-        client.create_tensorboard(runs=fake_runs)
+        client.create_tensorboard(runs=fake_runs_list)
+
+
+def test_tensorboard_runs_list():
+    EXP1_NAME = "exp1"
+    EXP2_NAME = "exp2"
+    CURR_NAMESPACE = "curr_namespace"
+    OWN_NAMESPACE = "owner2"
+
+    experiment_list = [EXP1_NAME, f'{OWN_NAMESPACE}/{EXP2_NAME}']
+
+    tensorboard_runs_list = build_tensorboard_run_list(exp_list=experiment_list, current_namespace=CURR_NAMESPACE)
+
+    assert len(tensorboard_runs_list) == 2
+    assert tensorboard_runs_list[0].name == EXP1_NAME
+    assert tensorboard_runs_list[0].owner == CURR_NAMESPACE
+    assert tensorboard_runs_list[1].name == EXP2_NAME
+    assert tensorboard_runs_list[1].owner == OWN_NAMESPACE
