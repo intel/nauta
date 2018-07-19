@@ -70,7 +70,7 @@ class Run(PlatformResource):
                    pod_count=object_dict['spec']['pod-count'],
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
-                   metrics=object_dict['spec']['metrics'],
+                   metrics=object_dict.get('spec').get('metrics', {}),
                    template_name=object_dict['spec']['pod-selector']['matchLabels']['app'])
 
     @property

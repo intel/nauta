@@ -11,6 +11,5 @@ spec:
       release: {{ .Release.Name }}
   pod-count: 1
   parameters:
-  metrics:
-    accuracy: "52.322"
+  metrics: {}
   state: ""
