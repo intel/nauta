@@ -96,6 +96,8 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
         error_msg = 'Error during creation of a proxy for a {}'
         logger.exception(error_msg.format(k8s_app_name))
         raise LaunchError(error_msg.format(k8s_app_name))
+    except LaunchError as e:
+        raise e
     except Exception:
         err_message = 'Failed to launch web application.'
         logger.exception(err_message)

@@ -123,7 +123,7 @@ def launch_app_with_proxy(k8s_app_name: DLS4EAppNames, no_launch: bool, port: in
         click.echo('K8s proxy hasn\'t been closed properly. '
                    'Check whether it still exists, if yes - close it manually.')
     except Exception:
-        err_message = "Other exception during setting up a K8s proxy."
+        err_message = "Other exception during launching web application."
         logger.exception(err_message)
         click.echo(err_message)
         sys.exit(1)

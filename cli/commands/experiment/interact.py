@@ -34,7 +34,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS
-from util.exceptions import SubmitExperimentError
+from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
 from commands.experiment.common import validate_experiment_name
@@ -151,5 +151,18 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                    "interact command another time passing a name of a current Jupyter notebook session")
         sys.exit(1)
 
-    launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
-               number_of_retries=number_of_retries, url_end=url_end, port=port)
+    try:
+        launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
+                   number_of_retries=number_of_retries, url_end=url_end, port=port)
+    except LaunchError as exe:
+        log.exception(exe.message)
+        click.echo(exe.message)
+        sys.exit(1)
+    except ProxyClosingError:
+        click.echo('K8s proxy hasn\'t been closed properly. '
+                   'Check whether it still exists, if yes - close it manually.')
+    except Exception:
+        err_message = "Other exception during launching interact session."
+        log.exception(err_message)
+        click.echo(err_message)
+        sys.exit(1)
