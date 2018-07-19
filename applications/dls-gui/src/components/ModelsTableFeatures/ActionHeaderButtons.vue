@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     getLabel: function (header) {
-      return LABELS[header] || header;
+      return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
     cutLongText (str, limit) {
       return str.length > limit ? `${str.substr(0, limit)}...` : str;

@@ -84,19 +84,44 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="item in experimentsData" v-bind:key="item.name" :id="item.name">
-                  <td v-if="tensorMode">
-                    <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn">
-                      check_circle
-                    </v-icon>
-                    <v-icon v-if="!isSelected(item)" v-on:click="selectExp(item)" class="pointer-btn">
-                      panorama_fish_eye
-                    </v-icon>
-                  </td>
-                  <td v-for="param in experimentsParams" v-bind:key="param" v-if="isVisibleColumn(param)">
-                    {{ parseValue(param, item[param]) || '-' }}
-                  </td>
-                </tr>
+                  <template v-for="item in experimentsData" :id="item.name">
+                    <tr v-bind:key="item.name" >
+                      <td v-if="tensorMode">
+                        <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn">
+                          check_circle
+                        </v-icon>
+                        <v-icon v-if="!isSelected(item)" v-on:click="selectExp(item)" class="pointer-btn">
+                          panorama_fish_eye
+                        </v-icon>
+                      </td>
+                      <td v-for="param in experimentsParams" v-bind:key="param" v-if="isVisibleColumn(param)">
+                        <span v-if="param === 'name'" id="exp-name" v-on:click="toggleDetails(item.attributes.name)">
+                          {{ parseValue(param, item.attributes[param]) || '-' }}
+                        </span>
+                        <span v-if="param !== 'name'">
+                          {{ parseValue(param, item.attributes[param]) || '-' }}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr v-if="areDetailsVisible(item.attributes.name)" v-bind:key="item.attributes.name + '_expand'">
+                      <th colspan="1000" class="expanded-view">
+                        <div class="exp-details">
+                          <v-layout row>
+                            <v-flex xs5 wrap>
+                              <ExpDetail keyname="Resources" :value="`Pods Count: ${item.params.podCount}`"/>
+                              <ExpDetail keyname="Training Submission Date" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
+                            </v-flex>
+                            <v-flex xs2>
+                              <div class="vertical-line"></div>
+                            </v-flex>
+                            <v-flex xs5 wrap>
+                              <ExpDetail keyname="Parameters" :value="item.params.parameters"/>
+                            </v-flex>
+                          </v-layout>
+                        </div>
+                      </th>
+                    </tr>
+                  </template>
                 </tbody>
               </table>
             </div>
@@ -130,6 +155,7 @@ import LABELS from '../utils/header-titles';
 import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
+import ExpDetail from './ModelsTableFeatures/ExpDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 
 const SORTING_ORDER = {
@@ -148,6 +174,7 @@ export default {
   name: 'ModelsTable',
   components: {
     ActionHeaderButtons,
+    ExpDetail,
     FilterByValWindow,
     FooterElements
   },
@@ -182,6 +209,7 @@ export default {
         itemsCountPerPage: 5,
         currentPage: 1
       },
+      visibleDetails: [],
       activeColumnIdx: DEFAULT_ORDER.key,
       activeColumnName: DEFAULT_ORDER.orderBy,
       hoveredColumnIdx: null,
@@ -255,7 +283,7 @@ export default {
   methods: {
     ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
     getLabel: function (header) {
-      return LABELS[header] || header;
+      return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
     cutLongText (str) {
       return str.length > 14 ? `${str.substr(0, 14)}...` : str;
@@ -311,6 +339,18 @@ export default {
     discardTensorboard () {
       this.disableTensorMode();
       this.selected = [];
+    },
+    toggleDetails (expName) {
+      if (this.areDetailsVisible(expName)) {
+        this.visibleDetails = this.visibleDetails.filter((exp) => {
+          return exp !== expName;
+        })
+      } else {
+        this.visibleDetails.push(expName);
+      }
+    },
+    areDetailsVisible (expName) {
+      return this.visibleDetails.includes(expName);
     },
     selectExp (exp) {
       this.selected.push(exp);
@@ -388,5 +428,22 @@ th {
 }
 #nodata {
   height: 80px;
+}
+#exp-name {
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.expanded-view {
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: normal;
+  text-align: left;
+}
+.exp-details {
+  margin: 40px 40px 40px 40px;
+}
+.vertical-line {
+  border-left: 1px dashed rgba(0, 0, 0, 0.87);
+  height: 100%;
 }
 </style>

@@ -302,8 +302,9 @@ describe('VUE components ModelsTable', () => {
 
   it('Should return headerKey for header if key is unknown', function () {
     const headerKey = 'xyz';
+    const expectedHeaderKey = 'Xyz';
     const label = wrapper.vm.getLabel(headerKey);
-    expect(label).to.equal(headerKey);
+    expect(label).to.equal(expectedHeaderKey);
   });
 
   it('Should return true if column is visible', function () {
@@ -330,5 +331,31 @@ describe('VUE components ModelsTable', () => {
     const columnName = 'xyz';
     const result = wrapper.vm.isFilterableByValColumn(columnName);
     expect(result).to.equal(false);
+  });
+
+  it('Should return false if details invisible', function () {
+    const expName = 'xyz';
+    const result = wrapper.vm.areDetailsVisible(expName);
+    expect(result).to.equal(false);
+  });
+
+  it('Should return true if details visible', function () {
+    const expName = 'xyz';
+    wrapper.vm.visibleDetails.push(expName);
+    const result = wrapper.vm.areDetailsVisible(expName);
+    expect(result).to.equal(true);
+  });
+
+  it('Should add exp to visibility list if not visible', function () {
+    const expName = 'xyz';
+    wrapper.vm.toggleDetails(expName);
+    expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(true);
+  });
+
+  it('Should remove exp from visibility list if visible', function () {
+    const expName = 'xyz';
+    wrapper.vm.visibleDetails.push(expName);
+    wrapper.vm.toggleDetails(expName);
+    expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(false);
   });
 });

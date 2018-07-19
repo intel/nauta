@@ -31,16 +31,20 @@ const generateExperimentEntities = function (data) {
   }
   return data.map(function (item) {
     let entity = {
-      creationTimestamp: item.metadata.creationTimestamp,
-      name: item.metadata.name,
-      namespace: item.metadata.namespace,
-      podSelector: item.spec['pod-selector']['matchLabels'],
-      podCount: item.spec['pod-count'],
-      state: item.spec['state'],
-      parameters: item.spec['parameters']
+      attributes: {
+        creationTimestamp: item.metadata.creationTimestamp,
+        name: item.metadata.name,
+        namespace: item.metadata.namespace,
+        state: item.spec['state']
+      },
+      params: {
+        podSelector: item.spec['pod-selector']['matchLabels'],
+        podCount: item.spec['pod-count'],
+        parameters: item.spec['parameters']
+      }
     };
     Object.keys(item.spec['metrics']).map((metricName) => {
-      entity[metricName] = item.spec['metrics'][metricName];
+      entity.attributes[metricName] = item.spec['metrics'][metricName];
     });
     return entity;
   });
@@ -53,9 +57,9 @@ const extractValuesForFilterableAttrs = function (entities) {
     namespace: new Set()
   };
   entities.forEach((entity) => {
-    values.name.add(entity.name);
-    values.state.add(entity.state);
-    values.namespace.add(entity.namespace);
+    values.name.add(entity.attributes.name);
+    values.state.add(entity.attributes.state);
+    values.namespace.add(entity.attributes.namespace);
   });
   return {
     name: Array.from(values.name),
@@ -70,9 +74,9 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
   }
 
   let filterParams = {
-    name: Array.from(new Set(entities.map((entity) => entity.name))),
-    namespace: Array.from(new Set(entities.map((entity) => entity.namespace))),
-    state: Array.from(new Set(entities.map((entity) => entity.state))),
+    name: Array.from(new Set(entities.map((entity) => entity.attributes.name))),
+    namespace: Array.from(new Set(entities.map((entity) => entity.attributes.namespace))),
+    state: Array.from(new Set(entities.map((entity) => entity.attributes.state))),
     searchPattern: searchPattern ? searchPattern.toUpperCase() : ''
   };
 
@@ -85,10 +89,10 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
   }
 
   const filteredEntities = entities.filter((item) => {
-    return filterParams.name.includes(item.name) &&
-      filterParams.namespace.includes(item.namespace) &&
-      filterParams.state.includes(item.state) &&
-      item.name.toUpperCase().includes(filterParams.searchPattern);
+    return filterParams.name.includes(item.attributes.name) &&
+      filterParams.namespace.includes(item.attributes.namespace) &&
+      filterParams.state.includes(item.attributes.state) &&
+      item.attributes.name.toUpperCase().includes(filterParams.searchPattern);
   });
 
   return {
@@ -107,7 +111,7 @@ const applyOrderParams = function (entities, orderBy, order, limitPerPage, pageN
     limitPerPage: limitPerPage || entities.length || 1,
     pageNo: pageNo || 1
   };
-  const sortedEntities = _.orderBy(entities, [orderParams.orderBy], [orderParams.order]);
+  const sortedEntities = _.orderBy(entities, [`attributes[${orderParams.orderBy}]`], [orderParams.order]);
   const a = (orderParams.pageNo - 1) * orderParams.limitPerPage;
   const b = orderParams.pageNo * orderParams.limitPerPage;
   const slicedEntities = sortedEntities.slice(a, b);
@@ -127,7 +131,7 @@ const extractAttrsNames = function (data) {
   }
   let attrsSet = new Set();
   data.map((exp) => {
-    _.keys(exp).forEach((p) => {
+    _.keys(exp.attributes).forEach((p) => {
       attrsSet.add(p);
     })
   });

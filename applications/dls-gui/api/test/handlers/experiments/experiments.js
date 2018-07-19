@@ -102,24 +102,32 @@ describe('Handlers | Experiments', function () {
     };
     generatedEntities = [
       {
-        creationTimestamp: k8sRunEntities[0].metadata.creationTimestamp,
-        name: k8sRunEntities[0].metadata.name,
-        namespace: k8sRunEntities[0].metadata.namespace,
-        podSelector: k8sRunEntities[0].spec['pod-selector']['matchLabels'],
-        podCount: k8sRunEntities[0].spec['pod-count'],
-        state: k8sRunEntities[0].spec['state'],
-        parameters: k8sRunEntities[0].spec['parameters'],
-        accuracy: k8sRunEntities[0].spec.metrics['accuracy']
+        attributes: {
+          creationTimestamp: k8sRunEntities[0].metadata.creationTimestamp,
+          name: k8sRunEntities[0].metadata.name,
+          namespace: k8sRunEntities[0].metadata.namespace,
+          state: k8sRunEntities[0].spec['state'],
+          accuracy: k8sRunEntities[0].spec.metrics['accuracy']
+        },
+        params: {
+          podSelector: k8sRunEntities[0].spec['pod-selector']['matchLabels'],
+          podCount: k8sRunEntities[0].spec['pod-count'],
+          parameters: k8sRunEntities[0].spec['parameters']
+        }
       },
       {
-        creationTimestamp: k8sRunEntities[1].metadata.creationTimestamp,
-        name: k8sRunEntities[1].metadata.name,
-        namespace: k8sRunEntities[1].metadata.namespace,
-        podSelector: k8sRunEntities[1].spec['pod-selector']['matchLabels'],
-        podCount: k8sRunEntities[1].spec['pod-count'],
-        state: k8sRunEntities[1].spec['state'],
-        parameters: k8sRunEntities[1].spec['parameters'],
-        accuracy: k8sRunEntities[1].spec.metrics['accuracy']
+        attributes: {
+          creationTimestamp: k8sRunEntities[1].metadata.creationTimestamp,
+          name: k8sRunEntities[1].metadata.name,
+          namespace: k8sRunEntities[1].metadata.namespace,
+          state: k8sRunEntities[1].spec['state'],
+          accuracy: k8sRunEntities[1].spec.metrics['accuracy']
+        },
+        params: {
+          podSelector: k8sRunEntities[1].spec['pod-selector']['matchLabels'],
+          podCount: k8sRunEntities[1].spec['pod-count'],
+          parameters: k8sRunEntities[1].spec['parameters']
+        }
       }
     ];
     error = {
@@ -198,9 +206,9 @@ describe('Handlers | Experiments', function () {
 
     it('should return correct object if data provided', function () {
       const expectedResult = {
-        name: [generatedEntities[0].name, generatedEntities[1].name],
-        namespace: [generatedEntities[0].namespace],
-        state: [generatedEntities[0].state, generatedEntities[1].state]
+        name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+        namespace: [generatedEntities[0].attributes.namespace],
+        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
       };
       const result = expApi.extractValuesForFilterableAttrs(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
@@ -234,9 +242,9 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: generatedEntities,
         queryParams: {
-          name: [generatedEntities[0].name, generatedEntities[1].name],
-          namespace: [generatedEntities[0].namespace],
-          state: [generatedEntities[0].state, generatedEntities[1].state],
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           searchPattern: ''
         }
       };
@@ -248,13 +256,13 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: [generatedEntities[0]],
         queryParams: {
-          name: [generatedEntities[0].name],
-          namespace: [generatedEntities[0].namespace],
-          state: [generatedEntities[0].state, generatedEntities[1].state],
+          name: [generatedEntities[0].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           searchPattern: ''
         }
       };
-      const queryParams = {name: [generatedEntities[0].name]}
+      const queryParams = {name: [generatedEntities[0].attributes.name]};
       const result = expApi.applyQueryFilters(generatedEntities, queryParams);
       expect(result).to.deep.equal(expectedResult);
     });
@@ -263,9 +271,9 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: generatedEntities,
         queryParams: {
-          name: [generatedEntities[0].name, generatedEntities[1].name],
-          namespace: [generatedEntities[0].namespace],
-          state: [generatedEntities[0].state, generatedEntities[1].state],
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           searchPattern: ''
         }
       };
@@ -278,9 +286,9 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         data: [generatedEntities[0]],
         queryParams: {
-          name: [generatedEntities[0].name, generatedEntities[1].name],
-          namespace: [generatedEntities[0].namespace],
-          state: [generatedEntities[0].state, generatedEntities[1].state],
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
         }
       };
@@ -350,7 +358,7 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return all params', function () {
-      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy'];
+      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'accuracy'];
       const result = expApi.extractAttrsNames(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
     });
@@ -362,16 +370,16 @@ describe('Handlers | Experiments', function () {
     beforeEach(function () {
       generateExperimentEntitiesMock = sinon.stub().returns(generatedEntities);
       extractValuesForFilterableAttrsMock = sinon.stub().returns({
-        name: [generatedEntities[0].name, generatedEntities[1].name],
-        namespace: [generatedEntities[0].namespace],
-        state: [generatedEntities[0].state, generatedEntities[1].state]
+        name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+        namespace: [generatedEntities[0].attributes.namespace],
+        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
       });
       applyQueryFiltersMock = sinon.stub().returns({
         data: generatedEntities,
         queryParams: {
-          name: [generatedEntities[0].name, generatedEntities[1].name],
-          namespace: [generatedEntities[0].namespace],
-          state: [generatedEntities[0].state, generatedEntities[1].state],
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           searchPattern: ''
         }
       });
@@ -406,14 +414,14 @@ describe('Handlers | Experiments', function () {
         },
         filterColumnValues: {
           options: {
-            name: [generatedEntities[0].name, generatedEntities[1].name],
-            namespace: [generatedEntities[0].namespace],
-            state: [generatedEntities[0].state, generatedEntities[1].state]
+            name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+            namespace: [generatedEntities[0].attributes.namespace],
+            state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
           },
           current: {
-            name: [generatedEntities[0].name, generatedEntities[1].name],
-            namespace: [generatedEntities[0].namespace],
-            state: [generatedEntities[0].state, generatedEntities[1].state],
+            name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+            namespace: [generatedEntities[0].attributes.namespace],
+            state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
             searchPattern: ''
           }
         },

@@ -19,12 +19,26 @@
  * and approved by Intel in writing.
  */
 
+<template>
+  <v-layout>
+    <v-flex xs6>
+      <span class="keyname">{{ keyname }}:</span>
+    </v-flex>
+    <v-flex xs6>
+      <span>{{ value }}</span>
+    </v-flex>
+  </v-layout>
+</template>
+
+<script>
 export default {
-  creationTimestamp: 'Submission Date',
-  namespace: 'Owner',
-  name: 'Model Name',
-  parameters: 'Parameters',
-  state: 'State',
-  podCount: 'Pod Count',
-  podSelector: 'Pod Selector'
-};
+  name: 'ExpDetail',
+  props: ['keyname', 'value']
+}
+</script>
+
+<style scoped>
+.keyname {
+  font-weight: bold;
+}
+</style>
