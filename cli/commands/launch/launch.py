@@ -48,8 +48,8 @@ FORWARDED_URL = 'http://localhost:{}'
 @click.command(cls=AliasCmd, alias='ui', short_help='Subcommand for launching webUI with credentials')
 @common_options()
 @pass_state
-@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
-                                                'only proxy tunnel is created')
+@click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
+                                                      'only proxy tunnel is created')
 @click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
 def webui(state: State, no_launch: bool, port: int):
     """
