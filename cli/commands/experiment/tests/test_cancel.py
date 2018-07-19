@@ -20,7 +20,8 @@
 #
 
 from click.testing import CliRunner
-from kubernetes.client.models import V1PodList, V1Pod, V1ObjectMeta, V1OwnerReference
+from kubernetes.client.models import V1PodList, V1Pod, V1ObjectMeta, V1OwnerReference, V1DeploymentList, V1Deployment, \
+    V1ServiceList, V1Service
 import pytest
 from unittest.mock import DEFAULT
 
@@ -217,6 +218,10 @@ class CancelExperimentMocks:
         self.delete_k8s_object = mocker.patch("commands.experiment.cancel.kubectl.delete_k8s_object")
         self.update_run = mocker.patch("commands.experiment.cancel.update_run")
         self.k8s_core_api_client = mocker.patch('kubernetes.client.CoreV1Api')
+
+        self.k8s_apps_api_client_instance = mocker.patch('kubernetes.client.AppsV1Api').return_value
+        self.k8s_apps_api_client_instance.list_namespaced_deployment.return_value.items = []
+
         self.load_kube_config = mocker.patch("kubernetes.config.load_kube_config")
         self.get_experiment = mocker.patch("commands.experiment.cancel.get_experiment",
                                            return_value=None)
@@ -262,7 +267,8 @@ def test_cancel_experiment_set_cancelling_state_failure(prepare_cancel_experimen
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     with pytest.raises(RuntimeError):
         cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED], namespace="namespace",
-                                 k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client)
+                                 k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
+                                 k8s_apps_api=prepare_cancel_experiment_mocks.k8s_apps_api_client_instance)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=0, update_run_count=0)
 
 
@@ -270,7 +276,8 @@ def test_cancel_experiment_success(prepare_cancel_experiment_mocks: CancelExperi
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED], namespace="namespace",
-                             k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client)
+                             k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
+                             k8s_apps_api=prepare_cancel_experiment_mocks.k8s_apps_api_client_instance)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, update_experiment_count=2)
 
 
@@ -280,7 +287,9 @@ def test_cancel_experiment_failure(prepare_cancel_experiment_mocks: CancelExperi
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED],
                                                       namespace="namespace",
-                                                      k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client)
+                                                      k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
+                                                      k8s_apps_api=prepare_cancel_experiment_mocks.
+                                                      k8s_apps_api_client_instance)
 
     assert len(del_list) == 0
     assert len(not_del_list) == 1
@@ -294,7 +303,8 @@ def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: C
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
     cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED], namespace="namespace",
                             k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
-                            k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
+                            k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client,
+                            k8s_apps_api=prepare_cancel_experiment_mocks.k8s_apps_api_client_instance)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2, update_run_count=0)
 
 
@@ -308,7 +318,9 @@ def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: Cancel
     del_list, not_del_list = cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED],
                                                      namespace="namespace",
                                                      k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
-                                                     k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
+                                                     k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client,
+                                                     k8s_apps_api=prepare_cancel_experiment_mocks.
+                                                     k8s_apps_api_client_instance)
 
     assert len(del_list) == 0
     assert len(not_del_list) == 1
@@ -319,9 +331,12 @@ def test_cancel_experiment_one_cancelled_one_not(prepare_cancel_experiment_mocks
     prepare_cancel_experiment_mocks.delete_k8s_object.side_effect = [DEFAULT, RuntimeError(), DEFAULT, DEFAULT]
     prepare_cancel_experiment_mocks.list_runs.return_value = TEST_RUNS_CORRECT
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+
     del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=TEST_RUNS_CORRECT,
                                                       namespace="namespace",
-                                                      k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client)
+                                                      k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
+                                                      k8s_apps_api=prepare_cancel_experiment_mocks.
+                                                      k8s_apps_api_client_instance)
 
     assert len(del_list) == 1
     assert len(not_del_list) == 1
@@ -333,3 +348,30 @@ def test_cancel_match_and_name(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
 
     assert "Both name and -m option cannot be given. Please choose one of them." in result.output
+
+
+def test_cancel_jupyter_notebook_experiment(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_COMPLETE]
+    prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+
+    meta = V1ObjectMeta(name="Deployment")
+
+    deployment = V1Deployment(metadata=meta)
+    deploymentList = V1DeploymentList(items=[deployment])
+    prepare_cancel_experiment_mocks.k8s_apps_api_client_instance.\
+        list_namespaced_deployment.return_value = deploymentList
+
+    service = V1Service(metadata=meta)
+    serviceList = V1ServiceList(items=[service])
+    k8s_core_api_client_instance = prepare_cancel_experiment_mocks.k8s_core_api_client.return_value
+    k8s_core_api_client_instance.list_namespaced_service.return_value = serviceList
+
+    del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_COMPLETE],
+                                                      namespace="namespace",
+                                                      k8s_api=k8s_core_api_client_instance,
+                                                      k8s_apps_api=prepare_cancel_experiment_mocks.
+                                                      k8s_apps_api_client_instance)
+
+    assert len(del_list) == 1
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2,
+                                    update_experiment_count=2)

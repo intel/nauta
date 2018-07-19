@@ -141,6 +141,7 @@ def cancel(state: State, name: str, match: str, purge: bool):
 
     config.load_kube_config()
     k8s_api = client.CoreV1Api()
+    k8s_apps_api = client.AppsV1Api()
 
     deleted_runs = []
     not_deleted_runs = []
@@ -156,7 +157,8 @@ def cancel(state: State, name: str, match: str, purge: bool):
                         exp_del_runs, exp_not_del_runs = purge_experiment(exp_name=exp_name,
                                                                           runs_to_purge=run_list, k8s_api=k8s_api,
                                                                           namespace=current_namespace,
-                                                                          k8s_es_client=es_client)
+                                                                          k8s_es_client=es_client,
+                                                                          k8s_apps_api=k8s_apps_api)
                         deleted_runs.extend(exp_del_runs)
                         not_deleted_runs.extend(exp_not_del_runs)
                     except Exception:
@@ -179,7 +181,8 @@ def cancel(state: State, name: str, match: str, purge: bool):
         for exp_name, run_list in exp_with_runs.items():
             try:
                 exp_del_runs, exp_not_del_runs = cancel_experiment(exp_name=exp_name, runs_to_cancel=run_list,
-                                                                   k8s_api=k8s_api, namespace=current_namespace)
+                                                                   k8s_api=k8s_api, namespace=current_namespace,
+                                                                   k8s_apps_api=k8s_apps_api)
                 deleted_runs.extend(exp_del_runs)
                 not_deleted_runs.extend(exp_not_del_runs)
             except Exception:
@@ -199,7 +202,8 @@ def cancel(state: State, name: str, match: str, purge: bool):
 
 
 def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.CoreV1Api,
-                     k8s_es_client: K8sElasticSearchClient, namespace: str="") -> Tuple[List[Run], List[Run]]:
+                     k8s_es_client: K8sElasticSearchClient, k8s_apps_api: client.AppsV1Api,
+                     namespace: str="") -> Tuple[List[Run], List[Run]]:
     """
        Purge experiment with a given name by cancelling runs given as a parameter. If given experiment
        contains more runs than is in the list of runs - experiment's state remains intact.
@@ -208,6 +212,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.Co
        :param runs_to_purge: list of runs that should be purged, they have to belong to exp_name experiment
        :param k8s_api: K8s api object
        :param k8s_es_client: Kubernetes ElasticSearch client
+       :param k8s_apps_api: K8s_apps api object
        :param namespace: namespace where experiment is located
        :return: two list - first contains runs that were cancelled successfully, second - those which weren't
        """
@@ -229,7 +234,8 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.Co
 
     try:
         cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge,
-                                                                    k8s_api=k8s_api, namespace=namespace)
+                                                                    k8s_api=k8s_api, namespace=namespace,
+                                                                    k8s_apps_api=k8s_apps_api)
         not_purged_runs = not_cancelled_runs
         for run in cancelled_runs:
             log.debug(f"Purging {run.name} run ...")
@@ -268,7 +274,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.Co
 
 
 def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
-                      namespace: str="") -> Tuple[List[Run], List[Run]]:
+                      k8s_apps_api: client.AppsV1Api, namespace: str="") -> Tuple[List[Run], List[Run]]:
     """
     Cancel experiment with a given name by cancelling runs given as a parameter. If given experiment
     contains more runs than is in the list of runs - experiment's state remains intact.
@@ -276,6 +282,7 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], k8s_api: client.
     :param exp_name: name of an experiment to which belong runs passed in run_list parameter
     :param runs_to_cancel: list of runs that should be deleted, they have to belong to exp_name experiment
     :param k8s_api: K8s api object
+    :param k8s_apps_api: K8s_apps api object
     :param namespace: namespace where experiment is located
     :return: two list - first contains runs that were cancelled successfully, second - those which weren't
     """
@@ -297,7 +304,8 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], k8s_api: client.
 
     try:
         deleted_runs, not_deleted_runs = cancel_experiment_runs(runs_to_cancel=runs_to_cancel,
-                                                                k8s_api=k8s_api, namespace=namespace)
+                                                                k8s_api=k8s_api, namespace=namespace,
+                                                                k8s_apps_api=k8s_apps_api)
 
         if cancel_whole_experiment and not not_deleted_runs:
             try:
@@ -317,11 +325,12 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], k8s_api: client.
 
 
 def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
-                           namespace: str="") -> Tuple[List[Run], List[Run]]:
+                           k8s_apps_api: client.AppsV1Api, namespace: str="") -> Tuple[List[Run], List[Run]]:
     """
     Cancel given list of Runs belonging to a single namespace.
     :param runs_to_cancel: Runs to be cancelled
     :param k8s_api: k8s API client instance
+    :param k8s_apps_api: K8s_apps api object
     :param namespace: namespace where Run instances reside
     :return: tuple of  list containing successfully Runs and list containing Runs that were not cancelled
     """
@@ -331,23 +340,52 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
         for run in runs_to_cancel:
             log.debug(f"Cancelling {run.name} run ...")
             click.echo(f"Cancelling {run.name} experiment ...")
-            # delete all main objects related to run
-            list_of_pods = k8s_api.list_namespaced_pod(watch=False, namespace=namespace,
-                                                       label_selector=f"runName={run.name}")
 
-            already_deleted = set()
-            click.echo(f"Deleting objects related to {run.name} experiment ...")
             all_objects_deleted = True
-            for pod in list_of_pods.items:
-                owner_name, owner_kind = get_owners_data(pod)
-                owner_key = f"{owner_name}{owner_kind}"
-                if owner_key not in already_deleted:
+
+            # removal of jupyter notebooks experiments - in the future - if there is such need - it can
+            # be generalized to any type of k8s objects
+            list_of_deployments = k8s_apps_api.list_namespaced_deployment(watch=False, namespace=namespace,
+                                                                          label_selector=f"runName={run.name}")
+
+            if list_of_deployments.items:
+                # jupyter notebook contains deployments
+                for item in list_of_deployments.items:
+                    click.echo(f"Deleting objects related to {run.name} experiment ...")
                     try:
-                        kubectl.delete_k8s_object(owner_kind, owner_name)
-                        already_deleted.add(owner_key)
+                        kubectl.delete_k8s_object("Deployment", item.metadata.name)
                     except Exception:
                         log.exception("Error during removal of a k8s object.")
                         all_objects_deleted = False
+
+                # and services - recognized by release and dls4e_app_name. To make it more general
+                # we should put (and expect) runName label in any object that can be a part of an experiment
+                list_of_services = k8s_api.list_namespaced_service(watch=False, namespace=namespace,
+                                                                   label_selector=f"release={run.name},"
+                                                                                  f"dls4e_app_name=jupyter")
+                for item in list_of_services.items:
+                    try:
+                        kubectl.delete_k8s_object("Service", item.metadata.name)
+                    except Exception:
+                        log.exception("Error during removal of a k8s object.")
+                        all_objects_deleted = False
+            else:
+                # delete all main objects related to run
+                list_of_pods = k8s_api.list_namespaced_pod(watch=False, namespace=namespace,
+                                                           label_selector=f"runName={run.name}")
+
+                already_deleted = set()
+                click.echo(f"Deleting objects related to {run.name} experiment ...")
+                for pod in list_of_pods.items:
+                    owner_name, owner_kind = get_owners_data(pod)
+                    owner_key = f"{owner_name}{owner_kind}"
+                    if owner_key not in already_deleted:
+                        try:
+                            kubectl.delete_k8s_object(owner_kind, owner_name)
+                            already_deleted.add(owner_key)
+                        except Exception:
+                            log.exception("Error during removal of a k8s object.")
+                            all_objects_deleted = False
 
             if all_objects_deleted:
                 # change a run state to CANCELLED
