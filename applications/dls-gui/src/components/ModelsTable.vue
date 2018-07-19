@@ -53,7 +53,7 @@
               <table class="datatable table">
                 <thead>
                 <tr>
-                  <th v-if="tensorMode"></th>
+                  <th v-if="tensorMode" width="35px"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="160px">
                     <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
