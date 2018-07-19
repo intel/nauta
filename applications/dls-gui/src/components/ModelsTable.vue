@@ -55,7 +55,7 @@
                 <tr>
                   <th v-if="tensorMode"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
-                      class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null">
+                      class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="160px">
                     <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
                     <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
                                        :column-name="header"
@@ -78,7 +78,7 @@
                   </th>
                 </tr>
                 <tr v-if="fetchingDataActive" class="datatable__progress">
-                  <th class="column" colspan="1000">
+                  <th class="column" :colspan="columnsCount">
                     <v-progress-linear indeterminate></v-progress-linear>
                   </th>
                 </tr>
@@ -104,7 +104,7 @@
                       </td>
                     </tr>
                     <tr v-if="areDetailsVisible(item.attributes.name)" v-bind:key="item.attributes.name + '_expand'">
-                      <th colspan="1000" class="expanded-view">
+                      <th :colspan="columnsCount" class="expanded-view">
                         <div class="exp-details">
                           <v-layout row>
                             <v-flex xs5 wrap>
@@ -254,7 +254,7 @@ export default {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
     },
     visibleColumns: function () {
-      return this.experimentsParams.map((header) => {
+      return this.experimentsParams.filter((header) => {
         if (!this.hiddenColumns.includes(header)) {
           return header;
         }
@@ -266,6 +266,9 @@ export default {
     },
     tensorBtnAvailable: function () {
       return !this.tensorMode || (this.tensorMode && this.selected.length > 0);
+    },
+    columnsCount: function () {
+      return this.visibleColumns.length > 8 ? 8 : this.visibleColumns.length;
     }
   },
   watch: {
@@ -415,6 +418,9 @@ export default {
 </script>
 
 <style scoped>
+table {
+  table-layout: fixed;
+}
 th {
   height: 46px;
   color: rgba(0, 0, 0, 0.52);

@@ -43,9 +43,11 @@ const generateExperimentEntities = function (data) {
         parameters: item.spec['parameters']
       }
     };
-    Object.keys(item.spec['metrics']).map((metricName) => {
-      entity.attributes[metricName] = item.spec['metrics'][metricName];
-    });
+    if (item.spec['metrics']) {
+      Object.keys(item.spec['metrics']).map((metricName) => {
+        entity.attributes[metricName] = item.spec['metrics'][metricName];
+      });
+    }
     return entity;
   });
 };

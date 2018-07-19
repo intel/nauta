@@ -191,6 +191,14 @@ describe('Handlers | Experiments', function () {
       const result = expApi.generateExperimentEntities(k8sRunEntities);
       expect(result).to.deep.equal(expectedResult);
     });
+
+    it('should return generated entities if data without metrics provided', function () {
+      delete k8sRunEntities[0].spec.metrics;
+      delete generatedEntities[0].attributes.accuracy;
+      const expectedResult = generatedEntities;
+      const result = expApi.generateExperimentEntities(k8sRunEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
   });
 
   describe('extractValuesForFilterableAttrs', function () {
