@@ -1,6 +1,6 @@
 ---
 
-kind: ClusterRoleBinding # change it to ClusterRole after CAN-818
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "{{ required "DLS4E Release name is required" .Values.global.dls4e }}-{{ required "DLS4E Username is required as parameter username" .Values.username }}-namespace-dls-common"
