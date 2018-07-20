@@ -54,37 +54,37 @@ var _ = Describe("Unit Tests of RunControllerImpl", func() {
 		rUT.pod = prepareRunningPod()
 	})
 
-	Describe("when calling saveWithRetries method", func() {
+	Describe("when calling updateState method", func() {
 		It("it saves run with success", func() {
 			updateRunMock := func(action fake_v1.Action) (handled bool, ret runtime.Object, err error) {
 				return true, rUT.runInstance, nil
 			}
-			rUT.mock.AddReactor("update", "runs", updateRunMock)
+			rUT.mock.AddReactor("patch", "runs", updateRunMock)
 
-			err := rUT.ctrl.saveWithRetries(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
+			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(rUT.runInstance.Spec.State).To(Equal(common.Complete))
 		})
 
 		It("it does not save the run if state is not changed", func() {
 			counter := 0
-			updateRunMock := func(action fake_v1.Action) (handled bool, ret runtime.Object, err error) {
+			patchRunMock := func(action fake_v1.Action) (handled bool, ret runtime.Object, err error) {
 				counter++
 				return true, rUT.runInstance, nil
 			}
-			rUT.mock.AddReactor("update", "runs", updateRunMock)
+			rUT.mock.AddReactor("update", "runs", patchRunMock)
 
 			rUT.runInstance.Spec.State = common.Complete
-			err := rUT.ctrl.saveWithRetries(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
+			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(counter).Should(Equal(0))
 			Expect(rUT.runInstance.Spec.State).To(Equal(common.Complete))
 		})
 
-		It("it returns error if retries run out without success", func() {
+		It("it returns error if run patch without success", func() {
 			updateErr := errors.New("update Run error")
 			counter := 0
-			updateRunMock := func(action fake_v1.Action) (handled bool, ret runtime.Object, err error) {
+			patchRunMock := func(action fake_v1.Action) (handled bool, ret runtime.Object, err error) {
 				counter++
 				return true, nil, updateErr
 			}
@@ -92,14 +92,14 @@ var _ = Describe("Unit Tests of RunControllerImpl", func() {
 				return true, prepareRun(1), nil
 			}
 
-			rUT.mock.AddReactor("update", "runs", updateRunMock)
+			rUT.mock.AddReactor("patch", "runs", patchRunMock)
 			rUT.mock.AddReactor("get", "runs", getRunMock)
 
-			err := rUT.ctrl.saveWithRetries(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
-			expectedErr := errors.New(fmt.Sprintf("Run %s update FAILED! No more save tries left! Error: %s",
-				rUT.runInstance.Name, updateErr))
+			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
+			expectedErr := errors.New(fmt.Sprintf("Run %s patch FAILED! Error: %s", rUT.runInstance.Name,
+				updateErr))
 			Expect(err).To(Equal(expectedErr))
-			Expect(counter).Should(Equal(3))
+			Expect(counter).Should(Equal(1))
 		})
 	})
 

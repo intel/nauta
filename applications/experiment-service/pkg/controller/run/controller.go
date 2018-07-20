@@ -21,6 +21,7 @@ and approved by Intel in writing.
 package run
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -28,6 +29,7 @@ import (
 	"github.com/kubernetes-incubator/apiserver-builder/pkg/builders"
 	core_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	listers_v1 "k8s.io/client-go/listers/core/v1"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
@@ -98,35 +100,42 @@ func (c *RunControllerImpl) Reconcile(run *v1.Run) error {
 	}
 
 	stateToSet := calculateRunState(run, pods)
-	return c.saveWithRetries(run, stateToSet, pods)
+	return c.updateState(run, stateToSet, pods)
 }
 
-func (c *RunControllerImpl) saveWithRetries(run *v1.Run, stateToSet common.RunState, pods []*core_v1.Pod) error {
-	for i := 3; i > 0; i-- {
-		if run.Spec.State != stateToSet {
-			run.Spec.State = stateToSet
-			_, err := c.runClient.Runs(run.Namespace).Update(run)
-			if err != nil {
-				// try to refresh Run instance
-				if i > 1 {
-					log.Printf("Run %s update - FALED! %d save tries left. Error: %v", run.Name, i-1, err)
-					run, err = c.runClient.Runs(run.Namespace).Get(run.Name, meta_v1.GetOptions{})
-					stateToSet = calculateRunState(run, pods)
-				} else {
-					errMsg := fmt.Sprintf("Run %s update FAILED! No more save tries left! Error: %v",
-						run.Name, err)
-					log.Printf(errMsg)
-					return errors.New(errMsg)
-				}
-			} else {
-				log.Printf("Run: %s saved in state %v", run.Name, run.Spec.State)
-				return nil
-			}
-		} else {
-			log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
-			return nil
+type statePatchSpec struct {
+	Op    string          `json:"op"`
+	Path  string          `json:"path"`
+	Value common.RunState `json:"value"`
+}
+
+func (c *RunControllerImpl) updateState(run *v1.Run, stateToSet common.RunState, pods []*core_v1.Pod) error {
+	if run.Spec.State != stateToSet {
+		statePatch := []statePatchSpec{
+			{
+				Op:    "add",
+				Path:  "/spec/state",
+				Value: stateToSet,
+			},
 		}
+
+		patchBytes, errMarshal := json.Marshal(statePatch)
+		if errMarshal != nil {
+			log.Printf("Run %s prepare patch error: %v", run.Name, errMarshal)
+			return errMarshal
+		}
+
+		_, err := c.runClient.Runs(run.Namespace).Patch(run.Name, types.JSONPatchType, patchBytes)
+		if err != nil {
+			errMsg := fmt.Sprintf("Run %s patch FAILED! Error: %v", run.Name, err)
+			log.Printf(errMsg)
+			return errors.New(errMsg)
+		}
+		run.Spec.State = stateToSet
+		return nil
 	}
+
+	log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
 	return nil
 }
 

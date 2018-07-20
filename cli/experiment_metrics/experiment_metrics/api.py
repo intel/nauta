@@ -31,7 +31,7 @@ API_GROUP_NAME = 'aggregator.aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
-MAX_RETRIES_COUNT = 5
+MAX_RETRIES_COUNT = 3
 
 logger = logging.getLogger()
 
@@ -69,3 +69,5 @@ def publish(metrics):
             if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
                 logger.exception("Exception during storing metrics.")
                 raise e
+            else:
+                logger.error("Exception during storing metrics. Retrying...")
