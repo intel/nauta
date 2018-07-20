@@ -58,7 +58,7 @@ spec:
               securityContext:
                 privileged: true
               resources:
-    {{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.worker_resources | indent 16 }}
           volumes:
             - name: input-home
               persistentVolumeClaim:
@@ -125,7 +125,7 @@ spec:
               securityContext:
                 privileged: true
               resources:
-{{ toYaml .Values.resources | indent 16 }}
+{{ toYaml .Values.ps_resources | indent 16 }}
             - name: sidecar
               image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/ps-sidecar:1.0.0"
               imagePullPolicy: Always
@@ -140,7 +140,7 @@ spec:
               securityContext:
                 privileged: true
               resources:
-{{ toYaml .Values.resources | indent 16 }}
+{{ toYaml .Values.sidecar_resources | indent 16 }}
           volumes:
             - name: input-home
               persistentVolumeClaim:
