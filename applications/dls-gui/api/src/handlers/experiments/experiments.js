@@ -91,10 +91,14 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
   }
 
   const filteredEntities = entities.filter((item) => {
-    return filterParams.name.includes(item.attributes.name) &&
+    const filterByValueCondition = filterParams.name.includes(item.attributes.name) &&
       filterParams.namespace.includes(item.attributes.namespace) &&
-      filterParams.state.includes(item.attributes.state) &&
-      item.attributes.name.toUpperCase().includes(filterParams.searchPattern);
+      filterParams.state.includes(item.attributes.state);
+    const filterBySearchCondition = Object.keys(item.attributes).some((key) => {
+      const attrValue = String(item.attributes[key]);
+      return attrValue.toUpperCase().includes(filterParams.searchPattern);
+    });
+    return filterByValueCondition && filterBySearchCondition;
   });
 
   return {
