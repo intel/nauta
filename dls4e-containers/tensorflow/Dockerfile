@@ -7,27 +7,6 @@ ENV TENSORFLOW_VERSION=1.9.0
 ARG PYTHON_VERSION
 ENV PYTHON=python${PYTHON_VERSION} PIP=pip${PYTHON_VERSION}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        curl \
-        libfreetype6-dev \
-        libhdf5-serial-dev \
-        libpng12-dev \
-        libzmq3-dev \
-        pkg-config \
-        python \
-        python3-pip \
-        python-pip \
-        python3-dev \
-        python-dev \
-        python-setuptools \
-        rsync \
-        software-properties-common \
-        unzip \
-        && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY jupyter_notebook_config.py /root/.jupyter/
 
 COPY notebooks /notebooks
@@ -44,8 +23,11 @@ WORKDIR "/notebooks"
 
 CMD ["/run_jupyter.sh", "--allow-root"]
 
-RUN ln -s -f /usr/bin/${PYTHON} /usr/bin/python && \
-    ln -s -f /usr/bin/${PIP} /usr/bin/pip
+RUN ln -s -f /usr/bin/${PYTHON} /usr/bin/python
+RUN ln -s -f /usr/bin/${PIP} /usr/bin/pip
+
+RUN ln -s -f /usr/bin/python3.6 /usr/bin/python3
+RUN ln -s -f /usr/bin/pip3.6 /usr/bin/pip3
 
 RUN ${PIP} install -U pip setuptools
 

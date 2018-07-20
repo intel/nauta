@@ -81,28 +81,28 @@ local_images:
   dls4e/tensorflow/1.9.0py2/haswell/base:
     version: "1.9.0-py2"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python27"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py2/haswell"
     args:
-      PYTHON_VERSION: 2
+      PYTHON_VERSION: 2.7
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow/1.9.0py3/haswell/base:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python36"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/haswell"
     args:
-      PYTHON_VERSION: 3
+      PYTHON_VERSION: 3.6
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow/1.9.0py3/skylake/base:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python36"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/skylake"
     args:
-      PYTHON_VERSION: 3
+      PYTHON_VERSION: 3.6
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow:

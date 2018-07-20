@@ -104,7 +104,7 @@ shared_images:
   shared/build/tensorflow/1.9.0py2/haswell:
     version: "1.9.0-py2"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python27"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py2/haswell"
     push: False
@@ -115,7 +115,7 @@ shared_images:
   shared/build/tensorflow/1.9.0py3/haswell:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/haswell"
     push: False
@@ -126,7 +126,7 @@ shared_images:
   shared/build/tensorflow/1.9.0py3/skylake:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/ubuntu"
+      BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/skylake"
     push: False
