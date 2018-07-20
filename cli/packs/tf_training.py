@@ -39,6 +39,11 @@ import dpath.util as dutil
 log = initialize_logger('packs.tf_training')
 
 
+WORK_CNT_PARAM = "workersCount"
+P_SERV_CNT_PARAM = "pServersCount"
+WAP_PARAM = "workersAndPServers"
+
+
 def update_configuration(run_folder: str, script_location: str,
                          script_parameters: Tuple[str, ...],
                          experiment_name: str,
@@ -113,15 +118,30 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         v["experimentName"] = experiment_name
         v["registry_port"] = str(cluster_registry_port)
         v["image"]["clusterRepository"] = f'127.0.0.1:{cluster_registry_port}/{run_name}'
-
         regex = re.compile("^\[.*|^\{.*")
+
+        workersCount = None
+        pServersCount = None
+
         for key, value in pack_params:
             if re.match(regex, value):
                 try:
                     value = ast.literal_eval(value)
                 except Exception as e:
                     raise AttributeError(f'Can not parse value: \"{value}\" to list/dict. Error: {e}')
+            if key == WORK_CNT_PARAM:
+                workersCount = value
+            if key == P_SERV_CNT_PARAM:
+                pServersCount = value
+
             dutil.new(v, key, value, '.')
+
+        # setting sum of replicas involved in multinode training - only if workersAndPServers in file with values and
+        # workersCount and/or  pServersCount were given by a user
+        if v.get(WAP_PARAM) and (workersCount or pServersCount):
+            number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
+            number_of_replicas += int(v.get(P_SERV_CNT_PARAM)) if not pServersCount else int(pServersCount)
+            v[WAP_PARAM] = str(number_of_replicas)
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)

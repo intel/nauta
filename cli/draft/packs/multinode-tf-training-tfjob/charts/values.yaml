@@ -41,3 +41,5 @@ experimentName: ''
 workersCount: 3
 
 pServersCount: 1
+
+workersAndPServers: 4

@@ -27,7 +27,7 @@ from util.exceptions import KubectlIntError
 
 
 SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
-PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']")]
+PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']"), ("workersCount", "2")]
 SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
 
@@ -46,6 +46,9 @@ resources:
     memory: 128Mi
 ingress:
   enabled: false
+workersAndPServers: 1
+workersCount: 3
+pServersCount: 1
 '''
 
 TEST_DOCKERFILE = "t"
@@ -82,6 +85,8 @@ def test_modify_values_yaml(mocker):
     assert yaml_dump_mock.call_count == 1, "job yaml wasn't modified"
     assert open_mock.call_count == 2, "files weren't read/written"
     assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
+
+    assert output['workersAndPServers'] == '3'
 
 
 def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
