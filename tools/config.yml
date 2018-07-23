@@ -101,39 +101,124 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.3.tar.gz
         dest: kubernetes.tar.gz
         checksum: f3750b19d6d7471ea33230f96a420c53df46d8a060a4f14722992c5c7bdd9055
-  shared/build/tensorflow/1.9.0py2/haswell:
-    version: "1.9.0-py2"
+  shared/build/tensorflow/py2.7:
+    version: "py2"
     required:
       BASE_IMAGE: "shared/centos/python27"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py2/haswell"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/2.7/build"
     push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
-        dest: tensorflow-v1.9.0.tar.gz
-        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
-  shared/build/tensorflow/1.9.0py3/haswell:
-    version: "1.9.0-py3"
+  shared/build/tensorflow/py3.6:
+    version: "py2"
     required:
       BASE_IMAGE: "shared/centos/python36"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/haswell"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/3.6/build"
+    push: False
+  shared/build/tensorflow/py2.7/1.9.0:
+    version: "1.9.0-py2"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py2.7"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0"
     push: False
     fetch_files:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
         dest: tensorflow-v1.9.0.tar.gz
         checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
-  shared/build/tensorflow/1.9.0py3/skylake:
+  shared/build/tensorflow/py3.6/1.9.0:
     version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py3.6"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+        dest: tensorflow-v1.9.0.tar.gz
+        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
+  shared/build/tensorflow/py2.7/1.9.0/haswell:
+    version: "1.9.0-py2"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/haswell"
+    push: False
+  shared/build/tensorflow/py3.6/1.9.0/haswell:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/haswell"
+    push: False
+  shared/build/tensorflow/py3.6/1.9.0/skylake:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/skylake"
+    push: False
+  shared/build/tensorflow-serving/py2.7/1.9.0:
+    version: "1.9.0-py2"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py2.7"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.9.0"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/tf-serving/1.9.0.tar.gz
+        dest: tensorflow-serving-v1.9.0.tar.gz
+        checksum: 860fc67fe6d385f721bf98b533d6cabb09162f8b1469e69af3c7e9f30dde0b92
+  shared/build/tensorflow-serving/py3.6/1.9.0:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow/py3.6"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.9.0"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/tf-serving/1.9.0.tar.gz
+        dest: tensorflow-serving-v1.9.0.tar.gz
+        checksum: 860fc67fe6d385f721bf98b533d6cabb09162f8b1469e69af3c7e9f30dde0b92
+  shared/build/tensorflow-serving/py2.7/1.9.0/haswell:
+    version: "1.9.0-py2"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/haswell"
+    push: False
+  shared/build/tensorflow-serving/py3.6/1.9.0/haswell:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/haswell"
+    push: False
+  shared/build/tensorflow-serving/py3.6/1.9.0/skylake:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/skylake"
+    push: False
+  shared/run/tensorflow/py2.7:
+    version: "py2"
+    required:
+      BASE_IMAGE: "shared/centos/python27"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
+    push: False
+    args:
+      PYTHON_VERSION: 2.7
+  shared/run/tensorflow/py3.6:
+    version: "py3"
     required:
       BASE_IMAGE: "shared/centos/python36"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0py3/skylake"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
     push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
-        dest: tensorflow-v1.9.0.tar.gz
-        checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
+    args:
+      PYTHON_VERSION: 3.6
   shared/build/helm:
     version: "v2.9.1"
     required:
@@ -200,3 +285,10 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/draft/draft-0.15.0.tar.gz
         dest: draft-0.15.0.tar.gz
         checksum: 666746985d9e2dd37d28f410afdd2831af131804d2c35d62caaf4f7a9555e726
+  shared/build/metrics:
+    version: "0.0.1"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../cli/experiment_metrics"
+    push: False

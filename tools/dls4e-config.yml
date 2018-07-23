@@ -3,12 +3,19 @@
 export_images:
   - name: tiller
     value: "{{ image_local_url['dls4e/tiller'] }}"
-  - name: tensorflow
-    value: "{{ image_local_url['dls4e/tensorflow'] }}"
-  - name: tensorboard
-    value: "{{ image_local_url['dls4e/tensorflow'] }}"
   - name: tensorboard_service
     value: "{{ image_local_url['dls4e/tensorboard-service'] }}"
+# tensorflow part
+  - name: tensorflow
+    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: tensorflow_1.9
+    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: tensorflow_1.9_py3
+    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: tensorflow_1.9_py2
+    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py2/haswell/base'] }}"
+  - name: tensorflow_1.9_py3_skylake
+    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/skylake/base'] }}"
 
 local_images:
   dls4e/centos:
@@ -81,36 +88,39 @@ local_images:
   dls4e/tensorflow/1.9.0py2/haswell/base:
     version: "1.9.0-py2"
     required:
-      BASE_IMAGE: "shared/centos/python27"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py2/haswell"
-    args:
-      PYTHON_VERSION: 2.7
+      BASE_IMAGE: "shared/run/tensorflow/py2.7"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow/1.9.0py3/haswell/base:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/centos/python36"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/haswell"
-    args:
-      PYTHON_VERSION: 3.6
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow/1.9.0py3/skylake/base:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "shared/centos/python36"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/1.9.0py3/skylake"
-    args:
-      PYTHON_VERSION: 3.6
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/skylake"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/skylake"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/tensorflow:
     version: "1.9.0-py3"
     required:
-      BASE_IMAGE: "dls4e/tensorflow/1.9.0py3/haswell/base"
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
-    directory: "{{ playbook_dir }}/../../cli/experiment_metrics"
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/nginx:
     version: "1.14.0"
     method: pull
@@ -228,7 +238,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/tf"
       chart_values:
         image: "{{ image_local_url['dls4e/tf/operator'] }}"
-        tfimage: "{{ image_local_url['dls4e/tensorflow'] }}"
+        tfimage: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
     ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/ingress"

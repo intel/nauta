@@ -5,15 +5,18 @@ RUN yum update -y
 RUN yum install -y centos-release-scl which
 RUN yum install -y devtoolset-7-gcc*
 RUN source /opt/rh/devtoolset-7/enable && gcc --version
-RUN yum install -y --nogpgcheck curl git rsync unzip zip which java-1.8.0-openjdk-devel java-1.8.0-openjdk libpng12-devel pkg-config freetype-devel hdf5-devel libcurl patch
+RUN yum install -y --nogpgcheck curl git rsync unzip zip which \
+                                java-1.8.0-openjdk-devel java-1.8.0-openjdk libpng12-devel \
+                                pkg-config freetype-devel hdf5-devel libcurl patch \
+                                make libtool automake
 
 RUN mkdir /tensorflow /build-output -p
 
-ENV PYTHON=python3.6
-ENV PIP=pip3.6
-ENV TENSORFLOW_VERSION=1.9.0
+ENV PYTHON=python2.7
+ENV PIP=pip2.7
 
-RUN source /opt/rh/devtoolset-7/enable && ${PIP} install -U pip setuptools
+RUN ${PIP} install --force-reinstall -U setuptools
+RUN ${PIP} install --force-reinstall -U pip
 
 RUN source /opt/rh/devtoolset-7/enable && ${PIP} install \
         Pillow \
@@ -44,28 +47,4 @@ RUN source /opt/rh/devtoolset-7/enable && mkdir /bazel && \
     cd / && \
     rm -f /bazel/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
 
-ADD tensorflow-v${TENSORFLOW_VERSION}.tar.gz /tensorflow
-
-WORKDIR /tensorflow/tensorflow-${TENSORFLOW_VERSION}/
-
-RUN source /opt/rh/devtoolset-7/enable && yes "" | ${PYTHON} configure.py
-RUN source /opt/rh/devtoolset-7/enable && bazel build \
-      --config=mkl \
-      --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 \
-      --copt=-march=haswell \
-      --copt=-mtune=broadwell \
-      --copt=-O3 \
-      --copt=-Wformat \
-      --copt=-Wformat-security \
-      --copt=-fstack-protector \
-      --copt=-fPIC \
-      --copt=-fpic \
-      --linkopt=-znoexecstack \
-      --linkopt=-zrelro \
-      --linkopt=-znow \
-      --linkopt=-fstack-protector \
-      --linkopt=-pie \
-      --jobs=64 \
-      -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
-
-RUN source /opt/rh/devtoolset-7/enable && bazel-bin/tensorflow/tools/pip_package/build_pip_package /build-output/
+RUN ln -fs /usr/bin/${PYTHON} /usr/bin/python

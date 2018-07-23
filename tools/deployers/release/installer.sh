@@ -12,6 +12,7 @@ BINDIR=${CURDIR}/bin
 . ${LIBDIR}/ansible.sh
 . ${LIBDIR}/logs.sh
 
+DATE=$(date '+%Y%m%d%H%M%S')
 
 hide_output() {
     $@ > /dev/null 2&>1
@@ -56,6 +57,8 @@ ansible_run() {
     export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
     hide_output inventory || exit 1
     hide_output config || exit 1
+    hide_output mkdir -p ${CURDIR}/logs || exit 1
+    export ANSIBLE_LOG_PATH="${CURDIR}/logs/log-${DATE}-${KIND:-install}.log"
     ansible $(inventory) $(config) \
     -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \
     -e "kubeconfig=$(realpath $(kubeconfig))" -e "loader=${LOADER}" \
@@ -65,6 +68,7 @@ ansible_run() {
 }
 
 platform_ansible_run() {
+    export KIND=platform
     if [ X"${ENV_INVENTORY}" = X"" ]; then
         >&2 echo "Inventory file should be provided for platform installation"
         exit 1
@@ -74,16 +78,19 @@ platform_ansible_run() {
 }
 
 dls4e_ansible_run() {
+    export KIND=dls4e
     ansible_run ${CURDIR}/dls4e/install.yml
     return $?
 }
 
 dls4e_fetch_ansible_run() {
+    export KIND=dls4e
     ansible_run ${CURDIR}/dls4e/fetch.yml
     return $?
 }
 
 platform_verify_ansible_run() {
+    export KIND=platform
     ansible_run ${CURDIR}/platform/verification.yml
     return $?
 }
