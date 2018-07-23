@@ -26,6 +26,10 @@ from util.aliascmd import AliasCmd
 from cli_state import common_options
 from version import VERSION
 from util.config import DLS4EConfigMap
+from util.exceptions import KubectlIntError
+from util.logger import initialize_logger
+
+logger = initialize_logger(__name__)
 
 HELP = "Displays the version of the installed dlsctl application."
 
@@ -36,8 +40,22 @@ def version():
     """
     Returns the version of the installed dlsctl application.
     """
+    platform_version = "UNKNOWN"
+    try:
+        platform_version = DLS4EConfigMap().platform_version
+    except KubectlIntError:
+        error_msg = 'Failed to get platform version. This may occur for example due to invalid path to kubectl config' \
+                    ' or invalid k8s credentials. Check your KUBECONFIG environmental variable. Run this command with' \
+                    ' -v or -vv option for more info.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+    except Exception:
+        error_msg = 'Unexpected error occurred during platform version check. Use -v or -vv option for more info.'
+        logger.exception(error_msg)
+        click.echo(error_msg)
+
     version_table = [["dlsctl application", VERSION],
-                     ["dls4e platform", DLS4EConfigMap().platform_version]]
+                     ["dls4e platform", platform_version]]
 
     click.echo(tabulate(version_table,
                         headers=['Component', 'Version'],

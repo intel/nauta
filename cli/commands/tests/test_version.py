@@ -26,6 +26,7 @@ from click.testing import CliRunner
 from commands import version
 from version import VERSION
 from util.config import DLS4EConfigMap
+from util.exceptions import KubectlIntError
 
 PLATFORM_VERSION = "1.2"
 
@@ -47,9 +48,45 @@ def mocked_k8s_CoreV1Api(mocker):
     return coreV1API_instance
 
 
-def test_version(mocked_k8s_CoreV1Api):
+@pytest.fixture()
+def mocked_k8s_config(mocker):
+    mocker.patch('kubernetes.config.load_kube_config')
+    mocked_conf_class = mocker.patch('kubernetes.client.configuration.Configuration')
+    conf_instance = mocked_conf_class.return_value
+    conf_instance.host = 'https://127.0.0.1:8080'
+
+
+def test_version(mocked_k8s_config, mocked_k8s_CoreV1Api):
     runner = CliRunner()
     result = runner.invoke(version.version, [])
 
-    assert f"dlsctl application version: {VERSION}" in result.output
-    assert f"dls4e platform version: {PLATFORM_VERSION}" in result.output
+    assert f"dlsctl application | {VERSION}" in result.output
+    assert f"dls4e platform     | {PLATFORM_VERSION}" in result.output
+
+
+def test_version_with_kubectl_exception(mocker):
+    config_map_mock = mocker.patch('util.config.DLS4EConfigMap.__init__')
+    config_map_mock.side_effect = KubectlIntError("")
+    runner = CliRunner()
+    result = runner.invoke(version.version, [])
+
+    assert f"dlsctl application | {VERSION}" in result.output
+    assert "dls4e platform     | UNKNOWN" in result.output
+
+    assert "Failed to get platform version. This may occur for example due to invalid path to kubectl config" \
+        " or invalid k8s credentials. Check your KUBECONFIG environmental variable. Run this command with" \
+        " -v or -vv option for more info." \
+        in result.output
+
+
+def test_version_with_unknown_exception(mocker):
+    config_map_mock = mocker.patch('util.config.DLS4EConfigMap.__init__')
+    config_map_mock.side_effect = Exception("")
+    runner = CliRunner()
+    result = runner.invoke(version.version, [])
+
+    assert f"dlsctl application | {VERSION}" in result.output
+    assert "dls4e platform     | UNKNOWN" in result.output
+
+    assert "Unexpected error occurred during platform version check. Use -v or -vv option for more info." \
+        in result.output
