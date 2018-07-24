@@ -25,6 +25,8 @@ import click
 from tabulate import tabulate
 from typing import List
 
+from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
+    RUN_STATUS, RUN_TEMPLATE_NAME
 from cli_state import common_options, pass_state, State
 import platform_resources.runs as runs_api
 import platform_resources.experiments as experiments_api
@@ -60,8 +62,8 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
         runs = replace_initalizing_runs(runs_api.list_runs(namespace=namespace, state=status, name_filter=name))
 
         click.echo(tabulate([run.cli_representation for run in runs],
-                            headers=['Name', 'Parameters', 'Metrics', 'Submission date',
-                                     'Submitter', 'Status', 'Template name'], tablefmt="orgtbl"))
+                            headers=[RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE,
+                                     RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME], tablefmt="orgtbl"))
     except runs_api.InvalidRegularExpressionError:
         error_msg = f'Regular expression provided for name filtering is invalid: {name}'
         logger.exception(error_msg)

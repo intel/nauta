@@ -48,10 +48,15 @@ from util.k8s.k8s_info import get_app_service_node_port
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 
 # definitions of headers content for different commands
-RUN_NAME = "Run"
+# run name table header should be displayed as "Experiment" to hide term "Run" from the user
+RUN_NAME = "Experiment"
 RUN_STATUS = "Status"
 RUN_MESSAGE = "Message"
-RUN_PARAMETERS = "Parameters used"
+RUN_PARAMETERS = "Parameters"
+RUN_METRICS = "Metrics"
+RUN_SUBMISSION_DATE = "Submission date"
+RUN_SUBMITTER = "Submitter"
+RUN_TEMPLATE_NAME = "Template name"
 
 log = initialize_logger('commands.common')
 
@@ -198,6 +203,10 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
         log.exception(message)
         raise SubmitExperimentError(message)
 
+    script_name = None
+    if script_location is not None:
+        script_name = os.path.basename(script_location)
+
     try:
         config = Config()
 
@@ -229,6 +238,12 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
                                                                            pack_type=template, pack_params=pack_params,
                                                                            local_registry_port=proxy.tunnel_port,
                                                                            cluster_registry_port=cluster_registry_port)
+
+                    # Prepend script_name parameter to run description only for display purposes.
+                    if experiment_run.parameters and script_name:
+                        experiment_run.parameters = (script_name, ) + experiment_run.parameters
+                    elif script_name:
+                        experiment_run.parameters = (script_name, )
             except Exception:
                 # any error in this step breaks execution of this command
                 message = "Problems during creation of environments."
@@ -239,7 +254,7 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
 
             # if there is more than one run to be scheduled - first ask whether all of them should be submitted
             if len(runs_list) > 1:
-                click.echo("Please confirm that the following Runs should be submitted.")
+                click.echo("Please confirm that the following experiments should be submitted.")
                 click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
                                      RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
                                     headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))

@@ -25,6 +25,7 @@ import sys
 import click
 from tabulate import tabulate
 
+from commands.experiment.common import RUN_TEMPLATE_NAME
 from cli_state import common_options
 from util.aliascmd import AliasCmd
 from draft.cmd import DRAFT_HOME_FOLDER
@@ -53,7 +54,7 @@ def template_list():
 
     if list_of_packs:
         click.echo(tabulate([[row] for row in list_of_packs],
-                            headers=["Template name"],
+                            headers=[RUN_TEMPLATE_NAME],
                             tablefmt="orgtbl"))
     else:
         click.echo("Lack of installed packs.")

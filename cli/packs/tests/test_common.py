@@ -70,10 +70,5 @@ def compare_list(param_list, str, script_name):
 def test_prepare_script_parameters():
     output = common.prepare_script_paramaters(PARAMETERS, SCRIPT_LOCATION)
 
-    assert len(output) == 4, "Not all PARAMETERS were processed - with script name."
+    assert len(output) == 4, "Not all PARAMETERS were processed."
     compare_list(output, PARAMETERS, SCRIPT_LOCATION)
-
-    output = common.prepare_script_paramaters(PARAMETERS, SCRIPT_LOCATION, False)
-
-    assert len(output) == 3, "Not all PARAMETERS were processed - without script name."
-    compare_list(output, PARAMETERS, "")

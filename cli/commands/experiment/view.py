@@ -24,6 +24,8 @@ import sys
 from tabulate import tabulate
 import click
 
+from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
+    RUN_STATUS, RUN_TEMPLATE_NAME
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods
@@ -99,8 +101,8 @@ def view(state: State, experiment_name: str, tensorboard: bool):
             tabulate(
                 [run.cli_representation],
                 headers=[
-                    "Name", "Parameters", "Metrics", "Submission date",
-                    "Submitter", "Status", "Template name"
+                    RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE,
+                    RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME
                 ],
                 tablefmt="orgtbl"))
 

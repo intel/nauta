@@ -27,26 +27,15 @@ from typing import List, Tuple
 draft_files = ['.draftignore', 'dockerignore', 'Dockerfile', 'draft.toml']
 
 
-def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_location: str,
-                              script_name_as_a_first_element: bool=True) -> List[str]:
+def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_location: str) -> List[str]:
     """
     Prepares a list of PARAMETERS based on arguments passed to a command.
 
     :param script_parameters: string with arguments passed to a command
     :param script_location: location of a script
-    :param script_name_as_a_first_element: if True - name of a script is a first element of
-                    an array returned by the function
     :return: list with arguments
     """
-    if "/" in script_location:
-        script_filename = script_location.split("/")[-1]
-    else:
-        script_filename = script_location
-
-    args = []
-
-    if script_name_as_a_first_element:
-        args.append(script_filename)
+    args = [script_location]
 
     if script_parameters:
         args.extend(list(script_parameters))
