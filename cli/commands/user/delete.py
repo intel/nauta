@@ -25,7 +25,7 @@ import click
 
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
-from util.k8s.kubectl import check_users_presence
+from util.k8s.kubectl import check_users_presence, UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
@@ -57,9 +57,16 @@ def delete(state: State, username: str, purge: bool):
             click.echo("Only administrators can delete users.")
             sys.exit(1)
 
-        if not check_users_presence(username):
+        user_state = check_users_presence(username)
+
+        if user_state == UserState.NOT_EXISTS:
             click.echo(f"User {username} doesn't exists.")
             sys.exit(1)
+
+        if user_state == UserState.TERMINATING:
+            click.echo("User is still being removed.")
+            sys.exit(1)
+
     except Exception:
         err_msg = "Problems during verifying users presence."
         log.exception(err_msg)

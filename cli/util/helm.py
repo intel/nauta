@@ -26,25 +26,19 @@ from util.logger import initialize_logger
 log = initialize_logger(__name__)
 
 
-def delete_user(username: str) -> bool:
+def delete_user(username: str):
     """
     Removes a user with all his/her objects
 
     :param username: name of a user to be deleted
-    :return: True if a user has been deleted without any problems, False otherwise
+    Throws an excpetion in case of any errors
     """
-    try:
-        delete_namespace(username)
+    delete_namespace(username)
 
-        delete_helm_release(username)
-    except Exception:
-        log.exception("Problems during removal of a user {}".format(username))
-        return False
-
-    return True
+    delete_helm_release(username)
 
 
-def delete_helm_release(release_name: str) -> bool:
+def delete_helm_release(release_name: str):
     """
     Deletes release of a helm's chart.
 
@@ -58,5 +52,3 @@ def delete_helm_release(release_name: str) -> bool:
     if err_code or f"release \"{release_name}\" deleted" not in output:
         log.error(output)
         raise RuntimeError("Error during removal of helm release {}.".format(release_name))
-
-    return True

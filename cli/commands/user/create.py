@@ -34,7 +34,7 @@ from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
-from util.k8s.kubectl import check_users_presence
+from util.k8s.kubectl import check_users_presence, UserState
 from platform_resources.users import validate_user_name, is_user_created
 
 
@@ -112,9 +112,16 @@ def create(state: State, username: str, list_only: bool, filename: str):
             click.echo("Only administrators can create new users.")
             sys.exit(1)
 
-        if check_users_presence(username):
+        user_state = check_users_presence(username)
+
+        if user_state == UserState.ACTIVE:
             click.echo("User already exists.")
             sys.exit(1)
+
+        if user_state == UserState.TERMINATING:
+            click.echo("User is still being removed.")
+            sys.exit(1)
+
     except Exception:
         error_msg = "Problems detected while verifying user with given user name."
         log.exception(error_msg)

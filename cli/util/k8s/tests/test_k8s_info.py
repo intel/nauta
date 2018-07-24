@@ -24,13 +24,14 @@ from unittest.mock import MagicMock
 import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
                                      V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
-                                     V1PolicyRule, V1PodList, V1Pod, V1PodStatus, V1ServiceSpec, V1ServicePort
+                                     V1PolicyRule, V1PodList, V1Pod, V1PodStatus, V1ServiceSpec, V1ServicePort, \
+                                     V1NamespaceStatus
 from kubernetes.client.rest import ApiException
 
 from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
-                              PodStatus, get_app_service_node_port, get_pods
+                              PodStatus, get_app_service_node_port, get_pods, NamespaceStatus
 from util.config import DLS4EConfigMap
 from util.app_names import DLS4EAppNames
 
@@ -115,6 +116,8 @@ def mocked_k8s_CoreV1Api(mocker):
     v1_namespace = V1Namespace()
     v1_metadata_namespace = V1ObjectMeta(name=test_namespace)
     v1_namespace.metadata = v1_metadata_namespace
+    v1_namespace_status = V1NamespaceStatus(phase=NamespaceStatus.ACTIVE.value)
+    v1_namespace.status = v1_namespace_status
 
     coreV1API_instance.read_namespace.return_value = v1_namespace
     coreV1API_instance.delete_namespace.return_value = V1Status(status="{'phase': 'Terminating'}")
@@ -177,12 +180,17 @@ def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
     assert services
 
 
-def test_find_namespace_success(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig) -> bool:
-    assert find_namespace(test_namespace)
+def test_find_namespace_success(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    assert find_namespace(test_namespace) == NamespaceStatus.ACTIVE
 
 
-def test_find_namespace_failure(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig) -> bool:
-    assert not find_namespace(test_namespace+'_wrong')
+def test_find_namespace_failure(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    assert find_namespace(test_namespace+'_wrong') == NamespaceStatus.NOT_EXISTS
+
+
+def test_find_namespace_terminating(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.read_namespace.return_value.status = V1NamespaceStatus(phase=NamespaceStatus.TERMINATING.value)
+    assert find_namespace(test_namespace) == NamespaceStatus.TERMINATING
 
 
 def test_delete_namespace(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):

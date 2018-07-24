@@ -22,6 +22,7 @@
 from click.testing import CliRunner
 
 from commands.user import delete
+from util.k8s.kubectl import UserState
 
 TEST_USERNAME = "testusername"
 
@@ -44,7 +45,7 @@ def test_deleteuser_success(mocker):
 
 def test_deleteuser_missing_user(mocker):
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
-    cup_mock = mocker.patch("commands.user.delete.check_users_presence", return_value=False)
+    cup_mock = mocker.patch("commands.user.delete.check_users_presence", return_value=UserState.NOT_EXISTS)
     deu_mock = mocker.patch("commands.user.delete.delete_user")
 
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME])

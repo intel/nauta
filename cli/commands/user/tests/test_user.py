@@ -26,8 +26,9 @@ from click.testing import CliRunner
 from unittest.mock import patch, mock_open
 
 from platform_resources.user_model import User, UserStatus
-from commands.user.create import check_users_presence, generate_kubeconfig, create
+from commands.user.create import check_users_presence, generate_kubeconfig, create, UserState
 from util.helm import delete_user, delete_helm_release
+from util.k8s.kubectl import NamespaceStatus
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -72,20 +73,20 @@ user_data = User(name=test_username,
 
 
 def test_check_users_presence_success(mocker):
-    mocker.patch("util.k8s.kubectl.find_namespace", return_value=False)
+    mocker.patch("util.k8s.kubectl.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
     mocker.patch("util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
 
-    assert check_users_presence(test_username)
+    assert check_users_presence(test_username) == UserState.ACTIVE
 
-    mocker.patch("util.k8s.kubectl.find_namespace", return_value=True)
-    assert check_users_presence(test_username)
+    mocker.patch("util.k8s.kubectl.find_namespace", return_value=NamespaceStatus.ACTIVE)
+    assert check_users_presence(test_username) == UserState.ACTIVE
 
 
 def test_check_users_presence_failure(mocker):
-    mocker.patch("util.k8s.kubectl.find_namespace", return_value=False)
+    mocker.patch("util.k8s.kubectl.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
     mocker.patch("util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
 
-    assert not check_users_presence(test_username+"_wrong")
+    assert check_users_presence(test_username+"_wrong") == UserState.NOT_EXISTS
 
 
 def test_generate_kubeconfig():
@@ -99,8 +100,12 @@ def test_generate_kubeconfig():
 
 
 def test_delete_helm_release_success(mocker):
-    mocker.patch("util.helm.execute_system_command", return_value=(f"release \"{test_username}\" deleted", 0))
-    assert delete_helm_release(test_username)
+    esc_mock = mocker.patch("util.helm.execute_system_command",
+                            return_value=(f"release \"{test_username}\" deleted", 0))
+
+    delete_helm_release(test_username)
+
+    esc_mock.call_count == 1
 
 
 def test_delete_helm_release_failure(mocker):
@@ -113,9 +118,8 @@ def test_delete_user_success(mocker):
     dns_mock = mocker.patch("util.helm.delete_namespace")
     dhr_mock = mocker.patch("util.helm.delete_helm_release")
 
-    user_deleted = delete_user(test_username)
+    delete_user(test_username)
 
-    assert user_deleted
     assert dns_mock.call_count == 1
     assert dhr_mock.call_count == 1
 
@@ -124,15 +128,15 @@ def test_delete_user_failure(mocker):
     dns_mock = mocker.patch("util.helm.delete_namespace", side_effect=RuntimeError)
     dhr_mock = mocker.patch("util.helm.delete_helm_release")
 
-    user_deleted = delete_user(test_username)
+    with pytest.raises(RuntimeError):
+        delete_user(test_username)
 
-    assert not user_deleted
     assert dns_mock.call_count == 1
     assert dhr_mock.call_count == 0
 
 
 def test_create_user_failure(mocker):  # noqa: F811
-    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=True)
+    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=UserState.ACTIVE)
     esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
     gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
     vun_mock = mocker.patch("commands.user.create.validate_user_name")
@@ -140,6 +144,25 @@ def test_create_user_failure(mocker):  # noqa: F811
 
     runner = CliRunner()
     runner.invoke(create, [test_username])
+
+    assert cup_mock.call_count == 1, "users presence wasn't checked"
+    assert esc_mock.call_count == 0, "user was created"
+    assert gut_mock.call_count == 0, "users password was taken"
+    assert vun_mock.call_count == 1, "username wasn't validated"
+    assert icu_mock.call_count == 1, "admin wasn't checked"
+
+
+def test_create_user_terminating(mocker):  # noqa: F811
+    cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=UserState.TERMINATING)
+    esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
+    gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
+    vun_mock = mocker.patch("commands.user.create.validate_user_name")
+    icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=True)
+
+    runner = CliRunner()
+    result = runner.invoke(create, [test_username])
+
+    assert "User is still being removed" in result.output
 
     assert cup_mock.call_count == 1, "users presence wasn't checked"
     assert esc_mock.call_count == 0, "user was created"

@@ -22,6 +22,7 @@
 import subprocess
 import time
 import random
+from enum import Enum
 
 from typing import Optional
 
@@ -29,7 +30,7 @@ import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError, KubectlConnectionError, LocalPortOccupiedError
-from util.k8s.k8s_info import get_app_services, find_namespace
+from util.k8s.k8s_info import get_app_services, find_namespace, NamespaceStatus
 from util.app_names import DLS4EAppNames
 from util.system import check_port_availability
 
@@ -38,6 +39,12 @@ logger = initialize_logger('util.kubectl')
 MAX_NUMBER_OF_TRIES = 1000
 START_PORT = 3000
 END_PORT = 65535
+
+
+class UserState(Enum):
+    ACTIVE = "Active"
+    TERMINATING = "Terminating"
+    NOT_EXISTS = "Not_Exists"
 
 
 def find_random_available_port() -> int:
@@ -140,23 +147,29 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
     return process, tunnel_port, service_container_port
 
 
-def check_users_presence(username: str) -> bool:
+def check_users_presence(username: str) -> UserState:
     """
     Checks whether a user with a given name exists. It searches also for a namespace
     with a name equal to the given username
 
     :param username: username
-    :return: True if a user exists, False otherwise
+    :return: returns a current state of user - as an item for UserState enum
     In case of problems during gathering user's data - it raises an exception.
     """
-    if find_namespace(username):
+    namespace = find_namespace(username)
+
+    if namespace != NamespaceStatus.NOT_EXISTS:
         logger.debug("Namespace {} already exists.".format(username))
-        return True
+        return UserState(namespace.value)
 
     try:
         user_data = users_api.get_user_data(username)
 
-        return user_data and user_data.name == username
+        if user_data and user_data.name == username:
+            return UserState.ACTIVE
+        else:
+            return UserState.NOT_EXISTS
+
     except Exception as exe:
         error_message = "Error during checking user's presence."
         logger.error(error_message)

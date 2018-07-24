@@ -41,6 +41,12 @@ class PodStatus(Enum):
     UNKNOWN = 'UNKNOWN'
 
 
+class NamespaceStatus(Enum):
+    ACTIVE = 'Active'
+    TERMINATING = 'Terminating'
+    NOT_EXISTS = 'Not_Exists'
+
+
 def get_kubectl_host(with_port: bool=False) -> str:
     config.load_kube_config()
     conf_with_port = configuration.Configuration().host.replace('https://', '').replace('http://', '')
@@ -139,25 +145,28 @@ def get_app_service_node_port(dls4e_app_name: DLS4EAppNames, namespace: str = No
     return services[0].spec.ports[0].node_port
 
 
-def find_namespace(namespace: str) -> bool:
+def find_namespace(namespace: str) -> NamespaceStatus:
     """
     Checks whether a namespace with a given name exists
 
     :param namespace: name of a namespace to be found
-    :return: True if a namespace with a given name exists
+    :return: value from the NamespaceStatus enum
     """
     api = get_k8s_api()
     try:
         namespace_def = api.read_namespace(namespace)
 
-        return namespace_def and namespace_def.metadata and namespace_def.metadata.name == namespace
+        if namespace_def and namespace_def.metadata and namespace_def.metadata.name == namespace:
+            return NamespaceStatus(namespace_def.status.phase)
     except ApiException as e:
         if e.status == 404:
-            return False
+            return NamespaceStatus.NOT_EXISTS
         else:
             error_message = "find_namespace error"
             logger.exception(error_message)
             raise KubectlIntError(error_message)
+
+    return NamespaceStatus.NOT_EXISTS
 
 
 def delete_namespace(namespace: str, propagate: bool=False):
