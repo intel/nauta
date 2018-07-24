@@ -104,8 +104,14 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
         else:
             tunnel_port = find_random_available_port()
 
-        port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}', f'service/{service_name}',
-                                f'{tunnel_port}:{service_container_port}']
+        if system.get_current_os() == system.OS.WINDOWS:
+            port_forward_command = ['FOR', '/L', '%N', 'IN', '()', 'DO', 'kubectl', 'port-forward',
+                                    f'--namespace={namespace}', f'service/{service_name}',
+                                    f'{service_node_port}:{service_container_port}']
+        else:
+            port_forward_command = ['while', 'true;', 'do', 'kubectl', 'port-forward', f'--namespace={namespace} ',
+                                    f'service/{service_name}', f'{service_node_port}:{service_container_port};',
+                                    'done']
 
         logger.debug(port_forward_command)
 
@@ -113,7 +119,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
         if number_of_retries:
             for i in range(number_of_retries-1):
                 try:
-                    process = system.execute_subprocess_command(port_forward_command)
+                    process = system.execute_subprocess_command(port_forward_command, shell=True, join=True)
                 except Exception:
                     logger.exception("Error during setting up proxy - retrying.")
                 else:
@@ -121,7 +127,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
                 time.sleep(5)
 
         if not process:
-            process = system.execute_subprocess_command(port_forward_command)
+            process = system.execute_subprocess_command(port_forward_command, shell=True, join=True)
 
     except KubectlIntError as exe:
         raise RuntimeError(exe)
