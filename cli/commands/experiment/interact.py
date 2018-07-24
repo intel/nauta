@@ -37,7 +37,7 @@ from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME,
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
-from commands.experiment.common import validate_experiment_name
+from commands.experiment.common import check_experiment_name
 from util.exceptions import K8sProxyCloseError
 
 HELP = "Launches a local browser with Jupyter Notebook. If the script name argument " \
@@ -53,7 +53,7 @@ log = initialize_logger(__name__)
 
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='i')
-@click.option('-n', '--name', default=None, help=HELP_N, callback=validate_experiment_name)
+@click.option('-n', '--name', default=None, help=HELP_N)
 @click.option('-f', '--filename', default=None, help=HELP_F)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
 @click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
@@ -89,6 +89,12 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
 
         if jupyter_experiment:
             create_new_notebook = False
+        else:
+            try:
+                check_experiment_name(value=name)
+            except click.BadParameter as exe:
+                click.echo(str(exe))
+                sys.exit(1)
 
     number_of_retries = 0
     if create_new_notebook:

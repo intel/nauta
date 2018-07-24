@@ -47,7 +47,7 @@ class InteractMocks:
     def __init__(self, mocker):
         self.mocker = mocker
         self.get_namespace = mocker.patch("commands.experiment.interact.get_kubectl_current_context_namespace",
-                                          side_effect=[EXPERIMENT_NAMESPACE])
+                                          side_effect=[EXPERIMENT_NAMESPACE, EXPERIMENT_NAMESPACE])
         self.get_experiment = mocker.patch("commands.experiment.interact.get_experiment",
                                            return_value=None)
         self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment")
@@ -69,16 +69,16 @@ def check_asserts(prepare_mocks: InteractMocks, get_namespace_count=1, get_exper
 
 
 def test_interact_incorrect_name(prepare_mocks: InteractMocks):
-    result = CliRunner().invoke(interact.interact, ["-n", INCORRECT_INTERACT_NAME])
+    result = CliRunner().invoke(interact.interact, ["-n", INCORRECT_INTERACT_NAME], input="y")
 
     assert "name must consist of lower case alphanumeric characters" in result.output
-    check_asserts(prepare_mocks, get_namespace_count=0, get_experiment_count=0, submit_experiment_count=0,
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
-    result = CliRunner().invoke(interact.interact, ["-n", TOO_LONG_INTERACT_NAME])
+    result = CliRunner().invoke(interact.interact, ["-n", TOO_LONG_INTERACT_NAME], input="y")
 
-    assert "Name cannot be longer than 30 characters" in result.output
-    check_asserts(prepare_mocks, get_namespace_count=0, get_experiment_count=0, submit_experiment_count=0,
+    assert "Name given by a user cannot be longer than 30 characters" in result.output
+    check_asserts(prepare_mocks, get_namespace_count=2, get_experiment_count=2, submit_experiment_count=0,
                   launch_app_count=0)
 
 

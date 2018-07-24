@@ -569,11 +569,15 @@ def check_enclosing_brackets(params: str):
 
 
 def validate_experiment_name(ctx, param, value):
+    return check_experiment_name(value)
+
+
+def check_experiment_name(value: str) -> str:
     try:
         if value:
             if len(value) > 30:
                 # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit this
-                raise ValidationError("Name cannot be longer than 30 characters.")
+                raise ValidationError("Name given by a user cannot be longer than 30 characters.")
             validate_kubernetes_name(value)
             return value
     except ValidationError as ex:
