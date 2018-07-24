@@ -230,14 +230,14 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should delete exp from selected list on deselect', function () {
-    const selectedExp = {name: 'test'};
+    const selectedExp = {attributes:{name: 'test'}};
     wrapper.vm.selected = [selectedExp];
     wrapper.vm.deselectExp(selectedExp);
     expect(wrapper.vm.selected).to.deep.equal([]);
   });
 
   it('Should check is selected item correctly', function () {
-    const selectedExp = {name: 'test'};
+    const selectedExp = {attributes:{name: 'test'}};
     wrapper.vm.selected = [selectedExp];
     const result = wrapper.vm.isSelected(selectedExp);
     expect(result).to.deep.equal(true);

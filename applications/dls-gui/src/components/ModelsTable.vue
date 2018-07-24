@@ -84,8 +84,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                  <template v-for="item in experimentsData" :id="item.name">
-                    <tr v-bind:key="item.name" >
+                  <template v-for="item in experimentsData" :id="item.attributes.name">
+                    <tr v-bind:key="item.attributes.name" >
                       <td v-if="tensorMode">
                         <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn">
                           check_circle
@@ -331,7 +331,7 @@ export default {
     onLaunchTensorboardClick () {
       if (this.tensorMode) {
         const experiments = this.selected.map((exp) => {
-          return `${exp.namespace}=${encodeURIComponent(exp.name)}`;
+          return `${exp.attributes.namespace}=${encodeURIComponent(exp.attributes.name)}`;
         }).join('&');
         window.open(`/tensorboard?${experiments}`);
         this.discardTensorboard();
@@ -360,12 +360,12 @@ export default {
     },
     deselectExp (exp) {
       this.selected = this.selected.filter((item) => {
-        return item.name !== exp.name;
+        return item.attributes.name !== exp.attributes.name;
       });
     },
     isSelected (exp) {
       const filtered = this.selected.filter((item) => {
-        return item.name === exp.name;
+        return item.attributes.name === exp.attributes.name;
       });
       return filtered.length !== 0;
     },
