@@ -1,0 +1,3 @@
+FROM dls4e/tensorflow:1.9.0-py3
+
+ENV PYTHONUNBUFFERED 1

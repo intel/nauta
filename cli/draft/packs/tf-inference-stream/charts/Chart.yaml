@@ -1,0 +1,4 @@
+name: tf-inference-stream
+apiVersion: v1
+description: tensorflow-serving stream inference chart
+version: 0.1.0

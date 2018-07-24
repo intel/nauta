@@ -1,0 +1,21 @@
+# Default values for charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+modelPath: ''
+modelName: ''
+
+containerPort: 8501
+
+image:
+  pullPolicy: IfNotPresent
+  clusterRepository: ''
+
+workersCount: 1
+
+resources:
+  requests:
+    cpu: 0.01
+    memory: 1Gi
+
+experimentName: ''
