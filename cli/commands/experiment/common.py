@@ -252,8 +252,8 @@ def submit_experiment(script_location: str, script_folder_location: str, templat
                 delete_run_environments(runs_list)
                 raise SubmitExperimentError(message)
 
-            # if there is more than one run to be scheduled - first ask whether all of them should be submitted
-            if len(runs_list) > 1:
+            # if ps or pr option is used - first ask whether experiment(s) should be submitted
+            if parameter_range or parameter_set:
                 click.echo("Please confirm that the following experiments should be submitted.")
                 click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
                                      RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
