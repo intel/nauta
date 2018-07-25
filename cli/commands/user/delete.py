@@ -20,6 +20,7 @@
 #
 
 import sys
+import time
 
 import click
 
@@ -80,10 +81,26 @@ def delete(state: State, username: str, purge: bool):
     try:
         delete_user(username)
 
-        click.echo(f"User {username} has been deleted.")
+        purge_error_message = "Some artifacts belonging to a user weren't removed."
+        try:
+            # failure during purging a user doesn't mean that user wasn't deleted
+            if purge and not purge_user(username):
+                click.echo(purge_error_message)
+        except Exception:
+            log.exception("Problems during purging a user")
+            click.echo(purge_error_message)
 
-        if purge and not purge_user(username):
-            click.echo("Some artifacts belonging to a user weren't removed.")
+        # CAN-616 - wait until user has been really deleted
+        for i in range(30):
+            if not check_users_presence(username):
+                break
+
+            time.sleep(1)
+        else:
+            click.echo("User is still being deleted. Please check status of this user in a while.")
+            sys.exit(0)
+
+        click.echo(f"User {username} has been deleted.")
     except K8sProxyCloseError:
         log.exception("Error during closing of a proxy for elasticsearch.")
         click.echo("Elasticsearch proxy hasn't been closed properly. "

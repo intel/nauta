@@ -29,14 +29,14 @@ TEST_USERNAME = "testusername"
 
 def test_deleteuser_success(mocker):
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
-    cup_mock = mocker.patch("commands.user.delete.check_users_presence")
+    cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
 
     mocker.patch("click.confirm", return_value=True)
 
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME])
 
-    assert cup_mock.call_count == 1
+    assert cup_mock.call_count == 2
     assert deu_mock.call_count == 1
     assert icu_mock.call_count == 1
 
@@ -119,7 +119,7 @@ def test_deleteuser_answer_n(mocker):
 
 def test_deleteuser_purge_success(mocker):
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
-    cup_mock = mocker.patch("commands.user.delete.check_users_presence")
+    cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
     prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=True)
 
@@ -127,14 +127,14 @@ def test_deleteuser_purge_success(mocker):
 
     CliRunner().invoke(delete.delete, [TEST_USERNAME, "-p"])
 
-    assert cup_mock.call_count == 1
+    assert cup_mock.call_count == 2
     assert deu_mock.call_count == 1
     assert prg_mock.call_count == 1
     assert icu_mock.call_count == 1
 
 
 def test_deleteuser_purge_failure(mocker):
-    cup_mock = mocker.patch("commands.user.delete.check_users_presence")
+    cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
     prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=False)
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
@@ -143,7 +143,7 @@ def test_deleteuser_purge_failure(mocker):
 
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME, "-p"])
 
-    assert cup_mock.call_count == 1
+    assert cup_mock.call_count == 2
     assert deu_mock.call_count == 1
     assert prg_mock.call_count == 1
     assert "Some artifacts belonging to a user weren't removed." in result.output
@@ -156,4 +156,20 @@ def test_deleteuser_not_admin(mocker):
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME, "-p"])
 
     assert "Only administrators can delete users." in result.output
+    assert icu_mock.call_count == 1
+
+
+def test_deleteuser_purge_success_wait_for_deletion(mocker):
+    icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
+    cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, True, True, True, False])
+    deu_mock = mocker.patch("commands.user.delete.delete_user")
+    prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=True)
+
+    mocker.patch("click.confirm", return_value=True)
+
+    CliRunner().invoke(delete.delete, [TEST_USERNAME, "-p"])
+
+    assert cup_mock.call_count == 5
+    assert deu_mock.call_count == 1
+    assert prg_mock.call_count == 1
     assert icu_mock.call_count == 1
