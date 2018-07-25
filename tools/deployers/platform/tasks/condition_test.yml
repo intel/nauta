@@ -1,18 +1,6 @@
 ---
 
-- set_fact:
-    local_test_variable: True
-  no_log: True
-
-- set_fact:
-    local_test_variable: "{{ local_test_variable and test | bool }}"
-  loop_control:
-    loop_var: test
-  with_items: "{{ conditions }}"
-  when: local_test_variable
-  no_log: True
-
 - name: Fail if test failed
   fail:
     msg: "{{ message }}"
-  when: local_test_variable
+  when: conditions | bool

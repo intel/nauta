@@ -1,14 +1,17 @@
 ---
 
+- set_fact:
+    node_kind_path: "/etc/dls-cluster/master/{{ kind }}"
+
 - name: Generate privatekey for type {{ name }}
   openssl_privatekey:
-    path: "/etc/dls-cluster/master/key/{{ name }}.key"
+    path: "{{ node_kind_path }}/key/{{ name }}.key"
 
 - name: Generate csr for type {{ name }}
   changed_when: False
   openssl_csr:
-    path: "/etc/dls-cluster/master/csr/{{ name }}.csr"
-    privatekey_path: "/etc/dls-cluster/master/key/{{ name }}.key"
+    path: "{{ node_kind_path }}/csr/{{ name }}.csr"
+    privatekey_path: "{{ node_kind_path }}/key/{{ name }}.key"
     common_name: "{{ common_name }}"
     subject_alt_name: "{% for key, value in subject_alt_name.items() %}{{ key }}:{{ value }}{% if not loop.last %},{% endif %}{% endfor %}"
     key_usage: "{{ key_usage }}"
@@ -16,14 +19,19 @@
 
 - name: Render configuration
   template:
-    dest: "/etc/dls-cluster/master/cfg/{{ name }}.cfg"
+    dest: "{{ node_kind_path }}/cfg/{{ name }}.cfg"
     src: conf.j2
 
 - name: Create crt
   shell: >
-    openssl x509 -req -in "/etc/dls-cluster/master/csr/{{ name }}.csr"
-    -set_serial {{ 9999 | random }} -CA "/etc/dls-cluster/master/ca/CA.crt" -CAkey "/etc/dls-cluster/master/ca/CA.key"
-    -out "/etc/dls-cluster/master/crt/{{ name }}.crt" -days 3650
-    -extensions v3_req -extfile "/etc/dls-cluster/master/cfg/{{ name }}.cfg"
+    openssl x509 -req -in "{{ node_kind_path }}/csr/{{ name }}.csr"
+    -set_serial {{ 9999 | random }} -CA "{{ node_kind_path }}/ca/CA.crt" -CAkey "{{ node_kind_path }}/ca/CA.key"
+    -out "{{ node_kind_path }}/crt/{{ name }}.crt" -days 3650
+    -extensions v3_req -extfile "{{ node_kind_path }}/cfg/{{ name }}.cfg"
   args:
-    creates: "/etc/dls-cluster/master/crt/{{ name }}.crt"
+    creates: "{{ node_kind_path }}/crt/{{ name }}.crt"
+
+- name: Join global ca
+  shell: 'cat "{{ node_kind_path }}/crt/{{ name }}.crt" "{{ node_kind_path }}/ca/CA.crt" > "{{ node_kind_path }}/crt/{{ name }}-fullchain.crt"'
+  args:
+    creates: "{{ node_kind_path }}/crt/{{ name }}-fullchain.crt"

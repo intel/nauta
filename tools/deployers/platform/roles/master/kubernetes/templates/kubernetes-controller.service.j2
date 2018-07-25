@@ -8,14 +8,14 @@ TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
 ExecStart=/opt/dls4e/kubernetes/kube-controller-manager \
-      --service-account-private-key-file /etc/dls-cluster/master/key/service.key \
+      --service-account-private-key-file /etc/dls-cluster/master/kubernetes/key/service.key \
       --node-sync-period 2m \
       --v 0 --leader-elect \
       --master http://127.0.0.1:8080 \
       --cluster-cidr {{ kubernetes_network.pod }} \
-      --root-ca-file=/etc/dls-cluster/client/ca.pem \
-      --cluster-signing-cert-file=/etc/dls-cluster/master/ca/CA.crt \
-      --cluster-signing-key-file=/etc/dls-cluster/master/ca/CA.key \
+      --root-ca-file=/etc/dls-cluster/master/kubernetes/ca/CA.crt \
+      --cluster-signing-cert-file=/etc/dls-cluster/master/kubernetes/ca/CA.crt \
+      --cluster-signing-key-file=/etc/dls-cluster/master/kubernetes/ca/CA.key \
       --controllers=*,tokencleaner,bootstrapsigner \
       --allocate-node-cidrs=true \
       {{ feature_gates }}

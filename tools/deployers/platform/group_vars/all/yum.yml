@@ -8,7 +8,7 @@ calculated_disabled_plugins: "{% if use_system_enabled_plugins %}{{ disabled_plu
 
 enabled_repos: []
 disabled_repos: []
-use_system_enabled_repos: False
+use_system_enabled_repos: True
 calculated_enabled_repos: "{{ enabled_repos }}"
 calculated_disabled_repos: "{% if use_system_enabled_repos %}{{ disabled_repos }}{% else %}*{% endif %}"
 

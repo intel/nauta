@@ -2,11 +2,8 @@
 
 verification_checks:
   - message: Master group is not defined in inventory
-    condition:
-      - '"master" not in groups'
-      - groups["master"] | length == 0
-  - message: Too many master hosts defined in inventory. Got {{ groups["master"] | length }}, expected 1
-    condition:
-      - groups["master"] | length > 1
+    condition: "{{ 'master' not in groups or groups['master'] | length == 0 }}"
+  - message: Too many master hosts defined in inventory. Got {{ groups["master"] | default([]) | length }}, expected 1
+    condition: "{{ 'master' not in groups or groups['master'] | length > 1 }}"
 
 required_parameters: []

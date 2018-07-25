@@ -42,17 +42,21 @@ spec:
           - "./apiserver"
           args:
           - "--etcd-servers=http://{{ .Release.Name }}-{{ .Chart.Name }}-etcd:2379"
+          - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+          - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
           - "--loglevel=1"
           - "--audit-log-path=-"
           - "--audit-log-maxage=0"
           - "--audit-log-maxbackup=0"
+          - "--loglevel=1"
           resources:
             requests:
               cpu: 100m
               memory: 200Mi
           volumeMounts:
-          - name: apiserver-certs-temp
+          - name: apiserver-certs
             mountPath: /apiserver.local.config/certificates
+            readOnly: true
         - name: controller
           image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E service image is required" .Values.service_image }}
           imagePullPolicy: Always
@@ -64,13 +68,6 @@ spec:
               cpu: 100m
               memory: 200Mi
       volumes:
-{{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
-        - name: apiserver-certs-temp
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-{{ .Chart.Name }}
-{{ else }}
-        - name: apiserver-certs-temp
-          hostPath:
-            path: {{ required "DLS4E Storage Path" .Values.global.dls4e_storage.local_path }}/{{ .Release.Name }}/{{ .Chart.Name }}/main
-            type: DirectoryOrCreate
-{{ end }}
+      - name: apiserver-certs
+        secret:
+          secretName: {{ .Release.Name }}-{{ .Chart.Name }}

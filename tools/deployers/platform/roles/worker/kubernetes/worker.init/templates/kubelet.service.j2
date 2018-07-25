@@ -19,8 +19,9 @@ ExecStart=/opt/dls4e/kubernetes/kubelet \
                   --cni-bin-dir /opt/dls4e/cni-plugins \
                   --pod-infra-container-image registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/pause:3.1 \
                   --serialize-image-pulls=True --image-pull-progress-deadline=30m0s \
-                  --tls-cert-file /etc/dls-cluster/client/node.crt \
-                  --tls-private-key-file /etc/dls-cluster/client/node.key --maximum-dead-containers 512 \
+                  --client-ca-file /etc/dls-cluster/client/kubernetes/ca.pem \
+                  --tls-cert-file /etc/dls-cluster/client/kubernetes/node.crt \
+                  --tls-private-key-file /etc/dls-cluster/client/kubernetes/node.key --maximum-dead-containers 512 \
                   --maximum-dead-containers-per-container 1 --minimum-container-ttl-duration 0
 RestartSec=10
 StartLimitInterval=0

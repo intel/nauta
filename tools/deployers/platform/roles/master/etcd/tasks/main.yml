@@ -38,9 +38,9 @@
       ETCD_PEER_KEY_FILE: /ca/node.key
     volumes:
       - "/data/local/etcd:/etcd-data"
-      - "/etc/dls-cluster/client/ca.pem:/ca/CA.pem:ro"
-      - "/etc/dls-cluster/client/node.crt:/ca/node.crt:ro"
-      - "/etc/dls-cluster/client/node.key:/ca/node.key:ro"
+      - "/etc/dls-cluster/client/etcd/ca.pem:/ca/CA.pem:ro"
+      - "/etc/dls-cluster/client/etcd/node.crt:/ca/node.crt:ro"
+      - "/etc/dls-cluster/client/etcd/node.key:/ca/node.key:ro"
     command: /usr/local/bin/etcd
 
 - name: Render etcd service script

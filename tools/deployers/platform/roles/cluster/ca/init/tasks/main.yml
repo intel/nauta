@@ -1,83 +1,14 @@
 ---
 
-- name: Ensure that node dirs exis
-  file:
-    path: /etc/dls-cluster/master/nodes
-    owner: cluster-master
-    group: cluster-master
-    mode: 0750
-    state: directory
-
-- name: Ensure that dirs exists for each node
-  file:
-    path: /etc/dls-cluster/master/nodes/{{ item }}
-    owner: cluster-master
-    group: cluster-master
-    mode: 0750
-    state: directory
-  with_items: "{{ groups['all'] }}"
-
-- name: Create base directories for CA
-  file:
-    path: "/etc/dls-cluster/master/{{ item }}"
-    state: directory
-    mode: 0750
-    owner: cluster-master
-    group: cluster-master
+- name: Generate root for certs
+  include_tasks: kind.yml
   with_items:
-    - ca
-    - csr
-    - key
-    - crt
-    - cfg
-    -
-
-- name: Generate private CA key (4096 bit, RSA)
-  openssl_privatekey:
-    path: "/etc/dls-cluster/master/ca/CA.key"
-
-- name: Generate selfsigned cert for platform
-  shell: openssl req -x509 -new -nodes -key "/etc/dls-cluster/master/ca/CA.key" -days 3650 -subj "/CN=dls" -out "/etc/dls-cluster/master/ca/CA.crt"
-  args:
-    creates: "/etc/dls-cluster/master/ca/CA.crt"
-
-- name: Generate certs for hosts
-  include_tasks: cert.yml
-  vars:
-    name: "{{ item }}"
-    common_name: "{{ hostvars[item].dls_configuration.network.instance_name }}"
-    subject_alt_name:
-      DNS.1: "{{ hostvars[item].dls_configuration.network.instance_name }}"
-      DNS.2: "{{ item }}"
-      IP.1: "{{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}"
-    key_usage:
-      - digitalSignature
-      - keyEncipherment
-    extended_key_usage:
-      - clientAuth
-      - serverAuth
-  with_items: "{{ groups['all'] }}"
-
-- name: Copy key to worker directory
-  copy:
-    remote_src: True
-    src: "/etc/dls-cluster/master/key/{{ item }}.key"
-    dest: "/etc/dls-cluster/master/nodes/{{ item }}/node.key"
-  with_items: "{{ groups['all'] }}"
-
-- name: Copy crt to worker directory
-  copy:
-    remote_src: True
-    src: "/etc/dls-cluster/master/crt/{{ item }}.crt"
-    dest: "/etc/dls-cluster/master/nodes/{{ item }}/node.crt"
-  with_items: "{{ groups['all'] }}"
-
-- name: Copy CA to worker directory
-  copy:
-    remote_src: True
-    src: "/etc/dls-cluster/master/ca/CA.crt"
-    dest: "/etc/dls-cluster/master/nodes/{{ item }}/ca.pem"
-  with_items: "{{ groups['all'] }}"
+    - kubernetes
+    - api-proxy
+    - consul
+    - etcd
+  loop_control:
+    loop_var: kind
 
 - name: Generate certs for apiservice
   include_tasks: cert.yml
@@ -99,6 +30,11 @@
     extended_key_usage:
       - clientAuth
       - serverAuth
+  with_items:
+    - kubernetes
+    - api-proxy
+  loop_control:
+    loop_var: kind
 
 - name: Generate certs for service
   include_tasks: cert.yml
@@ -113,6 +49,10 @@
       - nonRepudiation
     extended_key_usage:
       - clientAuth
+  with_items:
+    - kubernetes
+  loop_control:
+    loop_var: kind
 
 - name: Generate certs for registry
   include_tasks: cert.yml
@@ -120,12 +60,23 @@
     name: "registry"
     common_name: "registry"
     subject_alt_name:
-      DNS.1: "registry.service.{{ nodes_domain }}. {{ domain }}"
+      DNS.1: "registry.service.{{ nodes_domain }}.{{ domain }}"
     key_usage:
       - digitalSignature
       - keyEncipherment
       - nonRepudiation
     extended_key_usage:
       - clientAuth
+  with_items:
+    - consul
+  loop_control:
+    loop_var: kind
 
 - include_tasks: synchronize-ca.yml
+  with_items:
+    - kubernetes
+    - api-proxy
+    - consul
+    - etcd
+  loop_control:
+    loop_var: kind

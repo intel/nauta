@@ -1,7 +1,7 @@
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority: /etc/dls-cluster/client/ca.pem
+    certificate-authority: /etc/dls-cluster/client/kubernetes/ca.pem
     server: https://{{ kubernetes_network.svc_list.apiservice.consul_name }}:{{ kubernetes_network.internal_port }}/
   name: bootstrap
 contexts:
@@ -15,5 +15,5 @@ preferences: {}
 users:
 - name: kubelet-bootstrap
   user:
-    client-certificate: /etc/dls-cluster/client/node.crt
-    client-key: /etc/dls-cluster/client/node.key
+    client-certificate: /etc/dls-cluster/client/kubernetes/node.crt
+    client-key: /etc/dls-cluster/client/kubernetes/node.key

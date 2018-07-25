@@ -1,0 +1,6 @@
+---
+
+- hosts: all
+  tasks:
+  - name: tt
+    shell: echo 1

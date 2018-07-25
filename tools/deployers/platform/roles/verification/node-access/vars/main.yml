@@ -2,8 +2,8 @@
 
 verification_checks:
   - message: "Can not find ansible_host or ansible_ssh_host on host."
-    condition:
-      - "{{ 'ansible_ssh_host' not in hostvars[inventory_hostname] }}"
-      - "{{ 'ansible_host' not in hostvars[inventory_hostname] }}"
+    condition: "{{ 'ansible_ssh_host' not in hostvars[inventory_hostname] and 'ansible_host' not in hostvars[inventory_hostname] }}"
+  - message: "Inventory hostname contains underscore - {{ inventory_hostname }}"
+    condition: "{{ '_' in inventory_hostname }}"
 
 required_parameters: []

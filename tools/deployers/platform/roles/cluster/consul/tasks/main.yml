@@ -32,7 +32,7 @@
 - name: Copy ssl keys
   copy:
     remote_src: True
-    src: "/etc/dls-cluster/client/{{ item }}"
+    src: "/etc/dls-cluster/client/consul/{{ item }}"
     dest: "/etc/consul/ssl/{{ item }}"
     owner: consul
     group: consul
