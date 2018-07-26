@@ -37,6 +37,7 @@ def test_set_up_proxy(mocker):
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             return_value=(spo_mock, "1000", "1001"))
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
+    mocker.patch("psutil.Process")
 
     with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
         pass
@@ -70,6 +71,7 @@ def test_set_up_proxy_close_failure(mocker):
                  return_value=(spo_mock, 1000, 1001))
 
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
+    mocker.patch("psutil.Process")
 
     with pytest.raises(K8sProxyCloseError):
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
@@ -92,6 +94,7 @@ def test_set_up_proxy_open_readiness_failure(mocker):
                  return_value=(popen_mock, 1000, 1001))
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness",
                  side_effect=TunnelSetupError)
+    mocker.patch("psutil.Process")
 
     with pytest.raises(K8sProxyOpenError):
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
