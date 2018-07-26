@@ -117,7 +117,7 @@ def test_view_experiment_no_pods(prepare_mocks: ViewMocks):
     result = runner.invoke(view.view, [TEST_RUNS[0].name])
 
     assert prepare_mocks.get_run.call_count == 1, "Experiments were not retrieved"
-    assert "At this moment there are no pods connected with this experiment." in result.output, "Bad output."
+    assert result.output.count("\n") == 8, "Bad output."
 
 
 def test_container_volume_mounts_to_msg():

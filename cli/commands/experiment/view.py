@@ -138,14 +138,8 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 pod.metadata.name, pod.metadata.uid, status_string,
                 container_details
             ])
-        if pods:
-            click.echo(
-                tabulate(
-                    tabular_output,
-                    headers=['Name', 'Uid', 'Status', 'Container Details'],
-                    tablefmt="orgtbl"))
-        else:
-            click.echo('At this moment there are no pods connected with this experiment.')
+        click.echo(tabulate(tabular_output,
+                            headers=['Name', 'Uid', 'Status', 'Container Details'], tablefmt="orgtbl"))
 
     except Exception:
         error_msg = 'Failed to get experiment.'
