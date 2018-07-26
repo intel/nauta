@@ -28,7 +28,7 @@ from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Sta
                                      V1NamespaceStatus
 from kubernetes.client.rest import ApiException
 
-from util.k8s.k8s_info import get_kubectl_port, get_kubectl_host, get_app_services, \
+from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
                               PodStatus, get_app_service_node_port, get_pods, NamespaceStatus
@@ -156,22 +156,10 @@ def mocked_k8s_RbacAuthorizationV1Api(mocker):
     rbacAuthorizationV1_instance.list_cluster_role.return_value = v1_cluster_role_list
 
 
-def test_get_k8s_host_wo_port(mocked_k8s_config):
+def test_get_k8s_host_w_port(mocked_k8s_config):
     k8s_host = get_kubectl_host()
 
-    assert k8s_host == '127.0.0.1'
-
-
-def test_get_k8s_host_w_port(mocked_k8s_config):
-    k8s_host = get_kubectl_host(with_port=True)
-
     assert k8s_host == '127.0.0.1:8080'
-
-
-def test_get_k8s_port(mocked_k8s_config):
-    k8s_port = get_kubectl_port()
-
-    assert k8s_port == 8080
 
 
 def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):

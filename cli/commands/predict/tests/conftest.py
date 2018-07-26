@@ -19,23 +19,10 @@
 # and approved by Intel in writing.
 #
 
-import click
-
-from commands.predict import launch
-from util.logger import initialize_logger
-from util.aliascmd import AliasGroup
-
-logger = initialize_logger(__name__)
+import pytest
 
 
-HELP = "Command for starting, stopping, and managing prediction jobs and instances."
-
-
-@click.group(short_help=HELP, cls=AliasGroup, alias='p',
-             help="To get further help on commands use COMMAND with -h or --help option.",
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
-def predict():
-    pass
-
-
-predict.add_command(launch.launch)
+@pytest.fixture(autouse=True)
+def mock_cli_validation(mocker):
+    mocker.patch('cli_state.verify_cli_dependencies')
+    mocker.patch('cli_state.verify_cli_config_path')
