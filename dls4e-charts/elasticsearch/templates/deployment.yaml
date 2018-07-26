@@ -49,9 +49,9 @@ spec:
         imagePullPolicy: "IfNotPresent"
         env:
         - name: ES_JAVA_OPTS
-          value: "-Xmx256m -Xms256m -XX:+UnlockDiagnosticVMOptions -XX:+PrintCompressedOopsMode"
+          value: "-Xmx1G -Xms1G -XX:+UnlockDiagnosticVMOptions -XX:+PrintCompressedOopsMode -XX:HeapDumpPath=/data"
         - name: PROCESSORS
-          value: "1"
+          value: "2"
         - name: NODE_MASTER
           value: "true"
         - name: NODE_DATA
@@ -60,20 +60,20 @@ spec:
           value: "_local_,_site_"
         resources:
           requests:
-            memory: 1Gi
-            cpu: 1
+            memory: 2Gi
+            cpu: 2
           limits:
-            memory: 1Gi
-            cpu: 1
+            memory: 3Gi
+            cpu: 4
         ports:
         - containerPort: 9200
           protocol: TCP
         readinessProbe:
           httpGet:
-            path: /_cluster/health
+            path: /_cluster/health?wait_for_status=yellow&wait_for_no_initializing_shards&timeout=60s
             port: 9200
           initialDelaySeconds: 20
-          timeoutSeconds: 5
+          timeoutSeconds: 60
         volumeMounts:
         - name: data
           mountPath: /data
