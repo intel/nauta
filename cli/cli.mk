@@ -20,7 +20,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-build: $(ACTIVATE) set-version
+build: update-venv set-version
 	@. $(ACTIVATE); pip install pyinstaller;
 
 ifeq (Windows,$(OS))
