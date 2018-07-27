@@ -21,21 +21,20 @@
 
 import click
 
-from commands.predict import launch
-from util.logger import initialize_logger
-from util.aliascmd import AliasGroup
+from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
 
-logger = initialize_logger(__name__)
-
-
-HELP = "Command for starting, stopping, and managing prediction jobs and instances."
+HELP = "Runs inference on a previously trained model."
+HELP_N = "Name of prediction session."
 
 
-@click.group(short_help=HELP, cls=AliasGroup, alias='p',
-             help="To get further help on commands use COMMAND with -h or --help option.",
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
-def predict():
-    pass
-
-
-predict.add_command(launch.launch)
+@click.command(short_help=HELP, cls=AliasCmd, alias='p')
+@click.argument("model_location")
+@click.option('-n', '--name', default=None, help=HELP_N)
+@common_options()
+@pass_state
+def predict(state: State, model_location: str, name: str):
+    """
+    Runs an inference based on a trained model
+    """
+    click.echo("predict command - under development")

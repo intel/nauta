@@ -47,18 +47,23 @@ class NamespaceStatus(Enum):
     NOT_EXISTS = 'Not_Exists'
 
 
-def get_kubectl_host(replace_https=True) -> str:
+def get_kubectl_host(with_port: bool=False) -> str:
     config.load_kube_config()
-    kubect_host = configuration.Configuration().host
-    if replace_https:
-        kubect_host = kubect_host.replace('https://', '').replace('http://', '')
+    conf_with_port = configuration.Configuration().host.replace('https://', '').replace('http://', '')
+    if with_port:
+        return conf_with_port
+    else:
+        return conf_with_port.split(':')[0]
 
-    return kubect_host
 
-
-def get_api_key() -> str:
+def get_kubectl_port() -> int:
     config.load_kube_config()
-    return configuration.Configuration().api_key.get('authorization')
+    try:
+        port = int(configuration.Configuration().host.split(':')[-1])
+    except ValueError:
+        port = 443
+
+    return port
 
 
 def get_kubectl_current_context_namespace() -> str:

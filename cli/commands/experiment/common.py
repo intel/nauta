@@ -182,15 +182,9 @@ class RunDescription:
         return self.status.name
 
 
-def submit_experiment(template: str, name: str,
-                      script_location: str = None, script_parameters: Tuple[str, ...] = None,
-                      pack_params: List[Tuple[str, str]] = None, parameter_range: List[Tuple[str, str]] = None,
-                      parameter_set: Tuple[str, ...] = None,
-                      script_folder_location: str = None) -> List[RunDescription]:
-    script_parameters = script_parameters if script_parameters else ()
-    parameter_set = parameter_set if parameter_set else ()
-    parameter_range = parameter_range if parameter_range else []
-
+def submit_experiment(script_location: str, script_folder_location: str, template: str, name: str,
+                      parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
+                      script_parameters: Tuple[str, ...], pack_params: List[Tuple[str, str]]):
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()

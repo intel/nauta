@@ -174,7 +174,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
         click.echo(f"User {username} is still not ready.")
 
     try:
-        kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(),
+        kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(with_port=True),
                                          users_password, "")
     except Exception:
         error_msg = "Problems during creation of the file with user's configuration."
