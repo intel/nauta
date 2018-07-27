@@ -16,6 +16,25 @@
     msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - {{ node_access.msg }}"
   when: node_access is failed
 
+- name: Check if python exists
+  raw: stat /usr/bin/python2
+  register: python_exists
+  changed_when: python_exists.rc != 0
+  failed_when: False
+
+- name: Fail if we are not able to get system version
+  fail:
+    msg: Unable to check system - check supported systems list
+  when: python_exists is changed
+
+- name: Collect facts
+  setup:
+
+- name: Check if system is supported
+  fail:
+    msg: "Your system is not supported - detected {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  when: ansible_distribution_version not in supported_systems[ansible_distribution] | default([])
+
 - name: Check if regular user is accessible
   shell: echo
   changed_when: False

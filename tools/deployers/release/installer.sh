@@ -25,7 +25,7 @@ inventory() {
     else
         if [ ! -f "${ENV_INVENTORY}" ]; then
             >&2 echo "Could not find or access inventory file: ${ENV_INVENTORY}"
-            exit 1
+            return 1
         fi
         echo "--inventory-file=$(realpath ${ENV_INVENTORY})"
     fi
@@ -36,8 +36,8 @@ config() {
         echo ""
     else
         if [ ! -f "${ENV_CONFIG}" ]; then
-            >&2 echo "Could not find or access config file: ${ENV_INVENTORY}"
-            exit 1
+            >&2 echo "Could not find or access config file: ${ENV_CONFIG}"
+            return 1
         fi
         echo "-e @$(realpath ${ENV_CONFIG})"
     fi
@@ -55,9 +55,9 @@ kubeconfig() {
 
 ansible_run() {
     export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
-    hide_output inventory || exit 1
-    hide_output config || exit 1
-    hide_output mkdir -p ${CURDIR}/logs || exit 1
+    inventory || return 1
+    config || return 1
+    mkdir -p ${CURDIR}/logs || exit 1
     export ANSIBLE_LOG_PATH="${CURDIR}/logs/log-${DATE}-${KIND:-install}.log"
     ansible $(inventory) $(config) \
     -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \

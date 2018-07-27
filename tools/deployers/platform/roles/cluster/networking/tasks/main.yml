@@ -3,3 +3,13 @@
 - include_tasks: include_distribution.yml
   vars:
     distribution_file: configure.yml
+
+- name: Set outgoing ports so that they wont conflict with apps
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    reload: yes
+    sysctl_file: /etc/sysctl.d/99-dlsadmin.conf
+  with_dict:
+    net.ipv4.ip_local_port_range: '45000 65535'
