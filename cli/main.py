@@ -41,7 +41,9 @@ from cli_state import verify_cli_config_path
 
 logger = initialize_logger(__name__)
 
+BANNER = """Intel® Deep Learning Studio (Intel® DL Studio) Client
 
+            To get further help on commands use COMMAND with -h or --help option."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
 
@@ -66,8 +68,7 @@ def configure_cli_logs():
     setup_log_file(log_file_directory=log_file_directory, log_level=log_level, log_backup_count=log_retention)
 
 
-@click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup,
-             help="To get further help on commands use COMMAND with -h or --help option.",
+@click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup, help=BANNER,
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def entry_point():
     configure_cli_logs()

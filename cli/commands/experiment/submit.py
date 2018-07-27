@@ -39,7 +39,7 @@ log = initialize_logger('commands.submit')
 
 DEFAULT_SCRIPT_NAME = "experiment.py"
 
-HELP = "Command used to submitting training scripts for a single-node tensorflow training."
+HELP = "Command used to submitting training scripts."
 HELP_N = "Name for this experiment."
 HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. " \
            "If not given - its content won't be copied into an image."
@@ -76,7 +76,7 @@ def validate_script_folder_location(script_folder_location: str):
         sys.exit(2)
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='s')
+@click.command(short_help=HELP, help=HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=HELP_SFL)
 @click.option("-t", "--template", help=HELP_T, default="tf-training-tfjob")

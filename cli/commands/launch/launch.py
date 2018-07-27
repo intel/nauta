@@ -103,8 +103,7 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
         sys.exit(2)
 
 
-@click.group(short_help=HELP, cls=AliasGroup, alias='l',
-             help="To get further help on commands use COMMAND with -h or --help option.",
+@click.group(short_help=HELP, help=HELP, cls=AliasGroup, alias='l',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def launch():
     pass

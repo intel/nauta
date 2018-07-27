@@ -58,7 +58,7 @@ as output/<EXPERIMENT_NAME>.
 '''
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='m')
+@click.command(short_help=HELP, help=HELP, cls=AliasCmd, alias='m')
 @common_options()
 @pass_state
 def mounts(state: State):
