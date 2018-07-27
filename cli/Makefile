@@ -67,7 +67,7 @@ endif
 
 update-venv: $(ACTIVATE)
 	@echo "downloading dependencies to ./vendor/ ..."
-	@. $(ACTIVATE); mkdir -p vendor
+	@. $(ACTIVATE); rm -rf vendor && mkdir -p vendor
 	@. $(ACTIVATE); cd vendor && pip download -r ../requirements.txt;
 	@echo "installing vendored packages from ./vendor/*"
 	@. $(ACTIVATE); cd vendor && pip install *;
