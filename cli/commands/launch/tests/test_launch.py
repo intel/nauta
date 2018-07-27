@@ -225,13 +225,16 @@ FAKE_TENSORBOARD_ID = 'd846ed7d-3d17-4c65-9430-40729b27afec'
 FAKE_CREATING_TENSORBOARD = Tensorboard(
     id=FAKE_TENSORBOARD_ID,
     status=TensorboardStatus.CREATING,
-    url=f'/tb/{FAKE_TENSORBOARD_ID}/'
+    url=f'/tb/{FAKE_TENSORBOARD_ID}/',
+    invalid_runs=[]
 )
 FAKE_RUNNING_TENSORBOARD = Tensorboard(
     id=FAKE_TENSORBOARD_ID,
     status=TensorboardStatus.RUNNING,
-    url=f'/tb/{FAKE_TENSORBOARD_ID}/'
+    url=f'/tb/{FAKE_TENSORBOARD_ID}/',
+    invalid_runs=[]
 )
+FAKE_INVALID_RUNS = [{'name': 'fake_name', 'owner': 'fake_owner'}]
 
 
 # noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
@@ -316,3 +319,35 @@ def test_tensorboard_command_many_experiments(mocker, launch_tensorboard_command
     assert commands.launch.launch.launch_app_with_proxy.call_count == 1
     assert launch.sleep.call_count == 0
     assert result.exit_code == 0
+
+
+# noinspection PyUnusedLocal,PyShadowingNames
+def test_tensorboard_command_missing_experiment(mocker, launch_tensorboard_command_mock):
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').side_effect = \
+        TensorboardServiceAPIException(error_code=HTTPStatus.UNPROCESSABLE_ENTITY.value,
+                                       message='There is no data for the following experiments :')
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
+
+    assert result.exit_code == 1
+    assert 'There is no data for the following experiments' in result.output
+
+
+# noinspection PyUnusedLocal,PyShadowingNames,PyUnresolvedReferences
+def test_tensorboard_command_many_experiments_some_nonexisting(mocker, launch_tensorboard_command_mock):
+    FAKE_CREATING_TENSORBOARD.invalid_runs = FAKE_INVALID_RUNS
+    mocker.patch('tensorboard.client.TensorboardServiceClient.create_tensorboard').return_value = \
+        FAKE_CREATING_TENSORBOARD
+
+    mocker.patch('tensorboard.client.TensorboardServiceClient.get_tensorboard').return_value = FAKE_RUNNING_TENSORBOARD
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['tensorboard', 'some-exp', 'another-exp', 'next-exp'])
+
+    assert launch.K8sProxy.call_count == 1
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 1
+    assert commands.launch.launch.launch_app_with_proxy.call_count == 1
+    assert launch.sleep.call_count == 0
+    assert result.exit_code == 0
+    assert "Tensorboard will present information from the rest" in result.output

@@ -22,6 +22,7 @@
 import sys
 from time import sleep
 from typing import Optional, List
+from http import HTTPStatus
 
 import click
 
@@ -83,9 +84,17 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
         # noinspection PyBroadException
         try:
             tb = tensorboard_service_client.create_tensorboard(requested_runs)
-        except Exception:
-            click.echo('failed to create tensorboard!')
-            logger.exception('failed to create tensorboard!')
+            if tb.invalid_runs:
+                list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
+                                                  for item in tb.invalid_runs])
+                click.echo('There is no data for the following experiments : {}'.format(list_of_invalid_runs))
+                click.echo('Tensorboard will present information from the rest of given experiments.')
+        except Exception as exe:
+            err_message = 'failed to create tensorboard!'
+            if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:
+                err_message = str(exe)
+            click.echo(err_message)
+            logger.exception(err_message)
             sys.exit(1)
 
         click.echo('Please wait for Tensorboard to run...')

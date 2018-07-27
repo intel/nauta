@@ -111,7 +111,8 @@ def test_create_tensorboard(mocker, requests_post_return_status_code: int):
 
 
 @pytest.mark.parametrize('requests_post_return_status_code', [HTTPStatus.BAD_REQUEST.value,
-                                                              HTTPStatus.INTERNAL_SERVER_ERROR.value])
+                                                              HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                                                              HTTPStatus.UNPROCESSABLE_ENTITY])
 def test_create_tensorboard_error(mocker, requests_post_return_status_code: int):
 
     fake_runs_list = [TensorboardRun(name='some-run', owner='c_namespace')]
@@ -147,3 +148,40 @@ def test_tensorboard_runs_list():
     assert tensorboard_runs_list[0].owner == CURR_NAMESPACE
     assert tensorboard_runs_list[1].name == EXP2_NAME
     assert tensorboard_runs_list[1].owner == OWN_NAMESPACE
+
+
+def test_create_tensorboard_missing_experiments(mocker):
+
+    fake_runs_list = [TensorboardRun(name='some-run', owner='c_namespace')]
+    fake_exp_name = 'fake_name'
+    fake_owner = 'fake_owner'
+    content = {
+        'code': HTTPStatus.INTERNAL_SERVER_ERROR.value,
+        'message': 'Unexpected internal error',
+        'invalidRuns': [{'name': fake_exp_name, 'owner': fake_owner}]
+    }
+
+    content_bytes = json.dumps(content).encode('utf-8')
+
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                                                           content=content_bytes)
+
+    client = TensorboardServiceClient(address='fake-address')
+
+    with pytest.raises(TensorboardServiceAPIException) as exe:
+        client.create_tensorboard(runs=fake_runs_list)
+
+    assert f'There is no data for the following experiments : {fake_owner}/{fake_exp_name}' in str(exe.value)
+
+    content['invalidRuns'] = []
+    content_bytes = json.dumps(content).encode('utf-8')
+
+    mocker.patch('requests.post').return_value = MagicMock(status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                                                           content=content_bytes)
+
+    client = TensorboardServiceClient(address='fake-address')
+
+    with pytest.raises(TensorboardServiceAPIException) as exe:
+        client.create_tensorboard(runs=fake_runs_list)
+
+    assert 'Experiments given as paramaters of the command don\'t exist.' in str(exe.value)

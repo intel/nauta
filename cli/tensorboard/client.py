@@ -40,17 +40,19 @@ class TensorboardStatus(Enum):
 
 
 class Tensorboard:
-    def __init__(self, id: str, status: TensorboardStatus, url: str):
+    def __init__(self, id: str, status: TensorboardStatus, url: str, invalid_runs: List[str]):
         self.id = id
         self.status = status
         self.url = url
+        self.invalid_runs = invalid_runs
 
     @classmethod
     def from_dict(cls, tensorboard_dict: Dict[str, str]):
         id = tensorboard_dict['id']
         status = TensorboardStatus(tensorboard_dict['status'].upper())
         url = tensorboard_dict['url']
-        return cls(id, status, url)
+        invalid_runs = tensorboard_dict.get('invalidRuns')
+        return cls(id, status, url, invalid_runs)
 
 
 class TensorboardRun:
@@ -119,6 +121,15 @@ class TensorboardServiceClient:
             response_body = json.loads(response.content.decode('utf-8'))
             tensorboard = Tensorboard.from_dict(tensorboard_dict=response_body)
             return tensorboard
+        elif response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
+            response_body = json.loads(response.content.decode('utf-8'))
+            if response_body.get('invalidRuns'):
+                list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
+                                                  for item in response_body.get('invalidRuns')])
+                err_message = 'There is no data for the following experiments : {}'.format(list_of_invalid_runs)
+            else:
+                err_message = 'Experiments given as paramaters of the command don\'t exist.'
+            raise TensorboardServiceAPIException(error_code=response.status_code, message=err_message)
         else:
             response_body = json.loads(response.content.decode('utf-8'))
             error = TensorboardServiceAPIErrorResponse.from_dict(response_body)
