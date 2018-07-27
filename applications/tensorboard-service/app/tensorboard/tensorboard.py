@@ -19,18 +19,19 @@
 # and approved by Intel in writing.
 #
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import logging as log
 from os import path
 from typing import List, Optional
 from uuid import uuid4
 
 from kubernetes import config
-from kubernetes.client import V1Deployment, V1ObjectMeta
+from kubernetes.client import V1Deployment, V1ObjectMeta, V1Pod, V1ContainerStatus
 
 from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
 from tensorboard.models import Tensorboard, TensorboardStatus, Run
+from tensorboard.proxy_client import try_get_last_request_datetime
 
 
 class TensorboardManager:
@@ -51,7 +52,7 @@ class TensorboardManager:
 
     @staticmethod
     def _get_current_datetime() -> datetime:
-        return datetime.now(timezone.utc)
+        return datetime.utcnow()
 
     def create(self, runs: List[Run]) -> Tensorboard:
         new_tensorboard = Tensorboard(id=str(uuid4()))
@@ -70,18 +71,23 @@ class TensorboardManager:
         return self.client.list_deployments(namespace=self.namespace, label_selector='type=dls4e-tensorboard')
 
     @staticmethod
-    def _convert_str_pod_phase_to_tensorboard_status(pod_phase_str: str) -> TensorboardStatus:
+    def _check_tensorboard_status(pod: V1Pod) -> TensorboardStatus:
+        pod_phase: str = pod.status.phase
+
         try:
-            pod_status = K8SPodPhase[pod_phase_str.upper()]
+            pod_status = K8SPodPhase[pod_phase.upper()]
         except KeyError:
             pod_status = K8SPodPhase.UNKNOWN
 
-        if pod_status == K8SPodPhase.RUNNING:
-            tensorboard_status = TensorboardStatus.RUNNING
-        else:
-            tensorboard_status = TensorboardStatus.CREATING
+        if pod_status != K8SPodPhase.RUNNING:
+            return TensorboardStatus.CREATING
 
-        return tensorboard_status
+        container_statuses: List[V1ContainerStatus] = pod.status.container_statuses
+
+        for status in container_statuses:
+            if not status.ready:
+                return TensorboardStatus.CREATING
+        return TensorboardStatus.RUNNING
 
     def get_by_id(self, id: str) -> Optional[Tensorboard]:
         name = 'tensorboard-' + id
@@ -99,9 +105,7 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        pod_phase_str: str = pod.status.phase
-
-        tensorboard_status = self._convert_str_pod_phase_to_tensorboard_status(pod_phase_str)
+        tensorboard_status = self._check_tensorboard_status(pod)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
@@ -127,9 +131,7 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        pod_phase_str: str = pod.status.phase
-
-        tensorboard_status = self._convert_str_pod_phase_to_tensorboard_status(pod_phase_str)
+        tensorboard_status = self._check_tensorboard_status(pod)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
@@ -148,14 +150,20 @@ class TensorboardManager:
 
         for deployment in tensorboards:
             meta: V1ObjectMeta = deployment.metadata
-            creation_timestamp: datetime = meta.creation_timestamp
-            delta = TensorboardManager._get_current_datetime() - creation_timestamp
+            deployment_name = meta.name
+
+            last_request_datetime = try_get_last_request_datetime(proxy_address=deployment_name)
+            if last_request_datetime is None:
+                continue
+
+            delta = TensorboardManager._get_current_datetime() - last_request_datetime
             if delta >= timedelta(seconds=1800):
                 log.debug(f'garbage detected: {meta.name} , removing...')
                 self.delete(deployment)
                 log.debug(f'garbage removed: {meta.name}')
 
-    def validate_runs(self, runs: List[Run]) -> (List[Run], List[Run]):
+    @staticmethod
+    def validate_runs(runs: List[Run]) -> (List[Run], List[Run]):
         """
         :param runs: runs to validate
         :return: (valid_runs: List[Run], invalid_runs: List[Run])

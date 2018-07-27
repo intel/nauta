@@ -19,7 +19,7 @@
 # and approved by Intel in writing.
 #
 
-
+import random
 from typing import List
 
 from k8s.models import K8STensorboardInstance
@@ -27,7 +27,8 @@ from kubernetes import client as kube_models
 from tensorboard.models import Run
 
 
-def test_generate_tensorboard_deployment():
+def test_generate_tensorboard_deployment(mocker):
+    mocker.patch('k8s.models.Dls4ePlatformConfig')
     fake_runs = [
         Run(
             name="some-run-3",
@@ -51,3 +52,31 @@ def test_generate_tensorboard_deployment():
         model_instance.deployment.spec.template.spec.containers[0].volume_mounts
 
     assert len(volume_mounts) == len(fake_runs)
+
+
+def test_generate_run_names_hash():
+    fake_runs = [
+        Run(
+            name="some-run-3",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-2",
+            owner='alice'
+        ),
+        Run(
+            name="some-run-1",
+            owner='bob'
+        ),
+    ]
+
+    expected_hash = '72c9324ef4a28d65dc5d134bb0edc77fb700bd79'
+
+    run_names_hash_original = K8STensorboardInstance.generate_run_names_hash(fake_runs)
+
+    random.shuffle(fake_runs)
+
+    run_names_hash_suffled = K8STensorboardInstance.generate_run_names_hash(fake_runs)
+
+    assert run_names_hash_original == expected_hash
+    assert run_names_hash_suffled == expected_hash

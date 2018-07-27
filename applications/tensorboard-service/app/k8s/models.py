@@ -24,6 +24,7 @@ import os
 from typing import List
 
 from kubernetes import client as k8s
+from dls4e.config import Dls4ePlatformConfig
 from tensorboard.models import Run
 
 
@@ -76,9 +77,14 @@ class K8STensorboardInstance:
         tensorboard_command = [
             "tensorboard",
             "--logdir", cls.TENSORBOARD_CONTAINER_MOUNT_PATH_PREFIX,
-            "--port", "80",
-            "--host", "0.0.0.0"
+            "--port", "6006",
+            "--host", "127.0.0.1"
         ]
+
+        dls4e_config = Dls4ePlatformConfig.incluster_init()
+
+        tensorboard_image = dls4e_config.get_tensorboard_image()
+        tensorboard_proxy_image = dls4e_config.get_activity_proxy_image()
 
         deployment = k8s.V1Deployment(api_version='apps/v1',
                                       kind='Deployment',
@@ -99,9 +105,12 @@ class K8STensorboardInstance:
                                                   containers=[
                                                       k8s.V1Container(
                                                           name='app',
-                                                          image='tensorflow/tensorflow:1.8.0-py3',
+                                                          image=tensorboard_image,
                                                           command=tensorboard_command,
-                                                          volume_mounts=volume_mounts,
+                                                          volume_mounts=volume_mounts),
+                                                      k8s.V1Container(
+                                                          name='proxy',
+                                                          image=tensorboard_proxy_image,
                                                           ports=[
                                                               k8s.V1ContainerPort(
                                                                   container_port=80
@@ -110,7 +119,7 @@ class K8STensorboardInstance:
                                                           readiness_probe=k8s.V1Probe(
                                                               period_seconds=5,
                                                               http_get=k8s.V1HTTPGetAction(
-                                                                  path='/',
+                                                                  path='/healthz',
                                                                   port=80
                                                               )
                                                           )

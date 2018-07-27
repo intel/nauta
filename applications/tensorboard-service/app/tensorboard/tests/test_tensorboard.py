@@ -23,7 +23,8 @@ from datetime import datetime
 from unittest import mock
 
 from kubernetes.client import V1Deployment, V1ObjectMeta, V1beta1Ingress, V1Pod, V1beta1IngressSpec, \
-    V1beta1IngressRule, V1beta1HTTPIngressRuleValue, V1beta1HTTPIngressPath, V1PodStatus, V1beta1IngressBackend
+    V1beta1IngressRule, V1beta1HTTPIngressRuleValue, V1beta1HTTPIngressPath, V1PodStatus, V1beta1IngressBackend, \
+    V1ContainerStatus
 import pytest
 from pytest_mock import MockFixture
 
@@ -36,7 +37,8 @@ FAKE_NAMESPACE = "fake-namespace"
 
 
 @pytest.fixture
-def tensorboard_manager_mocked() -> TensorboardManager:
+def tensorboard_manager_mocked(mocker) -> TensorboardManager:
+    mocker.patch('k8s.models.Dls4ePlatformConfig')
     # noinspection PyTypeChecker
     mgr = TensorboardManager(api_client=mock.MagicMock(), namespace=FAKE_NAMESPACE)
 
@@ -126,7 +128,23 @@ def test_get_by_id(mocker: MockFixture,
     ))
     fake_pod = V1Pod(
         status=V1PodStatus(
-            phase=fake_tensorboard_pod_phase
+            phase=fake_tensorboard_pod_phase,
+            container_statuses=[
+                V1ContainerStatus(
+                    ready=True,
+                    image='',
+                    image_id='',
+                    name='',
+                    restart_count=0
+                ),
+                V1ContainerStatus(
+                    ready=True,
+                    image='',
+                    image_id='',
+                    name='',
+                    restart_count=0
+                )
+            ]
         )
     )
 
@@ -222,7 +240,23 @@ def test_get_by_runs(mocker: MockFixture, tensorboard_manager_mocked: Tensorboar
 
     fake_pod = V1Pod(
         status=V1PodStatus(
-            phase=fake_tensorboard_pod_phase
+            phase=fake_tensorboard_pod_phase,
+            container_statuses=[
+                V1ContainerStatus(
+                    ready=True,
+                    image='',
+                    image_id='',
+                    name='',
+                    restart_count=0
+                ),
+                V1ContainerStatus(
+                    ready=True,
+                    image='',
+                    image_id='',
+                    name='',
+                    restart_count=0
+                )
+            ]
         )
     )
 
@@ -336,9 +370,10 @@ def test_delete_garbage(mocker, tensorboard_manager_mocked: TensorboardManager,
                         current_datetime: datetime, delete_count: int):
     mocker.patch.object(TensorboardManager, '_get_current_datetime').return_value = current_datetime
     mocker.patch.object(tensorboard_manager_mocked, 'list').return_value = [
-        V1Deployment(metadata=V1ObjectMeta(creation_timestamp=datetime(year=2018, month=6, day=19, hour=12, minute=0)))
+        V1Deployment(metadata=V1ObjectMeta(name='fake-name'))
     ]
     mocker.patch.object(tensorboard_manager_mocked, 'delete')
+    mocker.patch.object(tensorboard.tensorboard, 'try_get_last_request_datetime').return_value = datetime(year=2018, month=6, day=19, hour=12, minute=0)
     tensorboard_manager_mocked.delete_garbage()
 
     # noinspection PyUnresolvedReferences
