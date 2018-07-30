@@ -24,8 +24,6 @@ import requests
 from requests.exceptions import ConnectionError
 import time
 
-import psutil
-
 from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
@@ -95,8 +93,5 @@ class K8sProxy:
         if get_current_os() == OS.WINDOWS:
             self.process.terminate()
         else:
-            for proc in psutil.Process(self.process.pid).children(recursive=True):
-                proc.send_signal(signal.SIGINT)
-
             self.process.send_signal(signal.SIGINT)
         self.process.wait()
