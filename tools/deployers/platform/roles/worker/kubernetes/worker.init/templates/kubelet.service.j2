@@ -9,6 +9,7 @@ Restart=always
 LimitNOFILE=65536
 ExecStart=/opt/dls4e/kubernetes/kubelet \
                   --address {{ dls_configuration.internal_interface.ipv4_address }} \
+                  --hostname-override "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}" \
                   --network-plugin cni --cloud-provider "" --node-ip {{ dls_configuration.internal_interface.ipv4_address }} \
                   --cluster-dns {{ kubernetes_network.svc_list.dns.ip }} --cluster-domain {{ k8s_domain }}.{{ domain }} \
                   --node-labels {{ labels }} --pod-manifest-path=/etc/kubelet/static \
