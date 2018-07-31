@@ -79,7 +79,7 @@ def mounts(state: State):
 
 def get_mount_command() -> str:
     try:
-        adr = get_kubectl_host()
+        adr = get_kubectl_host(with_port=False)
         usr = get_current_user()
         psw = get_users_samba_password(usr)
 
