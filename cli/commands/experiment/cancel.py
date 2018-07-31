@@ -94,7 +94,8 @@ def cancel(state: State, name: str, match: str, purge: bool):
         sys.exit(1)
 
     if not list_of_all_runs:
-        click.echo("Lack of experiments fulfilling given criteria.")
+        click.echo("Lack of experiments fulfilling given criteria. Name or match string parameters do not match any "
+                   "existing experiment. Run 'dlsctl exp list' to find out what are the names of existing experiments.")
         sys.exit(1)
 
     # check whether we have at least one experiment in state other than CANCELLED

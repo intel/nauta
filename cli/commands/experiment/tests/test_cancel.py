@@ -104,8 +104,12 @@ def check_command_asserts(prepare_mocks: CancelMocks, gcn_count=1, lor_count=1, 
 
 
 def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
-    CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME])
+    result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME])
+
     check_command_asserts(prepare_command_mocks, cne_count=0, lkc_count=0, acl_count=0)
+    assert "Lack of experiments fulfilling given criteria. Name or match string parameters do not match any existing " \
+           "experiment. Run 'dlsctl exp list' to find out what are the names of existing experiments." \
+           in result.output
 
 
 def test_cancel_all_exp_cancelled(prepare_command_mocks: CancelMocks):
