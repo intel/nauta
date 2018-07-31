@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from time import sleep
 from typing import Optional
 
 import docker
@@ -27,12 +28,14 @@ from docker.models.containers import Container
 
 client = docker.from_env()
 
-SOCAT_CONTAINER_NAME = 'dlsctl-registry-bridge'
+SOCAT_CONTAINER_NAME_PREFIX = 'dlsctl-registry-bridge'
+
+socat_container_name = 'socat-'
 
 
 def get() -> Optional[Container]:
     try:
-        socat_container = client.containers.get(SOCAT_CONTAINER_NAME)  # type: Container
+        socat_container = client.containers.get(socat_container_name)  # type: Container
         if socat_container.status != 'running':
             socat_container.remove(force=True)
             return None
@@ -42,11 +45,37 @@ def get() -> Optional[Container]:
     return socat_container
 
 
+def _ensure_socat_running():
+    for _ in range(120):
+        try:
+            socat_container = client.containers.get(socat_container_name)
+        except NotFound:
+            sleep(1)
+            continue
+
+        if socat_container.status == 'running':
+            return
+
+        sleep(1)
+
+    raise RuntimeError(f"failed to start socat container! expected status: 'running', got: {socat_container.status}")
+
+
 def start(docker_registry_port: str):
-    if not get():
-        client.containers.run(detach=True, remove=True, network_mode='host', name=SOCAT_CONTAINER_NAME,
-                              image='alpine/socat', command=f'TCP-LISTEN:{docker_registry_port},fork,reuseaddr '
-                                                            f'TCP:host.docker.internal:{docker_registry_port}')
+    """
+    This function is synchronous - it returns when socat container is running.
+    :param docker_registry_port:
+    :return:
+    """
+    global socat_container_name
+    socat_container_name = f'{SOCAT_CONTAINER_NAME_PREFIX}-{docker_registry_port}'
+
+    # TODO: change image to socat from cluster instead public Internet
+    client.containers.run(detach=True, remove=True, network_mode='host', name=socat_container_name,
+                          image='alpine/socat', command=f'TCP-LISTEN:{docker_registry_port},fork,reuseaddr '
+                                                        f'TCP:host.docker.internal:{docker_registry_port}')
+
+    _ensure_socat_running()
 
 
 def stop():
