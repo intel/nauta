@@ -46,7 +46,7 @@ class SubmitMocks:
     def __init__(self, mocker):
         self.mocker = mocker
         self.submit_experiment = mocker.patch("commands.experiment.submit.submit_experiment",
-                                              return_value=SUBMITTED_RUNS)
+                                              return_value=(SUBMITTED_RUNS, ""))
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
         self.isdir = mocker.patch("os.path.isdir", return_value=False)
         self.validate_experiment_name = mocker.patch("commands.experiment.submit.validate_experiment_name")
@@ -168,7 +168,7 @@ def test_get_default_script_location(prepare_mocks: SubmitMocks):
 
 
 def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
-    prepare_mocks.submit_experiment.return_value = FAILED_RUNS
+    prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, "")
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert FAILED_RUNS[0].name in result.output

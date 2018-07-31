@@ -33,7 +33,8 @@ from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
-from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS
+from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS, \
+    JUPYTER_NOTEBOOK_TEMPLATE_NAME
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
@@ -46,7 +47,7 @@ HELP_N = "The name of this Jupyter Notebook session."
 HELP_F = "File with a notebook that should be opened in Jupyter notebook."
 HELP_PO = "Port on which service will be exposed locally."
 
-JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
+
 JUPYTER_CHECK_POD_READY_TRIES = 60
 
 log = initialize_logger(__name__)
@@ -102,12 +103,13 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         try:
             exp_name = name
             if not name and not filename:
-                exp_name = generate_name('jup')
+                exp_name = generate_name("jup")
+
             click.echo("Submitting interactive experiment.")
-            runs = submit_experiment(script_location=filename, script_folder_location=None,
-                                     template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
-                                     name=exp_name, parameter_range=[], parameter_set=(), script_parameters=(),
-                                     pack_params=pack_param)
+            runs, filename = submit_experiment(script_location=filename, script_folder_location=None,
+                                               template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
+                                               name=exp_name, parameter_range=[], parameter_set=(),
+                                               script_parameters=(), pack_params=pack_param)
             click.echo(tabulate({RUN_NAME: [run.name for run in runs],
                                  RUN_PARAMETERS: [run.formatted_parameters() for run in runs],
                                  RUN_STATUS: [run.formatted_status() for run in runs],

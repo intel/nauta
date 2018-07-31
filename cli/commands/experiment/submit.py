@@ -103,11 +103,11 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # noinspection PyBroadException
     try:
-        runs_list = submit_experiment(script_location=script_location,
-                                      script_folder_location=script_folder_location,
-                                      template=template, name=name, pack_params=pack_param,
-                                      parameter_range=parameter_range, parameter_set=parameter_set,
-                                      script_parameters=script_parameters)
+        runs_list, _ = submit_experiment(script_location=script_location,
+                                         script_folder_location=script_folder_location,
+                                         template=template, name=name, pack_params=pack_param,
+                                         parameter_range=parameter_range, parameter_set=parameter_set,
+                                         script_parameters=script_parameters)
     except K8sProxyCloseError as exe:
         click.echo(exe.message)
     except SubmitExperimentError as exe:

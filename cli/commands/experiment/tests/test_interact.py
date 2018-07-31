@@ -25,6 +25,7 @@ import pytest
 from platform_resources.experiment_model import Experiment, ExperimentStatus
 from commands.experiment import interact
 from util.exceptions import SubmitExperimentError
+from commands.experiment.common import RunDescription, RunStatus
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -41,6 +42,8 @@ NON_JUPYTER_EXPERIMENT = Experiment(name='test-experiment-2', parameters_spec=['
                                     creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
                                     state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
                                     template_namespace='test-ex-namespace')
+SUBMITTED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                                 status=RunStatus.QUEUED)]
 
 
 class InteractMocks:
@@ -50,7 +53,8 @@ class InteractMocks:
                                           side_effect=[EXPERIMENT_NAMESPACE, EXPERIMENT_NAMESPACE])
         self.get_experiment = mocker.patch("commands.experiment.interact.get_experiment",
                                            return_value=None)
-        self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment")
+        self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment",
+                                              return_value=(SUBMITTED_RUNS, ""))
         self.launch_app = mocker.patch("commands.experiment.interact.launch_app")
         self.check_pods_status = mocker.patch("commands.experiment.interact.check_pods_status", return_value=True)
 

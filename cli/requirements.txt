@@ -9,3 +9,5 @@ toml==0.9.4
 marshmallow==2.15.2
 marshmallow-enum==1.4
 requests==2.19.1
+psutil==5.4.6
+nbformat==4.4.0

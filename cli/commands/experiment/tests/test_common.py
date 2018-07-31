@@ -227,8 +227,9 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.submit_one.side_effect = KubectlIntError()
 
-    runs_list = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
-                                  template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
+    runs_list, _ = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
+                                     template=None, name=None, parameter_range=[], parameter_set=[],
+                                     script_parameters=[])
 
     assert runs_list[0].status == RunStatus.FAILED
     check_asserts(prepare_mocks, del_env_count=1)
@@ -445,9 +446,9 @@ def test_create_list_of_runs_pr_and_ps(mocker):
 
 
 def test_submit_experiment_without_file(prepare_mocks: SubmitExperimentMocks):
-    runs_list = submit_experiment(script_location=None, script_folder_location=None,
-                                  template=None, name=None, parameter_range=[],
-                                  parameter_set=[], script_parameters=[], pack_params=[])
+    runs_list, _ = submit_experiment(script_location=None, script_folder_location=None,
+                                     template=None, name=None, parameter_range=[],
+                                     parameter_set=[], script_parameters=[], pack_params=[])
     assert len(runs_list) == 1
     assert runs_list[0].name == "experiment_name"
 

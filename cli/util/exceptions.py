@@ -67,3 +67,8 @@ class LaunchError(ExceptionWithMessage):
 
 class ProxyClosingError(ExceptionWithMessage):
     """Error raised in case of problems with closing local proxy"""
+
+
+class ScriptConversionError(Exception):
+    """Error raised in case of problems during conversion of python scripts into Jupyter notebooks"""
+    pass
