@@ -84,7 +84,7 @@ def purge_user(username: str):
     # remove data from elasticsearch
     try:
         with k8s_proxy_context_manager.K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.container_port,
+            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             es_client.delete_logs_for_namespace(username)
     except K8sProxyCloseError as exe:
