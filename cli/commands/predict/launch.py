@@ -83,8 +83,8 @@ def launch(state: State, name: str, model_location: str):
 
 def start_inference_instance(name: str, model_location: str, model_name: str,
                              template: str = INFERENCE_TEMPLATE) -> RunDescription:
-    runs = submit_experiment(name=name, template=template,
-                             pack_params=[('modelPath', model_location), ('modelName', model_name)])
+    runs, _ = submit_experiment(name=name, template=template,
+                                pack_params=[('modelPath', model_location), ('modelName', model_name)])
     return runs[0]
 
 

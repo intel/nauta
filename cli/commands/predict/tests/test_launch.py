@@ -99,7 +99,7 @@ def test_launch_url_fail(launch_mocks: LaunchPredictMocks):
 def test_start_inference_instance(mocker):
     submit_experiment_mock = mocker.patch('commands.predict.launch.submit_experiment')
     fake_experiment = MagicMock()
-    submit_experiment_mock.return_value = [fake_experiment]
+    submit_experiment_mock.return_value = [fake_experiment], 'fake_path'
 
     inference_instance = launch.start_inference_instance(name='', model_location='', model_name='')
 
