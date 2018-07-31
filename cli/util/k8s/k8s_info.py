@@ -33,6 +33,10 @@ from util.app_names import DLS4EAppNames
 logger = initialize_logger('util.kubectl')
 
 
+# Timeout in seconds used for requests made to k8s cluster by verify and version commands.
+K8S_REQUEST_TIMEOUT = 30
+
+
 class PodStatus(Enum):
     PENDING = 'PENDING'
     RUNNING = 'RUNNING'
@@ -208,7 +212,7 @@ def get_config_map_data(name: str, namespace: str) -> Dict[str, str]:
     """
     try:
         api = get_k8s_api()
-        ret_dict = api.read_namespaced_config_map(name, namespace).data
+        ret_dict = api.read_namespaced_config_map(name, namespace, _request_timeout=K8S_REQUEST_TIMEOUT).data
     except Exception:
         error_description = f"Problem during accessing ConfigMap : {name}."
         logger.exception(error_description)
@@ -302,7 +306,7 @@ def get_users_samba_password(username: str) -> str:
 def get_cluster_roles() -> client.V1ClusterRoleList:
     config.load_kube_config()
     api = client.RbacAuthorizationV1Api(client.ApiClient())
-    return api.list_cluster_role()
+    return api.list_cluster_role(_request_timeout=K8S_REQUEST_TIMEOUT)
 
 
 def is_current_user_administrator() -> bool:

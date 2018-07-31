@@ -45,8 +45,9 @@ def version():
         platform_version = DLS4EConfigMap().platform_version
     except KubectlIntError:
         error_msg = 'Failed to get platform version. This may occur for example due to invalid path to kubectl config' \
-                    ' or invalid k8s credentials. Check your KUBECONFIG environmental variable. Run this command with' \
-                    ' -v or -vv option for more info.'
+                    ', invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environmental ' \
+                    'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
+                    'for more info.'
         logger.exception(error_msg)
         click.echo(error_msg)
     except Exception:

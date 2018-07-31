@@ -38,15 +38,21 @@ def get_verbosity_level():
     return STREAM_HANDLER.level
 
 
+def set_global_logging_level(log_level):
+    for key in logging.Logger.manager.loggerDict:
+        logging.getLogger(key).setLevel(log_level)
+
+
 # ALWAYS called on CLI command init
 def set_verbosity_level(verbosity):
-    logging_level = logging.CRITICAL
-
-    if verbosity == 1:
+    if verbosity == 0:
+        logging_level = logging.CRITICAL
+    elif verbosity == 1:
         logging_level = logging.INFO
-    elif verbosity >= 2:
+    else:
         logging_level = logging.DEBUG
 
+    set_global_logging_level(logging_level)
     STREAM_HANDLER.setLevel(logging_level)
 
 

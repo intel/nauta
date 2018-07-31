@@ -73,9 +73,10 @@ def test_version_with_kubectl_exception(mocker):
     assert f"dlsctl application | {VERSION}" in result.output
     assert "dls4e platform     | UNKNOWN" in result.output
 
-    assert "Failed to get platform version. This may occur for example due to invalid path to kubectl config" \
-        " or invalid k8s credentials. Check your KUBECONFIG environmental variable. Run this command with" \
-        " -v or -vv option for more info." \
+    assert 'Failed to get platform version. This may occur for example due to invalid path to kubectl config' \
+        ', invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environmental ' \
+        'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
+        'for more info.' \
         in result.output
 
 
