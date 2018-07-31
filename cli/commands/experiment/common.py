@@ -51,12 +51,12 @@ from util.jupyter_notebook_creator import convert_py_to_ipynb
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
 RUN_NAME = "Experiment"
-RUN_STATUS = "Status"
+RUN_STATUS = "State"
 RUN_MESSAGE = "Message"
 RUN_PARAMETERS = "Parameters"
 RUN_METRICS = "Metrics"
 RUN_SUBMISSION_DATE = "Submission date"
-RUN_SUBMITTER = "Submitter"
+RUN_SUBMITTER = "Owner"
 RUN_TEMPLATE_NAME = "Template name"
 
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
