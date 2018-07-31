@@ -1,0 +1,6 @@
+---
+
+- name: Install helm chart
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} install -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
+  when: chart is changed

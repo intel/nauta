@@ -7,13 +7,6 @@
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
 
-- name: Fail if upgrade is not possible
-  fail:
-    msg: DLS4E is already installed and upgrade option is not selected
-  when:
-    - chart is not changed
-    - not (upgrade | default(False) | bool)
-
 - name: Set global values in configuration
   set_fact:
     global_values:
@@ -42,16 +35,13 @@
     dest: "{{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
 
 - name: Install helm chart
-  environment: "{{ local_envs }}"
-  shell: "{{ runtime_helm }} install -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
+  include_tasks: install.yml
   when: chart is changed
 
 - name: Upgrade helm chart if required
-  environment: "{{ local_envs }}"
-  shell: "{{ runtime_helm }} upgrade dls4enterprise {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
+  include_tasks: upgrade.yml
   when:
     - not chart is changed
-    - upgrade | default(False) | bool
 
 - name: Remove image values file
   file:
