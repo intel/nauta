@@ -65,9 +65,12 @@ def webui(state: State, no_launch: bool, port: int):
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                       'only proxy tunnel is created')
+@click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),
+              help="Local port on which tensorboard service client will be started.")
 @click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
 @click.argument("experiment_name", type=str, required=True, nargs=-1)
-def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_name: List[str]):
+def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int], port: Optional[int],
+                experiment_name: List[str]):
     """
     Subcommand for launching tensorboard with credentials
 
@@ -75,7 +78,7 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
     current_namespace = get_kubectl_current_context_namespace()
 
     with K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
-                  namespace=current_namespace, port=port) as proxy:
+                  namespace=current_namespace, port=tensorboard_service_client_port) as proxy:
 
         tensorboard_service_client = TensorboardServiceClient(address=f'http://127.0.0.1:{proxy.tunnel_port}')
 
@@ -102,7 +105,7 @@ def tensorboard(state: State, no_launch: bool, port: Optional[int], experiment_n
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
                 launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
-                                      namespace=current_namespace,
+                                      namespace=current_namespace, port=port,
                                       app_name=f"tensorboard-{tb.id}")
                 return
             logger.warning(f'Tensorboard instance: {tb.id} still in {tb.status.value} status, waiting for RUNNING...')
