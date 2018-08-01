@@ -40,6 +40,7 @@ from util.app_names import DLS4EAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.logger import initialize_logger
+from util.docker import delete_images_for_experiment
 
 HELP = "Cancels experiment/s chosen based on criteria given as a parameter."
 HELP_P = "If given, then all information concerning all experiments, completed and currently running, " \
@@ -258,6 +259,12 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.Co
                 k8s_es_client.delete_logs_for_run(run=run.name)
             except Exception:
                 log.exception("Error during clearing run logs.")
+
+            try:
+                # try to remove images from docker registry
+                delete_images_for_experiment(exp_name=run.name)
+            except Exception:
+                log.exception("Error during removing images.")
 
         if cancel_whole_experiment and not not_purged_runs:
             try:

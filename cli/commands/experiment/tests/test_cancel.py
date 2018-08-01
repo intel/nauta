@@ -230,6 +230,8 @@ class CancelExperimentMocks:
         self.get_experiment = mocker.patch("commands.experiment.cancel.get_experiment",
                                            return_value=None)
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
+        self.delete_images_for_experiment = mocker.patch('commands.experiment.cancel.'
+                                                         'delete_images_for_experiment')
 
 
 @pytest.fixture
@@ -250,7 +252,8 @@ def check_cancel_experiment_asserts(prepare_cancel_experiment_mocks: CancelExper
                                     update_experiment_count=1,
                                     delete_k8s_object_count=1,
                                     update_run_count=1,
-                                    get_experiment_count=1):
+                                    get_experiment_count=1,
+                                    delete_images_for_experiment_count=0):
     assert prepare_cancel_experiment_mocks.list_runs.call_count == list_runs_count, \
         "list of runs wasn't taken"
     assert prepare_cancel_experiment_mocks.update_experiment.call_count == update_experiment_count, \
@@ -261,6 +264,8 @@ def check_cancel_experiment_asserts(prepare_cancel_experiment_mocks: CancelExper
         "run wasn't updated"
     assert prepare_cancel_experiment_mocks.get_experiment.call_count == get_experiment_count, \
         "experiment wasn't taken"
+    assert prepare_cancel_experiment_mocks.delete_images_for_experiment.call_count == \
+        delete_images_for_experiment_count, "incorrect number of calls of deleting images"
 
 
 def test_cancel_experiment_set_cancelling_state_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks, caplog):
@@ -309,7 +314,8 @@ def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: C
                             k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client,
                             k8s_apps_api=prepare_cancel_experiment_mocks.k8s_apps_api_client_instance)
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2, update_run_count=0)
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2, update_run_count=0,
+                                    delete_images_for_experiment_count=1)
 
 
 def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
@@ -329,6 +335,20 @@ def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: Cancel
     assert len(del_list) == 0
     assert len(not_del_list) == 1
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=1, update_run_count=0)
+
+
+def test_cancel_experiment_with_purge_delete_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    prepare_cancel_experiment_mocks.mocker.patch('commands.experiment.cancel.cancel_experiment_runs').return_value \
+        = [RUN_QUEUED], []
+    prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    prepare_cancel_experiment_mocks.delete_images_for_experiment.side_effect = RuntimeError()
+    cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED], namespace="namespace",
+                            k8s_api=prepare_cancel_experiment_mocks.k8s_core_api_client,
+                            k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client,
+                            k8s_apps_api=prepare_cancel_experiment_mocks.k8s_apps_api_client_instance)
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_k8s_object_count=2, update_run_count=0,
+                                    delete_images_for_experiment_count=1)
 
 
 def test_cancel_experiment_one_cancelled_one_not(prepare_cancel_experiment_mocks: CancelExperimentMocks):

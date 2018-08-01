@@ -205,6 +205,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/docker-registry"
       chart_values:
         image: "{{ image_local_url['dls4e/registry'] }}"
+        gc_image: "{{ image_local_url['dls4e/kubectl'] }}"
     elasticsearch:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/elasticsearch"

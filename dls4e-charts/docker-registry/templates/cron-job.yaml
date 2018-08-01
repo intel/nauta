@@ -1,0 +1,39 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
+    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+spec:
+  schedule: "59 23 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ .Chart.Name }}
+            release: {{ .Release.Name }}
+            chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+            heritage: {{ .Release.Service }}
+            dls4e_app_name: docker-registry-gc
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}
+            image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E registry image is required" .Values.gc_image }}
+            imagePullPolicy: "IfNotPresent"
+            args:
+            - kubectl
+            - exec
+            - -it
+            - $(cut -d '/' -f 2 <<< $(kubectl get pods -l app=registry -n dls4e -o name))
+            - -n
+            - dls4e
+            - registry
+            - garbage-collect
+            - /etc/docker/registry/config.yml
+          restartPolicy: OnFailure

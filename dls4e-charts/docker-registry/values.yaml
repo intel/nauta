@@ -9,6 +9,8 @@ configData:
   storage:
     cache:
       blobdescriptor: inmemory
+    delete:
+      enabled: true
   http:
     addr: :5000
     secret: DLS4EREGISTRY
