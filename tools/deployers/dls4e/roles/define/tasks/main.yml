@@ -21,7 +21,7 @@
 - name: Fail if external ip is not defined
   fail:
     msg: External IP is not defined
-  when: runtime_external_ip is not defined
+  when: runtime_kubernetes_external_name is not defined
 
 - name: Add host
   add_host:
@@ -36,7 +36,7 @@
     runtime_dls4e_img: "{{ runtime_dls4e_img }}"
     runtime_registry_chart: "{{ runtime_registry_chart }}"
     runtime_dls4e_chart: "{{ runtime_dls4e_chart }}"
-    runtime_external_ip: "{{ runtime_external_ip }}"
+    runtime_kubernetes_external_name: "{{ runtime_kubernetes_external_name }}"
     runtime_kubeconfig: "{{ runtime_kubeconfig }}"
 
 - name: Create directory

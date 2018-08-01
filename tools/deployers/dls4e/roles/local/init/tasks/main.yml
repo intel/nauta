@@ -2,9 +2,9 @@
 
 - name: Calculate runtime external ip
   set_fact:
-    runtime_external_ip: "{{ external_ip |  default ('') }}"
+    runtime_kubernetes_external_name: "{{ external_ip |  default ('') }}"
 
 - name: Fail if external ip is not calculated
   fail:
     msg: Unable to calculate external ip
-  when: not runtime_external_ip
+  when: not runtime_kubernetes_external_name

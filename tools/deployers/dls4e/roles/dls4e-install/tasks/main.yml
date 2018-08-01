@@ -12,7 +12,7 @@
     global_values:
       dls4e_registry: "127.0.0.1:{{ registry_nodeport }}"
       dls4e_configuration:
-        external_ip: "{{ runtime_external_ip }}"
+        external_ip: "{{ runtime_kubernetes_external_name }}"
         registry: "127.0.0.1:{{ registry_nodeport }}"
       dls4e_storage: "{{ calculated_storage }}"
       images: "{{ registry_images }}"
