@@ -22,3 +22,5 @@ draft.toml
 .draftignore
 dlsctl-*.tar.gz
 dlsctl-*.zip
+
+vendor/
