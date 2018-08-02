@@ -28,7 +28,7 @@ const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
 
-  let resMock, reqMock, k8sMock, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred;
+  let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred;
 
   beforeEach(function () {
     resMock = {
@@ -130,6 +130,26 @@ describe('Handlers | Experiments', function () {
         }
       }
     ];
+    podsList = {
+      items: [
+        {
+          metadata: {
+            name: 'name1'
+          },
+          status: {
+            phase: 'succeed'
+          },
+          spec: {
+            containers: [
+              {
+                name: 'name_c_1',
+                resources: {}
+              }
+            ]
+          }
+        }
+      ]
+    };
     error = {
       status: 500,
       message: 'error'
@@ -444,5 +464,66 @@ describe('Handlers | Experiments', function () {
       expect(applyOrderParamsMock.calledOnce).to.equal(true);
       expect(extractAttrsNamesMock.calledOnce).to.equal(true);
     });
+  });
+
+  describe('getExperimentResourcesData', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+      k8sMock = {
+        listPodsByLabelValue: sinon.stub().returns(deferred.promise)
+      };
+      reqMock.params = {
+        experiment: 'exp'
+      }
+    });
+
+    it('should return error if invalid request headers', function () {
+      delete reqMock.headers.authorization;
+      expApi.getExperimentResourcesData(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.UNAUTHORIZED)).to.equal(true);
+    });
+
+    it('should return error if missing exp name in params', function () {
+      delete reqMock.params.experiment;
+      expApi.getExperimentResourcesData(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
+    });
+
+    it('should return error if cannot fetch pods', function (done) {
+      expApi.__set__('k8s', k8sMock);
+      expApi.getExperimentResourcesData(reqMock, resMock);
+      deferred.reject(error);
+      process.nextTick(function () {
+        expect(resMock.status.calledOnce).to.equal(true);
+        expect(resMock.status.calledWith(error.status)).to.equal(true);
+        expect(k8sMock.listPodsByLabelValue.calledOnce).to.equal(true);
+        done();
+      });
+    });
+
+    it('should return data if everything ok', function (done) {
+      const expectedResult = [{
+        name: 'name1',
+        state: 'succeed',
+        containers: [
+          {
+            name: 'name_c_1',
+            resources: {}
+          }
+        ]
+      }];
+      expApi.__set__('k8s', k8sMock);
+      expApi.getExperimentResourcesData(reqMock, resMock);
+      deferred.resolve(podsList);
+      process.nextTick(function () {
+        expect(resMock.send.calledOnce).to.equal(true);
+        expect(resMock.send.calledWith(expectedResult)).to.equal(true);
+        expect(k8sMock.listPodsByLabelValue.calledOnce).to.equal(true);
+        done();
+      });
+    });
+
   });
 });

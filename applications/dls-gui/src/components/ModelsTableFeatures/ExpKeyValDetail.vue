@@ -19,23 +19,26 @@
  * and approved by Intel in writing.
  */
 
-module.exports = {
-  GENERAL: {
-    INTERNAL_SERVER_ERROR: 'Internal server error',
-    BAD_REQUEST: 'Missing data'
-  },
-  AUTH: {
-    INVALID_TOKEN: 'Provided token is invalid.',
-    MISSING_TOKEN: 'Missing authorization token',
-    FORBIDDEN_OPERATION: 'Forbidden operation.',
-    UNAUTHORIZED_OPERATION: 'Unauthorized operation.'
-  },
-  K8S: {
-    CUSTOM_OBJECT: {
-      CANNOT_LIST: 'Cannot list custom objects'
-    },
-    PODS: {
-      CANNOT_LIST: 'Cannot list pods objects'
-    }
-  }
-};
+<template>
+  <v-layout>
+    <v-flex xs6>
+      <span class="keyname">{{ keyname }}:</span>
+    </v-flex>
+    <v-flex xs6>
+      <span>{{ value }}</span>
+    </v-flex>
+  </v-layout>
+</template>
+
+<script>
+export default {
+  name: 'ExpKeyValDetail',
+  props: ['keyname', 'value']
+}
+</script>
+
+<style scoped>
+.keyname {
+  font-weight: bold;
+}
+</style>

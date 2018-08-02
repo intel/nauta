@@ -107,15 +107,15 @@
                       <th :colspan="columnsCount" class="expanded-view">
                         <div class="exp-details">
                           <v-layout row>
-                            <v-flex xs5 wrap>
-                              <ExpDetail keyname="Resources" :value="`Pods Count: ${item.params.podCount}`"/>
-                              <ExpDetail keyname="Training Submission Date" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
+                            <v-flex xs6 wrap>
+                              <ExpResourcesDetail keyname="Resources" :podsList="experimentResources(item.attributes.name)"/>
+                              <ExpKeyValDetail keyname="Training Submission Date" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
                             </v-flex>
-                            <v-flex xs2>
+                            <v-flex xs1>
                               <div class="vertical-line"></div>
                             </v-flex>
                             <v-flex xs5 wrap>
-                              <ExpDetail keyname="Parameters" :value="item.params.parameters"/>
+                              <ExpKeyValDetail keyname="Parameters" :value="item.params.parameters"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -155,7 +155,8 @@ import LABELS from '../utils/header-titles';
 import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
-import ExpDetail from './ModelsTableFeatures/ExpDetail';
+import ExpKeyValDetail from './ModelsTableFeatures/ExpKeyValDetail';
+import ExpResourcesDetail from './ModelsTableFeatures/ExpResourcesDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 
 const SORTING_ORDER = {
@@ -174,7 +175,8 @@ export default {
   name: 'ModelsTable',
   components: {
     ActionHeaderButtons,
-    ExpDetail,
+    ExpKeyValDetail,
+    ExpResourcesDetail,
     FilterByValWindow,
     FooterElements
   },
@@ -248,7 +250,8 @@ export default {
       isCheckingAuth: 'authLoadingState',
       isInitializedData: 'initializedDataFlag',
       isLogged: 'isLogged',
-      username: 'username'
+      username: 'username',
+      experimentResources: 'experimentResources'
     }),
     paginationStats: function () {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
@@ -284,7 +287,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserExperiments', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
+    ...mapActions(['getUserExperiments', 'getExperimentResources', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
     getLabel: function (header) {
       return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
@@ -349,7 +352,10 @@ export default {
           return exp !== expName;
         })
       } else {
-        this.visibleDetails.push(expName);
+        this.getExperimentResources({experimentName: expName})
+          .then(() => {
+            this.visibleDetails.push(expName);
+          });
       }
     },
     areDetailsVisible (expName) {
@@ -380,6 +386,9 @@ export default {
         namespaces: this.filterByValModals.namespace.params,
         states: this.filterByValModals.state.params,
         refreshMode: refreshMode
+      });
+      this.visibleDetails.forEach((item) => {
+        this.getExperimentResources({experimentName: item})
       });
     },
     timer () {

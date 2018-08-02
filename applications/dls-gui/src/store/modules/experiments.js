@@ -19,7 +19,7 @@
  * and approved by Intel in writing.
  */
 
-import {getExperiments} from '../handlers/experiments';
+import {getExperiments, getExperimentsResources} from '../handlers/experiments';
 import RESPONSE_TYPES from '../../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../../utils/constants/messages';
 
@@ -42,7 +42,8 @@ const state = {
       pageNumber: 0,
       totalPagesCount: 0,
       datetime: 0
-    }
+    },
+    resources: []
   }
 };
 
@@ -60,7 +61,13 @@ export const getters = {
   lastUpdate: state => state.experiments.stats.datetime,
   fetchingDataActive: state => state.fetchingDataActive,
   tensorboardLaunching: state => state.tensorboardLaunching,
-  initializedDataFlag: state => state.initialized
+  initializedDataFlag: state => state.initialized,
+  experimentResources: state => experimentName => {
+    const item = state.experiments.resources.find((item) => {
+      return item.name === experimentName;
+    });
+    return item ? item.data : null;
+  }
 };
 
 export const actions = {
@@ -91,6 +98,20 @@ export const actions = {
           commit('setFetchingDataFlag', {isActive: false});
         }
       });
+  },
+  getExperimentResources: ({commit, dispatch}, {experimentName}) => {
+    getExperimentsResources(experimentName)
+      .then((res) => {
+        const data = res.data;
+        commit('setExperimentsResource', {experimentName, data});
+      })
+      .catch((err) => {
+        if (err && err.response && err.response.status && err.response.status === 401) {
+          dispatch('handleLogOut', '/invalid_token');
+        } else {
+          dispatch('showError', {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR});
+        }
+      });
   }
 };
 
@@ -115,6 +136,13 @@ export const mutations = {
   },
   setInitializedData: (state) => {
     state.initialized = true;
+  },
+  setExperimentsResource: (state, {experimentName, data}) => {
+    const filteredData = state.experiments.resources.filter((item) => {
+      return item.name !== experimentName;
+    });
+    const newData = [{name: experimentName, data: data}];
+    state.experiments.resources = filteredData.concat(newData);
   }
 };
 

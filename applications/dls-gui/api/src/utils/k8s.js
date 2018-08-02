@@ -50,7 +50,7 @@ module.exports.listNamespacedCustomObject = function (token, resourceName) {
         if (typeof (data) === 'object') {
           resolve(data);
         }
-        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT));
+        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT.CANNOT_LIST));
       })
       .catch(function (err) {
         reject(err);
@@ -75,7 +75,36 @@ module.exports.listClusterCustomObject = function (token, resourceName) {
         if (typeof (data) === 'object') {
           resolve(data);
         }
-        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT));
+        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.CUSTOM_OBJECT.CANNOT_LIST));
+      })
+      .catch(function (err) {
+        reject(err);
+      });
+  });
+};
+
+module.exports.listPodsByLabelValue = function (token, labelName, labelValue) {
+  return Q.Promise(function (resolve, reject) {
+    authApi.decodeToken(token)
+      .then(function () {
+        let url = `${K8S_API_URL}/api/v1/pods`;
+        if (labelName && labelValue) {
+          url = `${url}?labelSelector=${labelName}=${labelValue}`
+        }
+        const options = {
+          url: url,
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        };
+        logger.debug('Performing request to kubernetes API for fetching pods data');
+        return request(options);
+      })
+      .then(function (data) {
+        if (typeof (data) === 'object') {
+          resolve(data);
+        }
+        reject(errHandler(HttpStatus.INTERNAL_SERVER_ERROR, errMessages.K8S.PODS.CANNOT_LIST));
       })
       .catch(function (err) {
         reject(err);

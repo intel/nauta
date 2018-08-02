@@ -177,6 +177,7 @@ const getUserExperiments = function (req, res) {
   if (!req.headers.authorization) {
     logger.debug('Missing authorization token');
     res.status(HttpStatus.UNAUTHORIZED).send({message: errMessages.AUTH.MISSING_TOKEN});
+    return;
   }
   const token = req.headers.authorization;
   const queryParams = req.query;
@@ -194,6 +195,44 @@ const getUserExperiments = function (req, res) {
     })
 };
 
+const getExperimentResourcesData = function (req, res) {
+  if (!req.headers.authorization) {
+    logger.debug('Missing authorization token');
+    res.status(HttpStatus.UNAUTHORIZED).send({message: errMessages.AUTH.MISSING_TOKEN});
+    return;
+  }
+  const token = req.headers.authorization;
+  const experimentName = req.params.experiment;
+  if (!experimentName) {
+    res.status(HttpStatus.BAD_REQUEST).send({message: errMessages.GENERAL.BAD_REQUEST});
+    return;
+  }
+  const labelName = 'runName';
+  const labelValue = experimentName;
+
+  k8s.listPodsByLabelValue(token, labelName, labelValue)
+    .then(function (data) {
+      logger.info('Pods data retrieved');
+      const result = data.items.map((pod) => {
+        return {
+          name: pod.metadata.name,
+          state: pod.status.phase,
+          containers: pod.spec.containers.map((container) => {
+            return {
+              name: container.name,
+              resources: container.resources
+            }
+          })
+        };
+      });
+      res.send(result);
+    })
+    .catch(function (err) {
+      logger.error('Cannot get pods');
+      res.status(err.status).send({message: err.message});
+    })
+};
+
 module.exports = {
   getUserExperiments: getUserExperiments,
   parseExperiments: parseExperiments,
@@ -201,5 +240,6 @@ module.exports = {
   applyOrderParams: applyOrderParams,
   applyQueryFilters: applyQueryFilters,
   extractValuesForFilterableAttrs: extractValuesForFilterableAttrs,
-  generateExperimentEntities: generateExperimentEntities
+  generateExperimentEntities: generateExperimentEntities,
+  getExperimentResourcesData: getExperimentResourcesData
 };

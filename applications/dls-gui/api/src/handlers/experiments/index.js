@@ -25,5 +25,6 @@ const expApi = require('./experiments');
 const router = express.Router();
 
 router.get('/list', expApi.getUserExperiments);
+router.get('/:experiment/resources', expApi.getExperimentResourcesData);
 
 module.exports = router;

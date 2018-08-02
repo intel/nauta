@@ -29,7 +29,7 @@ const HttpStatus = require('http-status-codes');
 
 describe('Utils | k8s', function () {
 
-  let authApiMock, requestMock, deferred, data, token, error, resourceName;
+  let authApiMock, requestMock, deferred, data, token, error, resourceName, labelName, labelValue;
 
   beforeEach(function () {
     authApiMock = {
@@ -40,10 +40,12 @@ describe('Utils | k8s', function () {
     };
     error = {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: errMessages.K8S.CUSTOM_OBJECT
+      message: errMessages.K8S.CUSTOM_OBJECT.CANNOT_LIST
     };
     token = 'token';
     resourceName = 'experiment';
+    labelName = 'labelName';
+    labelValue = 'labelValue';
   });
 
   describe('listNamespacedCustomObject', function () {
@@ -156,6 +158,82 @@ describe('Utils | k8s', function () {
       deferred.resolve(data);
       reqDefer.resolve('string');
       return k8sApi.listClusterCustomObject(token, resourceName)
+        .catch(function (err) {
+          expect(err).to.deep.equal(error);
+        });
+    });
+  });
+
+  describe('listPodsByLabelValue', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+      error = {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: errMessages.K8S.PODS.CANNOT_LIST
+      };
+    });
+
+    it('should return error if cannot decode token', function () {
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      deferred.reject(error);
+      return k8sApi.listPodsByLabelValue(token, labelName, labelValue)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return error if request to api failed', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.reject(error);
+      return k8sApi.listPodsByLabelValue(token, labelName, labelValue)
+        .catch(function (err) {
+          expect(err).to.equal(error)
+        });
+    });
+
+    it('should return data if request to api with success', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve(data);
+      return k8sApi.listPodsByLabelValue(token, labelName, labelValue)
+        .then(function (res) {
+          expect(res).to.equal(data)
+        });
+    });
+
+    it('should return data if request to api with success without label name and value', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve(data);
+      return k8sApi.listPodsByLabelValue(token)
+        .then(function (res) {
+          expect(res).to.equal(data)
+        });
+    });
+
+    it('should not return data if request to api with success but string in response', function () {
+      const reqDefer = Q.defer();
+      authApiMock.decodeToken = sinon.stub().returns(deferred.promise);
+      requestMock = sinon.stub().returns(reqDefer.promise);
+      k8sApi.__set__('authApi', authApiMock);
+      k8sApi.__set__('request', requestMock);
+      deferred.resolve(data);
+      reqDefer.resolve('string');
+      return k8sApi.listPodsByLabelValue(token, labelName, labelValue)
         .catch(function (err) {
           expect(err).to.deep.equal(error);
         });

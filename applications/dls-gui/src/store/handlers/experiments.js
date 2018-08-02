@@ -44,3 +44,15 @@ export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, 
   };
   return axios(options);
 }
+
+const EXPERIMENTS_ENDPOINT = '/api/experiments';
+
+export function getExperimentsResources (experimentName) {
+  const token = cookies.get('TOKEN');
+  const options = {
+    url: `${EXPERIMENTS_ENDPOINT}/${experimentName}/resources`,
+    headers: {'Authorization': token},
+    method: 'GET'
+  };
+  return axios(options);
+}

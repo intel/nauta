@@ -25,19 +25,38 @@
       <span class="keyname">{{ keyname }}:</span>
     </v-flex>
     <v-flex xs6>
-      <span>{{ value }}</span>
+      <span><b>Pods --</b></span>
+      <ol id="pods-list">
+        <li v-bind:key="pod.name" v-for="pod in podsList">
+          <b>Name:</b> <i>{{ pod.name }}</i> <br/>
+          <b>State:</b> <i>{{ pod.state }}</i> <br/>
+          <b>Containers:</b>
+          <ul id="containers-list">
+            <li v-bind:key="container.name" v-for="container in pod.containers">
+              <b>Name:</b> <i>{{ container.name }}</i> <br/>
+              <b>Resources:</b> <i>{{ container.resources }}</i>
+            </li>
+          </ul>
+        </li>
+      </ol>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
 export default {
-  name: 'ExpDetail',
-  props: ['keyname', 'value']
+  name: 'ExpResourcesDetail',
+  props: ['keyname', 'podsList']
 }
 </script>
 
 <style scoped>
+#pods-list {
+  margin-left: 25px;
+}
+#containers-list {
+  margin-left: 25px;
+}
 .keyname {
   font-weight: bold;
 }

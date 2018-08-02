@@ -46,7 +46,8 @@ describe('VUEX modules experiments', () => {
         totalPagesCount: 0,
         filteredDataCount: 0,
         datetime: 1
-      }
+      },
+      resources: [{name: 'test1', data: 'data1'}]
     }
   };
 
@@ -120,6 +121,20 @@ describe('VUEX modules experiments', () => {
       const result = getters.initializedDataFlag(state);
       expect(result).to.equal(state.initialized);
     });
+
+    it('experimentResources should return item if exists', () => {
+      const expName = 'test1';
+      const expectedResult = 'data1';
+      const result = getters.experimentResources(state)(expName);
+      expect(result).to.equal(expectedResult);
+    });
+
+    it('experimentResources should return null if does not exist', () => {
+      const expName = 'testXXXXXXXX';
+      const expectedResult = null;
+      const result = getters.experimentResources(state)(expName);
+      expect(result).to.equal(expectedResult);
+    });
   });
 
   describe('Mutations', () => {
@@ -162,6 +177,28 @@ describe('VUEX modules experiments', () => {
     it('setInitializedData', () => {
       mutations.setInitializedData(state);
       expect(state.initialized).to.equal(true);
+    });
+
+    it('setExperimentsResource should add new item', () => {
+      const expName = 'tested1';
+      const data = 'data_tested_1';
+      mutations.setExperimentsResource(state, {experimentName: expName, data});
+      const newItem = state.experiments.resources.find((item) => {
+        return item.name === expName;
+      });
+      expect(newItem).to.not.equal(null);
+    });
+
+    it('setExperimentsResource should update existing item', () => {
+      const expName = state.experiments.resources[0].name;
+      const data = 'data_tested_1';
+      mutations.setExperimentsResource(state, {experimentName: expName, data});
+      const newItem = state.experiments.resources.find((item) => {
+        return item.name === expName;
+      });
+      expect(newItem).to.not.equal(null);
+      expect(newItem.data).to.equal(data);
+      expect(newItem.name).to.equal(expName);
     });
   });
 
@@ -248,6 +285,46 @@ describe('VUEX modules experiments', () => {
         ];
         mock.onGet('/api/experiments/list').reply(500, 'Internal Server Error');
         testAction(actions.getUserExperiments, {refreshMode: true}, state, expectedMutations, expectedActions, done);
+      });
+    });
+
+    describe('getExperimentResources', () => {
+      const expName = 'exp1';
+      beforeEach(() => {
+        expectedMutations = [];
+        expectedActions = [];
+        mock = new MockAdapter(axios);
+        mock.reset();
+      });
+
+      it('should show error if internal server error occurs in  experiments fetching', (done) => {
+        expectedMutations = [];
+        expectedActions = [
+          {type: 'showError', payload: {type: RESPONSE_TYPES.ERROR, content: RESPONSE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR}}
+        ];
+        mock.onGet(`/api/experiments/${expName}/resources`).reply(500, 'Internal Server Error');
+        testAction(actions.getExperimentResources, {experimentName: expName}, state, expectedMutations, expectedActions, done);
+      });
+
+      it('should show invalid token page if token is invalid', (done) => {
+        expectedMutations = [];
+        expectedActions = [
+          {type: 'handleLogOut', payload: '/invalid_token'}
+        ];
+        mock.onGet(`/api/experiments/${expName}/resources`).reply(401, {response: {status: 401}});
+        testAction(actions.getExperimentResources, {experimentName: expName}, state, expectedMutations, expectedActions, done);
+      });
+
+      it('should set resources data if req with success', (done) => {
+        const data = {
+          data: ['test1']
+        };
+        expectedMutations = [
+          {type: 'setExperimentsResource', payload: {experimentName: expName, data}}
+        ];
+        expectedActions = [];
+        mock.onGet(`/api/experiments/${expName}/resources`).reply(200, data);
+        testAction(actions.getExperimentResources, {experimentName: expName}, state, expectedMutations, expectedActions, done);
       });
     });
   });

@@ -26,9 +26,10 @@ import sinon from 'sinon';
 import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import ModelsTable from '../../../../src/components/ModelsTable';
+import Q from 'q';
 
 describe('VUE components ModelsTable', () => {
-  let wrapper, router, store, state, getters, actions, localVue;
+  let wrapper, router, store, state, getters, actions, localVue, defered;
   beforeEach(function () {
     state = {
       fetchingDataActive: false,
@@ -68,11 +69,13 @@ describe('VUE components ModelsTable', () => {
       tensorboardLaunching: state => state.tensorboardLaunching,
       username: state => state.username
     };
+    defered = Q.defer();
     actions = {
       getUserExperiments: sinon.spy(),
       enableTensorMode: sinon.spy(),
       launchTensorboard: sinon.spy(),
-      disableTensorMode: sinon.spy()
+      disableTensorMode: sinon.spy(),
+      getExperimentResources: sinon.stub().returns(defered.promise)
     };
     store = new Vuex.Store({
       state,
@@ -346,16 +349,34 @@ describe('VUE components ModelsTable', () => {
     expect(result).to.equal(true);
   });
 
-  it('Should add exp to visibility list if not visible', function () {
+  it('Should add exp to visibility list if not visible', function (done) {
     const expName = 'xyz';
     wrapper.vm.toggleDetails(expName);
-    expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(true);
+    defered.resolve();
+    process.nextTick(() => {
+      expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(true);
+      done();
+    });
   });
 
-  it('Should remove exp from visibility list if visible', function () {
+  it('Should remove exp from visibility list if visible', function (done) {
     const expName = 'xyz';
     wrapper.vm.visibleDetails.push(expName);
     wrapper.vm.toggleDetails(expName);
-    expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(false);
+    defered.resolve();
+    process.nextTick(() => {
+      expect(wrapper.vm.visibleDetails.includes(expName)).to.equal(false);
+      done();
+    });
+  });
+
+  it('Should refresh experiments resources data if any details visible', function (done) {
+    const expName = 'xyz';
+    wrapper.vm.visibleDetails.push(expName);
+    wrapper.vm.getData(expName);
+    process.nextTick(() => {
+      expect(actions.getExperimentResources.calledTwice).to.equal(true); // first on component init, second on getData
+      done();
+    });
   });
 });
