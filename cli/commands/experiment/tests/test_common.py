@@ -198,7 +198,7 @@ def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
 
     assert "Problems during creation of environments" in str(exe)
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0,
-                  submit_one_count=0, socat_start_count=0, del_env_count=1)
+                  submit_one_count=0, socat_start_count=1, del_env_count=1)
 
 
 def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
@@ -208,7 +208,7 @@ def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
-    check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, socat_start_count=0,
+    check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, socat_start_count=1,
                   del_env_count=1)
 
 
@@ -221,7 +221,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
                           template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
 
     assert "Problems during creation of environments" in str(exe)
-    check_asserts(prepare_mocks, add_exp_count=0, submit_one_count=0, socat_start_count=0, del_env_count=1)
+    check_asserts(prepare_mocks, add_exp_count=0, submit_one_count=0, socat_start_count=1, del_env_count=1)
 
 
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):

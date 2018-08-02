@@ -20,12 +20,16 @@
 #
 
 import ast
-import yaml
 import os
 import re
 import shutil
 from typing import Tuple, List
+
+import docker
+import docker.errors
+import yaml
 import toml
+
 
 from util.k8s import k8s_info
 from util.logger import initialize_logger
@@ -91,8 +95,13 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
                 if script_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM dls4e/tensorflow:1.9.0-py3"):
+                tf_image_repository = f'127.0.0.1:{local_registry_port}/dls4e/tensorflow'
+                tf_image_tag = '1.9.0-py3'
                 dockerfile_temp_content = dockerfile_temp_content + \
-                                          f"FROM 127.0.0.1:{local_registry_port}/dls4e/tensorflow:1.9.0-py3"
+                                          f"FROM {tf_image_repository}:{tf_image_tag}"
+
+                # pull image from platform's registry
+                pull_tf_image(tf_image_repository=tf_image_repository, tf_image_tag=tf_image_tag)
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
@@ -169,3 +178,12 @@ def modify_draft_toml(experiment_folder: str, registry: str):
 
     shutil.move(draft_toml_temp_filename, draft_toml_filename)
     log.debug("Modify draft.toml - end")
+
+
+def pull_tf_image(tf_image_repository: str, tf_image_tag: str):
+    try:
+        log.debug(f'Pulling TF image: {tf_image_repository}:{tf_image_tag}')
+        docker_client = docker.from_env()
+        docker_client.images.pull(repository=tf_image_repository, tag=tf_image_tag)
+    except docker.errors.APIError:
+        log.exception(f'Failed to pull TF image: {tf_image_repository}:{tf_image_tag}')

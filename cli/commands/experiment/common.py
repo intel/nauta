@@ -223,6 +223,17 @@ def submit_experiment(template: str, name: str,
                 config.local_registry_port = proxy.tunnel_port
 
             try:
+
+                # run socat if on Windows or Mac OS
+                if get_current_os() in (OS.WINDOWS, OS.MACOS):
+                    # noinspection PyBroadException
+                    try:
+                        socat.start(proxy.tunnel_port)
+                    except Exception:
+                        error_msg = "Error during creation of a local docker-host tunnel."
+                        log.exception(error_msg)
+                        raise SubmitExperimentError(error_msg)
+
                 # prepare environments for all experiment's runs
                 for experiment_run in runs_list:
                     if script_parameters and experiment_run.parameters:
@@ -270,16 +281,6 @@ def submit_experiment(template: str, name: str,
                 if not click.confirm('Do you want to continue?', default=True):
                     delete_run_environments(runs_list)
                     sys.exit(1)
-
-            # run socat if on Windows or Mac OS
-            if get_current_os() in (OS.WINDOWS, OS.MACOS):
-                # noinspection PyBroadException
-                try:
-                    socat.start(proxy.tunnel_port)
-                except Exception:
-                    error_msg = "Error during creation of a local docker-host tunnel."
-                    log.exception(error_msg)
-                    raise SubmitExperimentError(error_msg)
 
             # create Experiment model
             # TODO template_name & template_namespace should be filled after Template implementation

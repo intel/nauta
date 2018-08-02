@@ -20,3 +20,6 @@ RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VER
     ${PIP} install /tensorflow_serving_api-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz && \
     rm -rf /tensorflow-${TENSORFLOW_VERSION}-*.whl /tensorflow_serving_api-${TENSORFLOW_VERSION}-*.whl /experiment_metrics-*.tar.gz
+
+ENV KMP_BLOCKTIME 0
+ENV OMP_NUM_THREADS 8
