@@ -30,3 +30,12 @@ rules:
       - "/"
     verbs:
       - get
+  - apiGroups:
+      - "*"
+    resources:
+      - validatingwebhookconfigurations
+      - mutatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch

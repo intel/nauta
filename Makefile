@@ -56,6 +56,5 @@ gui-unit-tests:
 	@(cd $(CURDIR)/applications/dls-gui && make test)
 
 exp-service-tests:
-	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make dep_test_install)
 	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make test)
 	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make test_coverage)
