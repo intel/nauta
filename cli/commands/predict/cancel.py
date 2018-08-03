@@ -21,23 +21,30 @@
 
 import click
 
-from commands.predict import cancel, launch, stream
+from cli_state import common_options, pass_state, State
+from util.aliascmd import AliasCmd
+import commands.experiment.cancel
 from util.logger import initialize_logger
-from util.aliascmd import AliasGroup
 
-logger = initialize_logger(__name__)
+HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
+HELP_P = "If given, then all information concerning all prediction instances, completed and currently running, " \
+         "is removed from the system."
+HELP_M = "If given, command searches for prediction instances matching the value of this option."
 
-
-HELP = "Command for starting, stopping, and managing prediction jobs and instances."
-
-
-@click.group(short_help=HELP, cls=AliasGroup, alias='p',
-             help="To get further help on commands use COMMAND with -h or --help option.",
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
-def predict():
-    pass
+log = initialize_logger(__name__)
 
 
-predict.add_command(cancel.cancel)
-predict.add_command(launch.launch)
-predict.add_command(stream.stream)
+@click.command(short_help=HELP, cls=AliasCmd, alias='c')
+@click.argument("name", required=False)
+@click.option('-m', '--match', default=None, help=HELP_M)
+@click.option('-p', '--purge', default=None, help=HELP_P, is_flag=True)
+@common_options()
+@pass_state
+@click.pass_context
+def cancel(context, state: State, name: str, match: str, purge: bool):
+    """
+    Cancels chosen prediction instances based on a name provided as a parameter.
+    """
+    commands.experiment.cancel.experiment_name = 'prediction instance'
+    commands.experiment.cancel.experiment_name_plural = 'prediction instances'
+    context.forward(commands.experiment.cancel.cancel)

@@ -49,6 +49,9 @@ HELP_M = "If given, command searches for experiments matching the value of this 
 
 log = initialize_logger(__name__)
 
+experiment_name = 'experiment'
+experiment_name_plural = 'experiments'
+
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='c')
 @click.argument("name", required=False)
@@ -89,14 +92,15 @@ def cancel(state: State, name: str, match: str, purge: bool):
         else:
             list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name)
     except Exception:
-        err_message = "Problems during loading a list of experiments."
+        err_message = f"Problems during loading a list of {experiment_name_plural}."
         log.exception(err_message)
         click.echo(err_message)
         sys.exit(1)
 
     if not list_of_all_runs:
-        click.echo("Lack of experiments fulfilling given criteria. Name or match string parameters do not match any "
-                   "existing experiment. Run 'dlsctl exp list' to find out what are the names of existing experiments.")
+        click.echo(f"Lack of {experiment_name_plural} fulfilling given criteria."
+                   f" Name or match string parameters do not match any existing {experiment_name}."
+                   f" Run 'dlsctl exp list' to find out what are the names of existing {experiment_name_plural}.")
         sys.exit(1)
 
     # check whether we have at least one experiment in state other than CANCELLED
@@ -112,27 +116,27 @@ def cancel(state: State, name: str, match: str, purge: bool):
                 names_of_cancelled_runs.append(run.name)
 
         if not list_of_runs_to_be_deleted:
-            click.echo("Experiments fulfilling given criteria have been cancelled already.")
+            click.echo(f"{experiment_name_plural} fulfilling given criteria have been cancelled already.")
             sys.exit(1)
         elif len(list_of_runs_to_be_deleted) != len(list_of_all_runs):
-            click.echo("The following experiments have been cancelled already:")
+            click.echo(f"The following {experiment_name_plural} have been cancelled already:")
             for name in names_of_cancelled_runs:
                 click.echo(f"     - {name}")
-            click.echo("The following experiments can still be cancelled:")
+            click.echo(f"The following {experiment_name_plural} can still be cancelled:")
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
         else:
-            click.echo("The following experiments will be cancelled:")
+            click.echo(f"The following {experiment_name_plural} will be cancelled:")
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
     else:
         list_of_runs_to_be_deleted = list_of_all_runs
-        click.echo("The following experiments will be purged:")
+        click.echo(f"The following {experiment_name_plural} will be purged:")
         for name in list_of_runs_to_be_deleted:
             click.echo(f"     - {name.name}")
 
-    if not click.confirm("Do you want to continue with cancellation of those experiments?",):
-        click.echo("Operation of cancellation of experiments was aborted.")
+    if not click.confirm(f"Do you want to continue with cancellation of those {experiment_name_plural}?", ):
+        click.echo(f"Operation of cancellation of {experiment_name_plural} was aborted.")
         sys.exit(2)
 
     # group runs by experiments
@@ -192,12 +196,12 @@ def cancel(state: State, name: str, match: str, purge: bool):
                 not_deleted_runs.extend(run_list)
 
     if deleted_runs:
-        click.echo("The following experiments were cancelled succesfully:")
+        click.echo(f"The following {experiment_name_plural} were cancelled succesfully:")
         for run in deleted_runs:
             click.echo(f"     - {run.name}")
 
     if not_deleted_runs:
-        click.echo("The following experiments weren't cancelled properly:")
+        click.echo(f"The following {experiment_name_plural} weren't cancelled properly:")
         for run in not_deleted_runs:
             click.echo(f"     - {run.name}")
         sys.exit(1)
@@ -251,7 +255,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run], k8s_api: client.Co
                 log.exception("Error during purging runs.")
                 # occurence of NotFound error may mean, that run has been removed earlier
                 if "NotFound" not in str(exe):
-                    click.echo("Not all experiment's components were removed properly.")
+                    click.echo(f"Not all {experiment_name}'s components were removed properly.")
                     raise exe
             try:
                 # clear run logs
@@ -340,14 +344,14 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
     :param k8s_api: k8s API client instance
     :param k8s_apps_api: K8s_apps api object
     :param namespace: namespace where Run instances reside
-    :return: tuple of  list containing successfully Runs and list containing Runs that were not cancelled
+    :return: tuple of list containing successfully Runs and list containing Runs that were not cancelled
     """
     deleted_runs = []
     not_deleted_runs = []
     try:
         for run in runs_to_cancel:
             log.debug(f"Cancelling {run.name} run ...")
-            click.echo(f"Cancelling {run.name} experiment ...")
+            click.echo(f"Cancelling {run.name} {experiment_name} ...")
 
             all_objects_deleted = True
 
@@ -359,7 +363,7 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
             if list_of_deployments.items:
                 # jupyter notebook contains deployments
                 for item in list_of_deployments.items:
-                    click.echo(f"Deleting objects related to {run.name} experiment ...")
+                    click.echo(f"Deleting objects related to {run.name} {experiment_name} ...")
                     try:
                         kubectl.delete_k8s_object("Deployment", item.metadata.name)
                     except Exception:
@@ -369,8 +373,7 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
                 # and services - recognized by release and dls4e_app_name. To make it more general
                 # we should put (and expect) runName label in any object that can be a part of an experiment
                 list_of_services = k8s_api.list_namespaced_service(watch=False, namespace=namespace,
-                                                                   label_selector=f"release={run.name},"
-                                                                                  f"dls4e_app_name=jupyter")
+                                                                   label_selector=f"release={run.name}")
                 for item in list_of_services.items:
                     try:
                         kubectl.delete_k8s_object("Service", item.metadata.name)
@@ -383,7 +386,7 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
                                                            label_selector=f"runName={run.name}")
 
                 already_deleted = set()
-                click.echo(f"Deleting objects related to {run.name} experiment ...")
+                click.echo(f"Deleting objects related to {run.name} {experiment_name} ...")
                 for pod in list_of_pods.items:
                     owner_name, owner_kind = get_owners_data(pod)
                     owner_key = f"{owner_name}{owner_kind}"
@@ -397,12 +400,12 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], k8s_api: client.CoreV1Api,
 
             if all_objects_deleted:
                 # change a run state to CANCELLED
-                click.echo(f"Setting experiment status to CANCELLED ...")
+                click.echo(f"Setting {experiment_name} status to CANCELLED ...")
                 run.state = RunStatus.CANCELLED
                 update_run(run, namespace)
                 deleted_runs.append(run)
             else:
-                click.echo(f"Not all components of {run.name} experiment were deleted ...")
+                click.echo(f"Not all components of {run.name} {experiment_name} were deleted ...")
                 click.echo("Experiment remains in its previous state.")
                 not_deleted_runs.append(run)
 
