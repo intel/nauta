@@ -25,12 +25,13 @@ import sys
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import validate_experiment_name, submit_experiment, RunDescription
+from commands.experiment.common import validate_experiment_name
+from commands.predict.common import start_inference_instance, get_inference_instance_url
 from platform_resources.experiments import generate_name
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
-from util.k8s.k8s_info import get_kubectl_host, get_kubectl_current_context_namespace, get_api_key
+from util.k8s.k8s_info import get_api_key
 
 HELP = "Starts a new prediction instance that can be used for performing prediction, classification and" \
        " regression tasks on trained model."
@@ -72,31 +73,13 @@ def launch(state: State, name: str, model_location: str):
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance,
                                                             model_name=model_name)
         authorization_header = get_authorization_header()
-        click.echo(f'\nPrediction instance URL (append method signature manually, e.g. :predict):'
+        click.echo(f'\nPrediction instance URL (append method verb manually, e.g. :predict):'
                    f'\n{inference_instance_url}')
         click.echo(f'\nAuthorize with following header:\n{authorization_header}')
     except Exception:
         error_message = "Failed to obtain prediction instance URL."
         log.exception(error_message)
         sys.exit(error_message)
-
-
-def start_inference_instance(name: str, model_location: str, model_name: str,
-                             template: str = INFERENCE_TEMPLATE) -> RunDescription:
-    runs, _ = submit_experiment(name=name, template=template,
-                                pack_params=[('modelPath', model_location), ('modelName', model_name)])
-    return runs[0]
-
-
-def get_inference_instance_url(inference_instance: RunDescription, model_name: str) -> str:
-    service_name = inference_instance.name
-    k8s_host = get_kubectl_host(replace_https=False)
-    k8s_namespace = get_kubectl_current_context_namespace()
-
-    proxy_url = f'{k8s_host}/api/v1/namespaces/{k8s_namespace}/' \
-                f'services/{service_name}/proxy/v1/models/{model_name}'
-
-    return proxy_url
 
 
 def get_authorization_header():

@@ -22,6 +22,7 @@
 import click
 
 from commands.predict import launch
+from commands.predict import stream
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
 
@@ -39,3 +40,4 @@ def predict():
 
 
 predict.add_command(launch.launch)
+predict.add_command(stream.stream)

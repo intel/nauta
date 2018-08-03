@@ -47,7 +47,7 @@ class Run(PlatformResource):
 
     def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
                  pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
-                 creation_timestamp: str = None, template_name: str = None):
+                 creation_timestamp: str = None, template_name: str = None, metadata: dict = None):
         self.name = name
         self.parameters = parameters
         self.state = state
@@ -58,6 +58,7 @@ class Run(PlatformResource):
         self.submitter = submitter
         self.creation_timestamp = creation_timestamp
         self.template_name = template_name
+        self.metadata = metadata
 
 
     @classmethod
@@ -71,7 +72,8 @@ class Run(PlatformResource):
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
                    metrics=object_dict.get('spec').get('metrics', {}),
-                   template_name=object_dict['spec']['pod-selector']['matchLabels']['app'])
+                   template_name=object_dict['spec']['pod-selector']['matchLabels']['app'],
+                   metadata=object_dict['metadata'])
 
     @property
     def cli_representation(self):

@@ -2,6 +2,8 @@ apiVersion: "aggregator.aipg.intel.com/v1"
 kind: Run
 metadata:
   name: {{ .Release.Name }}
+  labels:
+    modelName: {{ .Values.modelName }}
 spec:
   experiment-name: {{ .Values.experimentName }}
   pod-selector:

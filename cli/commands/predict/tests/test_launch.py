@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-from unittest.mock import MagicMock
-
 from click.testing import CliRunner
 import pytest
 
@@ -46,24 +44,26 @@ def test_launch(launch_mocks: LaunchPredictMocks):
     name = 'fake-model-name'
 
     runner = CliRunner()
-    runner.invoke(launch.launch, ['--model-location', model_location, '--name', name])
+    result = runner.invoke(launch.launch, ['--model-location', model_location, '--name', name])
 
     assert launch_mocks.generate_name_mock.call_count == 0
     assert launch_mocks.start_inference_instance_mock.call_count == 1
     assert launch_mocks.get_inference_instance_url_mock.call_count == 1
     assert launch_mocks.get_authorization_header_mock.call_count == 1
+    assert result.exit_code == 0
 
 
 def test_launch_generate_name(launch_mocks: LaunchPredictMocks):
     model_location = '/fake/model/location'
 
     runner = CliRunner()
-    runner.invoke(launch.launch, ['--model-location', model_location])
+    result = runner.invoke(launch.launch, ['--model-location', model_location])
 
     assert launch_mocks.generate_name_mock.call_count == 1
     assert launch_mocks.start_inference_instance_mock.call_count == 1
     assert launch_mocks.get_inference_instance_url_mock.call_count == 1
     assert launch_mocks.get_authorization_header_mock.call_count == 1
+    assert result.exit_code == 0
 
 
 def test_launch_fail(launch_mocks: LaunchPredictMocks):
@@ -94,13 +94,3 @@ def test_launch_url_fail(launch_mocks: LaunchPredictMocks):
     assert launch_mocks.get_inference_instance_url_mock.call_count == 1
     assert launch_mocks.get_authorization_header_mock.call_count == 0
     assert result.exit_code == 1
-
-
-def test_start_inference_instance(mocker):
-    submit_experiment_mock = mocker.patch('commands.predict.launch.submit_experiment')
-    fake_experiment = MagicMock()
-    submit_experiment_mock.return_value = [fake_experiment], 'fake_path'
-
-    inference_instance = launch.start_inference_instance(name='', model_location='', model_name='')
-
-    assert inference_instance == fake_experiment

@@ -39,7 +39,14 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                                                'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
                  submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
-                 template_name="tf-training"),
+                 template_name="tf-training",
+                 metadata={'clusterName': '', 'creationTimestamp': '2018-05-17T14:05:52Z', 'generation': 1,
+                           'name': 'exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training',
+                           'namespace': 'mciesiel-dev',
+                           'resourceVersion': '435977',
+                           'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-dev/runs/'
+                                       'exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training',
+                           'uid': '68af2c7a-59db-11e8-b5db-527100001250'}),
              Run(name="exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training",
                  parameters=['mnist_single_node.py', '--data_dir', '/app'], state=RunStatus.COMPLETE,
                  metrics={'accuracy': 52.322}, experiment_name="experiment-name-will-be-added-soon", pod_count=1,
@@ -47,7 +54,14 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                      'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
                                      'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}},
                  submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:06:03Z",
-                 template_name="tf-training")]
+                 template_name="tf-training",
+                 metadata={'clusterName': '', 'creationTimestamp': '2018-05-17T14:06:03Z', 'generation': 1,
+                           'name': 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
+                           'namespace': 'mciesiel-dev',
+                           'resourceVersion': '436010',
+                           'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-dev/runs/'
+                                       'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
+                           'uid': '6f13b47c-59db-11e8-b5db-527100001250'})]
 
 
 @pytest.fixture()
