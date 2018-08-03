@@ -70,8 +70,8 @@ def verify(state: State):
             if valid:
                 click.echo(f'{dependency_name} verified successfully.')
             else:
-                click.echo(f'{dependency_name} installed version ({installed_version}) '
-                           f'was not tested, supported version {supported_versions_sign}'
+                click.echo(f'Warning: the installed version of {dependency_name} ({installed_version})'
+                           f' is not supported, supported version {supported_versions_sign}'
                            f' {dependency_spec.expected_version}')
         except FileNotFoundError:
             error_msg = f'{dependency_name} is not installed.'
