@@ -33,7 +33,7 @@ const getTensorBoardServiceUrl = function (namespace) {
   return process.env.NODE_ENV === 'dev' ? devUrl : prodUrl;
 };
 
-module.exports.createTensorBoardInstance = function (token, experimentName) {
+module.exports.createTensorBoardInstance = function (token, experiments) {
   return Q.Promise(function (resolve, reject) {
     authApi.decodeToken(token)
       .then(function (decoded) {
@@ -42,7 +42,7 @@ module.exports.createTensorBoardInstance = function (token, experimentName) {
         const options = {
           url: url,
           body: {
-            runNames: experimentName
+            runNames: experiments
           },
           json: true,
           method: 'POST'

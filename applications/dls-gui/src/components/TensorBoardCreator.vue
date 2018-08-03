@@ -63,6 +63,15 @@ export default {
       .then((tb) => {
         const instanceUrl = tb.data.url;
         const instanceId = tb.data.id;
+        const invalidRuns = tb.data.invalidRuns;
+        if (!instanceUrl || !instanceId) {
+          this.$store.dispatch('showError', {type: RESPONSE_TYPES.WARNING, content: RESPONSE_MESSAGES.WARNING.TB_NOT_CREATED});
+          this.$router.push('/');
+          return;
+        }
+        if (invalidRuns) {
+          this.$store.dispatch('showError', {type: RESPONSE_TYPES.WARNING, content: RESPONSE_MESSAGES.WARNING.TB_INVALID_RUNS});
+        }
         this2.timerId = setInterval(() => {
           this2.check(instanceId)
             .then(() => {

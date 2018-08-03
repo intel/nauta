@@ -23,5 +23,9 @@ export default {
   SUCCESS: {},
   ERROR: {
     INTERNAL_SERVER_ERROR: 'Internal server error. Contact with administrator'
+  },
+  WARNING: {
+    TB_INVALID_RUNS: 'Some of requested experiments cannot be visible in Tensorboard due to no output data provided.',
+    TB_NOT_CREATED: 'Cannot create Tensorboard instance for requested experiments.'
   }
 }
