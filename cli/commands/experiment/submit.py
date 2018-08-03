@@ -84,7 +84,7 @@ def validate_script_folder_location(script_folder_location: str):
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=HELP_PS)
-@click.argument("script_parameters", nargs=-1)
+@click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]')
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
