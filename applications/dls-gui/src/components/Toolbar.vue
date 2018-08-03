@@ -46,6 +46,13 @@
         <v-list-tile>
           <v-list-tile-title>RELEASE NOTES</v-list-tile-title>
         </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-title>
+            <a :href="licenseDoc" target="_blank">
+              LICENSE
+            </a>
+          </v-list-tile-title>
+        </v-list-tile>
       </v-list>
     </v-menu>
     <v-menu v-if="userboxParams.visible" bottom offset-y>
@@ -64,6 +71,7 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex';
+import LicenseDoc from '../assets/dls-evaluation-license.pdf';
 
 export default {
   name: 'Toolbar',
@@ -71,6 +79,11 @@ export default {
     ...mapActions(['toggleMenu', 'handleLogOut']),
     onSingOutBtnClick: function () {
       this.handleLogOut('/signed_out');
+    }
+  },
+  data () {
+    return {
+      licenseDoc: LicenseDoc
     }
   },
   computed: {
@@ -98,6 +111,10 @@ export default {
 }
 .transparent {
   background-color: rgba(0, 113, 197, 0.12) !important;
+}
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 </style>
