@@ -48,6 +48,7 @@ endif
 
 	@cp -Rf draft/packs/* dist/dls_ctl_config/.draft/packs/
 	@cp -Rf ../dls4e-user dist/dls_ctl_config/
+	@cp -f license.txt dist/
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ commands/ main.py
