@@ -81,14 +81,14 @@ def delete(state: State, username: str, purge: bool):
     try:
         delete_user(username)
 
-        purge_error_message = "Some artifacts belonging to a user weren't removed."
-        try:
-            # failure during purging a user doesn't mean that user wasn't deleted
-            if purge and not purge_user(username):
+        if purge:
+            purge_error_message = "Some artifacts belonging to a user weren't removed."
+            try:
+                # failure during purging a user doesn't mean that user wasn't deleted
+                purge_user(username)
+            except Exception:
+                log.exception(purge_error_message)
                 click.echo(purge_error_message)
-        except Exception:
-            log.exception("Problems during purging a user")
-            click.echo(purge_error_message)
 
         # CAN-616 - wait until user has been really deleted
         for i in range(30):

@@ -136,7 +136,7 @@ def test_deleteuser_purge_success(mocker):
 def test_deleteuser_purge_failure(mocker):
     cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
-    prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=False)
+    prg_mock = mocker.patch("commands.user.delete.purge_user", side_effect=RuntimeError)
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
 
     mocker.patch("click.confirm", return_value=True)
