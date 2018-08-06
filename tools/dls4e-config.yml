@@ -27,10 +27,6 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos"
     push: True
-  dls4e/etcd:
-    version: "3.1.10"
-    image: "gcr.io/google-containers/etcd-amd64:3.1.10"
-    method: "pull"
   dls4e/kubectl:
     version: "1.10.3"
     required:
@@ -65,6 +61,13 @@ local_images:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
+  dls4e/etcd:
+    version: "3.3.9"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/etcd"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/etcd"
   dls4e/tiller:
     version: "v2.9.1"
     image: "gcr.io/kubernetes-helm/tiller:v2.9.1"

@@ -46,9 +46,12 @@ local_images:
     image: "gcr.io/google-containers/k8s-dns-sidecar-amd64:1.14.8"
     method: "pull"
   core/etcd:
-    version: "3.1.10"
-    image: "gcr.io/google-containers/etcd-amd64:3.1.10"
-    method: "pull"
+    version: "3.3.9"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/etcd"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/etcd"
   core/nfs-provisioner:
     version: "v1.0.8"
     image: "quay.io/kubernetes_incubator/nfs-provisioner:v1.0.8"

@@ -37,17 +37,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build"
     push: False
-  shared/centos/build/gcc/7.2.0:
-    version: "7.2.0"
-    required:
-      BASE_IMAGE: "shared/centos/build"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/centos/build-gcc-7.2.0"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/gcc/gcc-7.2.0.tar.gz
-        dest: gcc-7.2.0.tar.gz
-        checksum: 0153a003d3b433459336a91610cca2995ee0fb3d71131bd72555f2231a6efcfc
   shared/centos/python27:
     version: "2.7"
     required:
@@ -241,6 +230,16 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/cni-plugins/v0.7.1.tar.gz
         dest: cni-plugins.tar.gz
         checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
+  shared/build/etcd:
+    version: "3.3.9"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/etcd"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/etcd/v3.3.9.tar.gz
+        dest: etcd-v3.3.9.tar.gz
+        checksum: 96639d35772108004da53e568489ce7572171d39ee507245848cc42fbd3a3032
   shared/build/consul:
     version: "v1.1.0"
     required:
