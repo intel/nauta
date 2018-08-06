@@ -34,6 +34,8 @@ RUN_VERSION = 'v1'
 MAX_RETRIES_COUNT = 3
 
 logger = logging.getLogger()
+config.load_incluster_config()
+api = client.CustomObjectsApi(client.ApiClient())
 
 
 def publish(metrics):
@@ -56,9 +58,6 @@ def publish(metrics):
         }
     }
 
-    config.load_incluster_config()
-    api = client.CustomObjectsApi(client.ApiClient())
-
     for i in range(MAX_RETRIES_COUNT):
         try:
             raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace,
@@ -70,4 +69,4 @@ def publish(metrics):
                 logger.exception("Exception during storing metrics.")
                 raise e
             else:
-                logger.error("Exception during storing metrics. Retrying...")
+                logger.error("Exception during storing metrics. Retrying {} of {}...".format(i+1, MAX_RETRIES_COUNT), e)
