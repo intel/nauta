@@ -48,7 +48,7 @@
             <v-layout row wrap>
               <v-flex xs12>
                 <div id="options" class="scroll-y">
-                  <div v-for="header in switchableColumns" v-bind:key="header" class="option">
+                  <div v-for="header in customizableVisibilityColumns" v-bind:key="header" class="option">
                     <v-icon :id="header + '_on'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'success'" v-on:click="showColumn(header)">done</v-icon>
                     <v-tooltip bottom class="label-box">
                       <span slot="activator" v-on:click="showColumn(header)">
@@ -64,10 +64,10 @@
                 <v-btn id="revert" block dark small v-on:click="revertToDefault()">REVERT TO DEFAULT</v-btn>
               </v-flex>
               <v-flex md6 xs12>
-                <v-btn color="intel_primary" block dark small v-on:click="discardHiddenHeaders()">CANCEL</v-btn>
+                <v-btn color="intel_primary" block dark small v-on:click="discardVisibleHeaders()">CANCEL</v-btn>
               </v-flex>
               <v-flex md6 xs12>
-                <v-btn color="intel_primary" block dark small v-on:click="applyHiddenHeaders()">SAVE</v-btn>
+                <v-btn color="intel_primary" block dark small v-on:click="applyVisibleHeaders()">SAVE</v-btn>
               </v-flex>
             </v-layout>
           </v-container>
@@ -83,7 +83,7 @@ import LABELS from '../../utils/header-titles';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'clearFilterHandler', 'setHiddenColumnsHandler', 'hiddenColumns', 'alwaysVisibleColumns', 'headers',
+  props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns', 'customizableVisibilityColumns',
     'onLaunchTensorHandler', 'launchTensorDisabled', 'onDiscardTensorHandler', 'disabled'],
   data: () => {
     return {
@@ -92,28 +92,16 @@ export default {
     }
   },
   watch: {
-    hiddenColumns: function () {
-      this.draft = [].concat(this.hiddenColumns)
+    selectedByUserColumns: function () {
+      this.draft = [].concat(this.selectedByUserColumns)
     }
   },
   computed: {
     ...mapGetters({
       tensorModeViewState: 'tensorMode'
-    }),
-    switchableColumns: function () {
-      const options = this.headers.filter((header) => {
-        return !this.alwaysVisibleColumns.includes(header);
-      });
-      return Array.from(new Set(this.draft.concat(options))).reverse();
-    },
-    initialHiddenHeaders: function () {
-      return this.headers.filter((header) => {
-        return !this.alwaysVisibleColumns.includes(header);
-      });
-    }
-  },
+    })},
   created: function () {
-    this.setHiddenColumnsHandler(this.initialHiddenHeaders)
+    this.setVisibleColumnsHandler(this.selectedByUserColumns)
   },
   methods: {
     getLabel: function (header) {
@@ -123,26 +111,27 @@ export default {
       return str.length > limit ? `${str.substr(0, limit)}...` : str;
     },
     revertToDefault: function () {
-      this.setHiddenColumnsHandler(this.initialHiddenHeaders);
+      this.draft = [];
+      this.setVisibleColumnsHandler([]);
       this.showColumnMgmtModal = false;
     },
-    hideColumn: function (name) {
+    showColumn: function (name) {
       this.draft.push(name);
     },
-    showColumn: function (name) {
+    hideColumn: function (name) {
       this.draft = this.draft.filter((column) => {
         return column !== name;
       });
     },
     isHidden: function (name) {
-      return this.draft.includes(name);
+      return !this.draft.includes(name);
     },
-    applyHiddenHeaders: function () {
-      this.setHiddenColumnsHandler(this.draft);
+    applyVisibleHeaders: function () {
+      this.setVisibleColumnsHandler(this.draft);
       this.showColumnMgmtModal = false;
     },
-    discardHiddenHeaders: function () {
-      this.draft = [].concat(this.hiddenColumns);
+    discardVisibleHeaders: function () {
+      this.draft = [].concat(this.selectedByUserColumns);
       this.showColumnMgmtModal = false;
     }
   }

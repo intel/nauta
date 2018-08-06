@@ -34,13 +34,12 @@
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
               :clearSort="clearSort"
               :clearFilterHandler="clearFilter"
-              :hiddenColumns="hiddenColumns"
-              :alwaysVisibleColumns="alwaysVisibleColumns"
-              :setHiddenColumnsHandler="setHiddenColumns"
+              :selectedByUserColumns="selectedByUserColumns"
+              :customizableVisibilityColumns="customizableVisibilityColumns"
+              :setVisibleColumnsHandler="setVisibleColumns"
               :onLaunchTensorHandler="onLaunchTensorboardClick"
               :launchTensorDisabled="!tensorBtnAvailable"
               :onDiscardTensorHandler="discardTensorboard"
-              :headers="experimentsParams"
             ></ActionHeaderButtons>
             <v-flex xs12 md3 v-if="!tensorMode && (experimentsTotal !== 0 || searchPattern)">
               <v-card-title>
@@ -184,7 +183,7 @@ export default {
     return {
       filterIcon: 'filter_list',
       searchPattern: '',
-      hiddenColumns: [],
+      selectedByUserColumns: [],
       alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name', 'state'],
       filterableByValColumns: ['name', 'namespace', 'state'],
       filterByValModals: {
@@ -256,12 +255,19 @@ export default {
     paginationStats: function () {
       return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
     },
-    visibleColumns: function () {
+    currentlyVisibleColumns: function () {
       return this.experimentsParams.filter((header) => {
-        if (!this.hiddenColumns.includes(header)) {
+        if (this.alwaysVisibleColumns.includes(header) || this.selectedByUserColumns.includes(header)) {
           return header;
         }
       });
+    },
+    customizableVisibilityColumns: function () {
+      return this.experimentsParams.filter((header) => {
+        if (!this.alwaysVisibleColumns.includes(header)) {
+          return header;
+        }
+      }).sort();
     },
     refreshTableDataTriggers: function () {
       return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
@@ -271,7 +277,7 @@ export default {
       return !this.tensorMode || (this.tensorMode && this.selected.length > 0);
     },
     columnsCount: function () {
-      return this.visibleColumns.length > 8 ? 8 : this.visibleColumns.length;
+      return this.currentlyVisibleColumns.length > 8 ? 8 : this.currentlyVisibleColumns.length;
     }
   },
   watch: {
@@ -323,13 +329,13 @@ export default {
       this.pagination.currentPage--;
     },
     isVisibleColumn (column) {
-      return this.visibleColumns.includes(column);
+      return this.currentlyVisibleColumns.includes(column);
     },
     isFilterableByValColumn (column) {
       return this.filterableByValColumns.includes(column);
     },
-    setHiddenColumns (columns) {
-      this.hiddenColumns = columns;
+    setVisibleColumns (columns) {
+      this.selectedByUserColumns = this.alwaysVisibleColumns.concat(columns);
     },
     onLaunchTensorboardClick () {
       if (this.tensorMode) {

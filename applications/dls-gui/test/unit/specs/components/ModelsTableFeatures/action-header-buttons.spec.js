@@ -41,10 +41,9 @@ describe('VUE components ActionHeaderButtons', () => {
     });
     props = {
       clearSort: sinon.spy(),
-      setHiddenColumnsHandler: sinon.spy(),
-      hiddenColumns: [],
-      alwaysVisibleColumns: ['name'],
-      headers: [],
+      setVisibleColumnsHandler: sinon.spy(),
+      selectedByUserColumns: [],
+      customizableVisibilityColumns: ['test_01'],
       onLaunchTensorHandler: sinon.spy(),
       onDiscardTensorHandler: sinon.spy(),
       disabled: false
@@ -61,45 +60,45 @@ describe('VUE components ActionHeaderButtons', () => {
     expect(wrapper.html().includes('buttons_block')).to.equal(true);
   });
 
-  it('Should call setHiddenColumnsHandler on revert click', function () {
+  it('Should call setVisibleColumnsHandler on revert click', function () {
     wrapper.vm.showColumnMgmtModal = true;
     wrapper.vm.revertToDefault();
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
-    expect(props.setHiddenColumnsHandler.calledTwice).to.equal(true);
-    expect(props.setHiddenColumnsHandler.calledWith(wrapper.vm.initialHiddenHeaders)).to.equal(true);
+    expect(props.setVisibleColumnsHandler.calledTwice).to.equal(true);
+    expect(props.setVisibleColumnsHandler.calledWith([])).to.equal(true);
   });
 
-  it('Should call setHiddenColumnsHandler on apply hidden headers action', function () {
+  it('Should call setVisibleColumnsHandler on apply visible headers action', function () {
     wrapper.vm.showColumnMgmtModal = true;
-    wrapper.vm.applyHiddenHeaders();
+    wrapper.vm.applyVisibleHeaders();
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
-    expect(props.setHiddenColumnsHandler.calledTwice).to.equal(true);
-    expect(props.setHiddenColumnsHandler.calledWith(wrapper.vm.draft)).to.equal(true);
+    expect(props.setVisibleColumnsHandler.calledTwice).to.equal(true);
+    expect(props.setVisibleColumnsHandler.calledWith(wrapper.vm.draft)).to.equal(true);
   });
 
-  it('Should prepare draft on hiddenColumns update', function () {
+  it('Should prepare draft on selectedByUserColumns update', function () {
     props.headers = ['header1'];
     wrapper = shallowMount(ActionHeaderButtons, {propsData: props, router, localVue, store});
-    wrapper.setProps({hiddenColumns: ['header1']});
-    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.hiddenColumns);
+    wrapper.setProps({selectedByUserColumns: ['header1']});
+    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.selectedByUserColumns);
   });
 
-  it('Should add to draft if hidden', function () {
-    wrapper.vm.hideColumn('test');
+  it('Should add to draft if visible', function () {
+    wrapper.vm.showColumn('test');
     expect(wrapper.vm.draft.includes('test')).to.equal(true);
   });
 
-  it('Should remove from draft if visible', function () {
+  it('Should remove from draft if hidden', function () {
     wrapper.vm.draft = ['test'];
-    wrapper.vm.showColumn('test');
+    wrapper.vm.hideColumn('test');
     expect(wrapper.vm.draft.includes('test')).to.equal(false);
   });
 
   it('Should clear draft if cancel button clicked', function () {
     wrapper.vm.draft = ['test'];
     wrapper.vm.showColumnMgmtModal = true;
-    wrapper.vm.discardHiddenHeaders();
-    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.hiddenColumns);
+    wrapper.vm.discardVisibleHeaders();
+    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.selectedByUserColumns);
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
   });
 });

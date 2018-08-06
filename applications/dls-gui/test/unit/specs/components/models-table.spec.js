@@ -113,14 +113,20 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
   });
 
-  it('Should return visible columns (default)', function () {
-    expect(wrapper.vm.visibleColumns).to.deep.equal(state.experiments.params);
+  it('Should return customizable visible columns without permament columns', function () {
+    wrapper.vm.$store.state.experiments.params = ['name', 'param1'];
+    expect(wrapper.vm.customizableVisibilityColumns.includes('param1')).to.equal(true);
+    expect(wrapper.vm.customizableVisibilityColumns.includes('name')).to.equal(false);
   });
 
-  it('Should return visible columns (one hidden)', function () {
-    wrapper.vm.hiddenColumns = ['param1'];
-    expect(wrapper.vm.visibleColumns).to.not.deep.equal(state.experiments.params);
-    expect(wrapper.vm.visibleColumns.indexOf('param1')).to.equal(-1);
+  it('Should return visible columns (default)', function () {
+    expect(wrapper.vm.currentlyVisibleColumns).to.deep.equal([]);
+  });
+
+  it('Should return visible columns (one visible)', function () {
+    wrapper.vm.selectedByUserColumns = ['param1'];
+    expect(wrapper.vm.currentlyVisibleColumns).to.not.deep.equal(state.experiments.params);
+    expect(wrapper.vm.currentlyVisibleColumns.includes('param1')).to.equal(true);
   });
 
   it('Should get data if search pattern provided', function () {
@@ -203,10 +209,11 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.pagination.currentPage).to.equal(currentPage + 1);
   });
 
-  it('Should set hidden columns', function () {
-    const hiddenColumns = [1, 2, 3];
-    wrapper.vm.setHiddenColumns(hiddenColumns);
-    expect(wrapper.vm.hiddenColumns).to.deep.equal(hiddenColumns);
+  it('Should set visible columns', function () {
+    const visibleColumns = [1, 2, 3];
+    const expectedVisibleColumns = [].concat(wrapper.vm.alwaysVisibleColumns, visibleColumns);
+    wrapper.vm.setVisibleColumns(visibleColumns);
+    expect(wrapper.vm.selectedByUserColumns).to.deep.equal(expectedVisibleColumns);
   });
 
   it('Should call enableTensorMode on launch btn first click', function () {
@@ -310,18 +317,18 @@ describe('VUE components ModelsTable', () => {
     expect(label).to.equal(expectedHeaderKey);
   });
 
-  it('Should return true if column is visible', function () {
+  it('Should return false if column is invisible', function () {
     const columnName = 'param3';
     wrapper.vm.hiddenColumns = [];
     const result = wrapper.vm.isVisibleColumn(columnName);
-    expect(result).to.equal(true);
+    expect(result).to.equal(false);
   });
 
-  it('Should return false if column is invisible', function () {
+  it('Should return true if column is visible', function () {
     const columnName = 'param3';
-    wrapper.vm.hiddenColumns = [columnName];
+    wrapper.vm.selectedByUserColumns = [columnName];
     const result = wrapper.vm.isVisibleColumn(columnName);
-    expect(result).to.equal(false);
+    expect(result).to.equal(true);
   });
 
   it('Should return true if column is filterable by value', function () {
