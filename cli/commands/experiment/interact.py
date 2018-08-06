@@ -59,10 +59,11 @@ log = initialize_logger(__name__)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
 @click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
                                                 'only proxy tunnel is created')
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_PO)
+@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=HELP_PO)
 @common_options()
 @pass_state
-def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool, port: int):
+def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
+             port_number: int):
     """
     Starts an interactive session with Jupyter Notebook.
     """
@@ -140,11 +141,15 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     url_end = ""
     if filename:
         # only Jupyter notebooks are opened directly, other files are opened in edit mode
-        if ".ipynb" in filename:
-            url_end = "/notebooks/"
+        if not jupyter_experiment:
+            if ".ipynb" in filename:
+                url_end = "/notebooks/"
+            else:
+                url_end = "/edit/"
+            url_end = url_end + Path(filename).name
         else:
-            url_end = "/edit/"
-        url_end = url_end + Path(filename).name
+            click.echo("Attaching script to existing Jupyter notebook's session is not supported. "
+                       "Please create a new Jupyter notebook's session to attach script.")
 
     # wait until all jupyter pods are ready
     for i in range(JUPYTER_CHECK_POD_READY_TRIES):
@@ -161,7 +166,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
 
     try:
         launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
-                   number_of_retries=number_of_retries, url_end=url_end, port=port)
+                   number_of_retries=number_of_retries, url_end=url_end, port=port_number)
     except LaunchError as exe:
         log.exception(exe.message)
         click.echo(exe.message)
