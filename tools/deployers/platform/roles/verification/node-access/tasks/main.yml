@@ -11,7 +11,7 @@
   register: node_access
   ignore_errors: True
 
-- name: Fail if node is not accessible
+- name: Fail if node is not accessible or system is not supported
   fail:
     msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - {{ node_access.msg }}"
   when: node_access is failed
