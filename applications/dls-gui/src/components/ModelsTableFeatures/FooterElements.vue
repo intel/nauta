@@ -26,8 +26,8 @@
       {{ lastUpdateLabel }}
     </div>
     <v-spacer></v-spacer>
+    Rows per page:
     <div class="datatable__actions__select">
-      Rows per page:
       <v-select
         :items="itemsPerPageOptions"
         v-model="chosenCount"
@@ -71,5 +71,8 @@ export default {
 <style scoped>
 .refreshStat {
   margin-left: 25px;
+}
+.datatable__actions__select {
+  margin-top: 18px;
 }
 </style>
