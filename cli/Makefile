@@ -42,7 +42,7 @@ ifeq ($(OS), $(filter $(OS),Linux Darwin))
 endif
 
 clean:
-	@rm -rf __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip
+	@rm -rf __pycache__ .cache build dist *.spec charts Dockerfile .draftignore *.toml .pytest_cache dlsctl-*.tar.gz dlsctl-*.zip experiment_metrics/dist
 
 full_clean: clean
 	@rm -rf $(VIRTUALENV_DIR)

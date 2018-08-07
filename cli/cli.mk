@@ -20,7 +20,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-build: update-venv set-version
+build: update-venv set-version metrics-lib
 	@. $(ACTIVATE); pip install pyinstaller;
 
 ifeq (Windows,$(OS))
@@ -48,9 +48,12 @@ endif
 
 	@cp -Rf draft/packs/* dist/dls_ctl_config/.draft/packs/
 	@cp -Rf ../dls4e-user dist/dls_ctl_config/
-	@mkdir -p dist/lib/experiment_metrics
-	@cp -Rf experiment_metrics/ dist/lib/experiment_metrics
+	@mkdir -p dist/lib/
+	@mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	@cp -f license.txt dist/
+
+metrics-lib:
+	@cd experiment_metrics && python setup.py sdist
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ commands/ main.py
