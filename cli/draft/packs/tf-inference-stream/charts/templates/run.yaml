@@ -3,6 +3,7 @@ kind: Run
 metadata:
   name: {{ .Release.Name }}
   labels:
+    runKind: {{ .Values.runKind }}
     modelName: {{ .Values.modelName }}
 spec:
   experiment-name: {{ .Values.experimentName }}

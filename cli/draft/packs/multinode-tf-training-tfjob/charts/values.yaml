@@ -38,6 +38,8 @@ sidecar_resources:
 
 experimentName: ''
 
+runKind: "training"
+
 workersCount: 3
 
 pServersCount: 1

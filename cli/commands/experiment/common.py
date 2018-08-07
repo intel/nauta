@@ -23,6 +23,7 @@ import os
 import shutil
 import itertools
 import sys
+from enum import Enum
 
 import click
 from typing import Tuple, List
@@ -51,6 +52,7 @@ from util.jupyter_notebook_creator import convert_py_to_ipynb
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
 RUN_NAME = "Experiment"
+RUN_INFERENCE_NAME = "Inference instance"
 RUN_STATUS = "State"
 RUN_MESSAGE = "Message"
 RUN_PARAMETERS = "Parameters"
@@ -62,6 +64,13 @@ RUN_TEMPLATE_NAME = "Template name"
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
 
 log = initialize_logger('commands.common')
+
+
+class RunKinds(Enum):
+    """ This enum contains all allowed run kinds which are used to filter runs in "list" commands. """
+    TRAINING = "training"
+    JUPYTER = "jupyter"
+    INFERENCE = "inference"
 
 
 def get_run_environment_path(run_name: str) -> str:

@@ -20,7 +20,7 @@
 #
 
 from enum import Enum
-from typing import Pattern
+from typing import Pattern, List
 
 from platform_resources.run_model import RunStatus
 
@@ -66,3 +66,8 @@ def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
 
 def filter_by_experiment_name(resource_object_dict: dict, exp_name: str = None):
     return resource_object_dict['spec']['experiment-name'] == exp_name if exp_name else True
+
+
+def filter_by_run_kinds(resource_object_dict: dict, run_kinds: List[Enum] = None):
+    return any([resource_object_dict['metadata']['labels']['runKind'] == run_kind.value for run_kind in run_kinds]) \
+        if run_kinds else True

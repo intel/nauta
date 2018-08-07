@@ -23,6 +23,7 @@ from functools import partial
 import re
 import sre_constants
 from typing import Dict, List, Optional
+from enum import Enum
 
 from kubernetes import config, client
 from kubernetes.client.rest import ApiException
@@ -30,7 +31,7 @@ from kubernetes.client.rest import ApiException
 from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.run_model import Run, RunStatus, RunKubernetesSchema
 from platform_resources.resource_filters import filter_by_name_regex, filter_run_by_excl_state, \
-    filter_by_experiment_name, filter_run_by_state
+    filter_by_experiment_name, filter_run_by_state, filter_by_run_kinds
 from util.logger import initialize_logger
 from util.exceptions import InvalidRegularExpressionError
 
@@ -71,7 +72,7 @@ def get_run(name: str, namespace: str = None) -> Optional[Run]:
 
 
 def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None, exp_name_filter: str = None,
-              excl_state: RunStatus = None) -> List[Run]:
+              excl_state: RunStatus = None, run_kinds_filter: List[Enum] = None) -> List[Run]:
     """
     Return list of experiment runs.
     :param namespace: If provided, only runs from this namespace will be returned
@@ -79,6 +80,8 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     :param name_filter: If provided, only runs matching name_filter regular expression will be returned
     :param exp_name_filter: If provided, list of runs is filtered by experiment name
     :param excl_state: If provided, only runs with a state other than given will be returned
+    :param run_kinds_filter: If provided, only runs with a kind that matches to any of the run kinds from given
+        filtering list will be returned
     :return: List of Run objects
     In case of problems during getting a list of runs - throws an error
     """
@@ -101,7 +104,8 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False),
                    partial(filter_run_by_state, state=state),
                    partial(filter_run_by_excl_state, state=excl_state),
-                   partial(filter_by_experiment_name, exp_name=exp_name_filter)]
+                   partial(filter_by_experiment_name, exp_name=exp_name_filter),
+                   partial(filter_by_run_kinds, run_kinds=run_kinds_filter)]
 
     runs = [Run.from_k8s_response_dict(run_dict)
             for run_dict in raw_runs['items']

@@ -27,3 +27,5 @@ resources:
 
 
 experimentName: ''
+
+runKind: "training"

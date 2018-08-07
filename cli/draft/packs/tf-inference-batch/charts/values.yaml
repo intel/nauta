@@ -19,3 +19,5 @@ resources:
     memory: 1Gi
 
 experimentName: ''
+
+runKind: "inference"

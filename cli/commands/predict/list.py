@@ -21,25 +21,22 @@
 
 import click
 
-from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
+from commands.experiment.common import RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
     RUN_STATUS, RUN_TEMPLATE_NAME, RunKinds
 from commands.common import list_runs_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
-from util.logger import initialize_logger
 
 
-logger = initialize_logger(__name__)
+LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
 
-LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
+HELP_A = 'Show all inference instances, regardless of the owner.'
+HELP_N = 'A regular expression to narrow down list to inference instances that match this expression.'
+HELP_S = 'List inference instances with matching status.'
 
-HELP_A = 'Show all experiments, regardless of the owner.'
-HELP_N = 'A regular expression to narrow down list to experiments that match this expression.'
-HELP_S = 'List experiments with matching status.'
-
-EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS,
-                            RUN_TEMPLATE_NAME]
+INFERENCE_INSTANCES_LIST_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER,
+                                    RUN_STATUS, RUN_TEMPLATE_NAME]
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
@@ -48,6 +45,6 @@ EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSIO
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=HELP_S)
 @common_options()
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: RunStatus):
-    """ List experiments. """
-    list_runs_in_cli(all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS, with_metrics=True)
+def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus):
+    """ List inference instances. """
+    list_runs_in_cli(all_users, name, status, LISTED_RUNS_KINDS, INFERENCE_INSTANCES_LIST_HEADERS, with_metrics=False)

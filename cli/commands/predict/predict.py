@@ -21,7 +21,7 @@
 
 import click
 
-from commands.predict import cancel, launch, stream
+from commands.predict import launch, list, cancel, stream
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
 
@@ -40,4 +40,5 @@ def predict():
 
 predict.add_command(cancel.cancel)
 predict.add_command(launch.launch)
+predict.add_command(list.list_inference_instances)
 predict.add_command(stream.stream)

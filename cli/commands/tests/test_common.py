@@ -19,9 +19,7 @@
 # and approved by Intel in writing.
 #
 
-from click.testing import CliRunner
-
-from commands.experiment import list
+from commands import common
 from platform_resources.run_model import Run, RunStatus
 from platform_resources.experiment_model import Experiment
 
@@ -62,43 +60,44 @@ TEST_RUN = Run(name="test-experiment", experiment_name="test-experiment", metric
                submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
                template_name="template_name")
 
+TEST_LIST_HEADERS = ["Name", "Parameters", "Metrics", "Submission date", "Owner", "State", "Template name"]
+
 
 def test_list_experiments_success(mocker):
-    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
     api_list_runs_mock.return_value = TEST_RUNS
 
-    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
-    runner = CliRunner()
-    runner.invoke(list.list_experiments, [])
+    common.list_runs_in_cli(all_users=False, name="", status=None, listed_runs_kinds=[],
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 
 
 def test_list_experiments_all_users_success(mocker):
-    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
     api_list_runs_mock.return_value = TEST_RUNS
 
-    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
-    runner = CliRunner()
-    runner.invoke(list.list_experiments, ['--all-users'])
+    common.list_runs_in_cli(all_users=True, name="", status=None, listed_runs_kinds=[],
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 0
     assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 
 
 def test_list_experiments_failure(mocker):
-    api_list_runs_mock = mocker.patch("commands.experiment.list.runs_api.list_runs")
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
     api_list_runs_mock.side_effect = RuntimeError
 
-    get_namespace_mock = mocker.patch("commands.experiment.list.get_kubectl_current_context_namespace")
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
     sys_exit_mock = mocker.patch("sys.exit")
 
-    runner = CliRunner()
-
-    runner.invoke(list.list_experiments, [])
+    common.list_runs_in_cli(all_users=False, name="", status=None, listed_runs_kinds=[],
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs retrieval was not called"
@@ -106,14 +105,14 @@ def test_list_experiments_failure(mocker):
 
 
 def test_create_fake_run():
-    assert TEST_RUN == list.create_fake_run(TEST_EXPERIMENT)
+    assert TEST_RUN == common.create_fake_run(TEST_EXPERIMENT)
 
 
 def test_replace_initalizing_runs_no_changes():
-    assert len(list.replace_initalizing_runs(TEST_RUNS)) == 2
+    assert len(common.replace_initializing_runs(TEST_RUNS)) == 2
 
 
 def test_replace_initializing_runs_two_not_ready(mocker):
     get_experiment_mock = mocker.patch("platform_resources.experiments.get_experiment", return_value=TEST_EXPERIMENT)
-    assert len(list.replace_initalizing_runs(TEST_RUNS_CREATING)) == 5
+    assert len(common.replace_initializing_runs(TEST_RUNS_CREATING)) == 5
     assert get_experiment_mock.call_count == 2
