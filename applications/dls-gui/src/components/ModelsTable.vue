@@ -131,7 +131,7 @@
             </div>
             <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length !== 0">
               <v-alert :value="true" type="info">
-                Currently signed in user does not have any models. To display models that belong to other users, use filters for the <i>owner</i> column.
+                No data for currently applied filters.
               </v-alert>
             </div>
             <FooterElements v-if="filteredDataCount"
