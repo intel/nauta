@@ -21,10 +21,10 @@
 
 <template>
   <v-layout>
-    <v-flex xs6>
+    <v-flex xs3>
       <span class="keyname">{{ keyname }}:</span>
     </v-flex>
-    <v-flex xs6>
+    <v-flex xs9 class="values">
       <span>{{ value }}</span>
     </v-flex>
   </v-layout>
@@ -40,5 +40,8 @@ export default {
 <style scoped>
 .keyname {
   font-weight: bold;
+}
+.values {
+  margin-left: 20px;
 }
 </style>

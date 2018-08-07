@@ -21,10 +21,10 @@
 
 <template>
   <v-layout>
-    <v-flex xs6>
+    <v-flex xs3>
       <span class="keyname">{{ keyname }}:</span>
     </v-flex>
-    <v-flex xs6>
+    <v-flex xs9 class="values">
       <span><b>Pods --</b></span>
       <ol id="pods-list">
         <li v-bind:key="pod.name" v-for="pod in podsList">
@@ -59,5 +59,8 @@ export default {
 }
 .keyname {
   font-weight: bold;
+}
+.values {
+  margin-left: 20px;
 }
 </style>

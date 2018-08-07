@@ -110,10 +110,10 @@
                               <ExpResourcesDetail keyname="Resources" :podsList="experimentResources(item.attributes.name)"/>
                               <ExpKeyValDetail keyname="Training Submission Date" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
                             </v-flex>
-                            <v-flex xs1>
+                            <v-flex>
                               <div class="vertical-line"></div>
                             </v-flex>
-                            <v-flex xs5 wrap>
+                            <v-flex xs6 wrap>
                               <ExpKeyValDetail keyname="Parameters" :value="item.params.parameters"/>
                             </v-flex>
                           </v-layout>
@@ -461,10 +461,12 @@ th {
   text-align: left;
 }
 .exp-details {
-  margin: 40px 40px 40px 40px;
+  margin: 20px;
 }
 .vertical-line {
   border-left: 1px dashed rgba(0, 0, 0, 0.87);
   height: 100%;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 </style>
