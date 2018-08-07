@@ -60,9 +60,8 @@ def publish(metrics):
 
     for i in range(MAX_RETRIES_COUNT):
         try:
-            raw_run = api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace,
-                                                         body=body, plural=RUN_PLURAL, version=RUN_VERSION, name=name)
-            logger.info('Run patch response : {}'.format(raw_run))
+            api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body=body,
+                                               plural=RUN_PLURAL, version=RUN_VERSION, name=name)
             break
         except ApiException as e:
             if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
