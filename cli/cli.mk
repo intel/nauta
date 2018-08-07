@@ -48,6 +48,8 @@ endif
 
 	@cp -Rf draft/packs/* dist/dls_ctl_config/.draft/packs/
 	@cp -Rf ../dls4e-user dist/dls_ctl_config/
+	@mkdir -p dist/lib/experiment_metrics
+	@cp -Rf experiment_metrics/ dist/lib/experiment_metrics
 	@cp -f license.txt dist/
 
 style: $(DEV_VIRTUALENV_MARK)
