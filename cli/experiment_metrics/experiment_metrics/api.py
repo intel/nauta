@@ -33,9 +33,17 @@ RUN_VERSION = 'v1'
 
 MAX_RETRIES_COUNT = 3
 
-logger = logging.getLogger()
-config.load_incluster_config()
-api = client.CustomObjectsApi(client.ApiClient())
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+logger = logging.getLogger('metrics')
+logger.setLevel(logging.INFO)
+logger.addHandler(ch)
+
+run_k8s_name = os.getenv('RUN_NAME')
+
+if run_k8s_name:
+    config.load_incluster_config()
+    api = client.CustomObjectsApi(client.ApiClient())
 
 
 def publish(metrics):
@@ -44,12 +52,11 @@ def publish(metrics):
     :param metrics Dict[str,str] of a data to apply
     :return: in case of any problems during update it throws an exception
     """
-    name = os.getenv("RUN_NAME")
-    if not name:
+    if not run_k8s_name:
         logger.info('[no-persist mode] Metrics: {}'.format(metrics))
         return
 
-    with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace','r') as ns_file:
+    with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'r') as ns_file:
         namespace = ns_file.read()
 
     body = {
@@ -61,7 +68,7 @@ def publish(metrics):
     for i in range(MAX_RETRIES_COUNT):
         try:
             api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body=body,
-                                               plural=RUN_PLURAL, version=RUN_VERSION, name=name)
+                                               plural=RUN_PLURAL, version=RUN_VERSION, name=run_k8s_name)
             break
         except ApiException as e:
             if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
