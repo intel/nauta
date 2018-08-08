@@ -1,8 +1,6 @@
 ---
 
 verification_checks:
-  - message: "Can not find local_data_device under {{ local_data_device | default('') }} on host."
-    condition: "{{ local_data_device is defined and local_data_device not in ansible_devices }}"
   - message: "Param dns_search_domains should be provided as list"
     condition: "{{ dns_search_domains is defined and dns_search_domains is string }}"
   - message: "Param dns_search_domains should be provided as list"
@@ -38,4 +36,5 @@ verification_checks:
   - message: "Subnet for kubernetes_pod_subnet and kubernetes_svc_subnet can not be equal"
     condition: "{{ kubernetes_pod_subnet == kubernetes_svc_subnet }}"
 
-required_parameters: []
+required_parameters:
+  - local_data_path
