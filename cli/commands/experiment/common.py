@@ -38,6 +38,7 @@ import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
 from platform_resources.run_model import RunStatus
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
+from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
@@ -302,14 +303,22 @@ def submit_experiment(template: str, name: str,
                                            namespace, labels=labels)
 
             # submit runs
+            submitted_runs = []
             for run in runs_list:
                 try:
                     submit_draft_pack(run.folder, namespace)
                     run.status = RunStatus.QUEUED
+                    submitted_runs.append(run)
                 except Exception as exe:
                     delete_environment(run.folder)
                     run.status = RunStatus.FAILED
-                    run.message = exe
+                    run.error_message = exe
+
+            # Delete experiment if no Runs were submitted
+            if not submitted_runs:
+                click.echo("Experiment submission failed. Try verbose option for more detailed "
+                           "information about failure cause.")
+                delete_k8s_object("experiment", experiment_name)
 
     except LocalPortOccupiedError as exe:
         click.echo(exe.message)

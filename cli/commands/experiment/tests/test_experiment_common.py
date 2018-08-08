@@ -158,6 +158,8 @@ class SubmitExperimentMocks:
         self.config_mock = mocker.patch('commands.experiment.common.Config')
         self.config_mock.return_value.config_path = FAKE_CLI_CONFIG_DIR_PATH
 
+        self.delete_k8s_object_mock = mocker.patch('commands.experiment.common.delete_k8s_object')
+
 
 @pytest.fixture
 def prepare_mocks(mocker) -> SubmitExperimentMocks:
@@ -166,7 +168,7 @@ def prepare_mocks(mocker) -> SubmitExperimentMocks:
 
 def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
                   cmd_create_count=1, update_conf_count=1, k8s_proxy_count=1, add_exp_count=1, submit_one_count=1,
-                  del_env_count=0, socat_start_count=1):
+                  del_env_count=0, socat_start_count=1, delete_k8s_object_count=0):
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "current user namespace was not fetched"
     assert prepare_mocks.gen_exp_name.call_count == get_exp_name_count, "experiment name wasn't created"
     assert prepare_mocks.create_env.call_count == create_env_count, "environment wasn't created"
@@ -176,6 +178,7 @@ def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, g
     assert prepare_mocks.add_exp.call_count == add_exp_count, "experiment model was not created"
     assert prepare_mocks.submit_one.call_count == submit_one_count, "training wasn't deployed"
     assert prepare_mocks.del_env.call_count == del_env_count, "environment folder was deleted"
+    assert prepare_mocks.delete_k8s_object_mock.call_count == delete_k8s_object_count, "experiment was not deleted"
     if get_current_os() in (OS.WINDOWS, OS.MACOS):
         assert prepare_mocks.socat.start.call_count == socat_start_count, "socat wasn't started"
         if socat_start_count > 0:
@@ -232,7 +235,7 @@ def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
                                      script_parameters=[])
 
     assert runs_list[0].status == RunStatus.FAILED
-    check_asserts(prepare_mocks, del_env_count=1)
+    check_asserts(prepare_mocks, del_env_count=1, delete_k8s_object_count=1)
 
 
 def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, capsys, caplog):
