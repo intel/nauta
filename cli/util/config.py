@@ -122,11 +122,12 @@ class DLS4EConfigMap:
 
     __shared_state = {}
 
-    def __init__(self):
+    def __init__(self, config_map_request_timeout: int = None):
         self.__dict__ = self.__shared_state
         if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip') \
                 or not hasattr(self, 'image_tensorboard_service') or not hasattr(self, "platform.version"):
-            config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE)
+            config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE,
+                                                  request_timeout=config_map_request_timeout)
             self.image_tiller = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
                                                config_map_data[self.IMAGE_TILLER_FIELD])
             self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]

@@ -31,6 +31,9 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_
 
 logger = initialize_logger(__name__)
 
+# Timeout for dependency verification request in seconds. This request is repeated 3 times.
+VERIFY_REQUEST_TIMEOUT = 10
+
 
 class State:
     def __init__(self):
@@ -53,7 +56,8 @@ def verbosity_option(f):
 
 def verify_cli_dependencies():
     try:
-        namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
+        namespace = 'kube-system' if is_current_user_administrator(request_timeout=VERIFY_REQUEST_TIMEOUT) \
+            else get_kubectl_current_context_namespace()
         check_all_binary_dependencies(namespace=namespace)
     except InvalidDependencyError:
         error_msg = 'Dependency check failed. Run "dlsctl verify -vv" for more detailed information.'

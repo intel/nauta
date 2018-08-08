@@ -33,6 +33,9 @@ logger = initialize_logger(__name__)
 
 HELP = "Displays the version of the installed dlsctl application."
 
+# Timeout for version check request in seconds. This request is repeated 3 times.
+PLATFORM_VERSION_REQUEST_TIMEOUT = 10
+
 
 @click.command(short_help=HELP, cls=AliasCmd, alias='v')
 @common_options(verify_dependencies=False, verify_config_path=False)
@@ -40,20 +43,22 @@ def version():
     """
     Returns the version of the installed dlsctl application.
     """
-    platform_version = "UNKNOWN"
+    platform_version = "Failed to get platform version."
+    error_msg = ""
+    platform_version_fail = False
     try:
-        platform_version = DLS4EConfigMap().platform_version
+        platform_version = DLS4EConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
     except KubectlIntError:
-        error_msg = 'Failed to get platform version. This may occur for example due to invalid path to kubectl config' \
-                    ', invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environmental ' \
+        error_msg = 'Platform version check failure may occur for example due to invalid path to kubectl config, ' \
+                    'invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environment ' \
                     'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
                     'for more info.'
         logger.exception(error_msg)
-        click.echo(error_msg)
+        platform_version_fail = True
     except Exception:
         error_msg = 'Unexpected error occurred during platform version check. Use -v or -vv option for more info.'
         logger.exception(error_msg)
-        click.echo(error_msg)
+        platform_version_fail = True
 
     version_table = [["dlsctl application", VERSION],
                      ["dls4e platform", platform_version]]
@@ -61,3 +66,6 @@ def version():
     click.echo(tabulate(version_table,
                         headers=['Component', 'Version'],
                         tablefmt="orgtbl"))
+
+    if platform_version_fail:
+        click.echo(error_msg)

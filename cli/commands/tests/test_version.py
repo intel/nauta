@@ -71,10 +71,10 @@ def test_version_with_kubectl_exception(mocker):
     result = runner.invoke(version.version, [])
 
     assert f"dlsctl application | {VERSION}" in result.output
-    assert "dls4e platform     | UNKNOWN" in result.output
+    assert "dls4e platform     | Failed to get platform version." in result.output
 
-    assert 'Failed to get platform version. This may occur for example due to invalid path to kubectl config' \
-        ', invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environmental ' \
+    assert 'Platform version check failure may occur for example due to invalid path to kubectl config, ' \
+        'invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environment ' \
         'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
         'for more info.' \
         in result.output
@@ -87,7 +87,7 @@ def test_version_with_unknown_exception(mocker):
     result = runner.invoke(version.version, [])
 
     assert f"dlsctl application | {VERSION}" in result.output
-    assert "dls4e platform     | UNKNOWN" in result.output
+    assert "dls4e platform     | Failed to get platform version." in result.output
 
     assert "Unexpected error occurred during platform version check. Use -v or -vv option for more info." \
         in result.output

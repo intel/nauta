@@ -33,10 +33,6 @@ from util.app_names import DLS4EAppNames
 logger = initialize_logger('util.kubectl')
 
 
-# Timeout in seconds used for requests made to k8s cluster by verify and version commands.
-K8S_REQUEST_TIMEOUT = 30
-
-
 class PodStatus(Enum):
     PENDING = 'PENDING'
     RUNNING = 'RUNNING'
@@ -83,7 +79,7 @@ def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())
 
 
-def check_pods_status(run_name: str, namespace: str, status: PodStatus, app_name: DLS4EAppNames=None) -> bool:
+def check_pods_status(run_name: str, namespace: str, status: PodStatus, app_name: DLS4EAppNames = None) -> bool:
     """
     Returns true if all pods related to a given run have given status.
     :param run_name: name of a run - obligatory
@@ -170,7 +166,7 @@ def find_namespace(namespace: str) -> NamespaceStatus:
     return NamespaceStatus.NOT_EXISTS
 
 
-def delete_namespace(namespace: str, propagate: bool=False):
+def delete_namespace(namespace: str, propagate: bool = False):
     """
     Removes a namespace with the given name
 
@@ -198,18 +194,19 @@ def delete_namespace(namespace: str, propagate: bool=False):
         raise KubectlIntError(error_description)
 
 
-def get_config_map_data(name: str, namespace: str) -> Dict[str, str]:
+def get_config_map_data(name: str, namespace: str, request_timeout: int = None) -> Dict[str, str]:
     """
     Returns a dictionary taken from data section of a config_map with a given name
     located in the given namespace.
     :param name: name of a config map
     :param namespace: name of a namespace
+    :param request_timeout: optional timeout for k8s request. Defaults inside k8s_api to 120 sec.
     :return: dictonary created based on data section of a config map. In case
     of any problems it raises an Exception
     """
     try:
         api = get_k8s_api()
-        ret_dict = api.read_namespaced_config_map(name, namespace, _request_timeout=K8S_REQUEST_TIMEOUT).data
+        ret_dict = api.read_namespaced_config_map(name, namespace, _request_timeout=request_timeout).data
     except Exception:
         error_description = f"Problem during accessing ConfigMap : {name}."
         logger.exception(error_description)
@@ -300,22 +297,23 @@ def get_users_samba_password(username: str) -> str:
     return str.strip(password)
 
 
-def get_cluster_roles() -> client.V1ClusterRoleList:
+def get_cluster_roles(request_timeout: int = None) -> client.V1ClusterRoleList:
     config.load_kube_config()
     api = client.RbacAuthorizationV1Api(client.ApiClient())
-    return api.list_cluster_role(_request_timeout=K8S_REQUEST_TIMEOUT)
+    return api.list_cluster_role(_request_timeout=request_timeout)
 
 
-def is_current_user_administrator() -> bool:
+def is_current_user_administrator(request_timeout: int = None) -> bool:
     """
     Function checks whether a current user is a k8s administrator
 
+    :param request_timeout: optional timeout for k8s request. Defaults to 120 sec inside k8s api.
     :return: True if a user is a k8s administrator, False otherwise
     In case of any errors - raises an exception
     """
     # regular users shouldn't have access to cluster roles
     try:
-        get_cluster_roles()
+        get_cluster_roles(request_timeout=request_timeout)
     except ApiException as exe:
         # 403 - forbidden
         if exe.status == 403:
