@@ -20,7 +20,7 @@
  */
 
 <template>
-  <v-navigation-drawer v-if="!tensorMode" app clipped fixed v-model="visible">
+  <v-navigation-drawer v-if="!tensorMode" app clipped fixed v-model="visible" ref="navelement">
     <v-list dense>
       <v-list-tile>
         <v-list-tile-action>
@@ -43,26 +43,28 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex';
+import {mapGetters, mapActions, mapMutations} from 'vuex';
 
 export default {
   name: 'Navigation',
   computed: {
     ...mapGetters({
       tensorMode: 'tensorMode',
-      username: 'username'
+      username: 'username',
+      menuVisibility: 'menuVisibility'
     }),
     visible: {
       get () {
-        return this.$store.state.app.menu.visible;
+        return this.menuVisibility;
       },
       set (value) {
-        this.$store.commit('setMenuVisibility', value);
+        this.setMenuVisibility(value);
       }
     }
   },
   methods: {
     ...mapActions(['logIntoK8SDashboard']),
+    ...mapMutations(['setMenuVisibility']),
     goToK8sDashboard () {
       this.logIntoK8SDashboard()
         .then(() => {
@@ -70,7 +72,20 @@ export default {
           const k8sDashboardUrl = `${hostname}/dashboard/#!/overview?namespace=${this.username}`;
           window.open(k8sDashboardUrl, '_blank');
         });
+    },
+    documentClick (e) {
+      const navElement = this.$refs.navelement.$vnode.elm;
+      const targetElement = e.target;
+      if (navElement !== targetElement) {
+        this.setMenuVisibility(false);
+      }
     }
+  },
+  created () {
+    document.addEventListener('click', this.documentClick);
+  },
+  destroyed () {
+    document.removeEventListener('click', this.documentClick);
   }
 }
 </script>

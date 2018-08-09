@@ -24,7 +24,7 @@ const DEFAULT_BANNER_TYPE = RESPONSE_TYPES.WARNING;
 
 const state = {
   menu: {
-    visible: true,
+    visible: false,
     btnVisible: false
   },
   userbox: {
@@ -41,7 +41,8 @@ const state = {
 
 export const getters = {
   tensorMode: state => state.tensorMode,
-  getMenuParams: state => state.menu,
+  menuVisibility: state => state.menu.visible,
+  menuBtnVisibility: state => state.menu.btnVisible,
   getUserboxParams: state => state.userbox,
   errorType: state => state.error.type,
   errorTime: state => state.error.time,

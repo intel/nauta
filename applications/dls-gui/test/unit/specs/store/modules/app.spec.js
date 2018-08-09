@@ -46,9 +46,14 @@ describe('VUEX modules app', () => {
       expect(result).to.deep.equal(state.tensorMode);
     });
 
-    it('getMenuParams', () => {
-      const result = getters.getMenuParams(state);
-      expect(result).to.deep.equal(state.menu);
+    it('menuVisibility', () => {
+      const result = getters.menuVisibility(state);
+      expect(result).to.deep.equal(state.menu.visible);
+    });
+
+    it('menuBtnVisibility', () => {
+      const result = getters.menuBtnVisibility(state);
+      expect(result).to.deep.equal(state.menu.btnVisible);
     });
 
     it('getUserboxParams', () => {

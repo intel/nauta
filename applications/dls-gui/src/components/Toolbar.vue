@@ -21,7 +21,7 @@
 
 <template>
   <v-toolbar dark color="intel_primary" :class="{ transparent: tensorMode }" app fixed clipped-left height="110px">
-    <v-toolbar-side-icon v-if="menuParams.btnVisible" @click.stop="toggleMenu"></v-toolbar-side-icon>
+    <v-toolbar-side-icon v-if="menuBtnVisibility" @click.stop="toggleMenu"></v-toolbar-side-icon>
     <v-toolbar-title>
       <v-container grid-list-md>
         <v-layout row >
@@ -89,7 +89,7 @@ export default {
   computed: {
     ...mapGetters({
       username: 'username',
-      menuParams: 'getMenuParams',
+      menuBtnVisibility: 'menuBtnVisibility',
       userboxParams: 'getUserboxParams',
       tensorMode: 'tensorMode'
     })
