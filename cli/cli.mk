@@ -20,7 +20,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-build: update-venv set-version metrics-lib
+build: $(ACTIVATE) set-version metrics-lib
 	@. $(ACTIVATE); pip install pyinstaller;
 
 ifeq (Windows,$(OS))
@@ -53,7 +53,7 @@ endif
 	@cp -f license.txt dist/
 
 metrics-lib:
-	@cd experiment_metrics && python setup.py sdist
+	@. $(ACTIVATE); cd experiment_metrics && python setup.py sdist
 
 style: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); flake8 draft/ util/ commands/ main.py

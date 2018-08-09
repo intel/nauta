@@ -65,15 +65,6 @@ endif
 	@echo "installing vendored packages from ./vendor/*"
 	@. $(ACTIVATE); cd vendor && pip install *;
 
-update-venv: $(ACTIVATE)
-	@echo "downloading dependencies to ./vendor/ ..."
-	@. $(ACTIVATE); rm -rf vendor && mkdir -p vendor
-	@. $(ACTIVATE); cd vendor && pip download -r ../requirements.txt;
-	@echo "installing vendored packages from ./vendor/*"
-	@. $(ACTIVATE); cd vendor && pip install *;
-
-.PHONY: update-venv
-
 venv-dev: $(DEV_VIRTUALENV_MARK)
 $(DEV_VIRTUALENV_MARK): requirements-dev.txt $(ACTIVATE)
 	@touch $(DEV_VIRTUALENV_MARK)
