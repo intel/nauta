@@ -35,7 +35,9 @@ from commands.predict.common import get_inference_instance_url, InferenceVerb
 
 HELP = "Perform stream prediction task on deployed prediction instance."
 HELP_N = "Name of prediction session."
-HELP_D = "Path to data in SignatureDef format, that will be streamed to prediction instance."
+HELP_D = "Path to JSON data file that will be streamed to prediction instance. " \
+         "Data must be formatted such that it is compatible with the SignatureDef specified within the model " \
+         "deployed in selected prediction instance."
 HELP_M = "Method verb that will be used when performing inference. Predict verb is used by default."
 
 log = initialize_logger(__name__)
