@@ -270,6 +270,8 @@ def submit_experiment(template: str, name: str,
                         script_name = os.path.basename(script_location)
 
                     # Prepend script_name parameter to run description only for display purposes.
+                    experiment_run.parameters = script_parameters if not experiment_run.parameters \
+                        else experiment_run.parameters + script_parameters
                     if experiment_run.parameters and script_name:
                         experiment_run.parameters = (script_name, ) + experiment_run.parameters
                     elif script_name:
