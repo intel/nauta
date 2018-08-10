@@ -70,6 +70,8 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     current_namespace = get_kubectl_current_context_namespace()
     create_new_notebook = True
 
+    jupyter_experiment = None
+
     if name:
         try:
             jupyter_experiment = get_experiment(namespace=current_namespace, name=name)

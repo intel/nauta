@@ -259,7 +259,7 @@ def submit_experiment(template: str, name: str,
                     experiment_run.folder, script_location = \
                         prepare_experiment_environment(experiment_name=experiment_name,
                                                        run_name=experiment_run.name,
-                                                       script_location=script_location,
+                                                       local_script_location=script_location,
                                                        script_folder_location=script_folder_location,  # noqa: E501
                                                        script_parameters=current_script_parameters,
                                                        pack_type=template, pack_params=pack_params,
@@ -388,7 +388,7 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
     return run_list
 
 
-def prepare_experiment_environment(experiment_name: str, run_name: str, script_location: str,
+def prepare_experiment_environment(experiment_name: str, run_name: str, local_script_location: str,
                                    script_folder_location: str, script_parameters: Tuple[str, ...],
                                    pack_type: str, local_registry_port: int, cluster_registry_port: int,
                                    pack_params: List[Tuple[str, str]]) -> Tuple[str, str]:
@@ -396,7 +396,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
     Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
     :param run_name: name of an experiment run
-    :param script_location: location of a script used for training purposes
+    :param local_script_location: location of a script used for training purposes on local machine
     :param script_folder_location: location of an additional folder used in training
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
@@ -412,23 +412,24 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
         # check environment directory
         check_run_environment(run_folder)
         # create an environment
-        create_environment(run_name, script_location, script_folder_location)
+        create_environment(run_name, local_script_location, script_folder_location)
         # generate draft's data
         output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
         if exit_code:
             raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
-        if script_location:
-            script_location = Path(script_location).name
 
-            if pack_type == JUPYTER_NOTEBOOK_TEMPLATE_NAME and script_location.endswith(".py"):
+        # Script location on experiment container
+        remote_script_location = Path(local_script_location).name if local_script_location else ''
+
+        if pack_type == JUPYTER_NOTEBOOK_TEMPLATE_NAME and remote_script_location.endswith(".py"):
                 # for interact (jupyter notebooks) try to convert .py file into .ipynb
-                py_script_location = os.path.join(run_folder, FOLDER_DIR_NAME, script_location)
+                py_script_location = os.path.join(run_folder, FOLDER_DIR_NAME, remote_script_location)
                 ipynb_file_name = convert_py_to_ipynb(py_script_location, os.path.join(run_folder, FOLDER_DIR_NAME))
-                script_location = ipynb_file_name
+                local_script_location = ipynb_file_name
 
         # reconfigure draft's templates
-        update_configuration(run_folder=run_folder, script_location=script_location,
+        update_configuration(run_folder=run_folder, script_location=remote_script_location,
                              script_parameters=script_parameters,
                              experiment_name=experiment_name, run_name=run_name,
                              local_registry_port=local_registry_port, cluster_registry_port=cluster_registry_port,
@@ -437,7 +438,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, script_l
         delete_environment(run_folder)
         raise KubectlIntError(exe) from exe
     log.debug(f'Prepare run {run_name} environment - finish')
-    return run_folder, script_location
+    return run_folder, local_script_location
 
 
 def submit_draft_pack(run_folder: str, namespace: str = None):
