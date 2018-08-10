@@ -19,6 +19,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+build-conditional-deep-clean:
+ifeq (Darwin,$(OS))
+	@echo Removes all virtualenv on MacOS
+	@rm -rf $(VIRTUALENV_DIR)
+	@rm -rf vendor
+endif
 
 build: $(ACTIVATE) set-version metrics-lib
 	@. $(ACTIVATE); pip install pyinstaller;

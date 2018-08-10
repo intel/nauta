@@ -46,6 +46,9 @@ single-tools-%:
 unit-tests:
 	@(cd $(CURDIR)/cli && make test)
 
+build-conditional-deep-clean:
+	@(cd $(CURDIR)/cli && make build-conditional-deep-clean)
+
 cli-style:
 	@(cd $(CURDIR)/cli && make style)
 
