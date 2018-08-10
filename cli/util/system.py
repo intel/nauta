@@ -50,15 +50,21 @@ def execute_system_command(command: List[str], timeout: int or None = None,
 
 
 def execute_subprocess_command(command: List[str], timeout: int or None = 1, stdin=None, env=None,
-                               cwd=None) -> subprocess.Popen:
+                               cwd=None, shell=False, join=False) -> subprocess.Popen:
 
     # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
     std_output_destination = None if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
     std_error_destination = subprocess.STDOUT if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
 
-    log.debug(f'executing COMMAND in subprocess: {command}')
-    process = subprocess.Popen(args=command, stdout=std_output_destination, stderr=std_error_destination,
-                               universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
+    if join:
+        final_command = ' '.join(command)
+    else:
+        final_command = command
+
+    log.debug(f'executing COMMAND in subprocess: {final_command}')
+    process = subprocess.Popen(args=final_command, stdout=std_output_destination, stderr=std_error_destination,
+                               universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8',
+                               shell=shell)
 
     # wait for command execution initialization
     time.sleep(timeout)
