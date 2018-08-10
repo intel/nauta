@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from collections import defaultdict
 import sys
 
 from tabulate import tabulate
@@ -49,6 +50,8 @@ CONTAINER_DETAILS = '''
 
 
 def container_status_to_msg(state) -> str:
+    if not state:
+        return "Not created"
     if state.running is not None:
         return "Running, " + str(state.running)
     if state.terminated is not None:
@@ -116,11 +119,13 @@ def view(state: State, experiment_name: str, tensorboard: bool):
             status_string = ""
             for cond in pod.status.conditions:
                 msg = "" if not cond.reason else ", reason: " + cond.reason
+                msg = msg + ",\nmessage: " + cond.message if cond.message else msg
                 status_string = "     " + cond.type + ": " + cond.status + msg
 
-            container_statuses = {}
-            for container_status in pod.status.container_statuses:
-                container_statuses[container_status.name] = container_status.state
+            container_statuses = defaultdict(lambda: None)
+            if pod.status.container_statuses:
+                for container_status in pod.status.container_statuses:
+                    container_statuses[container_status.name] = container_status.state
 
             container_details = []
             for container in pod.spec.containers:
