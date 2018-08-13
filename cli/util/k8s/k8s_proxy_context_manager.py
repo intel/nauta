@@ -96,10 +96,7 @@ class K8sProxy:
             self.process.terminate()
         else:
             for proc in psutil.Process(self.process.pid).children(recursive=True):
-                proc.send_signal(signal.SIGINT)
+                proc.send_signal(signal.SIGTERM)
 
-            if get_current_os() == OS.MACOS:
-                self.process.send_signal(signal.SIGKILL)
-            else:
-                self.process.send_signal(signal.SIGINT)
+            self.process.send_signal(signal.SIGKILL)
         self.process.wait()

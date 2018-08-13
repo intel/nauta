@@ -21,10 +21,13 @@
 
 import os
 import urllib3
+import signal
 import sys
 import traceback
 import click
 import logging
+
+import psutil
 
 from commands.experiment import experiment
 from commands.launch import launch
@@ -48,6 +51,21 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DEFAULT_LANG = "en_US.UTF-8"
 
 ERROR_MESSAGE = "Other error during starting application."
+
+
+def signal_handler(sig, frame):
+    """
+    This function is responsible for handling SIGINT (e.g. when user press CTRL+C) and SIGTERM signals.
+    :param sig: received signal
+    :param frame: stack frame
+    """
+    logger.debug(f'Received signal {sig}.')
+    for proc in psutil.Process(os.getpid()).children(recursive=True):
+        logger.debug(f'Terminating {proc.pid} child process.')
+        proc.send_signal(signal.SIGTERM)
+
+    logger.debug(f'Finished handling signal {sig}.')
+    sys.exit(0)
 
 
 def configure_cli_logs():
@@ -83,6 +101,10 @@ entry_point.add_command(version)
 entry_point.add_command(mounts)
 
 if __name__ == '__main__':
+    # Register signal handler
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     # at this moment we don't have all click's functions to handle parameters
     verbose_option = any(x.startswith("-vv") or x == "-v" or x == "--verbose" for x in sys.argv)
     try:
