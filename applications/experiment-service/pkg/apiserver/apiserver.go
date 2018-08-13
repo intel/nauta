@@ -108,6 +108,7 @@ func (c CompletedConfig) New() (*RunServer, error) {
 
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(aggregator.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
 	apiGroupInfo.GroupMeta.GroupVersion = v1.SchemeGroupVersion
+
 	v1storage := map[string]rest.Storage{}
 	v1storage["runs"] = aggregatorregistry.RESTInPeace(runStorage.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter))
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = v1storage

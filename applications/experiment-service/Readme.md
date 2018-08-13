@@ -12,24 +12,7 @@ This project should be placed under (only non-capitals letters!) `$HOME/go/src/g
 
 
 ## Development
-
-### Knowledge
-Project was prepared based on [sample-apiserver](https://github.com/kubernetes/sample-apiserver) and
-[sample-controller](https://github.com/kubernetes/sample-controller) which shows in practise 
-how to use following kubernetes libraries:
-1. [apiserver](https://github.com/kubernetes/apiserver)
-1. [code-generator](https://github.com/kubernetes/code-generator)
-
-
-[_example](_example) directory contains base code with models which was copied to [pkg](pkg)
-
-All generated code like [client](pkg/client) or `zz_generated.***.go` files were created by [update-codegen.sh](hack/update-codegen.sh) script
-
-#### Significant files
-1. Model: [pkg/apis/aggregator/v1/types.go](pkg/apis/aggregator/v1/types.go)
-1. Controller: [cmd/controller](cmd/controller)
-1. ApiServer [cmd/apiserver](cmd/apiserver)
-1. Informers (generated): [pkg/client/informers/externalversions/aggregator/v1](pkg/client/informers/externalversions/aggregator/v1)
+For more info about preoject structure check [Knowledge](#knowledge) section
 
 ### Update code
 1. Made changes - e.g. add new field in `types.go`
@@ -49,11 +32,10 @@ Current deployment configuration is handled by helm chart [here](../../dls4e-cha
 
 ### Update running api-server in the cluster
 1. Make changes in your code e.g.: add new field. Build it: `make build`
-1. Open port Forwarding: `./dev-local-cluster/registry.sh`
-1. Export returned port, e.g: `export FORWARDED_PORT=30887`
-1. Build new image: `docker build . -t 127.0.0.1:30887/experiment-service`
-1. Push to remote docker registry: `docker push 127.0.0.1:30887/experiment-service`
-1. Change image address in deployment to `127.0.0.1:30887/experiment-service`: 
+1. Open port Forwarding: `./hack/registry.sh`
+1. Build new image: `docker build . -t 127.0.0.1:31655/experiment-service`
+1. Push to remote docker registry: `docker push 127.0.0.1:31655/experiment-service`
+1. Change image address in deployment to `image: 127.0.0.1:31655/experiment-service`: 
     ```
     kubectl edit -n=dls4e deployment dls4enterprise-experiment-service
     ```
@@ -61,3 +43,46 @@ Current deployment configuration is handled by helm chart [here](../../dls4e-cha
 
 ## Test
 To verify if experiment-service works correctly we can try to add some exampled run: `kubectl create -f sample/run.yaml`
+
+
+## Knowledge
+Project was prepared based on [sample-apiserver](https://github.com/kubernetes/sample-apiserver) and
+[sample-controller](https://github.com/kubernetes/sample-controller) which shows in practise 
+how to use following kubernetes libraries:
+1. [apiserver](https://github.com/kubernetes/apiserver)
+1. [code-generator](https://github.com/kubernetes/code-generator)
+
+### Significant files
+1. Model: [pkg/apis/aggregator/v1/types.go](pkg/apis/aggregator/v1/types.go)
+1. Controller: [cmd/controller](cmd/controller)
+1. ApiServer [cmd/apiserver](cmd/apiserver)
+1. Informers (generated): [pkg/client/informers/externalversions/aggregator/v1](pkg/client/informers/externalversions/aggregator/v1)
+1. All generated code like [client](pkg/client) or `zz_generated.***.go` files were created by [update-codegen.sh](hack/update-codegen.sh) script
+
+### Enable paging (chunking) for List operations
+To enable Paging, flag `Paging` has to be enabled in [storagebackend.Config](https://github.com/kubernetes/apiserver/blob/master/pkg/storage/storagebackend/config.go).
+In our code we made it in [NewRunServerOptions](https://github.com/NervanaSystems/carbon/blob/develop/applications/experiment-service/cmd/apiserver/start.go#L46) method.
+
+Usage ([doc](https://github.com/kubernetes/kubernetes/commit/35ffb5c6cf70974c0a571cd1ebdc72ad8d0f8332)):
+1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?limit=1`
+1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?continue=a3ViZS1wdWJsaWM`
+
+### Enable and configure filter feature
+
+#### Field selectors
+Field selectors let you select Kubernetes resources based on the value of one or more resource fields.
+
+To enable filtering, proper `FieldLabelConversionFunc` method has to be register on schema init. We made it in [register.go](pkg/apis/aggregator/v1/register.go#L43).
+Next proper `fields.Set` has to be passed to `GetAttrs` method in [strategy.go](pkg/registry/aggregator/run/strategy.go#L47).
+
+Usage ([doc](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/)):
+1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?fieldSelector=spec.state=RUNNING&spec.metrics.accuracy=52`
+
+#### Labels selectors
+Labels selector are more complex and let among others for part search.
+
+We used it for `Name` and `Namespace` partial search, that's why we copy this fields to labels in `PrepareForCreate` and `PrepareForUpdate` methods in 
+[strategy.go](pkg/registry/aggregator/run/strategy.go#L84).
+
+Usage `?labelSelector=name in (test)` ([doc](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api)):
+1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?labelSelector%3Dname%20in%20(test)`

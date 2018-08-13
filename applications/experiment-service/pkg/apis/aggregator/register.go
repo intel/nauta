@@ -20,6 +20,8 @@ package aggregator
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
 )
 
 const GroupName = "aggregator.aipg.intel.com"
@@ -38,7 +40,7 @@ func Resource(resource string) schema.GroupResource {
 }
 
 var (
-	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
+	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes, addConversionFuncs)
 	AddToScheme   = SchemeBuilder.AddToScheme
 )
 
@@ -48,5 +50,13 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&Run{},
 		&RunList{},
 	)
+	return nil
+}
+
+func addConversionFuncs(scheme *runtime.Scheme) error {
+	err := scheme.AddFieldLabelConversionFunc(SchemeGroupVersion.String(), "Run", common.RunFieldLabelConversion)
+	if err != nil {
+		panic(err)
+	}
 	return nil
 }

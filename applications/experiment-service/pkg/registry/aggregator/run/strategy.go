@@ -19,17 +19,17 @@ package run
 
 import (
 	"fmt"
-
+	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator"
-	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 )
 
 // NewStrategy creates and returns a runStrategy instance
@@ -44,7 +44,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, bool, error) {
 	if !ok {
 		return nil, nil, false, fmt.Errorf("given object is not a Run")
 	}
-	return labels.Set(apiserver.ObjectMeta.Labels), SelectableFields(apiserver), apiserver.Initializers != nil, nil
+	return labels.Set(apiserver.ObjectMeta.Labels), selectableFieldsSet(apiserver), apiserver.Initializers != nil, nil
 }
 
 // MatchRun is the filter used by the generic etcd backend to watch events
@@ -58,8 +58,18 @@ func MatchRun(label labels.Selector, field fields.Selector) storage.SelectionPre
 }
 
 // SelectableFields returns a field set that represents the object.
-func SelectableFields(obj *aggregator.Run) fields.Set {
-	return generic.ObjectMetaFieldsSet(&obj.ObjectMeta, true)
+func selectableFieldsSet(run *aggregator.Run) fields.Set {
+	selectableFields := generic.ObjectMetaFieldsSet(&run.ObjectMeta, true)
+	selectableFields = addMetricsToSelectableFields(run.Spec.Metrics, selectableFields)
+	selectableFields["spec.state"] = string(run.Spec.State)
+	return selectableFields
+}
+
+func addMetricsToSelectableFields(metrics map[string]string, selectableFields fields.Set) fields.Set {
+	for k, value := range metrics {
+		selectableFields[fmt.Sprintf("spec.metrics.%s", k)] = value
+	}
+	return selectableFields
 }
 
 type runStrategy struct {
@@ -72,9 +82,25 @@ func (runStrategy) NamespaceScoped() bool {
 }
 
 func (runStrategy) PrepareForCreate(ctx genericapirequest.Context, obj runtime.Object) {
+	updateRunLabels(obj)
 }
 
 func (runStrategy) PrepareForUpdate(ctx genericapirequest.Context, obj, old runtime.Object) {
+	updateRunLabels(obj)
+}
+
+func updateRunLabels(obj runtime.Object) {
+	run, ok := obj.(*aggregator.Run)
+	if !ok {
+		glog.Errorf("can not update labels for run! Incorrect obj type: %v", obj.GetObjectKind())
+		return
+	}
+
+	if run.Labels == nil {
+		run.Labels = make(map[string]string)
+	}
+	run.Labels["name"] = run.Name
+	run.Labels["namespace"] = run.Namespace
 }
 
 func (runStrategy) Validate(ctx genericapirequest.Context, obj runtime.Object) field.ErrorList {

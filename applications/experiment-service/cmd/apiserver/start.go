@@ -22,6 +22,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/golang/glog"
 	"github.com/spf13/cobra"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
@@ -37,8 +38,8 @@ const defaultEtcdPathPrefix = "/registry/aggregator.aipg.intel.com"
 
 type RunServerOptions struct {
 	RecommendedOptions *genericoptions.RecommendedOptions
-	StdOut io.Writer
-	StdErr io.Writer
+	StdOut             io.Writer
+	StdErr             io.Writer
 }
 
 func NewRunServerOptions(out, errOut io.Writer) *RunServerOptions {
@@ -47,8 +48,8 @@ func NewRunServerOptions(out, errOut io.Writer) *RunServerOptions {
 
 	o := &RunServerOptions{
 		RecommendedOptions: recOptions,
-		StdOut: out,
-		StdErr: errOut,
+		StdOut:             out,
+		StdErr:             errOut,
 	}
 
 	return o
@@ -128,6 +129,8 @@ func (o RunServerOptions) RunAggregatorServer(stopCh <-chan struct{}) error {
 	if err != nil {
 		return err
 	}
+
+	glog.V(1).Infof("Server started")
 
 	server.GenericAPIServer.AddPostStartHook("start-run-server-informers", func(context genericapiserver.PostStartHookContext) error {
 		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)

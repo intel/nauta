@@ -18,22 +18,22 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
-	"time"
-	"log"
 	"encoding/json"
+	"fmt"
+	"log"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	coreinformers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
+	corelisters "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
-	corelisters "k8s.io/client-go/listers/core/v1"
-	coreinformers "k8s.io/client-go/informers/core/v1"
 
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/common"
 	"github.com/nervanasystems/carbon/applications/experiment-service/pkg/apis/aggregator/v1"
@@ -47,8 +47,8 @@ type Controller struct {
 	// runclientset is a clientset for our own API group
 	runclientset clientset.Interface
 
-	podLister  corelisters.PodLister
-	podSynced  cache.InformerSynced
+	podLister corelisters.PodLister
+	podSynced cache.InformerSynced
 
 	// workqueue is a rate limited work queue. This is used to queue work to be
 	// processed instead of performing it as soon as a change happens. This
@@ -222,12 +222,12 @@ func (c *Controller) syncHandler(key string) error {
 
 	if run.Spec.State == common.Complete || run.Spec.State == common.Failed || run.Spec.State == common.Cancelled {
 		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s already processed. Final status %v",
-			run.Name,run.Spec.State))
+			run.Name, run.Spec.State))
 		return nil
 	}
 
 	if run.Spec.State == "" && len(pods) < run.Spec.PodCount {
-		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s NOT READY to start yet. Not enough pods. " +
+		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s NOT READY to start yet. Not enough pods. "+
 			"Required %d, currently: %d", run.Name, run.Spec.PodCount, len(pods)))
 		return nil
 	}
