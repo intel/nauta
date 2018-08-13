@@ -76,13 +76,17 @@ To enable filtering, proper `FieldLabelConversionFunc` method has to be register
 Next proper `fields.Set` has to be passed to `GetAttrs` method in [strategy.go](pkg/registry/aggregator/run/strategy.go#L47).
 
 Usage ([doc](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/)):
-1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?fieldSelector=spec.state=RUNNING&spec.metrics.accuracy=52`
+1. Filter by state: `?fieldSelector=spec.state=RUNNING`
+1. Filter by specific metric: `?fieldSelector=spec.metrics.accuracy=52`
+1. Chained selectors: `?fieldSelector=spec.metrics.accuracy=52,spec.state=RUNNING`
+
+e.g: `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?fieldSelector=spec.metrics.accuracy=52&fieldSelector=spec.state=RUNNING`
 
 #### Labels selectors
-Labels selector are more complex and let among others for part search.
+Labels selector are more complex and let among others for set search: `my_label in (OK, BAD)`
 
-We used it for `Name` and `Namespace` partial search, that's why we copy this fields to labels in `PrepareForCreate` and `PrepareForUpdate` methods in 
-[strategy.go](pkg/registry/aggregator/run/strategy.go#L84).
+Usage ([doc](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api)):
+1. Filter by name: `?labelSelector=name=test-1`
+1. Filter using set (`my_label in (OK, BAD)`): `?labelSelector=my_label%20in%20(OK%2C%20BAD)%0A`
 
-Usage `?labelSelector=name in (test)` ([doc](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api)):
-1. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?labelSelector%3Dname%20in%20(test)`
+e.g. `https://http://127.0.0.1:8080/apis/aggregator/v1/namespaces/zenek/runs?labelSelector=name=test-1`
