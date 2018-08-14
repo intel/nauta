@@ -22,11 +22,15 @@
 <template>
   <div class="filter-box elevation-3">
     <v-container>
-      <h4>Filter by values...</h4>
+      <h4>{{ labels.FILTER_BY_VAL }}...</h4>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-btn color="intel_primary" small flat v-on:click="selectAll()">Select All</v-btn>
-          <v-btn color="intel_primary" small flat v-on:click="deselectAll()">Clear All</v-btn>
+          <v-btn color="intel_primary" small flat v-on:click="selectAll()">
+            {{ labels.SELECT_ALL }}
+          </v-btn>
+          <v-btn color="intel_primary" small flat v-on:click="deselectAll()">
+            {{ labels.CLEAR_ALL }}
+          </v-btn>
         </v-flex>
         <v-flex xs12>
           <v-text-field v-model="searchPattern" append-icon="search" box hide-details></v-text-field>
@@ -35,7 +39,9 @@
           <div id="options" class="scroll-y">
             <div v-for="option in boxOptions" v-bind:key="option"
                  class="input-group--selection-controls" v-on:click="switchOption(option)">
-              <v-icon :id="option" class="pointer-btn" :color="isSelected(option) ? 'success' : 'grey lighten-3'">done</v-icon>
+              <v-icon :id="option" class="pointer-btn" :color="isSelected(option) ? 'success' : 'grey lighten-3'">
+                done
+              </v-icon>
               <v-tooltip bottom>
                 <span slot="activator" class="label-box">
                   {{ cutLongText(option) }}
@@ -46,8 +52,12 @@
           </div>
         </v-flex>
         <v-flex xs12 pl-3>
-          <v-btn dark small color="intel_primary" v-on:click="onCloseAction()">CANCEL</v-btn>
-          <v-btn dark small color="intel_primary" v-on:click="onApplyAction()">OK</v-btn>
+          <v-btn dark small color="intel_primary" v-on:click="onCloseAction()">
+            {{ labels.CANCEL }}
+          </v-btn>
+          <v-btn dark small color="intel_primary" v-on:click="onApplyAction()">
+            {{ labels.OK }}
+          </v-btn>
         </v-flex>
       </v-layout>
     </v-container>
@@ -55,6 +65,7 @@
 </template>
 
 <script>
+import ELEMENT_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'FilterByValWindow',
@@ -62,7 +73,8 @@ export default {
   data: () => {
     return {
       searchPattern: '',
-      chosenOptions: []
+      chosenOptions: [],
+      labels: ELEMENT_LABELS
     }
   },
   computed: {

@@ -29,7 +29,7 @@
             <img src="../img/intel-ai-acrnym-rgb-3000-wht.png"/>
           </v-flex>
           <v-flex md9 hidden-xs-only>
-            DEEP LEARNING STUDIO
+            {{ labels.DLS.toUpperCase() }}
           </v-flex>
         </v-layout>
       </v-container>
@@ -41,15 +41,19 @@
       </v-btn>
       <v-list>
         <v-list-tile>
-          <v-list-tile-title>USER GUIDE</v-list-tile-title>
+          <v-list-tile-title>
+            {{ labels.USER_GUIDE }}
+          </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
-          <v-list-tile-title>RELEASE NOTES</v-list-tile-title>
+          <v-list-tile-title>
+            {{ labels.RELEASE_NOTES }}
+          </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
           <v-list-tile-title>
             <a :href="licenseDoc" target="_blank">
-              LICENSE
+              {{ labels.LICENSE }}
             </a>
           </v-list-tile-title>
         </v-list-tile>
@@ -62,7 +66,9 @@
       </v-btn>
       <v-list>
         <v-list-tile v-on:click="onSingOutBtnClick()">
-          <v-list-tile-title>SIGN OUT</v-list-tile-title>
+          <v-list-tile-title>
+            {{ labels.SIGN_OUT }}
+          </v-list-tile-title>
         </v-list-tile>
       </v-list>
     </v-menu>
@@ -72,6 +78,7 @@
 <script>
 import {mapActions, mapGetters} from 'vuex';
 import LicenseDoc from '../assets/dls-evaluation-license.pdf';
+import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {
   name: 'Toolbar',
@@ -83,6 +90,7 @@ export default {
   },
   data () {
     return {
+      labels: ELEMENT_LABELS,
       licenseDoc: LicenseDoc
     }
   },

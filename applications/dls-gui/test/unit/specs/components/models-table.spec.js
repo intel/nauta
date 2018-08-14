@@ -27,10 +27,14 @@ import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import ModelsTable from '../../../../src/components/ModelsTable';
 import Q from 'q';
+import messages from '../../../../src/utils/constants/messages';
 
 describe('VUE components ModelsTable', () => {
-  let wrapper, router, store, state, getters, actions, localVue, defered;
+  let wrapper, router, store, state, getters, actions, localVue, defered, context;
   beforeEach(function () {
+    context = {
+      messages: messages
+    };
     state = {
       fetchingDataActive: false,
       experiments: {
@@ -256,26 +260,26 @@ describe('VUE components ModelsTable', () => {
   it('Should not refresh data if younger than 30s', function () {
     Date.now = sinon.stub().returns(1528190409842);
     wrapper.vm.$store.state.experiments.stats.datetime = 1528190409842;
-    wrapper.vm.timer();
+    wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated a moment ago.');
+    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated a moment ago');
   });
 
   it('Should refresh data if older than 30s', function () {
     Date.now = sinon.stub().returns(1528190409842);
     wrapper.vm.$store.state.experiments.stats.datetime = 1128190409842;
-    wrapper.vm.timer();
+    wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago.');
+    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago');
   });
 
   it('Should not refresh data if older than 30s but request is pending', function () {
     Date.now = sinon.stub().returns(1528190409842);
     wrapper.vm.$store.state.experiments.stats.datetime = 1128190409842;
     wrapper.vm.$store.state.fetchingDataActive = true;
-    wrapper.vm.timer();
+    wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago.');
+    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago');
   });
 
   it('Should clear all filters on clear action', function () {

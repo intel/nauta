@@ -24,12 +24,14 @@
       <v-container
         v-if="!isLogged || (!isInitializedData && fetchingDataActive) || (isInitializedData && tensorboardLaunching)"
         fill-height justify-center>
-        <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
+        <v-progress-circular :size="90" indeterminate color="warning">
+          {{ labels.LOADING }}...
+        </v-progress-circular>
       </v-container>
       <v-flex v-if="isLogged && isInitializedData && !tensorboardLaunching" xs12>
         <v-card>
           <v-card-title>
-            <h2>Models</h2>
+            <h2>{{ labels.MODELS }}</h2>
             <v-spacer></v-spacer>
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
               :clearSort="clearSort"
@@ -107,14 +109,14 @@
                         <div class="exp-details">
                           <v-layout row>
                             <v-flex xs6 wrap>
-                              <ExpResourcesDetail keyname="Resources" :podsList="experimentResources(item.attributes.name)"/>
-                              <ExpKeyValDetail keyname="Training Submission Date" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
+                              <ExpResourcesDetail :keyname="labels.RESOURCES" :podsList="experimentResources(item.attributes.name)"/>
+                              <ExpKeyValDetail :keyname="labels.TRAINING_SUBMISSION_DATE" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
                             </v-flex>
                             <v-flex>
                               <div class="vertical-line"></div>
                             </v-flex>
                             <v-flex xs6 wrap>
-                              <ExpKeyValDetail keyname="Parameters" :value="item.params.parameters"/>
+                              <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.params.parameters"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -126,12 +128,12 @@
             </div>
             <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length === 0">
               <v-alert :value="true" type="info">
-                No data to display.
+                {{ messages.SUCCESS.NO_DATA }}
               </v-alert>
             </div>
             <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length !== 0">
               <v-alert :value="true" type="info">
-                No data for currently applied filters.
+                {{ messages.SUCCESS.NO_DATA_FOR_FILTER }}
               </v-alert>
             </div>
             <FooterElements v-if="filteredDataCount"
@@ -151,6 +153,8 @@
 
 <script>
 import LABELS from '../utils/header-titles';
+import ELEMENT_LABELS from '../utils/constants/labels';
+import MESSAGES from '../utils/constants/messages';
 import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
@@ -181,6 +185,8 @@ export default {
   },
   data: () => {
     return {
+      labels: ELEMENT_LABELS,
+      messages: MESSAGES,
       filterIcon: 'filter_list',
       searchPattern: '',
       selectedByUserColumns: [],
@@ -229,7 +235,8 @@ export default {
     this.filterByValModals.namespace.params.push(this.username);
     const refreshMode = false;
     this.getData(refreshMode);
-    this.intervalId = setInterval(this.timer, 1000);
+    const this2 = this;
+    this.intervalId = setInterval(this.timer, 1000, this2);
   },
   beforeDestroy: function () {
     clearInterval(this.intervalId);
@@ -257,7 +264,7 @@ export default {
       experimentResources: 'experimentResources'
     }),
     paginationStats: function () {
-      return `${this.experimentsBegin}-${this.experimentsEnd} of ${this.filteredDataCount}`;
+      return `${this.experimentsBegin}-${this.experimentsEnd} ${this.labels.OF} ${this.filteredDataCount}`;
     },
     currentlyVisibleColumns: function () {
       return this.experimentsParams.filter((header) => {
@@ -402,13 +409,13 @@ export default {
         this.getExperimentResources({experimentName: item})
       });
     },
-    timer () {
+    timer (context) {
       const currentTime = Date.now();
       const lastUpdateTimeDiffer = Math.ceil((currentTime - this.lastUpdate) / 1000); // in seconds
       if (lastUpdateTimeDiffer <= this.refresh.interval) {
-        this.refresh.lastUpdateLabel = 'Last updated a moment ago.';
+        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_A_MOMENT_AGO;
       } else {
-        this.refresh.lastUpdateLabel = `Last updated over ${this.refresh.interval} seconds ago.`;
+        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_30S_AGO;
         if (!this.fetchingDataActive) {
           const refreshMode = true;
           this.getData(refreshMode);

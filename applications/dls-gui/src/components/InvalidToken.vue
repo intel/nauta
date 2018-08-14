@@ -22,17 +22,26 @@
 <template>
   <v-layout row wrap>
     <v-flex xs12 align-center>
-      <h1>WE'RE SORRY, YOUR TOKEN IS INVALID</h1>
+      <h1>{{ messages.ERROR.INVALID_TOKEN.toUpperCase() }}</h1>
     </v-flex>
     <v-flex xs12>
-      <h3>Please contact your IT Administrator.</h3>
+      <h3>{{ messages.INFO.CONTACT_IT }}</h3>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
+import ELEMENT_LABELS from '../utils/constants/labels';
+import MESSAGES from '../utils/constants/messages';
+
 export default {
-  name: 'InvalidToken'
+  name: 'InvalidToken',
+  data () {
+    return {
+      labels: ELEMENT_LABELS,
+      messages: MESSAGES
+    }
+  }
 }
 </script>
 

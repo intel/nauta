@@ -22,15 +22,22 @@
 <template>
   <v-footer app color="intel_lightest_gray">
     <v-layout row justify-center>
-      &#9400; Intel Corporation. All rights reserved
-      <a>Terms of Use</a>
+      &#9400; Intel Corporation. {{ labels.ALL_RIGHTS_RESERVED }}
+      <a>{{ labels.TERMS_OF_USE }}</a>
     </v-layout>
   </v-footer>
 </template>
 
 <script>
+import ELEMENT_LABELS from '../utils/constants/labels';
+
 export default {
-  name: 'Footer'
+  name: 'Footer',
+  data () {
+    return {
+      labels: ELEMENT_LABELS
+    }
+  }
 }
 </script>
 

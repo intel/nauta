@@ -22,26 +22,33 @@
 <template>
   <div>
     <v-container v-if="isLoadingAuth" fill-height justify-center>
-      <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
+      <v-progress-circular :size="90" indeterminate color="warning">
+        {{ labels.LOADING }}...
+      </v-progress-circular>
     </v-container>
     <v-layout row wrap v-if="!isLoadingAuth">
       <v-flex xs12 align-center>
-        <h1>WE'RE SORRY, UNEXPECTED ERROR OCCURRED</h1>
+        <h1>{{ messages.ERROR.UNEXPECTED_ERROR.toUpperCase() }}</h1>
       </v-flex>
       <v-flex xs12>
-        <h3>Please contact your IT Administrator.</h3>
+        <h3>{{ messages.INFO.CONTACT_IT }}</h3>
       </v-flex>
     </v-layout>
   </div>
 </template>
 
 <script>
+import ELEMENT_LABELS from '../utils/constants/labels';
+import MESSAGES from '../utils/constants/messages';
 import {mapGetters, mapActions} from 'vuex';
 
 export default {
   name: 'Home',
   data () {
-    return {}
+    return {
+      labels: ELEMENT_LABELS,
+      messages: MESSAGES
+    }
   },
   created: function () {
     const token = this.$route.query.token;

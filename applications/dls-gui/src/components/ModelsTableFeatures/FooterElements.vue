@@ -26,7 +26,7 @@
       {{ lastUpdateLabel }}
     </div>
     <v-spacer></v-spacer>
-    Rows per page:
+    {{ labels.ROWS_PER_PAGE }}:
     <div class="datatable__actions__select">
       <v-select
         :items="itemsPerPageOptions"
@@ -50,12 +50,15 @@
 </template>
 
 <script>
+import ELEMENT_LABELS from '../../utils/constants/labels';
+
 export default {
   name: 'FooterElements',
   props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'paginationStats',
     'lastUpdateLabel'],
   data: () => {
     return {
+      labels: ELEMENT_LABELS,
       itemsPerPageOptions: [5, 10, 15, 25],
       chosenCount: 5
     }

@@ -19,41 +19,35 @@
  * and approved by Intel in writing.
  */
 
-<template>
-  <v-layout row wrap>
-    <v-flex xs12 align-center>
-      <h1>{{ messages.SUCCESS.SIGNED_OUT.toUpperCase() }}</h1>
-    </v-flex>
-    <v-flex xs12>
-      <h3>{{ messages.INFO.RETRY_SIGN_IN }}</h3>
-    </v-flex>
-  </v-layout>
-</template>
-
-<script>
-import ELEMENT_LABELS from '../utils/constants/labels';
-import MESSAGES from '../utils/constants/messages';
-
 export default {
-  name: 'SignedOut',
-  data () {
-    return {
-      labels: ELEMENT_LABELS,
-      messages: MESSAGES
-    }
-  }
+  ADD_DEL_COLUMN: 'Add/Delete columns',
+  ALL_RIGHTS_RESERVED: 'All rights reserved',
+  CANCEL: 'Cancel',
+  CLEAR_ALL: 'Clear all',
+  CONTAINERS: 'Containers',
+  DLS: 'Deep Learning Studio',
+  EXIT: 'Exit',
+  FILTER_BY_VAL: 'Filter by values',
+  LAUNCH_TB: 'Launch Tensorboard',
+  LICENSE: 'License',
+  LOADING: 'Loading',
+  MODELS: 'Models',
+  NAME: 'Name',
+  OF: 'of',
+  OK: 'OK',
+  PARAMETERS: 'Parameters',
+  PODS: 'Pods',
+  RELEASE_NOTES: 'Release notes',
+  RESET: 'Reset',
+  RESOURCES: 'Resources',
+  RESOURCES_DASHBOARD: 'Resources dashboard',
+  REVERT_TO_DEFAULT: 'Revert to default',
+  ROWS_PER_PAGE: 'Rows per page',
+  SAVE: 'Save',
+  SELECT_ALL: 'Select all',
+  SIGN_OUT: 'Sign out',
+  STATE: 'State',
+  TERMS_OF_USE: 'Terms of Use',
+  TRAINING_SUBMISSION_DATE: 'Training Submission Date',
+  USER_GUIDE: 'User guide'
 }
-</script>
-
-<style scoped>
-h1 {
-  font-family: 'Intel Clear Pro', sans-serif;
-  font-size: 64px;
-  margin-left: 100px;
-  margin-top: 100px;
-}
-h3 {
-  font-family: 'Intel Clear', sans-serif;
-  margin-left: 100px;
-}
-</style>

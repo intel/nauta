@@ -21,10 +21,16 @@
 
 <template>
 <div id="buttons_block">
-  <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">LAUNCH TENSORBOARD</v-btn>
-  <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">EXIT</v-btn>
+  <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">
+    {{ labels.LAUNCH_TB }}
+  </v-btn>
+  <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">
+    {{ labels.EXIT }}
+  </v-btn>
   <v-menu :disabled="tensorModeViewState" bottom offset-y>
-    <v-btn :disabled="tensorModeViewState" slot="activator" dark small>RESET</v-btn>
+    <v-btn :disabled="tensorModeViewState" slot="activator" dark small>
+      {{ labels.RESET }}
+    </v-btn>
     <v-list>
       <v-list-tile v-on:click="clearSort()">
         <v-list-tile-title>Clear sort</v-list-tile-title>
@@ -34,14 +40,18 @@
       </v-list-tile>
     </v-list>
   </v-menu>
-  <v-btn :disabled="tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>ADD/DELETE COLUMNS</v-btn>
+  <v-btn :disabled="tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>
+    {{ labels.ADD_DEL_COLUMN }}
+  </v-btn>
   <v-dialog
     v-model="showColumnMgmtModal"
     max-width="320px"
   >
       <v-card>
         <v-card-title>
-          <h2>Add/Delete Columns</h2>
+          <h2>
+            {{ labels.ADD_DEL_COLUMN }}
+          </h2>
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
@@ -49,25 +59,45 @@
               <v-flex xs12>
                 <div id="options" class="scroll-y">
                   <div v-for="header in customizableVisibilityColumns" v-bind:key="header" class="option">
-                    <v-icon :id="header + '_on'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'success'" v-on:click="showColumn(header)">done</v-icon>
+                    <v-icon
+                      :id="header + '_on'"
+                      class="pointer-btn"
+                      :color="isHidden(header) ? 'grey lighten-3' : 'success'"
+                      v-on:click="showColumn(header)"
+                    >
+                      done
+                    </v-icon>
                     <v-tooltip bottom class="label-box">
                       <span slot="activator" v-on:click="showColumn(header)">
                         {{ cutLongText(getLabel(header), 20) }}
                       </span>
                       <span>{{ getLabel(header) }}</span>
                     </v-tooltip>
-                    <v-icon :id="header + '_off'" class="pointer-btn" :color="isHidden(header) ? 'grey lighten-3' : 'grey darken-2'" v-on:click="hideColumn(header)">delete</v-icon>
+                    <v-icon
+                      :id="header + '_off'"
+                      class="pointer-btn"
+                      :color="isHidden(header) ? 'grey lighten-3' : 'grey darken-2'"
+                      v-on:click="hideColumn(header)"
+                    >
+                      delete
+                    </v-icon>
                   </div>
                 </div>
               </v-flex>
               <v-flex md8 xs12 offset-md2>
-                <v-btn id="revert" block dark small v-on:click="revertToDefault()">REVERT TO DEFAULT</v-btn>
+                <v-btn id="revert" block dark small v-on:click="revertToDefault()">
+                  {{ labels.REVERT_TO_DEFAULT }}
+                </v-btn>
               </v-flex>
               <v-flex md6 xs12>
-                <v-btn color="intel_primary" block dark small v-on:click="discardVisibleHeaders()">CANCEL</v-btn>
+                <v-btn color="intel_primary" block dark small v-on:click="discardVisibleHeaders()">
+                  {{ labels.CANCEL }}
+                </v-btn>
               </v-flex>
               <v-flex md6 xs12>
-                <v-btn color="intel_primary" block dark small v-on:click="applyVisibleHeaders()">SAVE</v-btn>
+                <v-btn color="intel_primary" block dark small v-on:click="applyVisibleHeaders()">
+                  {{ labels.SAVE }}
+                </v-btn>
               </v-flex>
             </v-layout>
           </v-container>
@@ -79,7 +109,8 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import LABELS from '../../utils/header-titles';
+import HEADERS_LABELS from '../../utils/header-titles';
+import ELEMENTS_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'ActionHeaderButtons',
@@ -88,7 +119,8 @@ export default {
   data: () => {
     return {
       showColumnMgmtModal: false,
-      draft: []
+      draft: [],
+      labels: ELEMENTS_LABELS
     }
   },
   watch: {
@@ -99,13 +131,14 @@ export default {
   computed: {
     ...mapGetters({
       tensorModeViewState: 'tensorMode'
-    })},
+    })
+  },
   created: function () {
     this.setVisibleColumnsHandler(this.selectedByUserColumns)
   },
   methods: {
     getLabel: function (header) {
-      return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
+      return HEADERS_LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
     cutLongText (str, limit) {
       return str.length > limit ? `${str.substr(0, limit)}...` : str;

@@ -20,12 +20,24 @@
  */
 
 export default {
-  SUCCESS: {},
+  SUCCESS: {
+    LAST_UPDATED_A_MOMENT_AGO: 'Last updated a moment ago',
+    LAST_UPDATED_30S_AGO: 'Last updated over 30 seconds ago',
+    NO_DATA: 'No data to display',
+    NO_DATA_FOR_FILTER: 'No data for currently applied filters',
+    SIGNED_OUT: 'You are signed out'
+  },
   ERROR: {
-    INTERNAL_SERVER_ERROR: 'Internal server error. Contact with administrator'
+    INTERNAL_SERVER_ERROR: 'Internal server error. Contact with administrator',
+    INVALID_TOKEN: 'We\'re sorry, your token is invalid',
+    UNEXPECTED_ERROR: 'We\'re sorry, unexpected error occured'
   },
   WARNING: {
     TB_INVALID_RUNS: 'Some of requested experiments cannot be visible in Tensorboard due to no output data provided.',
     TB_NOT_CREATED: 'Cannot create Tensorboard instance for requested experiments.'
+  },
+  INFO: {
+    CONTACT_IT: 'Please contact your IT Administrator.',
+    RETRY_SIGN_IN: 'To sign in, please return to the CLI and run the "dlsctl launch webui" command.'
   }
 }

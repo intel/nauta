@@ -21,12 +21,15 @@
 
 <template>
   <v-container fill-height justify-center>
-    <v-progress-circular :size="90" indeterminate color="warning">Loading...</v-progress-circular>
+    <v-progress-circular :size="90" indeterminate color="warning">
+      {{ labels.LOADING }}...
+    </v-progress-circular>
   </v-container>
 </template>
 
 <script>
 import {launchTensorBoard, checkIsTBInstanceReady} from '../store/handlers/tensorboard';
+import ELEMENT_LABELS from '../utils/constants/labels';
 import RESPONSE_TYPES from '../utils/constants/message-types';
 import RESPONSE_MESSAGES from '../utils/constants/messages';
 
@@ -36,6 +39,7 @@ export default {
   name: 'TensorBoardCreator',
   data: () => {
     return {
+      labels: ELEMENT_LABELS,
       retry: 0,
       maxRetries: 20
     };
