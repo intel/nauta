@@ -1,6 +1,5 @@
-apiVersion: batch/v1
-kind: Job
-
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   labels:
@@ -10,17 +9,30 @@ metadata:
     heritage: {{ .Release.Service }}
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
+    batchType: server
 spec:
   replicas: {{ .Values.workersCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      draft: {{ .Values.draft }}
+      heritage: {{ .Release.Service }}
+      runName: {{ .Release.Name }}
+      batchType: server
   template:
     metadata:
       annotations:
         buildID: {{ .Values.buildID }}
       labels:
         app: {{ template "name" . }}
-        draft: {{ .Values.draft }}
         release: {{ .Release.Name }}
+        chart: {{ template "chart_version" . }}
+        draft: {{ .Values.draft }}
+        heritage: {{ .Release.Service }}
         runName: {{ .Release.Name }}
+        batchType: server
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -31,7 +43,7 @@ spec:
             - name: MODEL_BASE_PATH
               value: "/models"
           command: ["tensorflow_model_server"]
-          args: ["--port=8500", "--rest_api_port=8501", "--model_name=$(MODEL_NAME)", "--model_base_path=$(MODEL_BASE_PATH)/$(MODEL_NAME)"]
+          args: ["--port=8500", "--rest_api_port=8501", "--model_name=$(MODEL_NAME)", "--model_base_path=$(MODEL_BASE_PATH)"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
@@ -55,7 +67,7 @@ spec:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-      restartPolicy: OnFailure
+      restartPolicy: Always
       volumes:
         - name: input-home
           persistentVolumeClaim:
@@ -72,9 +84,9 @@ spec:
         - name: models
           emptyDir: {}
       initContainers:
-        - name: init-batch-inference-pod
+        - name: init-inference-pod
           image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
-          command: ['bash', '-c', 'mkdir -p "/mnt/output/home/{{ .Values.experimentName }}" && cp -r "{{ .Values.modelPath }}" /models']
+          command: ['cp', '-rf', "{{ .Values.modelPath }}/.", '/models']
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home

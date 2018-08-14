@@ -18,6 +18,8 @@ export_images:
     value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/skylake/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['dls4e/activity-proxy'] }}"
+  - name: batch-inference
+    value: "{{ image_local_url['dls4e/batch-inference'] }}"
 
 local_images:
   dls4e/centos:
@@ -177,6 +179,12 @@ local_images:
       BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/activity-proxy"
+  dls4e/batch-inference:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/batch-inference"
 
 subcharts:
   dls4e-registry:

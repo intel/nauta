@@ -18,4 +18,5 @@ spec:
     draft: {{ .Values.draft }}
     release: {{ .Release.Name }}
     runName: {{ .Release.Name }}
+    batchType: server
   type: ClusterIP

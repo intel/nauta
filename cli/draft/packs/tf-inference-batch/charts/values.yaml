@@ -2,10 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-modelPath: ''
-modelName: ''
+modelPath: '/mnt/input/home/models'
+modelName: 'mnist'
 
-containerPort: 8501
+containerPort: 8500
 
 image:
   pullPolicy: IfNotPresent
