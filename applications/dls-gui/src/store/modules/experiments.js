@@ -72,11 +72,11 @@ export const getters = {
 
 export const actions = {
   getUserExperiments: ({commit, dispatch}, {limitPerPage, pageNo, orderBy, order, searchBy, names, states,
-    namespaces, refreshMode}) => {
+    namespaces, types, refreshMode}) => {
     if (!refreshMode) {
       commit('setFetchingDataFlag', {isActive: true});
     }
-    getExperiments(limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces)
+    getExperiments(limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces, types)
       .then((res) => {
         const data = res.data;
         commit('setExperimentsData', {data: data.data});

@@ -184,8 +184,8 @@ export default {
       filterIcon: 'filter_list',
       searchPattern: '',
       selectedByUserColumns: [],
-      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name', 'state'],
-      filterableByValColumns: ['name', 'namespace', 'state'],
+      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name', 'state', 'type'],
+      filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
         name: {
           visible: false,
@@ -196,6 +196,10 @@ export default {
           params: []
         },
         state: {
+          visible: false,
+          params: []
+        },
+        type: {
           visible: false,
           params: []
         }
@@ -391,6 +395,7 @@ export default {
         names: this.filterByValModals.name.params,
         namespaces: this.filterByValModals.namespace.params,
         states: this.filterByValModals.state.params,
+        types: this.filterByValModals.type.params,
         refreshMode: refreshMode
       });
       this.visibleDetails.forEach((item) => {

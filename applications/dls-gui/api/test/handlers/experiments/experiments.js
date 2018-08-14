@@ -51,6 +51,9 @@ describe('Handlers | Experiments', function () {
           creationTimestamp: '2018-06-11T07:35:06Z',
           name: 'exp-mnist-sing-18-06-11-09-34-45-41',
           namespace: 'andrzej',
+          labels: {
+            runKind: 'training'
+          }
         },
         spec: {
           'experiment-name': 'experiment-name-will-be-added-soon',
@@ -76,6 +79,9 @@ describe('Handlers | Experiments', function () {
           creationTimestamp: '2018-06-11T07:35:06Z',
           name: 'exp-mnist-sing-18-06-11-09-34-45-42',
           namespace: 'andrzej',
+          labels: {
+            runKind: 'inference'
+          }
         },
         spec: {
           'experiment-name': 'experiment-name-will-be-added-soon',
@@ -106,7 +112,8 @@ describe('Handlers | Experiments', function () {
           creationTimestamp: k8sRunEntities[0].metadata.creationTimestamp,
           name: k8sRunEntities[0].metadata.name,
           namespace: k8sRunEntities[0].metadata.namespace,
-          state: k8sRunEntities[0].spec['state'],
+          state: k8sRunEntities[0].spec.state,
+          type: k8sRunEntities[0].metadata.labels.runKind,
           accuracy: k8sRunEntities[0].spec.metrics['accuracy']
         },
         params: {
@@ -120,7 +127,8 @@ describe('Handlers | Experiments', function () {
           creationTimestamp: k8sRunEntities[1].metadata.creationTimestamp,
           name: k8sRunEntities[1].metadata.name,
           namespace: k8sRunEntities[1].metadata.namespace,
-          state: k8sRunEntities[1].spec['state'],
+          state: k8sRunEntities[1].spec.state,
+          type: k8sRunEntities[1].metadata.labels.runKind,
           accuracy: k8sRunEntities[1].spec.metrics['accuracy']
         },
         params: {
@@ -226,7 +234,8 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         name: [],
         namespace: [],
-        state: []
+        state: [],
+        type: []
       };
       const result = expApi.extractValuesForFilterableAttrs([]);
       expect(result).to.deep.equal(expectedResult);
@@ -236,7 +245,8 @@ describe('Handlers | Experiments', function () {
       const expectedResult = {
         name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
         namespace: [generatedEntities[0].attributes.namespace],
-        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
+        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+        type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
       };
       const result = expApi.extractValuesForFilterableAttrs(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
@@ -259,6 +269,7 @@ describe('Handlers | Experiments', function () {
           name: [],
           namespace: [],
           state: [],
+          type: [],
           searchPattern: ''
         }
       };
@@ -273,6 +284,7 @@ describe('Handlers | Experiments', function () {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
           searchPattern: ''
         }
       };
@@ -287,6 +299,7 @@ describe('Handlers | Experiments', function () {
           name: [generatedEntities[0].attributes.name],
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
           searchPattern: ''
         }
       };
@@ -302,6 +315,7 @@ describe('Handlers | Experiments', function () {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
           searchPattern: ''
         }
       };
@@ -317,6 +331,7 @@ describe('Handlers | Experiments', function () {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
           searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
         }
       };
@@ -386,7 +401,7 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return all params', function () {
-      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'accuracy'];
+      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'type', 'accuracy'];
       const result = expApi.extractAttrsNames(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
     });

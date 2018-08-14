@@ -24,7 +24,7 @@ import cookies from 'js-cookie';
 
 const DECODE_TOKEN_ENDPOINT = '/api/experiments/list';
 
-export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces) {
+export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, names, states, namespaces, types) {
   const token = cookies.get('TOKEN');
   let queryParams = {
     limit: limitPerPage || 5,
@@ -34,7 +34,8 @@ export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, 
     searchBy: searchBy || '',
     names: Array.isArray(names) && names.length ? names : '*',
     states: Array.isArray(states) && states.length ? states : '*',
-    namespaces: Array.isArray(namespaces) && namespaces.length ? namespaces : '*'
+    namespaces: Array.isArray(namespaces) && namespaces.length ? namespaces : '*',
+    types: Array.isArray(types) && types.length ? types : '*'
   };
   const options = {
     url: DECODE_TOKEN_ENDPOINT,

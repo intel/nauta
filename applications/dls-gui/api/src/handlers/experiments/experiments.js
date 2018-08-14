@@ -32,10 +32,11 @@ const generateExperimentEntities = function (data) {
   return data.map(function (item) {
     let entity = {
       attributes: {
-        creationTimestamp: item.metadata.creationTimestamp,
         name: item.metadata.name,
-        namespace: item.metadata.namespace,
-        state: item.spec['state']
+        type: item.metadata.labels.runKind,
+        creationTimestamp: item.metadata.creationTimestamp,
+        state: item.spec.state,
+        namespace: item.metadata.namespace
       },
       params: {
         podSelector: item.spec['pod-selector']['matchLabels'],
@@ -56,17 +57,20 @@ const extractValuesForFilterableAttrs = function (entities) {
   let values = {
     name: new Set(),
     state: new Set(),
-    namespace: new Set()
+    namespace: new Set(),
+    type: new Set()
   };
   entities.forEach((entity) => {
     values.name.add(entity.attributes.name);
     values.state.add(entity.attributes.state);
     values.namespace.add(entity.attributes.namespace);
+    values.type.add(entity.attributes.type);
   });
   return {
     name: Array.from(values.name),
     namespace: Array.from(values.namespace),
-    state: Array.from(values.state)
+    state: Array.from(values.state),
+    type: Array.from(values.type)
   };
 };
 
@@ -79,6 +83,7 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
     name: Array.from(new Set(entities.map((entity) => entity.attributes.name))),
     namespace: Array.from(new Set(entities.map((entity) => entity.attributes.namespace))),
     state: Array.from(new Set(entities.map((entity) => entity.attributes.state))),
+    type: Array.from(new Set(entities.map((entity) => entity.attributes.type))),
     searchPattern: searchPattern ? searchPattern.toUpperCase() : ''
   };
 
@@ -93,7 +98,8 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
   const filteredEntities = entities.filter((item) => {
     const filterByValueCondition = filterParams.name.includes(item.attributes.name) &&
       filterParams.namespace.includes(item.attributes.namespace) &&
-      filterParams.state.includes(item.attributes.state);
+      filterParams.state.includes(item.attributes.state) &&
+      filterParams.type.includes(item.attributes.type);
     const filterBySearchCondition = Object.keys(item.attributes).some((key) => {
       const attrValue = String(item.attributes[key]);
       return attrValue.toUpperCase().includes(filterParams.searchPattern);
@@ -150,7 +156,8 @@ const parseExperiments = function (experiments, queryParams) {
   const filteredDataWithMetadata = applyQueryFilters(entities, {
     name: queryParams.names,
     namespace: queryParams.namespaces,
-    state: queryParams.states
+    state: queryParams.states,
+    type: queryParams.types
   }, queryParams.searchBy);
   const orderedData = applyOrderParams(filteredDataWithMetadata.data, queryParams.orderBy, queryParams.order, queryParams.limit, queryParams.page);
   return {

@@ -20,11 +20,9 @@
  */
 
 export default {
-  creationTimestamp: 'Submission Date',
+  creationTimestamp: 'Training Submission Date',
   namespace: 'Owner',
   name: 'Model Name',
-  parameters: 'Parameters',
-  state: 'State',
-  podCount: 'Pod Count',
-  podSelector: 'Pod Selector'
+  state: 'Training Status',
+  type: 'Training Type'
 };
