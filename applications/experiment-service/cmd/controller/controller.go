@@ -59,9 +59,7 @@ type Controller struct {
 }
 
 // NewController returns a new run controller
-func NewController(
-	kubeclientset kubernetes.Interface,
-	runclientset clientset.Interface,
+func NewController(kubeclientset kubernetes.Interface, runclientset clientset.Interface,
 	podInformer coreinformers.PodInformer) *Controller {
 
 	controller := &Controller{
@@ -192,7 +190,7 @@ func (c *Controller) syncHandler(key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		runtime.HandleError(fmt.Errorf("invalid resource key: %s", key))
-		return nil
+		return err
 	}
 
 	// Get the Run resource with this namespace/name

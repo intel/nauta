@@ -8,7 +8,8 @@
 
 ## Setup project
 If `$GOPATH` is not set, Go will use following location as the default one: `$HOME/go`
-This project should be placed under (only non-capitals letters!) `$HOME/go/src/github.com/nervanasystems/carbon`
+This project should be placed under (only non-capitals letters - issue in
+ [code-generator](https://github.com/kubernetes/code-generator/issues/20#issuecomment-412686432)) `$HOME/go/src/github.com/nervanasystems/carbon`
 
 
 ## Development
@@ -54,6 +55,9 @@ how to use following kubernetes libraries:
 
 ### Significant files
 1. Model: [pkg/apis/aggregator/v1/types.go](pkg/apis/aggregator/v1/types.go)
+    More info how to prepare models and how to use **tags**:
+    1.  https://blog.openshift.com/kubernetes-deep-dive-code-generation-customresources/
+    1.  https://github.com/kubernetes/community/blob/master/contributors/devel/generating-clientset.md
 1. Controller: [cmd/controller](cmd/controller)
 1. ApiServer [cmd/apiserver](cmd/apiserver)
 1. Informers (generated): [pkg/client/informers/externalversions/aggregator/v1](pkg/client/informers/externalversions/aggregator/v1)

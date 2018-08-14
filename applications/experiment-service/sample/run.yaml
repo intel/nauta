@@ -3,7 +3,7 @@ kind: Run
 metadata:
   name: test-1
   labels:
-    intel: yes
+    intel: "yes"
 spec:
   pod-count: 1
   experiment-name: exp-test

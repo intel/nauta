@@ -13,7 +13,7 @@ test:
 	go test -v ./...
 
 test_coverage:
-	go test -v ./...
+	./code_coverage.sh
 
 dep_update:
 	dep ensure -v
