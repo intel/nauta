@@ -45,7 +45,8 @@ from util.docker import delete_images_for_experiment
 HELP = "Cancels experiment/s chosen based on criteria given as a parameter."
 HELP_P = "If given, then all information concerning all experiments, completed and currently running, " \
          "is removed from the system."
-HELP_M = "If given, command searches for experiments matching the value of this option."
+HELP_M = "If given, command searches for experiments matching the value of this option. This option cannot be used " \
+         "along with the NAME argument."
 
 log = initialize_logger(__name__)
 
