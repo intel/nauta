@@ -44,3 +44,16 @@ local_images:
       - src: /out/*
         dest: pip
     push: False
+  bin/centos/ansible:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      PIP_IMAGE: "bin/pip"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
+    artifacts:
+      - src: /out/ansible-playbook
+        dest: Linux/amd64/CENTOS/7/ansible-playbook
+      - src: /out/ansible-playbook
+        dest: Linux/amd64/REDHAT/7.5/ansible-playbook
+    push: False

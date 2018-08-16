@@ -22,8 +22,12 @@ OS_NAME=$(awk -F= '/^NAME/{print $2}' /etc/os-release | tr -d '"')
 if [ X"${OS_NAME}" = X"Ubuntu" ]; then
     DETECTED_OS_NAME="UBUNTU"
     . ${LIBDIR}/detect/distribution/UBUNTU.sh
-#elif [ X"${OS_NAME}" = X"Red Hat Enterprise Linux Server" ]; then
-#    DETECTED_OS_NAME="RHEL"
+elif [ X"${OS_NAME}" = X"Red Hat Enterprise Linux Server" ]; then
+    DETECTED_OS_NAME="REDHAT"
+    . ${LIBDIR}/detect/distribution/RHEL.sh
+elif [ X"${OS_NAME}" = X"CentOS Linux" ]; then
+    DETECTED_OS_NAME="CENTOS"
+    . ${LIBDIR}/detect/distribution/CENTOS.sh
 else
     >&2 echo "Distribution ${OS_NAME} is not supported"
     exit 1
