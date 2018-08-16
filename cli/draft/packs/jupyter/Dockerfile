@@ -9,4 +9,8 @@ ENV PASSWORD ""
 
 ADD training.py
 
+# create dummy file to inform user about /mnt/input not being persistent volume
+RUN ["mkdir", "/mnt/input"]
+RUN echo "Warning - you are able to save some temporary content directly in the input directory. This content is discarded after the session ends." \
+    > /mnt/input/README
 CMD ["jupyter", "notebook", "--allow-root"]
