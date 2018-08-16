@@ -30,7 +30,7 @@ func RunFieldLabelConversion(label, value string) (string, string, error) {
 	switch label {
 	case "metadata.name",
 		"metadata.namespace",
-		"spec.metrics",
+		//"spec.metrics",
 		"spec.state":
 		return label, value, nil
 	default:

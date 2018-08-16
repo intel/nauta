@@ -60,7 +60,9 @@ func MatchRun(label labels.Selector, field fields.Selector) storage.SelectionPre
 // SelectableFields returns a field set that represents the object.
 func selectableFieldsSet(run *aggregator.Run) fields.Set {
 	selectableFields := generic.ObjectMetaFieldsSet(&run.ObjectMeta, true)
-	selectableFields = addMetricsToSelectableFields(run.Spec.Metrics, selectableFields)
+
+	// filtering through metrics is switched off since we are not going to use it and may have a big impact on performance during filtering
+	// selectableFields = addMetricsToSelectableFields(run.Spec.Metrics, selectableFields)
 	selectableFields["spec.state"] = string(run.Spec.State)
 	return selectableFields
 }
