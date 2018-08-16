@@ -72,7 +72,5 @@ def publish(metrics):
             break
         except ApiException as e:
             if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
-                logger.exception("Exception during storing metrics.")
+                logger.exception("Exception during saving metrics. All {} retries failed!".format(MAX_RETRIES_COUNT), e)
                 raise e
-            else:
-                logger.error("Exception during storing metrics. Retrying {} of {}...".format(i+1, MAX_RETRIES_COUNT), e)
