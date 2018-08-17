@@ -145,7 +145,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/kubernetes:
-    version: "v1.10.3"
+    version: "v1.10.6"
     required:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       BASE_IMAGE: "shared/centos/rpm-packer"
