@@ -199,7 +199,7 @@ def submit_experiment(template: str, name: str,
                       script_location: str = None, script_parameters: Tuple[str, ...] = None,
                       pack_params: List[Tuple[str, str]] = None, parameter_range: List[Tuple[str, str]] = None,
                       parameter_set: Tuple[str, ...] = None,
-                      script_folder_location: str = None) -> Tuple[List[RunDescription], str]:
+                      script_folder_location: str = None) -> (List[RunDescription], str):
     script_parameters = script_parameters if script_parameters else ()
     parameter_set = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []

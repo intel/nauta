@@ -35,10 +35,21 @@ class InferenceVerb(Enum):
     PREDICT = 'predict'
 
 
-def start_inference_instance(name: str, model_location: str, model_name: str,
-                             template: str = INFERENCE_TEMPLATE) -> RunDescription:
-    runs, _ = submit_experiment(name=name, template=template,
-                                pack_params=[('modelPath', model_location), ('modelName', model_name)])
+def start_inference_instance(name: str,
+                             model_location: str,
+                             model_name: str,
+                             template: str = INFERENCE_TEMPLATE,
+                             data_location: str = None,
+                             output_location: str = None) -> RunDescription:
+
+    pack_params = [('modelPath', model_location), ('modelName', model_name)]
+
+    if data_location:
+        pack_params.append(('dataPath', data_location))
+    if output_location:
+        pack_params.append(('outputPath', output_location))
+
+    runs, _ = submit_experiment(name=name, template=template, pack_params=pack_params)
     return runs[0]
 
 

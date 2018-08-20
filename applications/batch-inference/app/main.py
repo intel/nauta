@@ -19,11 +19,12 @@
 # and approved by Intel in writing.
 #
 
+import argparse
 import os
 
 import grpc
 
-from tensorflow_serving.apis import predict_pb2, prediction_service_pb2
+from tensorflow_serving.apis import predict_pb2, prediction_service_pb2_grpc
 
 
 def do_batch_inference(server_address, input_dir_path, output_dir_path):
@@ -36,10 +37,9 @@ def do_batch_inference(server_address, input_dir_path, output_dir_path):
     len_detected_files = len(detected_files)
 
     channel = grpc.insecure_channel(server_address)
-    stub = prediction_service_pb2.PredictionServiceStub(channel)
+    stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
     for i, data_file in enumerate(detected_files, start=1):
-
         request = predict_pb2.PredictRequest()
         with open(data_file, mode='rb') as fi:
             pb_bytes = fi.read()
@@ -60,10 +60,21 @@ def do_batch_inference(server_address, input_dir_path, output_dir_path):
 
 
 def main():
-    # TODO: parametrize input_dir_path, output_dir_path from dlsctl predict command
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_dir_path', type=str)
+    parser.add_argument('--output_dir_path', type=str)
+
+    args = parser.parse_args()
+
+    if not args.input_dir_path:
+        parser.error("'input_dir_path' is required!")
+
+    input_dir_path = args.input_dir_path
+    output_dir_path = args.output_dir_path if args.output_dir_path else '/mnt/output/experiment'
+
     do_batch_inference(server_address=os.getenv('TENSORFLOW_MODEL_SERVER_SVC_NAME', ''),
-                       input_dir_path='/mnt/input/home/data',
-                       output_dir_path='/mnt/output/experiment')
+                       input_dir_path=input_dir_path,
+                       output_dir_path=output_dir_path)
 
     # TODO: cleanup of k8s resources after inference
 

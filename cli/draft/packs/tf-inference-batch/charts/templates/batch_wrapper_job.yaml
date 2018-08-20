@@ -25,6 +25,8 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/batch-inference:v1.0.0"
+          command: ["python3.6", "main.py"]
+          args: ["--input_dir_path", "{{ .Values.dataPath }}", "--output_dir_path", "{{ .Values.outputPath }}"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: TENSORFLOW_MODEL_SERVER_SVC_NAME
