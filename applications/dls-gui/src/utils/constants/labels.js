@@ -30,6 +30,7 @@ export default {
   FILTER_BY_VAL: 'Filter by values',
   LAUNCH_TB: 'Launch Tensorboard',
   LICENSE: 'License',
+  LOAD_MORE: 'Load more',
   LOADING: 'Loading',
   MODELS: 'Models',
   NAME: 'Name',

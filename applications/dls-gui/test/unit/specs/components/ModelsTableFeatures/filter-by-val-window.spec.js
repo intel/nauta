@@ -82,4 +82,12 @@ describe('VUE components FilterByValWindow', () => {
     wrapper.vm.onApplyAction();
     expect(props.onApplyClickHandler.calledOnce).to.equal(true);
   });
+
+  it('Should increase limit of visible options on load more action', function () {
+    const initialLimit = 10;
+    const expectedLimit = 20;
+    expect(wrapper.vm.pagination.b).to.equal(initialLimit);
+    wrapper.vm.onLoadMoreAction();
+    expect(wrapper.vm.pagination.b).to.equal(expectedLimit);
+  });
 });

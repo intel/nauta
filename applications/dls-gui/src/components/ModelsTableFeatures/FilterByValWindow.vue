@@ -49,6 +49,11 @@
                 <span>{{ option }}</span>
               </v-tooltip>
             </div>
+            <div id="load-more">
+              <v-btn color="intel_primary" small flat v-if="loadMoreBtnVisibility" v-on:click="onLoadMoreAction()">
+                {{ labels.LOAD_MORE }}...
+              </v-btn>
+            </div>
           </div>
         </v-flex>
         <v-flex xs12 pl-3>
@@ -67,6 +72,8 @@
 <script>
 import ELEMENT_LABELS from '../../utils/constants/labels';
 
+const DEFAULT_PAGINATION_LIMIT = 10;
+
 export default {
   name: 'FilterByValWindow',
   props: ['columnName', 'options', 'appliedOptions', 'onCloseClickHandler', 'onApplyClickHandler'],
@@ -74,14 +81,29 @@ export default {
     return {
       searchPattern: '',
       chosenOptions: [],
-      labels: ELEMENT_LABELS
+      labels: ELEMENT_LABELS,
+      pagination: {
+        a: 0,
+        b: DEFAULT_PAGINATION_LIMIT
+      }
     }
   },
   computed: {
-    boxOptions: function () {
+    filteredOptions: function () {
       return this.options.filter((option) => {
         return option.includes(this.searchPattern);
-      })
+      });
+    },
+    loadMoreBtnVisibility: function () {
+      return this.filteredOptions.length > this.pagination.b;
+    },
+    boxOptions: function () {
+      return this.filteredOptions.slice(this.pagination.a, this.pagination.b);
+    }
+  },
+  watch: {
+    searchPattern: function () {
+      this.pagination.b = DEFAULT_PAGINATION_LIMIT;
     }
   },
   created: function () {
@@ -116,6 +138,9 @@ export default {
     },
     onApplyAction () {
       this.onApplyClickHandler(this.columnName, this.chosenOptions);
+    },
+    onLoadMoreAction () {
+      this.pagination.b += 10;
     }
   }
 }
@@ -144,5 +169,11 @@ export default {
 }
 .pointer-btn {
   cursor: pointer;
+}
+#load-more {
+  margin-top: 5px;
+}
+#load-more button {
+  margin-left: 55px;
 }
 </style>
