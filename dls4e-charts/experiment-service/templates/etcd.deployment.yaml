@@ -19,6 +19,8 @@ spec:
       release: {{ .Release.Name }}
       chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       heritage: {{ .Release.Service }}
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -90,6 +92,8 @@ metadata:
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Chart.Name }}-etcd

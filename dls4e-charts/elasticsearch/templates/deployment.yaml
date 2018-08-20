@@ -12,6 +12,8 @@ metadata:
     dls4e_app_name: elasticsearch
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
