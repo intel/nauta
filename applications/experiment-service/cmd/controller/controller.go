@@ -231,41 +231,73 @@ func (c *Controller) syncHandler(key string) error {
 	}
 
 	stateToSet := calculateRunState(run, pods)
-	return c.updateState(run, stateToSet, pods)
-}
 
-type statePatchSpec struct {
-	Op    string          `json:"op"`
-	Path  string          `json:"path"`
-	Value common.RunState `json:"value"`
-}
+	var patches []patchSpec
 
-func (c *Controller) updateState(run *v1.Run, stateToSet common.RunState, pods []*corev1.Pod) error {
+	if run.Spec.State == common.Queued && stateToSet != common.Queued {
+		patches = append(patches, createUpdateStartTimePatch())
+	}
+
+	if (run.Spec.State == common.Queued || run.Spec.State == common.Running) && (stateToSet != common.Queued && stateToSet != common.Running) {
+		patches = append(patches, createUpdateEndTimePatch())
+	}
+
 	if run.Spec.State != stateToSet {
-		statePatch := []statePatchSpec{
-			{
-				Op:    "add",
-				Path:  "/spec/state",
-				Value: stateToSet,
-			},
-		}
+		patches = append(patches, createUpdateStatePatch(stateToSet))
+	} else {
+		log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
+	}
 
-		patchBytes, errMarshal := json.Marshal(statePatch)
-		if errMarshal != nil {
-			runtime.HandleError(fmt.Errorf("run %s prepare patch error: %v", run.Name, errMarshal))
-			return errMarshal
-		}
+	return c.updateRun(run, patches, pods)
+}
 
-		_, err := c.runclientset.AggregatorV1().Runs(run.Namespace).Patch(run.Name, types.JSONPatchType, patchBytes)
-		if err != nil {
-			runtime.HandleError(fmt.Errorf("run %s patch FAILED! Error: %v", run.Name, err))
-			return err
-		}
-		run.Spec.State = stateToSet
+type patchSpec struct {
+	Op    string      `json:"op"`
+	Path  string      `json:"path"`
+	Value interface{} `json:"value"`
+}
+
+func createUpdateStatePatch(stateToSet common.RunState) patchSpec {
+	return patchSpec{
+		Op:    "add",
+		Path:  "/spec/state",
+		Value: stateToSet,
+	}
+}
+
+func createUpdateStartTimePatch() patchSpec {
+	return patchSpec{
+		Op:    "add",
+		Path:  "/spec/start-time",
+		Value: time.Now(),
+	}
+}
+
+func createUpdateEndTimePatch() patchSpec {
+	return patchSpec{
+		Op:    "add",
+		Path:  "/spec/end-time",
+		Value: time.Now(),
+	}
+}
+
+
+func (c *Controller) updateRun(run *v1.Run, patches []patchSpec, pods []*corev1.Pod) error {
+	if len(patches) == 0 {
 		return nil
 	}
 
-	log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
+	patchBytes, errMarshal := json.Marshal(patches)
+	if errMarshal != nil {
+		runtime.HandleError(fmt.Errorf("run %s prepare patch error: %v", run.Name, errMarshal))
+		return errMarshal
+	}
+
+	_, err := c.runclientset.AggregatorV1().Runs(run.Namespace).Patch(run.Name, types.JSONPatchType, patchBytes)
+	if err != nil {
+		runtime.HandleError(fmt.Errorf("run %s patch FAILED! Error: %v", run.Name, err))
+		return err
+	}
 	return nil
 }
 

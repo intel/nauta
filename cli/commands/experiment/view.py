@@ -25,8 +25,7 @@ import sys
 from tabulate import tabulate
 import click
 
-from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
-    RUN_STATUS, RUN_TEMPLATE_NAME
+from commands.experiment.common import EXPERIMENTS_LIST_HEADERS
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods
@@ -103,10 +102,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
         click.echo(
             tabulate(
                 [run.cli_representation],
-                headers=[
-                    RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE,
-                    RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME
-                ],
+                headers=EXPERIMENTS_LIST_HEADERS,
                 tablefmt="orgtbl"))
 
         click.echo("\nPods participating in the execution:\n")

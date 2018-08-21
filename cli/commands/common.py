@@ -63,6 +63,7 @@ def list_runs_in_cli(all_users: bool, name: str, status: RunStatus, listed_runs_
         else:
             runs_table_data = [
                 (run_representation.name, run_representation.parameters, run_representation.submission_date,
+                 run_representation.start_date, run_representation.end_date,
                  run_representation.submitter, run_representation.status, run_representation.template_name)
                 for run_representation in runs_representations
             ]

@@ -40,14 +40,15 @@ class RunStatus(Enum):
     CREATING = 'CREATING'
 
 
-
 class Run(PlatformResource):
     RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics',
-                                             'submission_date', 'submitter', 'status', 'template_name'])
+                                             'submission_date', 'start_date', 'end_date', 'submitter', 'status',
+                                             'template_name'])
 
     def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
                  pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
-                 creation_timestamp: str = None, template_name: str = None, metadata: dict = None):
+                 creation_timestamp: str = None, template_name: str = None, metadata: dict = None,
+                 start_timestamp: str = None, end_timestamp: str = None):
         self.name = name
         self.parameters = parameters
         self.state = state
@@ -59,7 +60,8 @@ class Run(PlatformResource):
         self.creation_timestamp = creation_timestamp
         self.template_name = template_name
         self.metadata = metadata
-
+        self.start_timestamp = start_timestamp
+        self.end_timestamp = end_timestamp
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -73,7 +75,9 @@ class Run(PlatformResource):
                    experiment_name=object_dict['spec']['experiment-name'],
                    metrics=object_dict.get('spec').get('metrics', {}),
                    template_name=object_dict['spec']['pod-selector']['matchLabels']['app'],
-                   metadata=object_dict['metadata'])
+                   metadata=object_dict['metadata'],
+                   start_timestamp=object_dict['spec']['start-time'],
+                   end_timestamp=object_dict['spec']['end-time'])
 
     @property
     def cli_representation(self):
@@ -85,7 +89,9 @@ class Run(PlatformResource):
                                submission_date=format_timestamp_for_cli(self.creation_timestamp),
                                submitter=self.submitter,
                                status=self.state.value if self.state else "",
-                               template_name=self.template_name)
+                               template_name=self.template_name,
+                               start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",
+                               end_date=format_timestamp_for_cli(self.end_timestamp) if self.end_timestamp else "")
 
 
 class RunSchema(Schema):

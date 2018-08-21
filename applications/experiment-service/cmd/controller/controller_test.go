@@ -44,31 +44,19 @@ var _ = Describe("Controller", func() {
 
 	Describe("when calling updateState method", func() {
 		It("it saves run with success", func() {
+			counter := 0
 			updateRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
+				counter++
 				return true, rUT.runInstance, nil
 			}
 			rUT.mock.AddReactor("patch", "runs", updateRunMock)
 			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
 
-			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(rUT.runInstance.Spec.State).To(Equal(common.Complete))
-		})
+			patch := createUpdateStatePatch(common.Complete)
+			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch}, []*core_v1.Pod{rUT.pod})
 
-		It("it does not save the run if state is not changed", func() {
-			counter := 0
-			patchRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
-				counter++
-				return true, rUT.runInstance, nil
-			}
-			rUT.mock.AddReactor("update", "runs", patchRunMock)
-			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
-
-			rUT.runInstance.Spec.State = common.Complete
-			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(counter).Should(Equal(0))
-			Expect(rUT.runInstance.Spec.State).To(Equal(common.Complete))
+			Expect(counter).Should(Equal(1))
 		})
 
 		It("it returns error if run patch without success", func() {
@@ -86,7 +74,9 @@ var _ = Describe("Controller", func() {
 			rUT.mock.AddReactor("get", "runs", getRunMock)
 			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
 
-			err := rUT.ctrl.updateState(rUT.runInstance, common.Complete, []*core_v1.Pod{rUT.pod})
+			patch := createUpdateStatePatch(common.Complete)
+			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch}, []*core_v1.Pod{rUT.pod})
+
 			Expect(err).To(Equal(updateErr))
 			Expect(counter).Should(Equal(1))
 		})
@@ -173,6 +163,24 @@ var _ = Describe("Controller", func() {
 			rUT.podListenerMock.lister.AssertExpectations(GinkgoT())
 		})
 
+		It("skips run when not enough pods yet", func() {
+			counter := 0
+			getRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
+				counter++
+				return true, prepareRun(1), nil
+			}
+			rUT.mock.AddReactor("get", "runs", getRunMock)
+			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
+
+			rUT.podListenerMock.lister.On("List", mock.Anything).Return([]*core_v1.Pod{}, nil).Once()
+
+			err := rUT.ctrl.syncHandler(rUT.runInstance.Namespace + "/" + rUT.runInstance.Name)
+
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(counter).Should(Equal(1))
+			rUT.podListenerMock.lister.AssertExpectations(GinkgoT())
+		})
+
 		It("returns error when resource key is invalid", func() {
 			err := rUT.ctrl.syncHandler("very/bad/key/format")
 			Expect(err).Should(HaveOccurred())
@@ -217,9 +225,9 @@ var _ = Describe("Controller", func() {
 			}
 			rUT.mock.AddReactor("get", "runs", getRunMock)
 
-			update_counter := 0
+			updateCounter := 0
 			updateRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
-				update_counter++
+				updateCounter++
 				return true, rUT.runInstance, nil
 			}
 			rUT.mock.AddReactor("patch", "runs", updateRunMock)
@@ -230,7 +238,7 @@ var _ = Describe("Controller", func() {
 			err := rUT.ctrl.syncHandler(rUT.runInstance.Namespace + "/" + rUT.runInstance.Name)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(counter).Should(Equal(1))
-			Expect(update_counter).Should(Equal(0))
+			Expect(updateCounter).Should(Equal(0))
 			rUT.podListenerMock.lister.AssertExpectations(GinkgoT())
 		})
 	})

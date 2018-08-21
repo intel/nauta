@@ -49,6 +49,8 @@ type RunSpec struct {
 	Parameters     []string             `json:"parameters,omitempty"`
 	Metrics        map[string]string    `json:"metrics,omitempty"`
 	State          common.RunState      `json:"state,omitempty"`
+	StartTime      metav1.Time          `json:"start-time,omitempty"`
+	EndTime        metav1.Time          `json:"end-time,omitempty"`
 }
 
 // RunStatus defines the observed state of Run

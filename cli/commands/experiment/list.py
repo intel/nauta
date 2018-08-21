@@ -21,8 +21,7 @@
 
 import click
 
-from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
-    RUN_STATUS, RUN_TEMPLATE_NAME, RunKinds
+from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds
 from commands.common import list_runs_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
@@ -37,9 +36,6 @@ LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 HELP_A = 'Show all experiments, regardless of the owner.'
 HELP_N = 'A regular expression to narrow down list to experiments that match this expression.'
 HELP_S = 'List experiments with matching status.'
-
-EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS,
-                            RUN_TEMPLATE_NAME]
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')

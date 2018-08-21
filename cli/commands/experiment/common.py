@@ -59,10 +59,15 @@ RUN_MESSAGE = "Message"
 RUN_PARAMETERS = "Parameters"
 RUN_METRICS = "Metrics"
 RUN_SUBMISSION_DATE = "Submission date"
+RUN_START_DATE = "Start date"
+RUN_END_DATE = "End date"
 RUN_SUBMITTER = "Owner"
 RUN_TEMPLATE_NAME = "Template name"
 
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
+
+EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE,
+                            RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
 
 log = initialize_logger('commands.common')
 

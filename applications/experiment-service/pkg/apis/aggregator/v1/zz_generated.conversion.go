@@ -110,6 +110,8 @@ func autoConvert_v1_RunSpec_To_aggregator_RunSpec(in *RunSpec, out *aggregator.R
 	out.Parameters = *(*[]string)(unsafe.Pointer(&in.Parameters))
 	out.Metrics = *(*map[string]string)(unsafe.Pointer(&in.Metrics))
 	out.State = common.RunState(in.State)
+	out.StartTime = in.StartTime
+	out.EndTime = in.EndTime
 	return nil
 }
 
@@ -125,6 +127,8 @@ func autoConvert_aggregator_RunSpec_To_v1_RunSpec(in *aggregator.RunSpec, out *R
 	out.Parameters = *(*[]string)(unsafe.Pointer(&in.Parameters))
 	out.Metrics = *(*map[string]string)(unsafe.Pointer(&in.Metrics))
 	out.State = common.RunState(in.State)
+	out.StartTime = in.StartTime
+	out.EndTime = in.EndTime
 	return nil
 }
 

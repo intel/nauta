@@ -102,6 +102,8 @@ func (in *RunSpec) DeepCopyInto(out *RunSpec) {
 			(*out)[key] = val
 		}
 	}
+	in.StartTime.DeepCopyInto(&out.StartTime)
+	in.EndTime.DeepCopyInto(&out.EndTime)
 	return
 }
 

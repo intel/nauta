@@ -49,6 +49,8 @@ type RunSpec struct {
 	Parameters     []string
 	Metrics        map[string]string
 	State          common.RunState
+	StartTime      metav1.Time
+	EndTime        metav1.Time
 }
 
 type RunStatus struct {
