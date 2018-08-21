@@ -37,7 +37,7 @@ HELP = "Starts a new prediction instance that can be used for performing predict
        " regression tasks on trained model."
 HELP_N = "The name of this inference instance."
 HELP_M = "Path to saved model that will be used for inference. Model must be located on one of the input or output" \
-         " system shares (e.g. /mnt/input/saved_model)."
+         " system shares (e.g. /mnt/input/home/<experiment_name>)."
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
 
