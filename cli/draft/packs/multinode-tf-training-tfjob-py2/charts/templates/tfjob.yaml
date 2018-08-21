@@ -1,0 +1,166 @@
+apiVersion: kubeflow.org/v1alpha2
+kind: TFJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart_version" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    draft: {{ .Values.draft }}
+    runName: {{ .Release.Name }}
+spec:
+  tfReplicaSpecs:
+    Worker:
+      replicas: {{ .Values.workersCount }}
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            buildID: {{ .Values.buildID }}
+          labels:
+            app: {{ template "name" . }}
+            draft: {{ .Values.draft }}
+            release: {{ .Release.Name }}
+            runName: {{ .Release.Name }}
+        spec:
+          containers:
+            - name: tensorflow
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["python"]
+              args:
+              {{- range .Values.commandline.args }}
+                - "{{ . }}"
+              {{- end }}
+              ports:
+                - containerPort: {{ .Values.TensorBoardPort }}
+                  name: "tensorboard"
+                - containerPort: {{ .Values.TensorIPythonPort }}
+                  name: "ipython"
+              env:
+              - name: RUN_NAME
+                value: {{ .Release.Name }}
+              volumeMounts:
+                - name: input-home
+                  mountPath: /mnt/input/home
+                  readOnly: True
+                - name: input-public
+                  mountPath: /mnt/input/root
+                  readOnly: True
+                - name: output-home
+                  mountPath: /mnt/output/home
+                - name: output-public
+                  mountPath: /mnt/output/root
+                - name: output-home
+                  mountPath: /mnt/output/experiment
+                  subPath: {{ .Values.experimentName }}
+              securityContext:
+                privileged: true
+              resources:
+{{ toYaml .Values.worker_resources | indent 16 }}
+          volumes:
+            - name: input-home
+              persistentVolumeClaim:
+                claimName: input-home
+            - name: input-public
+              persistentVolumeClaim:
+                claimName: input-public
+            - name: output-home
+              persistentVolumeClaim:
+                claimName: output-home
+            - name: output-public
+              persistentVolumeClaim:
+                claimName: output-public
+          initContainers:
+            - name: init-experiment-pod
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+              volumeMounts:
+                - name: output-home
+                  mountPath: /mnt/output/home
+      backoffLimit: 5
+    PS:
+      replicas: {{ .Values.pServersCount }}
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            buildID: {{ .Values.buildID }}
+          labels:
+            app: {{ template "name" . }}
+            draft: {{ .Values.draft }}
+            release: {{ .Release.Name }}
+            runName: {{ .Release.Name }}
+        spec:
+          containers:
+            - name: tensorflow
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["/bin/bash"]
+              args:
+                - "-c"
+                - "python {{range .Values.commandline.args}}{{.}} {{end}}& while true ; do if [[ -e /pod-data/END ]] ; then exit 0 ; else sleep 10 ; fi ; done"
+              ports:
+                - containerPort: {{ .Values.TensorBoardPort }}
+                  name: "tensorboard"
+                - containerPort: {{ .Values.TensorIPythonPort }}
+                  name: "ipython"
+              volumeMounts:
+                - name: input-home
+                  mountPath: /mnt/input/home
+                  readOnly: True
+                - name: input-public
+                  mountPath: /mnt/input/root
+                  readOnly: True
+                - name: output-home
+                  mountPath: /mnt/output/home
+                - name: output-public
+                  mountPath: /mnt/output/root
+                - name: output-home
+                  mountPath: /mnt/output/experiment
+                  subPath: {{ .Values.experimentName }}
+                - name: shared-data
+                  mountPath: /pod-data
+              securityContext:
+                privileged: true
+              resources:
+{{ toYaml .Values.ps_resources | indent 16 }}
+            - name: sidecar
+              image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/ps-sidecar:1.0.0"
+              imagePullPolicy: Always
+              env:
+                - name: MY_POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              volumeMounts:
+                - name: shared-data
+                  mountPath: /pod-data
+              securityContext:
+                privileged: true
+              resources:
+{{ toYaml .Values.sidecar_resources | indent 16 }}
+          volumes:
+            - name: input-home
+              persistentVolumeClaim:
+                claimName: input-home
+            - name: input-public
+              persistentVolumeClaim:
+                claimName: input-public
+            - name: output-home
+              persistentVolumeClaim:
+                claimName: output-home
+            - name: output-public
+              persistentVolumeClaim:
+                claimName: output-public
+            - name: shared-data
+              emptyDir: {}
+          initContainers:
+            - name: init-experiment-pod
+              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+              volumeMounts:
+                - name: output-home
+                  mountPath: /mnt/output/home
+      backoffLimit: 5

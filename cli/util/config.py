@@ -119,6 +119,8 @@ class DLS4EConfigMap:
     IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
     REGISTRY_FIELD = 'registry'
     PLATFORM_VERSION = 'platform.version'
+    PY2_IMAGE_NAME = 'image.tensorflow_1.9_py2'
+    PY3_IMAGE_NAME = 'image.tensorflow_1.9_py3'
 
     __shared_state = {}
 
@@ -134,3 +136,5 @@ class DLS4EConfigMap:
             self.image_tensorboard_service = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
                                                             config_map_data[self.IMAGE_TENSORBOARD_SERVICE_FIELD])
             self.platform_version = config_map_data.get(self.PLATFORM_VERSION)
+            self.py2_image_name = config_map_data.get(self.PY2_IMAGE_NAME)
+            self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)

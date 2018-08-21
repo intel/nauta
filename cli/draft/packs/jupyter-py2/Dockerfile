@@ -1,0 +1,16 @@
+FROM dls4e/tensorflow:1.9.0-py2
+
+# workdir set to /mnt - is treated by a jupyter as a main folder with notebooks
+WORKDIR /mnt
+
+ENV PYTHONUNBUFFERED 1
+# setting PASSWORD env variable to an empty string turns off authetication
+ENV PASSWORD ""
+
+ADD training.py
+
+# create dummy file to inform user about /mnt/input not being persistent volume
+RUN ["mkdir", "/mnt/input"]
+RUN echo "Warning - you are able to save some temporary content directly in the input directory. This content is discarded after the session ends." \
+    > /mnt/input/README
+CMD ["jupyter", "notebook", "--allow-root"]

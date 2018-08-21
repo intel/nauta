@@ -34,6 +34,7 @@ import toml
 from util.k8s import k8s_info
 from util.logger import initialize_logger
 from util.config import FOLDER_DIR_NAME
+from util.config import DLS4EConfigMap
 
 import packs.common as common
 from util.exceptions import KubectlIntError
@@ -94,11 +95,16 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
             if line.startswith("ADD training.py"):
                 if script_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
-            elif line.startswith("FROM dls4e/tensorflow:1.9.0-py3"):
-                tf_image_repository = f'127.0.0.1:{local_registry_port}/dls4e/tensorflow'
-                tf_image_tag = '1.9.0-py3'
+            elif line.startswith("FROM dls4e/tensorflow:1.9.0-py"):
+                dls4e_config_map = DLS4EConfigMap()
+                if line.find('1.9.0-py2') != -1:
+                    tf_image_name = dls4e_config_map.py2_image_name
+                else:
+                    tf_image_name = dls4e_config_map.py3_image_name
+                tf_image_tag = tf_image_name.split(':')[1]
+                tf_image_repository = f'127.0.0.1:{local_registry_port}/{tf_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + \
-                                          f"FROM {tf_image_repository}:{tf_image_tag}"
+                                          f'FROM {tf_image_repository}'
 
                 # pull image from platform's registry
                 pull_tf_image(tf_image_repository=tf_image_repository, tf_image_tag=tf_image_tag)
