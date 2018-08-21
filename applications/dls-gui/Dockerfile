@@ -13,6 +13,9 @@ RUN npm install
 ADD . /app
 RUN npm run build
 
+# remove blacklisted components
+RUN rm -rf ./node_modules/commander
+
 EXPOSE 9000
 
 WORKDIR /app
