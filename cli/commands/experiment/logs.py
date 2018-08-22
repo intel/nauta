@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-import sys
-
 import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
@@ -34,23 +32,21 @@ from util.app_names import DLS4EAppNames
 from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.system import handle_error
+from cli_text_consts import EXPERIMENT_LOGS_CMD_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(cls=AliasCmd, alias='lg')
+@click.command(help=TEXTS["help"], cls=AliasCmd, alias='lg')
 @click.argument('experiment-name')
-@click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]),
-              help='Show all events with this specified minimal and greater severity.')
-@click.option('-sd', '--start-date', default=None,
-              help='Retrieve all logs produced on and after this date (use ISO 8601 date format).')
-@click.option('-ed', '--end-date', default=None,
-              help='Retrieve all logs produced on and before this date (use ISO 8601 date format).')
-@click.option('-i', '--pod-ids', default=None,
-              help='Comma separated list of pod IDs. If provided, only logs from these pods will be returned.')
+@click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=TEXTS["help_s"])
+@click.option('-sd', '--start-date', default=None, help=TEXTS["help_sd"])
+@click.option('-ed', '--end-date', default=None, help=TEXTS["help_ed"])
+@click.option('-i', '--pod-ids', default=None, help=TEXTS["help_i"])
 @click.option('-p', '--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
-              help='Get logs only for pods with given status.')
+              help=TEXTS["help_p"])
 @common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
@@ -80,22 +76,14 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
                                        in experiment_logs if not log_entry.content.isspace()])
             click.echo(experiment_logs)
     except K8sProxyCloseError:
-        logger.exception("Error during closing of a proxy for elasticsearch.")
-        sys.exit("Elasticsearch proxy hasn't been closed properly. "
-                 "Check whether it still exists, if yes - close it manually.")
+        handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
     except LocalPortOccupiedError as exe:
-        msg = f"Error during creation of a proxy for elasticsearch. {exe.message}"
-        logger.exception(msg)
-        sys.exit(msg)
+        handle_error(logger, TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message),
+                     TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message))
     except K8sProxyOpenError:
-        msg = "Error during creation of a proxy for elasticsearch."
-        logger.exception(msg)
-        sys.exit(msg)
+        handle_error(logger, TEXTS["proxy_creation_error_msg"], TEXTS["proxy_creation_error_msg"])
     except ValueError:
-        msg = f"Experiment with name {experiment_name} does not exist."
-        logger.exception(msg)
-        sys.exit(msg)
+        handle_error(logger, TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name),
+                     TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name))
     except Exception:
-        error_msg = 'Failed to get experiment logs.'
-        logger.exception(error_msg)
-        sys.exit(error_msg)
+        handle_error(logger, TEXTS["logs_get_other_error_msg"], TEXTS["logs_get_other_error_msg"])

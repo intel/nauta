@@ -33,6 +33,7 @@ from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, LaunchError, \
     ProxyClosingError
+from cli_text_consts import UTIL_LAUNCHER_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
@@ -61,7 +62,7 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                 try:
                     socat.start(proxy.container_port)
                 except Exception:
-                    err_message = 'Error during creation of a local docker-host tunnel.'
+                    err_message = TEXTS["local_docker_tunnel_error_msg"]
                     logger.exception(err_message)
                     raise LaunchError(err_message)
 
@@ -73,33 +74,30 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
 
             if not no_launch:
                 if is_gui_browser_available():
-                    click.echo('Browser will start in few seconds. Please wait... ')
+                    click.echo(TEXTS["browser_starting_msg"])
                     wait_for_connection(url)
                     webbrowser.open_new(url)
                 else:
-                    err_message = 'Cannot find a suitable web browser. Try running this command ' \
-                                  'with --no-launch option.'
+                    raise LaunchError(TEXTS["no_web_browser_error_msg"])
 
-                    raise LaunchError(err_message)
+            click.echo(TEXTS["go_to_msg"].format(url=url))
 
-            click.echo('Go to {}'.format(url))
-
-            click.echo('Proxy connection created.\nPress Ctrl-C key to close a port forwarding process...')
+            click.echo(TEXTS["proxy_created_msg"])
             wait_for_ctrl_c()
     except K8sProxyCloseError:
-        err_message = 'Error during closing of a proxy for a {}'.format(k8s_app_name)
+        err_message = TEXTS["proxy_close_error_msg"].format(app_name=k8s_app_name)
         raise ProxyClosingError(err_message)
     except LocalPortOccupiedError as exe:
-        err_message = 'Error during creation of a proxy for a {}. {}'.format(k8s_app_name, exe.message)
+        err_message = TEXTS["proxy_created_extended_error_msg"].format(app_name=k8s_app_name, reason=exe.message)
         raise LaunchError(err_message)
     except K8sProxyOpenError:
-        error_msg = 'Error during creation of a proxy for a {}'
-        logger.exception(error_msg.format(k8s_app_name))
-        raise LaunchError(error_msg.format(k8s_app_name))
+        error_msg = TEXTS["proxy_create_error_msg"].format(app_name=k8s_app_name)
+        logger.exception(error_msg)
+        raise LaunchError(error_msg)
     except LaunchError as e:
         raise e
     except Exception:
-        err_message = 'Failed to launch web application.'
+        err_message = TEXTS["web_app_lauch_fail_msg"]
         logger.exception(err_message)
         raise LaunchError(err_message)
     finally:
@@ -110,5 +108,5 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
             try:
                 socat.stop()
             except Exception:
-                err_message = 'Error during closing of a proxy for a {}'.format(k8s_app_name)
+                err_message = TEXTS["proxy_close_error_msg"].format(k8s_app_name)
                 raise ProxyClosingError(err_message)

@@ -31,6 +31,8 @@ from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.system import get_current_os, OS
+from cli_text_consts import UTIL_K8S_PROXY_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
@@ -65,7 +67,7 @@ class K8sProxy:
         except LocalPortOccupiedError as exe:
             raise exe
         except Exception as exe:
-            error_message = "k8s_proxy - enter - error"
+            error_message = TEXTS["proxy_enter_error_msg"]
             logger.exception(error_message)
             raise K8sProxyOpenError(error_message) from exe
 
@@ -76,7 +78,7 @@ class K8sProxy:
         try:
             self._close_tunnel()
         except Exception as exe:
-            error_message = "k8s_proxy - exit - error"
+            error_message = TEXTS["proxy_exit_error_msg"]
             logger.exception(error_message)
             raise K8sProxyCloseError(error_message) from exe
 
@@ -89,7 +91,7 @@ class K8sProxy:
             except ConnectionError as e:
                 logger.error(f'can not connect to {address}:{port}. Error: {e}')
                 time.sleep(1)
-        raise TunnelSetupError(f'connection on {address}:{port} NOT READY!')
+        raise TunnelSetupError(TEXTS["tunnel_not_ready_error_msg"].format(address=address, port=port))
 
     def _close_tunnel(self):
         if get_current_os() == OS.WINDOWS:

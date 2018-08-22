@@ -26,6 +26,8 @@ from kubernetes.client import V1Pod
 
 from commands.experiment import view
 from platform_resources.run_model import Run, RunStatus
+from cli_text_consts import EXPERIMENT_VIEW_CMD_TEXTS as TEXTS
+
 
 TEST_RUNS = [
     Run(
@@ -91,7 +93,7 @@ def test_view_experiments_not_found(prepare_mocks: ViewMocks):
 
     assert prepare_mocks.get_run.call_count == 1, "Run retrieval was not called"
     assert result.exit_code == 2
-    assert "Experiment \"missing\" not found" in result.output, "Bad output."
+    assert TEXTS["experiment_not_found_error_msg"].format(experiment_name="missing") in result.output, "Bad output."
 
 
 def test_view_experiments_no_argument(prepare_mocks: ViewMocks):
@@ -138,7 +140,7 @@ def test_container_resources_to_msg():
 
     msg = view.container_resources_to_msg(resources=resources)
 
-    assert '- Requests:' in msg
+    assert TEXTS["container_requests_list_header"].format("") in msg
     assert f'cpu: {resources.requests["cpu"]}' in msg
     assert f'mem: {resources.requests["mem"]}' in msg
 

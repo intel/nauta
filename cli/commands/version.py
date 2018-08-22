@@ -23,49 +23,44 @@ import click
 from tabulate import tabulate
 
 from util.aliascmd import AliasCmd
-from cli_state import common_options
+from cli_state import common_options, pass_state, State
 from version import VERSION
 from util.config import DLS4EConfigMap
 from util.exceptions import KubectlIntError
 from util.logger import initialize_logger
+from util.system import handle_error
+from cli_text_consts import VERSION_CMD_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
-
-HELP = "Displays the version of the installed dlsctl application."
 
 # Timeout for version check request in seconds. This request is repeated 3 times.
 PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='v')
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='v')
 @common_options(verify_dependencies=False, verify_config_path=False)
-def version():
-    """
-    Returns the version of the installed dlsctl application.
-    """
-    platform_version = "Failed to get platform version."
+@pass_state
+def version(state: State):
+    """ Returns the version of the installed dlsctl application. """
+    platform_version = TEXTS["initial_platform_version"]
     error_msg = ""
     platform_version_fail = False
     try:
         platform_version = DLS4EConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
     except KubectlIntError:
-        error_msg = 'Platform version check failure may occur for example due to invalid path to kubectl config, ' \
-                    'invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environment ' \
-                    'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
-                    'for more info.'
-        logger.exception(error_msg)
+        error_msg = TEXTS["kubectl_int_error_msg"]
         platform_version_fail = True
     except Exception:
-        error_msg = 'Unexpected error occurred during platform version check. Use -v or -vv option for more info.'
-        logger.exception(error_msg)
+        error_msg = TEXTS["other_error_msg"]
         platform_version_fail = True
 
-    version_table = [["dlsctl application", VERSION],
-                     ["dls4e platform", platform_version]]
+    version_table = [[TEXTS["table_app_row_name"], VERSION],
+                     [TEXTS["table_platform_row_name"], platform_version]]
 
     click.echo(tabulate(version_table,
-                        headers=['Component', 'Version'],
+                        headers=TEXTS["table_headers"],
                         tablefmt="orgtbl"))
 
     if platform_version_fail:
-        click.echo(error_msg)
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=state.verbosity == 0, exit_code=None)

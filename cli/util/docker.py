@@ -26,6 +26,8 @@ from typing import List
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
+from cli_text_consts import UTIL_DOCKER_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
@@ -42,7 +44,7 @@ def get_tags_list(server_address: str, image_name: str) -> List[str]:
     result = requests.get(url)
 
     if not result or result.status_code != HTTPStatus.OK:
-        err_message = "Error during getting list of tags for an image."
+        err_message = TEXTS["tags_get_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message)
 
@@ -63,14 +65,14 @@ def delete_tag(server_address: str, image_name: str, tag: str):
     result = requests.get(get_digest_url, headers=headers)
 
     if not result or result.status_code != HTTPStatus.OK or not result.headers.get("Docker-Content-Digest"):
-        err_message = "Error during deletion of an image."
+        err_message = TEXTS["image_delete_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message)
 
     digest = result.headers.get("Docker-Content-Digest")
 
     if not digest:
-        err_message = "Error during deletion of an image."
+        err_message = TEXTS["image_delete_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message)
 
@@ -78,7 +80,7 @@ def delete_tag(server_address: str, image_name: str, tag: str):
     result = requests.delete(delete_tag_url, headers=headers)
 
     if not result or result.status_code != HTTPStatus.ACCEPTED:
-        err_message = "Error during deletion of an image."
+        err_message = TEXTS["image_delete_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message)
 

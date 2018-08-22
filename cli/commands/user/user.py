@@ -26,14 +26,13 @@ from commands.user.delete import delete
 from commands.user.list_users import list_users
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger
-
-log = initialize_logger(__name__)
-
-HELP = "Command for creating/deleting/listing users of the platform. Can only be " \
-       "run by a platform administrator."
+from cli_text_consts import USER_CMD_TEXTS as TEXTS
 
 
-@click.group(short_help=HELP, help=HELP, cls=AliasGroup, alias='u',
+logger = initialize_logger(__name__)
+
+
+@click.group(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasGroup, alias='u',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def user():
     pass

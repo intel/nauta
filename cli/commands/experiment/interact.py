@@ -28,7 +28,6 @@ import click
 from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
-from commands.experiment.submit import HELP_P
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
@@ -40,26 +39,21 @@ from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
 from commands.experiment.common import check_experiment_name
 from util.exceptions import K8sProxyCloseError
-
-HELP = "Launches a local browser with Jupyter Notebook. If the script name argument " \
-       "is given, then script is put into the opened notebook."
-HELP_N = "The name of this Jupyter Notebook session."
-HELP_F = "File with a notebook that should be opened in Jupyter notebook."
-HELP_PO = "Port on which service will be exposed locally."
+from util.system import handle_error
+from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
 
 
 JUPYTER_CHECK_POD_READY_TRIES = 60
 
-log = initialize_logger(__name__)
+logger = initialize_logger(__name__)
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='i')
-@click.option('-n', '--name', default=None, help=HELP_N)
-@click.option('-f', '--filename', default=None, help=HELP_F)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=HELP_P)
-@click.option('--no-launch', is_flag=True, help='Run command without a web browser starting, '
-                                                'only proxy tunnel is created')
-@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=HELP_PO)
+@click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='i')
+@click.option('-n', '--name', default=None, help=TEXTS["help_n"])
+@click.option('-f', '--filename', default=None, help=TEXTS["help_f"])
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"])
+@click.option('--no-launch', is_flag=True, help=TEXTS["help_no_launch"])
+@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"])
 @common_options()
 @pass_state
 def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
@@ -76,19 +70,13 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         try:
             jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
         except Exception:
-            err_message = "Problems during loading a list of experiments."
-            log.exception(err_message)
-            click.echo(err_message)
-            sys.exit(1)
+            handle_error(logger, TEXTS["experiment_get_error_msg"], TEXTS["experiment_get_error_msg"])
 
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
         if jupyter_experiment and jupyter_experiment.template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
-            click.echo(f"The chosen name ({name}) is already used by an experiment other than Jupyter Notebook. "
-                       f"Please choose another one")
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["name_already_used"].format(name=name))
 
-        if not jupyter_experiment and not click.confirm("Experiment with a given name doesn't exist. "
-                                                        "Should the app continue and create a new one? "):
+        if not jupyter_experiment and not click.confirm(TEXTS["confirm_experiment_creation"]):
             sys.exit(0)
 
         if jupyter_experiment:
@@ -97,8 +85,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             try:
                 check_experiment_name(value=name)
             except click.BadParameter as exe:
-                click.echo(str(exe))
-                sys.exit(1)
+                handle_error(user_msg=str(exe))
 
     number_of_retries = 0
     if create_new_notebook:
@@ -108,7 +95,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             if not name and not filename:
                 exp_name = generate_name("jup")
 
-            click.echo("Submitting interactive experiment.")
+            click.echo(TEXTS["submitting_experiment_user_msg"])
             runs, filename = submit_experiment(script_location=filename, script_folder_location=None,
                                                template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
                                                name=exp_name, parameter_range=[], parameter_set=(),
@@ -125,20 +112,15 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 raise RuntimeError("Run wasn't created")
 
         except K8sProxyCloseError as exe:
-            click.echo(exe.message)
+            handle_error(user_msg=exe.message)
         except SubmitExperimentError as exe:
-            err_message = f"Error during starting jupyter notebook session: {exe.message}"
-            log.exception(err_message)
-            click.echo(err_message)
-            sys.exit(1)
+            handle_error(logger, TEXTS["submit_error_msg"].format(exception_message=exe.message),
+                         TEXTS["submit_error_msg"].format(exception_message=exe.message))
         except Exception:
-            err_message = "Other error during starting jupyter notebook session."
-            log.exception(err_message)
-            click.echo(err_message)
-            sys.exit(1)
+            handle_error(logger, TEXTS["submit_other_error_msg"], TEXTS["submit_other_error_msg"])
     else:
         # if jupyter service exists - the system only connects to it
-        click.echo("Jupyter notebook's session exists. dlsctl connects to this session ...")
+        click.echo(TEXTS["session_exists_msg"])
 
     url_end = ""
     if filename:
@@ -150,8 +132,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 url_end = "/edit/"
             url_end = url_end + Path(filename).name
         else:
-            click.echo("Attaching script to existing Jupyter notebook's session is not supported. "
-                       "Please create a new Jupyter notebook's session to attach script.")
+            click.echo(TEXTS["attaching_script_not_supported_msg"])
 
     # wait until all jupyter pods are ready
     for i in range(JUPYTER_CHECK_POD_READY_TRIES):
@@ -159,25 +140,17 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             if check_pods_status(run_name=name, namespace=current_namespace, status=PodStatus.RUNNING):
                 break
         except Exception:
-            log.exception("Error during checking state of Jupyter notebook.")
+            handle_error(logger, TEXTS["notebook_state_check_error_msg"])
         time.sleep(1)
     else:
-        click.echo("Jupyter notebook is still not ready. Please try to connect to it by running"
-                   "interact command another time passing a name of a current Jupyter notebook session")
-        sys.exit(1)
+        handle_error(user_msg=TEXTS["notebook_not_ready_error_msg"])
 
     try:
         launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
                    number_of_retries=number_of_retries, url_end=url_end, port=port_number)
     except LaunchError as exe:
-        log.exception(exe.message)
-        click.echo(exe.message)
-        sys.exit(1)
+        handle_error(logger, exe.message, exe.message)
     except ProxyClosingError:
-        click.echo('K8s proxy hasn\'t been closed properly. '
-                   'Check whether it still exists, if yes - close it manually.')
+        handle_error(user_msg=TEXTS["proxy_closing_error_msg"])
     except Exception:
-        err_message = "Other exception during launching interact session."
-        log.exception(err_message)
-        click.echo(err_message)
-        sys.exit(1)
+        handle_error(logger, TEXTS["session_launch_other_error_msg"], TEXTS["session_launch_other_error_msg"])

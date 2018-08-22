@@ -29,6 +29,8 @@ from kubernetes.client import configuration, V1DeleteOptions
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from util.app_names import DLS4EAppNames
+from cli_text_consts import UTIL_K8S_INFO_TEXTS as TEXTS
+
 
 logger = initialize_logger('util.kubectl')
 
@@ -159,7 +161,7 @@ def find_namespace(namespace: str) -> NamespaceStatus:
         if e.status == 404:
             return NamespaceStatus.NOT_EXISTS
         else:
-            error_message = "find_namespace error"
+            error_message = TEXTS["other_find_namespace_error"]
             logger.exception(error_message)
             raise KubectlIntError(error_message)
 
@@ -184,12 +186,12 @@ def delete_namespace(namespace: str, propagate: bool = False):
         response = api.delete_namespace(namespace, body)
 
         if response.status != "{'phase': 'Terminating'}":
-            error_description = f"Error during deleting namespace {namespace}"
+            error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
             logger.exception(error_description)
             raise KubectlIntError(error_description)
 
     except Exception:
-        error_description = f"Error during deleting namespace {namespace}"
+        error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
         logger.exception(error_description)
         raise KubectlIntError(error_description)
 
@@ -208,7 +210,7 @@ def get_config_map_data(name: str, namespace: str, request_timeout: int = None) 
         api = get_k8s_api()
         ret_dict = api.read_namespaced_config_map(name, namespace, _request_timeout=request_timeout).data
     except Exception:
-        error_description = f"Problem during accessing ConfigMap : {name}."
+        error_description = TEXTS["config_map_access_error_msg"].format(name=name)
         logger.exception(error_description)
         raise KubectlIntError(error_description)
 
@@ -234,12 +236,12 @@ def get_users_token(namespace: str) -> str:
                     ret_token = str(base64.b64decode(token.data.get("token")), encoding="utf-8")
                     break
             else:
-                raise ValueError("Lack of default-token on a list of tokens.")
+                raise ValueError(TEXTS["lack_of_default_token_error_msg"])
         else:
-            raise ValueError("Empty list of tokens.")
+            raise ValueError(TEXTS["empty_list_of_tokens_error_msg"])
 
     except Exception as exe:
-        error_message = "Problem during gathering users token."
+        error_message = TEXTS["gathering_users_token_error_msg"]
         logger.exception(error_message)
         raise KubectlIntError(error_message) from exe
 
@@ -273,7 +275,7 @@ def get_users_samba_password(username: str) -> str:
     In case of any problems during gathering of a password it raises KubectlIntError
     If password doesnt exist - it raises ValueError.
     """
-    error_message = "Error during gathering users password."
+    error_message = TEXTS["gathering_password_error_msg"]
     password = None
     try:
         api = get_k8s_api()
@@ -292,7 +294,7 @@ def get_users_samba_password(username: str) -> str:
         raise KubectlIntError(error_message) from exe
 
     if password is None:
-        raise ValueError("Lack of password.")
+        raise ValueError(TEXTS["lack_of_password_error_msg"])
 
     return str.strip(password)
 

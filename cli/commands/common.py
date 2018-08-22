@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-import sys
-
 import click
 from tabulate import tabulate
 from typing import List
@@ -32,15 +30,19 @@ from platform_resources.run_model import RunStatus, Run
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from platform_resources.experiment_model import Experiment
+from util.system import handle_error
+from cli_text_consts import CMDS_COMMON_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
 
-def list_runs_in_cli(all_users: bool, name: str, status: RunStatus, listed_runs_kinds: List[Enum],
+def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus, listed_runs_kinds: List[Enum],
                      runs_list_headers: List[str], with_metrics: bool):
     """
     Display a list of selected runs in the cli.
 
+    :param verbosity_lvl: level at which error messages should be logged or displayed
     :param all_users: whether to display runs regardless of their owner or not
     :param name: regular expression to which names of the shown runs have to match
     :param status: display runs with this status
@@ -69,15 +71,10 @@ def list_runs_in_cli(all_users: bool, name: str, status: RunStatus, listed_runs_
             ]
         click.echo(tabulate(runs_table_data, headers=runs_list_headers, tablefmt="orgtbl"))
     except runs_api.InvalidRegularExpressionError:
-        error_msg = f'Regular expression provided for name filtering is invalid: {name}'
-        logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],
+                     add_verbosity_msg=verbosity_lvl == 0)
     except Exception:
-        error_msg = 'Failed to get experiments list.'
-        logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=verbosity_lvl == 0)
 
 
 def replace_initializing_runs(run_list: List[Run]):

@@ -29,6 +29,8 @@ from platform_resources.user_model import User, UserStatus
 from commands.user.create import check_users_presence, generate_kubeconfig, create, UserState
 from util.helm import delete_user, delete_helm_release
 from util.k8s.kubectl import NamespaceStatus
+from cli_text_consts import VERBOSE_RERUN_MSG, USER_CREATE_CMD_TEXTS as TEXTS
+
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -162,7 +164,7 @@ def test_create_user_terminating(mocker):  # noqa: F811
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
-    assert "User is still being removed" in result.output
+    assert TEXTS["user_being_removed_error_msg"] in result.output
 
     assert cup_mock.call_count == 1, "users presence wasn't checked"
     assert esc_mock.call_count == 0, "user was created"
@@ -179,7 +181,7 @@ def test_create_user_not_admin(mocker):  # noqa: F811
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
-    assert "Only administrators can create new users." in result.output
+    assert TEXTS["user_not_admin_error_msg"] in result.output
 
     assert cup_mock.call_count == 0, "users presence wasn't checked"
     assert vun_mock.call_count == 1, "username wasn't validated"
@@ -187,14 +189,13 @@ def test_create_user_not_admin(mocker):  # noqa: F811
 
 
 def test_create_user_incorrect_name(mocker):  # noqa: F811
-    error_message = "error message"
-    vun_mock = mocker.patch("commands.user.create.validate_user_name", side_effect=ValueError(error_message))
+    vun_mock = mocker.patch("commands.user.create.validate_user_name", side_effect=ValueError("error"))
     icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=False)
 
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
-    assert error_message in result.output
+    assert "error" in result.output
 
     assert vun_mock.call_count == 1, "username wasn't validated"
     assert icu_mock.call_count == 0, "admin wasn't checked"
@@ -257,7 +258,7 @@ def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert f"Configuration has been saved to the {test_username}.config file." in result.output
+    assert TEXTS["config_save_success_msg"].format(filename=test_username + ".config") in result.output
 
     check_asserts(prepare_mocks)
 
@@ -272,7 +273,7 @@ def test_create_user_with_empty_username(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [])
 
-    assert f"Configuration has been saved to the {os_username}.config file." in result.output
+    assert TEXTS["config_save_success_msg"].format(filename=os_username + ".config") in result.output
     assert getpass_mock.call_count == 1
     prepare_mocks.vun.assert_called_once_with(os_username)
     check_asserts(prepare_mocks)
@@ -286,7 +287,7 @@ def test_create_user_with_non_empty_username(mocker, prepare_mocks):  # noqa: F8
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert f"Configuration has been saved to the {test_username}.config file." in result.output
+    assert TEXTS["config_save_success_msg"].format(filename=test_username + ".config") in result.output
     assert getpass_mock.call_count == 0
     check_asserts(prepare_mocks)
 
@@ -298,7 +299,7 @@ def test_create_user_success_display_config(mocker, prepare_mocks):  # noqa: F81
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username, "-l"])
 
-    assert "Please use the following kubectl config to connect" in result.output
+    assert TEXTS["list_only_header"] in result.output
 
     check_asserts(prepare_mocks)
 
@@ -311,7 +312,7 @@ def test_create_user_success_with_filename(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username, "-f", filename])
 
-    assert f"Configuration has been saved to the {filename} file." in result.output
+    assert TEXTS["config_save_success_msg"].format(filename=filename) in result.output
 
     check_asserts(prepare_mocks)
 
@@ -325,7 +326,7 @@ def test_create_user_success_with_error_saving_file(mocker, prepare_mocks):  # n
         mocked_file.return_value.__enter__.side_effect = RuntimeError()
         result = runner.invoke(create, [test_username, "-f", filename])
 
-    assert "Content of the generated config file is as follows. Please copy it to a file manually." in result.output
+    assert TEXTS["config_save_fail_instructions_msg"] in result.output
 
     check_asserts(prepare_mocks)
 
@@ -339,7 +340,7 @@ def test_create_user_success_with_error_creating_file(mocker, prepare_mocks):  #
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert "Problems during creation of the file with user's configuration." in result.output
+    assert TEXTS["config_creation_error_msg"] + " " + VERBOSE_RERUN_MSG in result.output
     assert gkc_mock.call_count == 1
     check_asserts(prepare_mocks)
 
@@ -351,8 +352,8 @@ def test_create_user_with_defined_status_only(mocker, prepare_mocks):  # noqa: F
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
-    assert f"Configuration has been saved to the {test_username}.config file." in result.output
-    assert f"User {test_username} is still not ready." in result.output
+    assert TEXTS["config_save_success_msg"].format(filename=test_username + ".config") in result.output
+    assert TEXTS["user_not_ready_error_msg"].format(username=test_username) in result.output
 
     check_asserts(prepare_mocks)
 
@@ -365,7 +366,7 @@ def test_create_user_with_l_and_f(mocker, prepare_mocks):  # noqa: F811
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username, "-l", "-f", "test-filename"])
 
-    assert "Both -f/--filename and -l/--list_only options cannot be given." in result.output
+    assert TEXTS["f_l_options_exclusion_error_msg"] in result.output
     assert result.exit_code == 1
     check_asserts(prepare_mocks, cup_count=0, esc_count=0, gut_count=0, vun_count=0, icu_count=0,
                   opj_count=0, gkh_count=0, iuc_count=0)

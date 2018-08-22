@@ -27,23 +27,21 @@ from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
+from cli_text_consts import EXPERIMENT_LIST_CMD_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
 
 LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 
-HELP_A = 'Show all experiments, regardless of the owner.'
-HELP_N = 'A regular expression to narrow down list to experiments that match this expression.'
-HELP_S = 'List experiments with matching status.'
-
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
-@click.option('-a', '--all-users', is_flag=True, help=HELP_A)
-@click.option('-n', '--name', type=str, help=HELP_N)
-@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=HELP_S)
+@click.option('-a', '--all-users', is_flag=True, help=TEXTS["help_a"])
+@click.option('-n', '--name', type=str, help=TEXTS["help_n"])
+@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=TEXTS["help_s"])
 @common_options()
 @pass_state
 def list_experiments(state: State, all_users: bool, name: str, status: RunStatus):
     """ List experiments. """
-    list_runs_in_cli(all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS, with_metrics=True)
+    list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS,
+                     with_metrics=True)

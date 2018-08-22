@@ -31,16 +31,17 @@ from util.aliascmd import AliasCmd
 from draft.cmd import DRAFT_HOME_FOLDER
 from util.config import Config
 from util.logger import initialize_logger
+from util.system import handle_error
+from cli_text_consts import EXPERIMENT_TEMPLATE_LIST_CMD_TEXTS as TEXTS
+
 
 log = initialize_logger('commands.template_list')
-
-HELP = "Returns a list of available templates that can be used to submit training jobs."
 
 CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 
-@click.command(short_help=HELP, help=HELP, cls=AliasCmd, alias='t')
+@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='t')
 @common_options()
 def template_list():
     path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")
@@ -57,5 +58,5 @@ def template_list():
                             headers=[RUN_TEMPLATE_NAME],
                             tablefmt="orgtbl"))
     else:
-        click.echo("Lack of installed packs.")
+        handle_error(user_msg=TEXTS["lack_of_packs_error_msg"])
         sys.exit(1)

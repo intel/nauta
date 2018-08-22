@@ -38,6 +38,8 @@ from util.exceptions import K8sProxyCloseError
 from util.app_names import DLS4EAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
+from cli_text_consts import PLATFORM_RESOURCES_USERS_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
@@ -132,16 +134,16 @@ def validate_user_name(username: str) -> bool:
     # name cannot be longer than 32 and shorter than 1 character - due to lmitations
     # of a mechanism responsible for creating user/public shares
     if not username:
-        raise ValueError("Name of a user cannot be an empty string.")
+        raise ValueError(TEXTS["username_cannot_be_empty_error_msg"])
 
-    if len(username)>32:
-        raise ValueError("Name of a user cannot be longer than 32 characters.")
+    if len(username) > 32:
+        raise ValueError(TEXTS["username_too_long_error_msg"])
 
     # name must be a correct k8s name
     try:
         validate_kubernetes_name(username)
-    except ValidationError as exe:
-        raise ValueError("Incorrect k8s user name.")
+    except ValidationError:
+        raise ValueError(TEXTS["incorrect_k8s_username_error_msg"])
 
 
 def is_user_created(username: str, timeout: int = 1) -> bool:

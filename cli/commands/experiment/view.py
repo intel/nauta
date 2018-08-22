@@ -20,7 +20,6 @@
 #
 
 from collections import defaultdict
-import sys
 
 from tabulate import tabulate
 import click
@@ -31,32 +30,22 @@ from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods
 from util.logger import initialize_logger
 import platform_resources.runs as runs_api
+from util.system import handle_error
+from cli_text_consts import EXPERIMENT_VIEW_CMD_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
 
-HELP = "Displays details of experiment with a given name."
-HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
-
-CONTAINER_DETAILS = '''
-- Name: {name}
-   - Status: {status}
-   - Volumes:
-       {volumes}
-   - Resources:
-{resources}
-'''
-
 
 def container_status_to_msg(state) -> str:
     if not state:
-        return "Not created"
+        return TEXTS["container_not_created_msg"]
     if state.running is not None:
-        return "Running, " + str(state.running)
+        return TEXTS["container_running_msg"] + str(state.running)
     if state.terminated is not None:
-        return "Terminated, " + str(state.terminated.reason)
+        return TEXTS["container_terminated_msg"] + str(state.terminated.reason)
     if state.waiting is not None:
-        return "Waiting, " + str(state.waiting)
+        return TEXTS["container_waiting_msg"] + str(state.waiting)
 
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
@@ -70,21 +59,21 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     indent = ' ' * spaces
     if resources.requests:
         msg += header_indent
-        msg += '- Requests:\n{}'.format(indent)
+        msg += TEXTS["container_requests_list_header"].format(indent)
         msg += indent.join([f'{request_name}: {request_value}\n' for request_name, request_value
                             in resources.requests.items()])
     if resources.limits:
         msg += header_indent
-        msg += '- Limits:\n{}'.format(indent)
+        msg += TEXTS["container_limits_list_header"].format(indent)
         msg += indent.join([f'{limit_name}: {limit_value}\n' for limit_name, limit_value
                             in resources.limits.items()])
 
     return msg
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='v')
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
-@click.option('-tb', '--tensorboard', default=None, help=HELP_T, is_flag=True)
+@click.option('-tb', '--tensorboard', default=None, help=TEXTS["help_t"], is_flag=True)
 @common_options()
 @pass_state
 def view(state: State, experiment_name: str, tensorboard: bool):
@@ -96,8 +85,8 @@ def view(state: State, experiment_name: str, tensorboard: bool):
         run = runs_api.get_run(name=experiment_name,
                                namespace=namespace)
         if not run:
-            click.echo(f"Experiment \"{experiment_name}\" not found.")
-            sys.exit(2)
+            handle_error(user_msg=TEXTS["experiment_not_found_error_msg"].format(experiment_name=experiment_name),
+                         exit_code=2)
 
         click.echo(
             tabulate(
@@ -105,7 +94,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 headers=EXPERIMENTS_LIST_HEADERS,
                 tablefmt="orgtbl"))
 
-        click.echo("\nPods participating in the execution:\n")
+        click.echo(TEXTS["pods_participating_list_header"])
 
         pods = get_pods(label_selector="runName=" + experiment_name)
 
@@ -125,13 +114,13 @@ def view(state: State, experiment_name: str, tensorboard: bool):
 
             container_details = []
             for container in pod.spec.containers:
-                container_description = CONTAINER_DETAILS.format(name=container.name,
-                                                                 status=container_status_to_msg(
-                                                                     container_statuses[container.name]),
-                                                                 volumes=container_volume_mounts_to_msg(
-                                                                     container.volume_mounts),
-                                                                 resources=container_resources_to_msg(
-                                                                     container.resources))
+                container_description = TEXTS["container_details_msg"].format(name=container.name,
+                                                                              status=container_status_to_msg(
+                                                                                  container_statuses[container.name]),
+                                                                              volumes=container_volume_mounts_to_msg(
+                                                                                  container.volume_mounts),
+                                                                              resources=container_resources_to_msg(
+                                                                                  container.resources))
                 container_details.append(container_description)
 
             container_details = ''.join(container_details)
@@ -139,11 +128,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 pod.metadata.name, pod.metadata.uid, status_string,
                 container_details
             ])
-        click.echo(tabulate(tabular_output,
-                            headers=['Name', 'Uid', 'Status', 'Container Details'], tablefmt="orgtbl"))
+        click.echo(tabulate(tabular_output, TEXTS["pods_table_headers"], tablefmt="orgtbl"))
 
     except Exception:
-        error_msg = 'Failed to get experiment.'
-        logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["view_other_error_msg"], TEXTS["view_other_error_msg"])

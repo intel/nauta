@@ -49,6 +49,9 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s.k8s_info import get_app_service_node_port
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.jupyter_notebook_creator import convert_py_to_ipynb
+from util.system import handle_error
+from cli_text_consts import EXPERIMENT_COMMON_TEXTS as TEXTS
+
 
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
@@ -88,15 +91,11 @@ def check_run_environment(run_environment_path: str):
     If Run environment is not empty, ask user if it should be deleted in order to proceed with Run environment creation.
     """
     if os.path.isdir(run_environment_path) and os.listdir(run_environment_path):
-        if click.confirm(f'Experiment data directory: {run_environment_path} already exists. '
-                         f'It will be deleted in order to proceed with experiment submission. '
-                         f'Do you want to continue?'):
+        if click.confirm(TEXTS["confirm_exp_dir_deletion_msg"].format(run_environment_path=run_environment_path)):
             delete_environment(run_environment_path)
         else:
-            click.echo(f"Cannot continue experiment submission. "
-                       f"Please delete experiment's data directory "
-                       f"{run_environment_path} manually or use different name for experiment.")
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["unable_to_continue_exp_submission_error_msg"]
+                         .format(run_environment_path=run_environment_path))
 
 
 def create_environment(experiment_name: str, file_location: str, folder_location: str) -> str:
@@ -113,7 +112,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     exception with a description of a problem
     """
     log.debug("Create environment - start")
-    message_prefix = "Experiment's environment hasn't been created. Reason - {}"
+    message_prefix = TEXTS["create_env_msg_prefix"]
 
     # create a folder for experiment's purposes
     run_environment_path = get_run_environment_path(experiment_name)
@@ -124,15 +123,14 @@ def create_environment(experiment_name: str, file_location: str, folder_location
             shutil.copytree(folder_location, folder_path)
         except Exception:
             log.exception("Create environment - copying training folder error.")
-            raise KubectlIntError(message_prefix.format("Additional folder cannot"
-                                                        " be copied into experiment's folder."))
+            raise KubectlIntError(message_prefix.format(reason=TEXTS["dir_cant_be_copied_error_text"]))
 
     try:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
     except Exception as exe:
         log.exception("Create environment - creating experiment folder error.")
-        raise KubectlIntError(message_prefix.format("Folder with experiments' data cannot be created."))
+        raise KubectlIntError(message_prefix.format(reason=TEXTS["exp_dir_cant_be_created"]))
 
     # copy training script - it overwrites the file taken from a folder_location
     if file_location:
@@ -140,7 +138,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
             shutil.copy2(file_location, folder_path)
         except Exception as exe:
             log.exception("Create environment - copying training script error.")
-            raise KubectlIntError(message_prefix.format("Training script cannot be created."))
+            raise KubectlIntError(message_prefix.format(reason=TEXTS["training_script_cant_be_created"]))
 
     log.debug("Create environment - end")
     return run_environment_path
@@ -223,7 +221,7 @@ def submit_experiment(template: str, name: str,
         log.exception(str(exe))
         raise exe
     except Exception:
-        message = "Problem during preparation of experiments' data."
+        message = TEXTS["submit_preparation_error_msg"]
         log.exception(message)
         raise SubmitExperimentError(message)
 
@@ -245,7 +243,7 @@ def submit_experiment(template: str, name: str,
                     try:
                         socat.start(proxy.tunnel_port)
                     except Exception:
-                        error_msg = "Error during creation of a local docker-host tunnel."
+                        error_msg = TEXTS["local_docker_tunnel_error_msg"]
                         log.exception(error_msg)
                         raise SubmitExperimentError(error_msg)
 
@@ -283,7 +281,7 @@ def submit_experiment(template: str, name: str,
                         experiment_run.parameters = (script_name, )
             except Exception:
                 # any error in this step breaks execution of this command
-                message = "Problems during creation of environments."
+                message = TEXTS["env_creation_error_msg"]
                 log.exception(message)
                 # just in case - remove folders that were created with a success
                 delete_run_environments(runs_list)
@@ -291,11 +289,11 @@ def submit_experiment(template: str, name: str,
 
             # if ps or pr option is used - first ask whether experiment(s) should be submitted
             if parameter_range or parameter_set:
-                click.echo("Please confirm that the following experiments should be submitted.")
+                click.echo(TEXTS["confirm_submit_msg"])
                 click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
                                      RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list]},
                                     headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
-                if not click.confirm('Do you want to continue?', default=True):
+                if not click.confirm(TEXTS["confirm_submit_question_msg"], default=True):
                     delete_run_environments(runs_list)
                     sys.exit(1)
 
@@ -323,8 +321,7 @@ def submit_experiment(template: str, name: str,
 
             # Delete experiment if no Runs were submitted
             if not submitted_runs:
-                click.echo("Experiment submission failed. Try verbose option for more detailed "
-                           "information about failure cause.")
+                click.echo(TEXTS["submission_fail_error_msg"])
                 delete_k8s_object("experiment", experiment_name)
 
     except LocalPortOccupiedError as exe:
@@ -332,16 +329,15 @@ def submit_experiment(template: str, name: str,
         raise SubmitExperimentError(exe.message)
     except K8sProxyCloseError:
         log.exception('Error during closing of a proxy for a {}'.format(DLS4EAppNames.DOCKER_REGISTRY))
-        raise K8sProxyCloseError('Docker proxy hasn\'t been closed properly. '
-                                 'Check whether it still exists, if yes - close it manually.')
+        raise K8sProxyCloseError(TEXTS["proxy_close_error_msg"])
     except K8sProxyOpenError:
-        error_msg = "Error during opening of a proxy for a docker registry."
+        error_msg = TEXTS["proxy_open_error_msg"]
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg)
     except SubmitExperimentError as exe:
         raise exe
     except Exception:
-        error_msg = 'Other error during submitting experiments.'
+        error_msg = TEXTS["submit_other_error_msg"]
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg)
     finally:
@@ -353,8 +349,7 @@ def submit_experiment(template: str, name: str,
                 socat.stop()
             except Exception:
                 log.exception("Error during closing of a proxy for a local docker-host tunnel")
-                raise K8sProxyCloseError("Local Docker-host tunnel hasn't been closed properly. "
-                                         "Check whether it still exists, if yes - close it manually.")
+                raise K8sProxyCloseError(TEXTS["docker_tunnel_close_error_msg"])
 
     log.debug("Submit - finish")
     return runs_list, script_location
@@ -422,7 +417,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
         if exit_code:
-            raise KubectlIntError("Draft templates haven't been generated. Reason - {}".format(output))
+            raise KubectlIntError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=output))
 
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
@@ -459,7 +454,7 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     output, exit_code = cmd.up(working_directory=run_folder, namespace=namespace)
 
     if exit_code:
-        error_message = "Job hasn't been deployed. Reason - {}".format(output)
+        error_message = TEXTS["job_not_deployed"].format(reason=output)
         log.error(error_message)
         delete_environment(run_folder)
         raise KubectlIntError(error_message)
@@ -514,7 +509,7 @@ def prepare_list_of_values(param_name: str, param_values: str) -> List[str]:
     an exception with a short message about a detected problem.
     More details concerning a cause of such issue can be found in logs.
     """
-    error_message = "Parameter {} has incorrect format.".format(param_name)
+    error_message = TEXTS["incorrect_param_format_error_msg"].format(param_name=param_name)
     if not check_enclosing_brackets(param_values):
         log.error(error_message)
         raise KubectlIntError(error_message)
@@ -559,7 +554,7 @@ def analyze_pr_parameters_list(list_of_params: Tuple[Tuple, ...]) -> List[Tuple[
 
     for param_name, param_value in list_of_params:
         if param_name in param_names:
-            exe_message = "Parameter {} ambiguously defined.".format(param_name)
+            exe_message = TEXTS["param_ambiguously_defined"].format(param_name=param_name)
             log.exception(exe_message)
             raise KubectlIntError(exe_message)
 
@@ -578,7 +573,7 @@ def analyze_ps_parameters_list(list_of_params: Tuple[str, ...]):
     :param list_of_params:
     :return: list containing tuples of all set of params given as a parameter
     """
-    error_message = "One of -ps options has incorrect format."
+    error_message = TEXTS["param_set_incorrect_format_error_msg"]
 
     ret_list = []
 
@@ -620,7 +615,7 @@ def check_experiment_name(value: str) -> str:
         if value:
             if len(value) > 30:
                 # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit this
-                raise ValidationError("Name given by a user cannot be longer than 30 characters.")
+                raise ValidationError(TEXTS["experiment_name_too_long_error_msg"])
             validate_kubernetes_name(value)
             return value
     except ValidationError as ex:

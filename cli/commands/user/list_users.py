@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-import sys
-
 import click
 from tabulate import tabulate
 
@@ -28,25 +26,22 @@ from cli_state import common_options, pass_state, State
 import platform_resources.users as users_api
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
+from util.system import handle_error
+from cli_text_consts import USER_LIST_CMD_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
 
-@click.command(name='list', cls=AliasCmd, alias='ls')
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], name='list', cls=AliasCmd, alias='ls')
 @common_options()
 @pass_state
 def list_users(state: State):
-    """
-    List users.
-    """
+    """ List users. """
     try:
         users = users_api.list_users()
         click.echo(tabulate([user.cli_representation for user in users],
-                            headers=['Name', 'Creation date', 'Date of last submitted job',
-                                     'Number of running jobs', 'Number of queued jobs'],
+                            headers=TEXTS["table_headers"],
                             tablefmt="orgtbl"))
     except Exception:
-        error_msg = 'Failed to get users list.'
-        logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=state.verbosity == 0)

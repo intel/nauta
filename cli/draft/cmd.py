@@ -26,8 +26,10 @@ from typing import List
 from util.config import Config
 from util.system import execute_system_command
 from util.logger import initialize_logger, get_verbosity_level
+from cli_text_consts import DRAFT_CMD_TEXTS as TEXTS
 
-log = initialize_logger('draft.cmd')
+
+logger = initialize_logger('draft.cmd')
 
 DRAFT_BIN = 'draft'
 DRAFT_HOME_FOLDER = ".draft"
@@ -80,11 +82,11 @@ def check_up_status(output: str) -> (str, int):
     - message - message with a description of a problem
     """
     if "Building Docker Image: SUCCESS" not in output:
-        return "Docker image hasn't been built.", 100
+        return TEXTS["docker_image_not_built"], 100
     elif "Pushing Docker Image: SUCCESS" not in output:
-        return "Docker image hasn't been sent to the cluster.", 101
+        return TEXTS["docker_image_not_sent"], 101
     elif "Releasing Application: SUCCESS" not in output:
-        return "Application hasn't been released.", 102
+        return TEXTS["app_not_released"], 102
     return "", 0
 
 
@@ -97,7 +99,7 @@ def check_create_status(output: str) -> (str, int):
     - message - message with a description of a problem
     """
     if "--> Ready to sail" not in output:
-        return "Deployment hasn't been created.", 100
+        return TEXTS["deployment_not_created"], 100
     return "", 0
 
 
@@ -112,6 +114,6 @@ def translate_create_status_description(output: str) -> str:
     output
     """
     if "Error: could not load pack:" in output:
-        return "Chosen pack doesn't exist."
+        return TEXTS["pack_not_exists"]
     else:
         return output

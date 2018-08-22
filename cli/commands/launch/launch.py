@@ -35,46 +35,38 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.launcher import launch_app
 from util.logger import initialize_logger
+from util.system import handle_error
+from cli_text_consts import LAUNCH_CMD_TEXTS as TEXTS
 
 
 logger = initialize_logger('commands.launch')
-
-HELP = "Command for launching web user-interface or tensorboard."
-HELP_P = "Port on which service will be exposed locally."
 
 FORWARDED_URL = 'http://localhost:{}'
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='ui', short_help='Subcommand for launching webUI with credentials')
+@click.command(cls=AliasCmd, alias='ui', short_help=TEXTS["webui_help"], help=TEXTS["webui_help"])
 @common_options()
 @pass_state
-@click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
-                                                      'only proxy tunnel is created')
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
+@click.option('-n', '--no-launch', is_flag=True, help=TEXTS["help_n"])
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=TEXTS["help_p"])
 def webui(state: State, no_launch: bool, port: int):
-    """
-    Subcommand for launching webUI with credentials
-    """
+    """ Subcommand for launching webUI with credentials """
     launch_app_with_proxy(DLS4EAppNames.INGRESS, no_launch, port)
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='tb', short_help='Subcommand for launching tensorboard with credentials')
+@click.command(cls=AliasCmd, alias='tb', help=TEXTS["tb_help"], short_help=TEXTS["tb_help"])
 @common_options()
 @pass_state
-@click.option('-n', '--no-launch', is_flag=True, help='Run command without a web browser starting, '
-                                                      'only proxy tunnel is created')
+@click.option('-n', '--no-launch', is_flag=True, help=TEXTS["help_n"])
 @click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),
-              help="Local port on which tensorboard service client will be started.")
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=HELP_P)
+              help=TEXTS["tb_help_tscp"])
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=TEXTS["help_p"])
 @click.argument("experiment_name", type=str, required=True, nargs=-1)
 def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int], port: Optional[int],
                 experiment_name: List[str]):
-    """
-    Subcommand for launching tensorboard with credentials
-
-    """
+    """ Subcommand for launching tensorboard with credentials """
     current_namespace = get_kubectl_current_context_namespace()
 
     with K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
@@ -90,17 +82,14 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             if tb.invalid_runs:
                 list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
                                                   for item in tb.invalid_runs])
-                click.echo('There is no data for the following experiments : {}'.format(list_of_invalid_runs))
-                click.echo('Tensorboard will present information from the rest of given experiments.')
+                click.echo(TEXTS["tb_invalid_runs_msg"].format(invalid_runs=list_of_invalid_runs))
         except Exception as exe:
-            err_message = 'failed to create tensorboard!'
+            err_message = TEXTS["tb_create_error_msg"]
             if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:
                 err_message = str(exe)
-            click.echo(err_message)
-            logger.exception(err_message)
-            sys.exit(1)
+            handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
 
-        click.echo('Please wait for Tensorboard to run...')
+        click.echo(TEXTS["tb_waiting_msg"])
         for i in range(10):
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
@@ -108,14 +97,14 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
                                       namespace=current_namespace, port=port,
                                       app_name=f"tensorboard-{tb.id}")
                 return
-            logger.warning(f'Tensorboard instance: {tb.id} still in {tb.status.value} status, waiting for RUNNING...')
+            logger.warning(TEXTS["tb_waiting_for_tb_msg"].format(tb_id=tb.id, tb_status_value=tb.status.value))
             sleep(5)
 
-        click.echo('Tensorboard failed to run - timeout.')
+        click.echo(TEXTS["tb_timeout_error_msg"])
         sys.exit(2)
 
 
-@click.group(short_help=HELP, help=HELP, cls=AliasGroup, alias='l',
+@click.group(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasGroup, alias='l',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def launch():
     pass
@@ -127,17 +116,11 @@ def launch_app_with_proxy(k8s_app_name: DLS4EAppNames, no_launch: bool, port: in
     try:
         launch_app(k8s_app_name=k8s_app_name, no_launch=no_launch, port=port, namespace=namespace, app_name=app_name)
     except LaunchError as exe:
-        logger.exception(exe.message)
-        click.echo(exe.message)
-        sys.exit(1)
+        handle_error(logger, exe.message, exe.message)
     except ProxyClosingError:
-        click.echo('K8s proxy hasn\'t been closed properly. '
-                   'Check whether it still exists, if yes - close it manually.')
+        handle_error(user_msg=TEXTS["app_proxy_exists_error_msg"], exit_code=None)
     except Exception:
-        err_message = "Other exception during launching web application."
-        logger.exception(err_message)
-        click.echo(err_message)
-        sys.exit(1)
+        handle_error(logger, TEXTS["app_proxy_other_error_msg"], TEXTS["app_proxy_other_error_msg"])
 
 
 launch.add_command(webui)

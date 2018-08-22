@@ -26,6 +26,8 @@ from platform_resources.experiment_model import Experiment, ExperimentStatus
 from commands.experiment import interact
 from util.exceptions import SubmitExperimentError
 from commands.experiment.common import RunDescription, RunStatus
+from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
+
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -91,7 +93,7 @@ def test_error_when_listing_experiments(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
-    assert "Problems during loading a list of experiments" in result.output
+    assert TEXTS["experiment_get_error_msg"] in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
@@ -101,7 +103,7 @@ def test_incorrect_experiment_type(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
-    assert "is already used by an experiment other than Jupyter Notebook." in result.output
+    assert TEXTS["name_already_used"].format(name=CORRECT_INTERACT_NAME) in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
@@ -142,7 +144,7 @@ def test_interact_pods_not_created(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="y")
 
-    assert "Jupyter notebook is still not ready. Please try to connect" in result.output
+    assert TEXTS["notebook_not_ready_error_msg"] in result.output
 
 
 def test_interact_error_when_submitting(prepare_mocks: InteractMocks):
@@ -151,7 +153,7 @@ def test_interact_error_when_submitting(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact)
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=0)
-    assert "Error during starting jupyter notebook session:" in result.output
+    assert TEXTS["submit_error_msg"].format(exception_message="error") in result.output
 
 
 def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
@@ -160,4 +162,4 @@ def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact)
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=0)
-    assert "Other error during starting jupyter notebook session." in result.output
+    assert TEXTS["submit_other_error_msg"] in result.output

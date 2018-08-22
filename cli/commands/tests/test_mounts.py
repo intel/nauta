@@ -24,6 +24,8 @@ import platform
 from click.testing import CliRunner
 
 from commands.mounts import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mounts
+from cli_text_consts import MOUNTS_CMD_TEXTS as TEXTS
+
 
 TEST_USR = "test_user"
 TEST_PSW = "test_password"
@@ -110,4 +112,4 @@ def test_mounts_is_admin(mocker):
     result = runner.invoke(mounts)
 
     assert icu_mock.call_count == 1
-    assert "DLS4E doesn't create shares for administrators." in result.output
+    assert TEXTS["user_is_admin_error_msg"] in result.output

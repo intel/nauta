@@ -25,6 +25,8 @@ from typing import Optional
 import docker
 from docker.errors import NotFound
 from docker.models.containers import Container
+from cli_text_consts import UTIL_SOCAT_TEXTS as TEXTS
+
 
 client = docker.from_env()
 
@@ -58,7 +60,7 @@ def _ensure_socat_running():
 
         sleep(1)
 
-    raise RuntimeError(f"failed to start socat container! expected status: 'running', got: {socat_container.status}")
+    raise RuntimeError(TEXTS["socat_container_start_fail_msg"].format(container_status=socat_container.status))
 
 
 def start(docker_registry_port: str):

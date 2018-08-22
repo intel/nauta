@@ -27,24 +27,20 @@ from commands.common import list_runs_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
+from cli_text_consts import PREDICT_LIST_CMD_TEXTS as TEXTS
 
 
 LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
-
-HELP_A = 'Show all inference instances, regardless of the owner.'
-HELP_N = 'A regular expression to narrow down list to inference instances that match this expression.'
-HELP_S = 'List inference instances with matching status.'
-
-INFERENCE_INSTANCES_LIST_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER,
-                                    RUN_STATUS, RUN_TEMPLATE_NAME]
+TABLE_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
-@click.option('-a', '--all-users', is_flag=True, help=HELP_A)
-@click.option('-n', '--name', type=str, help=HELP_N)
-@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=HELP_S)
+@click.option('-a', '--all-users', is_flag=True, help=TEXTS["help_a"])
+@click.option('-n', '--name', type=str, help=TEXTS["help_n"])
+@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=TEXTS["help_s"])
 @common_options()
 @pass_state
 def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus):
     """ List inference instances. """
-    list_runs_in_cli(all_users, name, status, LISTED_RUNS_KINDS, INFERENCE_INSTANCES_LIST_HEADERS, with_metrics=False)
+    list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, TABLE_HEADERS,
+                     with_metrics=False)

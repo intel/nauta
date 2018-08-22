@@ -26,6 +26,7 @@ import re
 from draft.cmd import call_draft
 from util.system import execute_system_command
 from util.logger import initialize_logger
+from cli_text_consts import UTIL_DEPENDENCIES_CHECKER_TEXTS as TEXTS
 
 
 log = initialize_logger(__name__)
@@ -107,8 +108,8 @@ def _parse_installed_version(version_output: str, version_field='SemVer') -> Loo
     matches = re.findall(regex, version_output)
 
     if len(matches) != 1:
-        raise ValueError(f'Failed to parse version({version_field}) '
-                         f'from following input: {version_output}')
+        raise ValueError(TEXTS["parse_fail_error_msg"]
+                         .format(version_field=version_field, version_output=version_output))
 
     installed_version = LooseVersion(matches[0][0] or matches[0][1])
 
@@ -131,8 +132,12 @@ def check_dependency(dependency_spec: DependencySpec, namespace: str = None) -> 
         if exit_code != 0:
             raise RuntimeError
     except RuntimeError as e:
-        raise RuntimeError(f'Failed to run {dependency_spec.version_command}'
-                           f' with args {dependency_spec.version_command_args}. Output: {output}') from e
+        raise RuntimeError(
+            TEXTS["version_cmd_fail_msg"].format(
+                version_cmd=dependency_spec.version_command, version_cmd_args=dependency_spec.version_command_args,
+                output=output
+            )
+        ) from e
 
     if dependency_spec.version_field:
         installed_version = _parse_installed_version(output, version_field=dependency_spec.version_field)
@@ -157,13 +162,17 @@ def check_all_binary_dependencies(namespace: str):
                      f'Installed version: ({installed_version}). '
                      f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
             if not valid:
-                raise InvalidDependencyError(f'{dependency_name} installed version: {installed_version}, does not match'
-                                             f' expected version: {dependency_spec.expected_version}')
+                raise InvalidDependencyError(
+                    TEXTS["invalid_dependency_error_msg"].format(
+                        dependency_name=dependency_name, installed_version=installed_version,
+                        expected_version=dependency_spec.expected_version
+                    )
+                )
         except FileNotFoundError as e:
-            error_msg = f'{dependency_name} is not installed.'
+            error_msg = TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name)
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e
         except (RuntimeError, ValueError, TypeError) as e:
-            error_msg = f'Failed to get {dependency_name} version.'
+            error_msg = TEXTS["version_get_fail_msg"].format(dependency_name=dependency_name)
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e

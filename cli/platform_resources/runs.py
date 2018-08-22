@@ -34,6 +34,7 @@ from platform_resources.resource_filters import filter_by_name_regex, filter_run
     filter_by_experiment_name, filter_run_by_state, filter_by_run_kinds
 from util.logger import initialize_logger
 from util.exceptions import InvalidRegularExpressionError
+from cli_text_consts import PLATFORM_RESOURCES_RUNS_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
@@ -97,7 +98,7 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     try:
         name_regex = re.compile(name_filter) if name_filter else None
     except sre_constants.error as e:
-        error_msg = f'Failed to compile regular expresssion: {name_filter}'
+        error_msg = TEXTS["regex_compilation_fail_msg"].format(name_filter=name_filter)
         logger.exception(error_msg)
         raise InvalidRegularExpressionError(error_msg) from e
 
@@ -126,7 +127,7 @@ def update_run(run: Run, namespace: str) -> (KubernetesObject, Run):
     schema = RunKubernetesSchema()
     body, err = schema.dump(run_kubernetes)
     if err:
-        raise RuntimeError(f'preparing dump of RunKubernetes request object error - {err}')
+        raise RuntimeError(TEXTS["k8s_dump_preparation_error_msg"].format(err=err))
     return _update(run.name, namespace, body)
 
 
@@ -164,10 +165,10 @@ def _update(name: str, namespace: str, body: object) -> (KubernetesObject, Run):
         schema = RunKubernetesSchema()
         run, err = schema.load(raw_run)
         if err:
-            raise RuntimeError(f'preparing load of RunKubernetes update response object error - {err}')
+            raise RuntimeError(TEXTS["k8s_response_load_error_msg"].format(err=err))
         logger.debug(f"Run patch response : {raw_run}")
         return run, Run.from_k8s_response_dict(raw_run)
     except ApiException as exe:
-        err_message = "Error during patching a Run"
+        err_message = TEXTS["run_update_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message) from exe

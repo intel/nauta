@@ -28,6 +28,7 @@ import pytest
 
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, TensorboardServiceAPIException, \
     TensorboardRun, build_tensorboard_run_list
+from cli_text_consts import TENSORBOARD_CLIENT_TEXTS as TEXTS
 
 
 def test_get_tensorboard(mocker):
@@ -171,7 +172,7 @@ def test_create_tensorboard_missing_experiments(mocker):
     with pytest.raises(TensorboardServiceAPIException) as exe:
         client.create_tensorboard(runs=fake_runs_list)
 
-    assert f'There is no data for the following experiments : {fake_owner}/{fake_exp_name}' in str(exe.value)
+    assert TEXTS["invalid_runs_error_msg"].format(invalid_runs_list=f"{fake_owner}/{fake_exp_name}") in str(exe.value)
 
     content['invalidRuns'] = []
     content_bytes = json.dumps(content).encode('utf-8')
@@ -184,4 +185,4 @@ def test_create_tensorboard_missing_experiments(mocker):
     with pytest.raises(TensorboardServiceAPIException) as exe:
         client.create_tensorboard(runs=fake_runs_list)
 
-    assert 'Experiments given as paramaters of the command don\'t exist.' in str(exe.value)
+    assert TEXTS["runs_not_exist_error_msg"] in str(exe.value)

@@ -28,6 +28,8 @@ from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_scr
     validate_script_folder_location, get_default_script_location
 from commands.experiment.common import RunDescription, RunStatus
 from util.exceptions import SubmitExperimentError
+from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
+
 
 SCRIPT_LOCATION = "training_script.py"
 SCRIPT_FOLDER = "/a/b/c"
@@ -82,7 +84,7 @@ def test_submit_experiment_failure(prepare_mocks: SubmitMocks):
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
-    assert f"Problems during submitting experiment:{exe_message}" in result.output
+    assert TEXTS["submit_error_msg"].format(exception_message=exe_message) in result.output
     assert result.exit_code == 1
 
 

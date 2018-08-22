@@ -33,6 +33,8 @@ from util.exceptions import KubectlIntError, KubectlConnectionError, LocalPortOc
 from util.k8s.k8s_info import get_app_services, find_namespace, NamespaceStatus
 from util.app_names import DLS4EAppNames
 from util.system import check_port_availability
+from cli_text_consts import UTIL_KUBECTL_TEXTS as TEXTS
+
 
 logger = initialize_logger('util.kubectl')
 
@@ -53,7 +55,7 @@ def find_random_available_port() -> int:
             tunnel_port = port
             break
     else:
-        error_msg = "Available port cannot be found."
+        error_msg = TEXTS["no_available_port_error_msg"]
         logger.error(error_msg)
         raise LocalPortOccupiedError(error_msg)
 
@@ -101,7 +103,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
 
         if not service_node_port and not service_container_port:
             logger.error(f'Cannot find open ports for {k8s_app_name} app')
-            raise KubectlIntError("Missing port during creation of port proxy.")
+            raise KubectlIntError(TEXTS["proxy_creation_missing_port_error_msg"])
 
         if port:
             if check_port_availability(port):
@@ -141,7 +143,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
     except LocalPortOccupiedError as exe:
         raise exe
     except Exception:
-        raise RuntimeError("Other error during creation of port proxy.")
+        raise RuntimeError(TEXTS["proxy_creation_other_error_msg"])
 
     logger.info("Port forwarding - proxy set up")
     return process, tunnel_port, service_container_port
@@ -171,7 +173,7 @@ def check_users_presence(username: str) -> UserState:
             return UserState.NOT_EXISTS
 
     except Exception as exe:
-        error_message = "Error during checking user's presence."
+        error_message = TEXTS["user_presence_check_error_msg"]
         logger.error(error_message)
         raise KubectlIntError(error_message) from exe
 
@@ -182,7 +184,7 @@ def delete_k8s_object(kind: str, name: str):
     output, err_code = system.execute_system_command(delete_command)
     logger.debug(f"delete_k8s_object - output : {err_code} - {output}")
     if err_code:
-        raise RuntimeError(f"Error when deleting k8s object: {output}")
+        raise RuntimeError(TEXTS["k8s_object_delete_error_msg"].format(output=output))
 
 
 def check_connection_to_cluster():
@@ -191,4 +193,4 @@ def check_connection_to_cluster():
     output, err_code = system.execute_system_command(check_connection_cmd)
     logger.debug(f"check_connection_to_cluster - output : {err_code} - {output}")
     if err_code:
-        raise KubectlConnectionError(f"Cannot connect to K8S cluster: {output}")
+        raise KubectlConnectionError(TEXTS["k8s_cluster_no_connection_error_msg"].format(output=output))

@@ -24,6 +24,7 @@ from kubernetes.client import V1ObjectMeta, V1ServiceList, V1Service, V1ServiceS
 import util.k8s.kubectl as kubectl
 from util.app_names import DLS4EAppNames
 from util.exceptions import KubectlConnectionError, LocalPortOccupiedError
+from cli_text_consts import UTIL_KUBECTL_TEXTS as TEXTS
 
 
 SERVICES_LIST_MOCK = V1ServiceList(items=[
@@ -55,7 +56,7 @@ def test_start_port_forwarding_missing_port(mocker):
     svcs_list_mock = mocker.patch('util.k8s.kubectl.get_app_services')
     svcs_list_mock.return_value = []
 
-    with raises(RuntimeError, message="Missing port during creation of registry port proxy."):
+    with raises(RuntimeError, message=TEXTS["proxy_creation_missing_port_error_msg"]):
         kubectl.start_port_forwarding(DLS4EAppNames.DOCKER_REGISTRY)
 
     assert subprocess_command_mock.call_count == 0, "kubectl proxy-forwarding command was called"
@@ -66,7 +67,7 @@ def test_start_port_forwarding_other_error(mock_k8s_svc, mocker):
                               side_effect=Exception("Other error during creation of registry port proxy."))
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=True)
     print("test start port forwarding")
-    with raises(RuntimeError, message="Other error during creation of registry port proxy."):
+    with raises(RuntimeError, message=TEXTS["proxy_creation_other_error_msg"]):
         kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
 
     assert popen_mock.call_count == 1, "kubectl proxy-forwarding command was called"
@@ -77,7 +78,7 @@ def test_start_port_forwarding_lack_of_ports(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=False)
 
-    with raises(LocalPortOccupiedError, message="Available port cannot be found."):
+    with raises(LocalPortOccupiedError, message=TEXTS["no_available_port_error_msg"]):
         kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
 
     assert subprocess_command_mock.call_count == 0, "kubectl proxy-forwarding command was called"

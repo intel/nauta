@@ -32,18 +32,16 @@ from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
 from util.k8s.k8s_info import is_current_user_administrator
 from util.aliascmd import AliasCmd
-
-log = initialize_logger(__name__)
-
-HELP = "Command used to delete a user from the platform. Can be only " \
-       "run by a platform administrator."
-HELP_PR = "If this option is added, the command removes all of " \
-       "client's artifacts."
+from util.system import handle_error
+from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='d')
+logger = initialize_logger(__name__)
+
+
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='d')
 @click.argument("username", nargs=1)
-@click.option("-p", "--purge", is_flag=True, help=HELP_PR)
+@click.option("-p", "--purge", is_flag=True, help=TEXTS["help_pr"])
 @common_options()
 @pass_state
 def delete(state: State, username: str, purge: bool):
@@ -55,40 +53,33 @@ def delete(state: State, username: str, purge: bool):
     """
     try:
         if not is_current_user_administrator():
-            click.echo("Only administrators can delete users.")
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["user_not_admin_error_msg"])
 
         user_state = check_users_presence(username)
 
         if user_state == UserState.NOT_EXISTS:
-            click.echo(f"User {username} doesn't exists.")
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["user_not_exists_error_msg"].format(username=username))
 
         if user_state == UserState.TERMINATING:
-            click.echo("User is still being removed.")
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["user_being_removed"])
 
     except Exception:
-        err_msg = "Problems during verifying users presence."
-        log.exception(err_msg)
-        click.echo(err_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["user_presence_verification_error_msg"],
+                     TEXTS["user_presence_verification_error_msg"], add_verbosity_msg=state.verbosity == 0)
 
-    if not click.confirm(f"User {username} is about to be deleted. Do you want to continue?",):
-        click.echo("Operation of deleting of a user was aborted.")
+    if not click.confirm(TEXTS["delete_confirm_msg"].format(username=username),):
+        click.echo(TEXTS["delete_abort_msg"])
         sys.exit(0)
 
     try:
         delete_user(username)
 
         if purge:
-            purge_error_message = "Some artifacts belonging to a user weren't removed."
             try:
                 # failure during purging a user doesn't mean that user wasn't deleted
                 purge_user(username)
             except Exception:
-                log.exception(purge_error_message)
-                click.echo(purge_error_message)
+                handle_error(logger, TEXTS["purge_error_msg"], TEXTS["purge_error_msg"], exit_code=None)
 
         # CAN-616 - wait until user has been really deleted
         for i in range(30):
@@ -97,16 +88,13 @@ def delete(state: State, username: str, purge: bool):
 
             time.sleep(1)
         else:
-            click.echo("User is still being deleted. Please check status of this user in a while.")
+            click.echo(TEXTS["delete_in_progress_msg"])
             sys.exit(0)
 
-        click.echo(f"User {username} has been deleted.")
+        click.echo(TEXTS["delete_success_msg"].format(username=username))
     except K8sProxyCloseError:
-        log.exception("Error during closing of a proxy for elasticsearch.")
-        click.echo("Elasticsearch proxy hasn't been closed properly. "
-                   "Check whether it still exists, if yes - close it manually.")
+        handle_error(logger, TEXTS["proxy_error_log_msg"], TEXTS["proxy_error_user_msg"], exit_code=None,
+                     add_verbosity_msg=state.verbosity == 0)
     except Exception:
-        log.exception("Error during deleting a user of a user.")
-        click.echo("User hasn't been deleted due to technical reasons. To get more information about causes "
-                   "of a problem - run command with -v option.")
-        sys.exit(1)
+        handle_error(logger, TEXTS["other_error_log_msg"], TEXTS["other_error_user_msg"],
+                     add_verbosity_msg=state.verbosity == 0)

@@ -69,7 +69,7 @@ def test_list_experiments_success(mocker):
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
-    common.list_runs_in_cli(all_users=False, name="", status=None, listed_runs_kinds=[],
+    common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
                             runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 1
@@ -82,7 +82,7 @@ def test_list_experiments_all_users_success(mocker):
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
-    common.list_runs_in_cli(all_users=True, name="", status=None, listed_runs_kinds=[],
+    common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
                             runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 0
@@ -96,7 +96,7 @@ def test_list_experiments_failure(mocker):
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
     sys_exit_mock = mocker.patch("sys.exit")
 
-    common.list_runs_in_cli(all_users=False, name="", status=None, listed_runs_kinds=[],
+    common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
                             runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
 
     assert get_namespace_mock.call_count == 1

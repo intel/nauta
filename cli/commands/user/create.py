@@ -28,7 +28,7 @@ import click
 
 from util.config import Config
 from util.logger import initialize_logger
-from util.system import execute_system_command
+from util.system import execute_system_command, handle_error
 from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
 from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
@@ -36,15 +36,10 @@ from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence, UserState
 from platform_resources.users import validate_user_name, is_user_created
+from cli_text_consts import USER_CREATE_CMD_TEXTS as TEXTS
 
 
-log = initialize_logger(__name__)
-
-HELP = "Command used to create a new user on the platform. Can only be " \
-       "run by a platform administrator."
-HELP_L = "If given - content of the generated user's config file is displayed on the screen only."
-HELP_F = "Name of file where user's configuration will be stored. If not given configuration " \
-         "is stored in the config. file."
+logger = initialize_logger(__name__)
 
 ADD_USER_CHART_NAME = "dls4e-user"
 
@@ -74,18 +69,13 @@ users:
     token: {token}
 '''
 
-ADD_USER_ERROR_DESCRIPTION = "User has not been created. To get more information about causes " \
-                             "of this problem - run command with -v option."
-REMOVE_USER_ERROR_DESCRIPTION = "Partially created user has not been removed successfully - " \
-                                "please remove the user manually."
-
 DEFAULT_FILENAME = "{}.config"
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='c')
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='c')
 @click.argument('username', required=False)
-@click.option("-l", "--list_only", is_flag=True, help=HELP_L)
-@click.option("-f", "--filename", help=HELP_F)
+@click.option("-l", "--list_only", is_flag=True, help=TEXTS["help_l"])
+@click.option("-f", "--filename", help=TEXTS["help_f"])
 @common_options()
 @pass_state
 def create(state: State, username: str, list_only: bool, filename: str):
@@ -96,37 +86,30 @@ def create(state: State, username: str, list_only: bool, filename: str):
     """
 
     if list_only and filename:
-        click.echo("Both -f/--filename and -l/--list_only options cannot be given. Please choose one of them.")
-        sys.exit(1)
+        handle_error(user_msg=TEXTS["f_l_options_exclusion_error_msg"])
 
     try:
         try:
             username = username if username else getpass.getuser()
             validate_user_name(username)
         except ValueError as exe:
-            log.exception("Error detected while validating user name.")
-            click.echo(exe)
-            sys.exit(1)
+            handle_error(logger, TEXTS["name_validation_error_msg"], str(exe),
+                         add_verbosity_msg=state.verbosity == 0)
 
         if not is_current_user_administrator():
-            click.echo("Only administrators can create new users.")
-            sys.exit(1)
+            handle_error(logger, TEXTS["user_not_admin_error_msg"], TEXTS["user_not_admin_error_msg"])
 
         user_state = check_users_presence(username)
 
         if user_state == UserState.ACTIVE:
-            click.echo("User already exists.")
-            sys.exit(1)
+            handle_error(logger, TEXTS["user_already_exists_error_msg"], TEXTS["user_already_exists_error_msg"])
 
         if user_state == UserState.TERMINATING:
-            click.echo("User is still being removed.")
-            sys.exit(1)
+            handle_error(logger, TEXTS["user_being_removed_error_msg"], TEXTS["user_being_removed_error_msg"])
 
     except Exception:
-        error_msg = "Problems detected while verifying user with given user name."
-        log.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["user_verification_error_msg"], TEXTS["user_verification_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
     try:
         chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
@@ -144,47 +127,43 @@ def create(state: State, username: str, list_only: bool, filename: str):
         output, err_code = execute_system_command(add_user_command)
 
         if err_code:
-            click.echo(ADD_USER_ERROR_DESCRIPTION)
-            log.error(output)
+            handle_error(logger, output, TEXTS["user_add_error_msg"], exit_code=None,
+                         add_verbosity_msg=state.verbosity == 0)
             if not delete_user(username):
-                click.echo(REMOVE_USER_ERROR_DESCRIPTION)
+                handle_error(user_msg=TEXTS["remove_user_error_msg"])
             sys.exit(1)
 
         try:
             users_password = get_users_token(username)
         except Exception:
-            error_msg = "The app encountered problems while gathering user's password."
-            log.exception(error_msg)
-            click.echo(error_msg)
+            handle_error(logger, TEXTS["password_gather_error_msg"], TEXTS["password_gather_error_msg"], exit_code=None,
+                         add_verbosity_msg=state.verbosity == 0)
             users_password = ""
 
     except Exception:
-        log.exception("Error detected while adding of a user.")
-        click.echo(ADD_USER_ERROR_DESCRIPTION)
+        handle_error(logger, TEXTS["user_add_error_msg"], TEXTS["user_add_error_msg"], exit_code=None,
+                     add_verbosity_msg=state.verbosity == 0)
         if not delete_user(username):
-            click.echo(REMOVE_USER_ERROR_DESCRIPTION)
+            handle_error(user_msg=TEXTS["remove_user_error_msg"])
         sys.exit(1)
 
     if is_user_created(username, 90):
-        click.echo(f"User {username} has been added successfully.")
+        click.echo(TEXTS["user_creation_success_msg"].format(username=username))
     else:
         # if during 90 seconds a user hasn't been created - app displays information about it
         # but don't step processing the command - config file generated here my be useful later
         # when user has been created
-        click.echo(f"User {username} is still not ready.")
+        click.echo(TEXTS["user_not_ready_error_msg"].format(username=username))
 
     try:
         kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(),
                                          users_password, "")
     except Exception:
-        error_msg = "Problems during creation of the file with user's configuration."
-        log.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["config_creation_error_msg"], TEXTS["config_creation_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
     if list_only:
-        click.echo("Please use the following kubectl config to connect to this user.")
-        click.echo("----------------------------------------------------------------")
+        click.echo(TEXTS["list_only_header"])
         click.echo(kubeconfig)
     else:
         if not filename:
@@ -193,12 +172,11 @@ def create(state: State, username: str, list_only: bool, filename: str):
             with open(filename, "w") as file:
                 file.write(kubeconfig)
 
-            click.echo(f"Configuration has been saved to the {filename} file.")
+            click.echo(TEXTS["config_save_success_msg"].format(filename=filename))
         except Exception:
-            error_msg = "File with configuration wasn't saved."
-            log.exception(error_msg)
-            click.echo(error_msg)
-            click.echo("Content of the generated config file is as follows. Please copy it to a file manually.")
+            handle_error(logger, TEXTS["config_save_fail_msg"], TEXTS["config_save_fail_msg"], exit_code=None,
+                         add_verbosity_msg=state.verbosity == 0)
+            click.echo(TEXTS["config_save_fail_instructions_msg"])
             click.echo(kubeconfig)
             sys.exit(1)
 

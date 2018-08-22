@@ -39,6 +39,7 @@ from util.config import DLS4EConfigMap
 import packs.common as common
 from util.exceptions import KubectlIntError
 import dpath.util as dutil
+from cli_text_consts import PACKS_TF_TRAINING_TEXTS as TEXTS
 
 
 log = initialize_logger('packs.tf_training')
@@ -79,7 +80,7 @@ def update_configuration(run_folder: str, script_location: str,
         modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
-        raise KubectlIntError("Configuration hasn't been updated.")
+        raise KubectlIntError(TEXTS["config_not_updated"])
 
     log.debug("Update configuration - end")
 
@@ -143,7 +144,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                 try:
                     value = ast.literal_eval(value)
                 except Exception as e:
-                    raise AttributeError(f'Can not parse value: \"{value}\" to list/dict. Error: {e}')
+                    raise AttributeError(TEXTS["cant_parse_value"].format(value=value, error=e))
             if key == WORK_CNT_PARAM:
                 workersCount = value
             if key == P_SERV_CNT_PARAM:

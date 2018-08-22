@@ -20,7 +20,6 @@
 #
 
 import json
-import sys
 
 import click
 import requests
@@ -32,22 +31,18 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key
 from platform_resources.runs import get_run
 from platform_resources.run_model import RunStatus
 from commands.predict.common import get_inference_instance_url, InferenceVerb
-
-HELP = "Perform stream prediction task on deployed prediction instance."
-HELP_N = "Name of prediction session."
-HELP_D = "Path to JSON data file that will be streamed to prediction instance. " \
-         "Data must be formatted such that it is compatible with the SignatureDef specified within the model " \
-         "deployed in selected prediction instance."
-HELP_M = "Method verb that will be used when performing inference. Predict verb is used by default."
-
-log = initialize_logger(__name__)
+from util.system import handle_error
+from cli_text_consts import PREDICT_STREAM_CMD_TEXTS as TEXTS
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='s')
-@click.option('-n', '--name', required=True, help=HELP_N)
-@click.option('-d', '--data', required=True, type=click.Path(exists=True), help=HELP_D)
+logger = initialize_logger(__name__)
+
+
+@click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='s')
+@click.option('-n', '--name', required=True, help=TEXTS["help_n"])
+@click.option('-d', '--data', required=True, type=click.Path(exists=True), help=TEXTS["help_d"])
 @click.option('-m', '--method-verb', default=InferenceVerb.PREDICT.value,
-              type=click.Choice([verb.value for verb in InferenceVerb]), help=HELP_M)
+              type=click.Choice([verb.value for verb in InferenceVerb]), help=TEXTS["help_m"])
 @common_options()
 @pass_state
 def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
@@ -61,27 +56,24 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         # TODO: check if kind field of inference instance Run is correct
         inference_instance = get_run(name=name, namespace=namespace)
         if not inference_instance:
-            click.echo(f'Prediction instance {name} does not exist.')
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["instance_not_exists_error_msg"].format(name=name))
         if not inference_instance.state == RunStatus.RUNNING:
-            click.echo(f'Prediction instance {name} is not in {RunStatus.RUNNING.value} state.')
-            sys.exit(1)
+            handle_error(user_msg=TEXTS["instance_not_running_error_msg"]
+                         .format(name=name, running_code=RunStatus.RUNNING.value))
 
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance)
         stream_url = f'{inference_instance_url}:{method_verb.value}'
     except Exception:
-        error_msg = f'Failed to get prediction instance {name} URL.'
-        log.exception(error_msg)
-        sys.exit(error_msg)
+        handle_error(logger, TEXTS["instance_get_fail_error_msg"].format(name=name),
+                     TEXTS["instance_get_fail_error_msg"].format(name=name),
+                     add_verbosity_msg=state.verbosity == 0)
 
     try:
         with open(data, 'r', encoding='utf-8') as data_file:
             stream_data = json.load(data_file)
     except (json.JSONDecodeError, IOError):
-        error_msg = f'Failed to load {data} data file. Make sure that provided file exists and' \
-                    f' is in a valid JSON format.'
-        log.exception(error_msg)
-        sys.exit(error_msg)
+        handle_error(logger, TEXTS["json_load_error_msg"].format(data=data),
+                     TEXTS["json_load_error_msg"].format(data=data))
 
     try:
         api_key = get_api_key()
@@ -90,8 +82,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         stream_response.raise_for_status()
         click.echo(stream_response.text)
     except Exception as e:
-        error_msg = f'Failed to perform inference. Reason: {e}'
+        error_msg = TEXTS["inference_other_error_msg"].format(exception=e)
         if hasattr(e, 'response'):
-            error_msg += f'\n Response: {e.response.text}'
-        log.exception(error_msg)
-        sys.exit(error_msg)
+            error_msg += TEXTS["inferenece_error_response_msg"].format(response_text=e.response.text)
+        handle_error(logger, error_msg, error_msg)

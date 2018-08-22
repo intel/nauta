@@ -22,8 +22,10 @@
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
 from util.logger import initialize_logger
+from cli_text_consts import UTIL_HELM_TEXTS as TEXTS
 
-log = initialize_logger(__name__)
+
+logger = initialize_logger(__name__)
 
 
 def delete_user(username: str):
@@ -50,5 +52,5 @@ def delete_helm_release(release_name: str):
     output, err_code = execute_system_command(delete_release_command)
 
     if err_code or f"release \"{release_name}\" deleted" not in output:
-        log.error(output)
-        raise RuntimeError("Error during removal of helm release {}.".format(release_name))
+        logger.error(output)
+        raise RuntimeError(TEXTS["helm_release_removal_error_msg"].format(release_name=release_name))

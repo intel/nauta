@@ -20,7 +20,6 @@
 #
 
 import os
-import sys
 
 import click
 from tabulate import tabulate
@@ -32,21 +31,18 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_api_key
+from util.system import handle_error
+from cli_text_consts import PREDICT_LAUNCH_CMD_TEXTS as TEXTS
 
-HELP = "Starts a new prediction instance that can be used for performing prediction, classification and" \
-       " regression tasks on trained model."
-HELP_N = "The name of this inference instance."
-HELP_M = "Path to saved model that will be used for inference. Model must be located on one of the input or output" \
-         " system shares (e.g. /mnt/input/home/<experiment_name>)."
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
 
-log = initialize_logger(__name__)
+logger = initialize_logger(__name__)
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='l')
-@click.option('-n', '--name', default=None, help=HELP_N, callback=validate_experiment_name)
-@click.option('-m', '--model-location', required=True, help=HELP_M)
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='l')
+@click.option('-n', '--name', default=None, help=TEXTS["help_n"], callback=validate_experiment_name)
+@click.option('-m', '--model-location', required=True, help=TEXTS["help_m"])
 @common_options()
 @pass_state
 def launch(state: State, name: str, model_location: str):
@@ -59,27 +55,22 @@ def launch(state: State, name: str, model_location: str):
         name = name if name else generate_name(name=model_name)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name)
     except Exception:
-        error_message = "Failed to create prediction instance."
-        log.exception(error_message)
-        sys.exit(error_message)
+        handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
-    click.echo(tabulate({'Name': [inference_instance.name],
-                         'Model Location': [model_location],
-                         'Status': [inference_instance.status.value]},
-                        headers=['Name', 'Model Location', 'Status'],
+    click.echo(tabulate([[inference_instance.name, model_location, inference_instance.status.value]],
+                        headers=TEXTS["table_headers"],
                         tablefmt="orgtbl"))
 
     try:
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance,
                                                             model_name=model_name)
         authorization_header = get_authorization_header()
-        click.echo(f'\nPrediction instance URL (append method verb manually, e.g. :predict):'
-                   f'\n{inference_instance_url}')
-        click.echo(f'\nAuthorize with following header:\n{authorization_header}')
+        click.echo(TEXTS["instance_info_msg"].format(inference_instance_url=inference_instance_url,
+                                                     authorization_header=authorization_header))
     except Exception:
-        error_message = "Failed to obtain prediction instance URL."
-        log.exception(error_message)
-        sys.exit(error_message)
+        handle_error(logger, TEXTS["instance_url_error_msg"], TEXTS["instance_url_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
 
 def get_authorization_header():

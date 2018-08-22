@@ -24,14 +24,16 @@ import time
 from enum import Enum
 import subprocess
 import sys
-from typing import List
+from typing import List, Union
 import errno
 import socket
 import dateutil
 import signal
+import click
 
 from util.exceptions import KubectlIntError
 from util.logger import initialize_logger, get_verbosity_level
+from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS, VERBOSE_RERUN_MSG
 
 
 log = initialize_logger('util.system')
@@ -71,7 +73,7 @@ def execute_subprocess_command(command: List[str], timeout: int or None = 1, std
 
     if not process or process.poll() != (0 or None):
         log.error(f'COMMAND execution FAIL: {command}')
-        raise RuntimeError(f'COMMAND execution FAIL: {command}')
+        raise RuntimeError(TEXTS["command_exe_fail_error_msg"].format(command=command))
     return process
 
 
@@ -94,7 +96,8 @@ def get_current_os() -> OS:
     elif sys_platform.startswith(OS.MACOS.value):
         return OS.MACOS
 
-    raise RuntimeError(f'unsupported platform: {sys_platform}, supported: {OS.all_str()}!')
+    raise RuntimeError(TEXTS["unsupported_platform_error_msg"]
+                       .format(sys_platform=sys_platform, supported_os=OS.all_str()))
 
 
 def check_port_availability(port: int) -> bool:
@@ -115,7 +118,7 @@ def check_port_availability(port: int) -> bool:
             ret_value = False
         else:
             # something else raised the socket.error exception
-            error_msg = "Problem during checking port's availability."
+            error_msg = TEXTS["port_availability_check_error_msg"]
             log.exception(error_msg)
             raise KubectlIntError(error_msg) from e
 
@@ -142,5 +145,28 @@ def wait_for_ctrl_c():
         continue_loop = False
 
     signal.signal(signal.SIGINT, signal_handler)
-    while (continue_loop):
+    while continue_loop:
         time.sleep(0.1)
+
+
+def handle_error(logger=None, log_msg: str = None, user_msg: str = None, exit_code: Union[int, None] = 1,
+                 add_verbosity_msg: bool = False):
+    """
+    Handle error in cli. Log message may be printed. User message may be printed or not, with or without verbosity
+    usage info. Execution may end with an exit code. Each combination of these 3 possibilities is achievable by
+    specifying correct arguments. Default behaviour is exit with code 1, log nothing and print nothing.
+
+    :param logger: logger which will handle log message. If None, then no message is logged.
+    :param log_msg: message to be shown in log. If None, then no message is logged.
+    :param user_msg: message to be shown to the user. If None, then no message is shown.
+    :param exit_code: exit code for sys.exit. If None, then execution is not terminated.
+    :param add_verbosity_msg: whether to add information about -v usage or not.
+    :return:
+    """
+    if logger is not None and log_msg is not None:
+        logger.exception(log_msg)
+    # Internationalization can be plugged in here.
+    if user_msg is not None:
+        click.echo(user_msg + (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
+    if exit_code is not None:
+        sys.exit(exit_code)

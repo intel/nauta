@@ -26,6 +26,8 @@ from typing import Dict, List, Optional
 import json
 import requests
 
+from cli_text_consts import TENSORBOARD_CLIENT_TEXTS as TEXTS
+
 
 class TensorboardServiceAPIException(Exception):
     def __init__(self, error_code: int, message: str):
@@ -126,9 +128,9 @@ class TensorboardServiceClient:
             if response_body.get('invalidRuns'):
                 list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
                                                   for item in response_body.get('invalidRuns')])
-                err_message = 'There is no data for the following experiments : {}'.format(list_of_invalid_runs)
+                err_message = TEXTS["invalid_runs_error_msg"].format(invalid_runs_list=list_of_invalid_runs)
             else:
-                err_message = 'Experiments given as paramaters of the command don\'t exist.'
+                err_message = TEXTS["runs_not_exist_error_msg"]
             raise TensorboardServiceAPIException(error_code=response.status_code, message=err_message)
         else:
             response_body = json.loads(response.content.decode('utf-8'))

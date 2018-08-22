@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import re
+
 import pytest
 from kubernetes.client.models import V1ConfigMap
 from click.testing import CliRunner
@@ -27,8 +29,31 @@ from commands import version
 from version import VERSION
 from util.config import DLS4EConfigMap
 from util.exceptions import KubectlIntError
+from cli_text_consts import VERSION_CMD_TEXTS as TEXTS, VERBOSE_RERUN_MSG
+
 
 PLATFORM_VERSION = "1.2"
+
+APPLICATION_VERSION_REGEX = r"{application_row_name}[ ]+\| {version}".format(
+    application_row_name=TEXTS["table_app_row_name"], version=VERSION
+)
+PLATFORM_VERSION_ON_SUCCESS_REGEX = r"{platform_row_name}[ ]+\| {version}".format(
+    platform_row_name=TEXTS["table_platform_row_name"], version=PLATFORM_VERSION
+)
+PLATFORM_VERSION_ON_FAIL_REGEX = r"{platform_row_name}[ ]+\| {version}".format(
+    platform_row_name=TEXTS["table_platform_row_name"], version=TEXTS["initial_platform_version"]
+)
+
+
+def assert_version_table_rows(cmd_output: str, on_cmd_fail):
+    """ Assert that expected application and platform rows are present only once in the command output. """
+    application_row_matches = re.findall(APPLICATION_VERSION_REGEX, cmd_output)
+    platform_row_matches = re.findall(
+        PLATFORM_VERSION_ON_FAIL_REGEX if on_cmd_fail else PLATFORM_VERSION_ON_SUCCESS_REGEX, cmd_output
+    )
+
+    assert len(application_row_matches) == 1
+    assert len(platform_row_matches) == 1
 
 
 @pytest.fixture()
@@ -60,8 +85,7 @@ def test_version(mocked_k8s_config, mocked_k8s_CoreV1Api):
     runner = CliRunner()
     result = runner.invoke(version.version, [])
 
-    assert f"dlsctl application | {VERSION}" in result.output
-    assert f"dls4e platform     | {PLATFORM_VERSION}" in result.output
+    assert_version_table_rows(result.output, on_cmd_fail=False)
 
 
 def test_version_with_kubectl_exception(mocker):
@@ -70,14 +94,9 @@ def test_version_with_kubectl_exception(mocker):
     runner = CliRunner()
     result = runner.invoke(version.version, [])
 
-    assert f"dlsctl application | {VERSION}" in result.output
-    assert "dls4e platform     | Failed to get platform version." in result.output
+    assert_version_table_rows(result.output, on_cmd_fail=True)
 
-    assert 'Platform version check failure may occur for example due to invalid path to kubectl config, ' \
-        'invalid k8s credentials or k8s cluster being unavailable. Check your KUBECONFIG environment ' \
-        'variable and make sure that the k8s cluster is online. Run this command with -v or -vv option ' \
-        'for more info.' \
-        in result.output
+    assert TEXTS["kubectl_int_error_msg"] + " " + VERBOSE_RERUN_MSG in result.output
 
 
 def test_version_with_unknown_exception(mocker):
@@ -86,8 +105,6 @@ def test_version_with_unknown_exception(mocker):
     runner = CliRunner()
     result = runner.invoke(version.version, [])
 
-    assert f"dlsctl application | {VERSION}" in result.output
-    assert "dls4e platform     | Failed to get platform version." in result.output
+    assert_version_table_rows(result.output, on_cmd_fail=True)
 
-    assert "Unexpected error occurred during platform version check. Use -v or -vv option for more info." \
-        in result.output
+    assert TEXTS["other_error_msg"] + " " + VERBOSE_RERUN_MSG in result.output

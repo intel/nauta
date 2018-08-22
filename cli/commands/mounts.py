@@ -20,9 +20,7 @@
 #
 
 import platform
-
 import os
-import sys
 
 import click
 
@@ -31,68 +29,44 @@ from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
     get_kubectl_host
 from util.aliascmd import AliasCmd
-
-log = initialize_logger(__name__)
-
-HELP = "Command displays a command that can be used to mount client's" \
-       " folders on his/her local machine."
+from util.system import handle_error
+from cli_text_consts import MOUNTS_CMD_TEXTS as TEXTS
 
 
-MOUNT_MESSAGE = '''
-Use the following command to mount those folders:
- - replace <MOUNTPOINT> with a proper location on your local machine)
- - replace <DLS4E_FOLDER> with one of the following:
-        - input - User's private input folder (read/write)
-          (can be accessed as /mnt/input/home from training script).
-        - output - User's private output folder (read/write)
-          (can be accessed as /mnt/output/home from training script).
-        - input-shared - Shared input folder (read/write)
-          (can be accessed as /mnt/input/root/public from training script).
-        - output-shared - Shared output folder (read/write)
-          (can be accessed as /mnt/output/root/public from training script).
-        - input-output-ro - Full input and output directories, read only.
-Additionally, each experiment has a special folder that can be accessed
-as /mnt/output/experiment from training script. This folder is shared by Samba
-as output/<EXPERIMENT_NAME>.
---------------------------------------------------------------------
-'''
+logger = initialize_logger(__name__)
 
 
-@click.command(short_help=HELP, help=HELP, cls=AliasCmd, alias='m')
+@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='m')
 @common_options()
 @pass_state
 def mounts(state: State):
     try:
         if is_current_user_administrator():
-            click.echo("DLS4E doesn't create shares for administrators. Please execute this command as "
-                       "a regular user.")
-            sys.exit(1)
+            handle_error(logger, TEXTS["user_is_admin_error_msg"], TEXTS["user_is_admin_error_msg"])
     except Exception:
-        error_msg = "Problems detected while verifying that current user is an administrator."
-        log.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(1)
+        handle_error(logger, TEXTS["admin_check_error_msg"], TEXTS["admin_check_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
-    click.echo(MOUNT_MESSAGE)
-    click.echo(get_mount_command())
+    click.echo(TEXTS["main_msg"])
+
+    try:
+        click.echo(get_mount_command())
+    except Exception:
+        handle_error(logger, TEXTS["get_mount_command_error_msg"], TEXTS["get_mount_command_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
 
 def get_mount_command() -> str:
-    try:
-        adr = get_kubectl_host(with_port=False)
-        usr = get_current_user()
-        psw = get_users_samba_password(usr)
+    adr = get_kubectl_host(with_port=False)
+    usr = get_current_user()
+    psw = get_users_samba_password(usr)
 
-        if platform.system() == 'Linux':
-            return get_mount_command_linux(usr, psw, adr)
-        elif platform.system() == 'Windows':
-            return get_mount_command_windows(usr, psw, adr)
-        else:  # OSX
-            return get_mount_command_osx(usr, psw, adr)
-    except Exception:
-        error_msg = "Error detected while gathering data needed for mounting Samba share."
-        log.exception(error_msg)
-        click.echo(error_msg)
+    if platform.system() == 'Linux':
+        return get_mount_command_linux(usr, psw, adr)
+    elif platform.system() == 'Windows':
+        return get_mount_command_windows(usr, psw, adr)
+    else:  # OSX
+        return get_mount_command_osx(usr, psw, adr)
 
 
 def get_mount_command_linux(usr: str, psw: str, adr: str) -> str:

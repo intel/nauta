@@ -19,8 +19,6 @@
 # and approved by Intel in writing.
 #
 
-import sys
-
 import click
 
 from cli_state import common_options, pass_state, State
@@ -30,58 +28,62 @@ from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.exceptions import KubectlConnectionError
+from util.system import handle_error
+from cli_text_consts import VERIFY_CMD_TEXTS as TEXTS
 
 
-HELP = "Command verifies whether all external components required by dlsctl are installed " \
-       "in proper versions. If something is missing, the application displays detailed " \
-       "information about it."
-
-log = initialize_logger(__name__)
+logger = initialize_logger(__name__)
 
 
-@click.command(short_help=HELP, help=HELP, cls=AliasCmd, alias='ver')
+@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='ver')
 @common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):
     try:
         check_connection_to_cluster()
     except KubectlConnectionError as e:
-        log.exception(e)
-        sys.exit(e)
+        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
     except FileNotFoundError:
-        error_msg = 'kubectl is not installed.'
-        log.exception(error_msg)
-        sys.exit(error_msg)
+        handle_error(logger, TEXTS["kubectl_not_installed_error_msg"], TEXTS["kubectl_not_installed_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
     try:
         namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
     except Exception:
-        error_msg = f'Failed to get current Kubernetes namespace.'
-        log.exception(error_msg)
-        sys.exit(error_msg)
+        handle_error(logger, TEXTS["get_k8s_namespace_error_msg"], TEXTS["get_k8s_namespace_error_msg"],
+                     add_verbosity_msg=state.verbosity == 0)
 
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             valid, installed_version = check_dependency(dependency_spec, namespace=namespace)
-            log.info(f'Checking version of {dependency_name}. '
-                     f'Installed version: ({installed_version}). '
-                     f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
+            logger.info(
+                TEXTS["version_checking_msg"].format(
+                    dependency_name=dependency_name, installed_version=installed_version,
+                    supported_versions_sign=supported_versions_sign,
+                    expected_version=dependency_spec.expected_version
+                )
+            )
             if valid:
-                click.echo(f'{dependency_name} verified successfully.')
+                click.echo(TEXTS["dependency_verification_success_msg"].format(dependency_name=dependency_name))
             else:
-                click.echo(f'Warning: the installed version of {dependency_name} ({installed_version})'
-                           f' is not supported, supported version {supported_versions_sign}'
-                           f' {dependency_spec.expected_version}')
+                click.echo(
+                    TEXTS["invalid_version_warning_msg"].format(
+                        dependency_name=dependency_name, installed_version=installed_version,
+                        supported_versions_sign=supported_versions_sign,
+                        expected_version=dependency_spec.expected_version
+                    )
+                )
         except FileNotFoundError:
-            error_msg = f'{dependency_name} is not installed.'
-            log.exception(error_msg)
-            sys.exit(error_msg)
+            handle_error(logger, TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
+                         TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
+                         add_verbosity_msg=state.verbosity == 0)
         except (RuntimeError, ValueError, TypeError):
-            error_msg = f'Failed to get {dependency_name} version.'
-            log.exception(error_msg)
-            sys.exit(error_msg)
+            handle_error(logger, TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
+                         TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
+                         add_verbosity_msg=state.verbosity == 0)
         except Exception:
-            error_msg = "Exception during verification."
-            log.exception(error_msg)
-            sys.exit(error_msg)
+            handle_error(logger,
+                         TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
+                         TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
+                         add_verbosity_msg=state.verbosity == 0)

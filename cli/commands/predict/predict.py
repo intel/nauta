@@ -24,15 +24,13 @@ import click
 from commands.predict import launch, list, cancel, stream, batch
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
+from cli_text_consts import PREDICT_CMD_TEXTS as TEXTS
+
 
 logger = initialize_logger(__name__)
 
 
-HELP = "Command for starting, stopping, and managing prediction jobs and instances."
-
-
-@click.group(short_help=HELP, cls=AliasGroup, alias='p',
-             help="To get further help on commands use COMMAND with -h or --help option.",
+@click.group(short_help=TEXTS["help"], cls=AliasGroup, alias='p', help=TEXTS["help"],
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def predict():
     pass

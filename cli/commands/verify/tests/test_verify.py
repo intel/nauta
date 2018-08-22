@@ -24,6 +24,7 @@ import pytest
 
 from commands.verify import verify
 from util.exceptions import KubectlConnectionError
+from cli_text_consts import VERIFY_CMD_TEXTS as TEXTS
 
 
 @pytest.fixture(autouse=True)
@@ -60,7 +61,7 @@ def test_verify_with_kubectl_not_found_error(mocker):
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
-    assert "kubectl is not installed" in result.output, \
+    assert TEXTS["kubectl_not_installed_error_msg"] in result.output, \
         "Bad output. FileNotFoundError indicates that kubectl is not installed."
 
 

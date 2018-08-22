@@ -30,6 +30,7 @@ from commands.launch import launch
 from tensorboard.client import Tensorboard, TensorboardStatus, TensorboardServiceAPIException
 from util import launcher
 from util.system import get_current_os, OS
+from cli_text_consts import LAUNCH_CMD_TEXTS as TEXTS
 
 
 APP_NAME = 'webui'
@@ -350,4 +351,6 @@ def test_tensorboard_command_many_experiments_some_nonexisting(mocker, launch_te
     assert commands.launch.launch.launch_app_with_proxy.call_count == 1
     assert launch.sleep.call_count == 0
     assert result.exit_code == 0
-    assert "Tensorboard will present information from the rest" in result.output
+    assert TEXTS["tb_invalid_runs_msg"].format(
+        invalid_runs=", ".join([f'{item.get("owner")}/{item.get("name")}' for item in FAKE_INVALID_RUNS])
+    ) in result.output

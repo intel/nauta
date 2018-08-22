@@ -25,19 +25,16 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 import commands.experiment.cancel
 from util.logger import initialize_logger
-
-HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
-HELP_P = "If given, then all information concerning all prediction instances, completed and currently running, " \
-         "is removed from the system."
-HELP_M = "If given, command searches for prediction instances matching the value of this option."
-
-log = initialize_logger(__name__)
+from cli_text_consts import PREDICT_CANCEL_CMD_TEXTS as TEXTS
 
 
-@click.command(short_help=HELP, cls=AliasCmd, alias='c')
+logger = initialize_logger(__name__)
+
+
+@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='c')
 @click.argument("name", required=False)
-@click.option('-m', '--match', default=None, help=HELP_M)
-@click.option('-p', '--purge', default=None, help=HELP_P, is_flag=True)
+@click.option('-m', '--match', default=None, help=TEXTS["help_m"])
+@click.option('-p', '--purge', default=None, help=TEXTS["help_p"], is_flag=True)
 @common_options()
 @pass_state
 @click.pass_context
@@ -45,6 +42,6 @@ def cancel(context, state: State, name: str, match: str, purge: bool):
     """
     Cancels chosen prediction instances based on a name provided as a parameter.
     """
-    commands.experiment.cancel.experiment_name = 'prediction instance'
-    commands.experiment.cancel.experiment_name_plural = 'prediction instances'
+    commands.experiment.cancel.experiment_name = TEXTS["experiment_name"]
+    commands.experiment.cancel.experiment_name_plural = TEXTS["experiment_name_plural"]
     context.forward(commands.experiment.cancel.cancel)
