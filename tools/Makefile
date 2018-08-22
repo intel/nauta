@@ -42,7 +42,9 @@ DOCS_RELEASE_PACKAGE:=$(BUILD_DIR)/docs-release.tar.gz
 RPM_RELEASE_PACKAGE:=$(BUILD_DIR)/rpm-release.tar.gz
 
 RELEASE_PACKAGE:=$(WORKSPACE)/dls4e-$(VERSION).tar.gz
+RELEASE_PACKAGE_CHECKSUM:=$(WORKSPACE)/dls4e-$(VERSION).tar.gz.sha256sum
 REMOTE_RELEASE_PACKAGE:=releases/dls4e/dls4e-$(VERSION).tar.gz
+REMOTE_RELEASE_PACKAGE_CHECKSUM:=releases/dls4e/dls4e-$(VERSION).tar.gz.sha256sum
 
 DOCS:=$(CURDIR)/../docs/release
 
@@ -58,16 +60,32 @@ export VERSION_ID := $(DEFAULT_VERSION_ID)
 export GLOBAL_WORKSPACE := $(GLOBAL_WORKSPACE)
 export GLOBAL_VIRTUALENV_DIR := $(GLOBAL_VIRTUALENV_DIR)
 
-release: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY
-release: export ENV_S3_URL := $(ENV_S3_URL)
-release: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
-release: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
-release: $(RELEASE_PACKAGE)
-release: export ENV_SRC := $(RELEASE_PACKAGE)
-release: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
-release: export BUILD_LOGS := $(BUILD_LOGS)
-release:
+release-package: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY
+release-package: export ENV_S3_URL := $(ENV_S3_URL)
+release-package: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
+release-package: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
+release-package: $(RELEASE_PACKAGE)
+release-package: export ENV_SRC := $(RELEASE_PACKAGE)
+release-package: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
+release-package: export BUILD_LOGS := $(BUILD_LOGS)
+release-package:
 	@$(PUSH_MAKE)
+
+release-checksum: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY
+release-checksum: export ENV_S3_URL := $(ENV_S3_URL)
+release-checksum: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
+release-checksum: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
+release-checksum: $(RELEASE_PACKAGE)
+release-checksum: export ENV_SRC := $(RELEASE_PACKAGE_CHECKSUM)
+release-checksum: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE_CHECKSUM)
+release-checksum: export BUILD_LOGS := $(BUILD_LOGS)
+release-checksum:
+ifeq (True,$(ENV_CALCULATESUM))
+	sha256sum "$(RELEASE_PACKAGE)" > "$(RELEASE_PACKAGE).sha256sum"
+	@$(PUSH_MAKE)
+endif
+
+release: release-package release-checksum
 
 push: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY ENV_SRC ENV_DEST
 push: export ENV_S3_URL := $(ENV_S3_URL)
