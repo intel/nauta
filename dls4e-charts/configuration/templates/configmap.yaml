@@ -16,4 +16,4 @@ data:
 {{- range (required "List of images is required" .Values.global.images) }}
   image.{{ required "Name not found" .name }}: {{ required "Value not found" .value }}
 {{- end }}
-  platform.version: "{{ .Values.platformVersion }}"
+  platform.version: "{{ .Values.global.dls4e_release }}"
