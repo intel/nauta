@@ -42,12 +42,16 @@
       <v-list>
         <v-list-tile>
           <v-list-tile-title>
-            {{ labels.USER_GUIDE }}
+            <a :href="cliCommands" target="_blank">
+              {{ labels.USER_GUIDE }}
+            </a>
           </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
           <v-list-tile-title>
-            {{ labels.RELEASE_NOTES }}
+            <a :href="releaseNotesDoc" target="_blank">
+              {{ labels.RELEASE_NOTES }}
+            </a>
           </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
@@ -78,6 +82,8 @@
 <script>
 import {mapActions, mapGetters} from 'vuex';
 import LicenseDoc from '../assets/dls-evaluation-license.pdf';
+import ReleaseNotesDoc from '../assets/intel-release-notes-for-dell-early-access.pdf';
+import CliCommands from '../assets/dls4e-cli-commands.pdf';
 import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {
@@ -91,7 +97,9 @@ export default {
   data () {
     return {
       labels: ELEMENT_LABELS,
-      licenseDoc: LicenseDoc
+      licenseDoc: LicenseDoc,
+      releaseNotesDoc: ReleaseNotesDoc,
+      cliCommands: CliCommands
     }
   },
   computed: {
