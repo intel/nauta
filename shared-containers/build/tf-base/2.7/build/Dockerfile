@@ -2,7 +2,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 RUN yum update -y
-RUN yum install -y centos-release-scl which
+RUN yum install -y which
 RUN yum install -y devtoolset-7-gcc*
 RUN source /opt/rh/devtoolset-7/enable && gcc --version
 RUN yum install -y --nogpgcheck curl git rsync unzip zip which \

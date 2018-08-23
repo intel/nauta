@@ -3,7 +3,7 @@
 proxy:
   http_proxy: http://proxy-mu.intel.com:911
   https_proxy: http://proxy-mu.intel.com:912
-  no_proxy: .intel.com,127.0.0.1,localhost
+  no_proxy: os.mirror,.intel.com,127.0.0.1,localhost
 
 images: "{{ shared_images | combine(local_images | default({})) }}"
 
@@ -20,9 +20,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
     required: {}
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/centos/centos-docker-0001.tar.xz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/centos/centos-docker-0008.tar.xz
         dest: centos-docker.tar.xz
-        checksum: 8f3ce3f0c6b8d1cbc45c93f72c8c02425cda154d19230a66732778767f1daf80
+        checksum: d5759d1da5f8a1e70f29b7dacfe5458fb2edf86fc2679115e5a71eca463bfa42
   shared/centos/rpm-packer:
     version: "7.5.1804"
     required:

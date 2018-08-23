@@ -2,7 +2,6 @@ ARG BASE_IMAGE=centos:7.4.1708
 FROM ${BASE_IMAGE}
 
 RUN yum clean all
-RUN yum install -y epel-release
 RUN yum install -y make curl wget unzip vim rpm-build createrepo pigz
 
 RUN mkdir /root/rpmbuild/BUILD \
