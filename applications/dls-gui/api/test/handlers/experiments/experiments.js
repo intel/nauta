@@ -56,6 +56,8 @@ describe('Handlers | Experiments', function () {
           }
         },
         spec: {
+          'start-time': '2018-08-22T06:52:46Z',
+          'end-time': '2018-08-22T06:52:49Z',
           'experiment-name': 'experiment-name-will-be-added-soon',
           metrics: {
             accuracy: '52.322'
@@ -84,6 +86,8 @@ describe('Handlers | Experiments', function () {
           }
         },
         spec: {
+          'start-time': null,
+          'end-time': null,
           'experiment-name': 'experiment-name-will-be-added-soon',
           metrics: {
             accuracy: '52.322'
@@ -99,7 +103,7 @@ describe('Handlers | Experiments', function () {
               release: 'exp-mnist-sing-18-06-11-09-34-45-41'
             }
           },
-          state: 'SUCCESS'
+          state: 'QUEUED'
         }
       }
     ];
@@ -119,7 +123,9 @@ describe('Handlers | Experiments', function () {
         params: {
           podSelector: k8sRunEntities[0].spec['pod-selector']['matchLabels'],
           podCount: k8sRunEntities[0].spec['pod-count'],
-          parameters: k8sRunEntities[0].spec['parameters']
+          parameters: k8sRunEntities[0].spec['parameters'],
+          trainingStartTime: k8sRunEntities[0].spec['start-time'],
+          trainingEndTime: k8sRunEntities[0].spec['end-time']
         }
       },
       {
@@ -134,7 +140,9 @@ describe('Handlers | Experiments', function () {
         params: {
           podSelector: k8sRunEntities[1].spec['pod-selector']['matchLabels'],
           podCount: k8sRunEntities[1].spec['pod-count'],
-          parameters: k8sRunEntities[1].spec['parameters']
+          parameters: k8sRunEntities[1].spec['parameters'],
+          trainingStartTime: k8sRunEntities[1].spec['start-time'],
+          trainingEndTime: k8sRunEntities[1].spec['end-time']
         }
       }
     ];

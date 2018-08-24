@@ -294,6 +294,29 @@ describe('VUE components ModelsTable', () => {
     expect(result).to.deep.equal(value);
   });
 
+  it('Should return default string if trainingStartDate value empty', function () {
+    const value = null;
+    const expectedResult = '---';
+    const result = wrapper.vm.parseValue('trainingStartDate', value);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return correct duration time for training', function () {
+    const trainingStartTime = '2018-08-22T09:18:03Z';
+    const trainingEndTime = '2018-08-25T10:19:04Z';
+    const expectedResult = '3 day(s), 1 hour(s), 1 min(s), 1 s';
+    const result = wrapper.vm.parseValue('trainingDuration', trainingStartTime, trainingEndTime);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return default string if trainingEndTime value empty for calculating duration time for training', function () {
+    const trainingStartTime = '2018-08-22T09:18:03Z';
+    const trainingEndTime = null;
+    const expectedResult = '---';
+    const result = wrapper.vm.parseValue('trainingDuration', trainingStartTime, trainingEndTime);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
   it('Should hide filter windows before showing others', function () {
     wrapper.vm.filterByValModals.name.visible = true;
     wrapper.vm.switchFilterWindow('namespace', true);

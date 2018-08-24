@@ -41,7 +41,9 @@ const generateExperimentEntities = function (data) {
       params: {
         podSelector: item.spec['pod-selector']['matchLabels'],
         podCount: item.spec['pod-count'],
-        parameters: item.spec['parameters']
+        parameters: item.spec['parameters'],
+        trainingStartTime: item.spec['start-time'],
+        trainingEndTime: item.spec['end-time']
       }
     };
     if (item.spec['metrics']) {

@@ -10,6 +10,7 @@ yarn-error.log*
 /api/coverage/
 
 # Editor directories and files
+.editorconfig
 .idea
 .vscode
 *.suo

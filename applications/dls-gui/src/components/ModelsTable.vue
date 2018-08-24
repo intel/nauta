@@ -117,6 +117,8 @@
                             </v-flex>
                             <v-flex xs6 wrap>
                               <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.params.parameters"/>
+                              <ExpKeyValDetail :keyname="labels.TRAINING_START_DATE" :value="parseValue('trainingStartDate', item.params.trainingStartTime)"/>
+                              <ExpKeyValDetail :keyname="labels.TOTAL_TRAINING_DURATION" :value="parseValue('trainingDuration', item.params.trainingStartTime, item.params.trainingEndTime)"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -161,6 +163,7 @@ import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
 import ExpKeyValDetail from './ModelsTableFeatures/ExpKeyValDetail';
 import ExpResourcesDetail from './ModelsTableFeatures/ExpResourcesDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
+import TimedateExtractor from '../utils/timedate-extractor';
 
 const SORTING_ORDER = {
   ASC: 'asc',
@@ -422,12 +425,22 @@ export default {
         }
       }
     },
-    parseValue (key, value) {
+    parseValue (key, arg1, arg2) {
       switch (key) {
         case 'creationTimestamp':
-          return new Date(value).toLocaleString();
+          return new Date(arg1).toLocaleString();
+        case 'trainingStartDate':
+          return arg1 ? new Date(arg1).toLocaleString() : '---';
+        case 'trainingDuration':
+          const startDate = arg1;
+          const endDate = arg2;
+          if (!endDate) {
+            return '---';
+          }
+          const pData = TimedateExtractor(startDate, endDate);
+          return `${pData.days} day(s), ${pData.hours} hour(s), ${pData.minutes} min(s), ${pData.seconds} s`;
         default:
-          return value;
+          return arg1;
       }
     },
     switchFilterWindow (column, visible) {

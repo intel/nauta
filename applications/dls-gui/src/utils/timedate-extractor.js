@@ -19,38 +19,20 @@
  * and approved by Intel in writing.
  */
 
-export default {
-  ADD_DEL_COLUMN: 'Add/Delete columns',
-  ALL_RIGHTS_RESERVED: 'All rights reserved',
-  CANCEL: 'Cancel',
-  CLEAR_ALL: 'Clear all',
-  CONTAINERS: 'Containers',
-  DLS: 'Deep Learning Studio',
-  EXIT: 'Exit',
-  FILTER_BY_VAL: 'Filter by values',
-  LAUNCH_TB: 'Launch Tensorboard',
-  LICENSE: 'License',
-  LOAD_MORE: 'Load more',
-  LOADING: 'Loading',
-  MODELS: 'Models',
-  NAME: 'Name',
-  OF: 'of',
-  OK: 'OK',
-  PARAMETERS: 'Parameters',
-  PODS: 'Pods',
-  RELEASE_NOTES: 'Release notes',
-  RESET: 'Reset',
-  RESOURCES: 'Resources',
-  RESOURCES_DASHBOARD: 'Resources dashboard',
-  REVERT_TO_DEFAULT: 'Revert to default',
-  ROWS_PER_PAGE: 'Rows per page',
-  SAVE: 'Save',
-  SELECT_ALL: 'Select all',
-  SIGN_OUT: 'Sign out',
-  STATE: 'State',
-  TERMS_OF_USE: 'Terms of Use',
-  TOTAL_TRAINING_DURATION: 'Total Training Duration',
-  TRAINING_SUBMISSION_DATE: 'Training Submission Date',
-  TRAINING_START_DATE: 'Training Start Date',
-  USER_GUIDE: 'User guide'
+export default function (timedateA, timedateB) {
+  const startTime = new Date(timedateA);
+  const endTime = new Date(timedateB);
+  let diff = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
+  const days = Math.floor(diff / 60 / 60 / 24);
+  diff -= days * 60 * 60 * 24;
+  const hours = Math.floor(diff / 60 / 60);
+  diff -= hours * 60 * 60;
+  const minutes = Math.floor(diff / 60);
+  diff -= minutes * 60;
+  return {
+    days,
+    hours,
+    minutes,
+    seconds: diff
+  };
 }
