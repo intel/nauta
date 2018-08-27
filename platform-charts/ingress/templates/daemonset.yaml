@@ -27,6 +27,10 @@ spec:
         prometheus.io/port: '10254'
         prometheus.io/scrape: 'true'
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
       nodeSelector:
         master: "True"
       serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}

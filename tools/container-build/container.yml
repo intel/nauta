@@ -6,11 +6,7 @@
   handlers:
   - name: Cleanup registry container
     docker_container:
-      name: "yum-registry-{{ build_name }}-{{ user }}-{{ version }}"
-      state: absent
-  - name: Remove build dir
-    file:
-      path: "{{ build_dir }}"
+      name: "{{ registry_name }}"
       state: absent
   roles:
     - role: prepare

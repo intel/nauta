@@ -27,6 +27,20 @@ spec:
         heritage: {{ .Release.Service }}
         dls4e_app_name: samba
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       volumes:
         - name: input
           persistentVolumeClaim:
@@ -40,8 +54,10 @@ spec:
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E samba image is required" .Values.image }}
         imagePullPolicy: "IfNotPresent"
         resources:
-          limits:
+          requests:
             memory: 512Mi
+#          limits:
+#            memory: 512Mi
         livenessProbe:
           exec:
             command:

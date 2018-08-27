@@ -27,6 +27,20 @@ spec:
         heritage: {{ .Release.Service }}
         dls4e_app_name: gui
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       containers:
       - name: {{ .Chart.Name }}
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E dls-gui image is required" .Values.image }}

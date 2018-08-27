@@ -25,8 +25,11 @@ spec:
         release: {{ .Release.Name }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
-        kubernetes.io/cluster-service: "true"
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
       serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
       - name: {{ .Chart.Name }}

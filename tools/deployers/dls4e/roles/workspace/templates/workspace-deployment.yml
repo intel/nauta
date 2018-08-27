@@ -17,6 +17,10 @@ spec:
         release: dls4e
         kind: bootstrap-dls4e-workspace
     spec:
+      tolerations:
+        - key: "master"
+          operator: "Exists"
+          effect: "NoSchedule"
       nodeSelector:
         beta.kubernetes.io/arch: amd64
       volumes:
@@ -56,6 +60,15 @@ spec:
                       values:
                         - bootstrap-dls4e-workspace
                 topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: master
+                    operator: In
+                    values:
+                      - "True"
       containers:
         - name: bootstrap
           image: {{ pause_image }}

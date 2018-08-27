@@ -25,6 +25,20 @@ spec:
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       containers:
         - name: {{ .Chart.Name }}
           image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E nginx image is required" .Values.image }}
@@ -32,9 +46,12 @@ spec:
           ports:
             - containerPort: 5000
           resources:
-            limits:
+            requests:
               cpu: 200m
               memory: 512Mi
+#            limits:
+#              cpu: 200m
+#              memory: 512Mi
           volumeMounts:
             - name: "config"
               mountPath: "/etc/nginx/nginx.conf"

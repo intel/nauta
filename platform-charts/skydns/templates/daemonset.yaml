@@ -34,6 +34,9 @@ spec:
       tolerations:
       - key: "CriticalAddonsOnly"
         operator: "Exists"
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
       volumes:
       - name: kube-dns-config
         configMap:

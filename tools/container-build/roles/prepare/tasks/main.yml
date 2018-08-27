@@ -40,9 +40,13 @@
     artifacts_dir: "{{ build_dir }}/data/artifacts"
     facts_dir: "{{ build_dir }}/data/facts"
 
+- name: Register fact
+  set_fact:
+    registry_name: "yum-registry-{{ build_name }}-{{ 9999999999999999999999 | random | to_uuid }}"
+
 - name: Start registry container
   docker_container:
-    name: "yum-registry-{{ build_name }}-{{ user }}-{{ version }}"
+    name: "{{ registry_name }}"
     env: "{{ proxy }}"
     volumes:
       - "{{ registry_dir }}:/var/lib/registry"
@@ -56,7 +60,6 @@
   register: registry
   notify:
     - Cleanup registry container
-    - Remove build dir
 
 - set_fact:
     registry_port: "{{ registry.ansible_facts.docker_container.NetworkSettings.Ports['5000/tcp'][0].HostPort }}"

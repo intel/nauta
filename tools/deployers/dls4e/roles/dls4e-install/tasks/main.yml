@@ -15,6 +15,7 @@
         external_ip: "{{ runtime_kubernetes_external_name }}"
         registry: "127.0.0.1:{{ registry_nodeport }}"
       dls4e_storage: "{{ calculated_storage }}"
+      MasterHost: "{{ (calculated_storage | default({})).local_selector | default('') }}"
       images: "{{ registry_images }}"
 
 - name: Render configuration

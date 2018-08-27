@@ -27,6 +27,20 @@ spec:
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
     spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       hostNetwork: true
       serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
       nodeSelector:

@@ -28,11 +28,20 @@ spec:
         heritage: {{ .Release.Service }}
         apiserver: "true"
     spec:
-{{- if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
-{{- else }}
-      nodeSelector:
-{{ toYaml (required "DLS4E Storage Node Label Selector" .Values.global.dls4e_storage.local_selector) | indent 8 }}
-{{- end }}
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       serviceAccount: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
         - name: apiserver

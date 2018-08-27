@@ -28,11 +28,20 @@ spec:
         heritage: {{ .Release.Service }}
         dls4e_app_name: docker-registry
     spec:
-{{- if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
-{{- else }}
-      nodeSelector:
-{{ toYaml (required "DLS4E Storage Node Label Selector" .Values.global.dls4e_storage.local_selector) | indent 8 }}
-{{- end }}
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       containers:
         - name: {{ .Chart.Name }}
           image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E registry image is required" .Values.image }}
@@ -71,16 +80,9 @@ spec:
             - name: "config"
               mountPath: "/etc/docker/registry"
       volumes:
-{{ if eq (required "DLS4E Storage Type" .Values.global.dls4e_storage.type) "pvc" }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-{{ .Chart.Name }}
-{{ else }}
-        - name: data
-          hostPath:
-            path: {{ required "DLS4E Storage Path" .Values.global.dls4e_storage.local_path }}/{{ .Release.Name }}/{{ .Chart.Name }}/main
-            type: DirectoryOrCreate
-{{ end }}
         - name: config
           configMap:
             name: {{ .Release.Name }}-{{ .Chart.Name }}

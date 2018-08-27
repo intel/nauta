@@ -61,6 +61,7 @@
   vars:
     dls_release_values:
       global:
+        MasterHost: "{{ hostvars[groups['master'][0]].ansible_nodename }}"
         dls4e_registry: "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
       flannel:
         interfaces: "{{ all_cluster_interfaces | sort | unique }}"
@@ -79,6 +80,13 @@
   copy:
     content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "/tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml"
+
+- name: Mark node taint
+  changed_when: False
+  environment:
+    KUBECONFIG: /dev/null
+  shell: "kubectl taint nodes {{ hostvars[groups['master'][0]].ansible_nodename }} master=true:NoSchedule"
+  when: "'worker' in groups and groups['worker'] | length > 0"
 
 - name: Install helm chart
   environment:

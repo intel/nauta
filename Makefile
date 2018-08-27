@@ -38,7 +38,7 @@ dlsctl-build:
 	@(cd $(CURDIR)/cli && make clean && make push)
 
 tools-%:
-	@(cd $(CURDIR)/tools && make -j 4 $*)
+	@(cd $(CURDIR)/tools && make -j 2 $*)
 
 single-tools-%:
 	@(cd $(CURDIR)/tools && make $*)

@@ -30,10 +30,13 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      hostNetwork: true
       tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
       - key: "CriticalAddonsOnly"
         operator: "Exists"
+      hostNetwork: true
       containers:
       - name: redsocks
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E redsocks image is required" .Values.image }}
