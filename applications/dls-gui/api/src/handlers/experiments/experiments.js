@@ -223,13 +223,24 @@ const getExperimentResourcesData = function (req, res) {
     .then(function (data) {
       logger.info('Pods data retrieved');
       const result = data.items.map((pod) => {
+        const podStatusString = pod.status.conditions.map((cond) => {
+          let msg = cond.reason ? `, reason: ${cond.reason}` : '';
+          msg = cond.message ? `${msg}, message: ${cond.message}` : msg;
+          return `${cond.type}: ${cond.status} ${msg}`;
+        });
+
+        let containerStatuses = {};
+        pod.status.containerStatuses.forEach((containerStatus) => {
+          containerStatuses[containerStatus.name] = containerStatus.state;
+        });
         return {
           name: pod.metadata.name,
-          state: pod.status.phase,
+          state: podStatusString,
           containers: pod.spec.containers.map((container) => {
             return {
               name: container.name,
-              resources: container.resources
+              resources: container.resources,
+              status: k8s.parseContainerState(containerStatuses[container.name])
             }
           })
         };

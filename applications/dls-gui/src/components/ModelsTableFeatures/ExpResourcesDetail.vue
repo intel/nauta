@@ -36,7 +36,8 @@
           <ul id="containers-list">
             <li v-bind:key="container.name" v-for="container in pod.containers">
               <b>{{ labels.NAME }}:</b> <i>{{ container.name }}</i> <br/>
-              <b>{{ labels.RESOURCES }}:</b> <i>{{ container.resources }}</i>
+              <b>{{ labels.RESOURCES }}:</b> <i>{{ container.resources }}</i> <br/>
+              <b>{{ labels.STATUS }}:</b> <i>{{ container.status }}</i>
             </li>
           </ul>
         </li>

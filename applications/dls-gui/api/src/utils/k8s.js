@@ -111,3 +111,18 @@ module.exports.listPodsByLabelValue = function (token, labelName, labelValue) {
       });
   });
 };
+
+module.exports.parseContainerState = function (state) {
+  if (!state) {
+    return 'Not created';
+  }
+  if (state.running) {
+    return `Running, ${JSON.stringify(state.running)}`;
+  }
+  if (state.terminated) {
+    return `Terminated, ${JSON.stringify(state.terminated.reason)}`;
+  }
+  if (state.waiting) {
+    return `Waiting, ${JSON.stringify(state.waiting)}`;
+  }
+};

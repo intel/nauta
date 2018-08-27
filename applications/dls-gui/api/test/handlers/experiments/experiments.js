@@ -24,6 +24,7 @@ const sinon = require('sinon');
 const rewire = require('rewire');
 const Q = require('q');
 const expApi = rewire('../../../src/handlers/experiments/experiments');
+const k8sUtils = require('../../../src/utils/k8s');
 const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
@@ -153,13 +154,54 @@ describe('Handlers | Experiments', function () {
             name: 'name1'
           },
           status: {
+            containerStatuses: [
+              {
+                name: 'tensorflow',
+                state: {
+                  terminated: {
+                    containerID: 'docker://7e5515bc9f04fe4601e1dbea1d35852ec3af80434e6b040f42a22f0923d1773a',
+                    exitCode: 0,
+                    finishedAt: '2018-08-24T06:42:10Z',
+                    reason: 'Completed',
+                    startedAt: '2018-08-24T06:42:08Z'
+                  }
+                }
+              }
+            ],
+            conditions: [
+              {
+                lastProbeTime: null,
+                lastTransitionTime: '2018-08-24T06:42:07Z',
+                reason: 'PodCompleted',
+                status: 'True',
+                type: 'Initialized'
+              },
+              {
+                lastProbeTime: null,
+                lastTransitionTime: '2018-08-24T06:42:10Z',
+                reason: 'PodCompleted',
+                status: 'False',
+                type: 'Ready'
+              },
+              {
+                lastProbeTime: null,
+                lastTransitionTime: '2018-08-24T06:42:00Z',
+                status: 'True',
+                type: 'PodScheduled'
+              }
+            ],
             phase: 'succeed'
           },
           spec: {
             containers: [
               {
-                name: 'name_c_1',
-                resources: {}
+                name: 'tensorflow',
+                resources: {},
+                state: {
+                  terminated: {
+                    reason: 'Completed',
+                  }
+                }
               }
             ]
           }
@@ -493,7 +535,8 @@ describe('Handlers | Experiments', function () {
     beforeEach(function () {
       deferred = Q.defer();
       k8sMock = {
-        listPodsByLabelValue: sinon.stub().returns(deferred.promise)
+        listPodsByLabelValue: sinon.stub().returns(deferred.promise),
+        parseContainerState: k8sUtils.parseContainerState
       };
       reqMock.params = {
         experiment: 'exp'
@@ -529,11 +572,12 @@ describe('Handlers | Experiments', function () {
     it('should return data if everything ok', function (done) {
       const expectedResult = [{
         name: 'name1',
-        state: 'succeed',
+        state: ['Initialized: True , reason: PodCompleted', 'Ready: False , reason: PodCompleted', 'PodScheduled: True '],
         containers: [
           {
-            name: 'name_c_1',
-            resources: {}
+            name: 'tensorflow',
+            resources: {},
+            status: 'Terminated, "Completed"'
           }
         ]
       }];

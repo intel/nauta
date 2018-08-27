@@ -48,6 +48,7 @@ export default {
   SELECT_ALL: 'Select all',
   SIGN_OUT: 'Sign out',
   STATE: 'State',
+  STATUS: 'Status',
   TERMS_OF_USE: 'Terms of Use',
   TOTAL_TRAINING_DURATION: 'Total Training Duration',
   TRAINING_SUBMISSION_DATE: 'Training Submission Date',
