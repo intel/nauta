@@ -102,13 +102,12 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
                     tf_image_name = dls4e_config_map.py2_image_name
                 else:
                     tf_image_name = dls4e_config_map.py3_image_name
-                tf_image_tag = tf_image_name.split(':')[1]
                 tf_image_repository = f'127.0.0.1:{local_registry_port}/{tf_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + \
                                           f'FROM {tf_image_repository}'
 
                 # pull image from platform's registry
-                pull_tf_image(tf_image_repository=tf_image_repository, tf_image_tag=tf_image_tag)
+                pull_tf_image(tf_image_repository=tf_image_repository)
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
@@ -187,10 +186,10 @@ def modify_draft_toml(experiment_folder: str, registry: str):
     log.debug("Modify draft.toml - end")
 
 
-def pull_tf_image(tf_image_repository: str, tf_image_tag: str):
+def pull_tf_image(tf_image_repository: str):
     try:
-        log.debug(f'Pulling TF image: {tf_image_repository}:{tf_image_tag}')
+        log.debug(f'Pulling TF image: {tf_image_repository}')
         docker_client = docker.from_env()
-        docker_client.images.pull(repository=tf_image_repository, tag=tf_image_tag)
+        docker_client.images.pull(repository=tf_image_repository)
     except docker.errors.APIError:
-        log.exception(f'Failed to pull TF image: {tf_image_repository}:{tf_image_tag}')
+        log.exception(f'Failed to pull TF image: {tf_image_repository}')
