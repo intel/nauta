@@ -21,8 +21,8 @@
 
 import click
 
-from commands.experiment.common import RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, \
-    RUN_STATUS, RUN_TEMPLATE_NAME, RunKinds
+from commands.experiment.common import RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_START_DATE, RUN_END_DATE, \
+    RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RunKinds
 from commands.common import list_runs_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
@@ -31,7 +31,8 @@ from cli_text_consts import PREDICT_LIST_CMD_TEXTS as TEXTS
 
 
 LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
-TABLE_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+TABLE_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE, RUN_SUBMITTER,
+                 RUN_STATUS, RUN_TEMPLATE_NAME]
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')

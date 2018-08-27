@@ -454,7 +454,7 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     output, exit_code = cmd.up(working_directory=run_folder, namespace=namespace)
 
     if exit_code:
-        error_message = TEXTS["job_not_deployed"].format(reason=output)
+        error_message = TEXTS["job_not_deployed_error_msg"].format(reason=output)
         log.error(error_message)
         delete_environment(run_folder)
         raise KubectlIntError(error_message)
