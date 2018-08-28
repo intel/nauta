@@ -115,6 +115,35 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     return runs
 
 
+def add_run(run: Run, namespace: str, labels: Dict[str, str] = None) -> KubernetesObject:
+    """
+    Add a new Run resource object to the platform
+    :param labels: additional labels
+    :param exp model to save
+    :param namespace where Run will be saved
+    :return: Kubernetes response object
+    """
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+
+    run_kubernetes = KubernetesObject(run, client.V1ObjectMeta(name=run.name, namespace=namespace, labels=labels),
+                                      kind="Run", apiVersion=f"{API_GROUP_NAME}/{RUN_VERSION}")
+    schema = RunKubernetesSchema()
+    body, err = schema.dump(run_kubernetes)
+    if err:
+        raise RuntimeError(f'preparing dump of RunKubernetes request object error - {err}')
+
+    raw_run = api.create_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace, body=body,
+                                                  plural=RUN_PLURAL, version=RUN_VERSION)
+
+    response, err = schema.load(raw_run)
+    if err:
+        raise RuntimeError(f'preparing load of RunKubernetes response object error - {err}')
+
+    return response
+
+
 def update_run(run: Run, namespace: str) -> (KubernetesObject, Run):
     """
     Updates a Run object given as a parameter.

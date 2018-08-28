@@ -24,8 +24,9 @@ import pytest
 from kubernetes.client import CustomObjectsApi
 from kubernetes.client.rest import ApiException
 
+from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs, update_run, get_run
+from platform_resources.runs import list_runs, update_run, get_run, add_run
 from util.exceptions import InvalidRegularExpressionError
 
 TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
@@ -259,3 +260,17 @@ def test_get_run_failure(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=500)
     with pytest.raises(ApiException):
         get_run(name=RUN_NAME)
+
+
+def test_add_run(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.create_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
+    run = Run(name=RUN_NAME, experiment_name='fake')
+    added_run = add_run(run, NAMESPACE)
+    assert added_run is not None and type(added_run) is KubernetesObject
+
+
+def test_add_run_failure(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.create_namespaced_custom_object.side_effect = ApiException(status=500)
+    run = Run(name=RUN_NAME, experiment_name='fake')
+    with pytest.raises(ApiException):
+        add_run(run, NAMESPACE)

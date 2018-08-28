@@ -24,8 +24,7 @@ import pytest
 
 from platform_resources.experiment_model import Experiment, ExperimentStatus
 from commands.experiment import interact
-from util.exceptions import SubmitExperimentError
-from commands.experiment.common import RunDescription, RunStatus
+from commands.experiment.common import RunSubmission, RunStatus, SubmitExperimentError
 from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
 
 
@@ -44,8 +43,9 @@ NON_JUPYTER_EXPERIMENT = Experiment(name='test-experiment-2', parameters_spec=['
                                     creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
                                     state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
                                     template_namespace='test-ex-namespace')
-SUBMITTED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                 status=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                                experiment_name=CORRECT_INTERACT_NAME,
+                                state=RunStatus.QUEUED)]
 
 
 class InteractMocks:

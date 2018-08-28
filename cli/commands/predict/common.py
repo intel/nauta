@@ -23,7 +23,7 @@ from enum import Enum
 from typing import Union
 
 from platform_resources.run_model import Run
-from commands.experiment.common import submit_experiment, RunDescription
+from commands.experiment.common import submit_experiment, RunSubmission, RunKinds
 from util.k8s.k8s_info import get_kubectl_host, get_kubectl_current_context_namespace
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
@@ -40,7 +40,7 @@ def start_inference_instance(name: str,
                              model_name: str,
                              template: str = INFERENCE_TEMPLATE,
                              data_location: str = None,
-                             output_location: str = None) -> RunDescription:
+                             output_location: str = None) -> RunSubmission:
 
     pack_params = [('modelPath', model_location), ('modelName', model_name)]
 
@@ -49,11 +49,11 @@ def start_inference_instance(name: str,
     if output_location:
         pack_params.append(('outputPath', output_location))
 
-    runs, _ = submit_experiment(name=name, template=template, pack_params=pack_params)
+    runs, _ = submit_experiment(run_kind=RunKinds.JUPYTER, name=name, template=template, pack_params=pack_params)
     return runs[0]
 
 
-def get_inference_instance_url(inference_instance: Union[Run, RunDescription], model_name: str = None) -> str:
+def get_inference_instance_url(inference_instance: Union[Run, RunSubmission], model_name: str = None) -> str:
     """
     Get URL to inference instance. If RunDescription is passed as inference_instance, model_name must be also provided.
     If Run is passed as inference_instance, model name is automatically obtained from Run metadata.

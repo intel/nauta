@@ -31,7 +31,8 @@ PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']"), ("workersCount", "2
 SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
 
-TEST_YAML_FILE = '''replicaCount: 2
+TEST_POD_COUNT = 4
+TEST_YAML_FILE = f'''replicaCount: 2
 image:
   pullPolicy: IfNotPresent
 commandline:
@@ -46,7 +47,7 @@ resources:
     memory: 128Mi
 ingress:
   enabled: false
-workersAndPServers: 1
+podCount: {TEST_POD_COUNT}
 workersCount: 3
 pServersCount: 1
 '''
@@ -86,7 +87,7 @@ def test_modify_values_yaml(mocker):
     assert open_mock.call_count == 2, "files weren't read/written"
     assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
 
-    assert output['workersAndPServers'] == '3'
+    assert output['podCount'] == TEST_POD_COUNT
 
 
 def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
@@ -160,3 +161,9 @@ def test_update_configuration_failure(mocker):
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"
+
+
+def test_get_pod_count(mocker):
+    mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
+    pod_count = tf_training.get_pod_count(run_folder=EXPERIMENT_FOLDER, pack_type=EXAMPLE_PACK_TYPE)
+    assert pod_count == TEST_POD_COUNT

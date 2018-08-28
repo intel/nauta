@@ -38,10 +38,6 @@ sidecar_resources:
 
 experimentName: ''
 
-runKind: "training"
-
 workersCount: 3
-
 pServersCount: 1
-
-workersAndPServers: 4
+podCount: 4

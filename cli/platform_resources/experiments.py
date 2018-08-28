@@ -139,7 +139,7 @@ def list_raw_experiments(namespace: str = None, label_selector: str = "") -> obj
 
 def add_experiment(exp: model.Experiment, namespace: str, labels: Dict[str, str] = None) -> KubernetesObject:
     """
-    Return list of experiments.
+    Add a new Experiment resource object to the platform
     :param labels: additional labels
     :param exp model to save
     :param namespace where Experiment will be saved

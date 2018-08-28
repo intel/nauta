@@ -25,7 +25,7 @@ import os
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE
+from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds
 from cli_state import common_options, pass_state, State
 from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
@@ -95,7 +95,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # noinspection PyBroadException
     try:
-        runs_list, _ = submit_experiment(script_location=script_location,
+        runs_list, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
                                          script_folder_location=script_folder_location,
                                          template=template, name=name, pack_params=pack_param,
                                          parameter_range=parameter_range, parameter_set=parameter_set,
@@ -109,12 +109,10 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         handle_error(user_msg=TEXTS["submit_other_error_msg"])
 
     # display information about status of a training
-    click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
-                         RUN_PARAMETERS: [run.formatted_parameters() for run in runs_list],
-                         RUN_STATUS: [run.formatted_status() for run in runs_list],
-                         RUN_MESSAGE: [run.error_message for run in runs_list]},
+    click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
+                          run.cli_representation.status, run.message) for run in runs_list],
                         headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
 
     # if there is at least one FAILED experiment - application has to return exit code != 0
-    if any(run.status == RunStatus.FAILED for run in runs_list):
+    if any(run.state == RunStatus.FAILED for run in runs_list):
         handle_error(logger, TEXTS["failed_runs_log_msg"])

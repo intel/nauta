@@ -33,7 +33,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS, \
-    JUPYTER_NOTEBOOK_TEMPLATE_NAME
+    JUPYTER_NOTEBOOK_TEMPLATE_NAME, RunKinds
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
@@ -96,14 +96,14 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 exp_name = generate_name("jup")
 
             click.echo(TEXTS["submitting_experiment_user_msg"])
-            runs, filename = submit_experiment(script_location=filename, script_folder_location=None,
-                                               template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
+            runs, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
+                                               script_folder_location=None, template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
                                                name=exp_name, parameter_range=[], parameter_set=(),
                                                script_parameters=(), pack_params=pack_param)
-            click.echo(tabulate({RUN_NAME: [run.name for run in runs],
-                                 RUN_PARAMETERS: [run.formatted_parameters() for run in runs],
-                                 RUN_STATUS: [run.formatted_status() for run in runs],
-                                 RUN_MESSAGE: [run.error_message for run in runs]},
+            click.echo(tabulate({RUN_NAME: [run.cli_representation.name for run in runs],
+                                 RUN_PARAMETERS: [run.cli_representation.parameters for run in runs],
+                                 RUN_STATUS: [run.cli_representation.status for run in runs],
+                                 RUN_MESSAGE: [run.message for run in runs]},
                                 headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
             if runs:
                 name = runs[0].name

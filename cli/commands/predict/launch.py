@@ -24,8 +24,9 @@ import os
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import validate_experiment_name
+
 from commands.predict.common import start_inference_instance, get_inference_instance_url
+from commands.experiment.common import validate_experiment_name
 from platform_resources.experiments import generate_name
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -58,7 +59,8 @@ def launch(state: State, name: str, model_location: str):
         handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
 
-    click.echo(tabulate([[inference_instance.name, model_location, inference_instance.status.value]],
+    click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
+                          inference_instance.cli_representation.status.value]],
                         headers=TEXTS["table_headers"],
                         tablefmt="orgtbl"))
 

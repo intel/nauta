@@ -128,6 +128,7 @@ if __name__ == '__main__':
             if verbose_option:
                 traceback.print_tb(exe.__traceback__)
     except Exception as exe:
+        logger.exception(ERROR_MESSAGE)
         print(ERROR_MESSAGE)
         if verbose_option:
             traceback.print_tb(exe.__traceback__)

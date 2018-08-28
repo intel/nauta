@@ -19,5 +19,4 @@ resources:
     memory: 1Gi
 
 experimentName: ''
-
-runKind: "inference"
+podCount: 1

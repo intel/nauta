@@ -23,7 +23,7 @@ import ast
 import os
 import re
 import shutil
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import docker
 import docker.errors
@@ -193,3 +193,16 @@ def pull_tf_image(tf_image_repository: str):
         docker_client.images.pull(repository=tf_image_repository)
     except docker.errors.APIError:
         log.exception(f'Failed to pull TF image: {tf_image_repository}')
+
+
+def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:
+    log.debug(f"Getting pod count for Run: {run_folder}")
+    values_yaml_filename = os.path.join(run_folder, f"charts/{pack_type}/values.yaml")
+
+    with open(values_yaml_filename, "r") as values_yaml_file:
+        values = yaml.load(values_yaml_file)
+
+    pod_count = values.get('podCount')
+    log.debug(f"Pod count for Run: {run_folder} = {pod_count}")
+
+    return int(pod_count) if pod_count else None

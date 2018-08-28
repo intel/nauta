@@ -36,18 +36,24 @@ def delete_user(username: str):
     Throws an excpetion in case of any errors
     """
     delete_namespace(username)
+    delete_helm_release(username, purge=True)
 
-    delete_helm_release(username)
 
-
-def delete_helm_release(release_name: str):
+def delete_helm_release(release_name: str, purge=False, namespace: str = None):
     """
     Deletes release of a helm's chart.
 
     :param release_name: name of a release to be removed
+    :param purge: if True, helm release will be purged
     In case of any problems it throws an exception
     """
-    delete_release_command = ["helm", "delete", "--purge", release_name]
+    if purge:
+        delete_release_command = ["helm", "delete", "--purge", release_name]
+    else:
+        delete_release_command = ["helm", "delete", release_name]
+
+    if namespace:
+        delete_release_command += ["--tiller-namespace", namespace]
 
     output, err_code = execute_system_command(delete_release_command)
 

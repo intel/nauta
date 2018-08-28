@@ -22,7 +22,7 @@
 from unittest.mock import MagicMock
 
 from platform_resources.run_model import Run
-from commands.experiment.common import RunDescription
+from commands.experiment.common import RunSubmission
 from commands.predict.common import start_inference_instance, get_inference_instance_url
 
 
@@ -37,7 +37,7 @@ def test_start_inference_instance(mocker):
 
 
 def test_get_inference_instance_url_run_description(mocker):
-    fake_instance = MagicMock(spec=RunDescription)
+    fake_instance = MagicMock(spec=RunSubmission)
     fake_instance.name = 'inf'
     fake_host = 'https://localhost:8443'
     fake_namespace = 'fake_namespace'

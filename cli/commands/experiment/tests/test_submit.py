@@ -26,7 +26,7 @@ import pytest
 
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
     validate_script_folder_location, get_default_script_location
-from commands.experiment.common import RunDescription, RunStatus
+from commands.experiment.common import RunSubmission, RunStatus
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
 
@@ -34,13 +34,16 @@ from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
 SCRIPT_LOCATION = "training_script.py"
 SCRIPT_FOLDER = "/a/b/c"
 
-SUBMITTED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                 status=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                                experiment_name='test-experiment',
+                                state=RunStatus.QUEUED)]
 
-FAILED_RUNS = [RunDescription(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                              status=RunStatus.QUEUED),
-               RunDescription(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
-                              status=RunStatus.FAILED)
+FAILED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                             experiment_name='test-experiment',
+                             state=RunStatus.QUEUED),
+               RunSubmission(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
+                             experiment_name='test-experiment',
+                             state=RunStatus.FAILED)
                ]
 
 
@@ -92,7 +95,7 @@ def test_submit_experiment_success(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert SUBMITTED_RUNS[0].name in result.output
-    assert SUBMITTED_RUNS[0].status.value in result.output
+    assert SUBMITTED_RUNS[0].state.value in result.output
 
 
 def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks):
@@ -174,8 +177,8 @@ def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert FAILED_RUNS[0].name in result.output
-    assert FAILED_RUNS[0].status.value in result.output
+    assert FAILED_RUNS[0].state.value in result.output
     assert FAILED_RUNS[1].name in result.output
-    assert FAILED_RUNS[1].status.value in result.output
+    assert FAILED_RUNS[1].state.value in result.output
 
     assert result.exit_code == 1

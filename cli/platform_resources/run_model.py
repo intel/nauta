@@ -45,8 +45,9 @@ class Run(PlatformResource):
                                              'submission_date', 'start_date', 'end_date', 'submitter', 'status',
                                              'template_name'])
 
-    def __init__(self, name: str, experiment_name: str, metrics: dict, parameters: List[str],
-                 pod_count: int, pod_selector: dict, state: RunStatus, submitter: str = None,
+    def __init__(self, name: str, experiment_name: str, metrics: dict = None, parameters: List[str] = None,
+                 pod_count: int = None, pod_selector: dict = None,
+                 state: RunStatus = None, submitter: str = None,
                  creation_timestamp: str = None, template_name: str = None, metadata: dict = None,
                  start_timestamp: str = None, end_timestamp: str = None):
         self.name = name
@@ -69,7 +70,7 @@ class Run(PlatformResource):
                    parameters=object_dict.get('spec').get('parameters'),
                    creation_timestamp=object_dict['metadata']['creationTimestamp'],
                    submitter=object_dict['metadata']['namespace'],
-                   state=RunStatus[object_dict['spec']['state']] if 'state' in object_dict['spec'] else "",
+                   state=RunStatus[object_dict['spec']['state']] if 'state' in object_dict['spec'] else None,
                    pod_count=object_dict['spec']['pod-count'],
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
@@ -85,9 +86,9 @@ class Run(PlatformResource):
                                parameters=textwrap.fill(' '.join(self.parameters), width=30) if self.parameters else "",
                                metrics=textwrap.fill(
                                    ' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
-                                   width=30),
-                               submission_date=format_timestamp_for_cli(self.creation_timestamp),
-                               submitter=self.submitter,
+                                   width=30) if self.metrics else "",
+                               submission_date=format_timestamp_for_cli(self.creation_timestamp) if self.creation_timestamp else "",
+                               submitter=self.submitter if self.submitter else "",
                                status=self.state.value if self.state else "",
                                template_name=self.template_name,
                                start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",

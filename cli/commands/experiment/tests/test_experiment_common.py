@@ -24,9 +24,10 @@ import os
 
 import pytest
 
-from commands.experiment.common import submit_experiment, RunDescription, values_range, delete_run_environments, \
+from commands.experiment.common import submit_experiment, RunSubmission, values_range, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
-    check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment
+    check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
+    RunKinds
 
 from util.exceptions import KubectlIntError, SubmitExperimentError
 import util.config
@@ -137,6 +138,8 @@ class SubmitExperimentMocks:
         self.gen_exp_name = mocker.patch("platform_resources.experiments.generate_exp_name_and_labels",
                                          side_effect=[(EXPERIMENT_NAME, {})])
         self.add_exp = mocker.patch("platform_resources.experiments.add_experiment")
+        self.add_run = mocker.patch("platform_resources.runs.add_run")
+        self.update_run = mocker.patch("platform_resources.runs.update_run")
         self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
         self.submit_one = mocker.patch("commands.experiment.common.submit_draft_pack")
         self.update_conf = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
@@ -159,8 +162,8 @@ class SubmitExperimentMocks:
 
         self.config_mock = mocker.patch('commands.experiment.common.Config')
         self.config_mock.return_value.config_path = FAKE_CLI_CONFIG_DIR_PATH
-
         self.delete_k8s_object_mock = mocker.patch('commands.experiment.common.delete_k8s_object')
+        self.get_pod_count_mock = mocker.patch('commands.experiment.common.get_pod_count', return_value=1)
 
 
 @pytest.fixture
@@ -169,8 +172,9 @@ def prepare_mocks(mocker) -> SubmitExperimentMocks:
 
 
 def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
-                  cmd_create_count=1, update_conf_count=1, k8s_proxy_count=1, add_exp_count=1, submit_one_count=1,
-                  del_env_count=0, socat_start_count=1, delete_k8s_object_count=0):
+                  cmd_create_count=1, update_conf_count=1, k8s_proxy_count=1, add_exp_count=1, add_run_count=1,
+                  update_run_count=0, submit_one_count=1, del_env_count=0, socat_start_count=1,
+                  delete_k8s_object_count=0):
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "current user namespace was not fetched"
     assert prepare_mocks.gen_exp_name.call_count == get_exp_name_count, "experiment name wasn't created"
     assert prepare_mocks.create_env.call_count == create_env_count, "environment wasn't created"
@@ -178,6 +182,8 @@ def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, g
     assert prepare_mocks.update_conf.call_count == update_conf_count, "configuration wasn't updated"
     assert prepare_mocks.k8s_proxy.call_count == k8s_proxy_count, "port wasn't forwarded"
     assert prepare_mocks.add_exp.call_count == add_exp_count, "experiment model was not created"
+    assert prepare_mocks.add_run.call_count == add_run_count, "run model was not created"
+    assert prepare_mocks.update_run.call_count == update_run_count, "run model status was not updated"
     assert prepare_mocks.submit_one.call_count == submit_one_count, "training wasn't deployed"
     assert prepare_mocks.del_env.call_count == del_env_count, "environment folder was deleted"
     assert prepare_mocks.delete_k8s_object_mock.call_count == delete_k8s_object_count, "experiment was not deleted"
@@ -189,32 +195,34 @@ def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, g
 
 def test_submit_success(prepare_mocks: SubmitExperimentMocks):
     submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
-                      name=None, parameter_range=[], parameter_set=[], script_parameters=[], pack_params=[])
+                      name=None, parameter_range=[], parameter_set=[], script_parameters=[], pack_params=[],
+                      run_kind=RunKinds.TRAINING)
     check_asserts(prepare_mocks)
 
 
 def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
-    prepare_mocks.create_env = prepare_mocks.mocker.patch("commands.experiment.common.create_environment",
-                                                          side_effect=KubectlIntError)
+    prepare_mocks.create_env.side_effect = KubectlIntError
 
     with pytest.raises(SubmitExperimentError) as exe:
-        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template=None,
-                          name=None, parameter_range=[], parameter_set=[], script_parameters=[], pack_params=[])
+        submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template='',
+                          name='', parameter_range=[], parameter_set=(), script_parameters=(), pack_params=[],
+                          run_kind=RunKinds.TRAINING)
+        assert TEXTS["env_creation_error_msg"] in str(exe)
 
-    assert TEXTS["env_creation_error_msg"] in str(exe)
-    check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0,
+    check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0, add_run_count=0,
                   submit_one_count=0, socat_start_count=1, del_env_count=1)
 
 
 def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
-    prepare_mocks.cmd_create = prepare_mocks.mocker.patch("draft.cmd.create", side_effect=[("error message", 1)])
+    prepare_mocks.cmd_create.side_effect = [("error message", 1)]
     with pytest.raises(SubmitExperimentError) as exe:
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
-                          template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
+                          template=None, name=None, parameter_range=[], parameter_set=(), script_parameters=(),
+                          run_kind=RunKinds.TRAINING)
 
     assert TEXTS["env_creation_error_msg"] in str(exe)
     check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, socat_start_count=1,
-                  del_env_count=1)
+                  del_env_count=1, add_run_count=0)
 
 
 def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
@@ -223,21 +231,23 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 
     with pytest.raises(SubmitExperimentError) as exe:
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
-                          template=None, name=None, parameter_range=[], parameter_set=[], script_parameters=[])
+                          template=None, name=None, parameter_range=[], parameter_set=(), script_parameters=(),
+                          run_kind=RunKinds.TRAINING)
 
     assert TEXTS["env_creation_error_msg"] in str(exe)
-    check_asserts(prepare_mocks, add_exp_count=0, submit_one_count=0, socat_start_count=1, del_env_count=1)
+    check_asserts(prepare_mocks, add_exp_count=0, add_run_count=0,
+                  submit_one_count=0, socat_start_count=1, del_env_count=1)
 
 
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.submit_one.side_effect = KubectlIntError()
 
     runs_list, _ = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
-                                     template=None, name=None, parameter_range=[], parameter_set=[],
-                                     script_parameters=[])
+                                     template=None, name=None, parameter_range=[], parameter_set=(),
+                                     script_parameters=(), run_kind=RunKinds.TRAINING)
 
-    assert runs_list[0].status == RunStatus.FAILED
-    check_asserts(prepare_mocks, del_env_count=1, delete_k8s_object_count=1)
+    assert runs_list[0].state == RunStatus.FAILED
+    check_asserts(prepare_mocks, del_env_count=1, add_run_count=0, update_run_count=1, delete_k8s_object_count=1)
 
 
 def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, capsys, caplog):
@@ -255,9 +265,10 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
 
     submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                       template=None, name=None, parameter_range=PR_PARAMETER, parameter_set=PS_PARAMETER,
-                      script_parameters=[])
+                      script_parameters=[], run_kind=RunKinds.TRAINING)
 
-    check_asserts(prepare_mocks, create_env_count=2, cmd_create_count=2, update_conf_count=2, submit_one_count=2)
+    check_asserts(prepare_mocks, create_env_count=2, cmd_create_count=2, update_conf_count=2, submit_one_count=2,
+                  add_run_count=2)
     out, _ = capsys.readouterr()
     assert "param1=1" in out
     assert "param1=2" in out
@@ -267,18 +278,9 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
 def test_submit_with_name_success(prepare_mocks: SubmitExperimentMocks):
     submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                       template=None, name=EXPERIMENT_NAME, parameter_range=[],
-                      parameter_set=[], script_parameters=[])
+                      parameter_set=[], script_parameters=[], run_kind=RunKinds.TRAINING)
 
     check_asserts(prepare_mocks)
-
-
-def test_delete_runs(mocker):
-    del_env_mock = mocker.patch("commands.experiment.common.delete_environment")
-
-    runs_list = [RunDescription(folder="folder1"), RunDescription(), RunDescription(folder="folder3")]
-    delete_run_environments(runs_list)
-
-    assert del_env_mock.call_count == 2, "delete environment was called incorrect number of times"
 
 
 def test_values_range_int():
@@ -384,76 +386,93 @@ def test_check_enclosing_brackets():
 
 def test_create_list_of_runs_pr_only(mocker):
     experiment_name = "experiment_name"
+    template_name = "template_name"
     mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     two_params_list_result = \
-        [RunDescription(name=experiment_name + "-1", parameters=("param1=0", "param2=0")),
-         RunDescription(name=experiment_name + "-2", parameters=("param1=0", "param2=1")),
-         RunDescription(name=experiment_name + "-3", parameters=("param1=0", "param2=2")),
-         RunDescription(name=experiment_name + "-4", parameters=("param1=1", "param2=0")),
-         RunDescription(name=experiment_name + "-5", parameters=("param1=1", "param2=1")),
-         RunDescription(name=experiment_name + "-6", parameters=("param1=1", "param2=2"))]
+        [RunSubmission(name=experiment_name + "-1", experiment_name=experiment_name,
+                       parameters=("param1=0", "param2=0")),
+         RunSubmission(name=experiment_name + "-2", experiment_name=experiment_name,
+                       parameters=("param1=0", "param2=1")),
+         RunSubmission(name=experiment_name + "-3", experiment_name=experiment_name,
+                       parameters=("param1=0", "param2=2")),
+         RunSubmission(name=experiment_name + "-4", experiment_name=experiment_name,
+                       parameters=("param1=1", "param2=0")),
+         RunSubmission(name=experiment_name + "-5", experiment_name=experiment_name,
+                       parameters=("param1=1", "param2=1")),
+         RunSubmission(name=experiment_name + "-6", experiment_name=experiment_name,
+                       parameters=("param1=1", "param2=2"))]
 
-    output = prepare_list_of_runs(two_params_list, experiment_name, ())
+    output = prepare_list_of_runs(parameter_range=two_params_list, experiment_name=experiment_name,
+                                  parameter_set=(), template_name=template_name)
     assert len(output) == 6
-    assert output == two_params_list_result
+    for expected_run, result_run in zip(two_params_list_result, output):
+        assert expected_run.parameters == result_run.parameters
 
 
 def test_create_list_of_runs_ps_only(mocker):
     experiment_name = "experiment_name"
+    template_name = "template_name"
     mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     multiple_two_params = ("{param1:0, param2:1}", "{param1:2,param3:3}")
     multiple_two_params_list_result = \
-        [RunDescription(name=experiment_name + "-1", parameters=("param1=0", "param2=1")),
-         RunDescription(name=experiment_name + "-2", parameters=("param1=2", "param3=3"))]
-    output = prepare_list_of_runs((), experiment_name, multiple_two_params)
+        [RunSubmission(name=experiment_name + "-1", experiment_name=experiment_name,
+                       parameters=("param1=0", "param2=1")),
+         RunSubmission(name=experiment_name + "-2", experiment_name=experiment_name,
+                       parameters=("param1=2", "param3=3"))]
+    output = prepare_list_of_runs(parameter_range=[], experiment_name=experiment_name,
+                                  parameter_set=multiple_two_params, template_name=template_name)
     assert len(output) == 2
-    assert output == multiple_two_params_list_result
+    for expected_run, result_run in zip(multiple_two_params_list_result, output):
+        assert expected_run.parameters == result_run.parameters
 
 
 def test_create_list_of_runs_pr_and_ps(mocker):
     experiment_name = "experiment_name"
+    template_name = "template_name"
     mocker.patch("platform_resources.experiments.generate_exp_name_and_labels", side_effect=[(experiment_name, {})])
 
     two_params_list = [("param1", "{0, 1}"), ("param2", "{0...2:1}")]
     multiple_two_params = ("{param3:0, param4:1}", "{param3:2,param4:3}")
 
-    expected_result = [RunDescription(name=experiment_name + "-1",
-                                      parameters=("param3=0", "param4=1", "param1=0", "param2=0")),
-                       RunDescription(name=experiment_name + "-2",
-                                      parameters=("param3=0", "param4=1", "param1=0", "param2=1")),
-                       RunDescription(name=experiment_name + "-3",
-                                      parameters=("param3=0", "param4=1", "param1=0", "param2=2")),
-                       RunDescription(name=experiment_name + "-4",
-                                      parameters=("param3=0", "param4=1", "param1=1", "param2=0")),
-                       RunDescription(name=experiment_name + "-5",
-                                      parameters=("param3=0", "param4=1", "param1=1", "param2=1")),
-                       RunDescription(name=experiment_name + "-6",
-                                      parameters=("param3=0", "param4=1", "param1=1", "param2=2")),
-                       RunDescription(name=experiment_name + "-7",
-                                      parameters=("param3=2", "param4=3", "param1=0", "param2=0")),
-                       RunDescription(name=experiment_name + "-8",
-                                      parameters=("param3=2", "param4=3", "param1=0", "param2=1")),
-                       RunDescription(name=experiment_name + "-9",
-                                      parameters=("param3=2", "param4=3", "param1=0", "param2=2")),
-                       RunDescription(name=experiment_name + "-10",
-                                      parameters=("param3=2", "param4=3", "param1=1", "param2=0")),
-                       RunDescription(name=experiment_name + "-11",
-                                      parameters=("param3=2", "param4=3", "param1=1", "param2=1")),
-                       RunDescription(name=experiment_name + "-12",
-                                      parameters=("param3=2", "param4=3", "param1=1", "param2=2"))]
+    expected_result = [RunSubmission(name=experiment_name + "-1", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=0", "param2=0")),
+                       RunSubmission(name=experiment_name + "-2", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=0", "param2=1")),
+                       RunSubmission(name=experiment_name + "-3", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=0", "param2=2")),
+                       RunSubmission(name=experiment_name + "-4", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=1", "param2=0")),
+                       RunSubmission(name=experiment_name + "-5", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=1", "param2=1")),
+                       RunSubmission(name=experiment_name + "-6", experiment_name=experiment_name,
+                                     parameters=("param3=0", "param4=1", "param1=1", "param2=2")),
+                       RunSubmission(name=experiment_name + "-7", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=0", "param2=0")),
+                       RunSubmission(name=experiment_name + "-8", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=0", "param2=1")),
+                       RunSubmission(name=experiment_name + "-9", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=0", "param2=2")),
+                       RunSubmission(name=experiment_name + "-10", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=1", "param2=0")),
+                       RunSubmission(name=experiment_name + "-11", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=1", "param2=1")),
+                       RunSubmission(name=experiment_name + "-12", experiment_name=experiment_name,
+                                     parameters=("param3=2", "param4=3", "param1=1", "param2=2"))]
 
-    output = prepare_list_of_runs(two_params_list, experiment_name, multiple_two_params)
+    output = prepare_list_of_runs(two_params_list, experiment_name, multiple_two_params, template_name=template_name)
     assert len(output) == 12
-    assert output == expected_result
+
+    for expected_run, result_run in zip(expected_result, output):
+        assert expected_run.parameters == result_run.parameters
 
 
 def test_submit_experiment_without_file(prepare_mocks: SubmitExperimentMocks):
     runs_list, _ = submit_experiment(script_location=None, script_folder_location=None,
-                                     template=None, name=None, parameter_range=[],
-                                     parameter_set=[], script_parameters=[], pack_params=[])
+                                     template='', name='', parameter_range=[],
+                                     parameter_set=(), script_parameters=(), pack_params=[], run_kind=RunKinds.TRAINING)
     assert len(runs_list) == 1
     assert runs_list[0].name == "experiment_name"
 

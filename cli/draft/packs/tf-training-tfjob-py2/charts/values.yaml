@@ -27,5 +27,4 @@ resources:
 
 
 experimentName: ''
-
-runKind: "training"
+podCount: 1
