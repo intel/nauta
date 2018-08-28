@@ -49,7 +49,7 @@ def start_inference_instance(name: str,
     if output_location:
         pack_params.append(('outputPath', output_location))
 
-    runs, _ = submit_experiment(run_kind=RunKinds.JUPYTER, name=name, template=template, pack_params=pack_params)
+    runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params)
     return runs[0]
 
 

@@ -60,7 +60,7 @@ def launch(state: State, name: str, model_location: str):
                      add_verbosity_msg=state.verbosity == 0)
 
     click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
-                          inference_instance.cli_representation.status.value]],
+                          inference_instance.cli_representation.status]],
                         headers=TEXTS["table_headers"],
                         tablefmt="orgtbl"))
 
