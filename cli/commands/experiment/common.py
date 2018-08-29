@@ -57,7 +57,7 @@ from cli_text_consts import EXPERIMENT_COMMON_TEXTS as TEXTS
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
 RUN_NAME = "Experiment"
-RUN_INFERENCE_NAME = "Inference instance"
+RUN_INFERENCE_NAME = "Prediction instance"
 RUN_STATUS = "State"
 RUN_MESSAGE = "Message"
 RUN_PARAMETERS = "Parameters"

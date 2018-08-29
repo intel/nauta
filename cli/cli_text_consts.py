@@ -166,22 +166,22 @@ PREDICT_CMD_TEXTS = {
 }
 
 PREDICT_LIST_CMD_TEXTS = {
-    "help_a": "Show all inference instances, regardless of the owner.",
-    "help_n": "A regular expression to narrow down list to inference instances that match this expression.",
-    "help_s": "List inference instances with matching status."
+    "help_a": "Show all prediction instances, regardless of the owner.",
+    "help_n": "A regular expression to narrow down list to prediction instances that match this expression.",
+    "help_s": "List prediction instances with matching status."
 }
 
 PREDICT_LAUNCH_CMD_TEXTS = {
     "help": "Starts a new prediction instance that can be used for performing prediction, classification and "
             "regression tasks on trained model.",
-    "help_n": "The name of this inference instance.",
+    "help_n": "The name of this prediction instance.",
     "help_m": "Path to saved model that will be used for inference. Model must be located on one of the input or "
               "output system shares (e.g. /mnt/input/saved_model).",
     "instance_start_error_msg": "Failed to create prediction instance.",
     "instance_info_msg": "\nPrediction instance URL (append method verb manually, e.g. :predict):\n"
                          "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}",
     "instance_url_error_msg": "Failed to obtain prediction instance URL.",
-    "table_headers": ["Name", "Model Location", "Status"]
+    "table_headers": ["Prediction instance", "Model Location", "Status"]
 }
 
 PREDICT_STREAM_CMD_TEXTS = {
@@ -221,10 +221,10 @@ PREDICT_BATCH_CMD_TEXTS = {
     "help_output": "location of a folder where outputs from inferences will be stored. Value should points out the "
                    "location from one of the system's shares.",
     "other_instance_creation_error_msg": "Failed to create batch prediction instance.",
-    "table_name_header": "Name",
+    "table_name_header": "Prediction instance",
     "table_model_location_header": "Model location",
     "table_status_header": "Status",
-    "table_headers": ["Name", "Model location", "Status"]
+    "table_headers": ["Prediction instance", "Model location", "Status"]
 }
 
 EXPERIMENT_CMD_TEXTS = {
