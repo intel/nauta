@@ -1,7 +1,7 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-model-server
   labels:
     app: {{ template "name" . }}
     chart: {{ template "chart_version" . }}
@@ -11,16 +11,6 @@ metadata:
     runName: {{ .Release.Name }}
     batchType: server
 spec:
-  replicas: {{ .Values.workersCount }}
-  selector:
-    matchLabels:
-      app: {{ .Chart.Name }}
-      release: {{ .Release.Name }}
-      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-      draft: {{ .Values.draft }}
-      heritage: {{ .Release.Service }}
-      runName: {{ .Release.Name }}
-      batchType: server
   template:
     metadata:
       annotations:
@@ -42,8 +32,7 @@ spec:
               value: {{ .Values.modelName }}
             - name: MODEL_BASE_PATH
               value: "/models"
-          command: ["tensorflow_model_server"]
-          args: ["--port=8500", "--rest_api_port=8501", "--model_name=$(MODEL_NAME)", "--model_base_path=$(MODEL_BASE_PATH)"]
+          command: ["tf_serving_dls4e"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
@@ -63,11 +52,22 @@ spec:
               subPath: {{ .Values.experimentName }}
             - name: models
               mountPath: "/models"
+            - name: shared-data
+              mountPath: /pod-data
           securityContext:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-      restartPolicy: Always
+        - name: sidecar
+          image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/tf-serving-sidecar:v1.0.0"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: BATCH_WRAPPER_JOB_NAME
+            value: {{ .Release.Name }}-batch-wrapper
+          volumeMounts:
+          - name: shared-data
+            mountPath: /pod-data
+      restartPolicy: OnFailure
       volumes:
         - name: input-home
           persistentVolumeClaim:
@@ -82,6 +82,8 @@ spec:
           persistentVolumeClaim:
             claimName: output-public
         - name: models
+          emptyDir: {}
+        - name: shared-data
           emptyDir: {}
       initContainers:
         - name: init-inference-pod

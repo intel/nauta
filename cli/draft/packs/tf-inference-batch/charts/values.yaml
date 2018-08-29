@@ -21,4 +21,4 @@ resources:
     memory: 1Gi
 
 experimentName: ''
-podCount: 1
+podCount: 2

@@ -63,8 +63,8 @@ def batch(state: State, name: str, model_location: str, data: str, output: str, 
         handle_error(logger, TEXTS["other_instance_creation_error_msg"], TEXTS["other_instance_creation_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
 
-    click.echo(tabulate({TEXTS["table_name_header"]: [inference_instance.name],
+    click.echo(tabulate({TEXTS["table_name_header"]: [inference_instance.cli_representation.name],
                          TEXTS["table_model_location_header"]: [model_location],
-                         TEXTS["table_status_header"]: [inference_instance.status.value]},
+                         TEXTS["table_status_header"]: [inference_instance.cli_representation.status]},
                         headers=TEXTS["table_headers"],
                         tablefmt="orgtbl"))

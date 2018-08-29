@@ -20,6 +20,10 @@ export_images:
     value: "{{ image_local_url['dls4e/activity-proxy'] }}"
   - name: batch-inference
     value: "{{ image_local_url['dls4e/batch-inference'] }}"
+  - name: tf-serving-sidecar
+    value: "{{ image_local_url['dls4e/tf-serving-sidecar'] }}"
+  - name: ps-sidecar
+    value: "{{ image_local_url['dls4e/ps-sidecar'] }}"
 
 local_images:
   dls4e/centos:
@@ -185,6 +189,12 @@ local_images:
       BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/batch-inference"
+  dls4e/tf-serving-sidecar:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/tf-serving-sidecar"
 
 subcharts:
   dls4e-registry:
