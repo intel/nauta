@@ -67,6 +67,12 @@ local_images:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
+  dls4e/elasticsearch/curator:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/elasticsearch-curator"
   dls4e/etcd:
     version: "3.3.9"
     required:
@@ -232,6 +238,12 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/elasticsearch"
       chart_values:
         image: "{{ image_local_url['dls4e/elasticsearch'] }}"
+        init_image: "{{ image_local_url['dls4e/centos'] }}"
+    elasticsearch-curator:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../dls4e-charts/elasticsearch-curator"
+      chart_values:
+        image: "{{ image_local_url['dls4e/elasticsearch/curator'] }}"
         init_image: "{{ image_local_url['dls4e/centos'] }}"
     fluentd:
       version: 0.0.1

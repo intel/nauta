@@ -1,0 +1,7 @@
+apiVersion: v1
+version: 0.0.1
+appVersion: 5.4.0
+tillerVersion: ">=2.4.0"
+name: elasticsearch-curator
+sources:
+  - https://github.com/elastic/curator
