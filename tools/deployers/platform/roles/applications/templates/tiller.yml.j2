@@ -80,6 +80,9 @@ spec:
       - effect: NoExecute
         key: node.kubernetes.io/network-unavailable
         operator: Exists
+      - effect: NoSchedule
+        key: master
+        operator: Exists
 ---
 apiVersion: apps/v1
 kind: Deployment
