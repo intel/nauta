@@ -228,11 +228,12 @@ const getExperimentResourcesData = function (req, res) {
           msg = cond.message ? `${msg}, message: ${cond.message}` : msg;
           return `${cond.type}: ${cond.status} ${msg}`;
         });
-
         let containerStatuses = {};
-        pod.status.containerStatuses.forEach((containerStatus) => {
-          containerStatuses[containerStatus.name] = containerStatus.state;
-        });
+        if (pod.status.containerStatuses) {
+          pod.status.containerStatuses.forEach((containerStatus) => {
+            containerStatuses[containerStatus.name] = containerStatus.state;
+          });
+        }
         return {
           name: pod.metadata.name,
           state: podStatusString,
