@@ -316,7 +316,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
                     delete_environment(run_folder)
                     run.state = RunStatus.FAILED
                     run.message = str(exe)
-                    runs_api.update_run(run=run, namespace=name)
+                    runs_api.update_run(run=run, namespace=namespace)
 
             # Delete experiment if no Runs were submitted
             if not submitted_runs:
