@@ -2,7 +2,7 @@
 
 verification_checks:
   - message: "Param dns_search_domains should be provided as list"
-    condition: "{{ dns_search_domains is defined and dns_search_domains is string }}"
+    condition: "{{ dns_search_domains is defined and (dns_search_domains is string or dns_search_domains is not iterable) }}"
   - message: "Param dns_search_domains should be provided as list"
     condition: "{{ dns_search_domains is defined and dns_search_domains is string }}"
   - message: "Param insecure_registries should be provided as list"
