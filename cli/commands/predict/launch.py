@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+import base64
 import os
 
 import click
@@ -31,9 +32,9 @@ from platform_resources.experiments import generate_name
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
-from util.k8s.k8s_info import get_api_key
 from util.system import handle_error
 from cli_text_consts import PREDICT_LAUNCH_CMD_TEXTS as TEXTS
+from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace, get_service_account
 
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
@@ -51,6 +52,7 @@ def launch(state: State, name: str, model_location: str):
     Starts a new prediction instance that can be used for performing prediction, classification and
     regression tasks on trained model.
     """
+    click.echo('Submitting prediction instance.')
     try:
         model_name = os.path.basename(model_location)
         name = name if name else generate_name(name=model_name)
@@ -65,9 +67,10 @@ def launch(state: State, name: str, model_location: str):
                         tablefmt="orgtbl"))
 
     try:
+        namespace = get_kubectl_current_context_namespace()
+        authorization_header = get_authorization_header(service_account_name=name, namespace=namespace)
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance,
                                                             model_name=model_name)
-        authorization_header = get_authorization_header()
         click.echo(TEXTS["instance_info_msg"].format(inference_instance_url=inference_instance_url,
                                                      authorization_header=authorization_header))
     except Exception:
@@ -75,6 +78,9 @@ def launch(state: State, name: str, model_location: str):
                      add_verbosity_msg=state.verbosity == 0)
 
 
-def get_authorization_header():
-    authorization_token = get_api_key()
-    return f'Authorization: {authorization_token}'
+def get_authorization_header(service_account_name: str, namespace: str):
+    service_account = get_service_account(service_account_name=service_account_name, namespace=namespace)
+    secret_name = service_account.secrets[0].name
+    authorization_token = get_secret(secret_name=secret_name, namespace=namespace).data['token']
+    authorization_token = base64.b64decode(authorization_token).decode('utf-8')
+    return f'Authorization: Bearer {authorization_token}'

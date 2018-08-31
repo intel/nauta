@@ -99,6 +99,6 @@ class K8sProxy:
         else:
             for proc in psutil.Process(self.process.pid).children(recursive=True):
                 proc.send_signal(signal.SIGTERM)
-
             self.process.send_signal(signal.SIGKILL)
+
         self.process.wait()

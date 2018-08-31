@@ -24,6 +24,7 @@ spec:
         heritage: {{ .Release.Service }}
         runName: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ .Release.Name }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"

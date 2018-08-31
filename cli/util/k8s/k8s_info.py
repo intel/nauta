@@ -25,7 +25,7 @@ from enum import Enum
 from typing import List, Dict
 from kubernetes.client.rest import ApiException
 from kubernetes import config, client
-from kubernetes.client import configuration, V1DeleteOptions
+from kubernetes.client import configuration, V1DeleteOptions, V1Secret, V1ServiceAccount
 from util.logger import initialize_logger
 from util.exceptions import KubectlIntError
 from util.app_names import DLS4EAppNames
@@ -74,6 +74,16 @@ def get_kubectl_current_context_namespace() -> str:
 def get_k8s_api() -> client.CoreV1Api:
     config.load_kube_config()
     return client.CoreV1Api(client.ApiClient())
+
+
+def get_service_account(service_account_name: str, namespace: str) -> V1ServiceAccount:
+    api = get_k8s_api()
+    return api.read_namespaced_service_account(name=service_account_name, namespace=namespace)
+
+
+def get_secret(secret_name: str, namespace: str) -> V1Secret:
+    api = get_k8s_api()
+    return api.read_namespaced_secret(name=secret_name, namespace=namespace)
 
 
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:

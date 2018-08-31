@@ -31,6 +31,7 @@ class LaunchPredictMocks:
         self.start_inference_instance_mock = mocker.patch('commands.predict.launch.start_inference_instance')
         self.get_inference_instance_url_mock = mocker.patch('commands.predict.launch.get_inference_instance_url')
         self.get_authorization_header_mock = mocker.patch('commands.predict.launch.get_authorization_header')
+        self.get_namespace_mock = mocker.patch('commands.predict.launch.get_kubectl_current_context_namespace')
 
 
 @pytest.fixture
@@ -48,6 +49,7 @@ def test_launch(launch_mocks: LaunchPredictMocks):
 
     assert launch_mocks.generate_name_mock.call_count == 0
     assert launch_mocks.start_inference_instance_mock.call_count == 1
+    assert launch_mocks.get_namespace_mock.call_count == 1
     assert launch_mocks.get_inference_instance_url_mock.call_count == 1
     assert launch_mocks.get_authorization_header_mock.call_count == 1
     assert result.exit_code == 0
@@ -61,6 +63,7 @@ def test_launch_generate_name(launch_mocks: LaunchPredictMocks):
 
     assert launch_mocks.generate_name_mock.call_count == 1
     assert launch_mocks.start_inference_instance_mock.call_count == 1
+    assert launch_mocks.get_namespace_mock.call_count == 1
     assert launch_mocks.get_inference_instance_url_mock.call_count == 1
     assert launch_mocks.get_authorization_header_mock.call_count == 1
     assert result.exit_code == 0
@@ -76,6 +79,7 @@ def test_launch_fail(launch_mocks: LaunchPredictMocks):
 
     assert launch_mocks.generate_name_mock.call_count == 1
     assert launch_mocks.start_inference_instance_mock.call_count == 1
+    assert launch_mocks.get_namespace_mock.call_count == 0
     assert launch_mocks.get_inference_instance_url_mock.call_count == 0
     assert launch_mocks.get_authorization_header_mock.call_count == 0
     assert result.exit_code == 1
@@ -89,8 +93,5 @@ def test_launch_url_fail(launch_mocks: LaunchPredictMocks):
     runner = CliRunner()
     result = runner.invoke(launch.launch, ['--model-location', model_location])
 
-    assert launch_mocks.generate_name_mock.call_count == 1
-    assert launch_mocks.start_inference_instance_mock.call_count == 1
-    assert launch_mocks.get_inference_instance_url_mock.call_count == 1
-    assert launch_mocks.get_authorization_header_mock.call_count == 0
+    assert launch_mocks.get_authorization_header_mock.call_count == 1
     assert result.exit_code == 1
