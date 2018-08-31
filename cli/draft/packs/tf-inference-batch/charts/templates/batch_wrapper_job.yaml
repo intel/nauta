@@ -31,6 +31,8 @@ spec:
           env:
             - name: TENSORFLOW_MODEL_SERVER_SVC_NAME
               value: "{{ .Release.Name }}:{{ .Values.containerPort }}"
+            - name: RUN_NAME
+              value: {{ .Release.Name }}
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home

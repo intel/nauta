@@ -1,5 +1,12 @@
-ARG BASE_IMAGE=python:3.6.5
+ARG METRICS_IMAGE
+ARG BASE_IMAGE=python:3.6.6
+FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
+
+COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
+
+RUN pip3 install /experiment_metrics-*.tar.gz && \
+    rm -rf /experiment_metrics-*.tar.gz
 
 WORKDIR /app
 

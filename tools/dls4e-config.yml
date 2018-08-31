@@ -193,6 +193,7 @@ local_images:
     version: "v1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../applications/batch-inference"
   dls4e/tf-serving-sidecar:

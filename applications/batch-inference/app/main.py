@@ -21,10 +21,19 @@
 
 import argparse
 import os
+from time import sleep
+from threading import Thread
 
 import grpc
 
 from tensorflow_serving.apis import predict_pb2, prediction_service_pb2_grpc
+from experiment_metrics.api import publish
+
+progress = 0
+max_progress = 1
+
+if not os.getenv('RUN_NAME', None):
+    raise RuntimeError('RUN_NAME env var must be set for publishing progress metrics!')
 
 
 def do_batch_inference(server_address, input_dir_path, output_dir_path):
@@ -34,7 +43,8 @@ def do_batch_inference(server_address, input_dir_path, output_dir_path):
         for name in files:
             detected_files.append(os.path.join(root, name))
 
-    len_detected_files = len(detected_files)
+    global max_progress
+    max_progress = len(detected_files)
 
     channel = grpc.insecure_channel(server_address)
     stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
@@ -56,7 +66,25 @@ def do_batch_inference(server_address, input_dir_path, output_dir_path):
         with open(f'{output_dir_path}/{os.path.basename(data_file)}.pb', mode='wb') as fi:
             fi.write(result_pb_serialized)
 
-        print(f'progress: {i}/{len_detected_files}')
+        global progress
+        progress = i
+        print(f'progress: {progress}/{max_progress}')
+
+
+def publish_progress():
+    progress_percent = 0
+    while progress_percent != 100:
+        new_progress_percent = progress/max_progress * 100
+
+        if new_progress_percent != progress_percent:
+            progress_percent = new_progress_percent
+
+            metrics = {
+                'progress': str(progress_percent)
+            }
+            publish(metrics)
+
+        sleep(1)
 
 
 def main():
@@ -72,9 +100,14 @@ def main():
     input_dir_path = args.input_dir_path
     output_dir_path = args.output_dir_path if args.output_dir_path else '/mnt/output/experiment'
 
+    progress_thread = Thread(target=publish_progress)
+    progress_thread.start()
+
     do_batch_inference(server_address=os.getenv('TENSORFLOW_MODEL_SERVER_SVC_NAME', ''),
                        input_dir_path=input_dir_path,
                        output_dir_path=output_dir_path)
+
+    progress_thread.join()
 
     # TODO: cleanup of k8s resources after inference
 
