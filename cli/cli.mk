@@ -57,6 +57,8 @@ endif
 	@mkdir -p dist/lib/
 	@mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	@cp -f license.txt dist/
+	@mkdir -p dist/docs/
+	@cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
 
 metrics-lib:
 	@. $(ACTIVATE); cd experiment_metrics && python setup.py sdist
