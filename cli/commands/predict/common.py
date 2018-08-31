@@ -64,6 +64,6 @@ def get_inference_instance_url(inference_instance: Union[Run, RunSubmission], mo
     k8s_namespace = get_kubectl_current_context_namespace()
 
     proxy_url = f'{k8s_host}/api/v1/namespaces/{k8s_namespace}/' \
-                f'services/{service_name}/proxy/v1/models/{model_name}'
+                f'services/{service_name}:rest-port/proxy/v1/models/{model_name}'
 
     return proxy_url

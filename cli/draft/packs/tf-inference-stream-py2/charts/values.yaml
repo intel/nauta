@@ -5,7 +5,8 @@
 modelPath: ''
 modelName: ''
 
-containerPort: 8501
+restContainerPort: 8501
+grpcContainerPort: 8500
 
 image:
   pullPolicy: IfNotPresent

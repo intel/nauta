@@ -33,10 +33,13 @@ spec:
             - name: MODEL_BASE_PATH
               value: "/models"
           command: ["/bin/sh", "-c"]
-          args: ["[ -z \"$(ls -A /models)\" ] && echo 'Error: the provided path to model {{ .Values.modelPath }} is invalid or contains no files.' && exit 1 || tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=$(MODEL_NAME) --model_base_path=$(MODEL_BASE_PATH)/$(MODEL_NAME)"]
+          args: ["[ -z \"$(ls -A /models)\" ] && echo 'Error: the provided path to model {{ .Values.modelPath }} is invalid or contains no files.' && exit 1 || tensorflow_model_server --port={{ .Values.grpcContainerPort }} --rest_api_port={{ .Values.restContainerPort }} --model_name=$(MODEL_NAME) --model_base_path=$(MODEL_BASE_PATH)/$(MODEL_NAME)"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.containerPort }}
+            - containerPort: {{ .Values.grpcContainerPort }}
+              name: grpc-port
+            - containerPort: {{ .Values.restContainerPort }}
+              name: rest-port
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home

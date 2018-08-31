@@ -10,9 +10,14 @@ metadata:
     draft: {{ .Values.draft }}
 spec:
   ports:
-  - port: {{ .Values.containerPort }}
-    targetPort: {{ .Values.containerPort }}
+  - port: {{ .Values.restContainerPort }}
+    targetPort: {{ .Values.restContainerPort }}
     protocol: TCP
+    name: rest-port
+  - port: {{ .Values.grpcContainerPort }}
+    targetPort: {{ .Values.grpcContainerPort }}
+    protocol: TCP
+    name: grpc-port
   selector:
     app: {{ template "name" . }}
     draft: {{ .Values.draft }}

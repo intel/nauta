@@ -52,7 +52,7 @@ def test_get_inference_instance_url_run_description(mocker):
     instance_url = get_inference_instance_url(inference_instance=fake_instance, model_name=fake_model_name)
 
     assert instance_url == f'{fake_host}/api/v1/namespaces/{fake_namespace}/' \
-                           f'services/{fake_instance.name}/proxy/v1/models/{fake_model_name}'
+                           f'services/{fake_instance.name}:rest-port/proxy/v1/models/{fake_model_name}'
 
 
 def test_get_inference_instance_url_run(mocker):
@@ -72,4 +72,4 @@ def test_get_inference_instance_url_run(mocker):
     instance_url = get_inference_instance_url(inference_instance=fake_instance)
 
     assert instance_url == f'{fake_host}/api/v1/namespaces/{fake_namespace}/' \
-                           f'services/{fake_instance.name}/proxy/v1/models/{fake_model_name}'
+                           f'services/{fake_instance.name}:rest-port/proxy/v1/models/{fake_model_name}'

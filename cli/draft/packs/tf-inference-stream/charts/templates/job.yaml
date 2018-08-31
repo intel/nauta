@@ -35,7 +35,10 @@ spec:
           command: ["tf_serving_dls4e"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.containerPort }}
+            - containerPort: {{ .Values.grpcContainerPort }}
+              name: grpc-port
+            - containerPort: {{ .Values.restContainerPort }}
+              name: rest-port
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home
