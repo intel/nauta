@@ -50,7 +50,7 @@
             </v-flex>
           </v-card-title>
           <div class="elevation-3">
-            <div class="table__overflow">
+            <div class="overflow">
               <table class="datatable table">
                 <thead>
                 <tr>
@@ -458,13 +458,25 @@ export default {
 </script>
 
 <style scoped>
-table {
+.overflow {
+  width: 100%;
+  display: block;
+  overflow: scroll;
+  overflow-scrolling: auto;
+  height: 500px;
+}
+.overflow table {
   table-layout: fixed;
 }
-th {
+.overflow th {
   height: 46px;
   color: rgba(0, 0, 0, 0.52);
   font-size: 14px !important;
+}
+.overflow thead th {
+  position: sticky;
+  top: 0px;
+  background-color: #ffffff;
 }
 .pointer-btn {
   cursor: pointer;
