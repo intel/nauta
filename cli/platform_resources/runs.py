@@ -72,12 +72,12 @@ def get_run(name: str, namespace: str = None) -> Optional[Run]:
     return Run.from_k8s_response_dict(raw_run) if raw_run else None
 
 
-def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str = None, exp_name_filter: str = None,
+def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_filter: str = None, exp_name_filter: str = None,
               excl_state: RunStatus = None, run_kinds_filter: List[Enum] = None) -> List[Run]:
     """
     Return list of experiment runs.
     :param namespace: If provided, only runs from this namespace will be returned
-    :param state: If provided, only runs with given state will be returned
+    :param state_list: If provided, only runs with given states will be returned
     :param name_filter: If provided, only runs matching name_filter regular expression will be returned
     :param exp_name_filter: If provided, list of runs is filtered by experiment name
     :param excl_state: If provided, only runs with a state other than given will be returned
@@ -94,7 +94,6 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
                                                             plural=RUN_PLURAL, version=RUN_VERSION)
     else:
         raw_runs = api.list_cluster_custom_object(group=API_GROUP_NAME, plural=RUN_PLURAL, version=RUN_VERSION)
-
     try:
         name_regex = re.compile(name_filter) if name_filter else None
     except sre_constants.error as e:
@@ -103,7 +102,7 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
         raise InvalidRegularExpressionError(error_msg) from e
 
     run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False),
-                   partial(filter_run_by_state, state=state),
+                   partial(filter_run_by_state, state_list=state_list),
                    partial(filter_run_by_excl_state, state=excl_state),
                    partial(filter_by_experiment_name, exp_name=exp_name_filter),
                    partial(filter_by_run_kinds, run_kinds=run_kinds_filter)]
@@ -111,7 +110,6 @@ def list_runs(namespace: str = None, state: RunStatus = None, name_filter: str =
     runs = [Run.from_k8s_response_dict(run_dict)
             for run_dict in raw_runs['items']
             if all(f(run_dict) for f in run_filters)]
-
     return runs
 
 
