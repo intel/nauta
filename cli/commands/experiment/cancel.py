@@ -245,7 +245,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             try:
                 # clear run logs
                 logger.debug(f"Clearing logs for {run.name} run.")
-                k8s_es_client.delete_logs_for_run(run=run.name)
+                k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
             except Exception:
                 logger.exception("Error during clearing run logs.")
 

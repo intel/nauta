@@ -186,8 +186,10 @@ def test_delete_logs_for_run(mocker):
     mocked_delete_logs = mocker.patch.object(client, 'delete_by_query')
 
     run_name = 'test_run'
+    namespace = 'fake-namespace'
 
-    client.delete_logs_for_run(run_name)
+    client.delete_logs_for_run(run_name, namespace)
 
     mocked_delete_logs.assert_called_with(index='_all',
-                                          body={"query": {"term": {'kubernetes.labels.runName.keyword': run_name}}})
+                                          body={"query": [{"term": {'kubernetes.labels.runName.keyword': run_name}},
+                                                          {"term": {'kubernetes.labels.namespace.keyword': namespace}}]})
