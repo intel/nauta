@@ -24,7 +24,8 @@ export default {
     LAST_UPDATED_A_MOMENT_AGO: 'Last updated a moment ago',
     LAST_UPDATED_30S_AGO: 'Last updated over 30 seconds ago',
     NO_DATA: 'No data to display',
-    NO_DATA_FOR_FILTER: 'No data for currently applied filters',
+    NO_DATA_FOR_FILTER: 'No data for current search. Click on the RESET button and clear currently applied filters.',
+    NO_DATA_FOR_CURRENT_USER: 'No data for currently signed user.',
     SIGNED_OUT: 'You are signed out'
   },
   ERROR: {

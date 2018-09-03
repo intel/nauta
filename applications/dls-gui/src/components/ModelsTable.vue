@@ -50,7 +50,7 @@
             </v-flex>
           </v-card-title>
           <div class="elevation-3">
-            <div class="overflow">
+            <div v-bind:class="{overflow: filteredDataCount !== 0, 'table-style': true}">
               <table class="datatable table">
                 <thead>
                 <tr>
@@ -128,14 +128,20 @@
                 </tbody>
               </table>
             </div>
-            <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length === 0">
+            <div id="nodata" v-if="experimentsTotal === 0">
               <v-alert :value="true" type="info">
                 {{ messages.SUCCESS.NO_DATA }}
               </v-alert>
             </div>
-            <div id="nodata" v-if="filteredDataCount === 0 && experimentsParams.length !== 0">
+            <div id="nodata" v-if="filteredDataCount === 0 && experimentsTotal !== 0 && customFiltersActive">
               <v-alert :value="true" type="info">
                 {{ messages.SUCCESS.NO_DATA_FOR_FILTER }}
+              </v-alert>
+            </div>
+            <div id="nodata" v-if="filteredDataCount === 0 && experimentsTotal !== 0 && !customFiltersActive">
+              <v-alert :value="true" type="info">
+                {{ messages.SUCCESS.NO_DATA_FOR_CURRENT_USER }}
+                Click <u class="pointer-btn" v-on:click="showAllUsersData()">here</u> to load all users data.
               </v-alert>
             </div>
             <FooterElements v-if="filteredDataCount"
@@ -193,7 +199,7 @@ export default {
       filterIcon: 'filter_list',
       searchPattern: '',
       selectedByUserColumns: [],
-      alwaysVisibleColumns: ['creationTimestamp', 'namespace', 'name', 'state', 'type'],
+      alwaysVisibleColumns: ['name', 'type', 'creationTimestamp', 'state', 'namespace'],
       filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
         name: {
@@ -292,13 +298,15 @@ export default {
     },
     columnsCount: function () {
       return this.currentlyVisibleColumns.length > 8 ? 8 : this.currentlyVisibleColumns.length;
+    },
+    customFiltersActive: function () {
+      return this.filterByValModals.state.params.length || this.filterByValModals.name.params.length ||
+        this.filterByValModals.type.params.length || this.filterByValModals.namespace.params.length > 1 ||
+        this.searchPattern !== '';
     }
   },
   watch: {
     refreshTableDataTriggers: function () {
-      if (this.filterByValModals.namespace.params.length === 0) {
-        this.filterByValModals.namespace.params.push(this.username);
-      }
       const refreshMode = false;
       this.getData(refreshMode);
     },
@@ -330,7 +338,12 @@ export default {
       Object.keys(this.filterByValModals).forEach((item) => {
         this.filterByValModals[item].params = [];
       });
+      this.filterByValModals.namespace.params.push(this.username);
       this.searchPattern = '';
+    },
+    showAllUsersData () {
+      console.log(this.filterByValModals.namespace.params);
+      this.filterByValModals.namespace.params = [];
     },
     updateCountPerPage (count) {
       this.pagination.itemsCountPerPage = count;
@@ -465,10 +478,10 @@ export default {
   overflow-scrolling: auto;
   height: 500px;
 }
-.overflow table {
+.table-style table {
   table-layout: fixed;
 }
-.overflow th {
+.table-style th {
   height: 46px;
   color: rgba(0, 0, 0, 0.52);
   font-size: 14px !important;

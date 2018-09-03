@@ -55,7 +55,11 @@ const generateExperimentEntities = function (data) {
   });
 };
 
-const extractValuesForFilterableAttrs = function (entities) {
+const prepareDataUsingFilters = function (entities, valuesPattern, searchPattern) {
+  if (!Array.isArray(entities)) {
+    throw 'Incorrect Array Data';
+  }
+
   let values = {
     name: new Set(),
     state: new Set(),
@@ -63,23 +67,8 @@ const extractValuesForFilterableAttrs = function (entities) {
     type: new Set()
   };
   entities.forEach((entity) => {
-    values.name.add(entity.attributes.name);
-    values.state.add(entity.attributes.state);
     values.namespace.add(entity.attributes.namespace);
-    values.type.add(entity.attributes.type);
   });
-  return {
-    name: Array.from(values.name),
-    namespace: Array.from(values.namespace),
-    state: Array.from(values.state),
-    type: Array.from(values.type)
-  };
-};
-
-const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
-  if (!Array.isArray(entities)) {
-    throw 'Incorrect Array Data';
-  }
 
   let filterParams = {
     name: Array.from(new Set(entities.map((entity) => entity.attributes.name))),
@@ -97,6 +86,10 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
     });
   }
 
+  const filteredByUserEntities = entities.filter((item) => {
+    return filterParams.namespace.includes(item.attributes.namespace);
+  });
+
   const filteredEntities = entities.filter((item) => {
     const filterByValueCondition = filterParams.name.includes(item.attributes.name) &&
       filterParams.namespace.includes(item.attributes.namespace) &&
@@ -109,9 +102,21 @@ const applyQueryFilters = function (entities, valuesPattern, searchPattern) {
     return filterByValueCondition && filterBySearchCondition;
   });
 
+  filteredByUserEntities.forEach((entity) => {
+    values.name.add(entity.attributes.name);
+    values.state.add(entity.attributes.state);
+    values.type.add(entity.attributes.type);
+  });
+
   return {
     data: filteredEntities,
-    queryParams: filterParams
+    queryParams: filterParams,
+    valuesForFilterableAttrs: {
+      name: Array.from(values.name),
+      namespace: Array.from(values.namespace),
+      state: Array.from(values.state),
+      type: Array.from(values.type)
+    }
   }
 };
 
@@ -154,29 +159,28 @@ const extractAttrsNames = function (data) {
 
 const parseExperiments = function (experiments, queryParams) {
   const entities = generateExperimentEntities(experiments);
-  const valuesForFilterableAttrs = extractValuesForFilterableAttrs(entities);
-  const filteredDataWithMetadata = applyQueryFilters(entities, {
+  const preparedData = prepareDataUsingFilters(entities, {
     name: queryParams.names,
     namespace: queryParams.namespaces,
     state: queryParams.states,
     type: queryParams.types
   }, queryParams.searchBy);
-  const orderedData = applyOrderParams(filteredDataWithMetadata.data, queryParams.orderBy, queryParams.order, queryParams.limit, queryParams.page);
+  const orderedData = applyOrderParams(preparedData.data, queryParams.orderBy, queryParams.order, queryParams.limit, queryParams.page);
   return {
     stats: {
       total: entities.length,
       datetime: Date.now(),
-      filteredDataCount: filteredDataWithMetadata.data.length,
+      filteredDataCount: preparedData.data.length,
       a: orderedData.a,
       b: orderedData.b,
       totalPagesCount: orderedData.totalPagesCount,
       pageNumber: orderedData.pageNumber
     },
     filterColumnValues: {
-      options: valuesForFilterableAttrs,
-      current: filteredDataWithMetadata.queryParams
+      options: preparedData.valuesForFilterableAttrs,
+      current: preparedData.queryParams
     },
-    params: extractAttrsNames(entities),
+    params: extractAttrsNames(preparedData.data),
     data: orderedData.data
   };
 };
@@ -257,10 +261,9 @@ const getExperimentResourcesData = function (req, res) {
 module.exports = {
   getUserExperiments: getUserExperiments,
   parseExperiments: parseExperiments,
+  prepareDataUsingFilters: prepareDataUsingFilters,
   extractAttrsNames: extractAttrsNames,
   applyOrderParams: applyOrderParams,
-  applyQueryFilters: applyQueryFilters,
-  extractValuesForFilterableAttrs: extractValuesForFilterableAttrs,
   generateExperimentEntities: generateExperimentEntities,
   getExperimentResourcesData: getExperimentResourcesData
 };

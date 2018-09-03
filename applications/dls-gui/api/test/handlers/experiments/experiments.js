@@ -258,6 +258,135 @@ describe('Handlers | Experiments', function () {
 
   });
 
+  describe('prepareDataUsingFilters', function () {
+    it('should return throw exception if no array object', function () {
+      try {
+        expApi.prepareDataUsingFilters();
+      } catch (err) {
+        expect(err).to.equal('Incorrect Array Data');
+      }
+    });
+
+    it('should return correct valuesForFilterableAttrs object if data provided', function () {
+      const expectedResult = {
+        name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+        namespace: [generatedEntities[0].attributes.namespace],
+        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+        type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+      };
+      const result = expApi.prepareDataUsingFilters(generatedEntities);
+      expect(result.valuesForFilterableAttrs).to.deep.equal(expectedResult);
+    });
+
+    it('should return correct object if empty array provided', function () {
+      const expectedResult = {
+        data: [],
+        queryParams: {
+          name: [],
+          namespace: [],
+          state: [],
+          type: [],
+          searchPattern: ''
+        },
+        valuesForFilterableAttrs: {
+          name: [],
+          namespace: [],
+          state: [],
+          type: []
+        }
+      };
+      const result = expApi.prepareDataUsingFilters([]);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return not filtered data if empty query', function () {
+      const expectedResult = {
+        data: generatedEntities,
+        queryParams: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
+          searchPattern: ''
+        },
+        valuesForFilterableAttrs: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+        }
+      };
+      const result = expApi.prepareDataUsingFilters(generatedEntities);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if query by name provided', function () {
+      const expectedResult = {
+        data: [generatedEntities[0]],
+        queryParams: {
+          name: [generatedEntities[0].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
+          searchPattern: ''
+        },
+        valuesForFilterableAttrs: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+        }
+      };
+      const queryParams = {name: [generatedEntities[0].attributes.name]};
+      const result = expApi.prepareDataUsingFilters(generatedEntities, queryParams);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if query by name with wildcard provided', function () {
+      const expectedResult = {
+        data: generatedEntities,
+        queryParams: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
+          searchPattern: ''
+        },
+        valuesForFilterableAttrs: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+        }
+      };
+      const queryParams = {name: '*'};
+      const result = expApi.prepareDataUsingFilters(generatedEntities, queryParams);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('should return filtered data if search pattern provided', function () {
+      const expectedResult = {
+        data: [generatedEntities[0]],
+        queryParams: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
+          searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
+        },
+        valuesForFilterableAttrs: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+        }
+      };
+      const searchPattern = 'mnist-SING-18-06-11-09-34-45-41';
+      const result = expApi.prepareDataUsingFilters(generatedEntities, null, searchPattern);
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
+
   describe('generateExperimentEntities', function () {
     it('should return empty array if not data', function () {
       const result = expApi.generateExperimentEntities();
@@ -275,118 +404,6 @@ describe('Handlers | Experiments', function () {
       delete generatedEntities[0].attributes.accuracy;
       const expectedResult = generatedEntities;
       const result = expApi.generateExperimentEntities(k8sRunEntities);
-      expect(result).to.deep.equal(expectedResult);
-    });
-  });
-
-  describe('extractValuesForFilterableAttrs', function () {
-    it('should return correct object if not data', function () {
-      const expectedResult = {
-        name: [],
-        namespace: [],
-        state: [],
-        type: []
-      };
-      const result = expApi.extractValuesForFilterableAttrs([]);
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('should return correct object if data provided', function () {
-      const expectedResult = {
-        name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
-        namespace: [generatedEntities[0].attributes.namespace],
-        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
-        type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
-      };
-      const result = expApi.extractValuesForFilterableAttrs(generatedEntities);
-      expect(result).to.deep.equal(expectedResult);
-    });
-  });
-
-  describe('applyQueryFilters', function () {
-    it('should return throw exception if no array object', function () {
-      try {
-        expApi.applyQueryFilters();
-      } catch (err) {
-        expect(err).to.equal('Incorrect Array Data');
-      }
-    });
-
-    it('should return correct object if empty array provided', function () {
-      const expectedResult = {
-        data: [],
-        queryParams: {
-          name: [],
-          namespace: [],
-          state: [],
-          type: [],
-          searchPattern: ''
-        }
-      };
-      const result = expApi.applyQueryFilters([]);
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('should return not filtered data if empty query', function () {
-      const expectedResult = {
-        data: generatedEntities,
-        queryParams: {
-          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
-          namespace: [generatedEntities[0].attributes.namespace],
-          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
-          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
-        }
-      };
-      const result = expApi.applyQueryFilters(generatedEntities);
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('should return filtered data if query by name provided', function () {
-      const expectedResult = {
-        data: [generatedEntities[0]],
-        queryParams: {
-          name: [generatedEntities[0].attributes.name],
-          namespace: [generatedEntities[0].attributes.namespace],
-          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
-          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
-        }
-      };
-      const queryParams = {name: [generatedEntities[0].attributes.name]};
-      const result = expApi.applyQueryFilters(generatedEntities, queryParams);
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('should return filtered data if query by name with wildcard provided', function () {
-      const expectedResult = {
-        data: generatedEntities,
-        queryParams: {
-          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
-          namespace: [generatedEntities[0].attributes.namespace],
-          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
-          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
-        }
-      };
-      const queryParams = {name: '*'};
-      const result = expApi.applyQueryFilters(generatedEntities, queryParams);
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('should return filtered data if search pattern provided', function () {
-      const expectedResult = {
-        data: [generatedEntities[0]],
-        queryParams: {
-          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
-          namespace: [generatedEntities[0].attributes.namespace],
-          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
-          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
-        }
-      };
-      const searchPattern = 'mnist-SING-18-06-11-09-34-45-41';
-      const result = expApi.applyQueryFilters(generatedEntities, null, searchPattern);
       expect(result).to.deep.equal(expectedResult);
     });
   });
@@ -458,21 +475,23 @@ describe('Handlers | Experiments', function () {
   });
 
   describe('parseExperiments', function () {
-    let generateExperimentEntitiesMock, extractValuesForFilterableAttrsMock, applyQueryFiltersMock,
+    let generateExperimentEntitiesMock, prepareDataUsingFiltersMock,
       applyOrderParamsMock, extractAttrsNamesMock;
     beforeEach(function () {
       generateExperimentEntitiesMock = sinon.stub().returns(generatedEntities);
-      extractValuesForFilterableAttrsMock = sinon.stub().returns({
-        name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
-        namespace: [generatedEntities[0].attributes.namespace],
-        state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
-      });
-      applyQueryFiltersMock = sinon.stub().returns({
+      prepareDataUsingFiltersMock = sinon.stub().returns({
+        valuesForFilterableAttrs: {
+          name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
+          namespace: [generatedEntities[0].attributes.namespace],
+          state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
+        },
         data: generatedEntities,
         queryParams: {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+          type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
           searchPattern: ''
         }
       });
@@ -488,11 +507,10 @@ describe('Handlers | Experiments', function () {
       Date.now = sinon.stub().returns(1);
     });
 
-    it('should return correct data if no experiments provided', function () {
+    it('should return correct data', function () {
       const queryParams = {};
       expApi.__set__('generateExperimentEntities', generateExperimentEntitiesMock);
-      expApi.__set__('extractValuesForFilterableAttrs', extractValuesForFilterableAttrsMock);
-      expApi.__set__('applyQueryFilters', applyQueryFiltersMock);
+      expApi.__set__('prepareDataUsingFilters', prepareDataUsingFiltersMock);
       expApi.__set__('applyOrderParams', applyOrderParamsMock);
       expApi.__set__('extractAttrsNames', extractAttrsNamesMock);
       const expectedResult = {
@@ -509,12 +527,14 @@ describe('Handlers | Experiments', function () {
           options: {
             name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
             namespace: [generatedEntities[0].attributes.namespace],
-            state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state]
+            state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+            type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type]
           },
           current: {
             name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
             namespace: [generatedEntities[0].attributes.namespace],
             state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
+            type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
             searchPattern: ''
           }
         },
@@ -524,8 +544,7 @@ describe('Handlers | Experiments', function () {
       const result = expApi.parseExperiments(k8sRunEntities, queryParams);
       expect(result).to.deep.equal(expectedResult);
       expect(generateExperimentEntitiesMock.calledOnce).to.equal(true);
-      expect(extractValuesForFilterableAttrsMock.calledOnce).to.equal(true);
-      expect(applyQueryFiltersMock.calledOnce).to.equal(true);
+      expect(prepareDataUsingFiltersMock.calledOnce).to.equal(true);
       expect(applyOrderParamsMock.calledOnce).to.equal(true);
       expect(extractAttrsNamesMock.calledOnce).to.equal(true);
     });
