@@ -20,9 +20,9 @@
  */
 
 export default {
-  creationTimestamp: 'Training Submission Date',
+  creationTimestamp: 'Experiment Submission Date',
   namespace: 'Owner',
-  name: 'Model Name',
-  state: 'Training Status',
-  type: 'Training Type'
+  name: 'Experiment Name',
+  state: 'Experiment Status',
+  type: 'Experiment Type'
 };

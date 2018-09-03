@@ -31,7 +31,7 @@
       <v-flex v-if="isLogged && isInitializedData && !tensorboardLaunching" xs12>
         <v-card>
           <v-card-title>
-            <h2>{{ labels.MODELS }}</h2>
+            <h2>{{ labels.EXPERIMENTS }}</h2>
             <v-spacer></v-spacer>
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
               :clearSort="clearSort"
@@ -110,15 +110,15 @@
                           <v-layout row>
                             <v-flex xs6 wrap>
                               <ExpResourcesDetail :keyname="labels.RESOURCES" :podsList="experimentResources(item.attributes.name)"/>
-                              <ExpKeyValDetail :keyname="labels.TRAINING_SUBMISSION_DATE" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
+                              <ExpKeyValDetail :keyname="labels.EXPERIMENT_SUBMISSION_DATE" :value="parseValue('creationTimestamp', item.attributes.creationTimestamp)"/>
                             </v-flex>
                             <v-flex>
                               <div class="vertical-line"></div>
                             </v-flex>
                             <v-flex xs6 wrap>
                               <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.params.parameters"/>
-                              <ExpKeyValDetail :keyname="labels.TRAINING_START_DATE" :value="parseValue('trainingStartDate', item.params.trainingStartTime)"/>
-                              <ExpKeyValDetail :keyname="labels.TOTAL_TRAINING_DURATION" :value="parseValue('trainingDuration', item.params.trainingStartTime, item.params.trainingEndTime)"/>
+                              <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartDate', item.params.trainingStartTime)"/>
+                              <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDuration', item.params.trainingStartTime, item.params.trainingEndTime)"/>
                             </v-flex>
                           </v-layout>
                         </div>
