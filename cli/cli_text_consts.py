@@ -138,7 +138,14 @@ USER_DELETE_CMD_TEXTS = {
     "proxy_error_user_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if "
                             "yes - close it manually.",
     "other_error_log_msg": "Error during deleting a user of a user.",
-    "other_error_user_msg": "User hasn't been deleted due to technical reasons."
+    "other_error_user_msg": "User hasn't been deleted due to technical reasons.",
+    "deletion_check_presence": "Checking presence of a user that is going to be deleted...",
+    "deletion_start_deleting": "Deleting of a user is starting now...",
+    "deletion_start_purging": "Purging of a user is starting now...",
+    "deletion_verification_of_deleting": "Verifying, whether a user has been deleted properly...",
+    "deletion_deleting_namespace": "- deleting user's namespace",
+    "deletion_deleting_users_objects": "- deleting user's objects",
+    "deletion_deleting_users_experiments": "- deleting user experiments' logs"
 }
 
 LAUNCH_CMD_TEXTS = {

@@ -51,6 +51,7 @@ def delete(state: State, username: str, purge: bool):
     :param username: name of a user that should be deleted
     :param purge: if set - command removes also all artifacts associated with a user
     """
+    click.echo(TEXTS["deletion_check_presence"])
     try:
         if not is_current_user_administrator():
             handle_error(user_msg=TEXTS["user_not_admin_error_msg"])
@@ -67,30 +68,39 @@ def delete(state: State, username: str, purge: bool):
         handle_error(logger, TEXTS["user_presence_verification_error_msg"],
                      TEXTS["user_presence_verification_error_msg"], add_verbosity_msg=state.verbosity == 0)
 
+    click.echo()
     if not click.confirm(TEXTS["delete_confirm_msg"].format(username=username),):
         click.echo(TEXTS["delete_abort_msg"])
         sys.exit(0)
+    click.echo()
 
     try:
+        click.echo(TEXTS["deletion_start_deleting"])
         delete_user(username)
 
         if purge:
             try:
+                click.echo(TEXTS["deletion_start_purging"])
                 # failure during purging a user doesn't mean that user wasn't deleted
                 purge_user(username)
             except Exception:
                 handle_error(logger, TEXTS["purge_error_msg"], TEXTS["purge_error_msg"], exit_code=None)
 
         # CAN-616 - wait until user has been really deleted
-        for i in range(30):
-            if not check_users_presence(username):
+        click.echo(TEXTS["deletion_verification_of_deleting"])
+        for i in range(60):
+            user_state = check_users_presence(username)
+            if not user_state or user_state == UserState.NOT_EXISTS:
                 break
 
             time.sleep(1)
+            click.echo(".", nl=False)
         else:
+            click.echo()
             click.echo(TEXTS["delete_in_progress_msg"])
             sys.exit(0)
 
+        click.echo()
         click.echo(TEXTS["delete_success_msg"].format(username=username))
     except K8sProxyCloseError:
         handle_error(logger, TEXTS["proxy_error_log_msg"], TEXTS["proxy_error_user_msg"], exit_code=None,

@@ -19,11 +19,13 @@
 # and approved by Intel in writing.
 #
 
+import click
+
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
 from util.logger import initialize_logger
 from cli_text_consts import UTIL_HELM_TEXTS as TEXTS
-
+from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS_DEL
 
 logger = initialize_logger(__name__)
 
@@ -35,7 +37,9 @@ def delete_user(username: str):
     :param username: name of a user to be deleted
     Throws an excpetion in case of any errors
     """
+    click.echo(TEXTS_DEL["deletion_deleting_namespace"])
     delete_namespace(username)
+    click.echo(TEXTS_DEL["deletion_deleting_users_objects"])
     delete_helm_release(username, purge=True)
 
 

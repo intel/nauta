@@ -23,6 +23,8 @@ import time
 
 from typing import List
 
+import click
+
 from kubernetes import config, client
 
 from kubernetes.client.rest import ApiException
@@ -39,7 +41,7 @@ from util.app_names import DLS4EAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from cli_text_consts import PLATFORM_RESOURCES_USERS_TEXTS as TEXTS
-
+from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS_DEL
 
 logger = initialize_logger(__name__)
 
@@ -85,6 +87,7 @@ def purge_user(username: str):
     """
     # remove data from elasticsearch
     try:
+        click.echo(TEXTS_DEL["deletion_deleting_users_experiments"])
         with k8s_proxy_context_manager.K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
@@ -95,9 +98,6 @@ def purge_user(username: str):
     except Exception as exe:
         logger.exception("Error during removal of data from elasticsearch")
         raise exe
-
-    # remove experiments/runs data
-    # TODO
 
 
 def get_user_data(username: str) -> model.User:
