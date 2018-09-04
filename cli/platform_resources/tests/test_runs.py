@@ -94,7 +94,7 @@ def test_list_runs_from_namespace(mock_k8s_api_client: CustomObjectsApi):
 
 def test_list_runs_filter_status(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
-    runs = list_runs(state_list=[RunStatus.QUEUED])
+    runs = list_runs(state=RunStatus.QUEUED)
     assert [TEST_RUNS[0]] == runs
 
 

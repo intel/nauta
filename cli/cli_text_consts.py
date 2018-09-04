@@ -322,9 +322,8 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "name_m_none_given_error_msg": "Error: Name or -m option must be given. Please pass one of them.",
     "list_runs_error_msg": "Problems during loading a list of {experiment_name_plural}.",
     "lack_of_experiments_error_msg": "Lack of {experiment_name_plural} fulfilling given criteria. Name or match string "
-                                     "parameters do not match any existing {experiment_name} in an appropriate state "
-                                     "for the command. Run 'dlsctl exp list' to "
-                                     "find out what are the names and states of existing {experiment_name_plural}.",
+                                     "parameters do not match any existing {experiment_name}. Run 'dlsctl exp list' to "
+                                     "find out what are the names of existing {experiment_name_plural}.",
     "experiments_already_cancelled_error_msg": "{experiment_name_plural} fulfilling given criteria have been cancelled "
                                                "already.",
     "already_cancelled_list_header": "The following {experiment_name_plural} have been cancelled already:",
