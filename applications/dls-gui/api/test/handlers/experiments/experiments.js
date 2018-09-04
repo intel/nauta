@@ -25,6 +25,7 @@ const rewire = require('rewire');
 const Q = require('q');
 const expApi = rewire('../../../src/handlers/experiments/experiments');
 const k8sUtils = require('../../../src/utils/k8s');
+const datetimeUtils = require('../../../src/utils/datetime-utils');
 const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
@@ -126,7 +127,9 @@ describe('Handlers | Experiments', function () {
           podCount: k8sRunEntities[0].spec['pod-count'],
           parameters: k8sRunEntities[0].spec['parameters'],
           trainingStartTime: k8sRunEntities[0].spec['start-time'],
-          trainingEndTime: k8sRunEntities[0].spec['end-time']
+          trainingEndTime: k8sRunEntities[0].spec['end-time'],
+          trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
+            k8sRunEntities[0].spec['start-time'], k8sRunEntities[0].spec['end-time'])
         }
       },
       {
@@ -143,7 +146,9 @@ describe('Handlers | Experiments', function () {
           podCount: k8sRunEntities[1].spec['pod-count'],
           parameters: k8sRunEntities[1].spec['parameters'],
           trainingStartTime: k8sRunEntities[1].spec['start-time'],
-          trainingEndTime: k8sRunEntities[1].spec['end-time']
+          trainingEndTime: k8sRunEntities[1].spec['end-time'],
+          trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
+            k8sRunEntities[1].spec['start-time'], k8sRunEntities[1].spec['end-time'])
         }
       }
     ];

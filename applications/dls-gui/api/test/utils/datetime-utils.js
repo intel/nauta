@@ -20,6 +20,7 @@
  */
 
 const expect = require('chai').expect;
+const sinon = require('sinon');
 const datetimeUtils = require('../../src/utils/datetime-utils');
 
 describe('Utils ', function () {
@@ -42,6 +43,32 @@ describe('Utils ', function () {
       str = '';
       const result = datetimeUtils.parseStringToUTC(str);
       expect(result).to.equal(expectedResult);
+    });
+  });
+
+  describe('calculateTimeDifferenceFromDateString', function () {
+    it('should 0 if start date is empty', function () {
+      const expectedResult = 0;
+      const result = datetimeUtils.calculateTimeDifferenceFromDateString();
+      expect(result).to.equal(expectedResult);
+    });
+
+    it('should return difference if start and end times defined', function () {
+      const startDate = '2018-08-24T06:42:10Z';
+      const endDate = '2018-08-24T06:43:10Z';
+      const expectedResult = 60000;
+      const result = datetimeUtils.calculateTimeDifferenceFromDateString(startDate, endDate);
+      expect(result).to.equal(expectedResult);
+    });
+
+    it('should return difference between start and current time if only start date defined', function () {
+      const startDate = '2018-08-24T06:42:10Z';
+      const endDate = '2018-08-24T06:43:10Z';
+      const clock = sinon.useFakeTimers(new Date(endDate).getTime());
+      const expectedResult = 60000;
+      const result = datetimeUtils.calculateTimeDifferenceFromDateString(startDate);
+      expect(result).to.equal(expectedResult);
+      clock.restore();
     });
   });
 });

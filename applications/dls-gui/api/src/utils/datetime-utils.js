@@ -24,3 +24,17 @@ module.exports.parseStringToUTC = function (str) {
   const result = new Date(timestamp);
   return result == 'Invalid Date' ? str : result.toUTCString();
 };
+
+module.exports.calculateTimeDifferenceFromDateString = function (timeA, timeB) {
+  if (!timeA) {
+    return 0;
+  }
+  if (!timeB) {
+    const timedateA = new Date(timeA);
+    const currentTime = Date.now();
+    return currentTime - timedateA;
+  }
+  const timedateA = new Date(timeA).getTime();
+  const timedateB = new Date(timeB).getTime();
+  return timedateB - timedateA;
+};

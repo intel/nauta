@@ -302,18 +302,16 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should return correct duration time for training', function () {
-    const trainingStartTime = '2018-08-22T09:18:03Z';
-    const trainingEndTime = '2018-08-25T10:19:04Z';
+    const trainingDurationTime = 262861000;
     const expectedResult = '3 day(s), 1 hour(s), 1 min(s), 1 s';
-    const result = wrapper.vm.parseValue('trainingDuration', trainingStartTime, trainingEndTime);
+    const result = wrapper.vm.parseValue('trainingDuration', trainingDurationTime);
     expect(result).to.deep.equal(expectedResult);
   });
 
-  it('Should return default string if trainingEndTime value empty for calculating duration time for training', function () {
-    const trainingStartTime = '2018-08-22T09:18:03Z';
-    const trainingEndTime = null;
-    const expectedResult = '---';
-    const result = wrapper.vm.parseValue('trainingDuration', trainingStartTime, trainingEndTime);
+  it('Should return default string if training duration time is a negative value', function () {
+    const trainingDurationTime = -262861000;
+    const expectedResult = '0 day(s), 0 hour(s), 0 min(s), 0 s';
+    const result = wrapper.vm.parseValue('trainingDuration', trainingDurationTime);
     expect(result).to.deep.equal(expectedResult);
   });
 

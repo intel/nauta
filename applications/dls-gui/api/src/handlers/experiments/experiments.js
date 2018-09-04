@@ -24,6 +24,7 @@ const logger = require('../../utils/logger');
 const errMessages = require('../../utils/error-messages');
 const HttpStatus = require('http-status-codes');
 const k8s = require('../../utils/k8s');
+const datetimeUtils = require('../../utils/datetime-utils');
 
 const generateExperimentEntities = function (data) {
   if (!Array.isArray(data)) {
@@ -43,7 +44,9 @@ const generateExperimentEntities = function (data) {
         podCount: item.spec['pod-count'],
         parameters: item.spec['parameters'],
         trainingStartTime: item.spec['start-time'],
-        trainingEndTime: item.spec['end-time']
+        trainingEndTime: item.spec['end-time'],
+        trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
+          item.spec['start-time'], item.spec['end-time'])
       }
     };
     if (item.spec['metrics']) {

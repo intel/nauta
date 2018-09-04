@@ -118,7 +118,7 @@
                             <v-flex xs6 wrap>
                               <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.params.parameters"/>
                               <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartDate', item.params.trainingStartTime)"/>
-                              <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDuration', item.params.trainingStartTime, item.params.trainingEndTime)"/>
+                              <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDuration', item.params.trainingDurationTime)"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -438,19 +438,15 @@ export default {
         }
       }
     },
-    parseValue (key, arg1, arg2) {
+    parseValue (key, arg1) {
       switch (key) {
         case 'creationTimestamp':
           return new Date(arg1).toLocaleString();
         case 'trainingStartDate':
           return arg1 ? new Date(arg1).toLocaleString() : '---';
         case 'trainingDuration':
-          const startDate = arg1;
-          const endDate = arg2;
-          if (!endDate) {
-            return '---';
-          }
-          const pData = TimedateExtractor(startDate, endDate);
+          const duration = new Date(arg1);
+          const pData = TimedateExtractor(duration);
           return `${pData.days} day(s), ${pData.hours} hour(s), ${pData.minutes} min(s), ${pData.seconds} s`;
         default:
           return arg1;

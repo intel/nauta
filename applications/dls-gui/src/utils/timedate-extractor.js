@@ -19,20 +19,28 @@
  * and approved by Intel in writing.
  */
 
-export default function (timedateA, timedateB) {
-  const startTime = new Date(timedateA);
-  const endTime = new Date(timedateB);
-  let diff = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
+export default function (timedate) {
+  const timestamp = timedate.getTime();
+  if (timestamp < 0) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
+  }
+  let diff = (timedate.getTime()) / 1000; // in seconds
   const days = Math.floor(diff / 60 / 60 / 24);
   diff -= days * 60 * 60 * 24;
   const hours = Math.floor(diff / 60 / 60);
   diff -= hours * 60 * 60;
   const minutes = Math.floor(diff / 60);
   diff -= minutes * 60;
+  const seconds = Math.floor(diff);
   return {
     days,
     hours,
     minutes,
-    seconds: diff
+    seconds
   };
 }
