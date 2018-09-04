@@ -27,13 +27,12 @@ import elasticsearch
 import elasticsearch.helpers
 import elasticsearch.client
 
-from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity,\
+from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity, \
     filter_log_by_pod_status, filter_log_by_pod_ids
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
 from platform_resources.run_model import Run
-
 
 log = initialize_logger(__name__)
 
@@ -124,7 +123,6 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
         log.debug(f"Deleting logs - result: {str(output)}")
 
-
     def delete_logs_for_run(self, run: str, namespace: str, index='_all'):
         """
         Removes logs for a given run.
@@ -135,8 +133,15 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         """
         log.debug(f'Deleting logs for {run} run and namespace {namespace}.')
 
-        delete_query = {"query": [{"term": {'kubernetes.labels.runName.keyword': run}},
-                                  {"term": {'kubernetes.labels.namespace.keyword': namespace}}]}
+        delete_query = {"query": {"bool": {"must":
+            [
+                {"term": {'kubernetes.labels.runName.keyword': run}},
+                {"term": {'kubernetes.namespace_name.keyword': namespace}}
+            ]
+        }
+        }
+        }
+
         output = self.delete_by_query(index=index, body=delete_query)
 
         log.debug(f"Deleting logs - result: {str(output)}")

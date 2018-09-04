@@ -190,6 +190,14 @@ def test_delete_logs_for_run(mocker):
 
     client.delete_logs_for_run(run_name, namespace)
 
+    delete_query = {"query": {"bool": {"must":
+        [
+            {"term": {'kubernetes.labels.runName.keyword': run_name}},
+            {"term": {'kubernetes.namespace_name.keyword': namespace}}
+        ]
+    }
+    }
+    }
+
     mocked_delete_logs.assert_called_with(index='_all',
-                                          body={"query": [{"term": {'kubernetes.labels.runName.keyword': run_name}},
-                                                          {"term": {'kubernetes.labels.namespace.keyword': namespace}}]})
+                                          body=delete_query)
