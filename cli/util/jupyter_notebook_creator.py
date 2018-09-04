@@ -66,11 +66,8 @@ def convert_py_to_ipynb(py_filename: str, ipynb_location: str) -> bool:
 
     try:
         with open(py_filename, 'r') as file:
-            for line in file:
-                # omit comments and empty lines
-                if line and line.strip() and not line.strip().startswith("#"):
-                    cell = nbformat.v4.new_code_cell(source=line)
-                    cells.append(cell)
+            cell = nbformat.v4.new_code_cell(source=file.read())
+            cells.append(cell)
 
             output_notebook = nbformat.v4.new_notebook(cells=cells, metadata=notebook_metadata)
 
