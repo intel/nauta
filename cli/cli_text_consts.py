@@ -256,13 +256,17 @@ EXPERIMENT_LOGS_CMD_TEXTS = {
     "help_ed": "Retrieve all logs produced on and before this date (use ISO 8601 date format).",
     "help_i": "Comma separated list of pod IDs. If provided, only logs from these pods will be returned.",
     "help_p": "Get logs only for pods with given status.",
+    "help_m": "If given, command searches for logs from experiments matching the value of this option. "
+              "This option cannot be used along with the NAME argument.",
     "proxy_creation_error_msg": "Error during creation of a proxy for elasticsearch.",
     "logs_get_other_error_msg": "Failed to get experiment logs.",
     "experiment_not_exists_error_msg": "Experiment with name {experiment_name} does not exist.",
     "local_port_occupied_error_msg": "Error during creation of a proxy for elasticsearch. {exe.message}",
     "proxy_close_log_error_msg": "Error during closing of a proxy for elasticsearch.",
     "proxy_close_user_error_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if "
-                                  "yes - close it manually."
+                                  "yes - close it manually.",
+    "name_m_both_given_error_msg": "Both experiment name and -m option cannot be given. Please choose one of them.",
+    "name_m_none_given_error_msg": "Error: Experiment name or -m option must be given. Please pass one of them."
 }
 
 EXPERIMENT_SUBMIT_CMD_TEXTS = {
