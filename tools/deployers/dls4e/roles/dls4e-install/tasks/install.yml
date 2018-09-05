@@ -2,5 +2,5 @@
 
 - name: Install helm chart
   environment: "{{ local_envs }}"
-  shell: "{{ runtime_helm }} install --timeout 600 -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
+  shell: "{{ runtime_helm }} install --timeout 1200 -n dls4enterprise --namespace dls4e {{ runtime_dls4e_chart }} --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml"
   when: chart is changed
