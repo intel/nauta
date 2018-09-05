@@ -413,7 +413,8 @@ EXPERIMENT_COMMON_TEXTS = {
     "incorrect_param_format_error_msg": "Parameter {param_name} has incorrect format.",
     "param_ambiguously_defined": "Parameter {param_name} ambiguously defined.",
     "param_set_incorrect_format_error_msg": "One of -ps options has incorrect format.",
-    "experiment_name_too_long_error_msg": "Name given by a user cannot be longer than 30 characters."
+    "experiment_name_too_long_error_msg": "Name given by a user cannot be longer than 30 characters.",
+    "error_during_patching_run": "Error during patching a run occured {}."
 }
 
 DRAFT_CMD_TEXTS = {

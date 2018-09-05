@@ -314,9 +314,13 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
                     submitted_runs.append(run)
                 except Exception as exe:
                     delete_environment(run_folder)
-                    run.state = RunStatus.FAILED
-                    run.message = str(exe)
-                    runs_api.update_run(run=run, namespace=namespace)
+                    try:
+                        run.state = RunStatus.FAILED
+                        run.message = str(exe)
+                        runs_api.update_run(run=run, namespace=namespace)
+                    except Exception as rexe:
+                        # update of non-existing run may fail
+                        log.debug(TEXTS["error_during_patching_run"].format(str(rexe)))
 
             # Delete experiment if no Runs were submitted
             if not submitted_runs:
@@ -335,7 +339,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
         raise SubmitExperimentError(error_msg)
     except SubmitExperimentError as exe:
         raise exe
-    except Exception:
+    except Exception as exe:
         error_msg = TEXTS["submit_other_error_msg"]
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg)
