@@ -39,7 +39,7 @@ spec:
           image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
           env:
             - name: MODEL_NAME
-              value: {{ .Values.modelName }}
+              value: "{{ .Values.modelName }}"
             - name: MODEL_BASE_PATH
               value: "/models"
           command: ["tensorflow_model_server"]

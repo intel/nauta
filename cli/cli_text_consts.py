@@ -483,8 +483,8 @@ UTIL_CONFIG_TEXTS = {
 }
 
 PLATFORM_RESOURCES_CUSTOM_MODEL_TEXTS = {
-    "invalid_k8s_name": "name must consist of lower case alphanumeric characters, '-' or '.', and must start and end "
-                        "with an alphanumeric character "
+    "invalid_k8s_name": "name must consist of lower case alphanumeric characters, '-' or '.', and must start with "
+                        "alphabetic character and end with an alphanumeric character "
 }
 
 PLATFORM_RESOURCES_EXPERIMENTS_TEXTS = {

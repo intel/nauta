@@ -185,6 +185,7 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
 
         # CASE 3: If user submit exp without name and there is no existing exps with matching script name,then:
         # --> generate new name
+
         result = generate_name(script_name)
 
         experiments = list_experiments(namespace=namespace, name_filter=result)
@@ -194,9 +195,10 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
         return result, prepare_label(script_name, result)
 
 
-def generate_name(name: str) -> str:
+def generate_name(name: str, prefix='exp') -> str:
     # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit script name,
     # so user cannot pass script name with any number of chars
+    name = name if re.match('^[a-z]+', name) else f'{prefix}-{name}'
     formatter = re.compile(r'[^a-z0-9-]')
     normalized_script_name = name.lower().replace('_', '-').replace('.', '-')[:10]
     formatted_name = formatter.sub('', normalized_script_name)

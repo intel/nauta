@@ -27,7 +27,7 @@ from cli_text_consts import PLATFORM_RESOURCES_CUSTOM_MODEL_TEXTS as TEXTS
 
 
 # kubernetes name requirements
-KUBERNETES_NAME_RE = re.compile(r'[a-z0-9]([-.a-z0-9]*[a-z0-9])?')
+KUBERNETES_NAME_RE = re.compile(r'[a-z]([-.a-z0-9]*[a-z0-9])?')
 
 
 def validate_kubernetes_name(name: str):

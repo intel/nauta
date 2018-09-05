@@ -25,7 +25,7 @@ import click
 from tabulate import tabulate
 
 from commands.experiment.common import validate_experiment_name
-from commands.predict.common import start_inference_instance
+from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
@@ -55,7 +55,7 @@ def batch(state: State, name: str, model_location: str, data: str, output: str, 
     # noinspection PyBroadException
     try:
         model_name = model_name if model_name else os.path.basename(model_location)
-        name = name if name else generate_name(name=model_name)
+        name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
                                                       output_location=output)

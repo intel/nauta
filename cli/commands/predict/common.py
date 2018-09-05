@@ -27,6 +27,7 @@ from commands.experiment.common import submit_experiment, RunSubmission, RunKind
 from util.k8s.k8s_info import get_kubectl_host, get_kubectl_current_context_namespace
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
+INFERENCE_INSTANCE_PREFIX = 'pred'
 
 
 class InferenceVerb(Enum):
