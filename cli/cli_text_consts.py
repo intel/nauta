@@ -353,8 +353,8 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "incomplete_purge_error_msg": "Not all {experiment_name}'s components were removed properly.",
     "canceling_runs_start_msg": "Cancelling {run_name} {experiment_name} ...",
     "deleting_related_objects_msg": "Deleting objects related to {run_name} {experiment_name} ...",
-    "cancel_setting_status_msg": "Setting {experiment_name} status to CANCELLED ...",
-    "incomplete_cancel_error_msg": "Not all components of {run.name} {experiment_name} were deleted ...\nExperiment "
+    "cancel_setting_status_msg": "Setting {run_name} status to CANCELLED ...",
+    "incomplete_cancel_error_msg": "Not all components of {run_name} {experiment_name} were deleted ...\nExperiment "
                                    "remains in its previous state."
 }
 

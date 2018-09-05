@@ -25,7 +25,7 @@ import datetime
 
 import pytest
 
-from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli
+from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error
 from util.exceptions import KubectlIntError
 
 
@@ -91,3 +91,55 @@ def test_format_timestamp_for_cli(mocker):
     cli_timestamp = format_timestamp_for_cli("2018-10-11T20:30:30Z")
 
     assert cli_timestamp == "2018-10-11 21:30:30"
+
+
+def test_handle_error_no_logger(mocker):
+    sys_exit_mock = mocker.patch("sys.exit")
+    click_echo_mock = mocker.patch("click.echo")
+
+    try:
+        handle_error(log_msg="", user_msg="")
+    except Exception:
+        pytest.fail("Handle error should not allow None logger to call logger.exception.")
+
+    assert click_echo_mock.call_count == 1
+    assert sys_exit_mock.call_count == 1
+
+
+def test_handle_error_no_log_msg(mocker):
+    sys_exit_mock = mocker.patch("sys.exit")
+    click_echo_mock = mocker.patch("click.echo")
+    logger = mocker.MagicMock(exception=lambda msg: None)
+    mocker.spy(logger, "exception")
+
+    handle_error(logger=logger, user_msg="")
+
+    assert logger.exception.call_count == 0
+    assert click_echo_mock.call_count == 1
+    assert sys_exit_mock.call_count == 1
+
+
+def test_handle_error_no_user_msg(mocker):
+    sys_exit_mock = mocker.patch("sys.exit")
+    click_echo_mock = mocker.patch("click.echo")
+    logger = mocker.MagicMock(exception=lambda msg: None)
+    mocker.spy(logger, "exception")
+
+    handle_error(logger=logger, log_msg="")
+
+    assert logger.exception.call_count == 1
+    assert click_echo_mock.call_count == 0
+    assert sys_exit_mock.call_count == 1
+
+
+def test_handle_error_no_exit(mocker):
+    sys_exit_mock = mocker.patch("sys.exit")
+    click_echo_mock = mocker.patch("click.echo")
+    logger = mocker.MagicMock(exception=lambda msg: None)
+    mocker.spy(logger, "exception")
+
+    handle_error(logger=logger, log_msg="", user_msg="", exit_code=None)
+
+    assert logger.exception.call_count == 1
+    assert click_echo_mock.call_count == 1
+    assert sys_exit_mock.call_count == 0
