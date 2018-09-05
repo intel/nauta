@@ -188,7 +188,7 @@ PREDICT_LAUNCH_CMD_TEXTS = {
     "instance_info_msg": "\nPrediction instance URL (append method verb manually, e.g. :predict):\n"
                          "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}",
     "instance_url_error_msg": "Failed to obtain prediction instance URL.",
-    "table_headers": ["Prediction instance", "Model Location", "Status"]
+    "table_headers": ["Prediction instance", "Model Location", "State"]
 }
 
 PREDICT_STREAM_CMD_TEXTS = {
@@ -230,8 +230,8 @@ PREDICT_BATCH_CMD_TEXTS = {
     "other_instance_creation_error_msg": "Failed to create batch prediction instance.",
     "table_name_header": "Prediction instance",
     "table_model_location_header": "Model location",
-    "table_status_header": "Status",
-    "table_headers": ["Prediction instance", "Model location", "Status"]
+    "table_status_header": "State",
+    "table_headers": ["Prediction instance", "Model location", "State"]
 }
 
 EXPERIMENT_CMD_TEXTS = {
@@ -375,7 +375,7 @@ EXPERIMENT_VIEW_CMD_TEXTS = {
                              """,
     "experiment_not_found_error_msg": "Experiment \"{experiment_name}\" not found.",
     "pods_participating_list_header": "\nPods participating in the execution:\n",
-    "pods_table_headers": ["Name", "Uid", "Status", "Container Details"],
+    "pods_table_headers": ["Name", "Uid", "State", "Container Details"],
     "view_other_error_msg": "Failed to get experiment.",
     "container_not_created_msg": "Not created",
     "container_running_msg": "Running, ",
