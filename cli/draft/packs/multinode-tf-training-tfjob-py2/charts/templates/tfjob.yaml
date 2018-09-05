@@ -10,10 +10,11 @@ metadata:
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 5
   tfReplicaSpecs:
     Worker:
       replicas: {{ .Values.workersCount }}
-      restartPolicy: OnFailure
       template:
         metadata:
           annotations:
@@ -24,6 +25,7 @@ spec:
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
+          restartPolicy: ExitCode
           containers:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
@@ -82,7 +84,6 @@ spec:
       backoffLimit: 5
     PS:
       replicas: {{ .Values.pServersCount }}
-      restartPolicy: OnFailure
       template:
         metadata:
           annotations:
@@ -93,6 +94,7 @@ spec:
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
+          restartPolicy: ExitCode
           containers:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
@@ -163,4 +165,3 @@ spec:
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home
-      backoffLimit: 5
