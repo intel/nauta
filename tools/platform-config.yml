@@ -66,6 +66,9 @@ chart_values:
 
 subcharts:
   dls4e-platform:
+    priority-classes:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../platform-charts/priority-classes"
     dashboard:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/dashboard"
@@ -101,4 +104,3 @@ subcharts:
       chart_values:
         ingress_image: "{{ image_local_url['core/ingress'] }}"
         defaultbackend_image: "{{ image_local_url['core/defaultbackend'] }}"
-

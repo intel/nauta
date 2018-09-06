@@ -51,6 +51,7 @@ spec:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+      priorityClassName: low-priority
       restartPolicy: OnFailure
       volumes:
         - name: input-home

@@ -61,6 +61,7 @@ spec:
                 privileged: true
               resources:
 {{ toYaml .Values.resources | indent 16 }}
+          priorityClassName: low-priority
           volumes:
             - name: input-home
               persistentVolumeClaim:

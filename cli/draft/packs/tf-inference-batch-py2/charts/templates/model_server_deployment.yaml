@@ -68,6 +68,7 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       restartPolicy: Always
+      priorityClassName: low-priority
       volumes:
         - name: input-home
           persistentVolumeClaim:
