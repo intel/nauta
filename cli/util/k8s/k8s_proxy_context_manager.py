@@ -19,7 +19,6 @@
 # and approved by Intel in writing.
 #
 
-import signal
 import requests
 from requests.exceptions import ConnectionError
 import time
@@ -30,7 +29,6 @@ from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
-from util.system import get_current_os, OS
 from cli_text_consts import UTIL_K8S_PROXY_TEXTS as TEXTS
 
 
@@ -94,11 +92,10 @@ class K8sProxy:
         raise TunnelSetupError(TEXTS["tunnel_not_ready_error_msg"].format(address=address, port=port))
 
     def _close_tunnel(self):
-        if get_current_os() == OS.WINDOWS:
-            self.process.terminate()
-        else:
-            for proc in psutil.Process(self.process.pid).children(recursive=True):
-                proc.send_signal(signal.SIGTERM)
-            self.process.send_signal(signal.SIGKILL)
-
-        self.process.wait()
+        children = psutil.Process(self.process.pid).children(recursive=True)
+        children.insert(0, self.process)
+        for child in children:
+            child.terminate()
+        gone, alive = psutil.wait_procs(children, timeout=3)
+        for survivor in alive:
+            survivor.kill()

@@ -64,14 +64,14 @@ def test_set_up_proxy_open_failure(mocker):
 
 def test_set_up_proxy_close_failure(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
-    mocker.patch("subprocess.Popen.send_signal", side_effect=RuntimeError)
+    mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError)
     mocker.patch("subprocess.Popen.terminate", side_effect=RuntimeError)
-    mocker.patch("subprocess.Popen.wait")
     mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                  return_value=(spo_mock, 1000, 1001))
 
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
-    mocker.patch("psutil.Process")
+    mocker.patch("psutil.Process", return_value=mocker.MagicMock(children=lambda **kwargs: []))
+    mocker.patch("psutil.wait_procs")
 
     with pytest.raises(K8sProxyCloseError):
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
@@ -80,30 +80,28 @@ def test_set_up_proxy_close_failure(mocker):
     # noinspection PyUnresolvedReferences
     assert kubectl.start_port_forwarding.call_count == 1
     # noinspection PyUnresolvedReferences
-    assert subprocess.Popen.send_signal.call_count == 1 or subprocess.Popen.terminate.call_count == 1
+    assert subprocess.Popen.terminate.call_count == 1 or subprocess.Popen.kill.call_count == 1
     # noinspection PyProtectedMember,PyUnresolvedReferences
     assert K8sProxy._wait_for_connection_readiness.call_count == 1
 
 
 def test_set_up_proxy_open_readiness_failure(mocker):
     popen_mock = mocker.patch("subprocess.Popen")
-    mocker.patch("subprocess.Popen.send_signal")
+    mocker.patch("subprocess.Popen.kill")
     mocker.patch("subprocess.Popen.terminate")
-    mocker.patch("subprocess.Popen.wait")
     mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                  return_value=(popen_mock, 1000, 1001))
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness",
                  side_effect=TunnelSetupError)
-    mocker.patch("psutil.Process")
+    mocker.patch("psutil.Process", return_value=mocker.MagicMock(children=lambda **kwargs: []))
+    mocker.patch("psutil.wait_procs")
 
     with pytest.raises(K8sProxyOpenError):
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
             pass
 
     # noinspection PyUnresolvedReferences
-    assert subprocess.Popen.send_signal.call_count == 1 or subprocess.Popen.terminate.call_count == 1
-    # noinspection PyUnresolvedReferences
-    assert subprocess.Popen.wait.call_count == 1
+    assert subprocess.Popen.kill.call_count == 1 or subprocess.Popen.terminate.call_count == 1
 
 
 def test_wait_for_connection_readiness(mocker):
