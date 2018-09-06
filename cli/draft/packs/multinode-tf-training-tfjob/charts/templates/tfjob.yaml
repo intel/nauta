@@ -13,7 +13,7 @@ spec:
   tfReplicaSpecs:
     Worker:
       replicas: {{ .Values.workersCount }}
-      restartPolicy: ExitCode
+      restartPolicy: OnFailure
       template:
         metadata:
           annotations:

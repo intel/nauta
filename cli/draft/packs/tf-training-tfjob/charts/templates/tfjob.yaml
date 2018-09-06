@@ -10,12 +10,10 @@ metadata:
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
-  activeDeadlineSeconds: 120
-  backoffLimit: 3
   tfReplicaSpecs:
-    Worker:
-      restartPolicy: ExitCode
+    Master:
       replicas: 1
+      restartPolicy: OnFailure
       template:
         metadata:
           annotations:
@@ -82,3 +80,4 @@ spec:
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home
+      backoffLimit: 5

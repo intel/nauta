@@ -13,7 +13,7 @@ spec:
   tfReplicaSpecs:
     Master:
       replicas: 1
-      restartPolicy: ExitCode
+      restartPolicy: OnFailure
       template:
         metadata:
           annotations:

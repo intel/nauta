@@ -1,7 +1,6 @@
 ARG BUILD_IMAGE=golang:1.10.2
 ARG BASE_IMAGE=centos:7.4.1708
 FROM ${BUILD_IMAGE} as build
-ENV checkout_commit 1bc8425dff31f97262e7528f2e17be1a62132d3b
 
 RUN mkdir -p ${GOPATH}/src/github.com/kubeflow
 WORKDIR ${GOPATH}/src/github.com/kubeflow
@@ -10,7 +9,7 @@ RUN git clone https://github.com/kubeflow/tf-operator.git
 
 WORKDIR ${GOPATH}/src/github.com/kubeflow/tf-operator
 
-RUN git checkout ${checkout_commit}
+RUN git checkout 93843edae6b2c00cfa52a83df89e2592b1832662
 
 RUN wget https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -O /usr/local/bin/dep
 
