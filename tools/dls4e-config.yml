@@ -47,9 +47,13 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
-    version: "6.2.3"
-    image: "quay.io/pires/docker-elasticsearch-kubernetes:6.2.3"
-    method: pull
+    version: "v6.4.0"
+    required:
+      BASE_IMAGE: "shared/centos/java8"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      BUILD_IMAGE: "shared/build/elasticsearch"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/elasticsearch"
   dls4e/fluentd:
     version: "v0.12"
     image: "fluent/fluentd-kubernetes-daemonset:v0.12-debian-elasticsearch"

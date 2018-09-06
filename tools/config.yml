@@ -13,6 +13,11 @@ shared_images:
     method: "pull"
     push: False
     image: "ubuntu:16.04"
+  shared/nonredist/ubuntu1804:
+    version: "18.04"
+    method: "pull"
+    push: False
+    image: "ubuntu:bionic-20180821"
   shared/centos:
     version: "7.5.1804"
     method: "build"
@@ -68,6 +73,13 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/glide/glide-v0.13.1-linux-amd64
         dest: glide-v0.13.1-linux-amd64
         checksum: b3e126a0034ab41005b51fc9542997b632f2802ee64ad0e3850c0353ba2867cf
+  shared/centos/java8:
+    version: "8"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/java8"
+    push: False
   shared/centos/go-apiserver-builder:
     version: "v1.9-alpha.4"
     required:
@@ -252,6 +264,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/v1.1.0.tar.gz
         dest: consul-1.1.0.tar.gz
         checksum: 8e2539561eb07b2623d9828587e68f5ef46cee882227c7331ff26dddcdc0e9df
+  shared/build/elasticsearch:
+    version: "v6.4.0"
+    required:
+      BASE_IMAGE: "shared/nonredist/ubuntu1804"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/elasticsearch"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/elasticsearch/elasticsearch-v6.4.0.tar.gz
+        dest: elasticsearch-6.4.0.tar.gz
+        checksum: 33dcd95315833f8b2c87ec2db302c021ab7f0a47fdbe4cddb322748871679387
   shared/build/jq:
     version: "v1.5"
     required:
