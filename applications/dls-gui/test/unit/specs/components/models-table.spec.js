@@ -162,28 +162,6 @@ describe('VUE components ModelsTable', () => {
       }).catch(done);
   });
 
-  it('Should cut text if too long', function () {
-    const longText = 'veeeeeerrrryyyyyy looooooongggg texttt';
-    const expectedResult = 'veeeeeerrrryyy...';
-    const result = wrapper.vm.cutLongText(longText);
-    expect(result).to.equal(expectedResult);
-  });
-
-  it('Should not cut text if not too long', function () {
-    const notLongText = 'veeeeeerrrry';
-    const expectedResult = notLongText;
-    const result = wrapper.vm.cutLongText(notLongText);
-    expect(result).to.equal(expectedResult);
-  });
-
-  it('Should not cut text if not too long', function () {
-    const column = 'column1';
-    const idx = 1;
-    wrapper.vm.toggleOrder(column, idx);
-    expect(wrapper.vm.activeColumnIdx).to.equal(idx);
-    expect(wrapper.vm.activeColumnName).to.equal(column);
-  });
-
   it('Should clear sort params on clear sort action', function () {
     wrapper.vm.activeColumnIdx = 999;
     wrapper.vm.activeColumnName = '999';
@@ -294,24 +272,24 @@ describe('VUE components ModelsTable', () => {
     expect(result).to.deep.equal(value);
   });
 
-  it('Should return default string if trainingStartDate value empty', function () {
+  it('Should return default string if trainingStartTime value empty', function () {
     const value = null;
     const expectedResult = '---';
-    const result = wrapper.vm.parseValue('trainingStartDate', value);
+    const result = wrapper.vm.parseValue('trainingStartTime', value);
     expect(result).to.deep.equal(expectedResult);
   });
 
   it('Should return correct duration time for training', function () {
     const trainingDurationTime = 262861000;
     const expectedResult = '3 day(s), 1 hour(s), 1 min(s), 1 s';
-    const result = wrapper.vm.parseValue('trainingDuration', trainingDurationTime);
+    const result = wrapper.vm.parseValue('trainingDurationTime', trainingDurationTime);
     expect(result).to.deep.equal(expectedResult);
   });
 
   it('Should return default string if training duration time is a negative value', function () {
     const trainingDurationTime = -262861000;
     const expectedResult = '0 day(s), 0 hour(s), 0 min(s), 0 s';
-    const result = wrapper.vm.parseValue('trainingDuration', trainingDurationTime);
+    const result = wrapper.vm.parseValue('trainingDurationTime', trainingDurationTime);
     expect(result).to.deep.equal(expectedResult);
   });
 

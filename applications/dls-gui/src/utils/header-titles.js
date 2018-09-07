@@ -24,5 +24,10 @@ export default {
   namespace: 'Owner',
   name: 'Experiment Name',
   state: 'Experiment Status',
-  type: 'Experiment Type'
+  type: 'Experiment Type',
+  podCount: 'Pods',
+  podSelector: 'Pod Selector',
+  trainingEndTime: 'Experiment End Time',
+  trainingStartTime: 'Experiment Start Time',
+  trainingDurationTime: 'Experiment Duration Time'
 };

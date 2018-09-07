@@ -37,9 +37,7 @@ const generateExperimentEntities = function (data) {
         type: item.metadata.labels.runKind,
         creationTimestamp: item.metadata.creationTimestamp,
         state: item.spec.state,
-        namespace: item.metadata.namespace
-      },
-      params: {
+        namespace: item.metadata.namespace,
         podSelector: item.spec['pod-selector']['matchLabels'],
         podCount: item.spec['pod-count'],
         parameters: item.spec['parameters'],
@@ -155,7 +153,7 @@ const extractAttrsNames = function (data) {
   data.map((exp) => {
     _.keys(exp.attributes).forEach((p) => {
       attrsSet.add(p);
-    })
+    });
   });
   return Array.from(attrsSet);
 };

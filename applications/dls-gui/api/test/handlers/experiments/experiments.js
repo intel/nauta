@@ -120,9 +120,7 @@ describe('Handlers | Experiments', function () {
           namespace: k8sRunEntities[0].metadata.namespace,
           state: k8sRunEntities[0].spec.state,
           type: k8sRunEntities[0].metadata.labels.runKind,
-          accuracy: k8sRunEntities[0].spec.metrics['accuracy']
-        },
-        params: {
+          accuracy: k8sRunEntities[0].spec.metrics['accuracy'],
           podSelector: k8sRunEntities[0].spec['pod-selector']['matchLabels'],
           podCount: k8sRunEntities[0].spec['pod-count'],
           parameters: k8sRunEntities[0].spec['parameters'],
@@ -139,9 +137,7 @@ describe('Handlers | Experiments', function () {
           namespace: k8sRunEntities[1].metadata.namespace,
           state: k8sRunEntities[1].spec.state,
           type: k8sRunEntities[1].metadata.labels.runKind,
-          accuracy: k8sRunEntities[1].spec.metrics['accuracy']
-        },
-        params: {
+          accuracy: k8sRunEntities[1].spec.metrics['accuracy'],
           podSelector: k8sRunEntities[1].spec['pod-selector']['matchLabels'],
           podCount: k8sRunEntities[1].spec['pod-count'],
           parameters: k8sRunEntities[1].spec['parameters'],
@@ -473,7 +469,8 @@ describe('Handlers | Experiments', function () {
     });
 
     it('should return all params', function () {
-      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'type', 'accuracy'];
+      const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'type', 'accuracy', 'podSelector',
+        'podCount', 'parameters', 'trainingStartTime', 'trainingEndTime', 'trainingDurationTime'];
       const result = expApi.extractAttrsNames(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
     });

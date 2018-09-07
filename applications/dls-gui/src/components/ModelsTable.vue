@@ -50,32 +50,38 @@
             </v-flex>
           </v-card-title>
           <div class="elevation-3">
-            <div v-bind:class="{overflow: filteredDataCount !== 0, 'table-style': true}">
+            <div v-bind:class="{overflow: filteredDataCount !== 0, 'table-style': true, 'static-height': filterByValWindowVisible }">
               <table class="datatable table">
                 <thead>
                 <tr>
                   <th v-if="tensorMode" width="35px"></th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
-                      class="text-xs-left" @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="160px">
-                    <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
-                    <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
-                                       :column-name="header"
-                                       :options="columnValuesOptions[header]"
-                                       :onCloseClickHandler="switchFilterWindow"
-                                       :onApplyClickHandler="onApplyValuesColumnFilter"
-                                       :appliedOptions="columnValuesApplied[header]"
-                    >
-                    </FilterByValWindow>
-                    <v-tooltip bottom>
-                      <span slot="activator" v-bind:class="{active: activeColumnName === header}">
-                        {{ cutLongText(getLabel(header)) }}
-                      </span>
-                      <span>{{ getLabel(header) }}</span>
-                    </v-tooltip>
-                    <v-icon v-if="(hoveredColumnIdx === idx || activeColumnIdx === idx)" small
-                            v-on:click="toggleOrder(header, idx)" class="header-btn">
-                      {{ sorting.currentSortIcon }}
-                    </v-icon>
+                      @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="310px">
+                    <div class="filter-icon">
+                      <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
+                      <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
+                                         :column-name="header"
+                                         :options="columnValuesOptions[header]"
+                                         :onCloseClickHandler="switchFilterWindow"
+                                         :onApplyClickHandler="onApplyValuesColumnFilter"
+                                         :appliedOptions="columnValuesApplied[header]"
+                      >
+                      </FilterByValWindow>
+                    </div>
+                    <div class="cell-title">
+                      <v-tooltip bottom>
+                        <span slot="activator" v-bind:class="{active: activeColumnName === header}">
+                          {{ getLabel(header) }}
+                        </span>
+                        <span>{{ getLabel(header) }}</span>
+                      </v-tooltip>
+                    </div>
+                    <div class="sort-icon">
+                      <v-icon v-if="(hoveredColumnIdx === idx || activeColumnIdx === idx)" small
+                              v-on:click="toggleOrder(header, idx)" class="header-btn">
+                        {{ sorting.currentSortIcon }}
+                      </v-icon>
+                    </div>
                   </th>
                 </tr>
                 <tr v-if="fetchingDataActive" class="datatable__progress">
@@ -116,9 +122,9 @@
                               <div class="vertical-line"></div>
                             </v-flex>
                             <v-flex xs6 wrap>
-                              <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.params.parameters"/>
-                              <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartDate', item.params.trainingStartTime)"/>
-                              <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDuration', item.params.trainingDurationTime)"/>
+                              <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.attributes.parameters"/>
+                              <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartTime', item.attributes.trainingStartTime)"/>
+                              <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDurationTime', item.attributes.trainingDurationTime)"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -199,7 +205,7 @@ export default {
       filterIcon: 'filter_list',
       searchPattern: '',
       selectedByUserColumns: [],
-      alwaysVisibleColumns: ['name', 'type', 'creationTimestamp', 'state', 'namespace'],
+      alwaysVisibleColumns: ['name', 'type', 'creationTimestamp', 'state'],
       filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
         name: {
@@ -297,12 +303,19 @@ export default {
       return !this.tensorMode || (this.tensorMode && this.selected.length > 0);
     },
     columnsCount: function () {
-      return this.currentlyVisibleColumns.length > 8 ? 8 : this.currentlyVisibleColumns.length;
+      return this.currentlyVisibleColumns.length > 6 ? 6 : this.currentlyVisibleColumns.length;
     },
     customFiltersActive: function () {
       return this.filterByValModals.state.params.length || this.filterByValModals.name.params.length ||
         this.filterByValModals.type.params.length || this.filterByValModals.namespace.params.length > 1 ||
         this.searchPattern !== '';
+    },
+    filterByValWindowVisible: function () {
+      return Object.keys(this.filterByValModals).map((item) => {
+        return this.filterByValModals[item].visible;
+      }).reduce((previous, current) => {
+        return previous || current;
+      });
     }
   },
   watch: {
@@ -318,9 +331,6 @@ export default {
     ...mapActions(['getUserExperiments', 'getExperimentResources', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
     getLabel: function (header) {
       return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
-    },
-    cutLongText (str) {
-      return str.length > 14 ? `${str.substr(0, 14)}...` : str;
     },
     toggleOrder (column, idx) {
       this.activeColumnIdx = idx;
@@ -342,7 +352,6 @@ export default {
       this.searchPattern = '';
     },
     showAllUsersData () {
-      console.log(this.filterByValModals.namespace.params);
       this.filterByValModals.namespace.params = [];
     },
     updateCountPerPage (count) {
@@ -442,9 +451,10 @@ export default {
       switch (key) {
         case 'creationTimestamp':
           return new Date(arg1).toLocaleString();
-        case 'trainingStartDate':
+        case 'trainingStartTime':
+        case 'trainingEndTime':
           return arg1 ? new Date(arg1).toLocaleString() : '---';
-        case 'trainingDuration':
+        case 'trainingDurationTime':
           const duration = new Date(arg1);
           const pData = TimedateExtractor(duration);
           return `${pData.days} day(s), ${pData.hours} hour(s), ${pData.minutes} min(s), ${pData.seconds} s`;
@@ -467,12 +477,34 @@ export default {
 </script>
 
 <style scoped>
+.filter-icon {
+  width: 25px;
+  float: left;
+  padding-right: 5px;
+}
+.cell-title {
+  max-width: 200px;
+  float: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 5px;
+  text-align: left;
+}
+.sort-icon {
+  width: 30px;
+  float: right;
+  padding-left: 5px;
+  padding-right: 5px;
+}
 .overflow {
   width: 100%;
   display: block;
   overflow: scroll;
   overflow-scrolling: auto;
-  height: 500px;
+  max-height: 500px;
+}
+.static-height {
+  height: 500px !important;
 }
 .table-style table {
   table-layout: fixed;
@@ -485,7 +517,13 @@ export default {
 .overflow thead th {
   position: sticky;
   top: 0px;
-  background-color: #ffffff;
+}
+.table-style th {
+  background-color: #f2f2f2;
+  border-right: 1px solid #ffffff;
+}
+.table-style tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 .pointer-btn {
   cursor: pointer;
