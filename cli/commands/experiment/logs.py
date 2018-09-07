@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+from sys import exit
+
 import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
@@ -28,7 +30,6 @@ from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
-
 from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
@@ -59,8 +60,10 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
 
     if experiment_name and match:
         handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
+        exit(1)
     elif not experiment_name and not match:
         handle_error(user_msg=TEXTS["name_m_none_given_error_msg"])
+        exit(1)
 
     experiments_logs = {}
 
@@ -102,13 +105,18 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
 
     except K8sProxyCloseError:
         handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
+        exit(1)
     except LocalPortOccupiedError as exe:
         handle_error(logger, TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message),
                      TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message))
+        exit(1)
     except K8sProxyOpenError:
         handle_error(logger, TEXTS["proxy_creation_error_msg"], TEXTS["proxy_creation_error_msg"])
+        exit(1)
     except ValueError:
         handle_error(logger, TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name),
                      TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name))
+        exit(1)
     except Exception:
         handle_error(logger, TEXTS["logs_get_other_error_msg"], TEXTS["logs_get_other_error_msg"])
+        exit(1)

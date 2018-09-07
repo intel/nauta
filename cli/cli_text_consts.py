@@ -324,13 +324,16 @@ EXPERIMENT_INTERACT_CMD_TEXTS = {
 }
 
 EXPERIMENT_CANCEL_CMD_TEXTS = {
-    "help": "Cancels experiment/s chosen based on criteria given as a parameter.",
+    "help": "Cancels experiment/s or pods chosen based on criteria given as parameters.",
     "help_p": "If given, then all information concerning all experiments, completed and currently running, is removed "
               "from the system.",
     "help_m": "If given, command searches for experiments matching the value of this option. This option cannot be "
               "used along with the NAME argument.",
+    "help_i": "Comma-separated pods IDs - if given then matches pods by their IDs and deletes them.",
+    "help_s": "One of: {available_statuses} - searches pods by their status and deletes them.",
     "name_m_both_given_error_msg": "Both name and -m option cannot be given. Please choose one of them.",
-    "name_m_none_given_error_msg": "Error: Name or -m option must be given. Please pass one of them.",
+    "name_m_none_given_error_msg": "Error: Name, -m or at least one of [--pod-ids, --pod-status] option must be given. "
+                                   "Please pass one of them.",
     "list_runs_error_msg": "Problems during loading a list of {experiment_name_plural}.",
     "lack_of_experiments_error_msg": "Lack of {experiment_name_plural} fulfilling given criteria. Name or match string "
                                      "parameters do not match any existing {experiment_name}. Run 'dlsctl exp list' to "
@@ -350,7 +353,7 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "port_occupied_error_log_msg": "Error during creation of proxy - port is occupied.",
     "port_occupied_error_user_msg": "Error during creation of a proxy for elasticsearch. {exception_message}",
     "proxy_open_error_msg": "Error during creation of a proxy for elasticsearch.",
-    "successfully_cancelled_list_header": "The following {experiment_name_plural} were cancelled succesfully:",
+    "successfully_cancelled_list_header": "The following {experiment_name_plural} were cancelled successfully:",
     "failed_to_cancel_list_header": "The following {experiment_name_plural} weren't cancelled properly:",
     "get_experiment_error_msg": "Error during loading experiment's data.",
     "purging_start_msg": "Purging {run_name} experiment ...",
@@ -359,7 +362,12 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "deleting_related_objects_msg": "Deleting objects related to {run_name} {experiment_name} ...",
     "cancel_setting_status_msg": "Setting {run_name} status to CANCELLED ...",
     "incomplete_cancel_error_msg": "Not all components of {run_name} {experiment_name} were deleted ...\nExperiment "
-                                   "remains in its previous state."
+                                   "remains in its previous state.",
+    "bad_pod_status_passed": "Wrong status: {status_passed} , available: {available_statuses}",
+    "lack_of_pods_error_msg": "Lack of pods fulfilling given criteria. Pod ID or pod status "
+                                     "parameters do not match any existing pod.",
+    "canceling_pods_msg": "Cancelling the pod: {pod_name} ...",
+    "other_pod_cancelling_error_msg": "Error during cancelling the pod."
 }
 
 EXPERIMENT_VIEW_CMD_TEXTS = {

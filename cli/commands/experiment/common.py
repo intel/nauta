@@ -20,11 +20,11 @@
 #
 
 from collections import namedtuple
+from enum import Enum
+import itertools
 import os
 import shutil
-import itertools
-import sys
-from enum import Enum
+from sys import exit
 
 import click
 from typing import Tuple, List
@@ -106,6 +106,7 @@ def check_run_environment(run_environment_path: str):
         else:
             handle_error(user_msg=TEXTS["unable_to_continue_exp_submission_error_msg"]
                          .format(run_environment_path=run_environment_path))
+            exit(1)
 
 
 def create_environment(experiment_name: str, file_location: str, folder_location: str) -> str:
@@ -292,7 +293,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
                 if not click.confirm(TEXTS["confirm_submit_question_msg"], default=True):
                     for experiment_run_folder in experiment_run_folders:
                         delete_environment(experiment_run_folder)
-                    sys.exit(1)
+                    exit(1)
 
             # create Experiment model
             # TODO template_name & template_namespace should be filled after Template implementation
@@ -618,6 +619,7 @@ def validate_pack_params_names(ctx: click.Context, param, value: List[Tuple[str,
     for key, _ in value:
         if "=" in key:
             handle_error(user_msg=TEXTS["invalid_pack_param_format_error_msg"].format(key=key))
+            exit(1)
     return value
 
 

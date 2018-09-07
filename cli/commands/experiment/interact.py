@@ -72,10 +72,12 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
         except Exception:
             handle_error(logger, TEXTS["experiment_get_error_msg"], TEXTS["experiment_get_error_msg"])
+            sys.exit(1)
 
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
         if jupyter_experiment and jupyter_experiment.template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
             handle_error(user_msg=TEXTS["name_already_used"].format(name=name))
+            sys.exit(1)
 
         if not jupyter_experiment and not click.confirm(TEXTS["confirm_experiment_creation"]):
             sys.exit(0)
@@ -87,6 +89,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 check_experiment_name(value=name)
             except click.BadParameter as exe:
                 handle_error(user_msg=str(exe))
+                sys.exit(1)
 
     number_of_retries = 0
     if create_new_notebook:
@@ -114,11 +117,14 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
 
         except K8sProxyCloseError as exe:
             handle_error(user_msg=exe.message)
+            sys.exit(1)
         except SubmitExperimentError as exe:
             handle_error(logger, TEXTS["submit_error_msg"].format(exception_message=exe.message),
                          TEXTS["submit_error_msg"].format(exception_message=exe.message))
+            sys.exit(1)
         except Exception:
             handle_error(logger, TEXTS["submit_other_error_msg"], TEXTS["submit_other_error_msg"])
+            sys.exit(1)
     else:
         # if jupyter service exists - the system only connects to it
         click.echo(TEXTS["session_exists_msg"])
@@ -142,16 +148,21 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 break
         except Exception:
             handle_error(logger, TEXTS["notebook_state_check_error_msg"])
+            sys.exit(1)
         time.sleep(1)
     else:
         handle_error(user_msg=TEXTS["notebook_not_ready_error_msg"])
+        sys.exit(1)
 
     try:
         launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
                    number_of_retries=number_of_retries, url_end=url_end, port=port_number)
     except LaunchError as exe:
         handle_error(logger, exe.message, exe.message)
+        sys.exit(1)
     except ProxyClosingError:
         handle_error(user_msg=TEXTS["proxy_closing_error_msg"])
+        sys.exit(1)
     except Exception:
         handle_error(logger, TEXTS["session_launch_other_error_msg"], TEXTS["session_launch_other_error_msg"])
+        sys.exit(1)

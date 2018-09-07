@@ -21,6 +21,7 @@
 
 import platform
 import os
+from sys import exit
 
 import click
 
@@ -43,9 +44,11 @@ def mounts(state: State):
     try:
         if is_current_user_administrator():
             handle_error(logger, TEXTS["user_is_admin_error_msg"], TEXTS["user_is_admin_error_msg"])
+            exit(1)
     except Exception:
         handle_error(logger, TEXTS["admin_check_error_msg"], TEXTS["admin_check_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     click.echo(TEXTS["main_msg"])
 
@@ -54,6 +57,7 @@ def mounts(state: State):
     except Exception:
         handle_error(logger, TEXTS["get_mount_command_error_msg"], TEXTS["get_mount_command_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
 
 def get_mount_command() -> str:

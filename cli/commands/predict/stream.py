@@ -20,6 +20,7 @@
 #
 
 import json
+from sys import exit
 
 import click
 import requests
@@ -57,9 +58,11 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         inference_instance = get_run(name=name, namespace=namespace)
         if not inference_instance:
             handle_error(user_msg=TEXTS["instance_not_exists_error_msg"].format(name=name))
+            exit(1)
         if not inference_instance.state == RunStatus.RUNNING:
             handle_error(user_msg=TEXTS["instance_not_running_error_msg"]
                          .format(name=name, running_code=RunStatus.RUNNING.value))
+            exit(1)
 
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance)
         stream_url = f'{inference_instance_url}:{method_verb.value}'
@@ -67,6 +70,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         handle_error(logger, TEXTS["instance_get_fail_error_msg"].format(name=name),
                      TEXTS["instance_get_fail_error_msg"].format(name=name),
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     try:
         with open(data, 'r', encoding='utf-8') as data_file:
@@ -74,6 +78,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
     except (json.JSONDecodeError, IOError):
         handle_error(logger, TEXTS["json_load_error_msg"].format(data=data),
                      TEXTS["json_load_error_msg"].format(data=data))
+        exit(1)
 
     try:
         api_key = get_api_key()
@@ -86,3 +91,4 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         if hasattr(e, 'response'):
             error_msg += TEXTS["inferenece_error_response_msg"].format(response_text=e.response.text)
         handle_error(logger, error_msg, error_msg)
+        exit(1)

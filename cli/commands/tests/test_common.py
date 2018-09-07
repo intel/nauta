@@ -94,7 +94,7 @@ def test_list_experiments_failure(mocker):
     api_list_runs_mock.side_effect = RuntimeError
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
-    sys_exit_mock = mocker.patch("sys.exit")
+    sys_exit_mock = mocker.patch.object(common, "exit")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
                             runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)

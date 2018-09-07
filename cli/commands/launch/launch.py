@@ -88,6 +88,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:
                 err_message = str(exe)
             handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
+            sys.exit(1)
 
         click.echo(TEXTS["tb_waiting_msg"])
         for i in range(10):
@@ -117,10 +118,12 @@ def launch_app_with_proxy(k8s_app_name: DLS4EAppNames, no_launch: bool, port: in
         launch_app(k8s_app_name=k8s_app_name, no_launch=no_launch, port=port, namespace=namespace, app_name=app_name)
     except LaunchError as exe:
         handle_error(logger, exe.message, exe.message)
+        exit(1)
     except ProxyClosingError:
-        handle_error(user_msg=TEXTS["app_proxy_exists_error_msg"], exit_code=None)
+        handle_error(user_msg=TEXTS["app_proxy_exists_error_msg"])
     except Exception:
         handle_error(logger, TEXTS["app_proxy_other_error_msg"], TEXTS["app_proxy_other_error_msg"])
+        exit(1)
 
 
 launch.add_command(webui)

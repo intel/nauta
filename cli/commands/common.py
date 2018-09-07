@@ -19,10 +19,12 @@
 # and approved by Intel in writing.
 #
 
-import click
-from tabulate import tabulate
 from typing import List
 from enum import Enum
+from sys import exit
+
+import click
+from tabulate import tabulate
 
 import platform_resources.runs as runs_api
 import platform_resources.experiments as experiments_api
@@ -73,8 +75,10 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
     except runs_api.InvalidRegularExpressionError:
         handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],
                      add_verbosity_msg=verbosity_lvl == 0)
+        exit(1)
     except Exception:
         handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=verbosity_lvl == 0)
+        exit(1)
 
 
 def replace_initializing_runs(run_list: List[Run]):

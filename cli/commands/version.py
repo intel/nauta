@@ -63,4 +63,4 @@ def version(state: State):
                         tablefmt="orgtbl"))
 
     if platform_version_fail:
-        handle_error(logger, error_msg, error_msg, add_verbosity_msg=state.verbosity == 0, exit_code=None)
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=state.verbosity == 0)

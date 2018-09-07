@@ -19,7 +19,7 @@
 # and approved by Intel in writing.
 #
 
-import sys
+from sys import exit
 import time
 
 import click
@@ -55,23 +55,28 @@ def delete(state: State, username: str, purge: bool):
     try:
         if not is_current_user_administrator():
             handle_error(user_msg=TEXTS["user_not_admin_error_msg"])
+            exit(1)
 
         user_state = check_users_presence(username)
 
         if user_state == UserState.NOT_EXISTS:
             handle_error(user_msg=TEXTS["user_not_exists_error_msg"].format(username=username))
+            exit(1)
 
         if user_state == UserState.TERMINATING:
             handle_error(user_msg=TEXTS["user_being_removed"])
+            exit(1)
 
     except Exception:
         handle_error(logger, TEXTS["user_presence_verification_error_msg"],
                      TEXTS["user_presence_verification_error_msg"], add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     click.echo()
-    if not click.confirm(TEXTS["delete_confirm_msg"].format(username=username),):
+    if not click.confirm(TEXTS["delete_confirm_msg"].format(username=username)):
         click.echo(TEXTS["delete_abort_msg"])
-        sys.exit(0)
+        exit(0)
+
     click.echo()
 
     try:
@@ -84,7 +89,7 @@ def delete(state: State, username: str, purge: bool):
                 # failure during purging a user doesn't mean that user wasn't deleted
                 purge_user(username)
             except Exception:
-                handle_error(logger, TEXTS["purge_error_msg"], TEXTS["purge_error_msg"], exit_code=None)
+                handle_error(logger, TEXTS["purge_error_msg"], TEXTS["purge_error_msg"])
 
         # CAN-616 - wait until user has been really deleted
         click.echo(TEXTS["deletion_verification_of_deleting"])
@@ -98,13 +103,15 @@ def delete(state: State, username: str, purge: bool):
         else:
             click.echo()
             click.echo(TEXTS["delete_in_progress_msg"])
-            sys.exit(0)
+            exit(0)
 
         click.echo()
         click.echo(TEXTS["delete_success_msg"].format(username=username))
     except K8sProxyCloseError:
-        handle_error(logger, TEXTS["proxy_error_log_msg"], TEXTS["proxy_error_user_msg"], exit_code=None,
+        handle_error(logger, TEXTS["proxy_error_log_msg"], TEXTS["proxy_error_user_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
     except Exception:
         handle_error(logger, TEXTS["other_error_log_msg"], TEXTS["other_error_user_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)

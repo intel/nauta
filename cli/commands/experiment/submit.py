@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from sys import exit
 from typing import Tuple, List
 import os
 
@@ -44,7 +45,8 @@ DEFAULT_SCRIPT_NAME = "experiment.py"
 
 def validate_script_location(script_location: str):
     if not (os.path.isfile(script_location) or os.path.isdir(script_location)):
-        handle_error(user_msg=TEXTS["script_not_found_error_msg"].format(script_location=script_location), exit_code=2)
+        handle_error(user_msg=TEXTS["script_not_found_error_msg"].format(script_location=script_location))
+        exit(2)
 
 
 def get_default_script_location(script_directory: str) -> str:
@@ -53,9 +55,9 @@ def get_default_script_location(script_directory: str) -> str:
         handle_error(
             user_msg=TEXTS["default_script_not_found_error_msg"].format(
                 script_directory=script_directory, default_script_name=default_script_location
-            ),
-            exit_code=2
+            )
         )
+        exit(2)
     else:
         return default_script_location
 
@@ -63,9 +65,9 @@ def get_default_script_location(script_directory: str) -> str:
 def validate_script_folder_location(script_folder_location: str):
     if not os.path.isdir(script_folder_location):
         handle_error(
-            user_msg=TEXTS["script_dir_not_found_error_msg"].format(script_folder_location=script_folder_location),
-            exit_code=2
+            user_msg=TEXTS["script_dir_not_found_error_msg"].format(script_folder_location=script_folder_location)
         )
+        exit(2)
 
 
 @click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='s')
@@ -102,12 +104,14 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                                          parameter_range=parameter_range, parameter_set=parameter_set,
                                          script_parameters=script_parameters)
     except K8sProxyCloseError as exe:
-        handle_error(user_msg=exe.message, exit_code=None)
+        handle_error(user_msg=exe.message)
         click.echo(exe.message)
     except SubmitExperimentError as exe:
         handle_error(user_msg=TEXTS["submit_error_msg"].format(exception_message=exe.message))
+        exit(1)
     except Exception:
         handle_error(user_msg=TEXTS["submit_other_error_msg"])
+        exit(1)
 
     # display information about status of a training
     click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
@@ -117,3 +121,4 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     # if there is at least one FAILED experiment - application has to return exit code != 0
     if any(run.state == RunStatus.FAILED for run in runs_list):
         handle_error(logger, TEXTS["failed_runs_log_msg"])
+        exit(1)

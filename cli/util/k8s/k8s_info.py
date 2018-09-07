@@ -42,6 +42,10 @@ class PodStatus(Enum):
     FAILED = 'FAILED'
     UNKNOWN = 'UNKNOWN'
 
+    @classmethod
+    def all_members(cls):
+        return str([e.value for e in cls])
+
 
 class NamespaceStatus(Enum):
     ACTIVE = 'Active'

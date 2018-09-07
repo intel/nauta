@@ -23,6 +23,7 @@ import os
 import base64
 import sys
 import getpass
+from sys import exit
 
 import click
 
@@ -87,6 +88,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
     if list_only and filename:
         handle_error(user_msg=TEXTS["f_l_options_exclusion_error_msg"])
+        exit(1)
 
     try:
         try:
@@ -95,21 +97,26 @@ def create(state: State, username: str, list_only: bool, filename: str):
         except ValueError as exe:
             handle_error(logger, TEXTS["name_validation_error_msg"], str(exe),
                          add_verbosity_msg=state.verbosity == 0)
+            exit(1)
 
         if not is_current_user_administrator():
             handle_error(logger, TEXTS["user_not_admin_error_msg"], TEXTS["user_not_admin_error_msg"])
+            exit(1)
 
         user_state = check_users_presence(username)
 
         if user_state == UserState.ACTIVE:
             handle_error(logger, TEXTS["user_already_exists_error_msg"], TEXTS["user_already_exists_error_msg"])
+            exit(1)
 
         if user_state == UserState.TERMINATING:
             handle_error(logger, TEXTS["user_being_removed_error_msg"], TEXTS["user_being_removed_error_msg"])
+            exit(1)
 
     except Exception:
         handle_error(logger, TEXTS["user_verification_error_msg"], TEXTS["user_verification_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     try:
         chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
@@ -127,8 +134,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
         output, err_code = execute_system_command(add_user_command)
 
         if err_code:
-            handle_error(logger, output, TEXTS["user_add_error_msg"], exit_code=None,
-                         add_verbosity_msg=state.verbosity == 0)
+            handle_error(logger, output, TEXTS["user_add_error_msg"], add_verbosity_msg=state.verbosity == 0)
             if not delete_user(username):
                 handle_error(user_msg=TEXTS["remove_user_error_msg"])
             sys.exit(1)
@@ -136,12 +142,12 @@ def create(state: State, username: str, list_only: bool, filename: str):
         try:
             users_password = get_users_token(username)
         except Exception:
-            handle_error(logger, TEXTS["password_gather_error_msg"], TEXTS["password_gather_error_msg"], exit_code=None,
+            handle_error(logger, TEXTS["password_gather_error_msg"], TEXTS["password_gather_error_msg"],
                          add_verbosity_msg=state.verbosity == 0)
             users_password = ""
 
     except Exception:
-        handle_error(logger, TEXTS["user_add_error_msg"], TEXTS["user_add_error_msg"], exit_code=None,
+        handle_error(logger, TEXTS["user_add_error_msg"], TEXTS["user_add_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
         if not delete_user(username):
             handle_error(user_msg=TEXTS["remove_user_error_msg"])
@@ -161,6 +167,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
     except Exception:
         handle_error(logger, TEXTS["config_creation_error_msg"], TEXTS["config_creation_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     if list_only:
         click.echo(TEXTS["list_only_header"])
@@ -174,7 +181,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
             click.echo(TEXTS["config_save_success_msg"].format(filename=filename))
         except Exception:
-            handle_error(logger, TEXTS["config_save_fail_msg"], TEXTS["config_save_fail_msg"], exit_code=None,
+            handle_error(logger, TEXTS["config_save_fail_msg"], TEXTS["config_save_fail_msg"],
                          add_verbosity_msg=state.verbosity == 0)
             click.echo(TEXTS["config_save_fail_instructions_msg"])
             click.echo(kubeconfig)

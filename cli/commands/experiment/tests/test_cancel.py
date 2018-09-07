@@ -27,6 +27,8 @@ from platform_resources.run_model import Run, RunStatus
 from commands.experiment import cancel
 from commands.experiment.cancel import experiment_name, experiment_name_plural
 from platform_resources.tests.test_experiments import TEST_EXPERIMENTS
+from util.k8s.pods import K8SPod
+from util.k8s.k8s_info import PodStatus
 
 EXPERIMENT_NAME = "experiment"
 
@@ -147,7 +149,7 @@ def test_cancel_all_cancelled_successfully(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="y")
     check_command_asserts(prepare_command_mocks, cne_count=2, lkc_count=1, acl_count=1)
 
-    assert f"The following {experiment_name_plural} were cancelled succesfully:" in result.output
+    assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
 
@@ -159,7 +161,7 @@ def test_cancel_some_not_cancelled(prepare_command_mocks: CancelMocks):
 
     check_command_asserts(prepare_command_mocks, cne_count=2, lkc_count=1, acl_count=1)
 
-    assert f"The following {experiment_name_plural} were cancelled succesfully:" in result.output
+    assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
@@ -179,7 +181,7 @@ def test_exception_during_exp_cancellation(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="y")
 
     check_command_asserts(prepare_command_mocks, cne_count=2)
-    assert f"The following {experiment_name_plural} were cancelled succesfully:" in result.output
+    assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
@@ -190,7 +192,8 @@ def test_cancel_missing_parameters(prepare_command_mocks: CancelMocks):
     check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, lkc_count=0,
                           acl_count=0, gex_count=0)
 
-    assert "Name or -m option must be given. Please pass one of them." in result.output
+    assert "Name, -m or at least one of [--pod-ids, --pod-status] option must be given. Please pass one of them." \
+           in result.output
 
 
 def test_cancel_too_many_parameters(prepare_command_mocks: CancelMocks):
@@ -341,3 +344,26 @@ def test_cancel_match_and_name(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
 
     assert "Both name and -m option cannot be given. Please choose one of them." in result.output
+
+
+def test_cancel_pods(mocker):
+    fake_user_namespace_name = 'shawn'
+    fake_k8s_pods = [
+        K8SPod(
+            namespace=fake_user_namespace_name,
+            name='podid1',
+            status=PodStatus.RUNNING,
+            labels={
+                'runName': 'fake-name'
+            }
+        )
+    ]
+    mocker.patch.object(cancel, 'k8s_pods').list_pods.return_value = fake_k8s_pods
+    for fake_pod in fake_k8s_pods:
+        mocker.patch.object(fake_pod, 'delete')
+
+    mocker.patch.object(cancel.click, 'confirm')
+
+    cancel.cancel_pods_mode(fake_user_namespace_name, 'fake-name', 'podid1,podid2', pod_status='running')
+
+    assert fake_k8s_pods[0].delete.call_count == 1

@@ -24,7 +24,7 @@ import time
 from enum import Enum
 import subprocess
 import sys
-from typing import List, Union
+from typing import List
 import errno
 import socket
 import dateutil
@@ -149,8 +149,7 @@ def wait_for_ctrl_c():
         time.sleep(0.1)
 
 
-def handle_error(logger=None, log_msg: str = None, user_msg: str = None, exit_code: Union[int, None] = 1,
-                 add_verbosity_msg: bool = False):
+def handle_error(logger=None, log_msg: str = None, user_msg: str = None, add_verbosity_msg: bool = False):
     """
     Handle error in cli. Log message may be printed. User message may be printed or not, with or without verbosity
     usage info. Execution may end with an exit code. Each combination of these 3 possibilities is achievable by
@@ -159,7 +158,6 @@ def handle_error(logger=None, log_msg: str = None, user_msg: str = None, exit_co
     :param logger: logger which will handle log message. If None, then no message is logged.
     :param log_msg: message to be shown in log. If None, then no message is logged.
     :param user_msg: message to be shown to the user. If None, then no message is shown.
-    :param exit_code: exit code for sys.exit. If None, then execution is not terminated.
     :param add_verbosity_msg: whether to add information about -v usage or not.
     :return:
     """
@@ -168,5 +166,3 @@ def handle_error(logger=None, log_msg: str = None, user_msg: str = None, exit_co
     # Internationalization can be plugged in here.
     if user_msg is not None:
         click.echo(user_msg + (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
-    if exit_code is not None:
-        sys.exit(exit_code)

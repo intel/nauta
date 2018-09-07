@@ -20,6 +20,7 @@
 #
 
 from collections import defaultdict
+from sys import exit
 
 from tabulate import tabulate
 import click
@@ -85,8 +86,8 @@ def view(state: State, experiment_name: str, tensorboard: bool):
         run = runs_api.get_run(name=experiment_name,
                                namespace=namespace)
         if not run:
-            handle_error(user_msg=TEXTS["experiment_not_found_error_msg"].format(experiment_name=experiment_name),
-                         exit_code=2)
+            handle_error(user_msg=TEXTS["experiment_not_found_error_msg"].format(experiment_name=experiment_name))
+            exit(2)
 
         click.echo(
             tabulate(
@@ -132,3 +133,4 @@ def view(state: State, experiment_name: str, tensorboard: bool):
 
     except Exception:
         handle_error(logger, TEXTS["view_other_error_msg"], TEXTS["view_other_error_msg"])
+        exit(1)

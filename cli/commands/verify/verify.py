@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+from sys import exit
+
 import click
 
 from cli_state import common_options, pass_state, State
@@ -43,15 +45,18 @@ def verify(state: State):
         check_connection_to_cluster()
     except KubectlConnectionError as e:
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        exit(1)
     except FileNotFoundError:
         handle_error(logger, TEXTS["kubectl_not_installed_error_msg"], TEXTS["kubectl_not_installed_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     try:
         namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
     except Exception:
         handle_error(logger, TEXTS["get_k8s_namespace_error_msg"], TEXTS["get_k8s_namespace_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
@@ -78,12 +83,15 @@ def verify(state: State):
             handle_error(logger, TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
                          TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
+            exit(1)
         except (RuntimeError, ValueError, TypeError):
             handle_error(logger, TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
                          TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
+            exit(1)
         except Exception:
             handle_error(logger,
                          TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
                          TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
+            exit(1)

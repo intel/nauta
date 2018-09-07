@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+from sys import exit
+
 import click
 from tabulate import tabulate
 
@@ -45,3 +47,4 @@ def list_users(state: State):
                             tablefmt="orgtbl"))
     except Exception:
         handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=state.verbosity == 0)
+        exit(1)

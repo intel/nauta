@@ -21,6 +21,7 @@
 
 import base64
 import os
+from sys import exit
 
 import click
 from tabulate import tabulate
@@ -59,6 +60,7 @@ def launch(state: State, name: str, model_location: str):
     except Exception:
         handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
                           inference_instance.cli_representation.status]],
@@ -75,6 +77,7 @@ def launch(state: State, name: str, model_location: str):
     except Exception:
         handle_error(logger, TEXTS["instance_url_error_msg"], TEXTS["instance_url_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
 
 def get_authorization_header(service_account_name: str, namespace: str):
