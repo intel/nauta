@@ -37,7 +37,7 @@ from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME,
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
-from commands.experiment.common import check_experiment_name
+from commands.experiment.common import check_experiment_name, validate_pack_params_names
 from util.exceptions import K8sProxyCloseError
 from util.system import handle_error
 from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
@@ -51,7 +51,8 @@ logger = initialize_logger(__name__)
 @click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='i')
 @click.option('-n', '--name', default=None, help=TEXTS["help_n"])
 @click.option('-f', '--filename', default=None, help=TEXTS["help_f"])
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"])
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"],
+              callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=TEXTS["help_no_launch"])
 @click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"])
 @common_options()

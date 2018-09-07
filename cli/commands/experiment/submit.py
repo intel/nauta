@@ -31,7 +31,7 @@ from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
-from commands.experiment.common import validate_experiment_name
+from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from platform_resources.run_model import RunStatus
 from util.system import handle_error
 from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
@@ -73,7 +73,8 @@ def validate_script_folder_location(script_folder_location: str):
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=TEXTS["help_sfl"])
 @click.option("-t", "--template", help=TEXTS["help_t"], default="tf-training-tfjob")
 @click.option("-n", "--name", help=TEXTS["help_n"], callback=validate_experiment_name)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"])
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"],
+              callback=validate_pack_params_names)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=TEXTS["help_pr"])
 @click.option("-ps", "--parameter_set", multiple=True, help=TEXTS["help_ps"])
 @click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]')

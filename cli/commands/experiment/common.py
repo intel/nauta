@@ -614,6 +614,13 @@ def validate_experiment_name(ctx, param, value):
     return check_experiment_name(value)
 
 
+def validate_pack_params_names(ctx: click.Context, param, value: List[Tuple[str, str]]):
+    for key, _ in value:
+        if "=" in key:
+            handle_error(user_msg=TEXTS["invalid_pack_param_format_error_msg"].format(key=key))
+    return value
+
+
 def check_experiment_name(value: str) -> str:
     try:
         if value:

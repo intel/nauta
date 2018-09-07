@@ -27,7 +27,7 @@ import pytest
 from commands.experiment.common import submit_experiment, RunSubmission, values_range, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
     check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
-    RunKinds
+    RunKinds, validate_pack_params_names
 
 from util.exceptions import KubectlIntError, SubmitExperimentError
 import util.config
@@ -53,6 +53,10 @@ FAKE_CONTAINER_PORT = 5000
 
 FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
 FAKE_CLI_EXPERIMENT_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, util.config.EXPERIMENTS_DIR_NAME, EXPERIMENT_NAME)
+
+EXAMPLE_PACK_PARAM_KEY = "key"
+INVALID_PACK_PARAM_KEY = "key=value"
+EXAMPLE_PACK_PARAM_VALUE = "value"
 
 
 @pytest.fixture()
@@ -523,3 +527,15 @@ def test_check_run_environment_clear_not_confirmed(mocker):
 
     with pytest.raises(SystemExit):
         check_run_environment(FAKE_CLI_EXPERIMENT_PATH)
+
+
+def test_validate_pack_params_names_valid(mocker):
+    try:
+        validate_pack_params_names(None, None, [(EXAMPLE_PACK_PARAM_KEY, EXAMPLE_PACK_PARAM_VALUE)])
+    except Exception:
+        pytest.fail("Exception should not be thrown when validating example pack params.")
+
+
+def test_validate_pack_params_names_invalid(mocker):
+    with pytest.raises(SystemExit):
+        validate_pack_params_names(None, None, [(INVALID_PACK_PARAM_KEY, EXAMPLE_PACK_PARAM_VALUE)])
