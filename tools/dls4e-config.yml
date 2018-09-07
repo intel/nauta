@@ -56,8 +56,11 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/elasticsearch"
   dls4e/fluentd:
     version: "v0.12"
-    image: "fluent/fluentd-kubernetes-daemonset:v0.12-debian-elasticsearch"
-    method: pull
+    required:
+      BASE_IMAGE: "shared/centos"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/fluentd"
   dls4e/registry:
     version: "2.6.2"
     image: "registry:2.6.2"

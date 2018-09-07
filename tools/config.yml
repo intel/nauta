@@ -102,6 +102,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.6.tar.gz
         dest: kubernetes.tar.gz
         checksum: d91a77a65199f835ad68372fabd99a1f764ec59d9bde222c74224c1bf976ab20
+  shared/build/nginx:
+    version: "v1.13.9"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/nginx"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.src.rpm
+        dest: nginx-1.13.9-1.el7_4.ngx.src.rpm
+        checksum: 98d4329318dc9a681fa5e13cba5bc809bd2f7a97e38b36a1d07cb15a53b855ee
   shared/build/tensorflow/py2.7:
     version: "py2"
     required:
