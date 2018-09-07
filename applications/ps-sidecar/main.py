@@ -27,7 +27,21 @@ from time import sleep
 from kubernetes import client, config
 from kubernetes.client import V1Pod, V1ObjectMeta
 
-log.basicConfig(level=log.DEBUG)
+
+LOGGING_LEVEL_MAPPING = {"DEBUG": log.DEBUG, "INFO": log.INFO, "WARNING": log.WARNING, "ERROR": log.ERROR,
+                         "CRITICAL": log.CRITICAL}
+
+logging_level_str = getenv("LOGGING_LEVEL")
+
+if logging_level_str is None:
+    raise RuntimeError("LOGGING_LEVEL env var is not defined!")
+
+if logging_level_str not in LOGGING_LEVEL_MAPPING.keys():
+    raise RuntimeError("LOGGING_LEVEL env var must be set to one out of {}. Current value: {}"
+                       .format(LOGGING_LEVEL_MAPPING.keys(), logging_level_str))
+
+log.basicConfig(level=logging_level_str)
+log.critical("Ps sidecar log level set to: " + logging_level_str)
 
 config.load_incluster_config()
 

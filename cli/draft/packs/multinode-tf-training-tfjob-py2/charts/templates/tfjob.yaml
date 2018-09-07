@@ -135,6 +135,8 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
+                - name: LOGGING_LEVEL
+                  value: {{ .Values.psSidecarLoggingLevel }}
               volumeMounts:
                 - name: shared-data
                   mountPath: /pod-data

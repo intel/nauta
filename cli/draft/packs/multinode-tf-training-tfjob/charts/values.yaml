@@ -39,5 +39,6 @@ sidecar_resources:
 experimentName: ''
 
 workersCount: 3
+psSidecarLoggingLevel: "WARNING"
 pServersCount: 1
 podCount: 4
