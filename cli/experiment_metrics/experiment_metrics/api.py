@@ -19,7 +19,10 @@
 # and approved by Intel in writing.
 #
 
-from http import HTTPStatus
+try:
+    from http import HTTPStatus  # python3.5+ import
+except ImportError:
+    import httplib as HTTPStatus  # python2.7 import
 import logging
 import os
 
