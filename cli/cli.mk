@@ -72,7 +72,8 @@ test: $(DEV_VIRTUALENV_MARK)
 cli-check: venv-dev test style
 
 test-with-code-cov: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
+	#@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
 
 
 
