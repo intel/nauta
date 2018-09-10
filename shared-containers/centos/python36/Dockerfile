@@ -3,16 +3,12 @@ FROM ${BASE_IMAGE}
 
 RUN yum clean all
 RUN yum update -y
-#RUN yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum install rh-python36 -y
 
-RUN echo $'[ius] \n\
-name=IUS Community Packages for Enterprise Linux 7 - $basearch \n\
-#baseurl=https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/$basearch \n\
-mirrorlist=https://mirrors.iuscommunity.org/mirrorlist?repo=ius-centos7&arch=$basearch&protocol=http \n\
-failovermethod=priority \n\
-enabled=1 \n\
-gpgcheck=0 \n\
-gpgkey=file:///etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY' > /etc/yum.repos.d/ius.repo
+ENV PATH=$PATH:/opt/rh/rh-python36/root/usr/bin
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/rh/rh-python36/root/usr/lib64
+ENV MANPATH=$MANPATH:/opt/rh/rh-python36/root/usr/share/man
+ENV PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/rh/rh-python36/root/usr/lib64/pkgconfig
+ENV XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}:/opt/rh/rh-python36/root/usr/share"
 
-RUN yum install -y python36u python36u-pip python36u-devel
 RUN pip3.6 install -U pip==10.0.1

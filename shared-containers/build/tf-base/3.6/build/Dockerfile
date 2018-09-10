@@ -46,4 +46,5 @@ RUN source /opt/rh/devtoolset-7/enable && mkdir /bazel && \
     cd / && \
     rm -f /bazel/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
 
-RUN ln -fs /usr/bin/${PYTHON} /usr/bin/python
+#RUN ln -fs /usr/bin/${PYTHON} /usr/bin/python
+RUN ln -fs /opt/rh/rh-python36/root/usr/bin/${PYTHON} /usr/bin/python
