@@ -31,6 +31,7 @@ from experiment_metrics.api import publish
 
 progress = 0
 max_progress = 1
+stop_thread = False
 
 if not os.getenv('RUN_NAME', None):
     raise RuntimeError('RUN_NAME env var must be set for publishing progress metrics!')
@@ -73,7 +74,7 @@ def do_batch_inference(server_address, input_dir_path, output_dir_path):
 
 def publish_progress():
     progress_percent = 0
-    while progress_percent != 100:
+    while progress_percent != 100 and not stop_thread:
         new_progress_percent = progress/max_progress * 100
 
         if new_progress_percent != progress_percent:
@@ -103,13 +104,14 @@ def main():
     progress_thread = Thread(target=publish_progress)
     progress_thread.start()
 
-    do_batch_inference(server_address=os.getenv('TENSORFLOW_MODEL_SERVER_SVC_NAME', ''),
-                       input_dir_path=input_dir_path,
-                       output_dir_path=output_dir_path)
-
-    progress_thread.join()
-
-    # TODO: cleanup of k8s resources after inference
+    try:
+        do_batch_inference(server_address=os.getenv('TENSORFLOW_MODEL_SERVER_SVC_NAME', ''),
+                           input_dir_path=input_dir_path,
+                           output_dir_path=output_dir_path)
+    except Exception:
+        global stop_thread
+        stop_thread = True
+        raise
 
 
 if __name__ == '__main__':
