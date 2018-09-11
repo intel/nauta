@@ -40,24 +40,44 @@ BATCH_INFERENCE_TEMPLATE = 'tf-inference-batch'
 logger = initialize_logger(__name__)
 
 
+def validate_local_model_location(local_model_location: str):
+    if not os.path.isdir(local_model_location):
+        handle_error(
+            user_msg=TEXTS["model_dir_not_found_error_msg"].format(local_model_location=local_model_location)
+        )
+        exit(2)
+
+
 # noinspection PyUnusedLocal
 @click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='b')
 @click.option('-n', '--name', help=TEXTS["help_name"], callback=validate_experiment_name)
-@click.option('-m', '--model-location', required=True, help=TEXTS["help_model_location"])
+@click.option('-m', '--model-location', help=TEXTS["help_model_location"])
+@click.option("-l", "--local_model_location", type=click.Path(), help=TEXTS["help_local_model_location"])
 @click.option('-d', '--data', required=True, help=TEXTS["help_data"])
 @click.option('-o', '--output', help=TEXTS["help_output"])
 @click.option('-mn', '--model-name', help=TEXTS["help_model_name"])
 @common_options()
 @pass_state
-def batch(state: State, name: str, model_location: str, data: str, output: str, model_name: str):
+def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
+          model_name: str):
     """
     Starts a new batch instance that will perform prediction on provided data.
     """
+    if not model_location and not local_model_location:
+        handle_error(
+            user_msg=TEXTS["missing_model_location_error_msg"].format(local_model_location=local_model_location)
+        )
+        exit(1)
+
+    if local_model_location:
+        validate_local_model_location(local_model_location)
+
     # noinspection PyBroadException
     try:
         model_name = model_name if model_name else os.path.basename(model_location)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
-        inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
+        inference_instance = start_inference_instance(name=name, model_location=model_location,
+                                                      local_model_location=local_model_location, model_name=model_name,
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
                                                       output_location=output)
     except Exception:

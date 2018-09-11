@@ -32,6 +32,8 @@ spec:
               value: "{{ .Values.modelName }}"
             - name: MODEL_BASE_PATH
               value: "/models"
+            - name: MODEL_PATH
+              value: "{{ .Values.modelPath }}"
           command: ["tf_serving_dls4e"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -50,8 +52,6 @@ spec:
             - name: output-home
               mountPath: /mnt/output/experiment
               subPath: {{ .Values.experimentName }}
-            - name: models
-              mountPath: "/models"
             - name: shared-data
               mountPath: /pod-data
           securityContext:
@@ -82,28 +82,6 @@ spec:
         - name: output-public
           persistentVolumeClaim:
             claimName: output-public
-        - name: models
-          emptyDir: {}
         - name: shared-data
           emptyDir: {}
-      initContainers:
-        - name: init-inference-pod
-          image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
-          command: ['cp', '-rf', "{{ .Values.modelPath }}/.", '/models']
-          volumeMounts:
-            - name: input-home
-              mountPath: /mnt/input/home
-              readOnly: True
-            - name: input-public
-              mountPath: /mnt/input/root
-              readOnly: True
-            - name: output-home
-              mountPath: /mnt/output/home
-            - name: output-public
-              mountPath: /mnt/output/root
-            - name: output-home
-              mountPath: /mnt/output/experiment
-              subPath: {{ .Values.experimentName }}
-            - name: models
-              mountPath: "/models"
   backoffLimit: 5

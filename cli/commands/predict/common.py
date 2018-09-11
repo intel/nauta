@@ -38,19 +38,25 @@ class InferenceVerb(Enum):
 
 def start_inference_instance(name: str,
                              model_location: str,
+                             local_model_location: str,
                              model_name: str,
                              template: str = INFERENCE_TEMPLATE,
                              data_location: str = None,
                              output_location: str = None) -> RunSubmission:
 
-    pack_params = [('modelPath', model_location), ('modelName', model_name)]
+    pack_params = [('modelName', model_name)]
 
+    if model_location:
+        pack_params.append(('modelPath', model_location))
+    elif local_model_location:
+        pack_params.append(('modelPath', '/app'))
     if data_location:
         pack_params.append(('dataPath', data_location))
     if output_location:
         pack_params.append(('outputPath', output_location))
 
-    runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params)
+    runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
+                                script_folder_location=local_model_location)
     return runs[0]
 
 

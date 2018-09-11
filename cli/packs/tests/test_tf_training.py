@@ -130,6 +130,18 @@ def test_modify_dockerfile(mocker):
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
 
 
+def test_modify_dockerfile_if_script_path_provided(mocker):
+    script_folder_location = '/app'
+    open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_DOCKERFILE)
+    sh_move_mock = mocker.patch("shutil.move")
+
+    tf_training.modify_dockerfile(EXPERIMENT_FOLDER, None, None, script_folder_location=script_folder_location)
+
+    assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
+    assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
+
+
+
 def test_update_configuration_success(mocker):
     modify_values_yaml_mock = mocker.patch("packs.tf_training.modify_values_yaml")
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")

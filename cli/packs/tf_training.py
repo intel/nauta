@@ -58,7 +58,8 @@ def update_configuration(run_folder: str, script_location: str,
                          local_registry_port: int,
                          cluster_registry_port: int,
                          pack_type: str,
-                         pack_params: List[Tuple[str, str]]):
+                         pack_params: List[Tuple[str, str]],
+                         script_folder_location: str = None):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -77,7 +78,8 @@ def update_configuration(run_folder: str, script_location: str,
         modify_values_yaml(run_folder, script_location, script_parameters, pack_params=pack_params,
                            experiment_name=experiment_name, run_name=run_name,
                            pack_type=pack_type, cluster_registry_port=cluster_registry_port)
-        modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port)
+        modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
+                          script_folder_location=script_folder_location)
         modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
@@ -86,7 +88,8 @@ def update_configuration(run_folder: str, script_location: str,
     log.debug("Update configuration - end")
 
 
-def modify_dockerfile(experiment_folder: str, script_location: str, local_registry_port: int):
+def modify_dockerfile(experiment_folder: str, script_location: str, local_registry_port: int,
+                      script_folder_location: str = None):
     log.debug("Modify dockerfile - start")
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
@@ -95,7 +98,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
     with open(dockerfile_name, "r") as dockerfile:
         for line in dockerfile:
             if line.startswith("ADD training.py"):
-                if script_location:
+                if script_location or script_folder_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM dls4e/tensorflow:1.9.0-py"):
                 dls4e_config_map = DLS4EConfigMap()

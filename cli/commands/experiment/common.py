@@ -448,7 +448,8 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
                              script_parameters=script_parameters,
                              experiment_name=experiment_name, run_name=run_name,
                              local_registry_port=local_registry_port, cluster_registry_port=cluster_registry_port,
-                             pack_type=pack_type, pack_params=pack_params)
+                             pack_type=pack_type, pack_params=pack_params,
+                             script_folder_location=script_folder_location)
     except Exception as exe:
         delete_environment(run_folder)
         raise KubectlIntError(exe) from exe

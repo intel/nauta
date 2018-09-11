@@ -222,6 +222,7 @@ PREDICT_BATCH_CMD_TEXTS = {
                  "out the location from one of the system's shares.",
     "help_model_location": "Path to saved model that will be used for inference. Model must be located on one of the " 
                            "input or output system shares (e.g. /mnt/input/saved_model).",
+    "help_local_model_location": "Local path to saved model that will be used for inference. Model content will be copied into an image",
     "help_model_name": "Name of a model passed as a servable name. By default it is the name of directory in model's " 
                        "location.",
     "help_name": "name of a predict session",
@@ -231,7 +232,11 @@ PREDICT_BATCH_CMD_TEXTS = {
     "table_name_header": "Prediction instance",
     "table_model_location_header": "Model location",
     "table_status_header": "State",
-    "table_headers": ["Prediction instance", "Model location", "State"]
+    "table_headers": ["Prediction instance", "Model location", "State"],
+    "model_dir_not_found_error_msg": "Cannot find: {local_model_location}. local_model_location must be a path to "
+                                     "existing directory.",
+    "missing_model_location_error_msg": "Missing model location param - "
+                                        "'model location' or 'local model location' required"
 }
 
 EXPERIMENT_CMD_TEXTS = {

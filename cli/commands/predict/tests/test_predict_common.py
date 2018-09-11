@@ -31,7 +31,7 @@ def test_start_inference_instance(mocker):
     fake_experiment = MagicMock()
     submit_experiment_mock.return_value = [fake_experiment], 'bla'
 
-    inference_instance = start_inference_instance(name='', model_location='', model_name='')
+    inference_instance = start_inference_instance(name='', model_location='', model_name='', local_model_location='')
 
     assert inference_instance == fake_experiment
 
