@@ -22,6 +22,7 @@
 import logging
 import os
 from typing import List
+import re
 
 from util.config import Config
 from util.system import execute_system_command
@@ -33,6 +34,7 @@ logger = initialize_logger('draft.cmd')
 
 DRAFT_BIN = 'draft'
 DRAFT_HOME_FOLDER = ".draft"
+DRAFT_LOGS_FOLDER = "logs"
 
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
@@ -67,6 +69,31 @@ def create(working_directory: str = None, pack_type: str = None) -> (str, int):
 
 def up(working_directory: str = None, namespace: str = None) -> (str, int):
     output, exit_code = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
+    # displaying logs from draft - only in debug mode
+    pattern = "Inspect the logs with `draft logs (.*)`"
+
+    p = re.compile(pattern)
+
+    search_result = p.search(output)
+
+    try:
+        if search_result:
+            draft_logs_filename = search_result.group(1)
+
+            config_path = Config().config_path
+            filename = os.path.join(config_path, DRAFT_HOME_FOLDER, DRAFT_LOGS_FOLDER, draft_logs_filename)
+
+            with open(filename, "r") as file:
+                logger.debug("Draft logs:")
+                logger.debug(file.read())
+                logger.debug(20*"-")
+        else:
+            logger.debug("Lack of logs from draft.")
+    except Exception as exe:
+        # exception here shouldn't block finishing of the operation
+        error_message = TEXTS["problems_during_getting_draft_logs"].format(exception=str(exe))
+        logger.error(error_message)
+
     if not exit_code:
         output, exit_code = check_up_status(output)
 

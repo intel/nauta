@@ -424,7 +424,8 @@ EXPERIMENT_COMMON_TEXTS = {
     "invalid_pack_param_format_error_msg": "Invalid pack params format for param: {key}. Key cannot contain '='. "
                                            "Specify pack params in format 'key value' not as 'key=value'.",
     "experiment_name_too_long_error_msg": "Name given by a user cannot be longer than 30 characters.",
-    "error_during_patching_run": "Error during patching a run occured {}."
+    "error_during_patching_run": "Error during patching a run occured {}.",
+    "problems_during_getting_draft_logs": "Error during getting draft logs : {exception}"
 }
 
 DRAFT_CMD_TEXTS = {
