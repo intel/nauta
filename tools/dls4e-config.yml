@@ -258,6 +258,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/fluentd"
       chart_values:
         image: "{{ image_local_url['dls4e/fluentd'] }}"
+        centos_image: "{{ image_local_url['dls4e/centos'] }}"
     samba:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/samba"
