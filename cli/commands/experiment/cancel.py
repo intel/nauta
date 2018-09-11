@@ -23,10 +23,13 @@ from collections import defaultdict
 import re
 import sys
 from sys import exit
+from enum import Enum
+
 
 import click
 from typing import List, Tuple
 
+from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -62,7 +65,8 @@ experiment_name_plural = 'experiments'
 @click.option('-s', '--pod-status', help=TEXTS["help_s"].format(available_statuses=PodStatus.all_members()))
 @common_options()
 @pass_state
-def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str):
+def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
+           listed_runs_kinds: List[Enum] = [RunKinds.TRAINING, RunKinds.JUPYTER]):
     """
     Cancels chosen experiments based on a name provided as a parameter.
     """
@@ -99,11 +103,19 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         name = match
 
     list_of_all_runs = None
+
+    list_of_applicable_states = [RunStatus.QUEUED, RunStatus.RUNNING]
+
+    if purge:
+        list_of_applicable_states.extend([RunStatus.FAILED, RunStatus.COMPLETE, RunStatus.CANCELLED])
+
     try:
         if search_for_experiment:
-            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=name)
+            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=name,
+                                         state_list=list_of_applicable_states, run_kinds_filter=listed_runs_kinds)
         else:
-            list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name)
+            list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
+                                         state_list=list_of_applicable_states, run_kinds_filter=listed_runs_kinds)
     except Exception:
         handle_error(logger, TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural),
                      TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural))

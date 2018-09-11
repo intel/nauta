@@ -26,7 +26,7 @@ from util.aliascmd import AliasCmd
 import commands.experiment.cancel
 from util.logger import initialize_logger
 from cli_text_consts import PREDICT_CANCEL_CMD_TEXTS as TEXTS
-
+from commands.experiment.common import RunKinds
 
 logger = initialize_logger(__name__)
 
@@ -44,4 +44,4 @@ def cancel(context, state: State, name: str, match: str, purge: bool):
     """
     commands.experiment.cancel.experiment_name = TEXTS["experiment_name"]
     commands.experiment.cancel.experiment_name_plural = TEXTS["experiment_name_plural"]
-    context.forward(commands.experiment.cancel.cancel)
+    context.forward(commands.experiment.cancel.cancel, listed_runs_kinds=[RunKinds.INFERENCE])

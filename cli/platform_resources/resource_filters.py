@@ -38,16 +38,18 @@ def filter_by_state(resource_object_dict: dict, state: Enum = None):
     return resource_object_dict['spec']['state'] == state.value if state else True
 
 
-def filter_run_by_state(resource_object_dict: dict, state: Enum = None):
-    if not state:
+def filter_run_by_state(resource_object_dict: dict, state_list: List[Enum] = None):
+    if not state_list or not all(state_list):
         return True
 
     current_state = resource_object_dict['spec'].get('state')
-
     if current_state:
-        return current_state == state.value
+        if [item for item in state_list if item.value == current_state]:
+            return True
+        else:
+            return False
     else:
-        if state == RunStatus.CREATING:
+        if state_list and state_list[0] == RunStatus.CREATING:
             return True
         else:
             return False
@@ -61,7 +63,7 @@ def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
     if not state:
         return True
 
-    return not filter_run_by_state(resource_object_dict, state)
+    return not filter_run_by_state(resource_object_dict, [state])
 
 
 def filter_by_experiment_name(resource_object_dict: dict, exp_name: str = None):
