@@ -56,3 +56,5 @@
   fail:
     msg: Current server is not set in kubeconfig
   when: not kubectl_current_server
+
+- include_tasks: condition.yml

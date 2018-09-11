@@ -1,0 +1,17 @@
+---
+
+verification_checks:
+  - message: "Redsocks feature is enabled. IP parameter has to be defined."
+    condition: "{{ (features.redsocks | bool) and (features_config.redsocks is not defined or features_config.redsocks.IP is not defined) }}"
+
+  - message: "Redsocks feature is enabled. Port parameter has to be defined."
+    condition: "{{ (features.redsocks | bool) and (features_config.redsocks is not defined or features_config.redsocks.Port is not defined) }}"
+
+  - message: "Redsocks IP parameter has to be valid ip"
+    condition: "{{ (features_config.redsocks.IP | default('') != '') and not (features_config.redsocks.IP | ipaddr) }}"
+
+  - message: "Redsocks port parameter has to be integer"
+    condition: "{{ (features_config.redsocks.Port | default('') != '') and not (features_config.redsocks.Port | int) }}"
+
+  - message: "Redsocks port parameter has to be valid port number (1 - 65535)"
+    condition: "{{ (features_config.redsocks.Port | default('') != '') and not (features_config.redsocks.Port | int < 65535) }}"

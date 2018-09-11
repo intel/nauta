@@ -1,0 +1,6 @@
+---
+
+- name: Fail if test failed
+  fail:
+    msg: "{{ message }}"
+  when: conditions | bool

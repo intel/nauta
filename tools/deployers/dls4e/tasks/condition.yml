@@ -1,0 +1,8 @@
+---
+
+- name: Run conditions
+  vars:
+    conditions: "{{ item.condition }}"
+    message: "{{ item.message }}"
+  include_tasks: condition_test.yml
+  with_items: "{{ verification_checks }}"
