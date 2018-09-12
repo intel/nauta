@@ -34,6 +34,7 @@ from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               PodStatus, get_app_service_node_port, get_pods, NamespaceStatus
 from util.config import DLS4EConfigMap
 from util.app_names import DLS4EAppNames
+from util.exceptions import KubectlIntError
 
 test_namespace = "test_namespace"
 
@@ -191,6 +192,20 @@ def test_delete_namespace(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     delete_namespace(test_namespace)
 
     assert mocked_k8s_CoreV1Api.delete_namespace.call_count == 1
+
+
+def test_delete_namespace_exception(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.delete_namespace.side_effect = RuntimeError()
+
+    with pytest.raises(KubectlIntError):
+        delete_namespace(test_namespace)
+
+
+def test_delete_namespace_failure(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.delete_namespace.return_value = V1Status(status="{'phase': 'Other'}")
+
+    with pytest.raises(KubectlIntError):
+        delete_namespace(test_namespace)
 
 
 def test_get_config_map_data(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):

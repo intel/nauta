@@ -263,6 +263,7 @@ EXPERIMENT_LOGS_CMD_TEXTS = {
     "help_p": "Get logs only for pods with given status.",
     "help_m": "If given, command searches for logs from experiments matching the value of this option. "
               "This option cannot be used along with the NAME argument.",
+    "help_o": "If given - logs are stored in a file with a name derived from a name of an experiment.",
     "proxy_creation_error_msg": "Error during creation of a proxy for elasticsearch.",
     "logs_get_other_error_msg": "Failed to get experiment logs.",
     "experiment_not_exists_error_msg": "Experiment with name {experiment_name} does not exist.",
@@ -271,7 +272,15 @@ EXPERIMENT_LOGS_CMD_TEXTS = {
     "proxy_close_user_error_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if "
                                   "yes - close it manually.",
     "name_m_both_given_error_msg": "Both experiment name and -m option cannot be given. Please choose one of them.",
-    "name_m_none_given_error_msg": "Error: Experiment name or -m option must be given. Please pass one of them."
+    "name_m_none_given_error_msg": "Error: Experiment name or -m option must be given. Please pass one of them.",
+    "logs_storing_confirmation": "Logs from the {experiment_name} experiment will be stored in "
+                                 "the {filename} file. Should the app proceed?",
+    "logs_storing_confirmation_file_exists": "Logs from the {experiment_name} experiment will be stored in the "
+                                             "{filename} file. The file with this "
+                                             "name already exists. Should the app proceed?",
+    "logs_storing_error": "Some problems occurred during storing a file with logs. {exception_message}",
+    "logs_storing_final_message": "Logs have been written to the file mentioned above.",
+    "more_exp_logs_message": "There is more than one log to be stored. Each log will be stored in a separate file."
 }
 
 EXPERIMENT_SUBMIT_CMD_TEXTS = {

@@ -44,7 +44,7 @@ def test_start_port_forwarding_success(mock_k8s_svc, mocker):
     subprocess_command_mock = mocker.patch('util.system.execute_subprocess_command')
     check_port_avail = mocker.patch("util.k8s.kubectl.check_port_availability", return_value=True)
 
-    process, _, _ = kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH)
+    process, _, _ = kubectl.start_port_forwarding(DLS4EAppNames.ELASTICSEARCH, number_of_retries=2)
 
     assert process, "proxy process doesn't exist."
     assert subprocess_command_mock.call_count == 1, "kubectl proxy-forwarding command wasn't called"

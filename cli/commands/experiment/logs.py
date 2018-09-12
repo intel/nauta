@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+import os.path
 from sys import exit
 
 import click
@@ -43,21 +44,21 @@ logger = initialize_logger(__name__)
 @click.command(help=TEXTS["help"], cls=AliasCmd, alias='lg')
 @click.argument('experiment-name', required=False)
 @click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=TEXTS["help_s"])
-@click.option('-sd', '--start-date', default=None, help=TEXTS["help_sd"])
-@click.option('-ed', '--end-date', default=None, help=TEXTS["help_ed"])
-@click.option('-i', '--pod-ids', default=None, help=TEXTS["help_i"])
-@click.option('-p', '--pod-status', default=None, type=click.Choice([status.name for status in PodStatus]),
+@click.option('-sd', '--start-date', help=TEXTS["help_sd"])
+@click.option('-ed', '--end-date', help=TEXTS["help_ed"])
+@click.option('-i', '--pod-ids', help=TEXTS["help_i"])
+@click.option('-p', '--pod-status', type=click.Choice([status.name for status in PodStatus]),
               help=TEXTS["help_p"])
-@click.option('-m', '--match', default=None, help=TEXTS["help_m"])
+@click.option('-m', '--match', help=TEXTS["help_m"])
+@click.option('-o', '--output', help=TEXTS["help_o"], is_flag=True)
 @common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
-         end_date: str, pod_ids: str, pod_status: PodStatus, match: str):
+         end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool):
     """
     Show logs for a given experiment.
     """
     # check whether we have runs with a given name
-
     if experiment_name and match:
         handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
         exit(1)
@@ -94,15 +95,6 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
 
                 experiments_logs[run.name] = experiment_logs
 
-            if len(experiments_logs) == 1:
-                click.echo(experiment_logs)
-            else:
-                for key, value in experiments_logs.items():
-                    click.echo(f'Experiment : {key}')
-                    click.echo("")
-                    click.echo(value)
-                    click.echo("")
-
     except K8sProxyCloseError:
         handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
         exit(1)
@@ -120,3 +112,35 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
     except Exception:
         handle_error(logger, TEXTS["logs_get_other_error_msg"], TEXTS["logs_get_other_error_msg"])
         exit(1)
+
+    if output:
+        if len(experiments_logs) > 1:
+            click.echo(TEXTS["more_exp_logs_message"])
+
+        for key, value in experiments_logs.items():
+            filename = key + '.log'
+            confirmation_message = TEXTS["logs_storing_confirmation"].format(filename=filename,
+                                                                             experiment_name=key)
+            if os.path.isfile(filename):
+                confirmation_message = TEXTS["logs_storing_confirmation_file_exists"].format(filename=filename,
+                                                                                             experiment_name=key)
+
+            if click.confirm(confirmation_message, default=True):
+                try:
+                    with open(filename, 'w') as file:
+                        file.write(experiment_logs)
+                except Exception as exe:
+                    handle_error(logger,
+                                 TEXTS["logs_storing_error"].format(exception_message=exe.message),
+                                 TEXTS["logs_storing_error"].format(exception_message=exe.message))
+                    exit(1)
+        click.echo(TEXTS["logs_storing_final_message"])
+    else:
+        if len(experiments_logs) == 1:
+            click.echo(experiment_logs)
+        else:
+            for key, value in experiments_logs.items():
+                click.echo(f'Experiment : {key}')
+                click.echo()
+                click.echo(value)
+                click.echo()
