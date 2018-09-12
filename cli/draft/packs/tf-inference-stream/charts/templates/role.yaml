@@ -23,7 +23,7 @@ rules:
   resources:
   - "services/proxy"
   resourceNames:
-  - "{{ .Release.Name }}"
+  - "{{ .Release.Name }}:rest-port"
   verbs:
   - "get"
   - "create"
