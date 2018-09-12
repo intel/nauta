@@ -20,6 +20,7 @@
 #
 
 from collections import defaultdict
+from typing import List
 from sys import exit
 
 from tabulate import tabulate
@@ -72,6 +73,59 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     return msg
 
 
+def sum_cpu_resources(cpu_resources: List[str]):
+    """ Sum cpu resources given in k8s format and return the sum in the same format. """
+    cpu_sum = 0
+    for cpu_resource in cpu_resources:
+        if not cpu_resource:
+            continue
+        # If CPU resources are gives as for example 100m, we simply strip last character and sum leftover numbers.
+        elif cpu_resource[-1] == "m":
+            cpu_sum += int(cpu_resource[:-1])
+        # Else we assume that cpu resources are given as float value of normal CPUs instead of miliCPUs.
+        else:
+            cpu_sum += int(float(cpu_resource) * 1000)
+    return str(cpu_sum) + "m"
+
+
+def sum_mem_resources(mem_resources: List[str]):
+    """
+    Sum memory resources given in k8s format and return the sum converted to byte units with base 2 - for example KiB.
+    """
+    PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
+    PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
+    mem_sum = 0
+
+    for mem_resource in mem_resources:
+        if not mem_resource:
+            continue
+        # If last character is "i" then assume that resource is given as for example 1000Ki.
+        elif mem_resource[-1] == "i" and mem_resource[-2:] in PREFIX_I_VALUES:
+            prefix = mem_resource[-2:]
+            mem_sum += int(mem_resource[:-2]) * PREFIX_I_VALUES[prefix]
+        # If last character is one of the normal exponent prefixes (with base 10) then assume that resource is given
+        # as for example 1000K.
+        elif mem_resource[-1] in PREFIX_VALUES:
+            prefix = mem_resource[-1]
+            mem_sum += int(mem_resource[:-1]) * PREFIX_VALUES[prefix]
+        # If there is e contained inside resource string then assume that it is given in exponential format.
+        elif "e" in mem_resource:
+            mem_sum += int(float(mem_resource))
+        else:
+            mem_sum += int(mem_resource)
+
+    mem_sum_partial_strs = []
+    for prefix, value in PREFIX_I_VALUES.items():
+        mem_sum_partial = mem_sum // value
+        if mem_sum_partial != 0:
+            mem_sum_partial_strs.append(str(mem_sum_partial) + prefix + "B")
+            mem_sum = mem_sum % value
+    if len(mem_sum_partial_strs) == 0:
+        return "0KiB"
+    else:
+        return " ".join(mem_sum_partial_strs)
+
+
 @click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
 @click.option('-tb', '--tensorboard', default=None, help=TEXTS["help_t"], is_flag=True)
@@ -100,6 +154,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
         pods = get_pods(label_selector="runName=" + experiment_name)
 
         tabular_output = []
+        containers_resources = []
 
         for pod in pods:
             status_string = ""
@@ -114,6 +169,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                     container_statuses[container_status.name] = container_status.state
 
             container_details = []
+
             for container in pod.spec.containers:
                 container_description = TEXTS["container_details_msg"].format(name=container.name,
                                                                               status=container_status_to_msg(
@@ -123,6 +179,7 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                                                                               resources=container_resources_to_msg(
                                                                                   container.resources))
                 container_details.append(container_description)
+                containers_resources.append(container.resources)
 
             container_details = ''.join(container_details)
             tabular_output.append([
@@ -130,6 +187,35 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 container_details
             ])
         click.echo(tabulate(tabular_output, TEXTS["pods_table_headers"], tablefmt="orgtbl"))
+
+        try:
+            cpu_requests_sum = sum_cpu_resources(
+                [container_resource.requests["cpu"]
+                 for container_resource in containers_resources if container_resource.requests])
+            mem_requests_sum = sum_mem_resources(
+                [container_resource.requests["memory"]
+                 for container_resource in containers_resources if container_resource.requests])
+            cpu_limits_sum = sum_cpu_resources(
+                [container_resource.limits["cpu"]
+                 for container_resource in containers_resources if container_resource.limits])
+            mem_limits_sum = sum_mem_resources(
+                [container_resource.limits["memory"]
+                 for container_resource in containers_resources if container_resource.limits])
+        except ValueError as exception:
+            handle_error(logger, TEXTS["resources_sum_parsing_error_msg"].format(error_msg=str(exception)),
+                         TEXTS["resources_sum_parsing_error_msg"].format(error_msg=str(exception)))
+
+        click.echo(TEXTS["resources_sum_list_header"])
+        click.echo(
+            tabulate(
+                list(
+                    zip(
+                        TEXTS["resources_sum_table_rows_headers"],
+                        [cpu_requests_sum, mem_requests_sum, cpu_limits_sum, mem_limits_sum]
+                    )
+                ),
+                TEXTS["resources_sum_table_headers"], tablefmt="orgtbl")
+        )
 
     except Exception:
         handle_error(logger, TEXTS["view_other_error_msg"], TEXTS["view_other_error_msg"])

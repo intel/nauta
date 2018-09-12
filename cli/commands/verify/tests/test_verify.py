@@ -75,3 +75,39 @@ def test_verify_with_kubectl_connection_success(mocker):
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count != 0, "dependency was checked"
+
+
+def test_verify_with_kubectl_namespace_get_error(mocker):
+    mocker.patch("cli_state.verify_cli_config_path")
+    check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    admin_check_mock = mocker.patch("commands.verify.verify.is_current_user_administrator")
+    admin_check_mock.return_value = False
+    get_namespace_mock = mocker.patch("commands.verify.verify.get_kubectl_current_context_namespace")
+    get_namespace_mock.side_effect = Exception
+
+    runner = CliRunner()
+    result = runner.invoke(verify.verify, [])
+
+    assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_dependency_mock.call_count == 0, "dependency was checked"
+
+    assert TEXTS["get_k8s_namespace_error_msg"] in result.output, \
+        "Bad output. Namespace get error should be indicated in the console."
+
+
+def test_verify_with_kubectl_admin_check_error(mocker):
+    mocker.patch("cli_state.verify_cli_config_path")
+    check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    admin_check_mock = mocker.patch("commands.verify.verify.is_current_user_administrator")
+    admin_check_mock.side_effect = Exception
+
+    runner = CliRunner()
+    result = runner.invoke(verify.verify, [])
+
+    assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_dependency_mock.call_count == 0, "dependency was checked"
+
+    assert TEXTS["get_k8s_namespace_error_msg"] in result.output, \
+        "Bad output. Admin check error should be indicated in the console."

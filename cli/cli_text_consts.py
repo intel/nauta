@@ -396,7 +396,11 @@ EXPERIMENT_VIEW_CMD_TEXTS = {
     "container_terminated_msg": "Terminated, ",
     "container_waiting_msg": "Waiting, ",
     "container_requests_list_header": "- Requests:\n{}",
-    "container_limits_list_header": "- Limits:\n{}"
+    "container_limits_list_header": "- Limits:\n{}",
+    "resources_sum_list_header": "\nResources used by pods:\n",
+    "resources_sum_parsing_error_msg": "There was an error when trying to parse pods resources. Error msg: {error_msg}",
+    "resources_sum_table_headers": ["Resource type", "Total usage"],
+    "resources_sum_table_rows_headers": ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"]
 }
 
 EXPERIMENT_COMMON_TEXTS = {

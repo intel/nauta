@@ -66,6 +66,10 @@ class ViewMocks:
         self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
         self.format_timestamp = mocker.patch('platform_resources.run_model.format_timestamp_for_cli')
         self.format_timestamp.return_value = '2018-04-26 13:43:01'
+        self.sum_cpu_resources = mocker.patch("commands.experiment.view.sum_cpu_resources")
+        self.sum_cpu_resources.return_value = "100m"
+        self.sum_mem_resources = mocker.patch("commands.experiment.view.sum_mem_resources")
+        self.sum_mem_resources.return_value = "1Gi"
 
 
 @pytest.fixture
@@ -82,8 +86,32 @@ def test_view_experiment_success(prepare_mocks: ViewMocks):
     assert TEST_RUNS[0].name in result.output, "Bad output."
     assert TEST_RUNS[0].submitter in result.output, "Bad output."
     assert "2018-04-26 13:43:01" in result.output, result.output
+    assert "100m" in result.output, "Bad output"
+    assert "1Gi" in result.output, "Bad output"
 
     assert result.exit_code == 0
+
+
+def test_view_experiment_cpu_resources_parse_fail(prepare_mocks: ViewMocks):
+    prepare_mocks.sum_cpu_resources.side_effect = ValueError("error")
+
+    runner = CliRunner()
+    result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
+
+    assert TEXTS["resources_sum_parsing_error_msg"].format(error_msg="error") in result.output, "Bad output"
+
+    assert result.exit_code == 1
+
+
+def test_view_experiment_mem_resources_parse_fail(prepare_mocks: ViewMocks):
+    prepare_mocks.sum_mem_resources.side_effect = ValueError("error")
+
+    runner = CliRunner()
+    result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
+
+    assert TEXTS["resources_sum_parsing_error_msg"].format(error_msg="error") in result.output, "Bad output"
+
+    assert result.exit_code == 1
 
 
 def test_view_experiments_not_found(prepare_mocks: ViewMocks):
@@ -119,7 +147,7 @@ def test_view_experiment_no_pods(prepare_mocks: ViewMocks):
     result = runner.invoke(view.view, [TEST_RUNS[0].name])
 
     assert prepare_mocks.get_run.call_count == 1, "Experiments were not retrieved"
-    assert result.output.count("\n") == 8, "Bad output."
+    assert result.output.count("\n") == 17, "Bad output."
 
 
 def test_container_volume_mounts_to_msg():
@@ -147,3 +175,75 @@ def test_container_resources_to_msg():
     assert '- Limits:' in msg
     assert f'cpu: {resources.limits["cpu"]}' in msg
     assert f'mem: {resources.limits["mem"]}' in msg
+
+
+def test_sum_cpu_resources_empty_list():
+    cpu_resources = []
+    expected_result = "0m"
+
+    result = view.sum_cpu_resources(cpu_resources)
+
+    assert result == expected_result
+
+
+def test_sum_cpu_resources_example_list():
+    cpu_resources = ["30m", "40m", "700m"]
+    expected_result = "770m"
+
+    result = view.sum_cpu_resources(cpu_resources)
+
+    assert result == expected_result
+
+
+def test_sum_cpu_resources_example_list_with_none():
+    cpu_resources = ["30m", "40m", "700m", None, "700m", "33m"]
+    expected_result = "1503m"
+
+    result = view.sum_cpu_resources(cpu_resources)
+
+    assert result == expected_result
+
+
+def test_sum_cpu_resources_example_list_with_mixed():
+    cpu_resources = ["30m", "40m", "700m", None, "700m", "33m", "1", "2.5"]
+    expected_result = "5003m"
+
+    result = view.sum_cpu_resources(cpu_resources)
+
+    assert result == expected_result
+
+
+def test_sum_mem_resources_empty_list():
+    mem_resources = []
+    expected_result = "0KiB"
+
+    result = view.sum_mem_resources(mem_resources)
+
+    assert result == expected_result
+
+
+def test_sum_mem_resources_example_list():
+    mem_resources = ["10Gi", "34Mi", "50Mi", "950Mi", "50Ki", "60Ei"]
+    expected_result = "60EiB 11GiB 10MiB 50KiB"
+
+    result = view.sum_mem_resources(mem_resources)
+
+    assert result == expected_result
+
+
+def test_sum_mem_resources_example_with_none():
+    mem_resources = [None, "10Gi", "34Mi", None, "50Mi", "950Mi", None, "50Ki", "60Ei"]
+    expected_result = "60EiB 11GiB 10MiB 50KiB"
+
+    result = view.sum_mem_resources(mem_resources)
+
+    assert result == expected_result
+
+
+def test_sum_mem_resources_example_with_mixed():
+    mem_resources = ["50Ki", "1000K", "1024", "1000000", "52Ki"]
+    expected_result = "2MiB 8KiB"
+
+    result = view.sum_mem_resources(mem_resources)
+
+    assert result == expected_result
