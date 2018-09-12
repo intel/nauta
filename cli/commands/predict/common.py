@@ -38,9 +38,9 @@ class InferenceVerb(Enum):
 
 def start_inference_instance(name: str,
                              model_location: str,
-                             local_model_location: str,
                              model_name: str,
                              template: str = INFERENCE_TEMPLATE,
+                             local_model_location: str = None,
                              data_location: str = None,
                              output_location: str = None) -> RunSubmission:
 
