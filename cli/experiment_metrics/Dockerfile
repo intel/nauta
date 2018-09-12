@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=tensorflow/tensorflow:1.8.0-py3
+ARG BASE_IMAGE=python:3.6.5
 FROM ${BASE_IMAGE}
 
 ADD ./ /opt/experiment_metrics

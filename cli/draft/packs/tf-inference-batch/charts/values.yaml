@@ -22,3 +22,5 @@ resources:
 
 experimentName: ''
 podCount: 2
+
+logLevel: 'INFO'

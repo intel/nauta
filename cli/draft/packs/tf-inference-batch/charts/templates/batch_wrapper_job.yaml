@@ -33,6 +33,8 @@ spec:
               value: "{{ .Release.Name }}:{{ .Values.containerPort }}"
             - name: RUN_NAME
               value: {{ .Release.Name }}
+            - name: LOG_LEVEL
+              value: "{{ .Values.logLevel }}"
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home
