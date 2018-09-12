@@ -1,7 +1,14 @@
+log_format proxy '$remote_addr [$time_local] '
+                 '$protocol $status $bytes_sent $bytes_received '
+                 '$session_time "$upstream_addr" '
+                 '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
 server {
 {% for port in kubernetes_network.external_ports %}
     listen {{ port }};
 {% endfor %}
+    access_log  /var/log/nginx/kubernetes.log proxy;
+    error_log  /var/log/nginx/kubernetes.error;
     proxy_pass {{ kubernetes_network.svc_list.apiservice.consul_name }}:{{ kubernetes_network.internal_port }};
     proxy_timeout 900m;
 }
