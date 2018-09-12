@@ -27,6 +27,7 @@ from tabulate import tabulate
 import click
 
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS
+from commands.launch.launch import tensorboard as tensorboard_command
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods
@@ -131,7 +132,8 @@ def sum_mem_resources(mem_resources: List[str]):
 @click.option('-tb', '--tensorboard', default=None, help=TEXTS["help_t"], is_flag=True)
 @common_options()
 @pass_state
-def view(state: State, experiment_name: str, tensorboard: bool):
+@click.pass_context
+def view(context, state: State, experiment_name: str, tensorboard: bool):
     """
     Displays details of an experiment.
     """
@@ -216,6 +218,10 @@ def view(state: State, experiment_name: str, tensorboard: bool):
                 ),
                 TEXTS["resources_sum_table_headers"], tablefmt="orgtbl")
         )
+
+        if tensorboard:
+            click.echo()
+            context.invoke(tensorboard_command, experiment_name=[experiment_name])
 
     except Exception:
         handle_error(logger, TEXTS["view_other_error_msg"], TEXTS["view_other_error_msg"])
