@@ -62,7 +62,7 @@ ansible_run() {
     ansible $(inventory) $(config) \
     -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \
     -e "kubeconfig=$(realpath $(kubeconfig))" -e "loader=${LOADER}" \
-    -e "root=${CURDIR}" \
+    -e "root=${CURDIR}" -e "default_ansible_python_interpreter=${PYTHON}" \
     $@
     return $?
 }

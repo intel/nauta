@@ -52,8 +52,8 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
     artifacts:
-      - src: /out/ansible-playbook/bin/ansible-playbook
-        dest: Linux/amd64/CENTOS/7/ansible-playbook
-      - src: /out/ansible-playbook/bin/ansible-playbook
-        dest: Linux/amd64/REDHAT/7.5/ansible-playbook
+      - src: /out/*
+        dest: Linux/amd64/CENTOS/7
+      - src: /out/*
+        dest: Linux/amd64/REDHAT/7.5
     push: False
