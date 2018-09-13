@@ -41,9 +41,8 @@
               :setVisibleColumnsHandler="setVisibleColumns"
               :onLaunchTensorHandler="onLaunchTensorboardClick"
               :launchTensorDisabled="!tensorBtnAvailable"
-              :onDiscardTensorHandler="discardTensorboard"
             ></ActionHeaderButtons>
-            <v-flex xs12 md3 v-if="!tensorMode && (experimentsTotal !== 0 || searchPattern)">
+            <v-flex xs12 md3 v-if="(experimentsTotal !== 0 || searchPattern)">
               <v-card-title>
                 <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
               </v-card-title>
@@ -54,7 +53,9 @@
               <table class="datatable table">
                 <thead>
                 <tr>
-                  <th v-if="tensorMode" width="35px"></th>
+                  <th width="55px">
+                    <div class="select-icon"></div>
+                  </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="310px">
                     <div class="filter-icon">
@@ -93,13 +94,17 @@
                 <tbody>
                   <template v-for="item in experimentsData" :id="item.attributes.name">
                     <tr v-bind:key="item.attributes.name" >
-                      <td v-if="tensorMode">
-                        <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn">
-                          check_circle
-                        </v-icon>
-                        <v-icon v-if="!isSelected(item)" v-on:click="selectExp(item)" class="pointer-btn">
-                          panorama_fish_eye
-                        </v-icon>
+                      <td>
+                        <div class="select-icon">
+                          <v-icon v-if="isSelected(item)" color="success" v-on:click="deselectExp(item)" class="pointer-btn"
+                                  :disabled="!isTensorboardAvailableForExp(item.attributes.type)">
+                            check_circle
+                          </v-icon>
+                          <v-icon v-if="!isSelected(item)" v-on:click="selectExp(item)" class="pointer-btn"
+                                  :disabled="!isTensorboardAvailableForExp(item.attributes.type)">
+                            panorama_fish_eye
+                          </v-icon>
+                        </div>
                       </td>
                       <td v-for="param in experimentsParams" v-bind:key="param" v-if="isVisibleColumn(param)">
                         <span v-if="param === 'name'" id="exp-name" v-on:click="toggleDetails(item.attributes.name)">
@@ -203,6 +208,7 @@ export default {
       labels: ELEMENT_LABELS,
       messages: MESSAGES,
       filterIcon: 'filter_list',
+      tbCompatibleExpKinds: ['training'],
       searchPattern: '',
       selectedByUserColumns: [],
       alwaysVisibleColumns: ['name', 'type', 'creationTimestamp', 'state'],
@@ -271,7 +277,6 @@ export default {
       lastUpdate: 'lastUpdate',
       fetchingDataActive: 'fetchingDataActive',
       tensorboardLaunching: 'tensorboardLaunching',
-      tensorMode: 'tensorMode',
       isCheckingAuth: 'authLoadingState',
       isInitializedData: 'initializedDataFlag',
       isLogged: 'isLogged',
@@ -300,10 +305,10 @@ export default {
       ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
     },
     tensorBtnAvailable: function () {
-      return !this.tensorMode || (this.tensorMode && this.selected.length > 0);
+      return this.selected.length > 0;
     },
     columnsCount: function () {
-      return this.currentlyVisibleColumns.length > 6 ? 6 : this.currentlyVisibleColumns.length;
+      return this.currentlyVisibleColumns.length > 6 ? 7 : this.currentlyVisibleColumns.length + 1;
     },
     customFiltersActive: function () {
       return this.filterByValModals.state.params.length || this.filterByValModals.name.params.length ||
@@ -328,7 +333,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserExperiments', 'getExperimentResources', 'enableTensorMode', 'disableTensorMode', 'launchTensorboard']),
+    ...mapActions(['getUserExperiments', 'getExperimentResources', 'launchTensorboard']),
     getLabel: function (header) {
       return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
@@ -374,18 +379,10 @@ export default {
       this.selectedByUserColumns = this.alwaysVisibleColumns.concat(columns);
     },
     onLaunchTensorboardClick () {
-      if (this.tensorMode) {
-        const experiments = this.selected.map((exp) => {
-          return `${exp.attributes.namespace}=${encodeURIComponent(exp.attributes.name)}`;
-        }).join('&');
-        window.open(`/tensorboard?${experiments}`);
-        this.discardTensorboard();
-      } else {
-        this.enableTensorMode();
-      }
-    },
-    discardTensorboard () {
-      this.disableTensorMode();
+      const experiments = this.selected.map((exp) => {
+        return `${exp.attributes.namespace}=${encodeURIComponent(exp.attributes.name)}`;
+      }).join('&');
+      window.open(`/tensorboard?${experiments}`);
       this.selected = [];
     },
     toggleDetails (expName) {
@@ -471,6 +468,9 @@ export default {
     onApplyValuesColumnFilter (column, draft) {
       this.switchFilterWindow(column, false);
       this.filterByValModals[column].params = [].concat(draft);
+    },
+    isTensorboardAvailableForExp (expType) {
+      return this.tbCompatibleExpKinds.includes(expType);
     }
   }
 }
@@ -522,8 +522,14 @@ export default {
   background-color: #f2f2f2;
   border-right: 1px solid #ffffff;
 }
+.table-style th:first-child {
+  background-color: #ffffff;
+}
 .table-style tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+.select-icon {
+  width: 24px;
 }
 .pointer-btn {
   cursor: pointer;

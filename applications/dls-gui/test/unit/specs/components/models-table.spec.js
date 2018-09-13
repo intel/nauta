@@ -108,13 +108,37 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should return tensorBtnAvailable correctly', function () {
-    expect(wrapper.vm.tensorMode).to.equal(false);
-    expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
-    wrapper.vm.$store.state.tensorMode = true;
-    expect(wrapper.vm.tensorBtnAvailable).to.equal(false);
-    wrapper.vm.$store.state.tensorMode = true;
     wrapper.vm.selected = [1];
     expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
+    wrapper.vm.selected = [];
+    expect(wrapper.vm.tensorBtnAvailable).to.equal(false);
+  });
+
+  it('Should return "true" as activity status of custom filters if any filter active', function () {
+    wrapper.vm.filterByValModals.state.params = [1];
+    expect(wrapper.vm.customFiltersActive).to.equal(1);
+  });
+
+  it('Should return "false" as activity status of custom filters if any filter active', function () {
+    expect(wrapper.vm.customFiltersActive).to.equal(false);
+  });
+
+  it('Should return true if tensor btn should be available for exp', function () {
+    const type = 'training';
+    const result = wrapper.vm.isTensorboardAvailableForExp(type);
+    expect(result).to.equal(true);
+  });
+
+  it('Should return false if tensor btn should not be available for exp', function () {
+    const type = 'inference';
+    const result = wrapper.vm.isTensorboardAvailableForExp(type);
+    expect(result).to.equal(false);
+  });
+
+  it('Should clear namespace filters if showAllUsersData action', function () {
+    wrapper.vm.filterByValModals.namespace.params = ['1', '2'];
+    wrapper.vm.showAllUsersData();
+    expect(wrapper.vm.filterByValModals.namespace.params).to.deep.equal([]);
   });
 
   it('Should return customizable visible columns without permament columns', function () {
@@ -196,23 +220,6 @@ describe('VUE components ModelsTable', () => {
     const expectedVisibleColumns = [].concat(wrapper.vm.alwaysVisibleColumns, visibleColumns);
     wrapper.vm.setVisibleColumns(visibleColumns);
     expect(wrapper.vm.selectedByUserColumns).to.deep.equal(expectedVisibleColumns);
-  });
-
-  it('Should call enableTensorMode on launch btn first click', function () {
-    wrapper.vm.onLaunchTensorboardClick();
-    expect(actions.enableTensorMode.calledOnce).to.equal(true);
-  });
-
-  it('Should call disableTensorMode on launch btn second click', function () {
-    wrapper.vm.$store.state.tensorMode = true;
-    wrapper.vm.onLaunchTensorboardClick();
-    expect(actions.disableTensorMode.calledOnce).to.equal(true);
-  });
-
-  it('Should call disableTensorMode on exit btn click', function () {
-    wrapper.vm.discardTensorboard();
-    expect(actions.disableTensorMode.calledOnce).to.equal(true);
-    expect(wrapper.vm.selected).to.deep.equal([]);
   });
 
   it('Should add exp to selected list', function () {

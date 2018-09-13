@@ -35,12 +35,10 @@ const state = {
     type: DEFAULT_BANNER_TYPE,
     visible: false,
     time: null
-  },
-  tensorMode: false
+  }
 };
 
 export const getters = {
-  tensorMode: state => state.tensorMode,
   menuVisibility: state => state.menu.visible,
   menuBtnVisibility: state => state.menu.btnVisible,
   getUserboxParams: state => state.userbox,
@@ -70,12 +68,6 @@ export const actions = {
   },
   hideError: ({commit}) => {
     commit('removeError');
-  },
-  enableTensorMode: ({commit}) => {
-    commit('setTensorMode', true)
-  },
-  disableTensorMode: ({commit}) => {
-    commit('setTensorMode', false)
   }
 };
 
@@ -108,9 +100,6 @@ export const mutations = {
     state.error.type = '';
     state.error.content = '';
     state.error.visible = false;
-  },
-  setTensorMode: (state, enabled) => {
-    state.tensorMode = enabled;
   }
 };
 

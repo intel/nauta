@@ -20,7 +20,7 @@
  */
 
 <template>
-  <v-navigation-drawer v-if="!tensorMode" app clipped fixed v-model="visible" ref="navelement">
+  <v-navigation-drawer app clipped fixed v-model="visible" ref="navelement">
     <v-list dense>
       <v-list-tile>
         <v-list-tile-action>
@@ -55,7 +55,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      tensorMode: 'tensorMode',
       username: 'username',
       menuVisibility: 'menuVisibility'
     }),

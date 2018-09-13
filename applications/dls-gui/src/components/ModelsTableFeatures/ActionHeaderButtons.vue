@@ -24,11 +24,8 @@
   <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">
     {{ labels.LAUNCH_TB }}
   </v-btn>
-  <v-btn v-if="tensorModeViewState" dark small v-on:click="onDiscardTensorHandler()">
-    {{ labels.EXIT }}
-  </v-btn>
-  <v-menu :disabled="tensorModeViewState" bottom offset-y>
-    <v-btn :disabled="tensorModeViewState" slot="activator" dark small>
+  <v-menu bottom offset-y>
+    <v-btn slot="activator" dark small>
       {{ labels.RESET }}
     </v-btn>
     <v-list>
@@ -40,7 +37,7 @@
       </v-list-tile>
     </v-list>
   </v-menu>
-  <v-btn :disabled="tensorModeViewState" v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>
+  <v-btn v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>
     {{ labels.ADD_DEL_COLUMN }}
   </v-btn>
   <v-dialog
@@ -108,14 +105,13 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
 import HEADERS_LABELS from '../../utils/header-titles';
 import ELEMENTS_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'ActionHeaderButtons',
   props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns', 'customizableVisibilityColumns',
-    'onLaunchTensorHandler', 'launchTensorDisabled', 'onDiscardTensorHandler', 'disabled'],
+    'onLaunchTensorHandler', 'launchTensorDisabled', 'disabled'],
   data: () => {
     return {
       showColumnMgmtModal: false,
@@ -127,11 +123,6 @@ export default {
     selectedByUserColumns: function () {
       this.draft = [].concat(this.selectedByUserColumns)
     }
-  },
-  computed: {
-    ...mapGetters({
-      tensorModeViewState: 'tensorMode'
-    })
   },
   created: function () {
     this.setVisibleColumnsHandler(this.selectedByUserColumns)

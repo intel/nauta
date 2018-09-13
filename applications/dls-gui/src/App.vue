@@ -23,7 +23,7 @@
   <div id="app">
     <v-app>
       <div id="app-bg"
-           :class="{intelBlue: !isLogged, intelGray: isLogged && !tensorMode, intelGrayTransparent: isLogged && tensorMode}">
+           :class="{intelBlue: !isLogged, intelGray: isLogged}">
         <Navigation v-if="isLogged"></Navigation>
         <Toolbar></Toolbar>
         <v-content>
@@ -66,8 +66,7 @@ export default {
       isLogged: 'isLogged',
       errorTime: 'errorTime',
       errorType: 'errorType',
-      errorContent: 'errorContent',
-      tensorMode: 'tensorMode'
+      errorContent: 'errorContent'
     }),
     combinedError: function () {
       return {type: this.errorType, content: this.errorContent, time: this.errorTime};

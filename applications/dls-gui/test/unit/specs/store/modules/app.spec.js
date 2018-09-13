@@ -36,15 +36,10 @@ describe('VUEX modules app', () => {
       type: 'warning',
       visible: false,
       time: 1
-    },
-    tensorMode: false
+    }
   };
 
   describe('Getters', () => {
-    it('tensorMode', () => {
-      const result = getters.tensorMode(state);
-      expect(result).to.deep.equal(state.tensorMode);
-    });
 
     it('menuVisibility', () => {
       const result = getters.menuVisibility(state);
@@ -78,11 +73,6 @@ describe('VUEX modules app', () => {
   });
 
   describe('Mutations', () => {
-    it('setTensorMode', () => {
-      const enabled = true;
-      mutations.setTensorMode(state, enabled);
-      expect(state.tensorMode).to.deep.equal(enabled);
-    });
 
     it('setMenuVisibility', () => {
       const visibility = true;
@@ -197,16 +187,5 @@ describe('VUEX modules app', () => {
       ], [], done);
     });
 
-    it('enableTensorMode', (done) => {
-      testAction(actions.enableTensorMode, null, state, [
-        { type: 'setTensorMode', payload: true }
-      ], [], done);
-    });
-
-    it('disableTensorMode', (done) => {
-      testAction(actions.disableTensorMode, null, state, [
-        { type: 'setTensorMode', payload: false }
-      ], [], done);
-    });
   });
 });
