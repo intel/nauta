@@ -6,7 +6,7 @@
     # yamllint disable-line rule:line-length
     feature_gates: "{% if kubernetes_calculated_feature_gates != {} %}--feature-gates {% for key,value in kubernetes_calculated_feature_gates.items() %}{{ key }}={{ value }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
 
-- name: Install cgroup file
+- name: "{{ message_label }} Install cgroup file"
   template:
     src: kubelet.cgroup.conf.j2
     dest: /etc/cgconfig.d/50-DLS4E.conf
@@ -15,12 +15,12 @@
 
 - meta: flush_handlers
 
-- name: Create kubelet config dir
+- name: "{{ message_label }} Create kubelet config dir"
   file:
     path: /etc/kubelet/static
     state: directory
 
-- name: Render kubelet service file
+- name: "{{ message_label }} Render kubelet service file"
   template:
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
@@ -28,14 +28,14 @@
     - Reload Systemd
     - Restart Kubelet
 
-- name: Render template scripts
+- name: "{{ message_label }} Render template scripts"
   template:
     src: kube-proxy.yaml.j2
     dest: /etc/kubelet/static/kube-proxy.yaml
   notify:
     - Restart Kubelet
 
-- name: Render kubelet config file
+- name: "{{ message_label }} Render kubelet config file"
   template:
     src: kubelet.j2
     dest: /etc/kubelet/kubelet
@@ -44,13 +44,13 @@
 
 - meta: flush_handlers
 
-- name: Start and enable kubelet
+- name: "{{ message_label }} Start and enable kubelet"
   service:
     name: kubelet
     state: started
     enabled: True
 
-- name: Configure sysctl
+- name: "{{ message_label }} Configure sysctl"
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"

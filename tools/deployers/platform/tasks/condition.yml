@@ -1,10 +1,10 @@
 ---
 
-- name: Cleanup defined_parameters
+- name: "{{ message_label }} Cleanup defined_parameters"
   set_fact:
     defined_parameters: []
 
-- name: Find all defined parameters
+- name: "{{ message_label }} Find all defined parameters"
   vars:
     found_facts: "{{ hostvars[inventory_hostname] }}"
   set_fact:
@@ -12,14 +12,14 @@
   with_items: "{{ required_parameters }}"
   when: item in found_facts
 
-- name: Fail if parameters are missing
+- name: "{{ message_label }} Fail if parameters are missing"
   vars:
     missing_parameters: "{{ required_parameters | difference(defined_parameters) }}"
   fail:
     msg: "Parameters are missing: {{ missing_parameters | join(', ') }}"
   when: missing_parameters | length > 0
 
-- name: Run conditions
+- name: "{{ message_label }} Run conditions"
   vars:
     conditions: "{{ item.condition }}"
     message: "{{ item.message }}"

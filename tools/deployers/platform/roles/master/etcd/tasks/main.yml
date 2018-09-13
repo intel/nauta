@@ -1,10 +1,10 @@
 ---
 
-- name: Pull docker image
+- name: "{{ message_label }} Pull docker image"
   docker_image:
     name: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.9"
 
-- name: Create etcd server
+- name: "{{ message_label }} Create etcd server"
   docker_container:
     name: etcd
     image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.9"
@@ -43,7 +43,7 @@
       - "/etc/dls-cluster/client/etcd/node.key:/ca/node.key:ro"
     command: /usr/local/bin/etcd
 
-- name: Render etcd service script
+- name: "{{ message_label }} Render etcd service script"
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
@@ -53,7 +53,7 @@
 
 - meta: flush_handlers
 
-- name: Start and enable etcd
+- name: "{{ message_label }} Start and enable etcd"
   service:
     name: etcd
     state: started

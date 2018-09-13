@@ -1,6 +1,6 @@
 ---
 
-- name: Run conditions
+- name: "{{ message_label }} Run conditions"
   vars:
     conditions: "{{ item.condition }}"
     message: "{{ item.message }}"

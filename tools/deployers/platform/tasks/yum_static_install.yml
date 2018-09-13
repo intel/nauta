@@ -1,6 +1,6 @@
 ---
 
-- name: Install packages {{ packages | join(', ') }}
+- name: "{{ message_label }} Install packages {{ packages | join(', ') }}"
   environment: "{{ proxy }}"
   yum:
     disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"

@@ -4,7 +4,7 @@
   vars:
     distribution_file: install.yml
 
-- name: Prepare sysctl configuration
+- name: "{{ message_label }} Prepare sysctl configuration"
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
@@ -17,19 +17,19 @@
     - name: net.ipv4.ip_nonlocal_bind
       value: 1
 
-- name: Render nginx config
+- name: "{{ message_label }} Render nginx config"
   template:
     src: nginx.conf.j2
     dest: /etc/nginx/nginx.conf
   notify:
     - Restart Nginx
 
-- name: Create service configuration path
+- name: "{{ message_label }} Create service configuration path"
   file:
     path: /etc/systemd/system/nginx.service.d
     state: directory
 
-- name: Render proxy configuration
+- name: "{{ message_label }} Render proxy configuration"
   template:
     src: "{{ item }}.conf.j2"
     dest: "/etc/systemd/system/nginx.service.d/{{ item }}.conf"
@@ -39,7 +39,7 @@
     - Reload Systemd
     - Restart Nginx
 
-- name: Create nginx config dirs
+- name: "{{ message_label }} Create nginx config dirs"
   file:
     path: "/etc/nginx/{{ item }}.d"
     state: directory
@@ -47,7 +47,7 @@
     - http
     - stream
 
-- name: Render stream dirs
+- name: "{{ message_label }} Render stream dirs"
   template:
     src: "{{ item }}.stream.j2"
     dest: "/etc/nginx/stream.d/{{ item }}.conf"
@@ -58,7 +58,7 @@
   notify:
     - Restart Nginx
 
-- name: Render http dirs
+- name: "{{ message_label }} Render http dirs"
   template:
     src: "{{ item }}.http.j2"
     dest: "/etc/nginx/http.d/{{ item }}.conf"
@@ -69,7 +69,7 @@
 
 - meta: flush_handlers
 
-- name: Start and enable nginx
+- name: "{{ message_label }} Start and enable nginx"
   service:
     name: nginx
     state: started

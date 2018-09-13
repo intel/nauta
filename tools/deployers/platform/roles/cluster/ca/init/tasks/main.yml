@@ -1,6 +1,6 @@
 ---
 
-- name: Generate root for certs
+- name: "{{ message_label }} Generate root for certs"
   include_tasks: kind.yml
   with_items:
     - kubernetes
@@ -10,7 +10,7 @@
   loop_control:
     loop_var: kind
 
-- name: Generate certs for apiservice
+- name: "{{ message_label }} Generate certs for apiservice"
   include_tasks: cert.yml
   vars:
     name: "apiservice"
@@ -37,7 +37,7 @@
   loop_control:
     loop_var: kind
 
-- name: Generate certs for service
+- name: "{{ message_label }} Generate certs for service"
   include_tasks: cert.yml
   vars:
     name: "service"
@@ -55,7 +55,7 @@
   loop_control:
     loop_var: kind
 
-- name: Generate certs for registry
+- name: "{{ message_label }} Generate certs for registry"
   include_tasks: cert.yml
   vars:
     name: "registry"

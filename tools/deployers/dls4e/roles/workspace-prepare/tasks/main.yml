@@ -1,38 +1,38 @@
 ---
 
-- name: Copy loader
+- name: "{{ message_label }} Copy loader"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n dls4e cp {{ runtime_loader }} {{ pod }}:/loader"
   changed_when: False
 
-- name: Check if image is present
+- name: "{{ message_label }} Check if image is present"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n dls4e exec {{ pod }} /loader check dls4e-repository:{{ dls4e_version }}"
   register: package
   changed_when: package.rc != 0
   failed_when: False
 
-- name: Send image
+- name: "{{ message_label }} Send image"
   environment: "{{ local_envs }}"
   shell: 'cat {{ runtime_img }} | "{{ runtime_kubectl }}" -n dls4e exec -i "{{ pod }}" /loader load "dls4e-repository:{{ dls4e_version }}"'
   when: package is changed
 
-- name: Check if image is present
+- name: "{{ message_label }} Check if image is present"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n dls4e exec {{ pod }} /loader check dls4e-repository:{{ dls4e_version }}"
   changed_when: False
 
-- name: Fetch node name
+- name: "{{ message_label }} Fetch node name"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n dls4e get pods {{ pod }} -o jsonpath={.spec.nodeName}"
   register: node_name
   changed_when: False
 
-- name: Fail if node name is empty
+- name: "{{ message_label }} Fail if node name is empty"
   fail:
     msg: Node name is empty
   when: node_name.stdout == ''
 
-- name: Label node
+- name: "{{ message_label }} Label node"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} label node {{ node_name.stdout }} dls4e-release-version-{{ dls4e_version.replace('.', '-') }}=True --overwrite"

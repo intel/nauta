@@ -3,12 +3,12 @@
 - set_fact:
     repo_local_path: "/root/dls4e/repo/{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}"
 
-- name: Ensure repo directory is present
+- name: "{{ message_label }} Ensure repo directory is present"
   file:
     path: "{{ repo_local_path }}"
     state: directory
 
-- name: Copy repository files
+- name: "{{ message_label }} Copy repository files"
   vars:
     file_name: "dls4e-{{ item }}-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
   copy:
@@ -20,14 +20,14 @@
     - yum
     - yum-repository
 
-- name: Install package
+- name: "{{ message_label }} Install package"
   include_tasks: yum_static_install.yml
   vars:
     packages:
       - "{{ repo_local_path }}/dls4e-commons-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
     update_cache: True
 
-- name: Install data
+- name: "{{ message_label }} Install data"
   include_tasks: yum_static_install.yml
   vars:
     packages:

@@ -1,34 +1,34 @@
 ---
 
-- name: Verify helm access
+- name: "{{ message_label }} Verify helm access"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} init -c --skip-refresh"
   changed_when: False
 
-- name: Verify helm access
+- name: "{{ message_label }} Verify helm access"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} ls"
   changed_when: False
 
-- name: Verify kubernetes access
+- name: "{{ message_label }} Verify kubernetes access"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} get pods"
   changed_when: False
 
-- name: Check if kubernetes namespace exists
+- name: "{{ message_label }} Check if kubernetes namespace exists"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} get ns dls4e"
   register: namespace
   changed_when: namespace.rc in [1]
   failed_when: namespace.rc not in [0, 1]
 
-- name: Create kubernetes namespace if not exists
+- name: "{{ message_label }} Create kubernetes namespace if not exists"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} create ns dls4e"
   changed_when: False
   when: namespace is changed
 
-- name: Fetch all pods
+- name: "{{ message_label }} Fetch all pods"
   shell: "{{ runtime_kubectl }} get nodes -o 'jsonpath={.items[*].status.images[*].names[*]}'"
   environment: "{{ local_envs }}"
   changed_when: False
@@ -37,17 +37,17 @@
 - set_fact:
     pause_image: "{{ (images.stdout.split(' ') | map('regex_search', '.*pause.*') | select('string') | list | sort | unique)[0] }}"
 
-- name: Render kubernetes workspace pod deployment template
+- name: "{{ message_label }} Render kubernetes workspace pod deployment template"
   template:
     src: workspace-deployment.yml
     dest: "{{ workspace }}/workspace-deployment.yml"
 
-- name: Apply kubernetes workspace pod deployment
+- name: "{{ message_label }} Apply kubernetes workspace pod deployment"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} apply -f {{ workspace }}/workspace-deployment.yml"
   changed_when: False
 
-- name: Wait for all workspaces to get ready
+- name: "{{ message_label }} Wait for all workspaces to get ready"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} --namespace=dls4e get deployment dls4enterprise-workspace-pod -o jsonpath='{.status.readyReplicas}'"
   changed_when: False
@@ -56,7 +56,7 @@
   retries: 60
   delay: 1
 
-- name: Fetch all instance names
+- name: "{{ message_label }} Fetch all instance names"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} get pods -n dls4e -l kind=bootstrap-dls4e-workspace -o jsonpath={.items[*].metadata.name}"
   until: workspaces.stdout.split(' ') | length == 2
@@ -65,7 +65,7 @@
   changed_when: False
   register: workspaces
 
-- name: Register provisioner pods
+- name: "{{ message_label }} Register provisioner pods"
   add_host:
     name: "{{ item }}"
     pod: "{{ item }}"

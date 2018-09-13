@@ -4,20 +4,20 @@
   vars:
     distribution_file: install.yml
 
-- name: Create consul group
+- name: "{{ message_label }} Create consul group"
   group:
     name: consul
 
-- name: Create consul user
+- name: "{{ message_label }} Create consul user"
   user:
     name: consul
     group: consul
 
-- name: Allow consul to listen on port 53
+- name: "{{ message_label }} Allow consul to listen on port 53"
   shell: setcap 'cap_net_bind_service=+ep' /usr/bin/consul
   changed_when: False
 
-- name: Create consul directories
+- name: "{{ message_label }} Create consul directories"
   file:
     path: "{{ item }}"
     state: directory
@@ -29,7 +29,7 @@
     - /etc/consul
     - /etc/consul/ssl
 
-- name: Copy ssl keys
+- name: "{{ message_label }} Copy ssl keys"
   copy:
     remote_src: True
     src: "/etc/dls-cluster/client/consul/{{ item }}"
@@ -42,7 +42,7 @@
     - node.crt
     - node.key
 
-- name: Copy consul systemd definition
+- name: "{{ message_label }} Copy consul systemd definition"
   template:
     src: consul.service.j2
     dest: /etc/systemd/system/consul.service
@@ -50,7 +50,7 @@
     - Reload Systemd
     - Restart Consul
 
-- name: Render configuration
+- name: "{{ message_label }} Render configuration"
   template:
     src: "{{ item }}.json.j2"
     dest: "/etc/consul/{{ item }}.json"
@@ -64,7 +64,7 @@
   notify:
     - Restart Consul
 
-- name: Render server configuration
+- name: "{{ message_label }} Render server configuration"
   template:
     src: "{{ item }}.json.j2"
     dest: "/etc/consul/{{ item }}.json"
@@ -78,22 +78,22 @@
 
 - meta: flush_handlers
 
-- name: Start and enable consul
+- name: "{{ message_label }} Start and enable consul"
   service:
     name: consul
     state: started
     enabled: True
 
-- name: Refresh host hostname
+- name: "{{ message_label }} Refresh host hostname"
   hostname:
     name: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
 
-- name: Set hostname pernamently
+- name: "{{ message_label }} Set hostname pernamently"
   copy:
     content: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
     dest: /etc/hostname
 
-- name: Override dhclient resolver
+- name: "{{ message_label }} Override dhclient resolver"
   template:
     src: dhclient.j2
     dest: /etc/dhclient-enter-hooks
@@ -101,17 +101,17 @@
     owner: root
     group: root
 
-- name: Remove chattr -x from resolver
+- name: "{{ message_label }} Remove chattr -x from resolver"
   file:
     path: /etc/resolv.conf
     attr: ""
 
-- name: Override resolver
+- name: "{{ message_label }} Override resolver"
   template:
     src: resolv.j2
     dest: /etc/resolv.conf
 
-- name: Add chattr +x to resolver
+- name: "{{ message_label }} Add chattr +x to resolver"
   file:
     path: /etc/resolv.conf
     attr: "i"

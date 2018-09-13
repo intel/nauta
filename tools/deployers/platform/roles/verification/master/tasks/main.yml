@@ -2,17 +2,17 @@
 
 - include_tasks: condition.yml
 
-- name: Ensure that device is present
+- name: "{{ message_label }} Ensure that device is present"
   stat:
     path: "{{ local_data_device }}"
   register: local_data_device_obj
 
-- name: Fail if device does not exists
+- name: "{{ message_label }} Fail if device does not exists"
   fail:
     msg: "Device does not exists {{ local_data_device_obj }}"
   when: not local_data_device_obj.stat.exists
 
-- name: Path is not a block device
+- name: "{{ message_label }} Path is not a block device"
   fail:
     msg: "Path is not a block device {{ local_data_device_obj }}"
   when: not local_data_device_obj.stat.isblk

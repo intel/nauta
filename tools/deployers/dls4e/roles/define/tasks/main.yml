@@ -1,6 +1,6 @@
 ---
 
-- name: Set paths fact
+- name: "{{ message_label }} Set paths fact"
   set_fact:
     dls4e_img: "dls4e-{{ dls4e_version }}.img"
     registry_chart: "dls4e-registry-{{ dls4e_version }}.tgz"
@@ -10,7 +10,7 @@
     ansible_python_interpreter: "{{ default_ansible_python_interpreter }}"
   when: default_ansible_python_interpreter | default('') != ''
 
-- name: Set local paths fact
+- name: "{{ message_label }} Set local paths fact"
   set_fact:
     workspace: ".workspace"
     runtime_kubectl: "{{ kubectl }}"
@@ -22,12 +22,12 @@
     runtime_dls4e_chart: "{{ playbook_dir }}/files/{{ dls4e_chart }}"
     runtime_kubeconfig: "{{ kubeconfig }}"
 
-- name: Fail if external ip is not defined
+- name: "{{ message_label }} Fail if external ip is not defined"
   fail:
     msg: External IP is not defined
   when: runtime_kubernetes_external_name is not defined
 
-- name: Add host
+- name: "{{ message_label }} Add host"
   add_host:
     name: provisioner
     group: provisioners
@@ -43,7 +43,7 @@
     runtime_kubernetes_external_name: "{{ runtime_kubernetes_external_name }}"
     runtime_kubeconfig: "{{ runtime_kubeconfig }}"
 
-- name: Create directory
+- name: "{{ message_label }} Create directory"
   file:
     path: "{{ workspace }}"
     state: directory

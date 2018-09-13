@@ -1,24 +1,24 @@
 ---
 
-- name: Set interface name
+- name: "{{ message_label }} Set interface name"
   set_fact:
     external_interface_fact: "ansible_{{ external_interface | default('') }}"
 
-- name: Get external interface ip
+- name: "{{ message_label }} Get external interface ip"
   set_fact:
     instance_kubernetes_external_ip: "{{ hostvars[inventory_hostname][external_interface_fact].ipv4.address }}"
   when: external_interface_fact in hostvars[inventory_hostname]
 
-- name: Calculate runtime external ip
+- name: "{{ message_label }} Calculate runtime external ip"
   set_fact:
     runtime_kubernetes_external_name: "{{ kubernetes_api_address | default(instance_kubernetes_external_ip | default ('')) }}"
 
-- name: Fail if external ip is not calculated
+- name: "{{ message_label }} Fail if external ip is not calculated"
   fail:
     msg: Unable to calculate external ip
   when: not runtime_kubernetes_external_name
 
-- name: Add variable to localhost
+- name: "{{ message_label }} Add variable to localhost"
   add_host:
     name: localhost
     runtime_kubernetes_external_name: "{{ runtime_kubernetes_external_name }}"

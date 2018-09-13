@@ -1,28 +1,28 @@
 ---
 
-- name: Create a k8s dls4e namespace
+- name: "{{ message_label }} Create a k8s dls4e namespace"
   changed_when: False
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl get namespace dls4e || kubectl create namespace dls4e"
 
-- name: Create kubernetes configuration directory
+- name: "{{ message_label }} Create kubernetes configuration directory"
   file:
     path: /root/kubernetes/apps
     state: directory
 
-- name: Render tiller apps
+- name: "{{ message_label }} Render tiller apps"
   template:
     src: tiller.yml.j2
     dest: /root/kubernetes/apps/tiller.yml
 
-- name: Apply tiller release
+- name: "{{ message_label }} Apply tiller release"
   changed_when: False
   environment:
     KUBECONFIG: /dev/null
   shell: kubectl apply -f /root/kubernetes/apps/tiller.yml
 
-- name: Wait for at least one tiller instances to get ready
+- name: "{{ message_label }} Wait for at least one tiller instances to get ready"
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl --namespace=kube-system get ds tiller -o jsonpath='{.status.numberReady}'"
@@ -32,12 +32,12 @@
   retries: 60
   delay: 1
 
-- name: Fail if all tiller isntances are down
+- name: "{{ message_label }} Fail if all tiller isntances are down"
   fail:
     msg: Tiller did not get up
   when: tiller_ready.stdout == '0'
 
-- name: Verify helm access
+- name: "{{ message_label }} Verify helm access"
   environment:
     KUBECONFIG: /dev/null
   shell: helm ls
@@ -47,17 +47,17 @@
   retries: 10
   delay: 10
 
-- name: Copy chart
+- name: "{{ message_label }} Copy chart"
   copy:
     src: dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
     dest: /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
 
-- name: Fetch all interfaces names
+- name: "{{ message_label }} Fetch all interfaces names"
   set_fact:
     all_cluster_interfaces: "{{ (all_cluster_interfaces | default([])) + [hostvars[item].internal_interface] }}"
   with_items: "{{ groups['all'] }}"
 
-- name: Render values
+- name: "{{ message_label }} Render values"
   vars:
     dls_release_values:
       global:
@@ -81,14 +81,14 @@
     content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "/tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml"
 
-- name: Mark node taint
+- name: "{{ message_label }} Mark node taint"
   changed_when: False
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl taint nodes {{ hostvars[groups['master'][0]].ansible_nodename }} master=true:NoSchedule"
   when: "'worker' in groups and groups['worker'] | length > 0"
 
-- name: Install helm chart
+- name: "{{ message_label }} Install helm chart"
   environment:
     KUBECONFIG: /dev/null
   shell: >
@@ -97,45 +97,45 @@
     /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz --wait
     -f /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml
 
-- name: Load informations about admin user
+- name: "{{ message_label }} Load informations about admin user"
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl -n kube-system get serviceaccounts dls4enterprise-k8s-platform-admin -o jsonpath='{.secrets[0].name}'"
   register: dlsenterprise_admin_account
 
-- name: Load informations about admin token
+- name: "{{ message_label }} Load informations about admin token"
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.token}'"
   register: dlsenterprise_admin_token
 
-- name: Load informations about admin namespace
+- name: "{{ message_label }} Load informations about admin namespace"
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
   register: dlsenterprise_admin_namespace
 
-- name: Load informations about admin crt
+- name: "{{ message_label }} Load informations about admin crt"
   environment:
     KUBECONFIG: /dev/null
   shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
   register: dlsenterprise_admin_crt
 
-- name: Create kubeconfig directory
+- name: "{{ message_label }} Create kubeconfig directory"
   file:
     path: /root/.kube
     state: directory
 
-- name: Render kubeconfig
+- name: "{{ message_label }} Render kubeconfig"
   template:
     src: kubeconfig.j2
     dest: /root/.kube/config
 
-- name: Create a k8s dls4e namespace
+- name: "{{ message_label }} Create a k8s dls4e namespace"
   changed_when: False
   shell: "kubectl get pods"
 
-- name: Fetch kubeconfig
+- name: "{{ message_label }} Fetch kubeconfig"
   fetch:
     src: "/root/.kube/config"
     dest: "{{ root }}/platform-admin.config"

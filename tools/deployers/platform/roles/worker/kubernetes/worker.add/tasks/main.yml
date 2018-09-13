@@ -1,11 +1,11 @@
 ---
 
-- name: Create kubernetes configuration directory
+- name: "{{ message_label }} Create kubernetes configuration directory"
   file:
     path: /root/kubernetes/nodes
     state: directory
 
-- name: Render all node privileges directories
+- name: "{{ message_label }} Render all node privileges directories"
   template:
     src: kubernetes-node-privs.yml.j2
     dest: /root/kubernetes/nodes/{{ host }}.yml
@@ -13,7 +13,7 @@
   loop_control:
     loop_var: host
 
-- name: Apply all node privileges directories
+- name: "{{ message_label }} Apply all node privileges directories"
   changed_when: False
   environment:
     KUBECONFIG: /dev/null

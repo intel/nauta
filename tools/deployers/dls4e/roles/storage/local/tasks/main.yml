@@ -1,12 +1,12 @@
 ---
 
-- name: Set storage type
+- name: "{{ message_label }} Set storage type"
   set_fact:
     detected_storage_type: local
     detected_storage_path: "{{ master_storage_path }}"
     detected_storage_selector: "{{ master_storage_selector }}"
 
-- name: Set storage fact
+- name: "{{ message_label }} Set storage fact"
   set_fact:
     calculated_storage:
       type: "{{ detected_storage_type }}"

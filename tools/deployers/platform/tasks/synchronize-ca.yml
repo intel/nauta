@@ -1,6 +1,6 @@
 ---
 
-- name: Ensure that node dirs exis
+- name: "{{ message_label }} Ensure that node dirs exis"
   file:
     path: "/etc/dls-cluster/master/{{ kind }}/nodes"
     owner: cluster-master
@@ -8,7 +8,7 @@
     mode: 0750
     state: directory
 
-- name: Ensure that dirs exists for each node
+- name: "{{ message_label }} Ensure that dirs exists for each node"
   file:
     path: "/etc/dls-cluster/master/{{ kind }}/nodes/{{ item }}"
     owner: cluster-master
@@ -17,14 +17,14 @@
     state: directory
   with_items: "{{ groups['all'] }}"
 
-- name: Synchronize
+- name: "{{ message_label }} Synchronize"
   become_user: cluster-master
   shell: "rsync -avhz --delete --progress /etc/dls-cluster/master/{{ kind }}/ master-cluster-{{ item }}:/etc/dls-cluster/master/{{ kind }}/"
   changed_when: False
   with_items: "{{ groups['master'] }}"
   when: inventory_hostname != item
 
-- name: Synchronize workers
+- name: "{{ message_label }} Synchronize workers"
   become_user: cluster-master
   shell: "rsync -avhz --delete --progress /etc/dls-cluster/master/{{ kind }}/nodes/{{ item }}/ cluster-{{ item }}:/etc/dls-cluster/client/{{ kind }}/"
   changed_when: False

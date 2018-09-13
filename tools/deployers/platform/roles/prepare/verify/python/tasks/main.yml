@@ -1,6 +1,6 @@
 ---
 
-- name: Ensure that python exists
+- name: "{{ message_label }} Ensure that python exists"
   changed_when: python.rc == 1
   failed_when: python.rc not in [0, 1]
   raw: "stat {{ item }}"
@@ -10,11 +10,11 @@
     - /usr/bin/python2
   register: python
 
-- name: Check if any python is installed
+- name: "{{ message_label }} Check if any python is installed"
   fail:
     msg: "Unable to find python installed"
   when: 0 not in python | json_query('results[].rc') | unique
 
-- name: Set python fact
+- name: "{{ message_label }} Set python fact"
   set_fact:
     ansible_python_interpreter: "{{ python | json_query('results[?rc==`0`].{path: item}[0].path') }}"

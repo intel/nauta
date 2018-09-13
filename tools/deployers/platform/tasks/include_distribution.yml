@@ -1,6 +1,6 @@
 ---
 
-- name: Include distribution based task
+- name: "{{ message_label }} Include distribution based task"
   include_tasks: "{{ distribution_resolved_file }}"
   loop_control:
     loop_var: distribution_resolved_file

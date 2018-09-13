@@ -1,6 +1,6 @@
 ---
 
-- name: Install dls4e packages {{ packages | join(', ') }}
+- name: "{{ message_label }} Install dls4e packages {{ packages | join(', ') }}"
   yum:
     disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
     enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"

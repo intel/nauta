@@ -3,7 +3,7 @@
 - set_fact:
     kind_path: "/etc/dls-cluster/master/{{ kind }}"
 
-- name: Ensure that node dirs exis
+- name: "{{ message_label }} Ensure that node dirs exis"
   file:
     path: "{{ kind_path }}/nodes"
     owner: cluster-master
@@ -11,7 +11,7 @@
     mode: 0750
     state: directory
 
-- name: Ensure that dirs exists for each node
+- name: "{{ message_label }} Ensure that dirs exists for each node"
   file:
     path: "{{ kind_path }}/nodes/{{ item }}"
     owner: cluster-master
@@ -20,7 +20,7 @@
     state: directory
   with_items: "{{ groups['all'] }}"
 
-- name: Create base directories for CA
+- name: "{{ message_label }} Create base directories for CA"
   file:
     path: "{{ kind_path }}/{{ item }}"
     state: directory
@@ -35,7 +35,7 @@
     - cfg
     -
 
-- name: Generate private CA key (4096 bit, RSA)
+- name: "{{ message_label }} Generate private CA key (4096 bit, RSA)"
   openssl_privatekey:
     path: "{{ kind_path }}/ca/CA.key"
 
@@ -44,7 +44,7 @@
   args:
     creates: "{{ kind_path }}/ca/CA.crt"
 
-- name: Generate certs for hosts
+- name: "{{ message_label }} Generate certs for hosts"
   include_tasks: cert.yml
   vars:
     name: "{{ item }}"
@@ -61,7 +61,7 @@
       - serverAuth
   with_items: "{{ groups['all'] }}"
 
-- name: Generate certs for hosts
+- name: "{{ message_label }} Generate certs for hosts"
   include_tasks: cert.yml
   vars:
     name: "{{ item }}"
@@ -78,21 +78,21 @@
       - serverAuth
   with_items: "{{ groups['all'] }}"
 
-- name: Copy key to worker directory
+- name: "{{ message_label }} Copy key to worker directory"
   copy:
     remote_src: True
     src: "{{ kind_path }}/key/{{ item }}.key"
     dest: "{{ kind_path }}/nodes/{{ item }}/node.key"
   with_items: "{{ groups['all'] }}"
 
-- name: Copy crt to worker directory
+- name: "{{ message_label }} Copy crt to worker directory"
   copy:
     remote_src: True
     src: "{{ kind_path }}/crt/{{ item }}.crt"
     dest: "{{ kind_path }}/nodes/{{ item }}/node.crt"
   with_items: "{{ groups['all'] }}"
 
-- name: Copy CA to worker directory
+- name: "{{ message_label }} Copy CA to worker directory"
   copy:
     remote_src: True
     src: "{{ kind_path }}/ca/CA.crt"

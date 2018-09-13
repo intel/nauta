@@ -4,7 +4,7 @@
   vars:
     distribution_file: configure.yml
 
-- name: Set outgoing ports so that they wont conflict with apps
+- name: "{{ message_label }} Set outgoing ports so that they wont conflict with apps"
   sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"

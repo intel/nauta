@@ -4,7 +4,7 @@
   vars:
     distribution_file: install.yml
 
-- name: Start and enable cgroup service
+- name: "{{ message_label }} Start and enable cgroup service"
   service:
     name: cgconfig
     state: started

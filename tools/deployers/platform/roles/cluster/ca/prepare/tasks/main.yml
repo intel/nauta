@@ -1,6 +1,6 @@
 ---
 
-- name: Create required groups for cluster synchronization
+- name: "{{ message_label }} Create required groups for cluster synchronization"
   group:
     name: "{{ item.name }}"
     gid: "{{ item.gid }}"
@@ -12,7 +12,7 @@
     - name: cluster
       gid: 3502
 
-- name: Ensure that home dir exists
+- name: "{{ message_label }} Ensure that home dir exists"
   file:
     path: /opt/dls4e/home
     state: directory
@@ -20,7 +20,7 @@
     owner: root
     group: root
 
-- name: Create required users for cluster synchronization
+- name: "{{ message_label }} Create required users for cluster synchronization"
   user:
     name: "{{ item.name }}"
     create_home: True
@@ -39,25 +39,25 @@
   vars:
     distribution_file: install.yml
 
-- name: Fetch public keys from hosts
+- name: "{{ message_label }} Fetch public keys from hosts"
   slurp:
     src: "/opt/dls4e/home/cluster-master/.ssh/id_rsa.pub"
   register: cluster_master_key
 
-- name: Add authorized master keys to client users
+- name: "{{ message_label }} Add authorized master keys to client users"
   authorized_key:
     user: cluster-client
     key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
   with_items: "{{ groups['master'] }}"
 
-- name: Add authorized master keys to master users
+- name: "{{ message_label }} Add authorized master keys to master users"
   authorized_key:
     user: cluster-master
     key: "{{ hostvars[item].cluster_master_key.content | b64decode }}"
   with_items: "{{ groups['master'] }}"
   when: inventory_hostname in groups['master']
 
-- name: Render master key config
+- name: "{{ message_label }} Render master key config"
   template:
     src: config.j2
     dest: /opt/dls4e/home/cluster-master/.ssh/config
@@ -66,7 +66,7 @@
     group: cluster-master
   when: inventory_hostname in groups['master']
 
-- name: Create cluster directory
+- name: "{{ message_label }} Create cluster directory"
   file:
     path: /etc/dls-cluster
     state: directory
@@ -74,7 +74,7 @@
     group: cluster
     mode: 0750
 
-- name: Create cluster directory
+- name: "{{ message_label }} Create cluster directory"
   file:
     path: /etc/dls-cluster/master
     state: directory
@@ -82,7 +82,7 @@
     group: cluster-master
     mode: 0750
 
-- name: Create cluster directory
+- name: "{{ message_label }} Create cluster directory"
   file:
     path: /etc/dls-cluster/client
     state: directory

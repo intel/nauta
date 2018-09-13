@@ -2,7 +2,7 @@
 
 - include_tasks: condition.yml
 
-- name: Wait for node connection
+- name: "{{ message_label }} Wait for node connection"
   wait_for_connection:
     connect_timeout: 5
     delay: 0
@@ -11,35 +11,35 @@
   register: node_access
   ignore_errors: True
 
-- name: Fail if node is not accessible or system is not supported
+- name: "{{ message_label }} Fail if node is not accessible or system is not supported"
   fail:
     msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - {{ node_access.msg }}"
   when: node_access is failed
 
-- name: Check if python exists
+- name: "{{ message_label }} Check if python exists"
   raw: stat /usr/bin/python2
   register: python_exists
   changed_when: python_exists.rc != 0
   failed_when: False
 
-- name: Fail if we are not able to get system version
+- name: "{{ message_label }} Fail if we are not able to get system version"
   fail:
     msg: Unable to check system - check supported systems list
   when: python_exists is changed
 
-- name: Collect facts
+- name: "{{ message_label }} Collect facts"
   setup:
 
-- name: Check if system is supported
+- name: "{{ message_label }} Check if system is supported"
   fail:
     msg: "Your system is not supported - detected {{ ansible_distribution }} {{ ansible_distribution_version }}"
   when: ansible_distribution_version not in supported_systems[ansible_distribution] | default([])
 
-- name: Check if regular user is accessible
+- name: "{{ message_label }} Check if regular user is accessible"
   shell: echo
   changed_when: False
 
-- name: Check if admin user is accessible
+- name: "{{ message_label }} Check if admin user is accessible"
   become: True
   shell: echo
   changed_when: False

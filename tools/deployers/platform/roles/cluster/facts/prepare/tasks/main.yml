@@ -1,6 +1,6 @@
 ---
 
-- name: Create required groups for cluster facts synchronization
+- name: "{{ message_label }} Create required groups for cluster facts synchronization"
   group:
     name: "{{ item.name }}"
     gid: "{{ item.gid }}"
@@ -8,7 +8,7 @@
     - name: cluster-facts
       gid: 3510
 
-- name: Ensure that home dir exists
+- name: "{{ message_label }} Ensure that home dir exists"
   file:
     path: /opt/dls4e/home
     state: directory
@@ -16,7 +16,7 @@
     owner: root
     group: root
 
-- name: Create required users for cluster synchronization
+- name: "{{ message_label }} Create required users for cluster synchronization"
   user:
     name: "{{ item.name }}"
     create_home: True
@@ -32,18 +32,18 @@
   vars:
     distribution_file: install.yml
 
-- name: Fetch public keys from hosts
+- name: "{{ message_label }} Fetch public keys from hosts"
   slurp:
     src: "/opt/dls4e/home/cluster-facts/.ssh/id_rsa.pub"
   register: cluster_facts_key
 
-- name: Add authorized master keys to facts users
+- name: "{{ message_label }} Add authorized master keys to facts users"
   authorized_key:
     user: cluster-facts
     key: "{{ hostvars[item].cluster_facts_key.content | b64decode }}"
   with_items: "{{ groups['master'] }}"
 
-- name: Render facts key config
+- name: "{{ message_label }} Render facts key config"
   template:
     src: config.j2
     dest: /opt/dls4e/home/cluster-facts/.ssh/config
@@ -52,7 +52,7 @@
     group: cluster-facts
   when: inventory_hostname in groups['master']
 
-- name: Create cluster directory
+- name: "{{ message_label }} Create cluster directory"
   file:
     path: /etc/dls-facts
     state: directory

@@ -1,6 +1,6 @@
 ---
 
-- name: Ensure remove of {{ packages | join(', ') }}
+- name: "{{ message_label }} Ensure remove of {{ packages | join(', ') }}"
   environment: "{{ proxy }}"
   yum:
     disable_plugin: "*"

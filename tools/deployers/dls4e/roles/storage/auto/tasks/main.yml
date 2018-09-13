@@ -1,23 +1,23 @@
 ---
 
-- name: Get first master instance if master group is defined
+- name: "{{ message_label }} Get first master instance if master group is defined"
   set_fact:
     master_instance_data: "{{ groups['master'][0] }}"
   when:
     - "'master' in groups"
     - groups['master'] | length > 0
 
-- name: Check if variable is set
+- name: "{{ message_label }} Check if variable is set"
   set_fact:
     detected_storage_type: pvc
   when: not master_instance_data | default(False) or not (hostvars[master_instance_data] | default({})).local_data_device | default(False)
 
-- name: Check if variable is set
+- name: "{{ message_label }} Check if variable is set"
   set_fact:
     detected_storage_type: local
   when:
     - master_instance_data | default(False)
     - (hostvars[master_instance_data] | default({})).local_data_device | default(False)
 
-- name: Include tasks
+- name: "{{ message_label }} Include tasks"
   include_tasks: "storage-{{ detected_storage_type }}.yml"

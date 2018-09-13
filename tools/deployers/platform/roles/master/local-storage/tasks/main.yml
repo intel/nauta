@@ -1,11 +1,11 @@
 ---
 
-- name: Ensure that .done file does not exists
+- name: "{{ message_label }} Ensure that .done file does not exists"
   stat:
     path: "{{ local_data_path }}/.done"
   register: data_done_file
 
-- name: Create mount path
+- name: "{{ message_label }} Create mount path"
   file:
     path: "{{ local_data_path }}"
     state: directory
@@ -15,12 +15,12 @@
     - local_data_device | default(False)
     - not data_done_file.stat.exists
 
-- name: Touch done file
+- name: "{{ message_label }} Touch done file"
   file:
     path: "{{ local_data_path }}/.done"
     state: touch
 
-- name: Create directories
+- name: "{{ message_label }} Create directories"
   file:
     path: "{{ local_data_path }}/{{ item }}"
     state: directory

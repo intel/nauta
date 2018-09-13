@@ -3,11 +3,11 @@
 - set_fact:
     node_kind_path: "/etc/dls-cluster/master/{{ kind }}"
 
-- name: Generate privatekey for type {{ name }}
+- name: "{{ message_label }} Generate privatekey for type {{ name }}"
   openssl_privatekey:
     path: "{{ node_kind_path }}/key/{{ name }}.key"
 
-- name: Generate csr for type {{ name }}
+- name: "{{ message_label }} Generate csr for type {{ name }}"
   changed_when: False
   openssl_csr:
     path: "{{ node_kind_path }}/csr/{{ name }}.csr"
@@ -17,12 +17,12 @@
     key_usage: "{{ key_usage }}"
     extended_key_usage: "{{ extended_key_usage | default([]) }}"
 
-- name: Render configuration
+- name: "{{ message_label }} Render configuration"
   template:
     dest: "{{ node_kind_path }}/cfg/{{ name }}.cfg"
     src: conf.j2
 
-- name: Create crt
+- name: "{{ message_label }} Create crt"
   shell: >
     openssl x509 -req -in "{{ node_kind_path }}/csr/{{ name }}.csr"
     -set_serial {{ 9999 | random }} -CA "{{ node_kind_path }}/ca/CA.crt" -CAkey "{{ node_kind_path }}/ca/CA.key"
@@ -31,7 +31,7 @@
   args:
     creates: "{{ node_kind_path }}/crt/{{ name }}.crt"
 
-- name: Join global ca
+- name: "{{ message_label }} Join global ca"
   shell: 'cat "{{ node_kind_path }}/crt/{{ name }}.crt" "{{ node_kind_path }}/ca/CA.crt" > "{{ node_kind_path }}/crt/{{ name }}-fullchain.crt"'
   args:
     creates: "{{ node_kind_path }}/crt/{{ name }}-fullchain.crt"

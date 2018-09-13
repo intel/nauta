@@ -1,6 +1,6 @@
 ---
 
-- name: Fail on unknown distribution
+- name: "{{ message_label }} Fail on unknown distribution"
   tags:
     - always
   fail:

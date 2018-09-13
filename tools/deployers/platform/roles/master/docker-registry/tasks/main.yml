@@ -4,11 +4,11 @@
   vars:
     distribution_file: install.yml
 
-- name: Ensure registry directory exists
+- name: "{{ message_label }} Ensure registry directory exists"
   file:
     path: /opt/dls4e/registry
 
-- name: Replace configuration
+- name: "{{ message_label }} Replace configuration"
   template:
     src: registry.yml.j2
     dest: /etc/docker-distribution/registry/config.yml
@@ -17,7 +17,7 @@
 
 - meta: flush_handlers
 
-- name: Start and enable docker distribution
+- name: "{{ message_label }} Start and enable docker distribution"
   service:
     name: docker-distribution
     state: started

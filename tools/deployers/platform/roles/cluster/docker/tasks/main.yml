@@ -6,17 +6,17 @@
 
 - meta: flush_handlers
 
-- name: Create http configuration path
+- name: "{{ message_label }} Create http configuration path"
   file:
     path: /etc/systemd/system/docker.service.d
     state: directory
 
-- name: Create docker configuration path
+- name: "{{ message_label }} Create docker configuration path"
   file:
     path: /etc/docker
     state: directory
 
-- name: Render proxy configuration
+- name: "{{ message_label }} Render proxy configuration"
   template:
     src: "{{ item }}.conf.j2"
     dest: "/etc/systemd/system/docker.service.d/{{ item }}.conf"
@@ -27,7 +27,7 @@
     - Reload Systemd
     - Restart Docker
 
-- name: Render docker configuration
+- name: "{{ message_label }} Render docker configuration"
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
@@ -36,7 +36,7 @@
 
 - meta: flush_handlers
 
-- name: Start and enable docker
+- name: "{{ message_label }} Start and enable docker"
   service:
     name: docker
     state: started

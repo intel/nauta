@@ -1,6 +1,6 @@
 ---
 
-- name: Disable services
+- name: "{{ message_label }} Disable services"
   service:
     name: "{{ item }}"
     state: stopped
@@ -10,7 +10,7 @@
   with_items:
     - firewalld
 
-- name: Remove yum packages
+- name: "{{ message_label }} Remove yum packages"
   include_tasks: yum_remove.yml
   vars:
     packages:

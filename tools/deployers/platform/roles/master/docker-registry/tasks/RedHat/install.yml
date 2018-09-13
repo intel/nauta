@@ -1,6 +1,6 @@
 ---
 
-- name: Install package
+- name: "{{ message_label }} Install package"
   include_tasks: yum_dls4e_install.yml
   vars:
     packages:

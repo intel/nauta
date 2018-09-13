@@ -1,6 +1,6 @@
 ---
 
-- name: Verify rsync
+- name: "{{ message_label }} Verify rsync"
   include_tasks: yum_dls4e_install.yml
   vars:
     packages:

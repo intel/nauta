@@ -1,16 +1,16 @@
 ---
 
-- name: Get current version of release
+- name: "{{ message_label }} Get current version of release"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n dls4e get cm dls4enterprise -o 'jsonpath={.metadata.labels.dls4e_release_version}'"
   changed_when: False
   register: dls4e_version_remote
 
-- name: Register fact if version is matching
+- name: "{{ message_label }} Register fact if version is matching"
   set_fact:
     dls4e_version_match: "{{ dls4e_version == dls4e_version_remote.stdout }}"
 
-- name: Upgrade helm chart if required
+- name: "{{ message_label }} Upgrade helm chart if required"
   environment: "{{ local_envs }}"
   shell: "{{ runtime_helm }} upgrade dls4enterprise {{ runtime_dls4e_chart }} --timeout 1200 --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
   when:
@@ -18,7 +18,7 @@
     - upgrade | default(False) | bool
     - not dls4e_version_match
 
-- name: Fail if upgrade is not possible
+- name: "{{ message_label }} Fail if upgrade is not possible"
   fail:
     msg: DLS4E is already installed and upgrade option is not selected
   when:

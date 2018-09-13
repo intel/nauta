@@ -4,12 +4,12 @@
   vars:
     distribution_file: local-repository.yml
 
-- name: Render pip.ini file
+- name: "{{ message_label }} Render pip.ini file"
   template:
     src: pip.ini.j2
     dest: /opt/dls4e/pip.ini
 
-- name: Install pip core
+- name: "{{ message_label }} Install pip core"
   environment:
     PIP_CONFIG_FILE: /opt/dls4e/pip.ini
   pip:
@@ -21,7 +21,7 @@
     - setuptools
     - wheel
 
-- name: Install pip apps
+- name: "{{ message_label }} Install pip apps"
   environment:
     PIP_CONFIG_FILE: /opt/dls4e/pip.ini
   pip:
@@ -35,10 +35,10 @@
     - docker
     - pyOpenSSL
 
-- name: Ensure that python exists
+- name: "{{ message_label }} Ensure that python exists"
   file:
     path: "/opt/dls4e/python/bin/python2"
 
-- name: Override python variable
+- name: "{{ message_label }} Override python variable"
   set_fact:
     ansible_python_interpreter: "/opt/dls4e/python/bin/python2"

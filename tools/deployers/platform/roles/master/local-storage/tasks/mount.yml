@@ -1,11 +1,11 @@
 ---
 
-- name: Create filesystem on device
+- name: "{{ message_label }} Create filesystem on device"
   filesystem:
     dev: "{{ local_data_device }}"
     fstype: xfs
 
-- name: Mount data
+- name: "{{ message_label }} Mount data"
   mount:
     fstype: xfs
     path: "{{ local_data_path }}"
