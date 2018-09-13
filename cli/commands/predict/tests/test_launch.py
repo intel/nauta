@@ -32,6 +32,8 @@ class LaunchPredictMocks:
         self.get_inference_instance_url_mock = mocker.patch('commands.predict.launch.get_inference_instance_url')
         self.get_authorization_header_mock = mocker.patch('commands.predict.launch.get_authorization_header')
         self.get_namespace_mock = mocker.patch('commands.predict.launch.get_kubectl_current_context_namespace')
+        self.validate_local_model_location = mocker.patch(
+            'commands.predict.launch.validate_local_model_location')
 
 
 @pytest.fixture
@@ -95,3 +97,42 @@ def test_launch_url_fail(launch_mocks: LaunchPredictMocks):
 
     assert launch_mocks.get_authorization_header_mock.call_count == 1
     assert result.exit_code == 1
+
+
+# noinspection PyUnusedLocal,PyUnresolvedReferences
+def test_batch_missing_model_location(launch_mocks):
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, [])
+
+    assert launch_mocks.generate_name_mock.call_count == 0
+    assert launch_mocks.start_inference_instance_mock.call_count == 0
+    assert launch_mocks.get_namespace_mock.call_count == 0
+    assert launch_mocks.get_inference_instance_url_mock.call_count == 0
+    assert launch_mocks.get_authorization_header_mock.call_count == 0
+
+    assert result.exit_code == 1
+
+
+def test_missing_file(mocker, launch_mocks):
+    local_model_location = '/non_existing_path'
+    mocker.patch.object(launch, 'validate_local_model_location').side_effect = SystemExit(2)
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['--local_model_location', local_model_location])
+
+    assert launch_mocks.generate_name_mock.call_count == 0
+    assert launch_mocks.start_inference_instance_mock.call_count == 0
+    assert launch_mocks.get_namespace_mock.call_count == 0
+    assert launch_mocks.get_inference_instance_url_mock.call_count == 0
+    assert launch_mocks.get_authorization_header_mock.call_count == 0
+
+    assert result.exit_code == 2
+
+
+# noinspection PyUnusedLocal,PyUnresolvedReferences
+def test_validate_local_model_location(mocker):
+
+    mocker.patch('os.path.isdir', return_value=False)
+
+    with pytest.raises(SystemExit):
+        launch.validate_local_model_location('/bla')

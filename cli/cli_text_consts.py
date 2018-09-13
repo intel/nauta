@@ -188,7 +188,13 @@ PREDICT_LAUNCH_CMD_TEXTS = {
     "instance_info_msg": "\nPrediction instance URL (append method verb manually, e.g. :predict):\n"
                          "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}",
     "instance_url_error_msg": "Failed to obtain prediction instance URL.",
-    "table_headers": ["Prediction instance", "Model Location", "State"]
+    "table_headers": ["Prediction instance", "Model Location", "State"],
+    "help_local_model_location": "Local path to saved model that will be used for inference. Model content will be "
+                                 "copied into an image",
+    "model_dir_not_found_error_msg": "Cannot find: {local_model_location}. local_model_location must be a path to "
+                                     "existing directory.",
+    "missing_model_location_error_msg": "Missing model location param - "
+                                        "'model location' or 'local model location' required"
 }
 
 PREDICT_STREAM_CMD_TEXTS = {

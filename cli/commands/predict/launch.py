@@ -42,21 +42,40 @@ INFERENCE_TEMPLATE = 'tf-inference-stream'
 logger = initialize_logger(__name__)
 
 
+def validate_local_model_location(local_model_location: str):
+    if not os.path.isdir(local_model_location):
+        handle_error(
+            user_msg=TEXTS["model_dir_not_found_error_msg"].format(local_model_location=local_model_location)
+        )
+        exit(2)
+
+
 @click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='l')
 @click.option('-n', '--name', default=None, help=TEXTS["help_n"], callback=validate_experiment_name)
-@click.option('-m', '--model-location', required=True, help=TEXTS["help_m"])
+@click.option('-m', '--model-location', help=TEXTS["help_m"])
+@click.option("-l", "--local_model_location", type=click.Path(), help=TEXTS["help_local_model_location"])
 @common_options()
 @pass_state
-def launch(state: State, name: str, model_location: str):
+def launch(state: State, name: str, model_location: str, local_model_location: str):
     """
     Starts a new prediction instance that can be used for performing prediction, classification and
     regression tasks on trained model.
     """
+    if not model_location and not local_model_location:
+        handle_error(
+            user_msg=TEXTS["missing_model_location_error_msg"].format(local_model_location=local_model_location)
+        )
+        exit(1)
+
+    if local_model_location:
+        validate_local_model_location(local_model_location)
+
     click.echo('Submitting prediction instance.')
     try:
         model_name = os.path.basename(model_location)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
-        inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name)
+        inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
+                                                      local_model_location=local_model_location)
     except Exception:
         handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
