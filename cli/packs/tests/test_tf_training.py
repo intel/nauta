@@ -51,6 +51,24 @@ podCount: {TEST_POD_COUNT}
 workersCount: 3
 pServersCount: 1
 '''
+TEST_YAML_FILE_WITHOUT_POD_COUNT = f'''replicaCount: 2
+image:
+  pullPolicy: IfNotPresent
+commandline:
+  args:
+  - param4=value4
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+ingress:
+  enabled: false
+workersCount: 3
+pServersCount: 1
+'''
 
 TEST_DOCKERFILE = "t"
 
@@ -87,7 +105,35 @@ def test_modify_values_yaml(mocker):
     assert open_mock.call_count == 2, "files weren't read/written"
     assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
 
-    assert output['podCount'] == TEST_POD_COUNT
+    assert output['podCount'] == 3 or int(output['podCount']) == 3
+    assert output['workersCount'] == 2 or int(output['workersCount']) == 2
+    assert output['pServersCount'] == 1 or int(output['pServersCount']) == 1
+
+
+def test_modify_values_yaml_without_pod_count(mocker):
+    open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE_WITHOUT_POD_COUNT)
+    sh_move_mock = mocker.patch("shutil.move")
+    yaml_dump_mock = mocker.patch("yaml.dump")
+
+    tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
+                                   script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
+                                   experiment_name='test-experiment', run_name='test-experiment',
+                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
+
+    assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
+    output = yaml_dump_mock.call_args[0][0]
+    compare_yaml(output["commandline"]["args"], SCRIPT_LOCATION)
+    assert 'key1' and 'key2' in output
+    assert output['key1'] == 'val1'
+    assert output['key2'] == ["a", "b"]
+
+    assert yaml_dump_mock.call_count == 1, "job yaml wasn't modified"
+    assert open_mock.call_count == 2, "files weren't read/written"
+    assert all(EXAMPLE_PACK_TYPE in call[0][0] for call in open_mock.call_args_list)
+
+    assert output['podCount'] == 3 or int(output['podCount']) == 3
+    assert output['workersCount'] == 2 or int(output['workersCount']) == 2
+    assert output['pServersCount'] == 1 or int(output['pServersCount']) == 1
 
 
 def test_modify_values_yaml_raise_error_if_bad_argument(mocker):

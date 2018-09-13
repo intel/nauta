@@ -47,7 +47,6 @@ log = initialize_logger('packs.tf_training')
 
 WORK_CNT_PARAM = "workersCount"
 P_SERV_CNT_PARAM = "pServersCount"
-WAP_PARAM = "workersAndPServers"
 POD_COUNT_PARAM = "podCount"
 
 
@@ -155,13 +154,12 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
 
             dutil.new(v, key, value, '.')
 
-        # setting sum of replicas involved in multinode training - only if workersAndPServers in file with values and
-        # workersCount and/or  pServersCount were given by a user
-        if v.get(WAP_PARAM) and (workersCount or pServersCount):
+        # setting sum of replicas involved in multinode training if both pServersCount and workersCount are present in
+        # the pack or given in the cli
+        if (WORK_CNT_PARAM in v or workersCount) and (P_SERV_CNT_PARAM in v or pServersCount):
             number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
             number_of_replicas += int(v.get(P_SERV_CNT_PARAM)) if not pServersCount else int(pServersCount)
-            v[WAP_PARAM] = str(number_of_replicas)
-            v[POD_COUNT_PARAM] = str(number_of_replicas)
+            v[POD_COUNT_PARAM] = number_of_replicas
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)
@@ -208,6 +206,7 @@ def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:
         values = yaml.load(values_yaml_file)
 
     pod_count = values.get(POD_COUNT_PARAM)
+
     log.debug(f"Pod count for Run: {run_folder} = {pod_count}")
 
     return int(pod_count) if pod_count else None

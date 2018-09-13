@@ -432,8 +432,6 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         if exit_code:
             raise KubectlIntError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=output))
 
-        pod_count = get_pod_count(run_folder=run_folder, pack_type=pack_type)
-
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
 
@@ -450,6 +448,9 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
                              local_registry_port=local_registry_port, cluster_registry_port=cluster_registry_port,
                              pack_type=pack_type, pack_params=pack_params,
                              script_folder_location=script_folder_location)
+
+        pod_count = get_pod_count(run_folder=run_folder, pack_type=pack_type)
+
     except Exception as exe:
         delete_environment(run_folder)
         raise KubectlIntError(exe) from exe
