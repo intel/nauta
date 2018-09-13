@@ -48,7 +48,7 @@
               </v-card-title>
             </v-flex>
           </v-card-title>
-          <div class="elevation-3">
+          <div class="elevation">
             <div v-bind:class="{overflow: filteredDataCount !== 0, 'table-style': true, 'static-height': filterByValWindowVisible }">
               <table class="datatable table">
                 <thead>
@@ -57,7 +57,7 @@
                     <div class="select-icon"></div>
                   </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
-                      @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="310px">
+                      @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="230px">
                     <div class="filter-icon">
                       <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
                       <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
@@ -211,7 +211,8 @@ export default {
       tbCompatibleExpKinds: ['training'],
       searchPattern: '',
       selectedByUserColumns: [],
-      alwaysVisibleColumns: ['name', 'type', 'creationTimestamp', 'state'],
+      alwaysVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
+        'type'],
       filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
         name: {
@@ -454,7 +455,9 @@ export default {
         case 'trainingDurationTime':
           const duration = new Date(arg1);
           const pData = TimedateExtractor(duration);
-          return `${pData.days} day(s), ${pData.hours} hour(s), ${pData.minutes} min(s), ${pData.seconds} s`;
+          return `${pData.days} days, ${pData.hours} hrs, ${pData.minutes} mins, ${pData.seconds} s`;
+        case 'type':
+          return arg1 ? arg1.charAt(0).toUpperCase() + arg1.slice(1) : '-';
         default:
           return arg1;
       }
@@ -483,7 +486,7 @@ export default {
   padding-right: 5px;
 }
 .cell-title {
-  max-width: 200px;
+  max-width: 120px;
   float: left;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -517,6 +520,7 @@ export default {
 .overflow thead th {
   position: sticky;
   top: 0px;
+  z-index: 1;
 }
 .table-style th {
   background-color: #f2f2f2;
@@ -558,5 +562,10 @@ export default {
   height: 100%;
   margin-right: 20px;
   margin-left: 20px;
+}
+.elevation {
+  -webkit-box-shadow: -30px 28px 43px -30px rgba(0,0,0,0.2);
+  -moz-box-shadow: -30px 28px 43px -30px rgba(0,0,0,0.2);
+  box-shadow: -30px 28px 43px -30px rgba(0,0,0,0.2);
 }
 </style>

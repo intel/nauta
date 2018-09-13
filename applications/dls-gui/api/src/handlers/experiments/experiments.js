@@ -34,17 +34,17 @@ const generateExperimentEntities = function (data) {
     let entity = {
       attributes: {
         name: item.metadata.name,
-        type: item.metadata.labels.runKind,
-        creationTimestamp: item.metadata.creationTimestamp,
         state: item.spec.state,
-        namespace: item.metadata.namespace,
-        podSelector: item.spec['pod-selector']['matchLabels'],
-        podCount: item.spec['pod-count'],
-        parameters: item.spec['parameters'],
+        creationTimestamp: item.metadata.creationTimestamp,
         trainingStartTime: item.spec['start-time'],
         trainingEndTime: item.spec['end-time'],
         trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
-          item.spec['start-time'], item.spec['end-time'])
+          item.spec['start-time'], item.spec['end-time']),
+        type: item.metadata.labels.runKind,
+        namespace: item.metadata.namespace,
+        podSelector: item.spec['pod-selector']['matchLabels'],
+        podCount: item.spec['pod-count'],
+        parameters: item.spec['parameters']
       }
     };
     if (item.spec['metrics']) {

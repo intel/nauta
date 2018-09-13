@@ -20,14 +20,14 @@
  */
 
 export default {
-  creationTimestamp: 'Experiment Submission Date',
+  creationTimestamp: 'Submission Date',
   namespace: 'Owner',
-  name: 'Experiment Name',
-  state: 'Experiment Status',
-  type: 'Experiment Type',
+  name: 'Name',
+  state: 'Status',
+  type: 'Type',
   podCount: 'Pods',
   podSelector: 'Pod Selector',
-  trainingEndTime: 'Experiment End Time',
-  trainingStartTime: 'Experiment Start Time',
-  trainingDurationTime: 'Experiment Duration Time'
+  trainingEndTime: 'End Date',
+  trainingStartTime: 'Start Date',
+  trainingDurationTime: 'Duration Time'
 };

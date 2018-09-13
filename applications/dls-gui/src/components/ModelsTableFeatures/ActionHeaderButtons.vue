@@ -30,10 +30,10 @@
     </v-btn>
     <v-list>
       <v-list-tile v-on:click="clearSort()">
-        <v-list-tile-title>Clear sort</v-list-tile-title>
+        <v-list-tile-title>{{ labels.CLEAR_SORT }}</v-list-tile-title>
       </v-list-tile>
       <v-list-tile v-on:click="clearFilterHandler()">
-        <v-list-tile-title>Clear filter</v-list-tile-title>
+        <v-list-tile-title>{{ labels.CLEAR_FILTER }}</v-list-tile-title>
       </v-list-tile>
     </v-list>
   </v-menu>

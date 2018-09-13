@@ -24,11 +24,13 @@ export default {
   ALL_RIGHTS_RESERVED: 'All rights reserved',
   CANCEL: 'Cancel',
   CLEAR_ALL: 'Clear all',
+  CLEAR_FILTER: 'Clear Filter',
+  CLEAR_SORT: 'Clear Sort',
   CONTAINERS: 'Containers',
   DLS: 'Deep Learning Studio',
   EXIT: 'Exit',
-  EXPERIMENT_SUBMISSION_DATE: 'Experiment Submission Date',
-  EXPERIMENT_START_DATE: 'Experiment Start Date',
+  EXPERIMENT_SUBMISSION_DATE: 'Submission Date',
+  EXPERIMENT_START_DATE: 'Start Date',
   EXPERIMENTS: 'Experiments',
   FILTER_BY_VAL: 'Filter by values',
   LAUNCH_TB: 'Launch Tensorboard',
@@ -40,7 +42,7 @@ export default {
   OK: 'OK',
   PARAMETERS: 'Parameters',
   PODS: 'Pods',
-  RELEASE_NOTES: 'Release notes',
+  RELEASE_NOTES: 'Release Notes',
   RESET: 'Reset',
   RESOURCES: 'Resources',
   RESOURCES_DASHBOARD: 'Resources dashboard',
@@ -52,6 +54,6 @@ export default {
   STATE: 'State',
   STATUS: 'Status',
   TERMS_OF_USE: 'Terms of Use',
-  TOTAL_EXPERIMENT_DURATION: 'Total Experiment Duration',
-  USER_GUIDE: 'User guide'
+  TOTAL_EXPERIMENT_DURATION: 'Total Duration',
+  USER_GUIDE: 'User Guide'
 }

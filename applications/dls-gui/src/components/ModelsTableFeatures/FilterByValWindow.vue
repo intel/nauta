@@ -152,8 +152,9 @@ export default {
   width: 280px;
   border: 1px solid rgba(0, 0, 0, 0.4);
   background-color: #ffffff;
-  z-index: 10;
   position: absolute;
+  top: 60px;
+  left: 0px;
 }
 #options {
   height: 180px;
