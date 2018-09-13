@@ -35,6 +35,7 @@ def socat_mocked(mocker):
 
 def test_start(mocker, socat_mocked):
     mocker.patch.object(socat_mocked, '_ensure_socat_running')
+    mocker.patch.object(socat_mocked, 'load_socat_image')
 
     socat_mocked.start('whatever')
 

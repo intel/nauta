@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+import os
 from time import sleep
 from typing import Optional
 
@@ -26,6 +27,7 @@ import docker
 from docker.errors import NotFound
 from docker.models.containers import Container
 from cli_text_consts import UTIL_SOCAT_TEXTS as TEXTS
+from util.config import Config
 
 
 client = docker.from_env()
@@ -33,6 +35,10 @@ client = docker.from_env()
 SOCAT_CONTAINER_NAME_PREFIX = 'dlsctl-registry-bridge'
 
 socat_container_name = 'socat-'
+
+SOCAT_IMAGE_FILE_NAME = 'socat-container-image.tar.gz'
+
+SOCAT_IMAGE_NAME = 'socat-container-image:latest'
 
 
 def get() -> Optional[Container]:
@@ -63,6 +69,16 @@ def _ensure_socat_running():
     raise RuntimeError(TEXTS["socat_container_start_fail_msg"].format(container_status=socat_container.status))
 
 
+def load_socat_image():
+    config = Config()
+    if config.config_path:
+        with open(os.path.join(config.config_path, SOCAT_IMAGE_FILE_NAME), "rb") as file:
+            client.images.load(file)
+
+        if not client.images.list(name=SOCAT_IMAGE_NAME):
+            raise RuntimeError
+
+
 def start(docker_registry_port: str):
     """
     This function is synchronous - it returns when socat container is running.
@@ -71,11 +87,9 @@ def start(docker_registry_port: str):
     """
     global socat_container_name
     socat_container_name = f'{SOCAT_CONTAINER_NAME_PREFIX}-{docker_registry_port}'
-
-    # TODO: change image to socat from cluster instead public Internet
+    load_socat_image()
     client.containers.run(detach=True, remove=True, network_mode='host', name=socat_container_name,
-                          image='alpine/socat', command=f'TCP-LISTEN:{docker_registry_port},fork,reuseaddr '
-                                                        f'TCP:host.docker.internal:{docker_registry_port}')
+                          image=SOCAT_IMAGE_NAME, command=f'{docker_registry_port}')
 
     _ensure_socat_running()
 

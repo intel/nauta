@@ -35,6 +35,7 @@ ifeq (Windows,$(OS))
 	@mkdir dist/dls_ctl_config/
 	@7z x draft.7z -odist/dls_ctl_config/
 	@rm -f draft.7z
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/dls_ctl_config/socat-container-image.tar.gz
 endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
@@ -49,6 +50,7 @@ ifeq (Darwin,$(OS))
 	@mkdir dist/dls_ctl_config/
 	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
 	@rm -f draft.tar.gz
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/dls_ctl_config/socat-container-image.tar.gz
 endif
 
 

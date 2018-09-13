@@ -1,0 +1,5 @@
+FROM scratch
+
+ADD socat-container-image.tar.xz /
+
+ENTRYPOINT  ["/bin/bash", "-c", "/usr/bin/socat_script.sh ${*}", "--"]
