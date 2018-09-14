@@ -1,8 +1,73 @@
 ---
 
 verification_checks:
+  - message: "Param dls4e_configuration should be provided as a map with items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
+    condition: "{{ dls4e_configuration is not defined }}"
+
+  - message: "Param dls4e_configuration should be provided as a map with items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration is not iterable }}"
+
+  - message: "Param dls4e_configuration.input_nfs should be provided as a map with items: input_nfs.path and input_nfs.server"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is not defined }}"
+
+  - message: "Param dls4e_configuration.output_nfs should be provided as a map with items: output_nfs.path and output_nfs.server"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is not defined }}"
+
+  - message: "Param dls4e_configuration.input_nfs.path should be provided"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is defined and dls4e_configuration.input_nfs.path | default('') == '' }}"
+
+  - message: "Param dls4e_configuration.input_nfs.server should be provided"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is defined and dls4e_configuration.input_nfs.server | default('') == '' }}"
+
+  - message: "Param dls4e_configuration.output_nfs.path should be provided"
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is defined and dls4e_configuration.output_nfs.path | default('') == '' }}"
+
+  - message: "Param dls4e_configuration.output_nfs.server should be provided"
+    # yamllint disable-line rule:line-length
+    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is defined and dls4e_configuration.output_nfs.server | default('') == '' }}"
+
+  - message: "Param proxy should be provided as a map with items: http_proxy, https_proxy, no_proxy"
+    condition: "{{ proxy is defined and proxy is not iterable }}"
+
+  - message: "Param dns_servers should be provided as list"
+    condition: "{{ dns_servers is defined and dns_servers is not iterable }}"
+
+  - message: "Param dns_search_domains must be defined as list"
+    condition: "{{ dns_search_domains is not defined }}"
+
+  - message: "Param dns_search_domains should be provided as list"
+    condition: "{{ dns_search_domains is defined and dns_search_domains is not iterable }}"
+
+  - message: "Param dns_domains should be provided as list"
+    condition: "{{ dns_domains is defined and dns_domains is not iterable }}"
+
+  - message: "Param insecure_registries should be provided as list"
+    condition: "{{ insecure_registries is defined and insecure_registries is not iterable }}"
+
+  - message: "Param domain should be provided as string"
+    condition: "{{ domain is defined and (domain | join('')) != domain }}"
+
+  - message: "Param nodes_domain should be provided as string"
+    condition: "{{ nodes_domain is defined and (nodes_domain | join('')) != nodes_domain }}"
+
+  - message: "Param enabled_plugins should be provided as list"
+    condition: "{{ enabled_plugins is defined and enabled_plugins is not iterable }}"
+
+  - message: "Param disabled_plugins should be provided as list"
+    condition: "{{ disabled_plugins is defined and disabled_plugins is not iterable }}"
+
+  - message: "Param enabled_repos should be provided as list"
+    condition: "{{ enabled_repos is defined and enabled_repos is not iterable }}"
+
+  - message: "Param disabled_repos should be provided as list"
+    condition: "{{ disabled_repos is defined and disabled_repos is not iterable }}"
+
+  - message: "Param features should be provided as list"
+    condition: "{{ features is defined and features is not iterable }}"
+
   - message: "Can not find ansible_host or ansible_ssh_host on host."
     condition: "{{ 'ansible_ssh_host' not in hostvars[inventory_hostname] and 'ansible_host' not in hostvars[inventory_hostname] }}"
+
   - message: "Inventory hostname contains underscore - {{ inventory_hostname }}"
     condition: "{{ '_' in inventory_hostname }}"
 

@@ -1,50 +1,17 @@
 ---
 
 verification_checks:
-  - message: "Param dns_servers should be provided as list"
-    condition: "{{ dns_servers is defined and (dns_servers is string or dns_servers is not iterable) }}"
-
-  - message: "Param dns_search_domains must be defined as list"
-    condition: "{{ dns_search_domains is not defined }}"
-
-  - message: "Param dns_search_domains should be provided as list"
-    condition: "{{ dns_search_domains is defined and (dns_search_domains is string or dns_search_domains is not iterable) }}"
-
-  - message: "Param dns_domains should be provided as list"
-    condition: "{{ dns_domains is defined and (dns_domains is string or dns_domains is not iterable) }}"
-
-  - message: "Param insecure_registries should be provided as list"
-    condition: "{{ insecure_registries is defined and (insecure_registries is string or insecure_registries is not iterable) }}"
-
-  - message: "Param domain should be provided as string"
-    condition: "{{ domain is defined and domain is not string }}"
-
-  - message: "Param nodes_domain should be provided as string"
-    condition: "{{ nodes_domain is defined and nodes_domain is not string }}"
-
-  - message: "Param enabled_plugins should be provided as list"
-    condition: "{{ enabled_plugins is defined and (enabled_plugins is string or enabled_plugins is not iterable) }}"
-
-  - message: "Param disabled_plugins should be provided as list"
-    condition: "{{ disabled_plugins is defined and (disabled_plugins is string or disabled_plugins is not iterable) }}"
-
-  - message: "Param enabled_repos should be provided as list"
-    condition: "{{ enabled_repos is defined and (enabled_repos is string or enabled_repos is not iterable) }}"
-
-  - message: "Param disabled_repos should be provided as list"
-    condition: "{{ disabled_repos is defined and (disabled_repos is string or disabled_repos is not iterable) }}"
-
-  - message: "Param features should be provided as list"
-    condition: "{{ features is defined and (features is string or features is not iterable) }}"
-
   - message: "Param k8s_domain should be provided as string"
-    condition: "{{ k8s_domain is defined and k8s_domain is not string }}"
+    condition: "{{ k8s_domain is defined and (k8s_domain | join('')) != k8s_domain }}"
 
   - message: "Param kubernetes_pod_subnet should be provided as string"
-    condition: "{{ kubernetes_pod_subnet is defined and kubernetes_pod_subnet is not string }}"
+    condition: "{{ kubernetes_pod_subnet is defined and kubernetes_pod_subnet is not iterable }}"
 
   - message: "Param kubernetes_svc_subnet should be provided as string"
-    condition: "{{ kubernetes_svc_subnet is defined and kubernetes_svc_subnet is not string }}"
+    condition: "{{ kubernetes_svc_subnet is defined and kubernetes_svc_subnet is not iterable }}"
+
+  - message: "Param use_system_enabled_repos should be provided as bool (True/False)"
+    condition: "{{ use_system_enabled_repos is defined and use_system_enabled_repos | string not in ['True', 'False'] }}"
 
   - message: "Param use_system_enabled_plugins should be provided as bool (True/False)"
     condition: "{{ use_system_enabled_plugins is defined and use_system_enabled_plugins | string not in ['True', 'False'] }}"
@@ -53,13 +20,13 @@ verification_checks:
     condition: "{{ storage_type is defined and storage_type != 'auto' }}"
 
   - message: "Improper domain in parameter {{ domain }}"
-    condition: "{{ domain | regex_search ('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$') }}"
+    condition: "{{ domain | join ('') | regex_search ('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$') }}"
 
   - message: "Improper nodes_domain set in parameter {{ nodes_domain }}"
     condition: "{{ nodes_domain | regex_search ('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$') }}"
 
   - message: "Improper k8s_domain set in parameter {{ k8s_domain }}"
-    condition: "{{ k8s_domain | regex_search ('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$') }}"
+    condition: "{{ k8s_domain | join ('') | regex_search ('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$') }}"
 
   - message: "Unable to parse kubernetes_pod_subnet as subnet from value {{ kubernetes_pod_subnet }}"
     condition: "{{ not kubernetes_pod_subnet | ipaddr }}"
