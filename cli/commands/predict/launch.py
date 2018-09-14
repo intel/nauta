@@ -72,7 +72,8 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
 
     click.echo('Submitting prediction instance.')
     try:
-        model_name = os.path.basename(model_location)
+        model_path = model_location.rstrip('/') if model_location else local_model_location.rstrip('/')
+        model_name = os.path.basename(model_path)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
                                                       local_model_location=local_model_location)

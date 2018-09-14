@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cp -rf ${MODEL_PATH}/. ${MODEL_BASE_PATH}
+
 if [ -z \"$(ls -A /models)\" ]; then
     echo 'Error: the provided path to model {{ .Values.modelPath }} is invalid or contains no files.'
     exit 1
