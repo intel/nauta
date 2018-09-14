@@ -41,14 +41,14 @@ data:
           proxy_set_header  Host           $http_host;   # required for docker client's sake
           proxy_set_header  X-Real-IP      $remote_addr; # pass on real client's IP
           proxy_set_header  Authorization  ""; # see https://github.com/dotcloud/docker-registry/issues/170
-          proxy_read_timeout               900;
+          proxy_read_timeout               7200;
         }
         location / {
           proxy_pass http://{{ .Release.Name }}-docker-registry:5000/;
           proxy_set_header  Host           $http_host;   # required for docker client's sake
           proxy_set_header  X-Real-IP      $remote_addr; # pass on real client's IP
           proxy_set_header  Authorization  ""; # see https://github.com/dotcloud/docker-registry/issues/170
-          proxy_read_timeout               900;
+          proxy_read_timeout               7200;
         }
       }
     }
