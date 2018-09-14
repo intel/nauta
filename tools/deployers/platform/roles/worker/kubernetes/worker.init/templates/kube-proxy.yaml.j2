@@ -14,7 +14,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: kube-proxy
-    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-proxy:v1.10.0"
+    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-proxy:v1.10.6"
     resources:
       requests:
         cpu: 100m
@@ -22,7 +22,7 @@ spec:
     command:
     - /bin/sh
     - -c
-    - kube-proxy --proxy-mode ipvs --bind-address "$POD_IP" --kubeconfig /etc/kubelet/kubelet --cluster-cidr "{{ kubernetes_network.svc }}" --resource-container="" --oom-score-adj=-998
+    - kube-proxy --masquerade-all --proxy-mode iptables --bind-address "$POD_IP" --kubeconfig /etc/kubelet/kubelet --cluster-cidr "{{ kubernetes_network.svc }}" --resource-container="" --oom-score-adj=-998
     env:
     - name: POD_IP
       valueFrom:

@@ -4,8 +4,8 @@
   include_tasks: yum_dls4e_install.yml
   vars:
     packages:
-      - dls4e-kubernetes-server-1.10.3
-      - dls4e-kubernetes-client-1.10.3
+      - dls4e-kubernetes-server-1.10.6
+      - dls4e-kubernetes-client-1.10.6
       - dls4e-helm-2.9.1
     handlers:
       - Reload Systemd

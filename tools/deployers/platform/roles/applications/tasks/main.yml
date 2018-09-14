@@ -85,7 +85,7 @@
   changed_when: False
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl taint nodes {{ hostvars[groups['master'][0]].ansible_nodename }} master=true:NoSchedule"
+  shell: "kubectl taint nodes {{ hostvars[groups['master'][0]].ansible_nodename }} master=true:NoSchedule --overwrite=True"
   when: "'worker' in groups and groups['worker'] | length > 0"
 
 - name: "{{ message_label }} Install helm chart"
