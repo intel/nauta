@@ -73,6 +73,10 @@ platform_ansible_run() {
         >&2 echo "Inventory file should be provided for platform installation"
         exit 1
     fi
+    if [ X"${ENV_CONFIG}" = X"" ]; then
+        >&2 echo "Config file should be provided for platform installation"
+        exit 1
+    fi
     ansible_run ${CURDIR}/platform/dls.yml
     return $?
 }
