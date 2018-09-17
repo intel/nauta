@@ -161,9 +161,9 @@ def view(context, state: State, experiment_name: str, tensorboard: bool):
         for pod in pods:
             status_string = ""
             for cond in pod.status.conditions:
-                msg = "" if not cond.reason else ", reason: " + cond.reason
-                msg = msg + ",\nmessage: " + cond.message if cond.message else msg
-                status_string = "     " + cond.type + ": " + cond.status + msg
+                msg = "\n" if not cond.reason else ", reason: " + cond.reason + "\n"
+                msg = msg + ", message: " + cond.message if cond.message else msg
+                status_string += cond.type + ": " + cond.status + msg
 
             container_statuses = defaultdict(lambda: None)
             if pod.status.container_statuses:
