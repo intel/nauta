@@ -57,7 +57,7 @@
                     <div class="select-icon"></div>
                   </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
-                      @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="230px">
+                      @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="210px">
                     <div class="filter-icon">
                       <v-icon v-if="isFilterableByValColumn(header)" v-on:click="switchFilterWindow(header, true)" small class="pointer-btn">{{ filterIcon }}</v-icon>
                       <FilterByValWindow v-if="filterByValModals[header] && filterByValModals[header].visible"
@@ -309,7 +309,7 @@ export default {
       return this.selected.length > 0;
     },
     columnsCount: function () {
-      return this.currentlyVisibleColumns.length > 6 ? 7 : this.currentlyVisibleColumns.length + 1;
+      return this.currentlyVisibleColumns.length > 6 ? 8 : this.currentlyVisibleColumns.length + 1;
     },
     customFiltersActive: function () {
       return this.filterByValModals.state.params.length || this.filterByValModals.name.params.length ||
@@ -486,7 +486,7 @@ export default {
   padding-right: 5px;
 }
 .cell-title {
-  max-width: 120px;
+  max-width: 100px;
   float: left;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -515,7 +515,6 @@ export default {
 .table-style th {
   height: 46px;
   color: rgba(0, 0, 0, 0.52);
-  font-size: 14px !important;
 }
 .overflow thead th {
   position: sticky;
@@ -531,6 +530,9 @@ export default {
 }
 .table-style tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+.table-style td {
+  font-size: 12px;
 }
 .select-icon {
   width: 24px;
@@ -550,12 +552,12 @@ export default {
   cursor: pointer;
 }
 .expanded-view {
-  color: rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.87) !important;
   font-weight: normal;
   text-align: left;
 }
 .exp-details {
-  margin: 20px;
+  margin: 20px 20px 20px 45px;
 }
 .vertical-line {
   border-left: 1px dashed rgba(0, 0, 0, 0.87);

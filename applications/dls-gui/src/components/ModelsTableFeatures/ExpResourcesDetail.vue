@@ -63,6 +63,7 @@ export default {
 <style scoped>
 #pods-list {
   margin-left: 25px;
+  font-size: 12px;
 }
 #containers-list {
   margin-left: 25px;

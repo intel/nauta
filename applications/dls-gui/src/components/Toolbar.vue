@@ -20,7 +20,7 @@
  */
 
 <template>
-  <v-toolbar dark color="intel_primary" app fixed clipped-left height="110px">
+  <v-toolbar dark color="intel_primary" app fixed clipped-left height="100px">
     <v-toolbar-side-icon v-if="menuBtnVisibility" @click.stop="toggleMenu"></v-toolbar-side-icon>
     <v-toolbar-title>
       <v-container grid-list-md>

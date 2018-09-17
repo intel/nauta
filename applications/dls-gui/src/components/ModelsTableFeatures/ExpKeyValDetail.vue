@@ -40,8 +40,10 @@ export default {
 <style scoped>
 .keyname {
   font-weight: bold;
+  font-size: 12px;
 }
 .values {
   margin-left: 20px;
+  font-size: 12px;
 }
 </style>
