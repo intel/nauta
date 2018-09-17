@@ -42,21 +42,21 @@
       <v-list>
         <v-list-tile>
           <v-list-tile-title>
-            <a :href="cliCommands" target="_blank">
+            <a :href="cliCommands" target="_blank" :download="labels.USER_GUIDE_PDF">
               {{ labels.USER_GUIDE }}
             </a>
           </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
           <v-list-tile-title>
-            <a :href="releaseNotesDoc" target="_blank">
+            <a :href="releaseNotesDoc" target="_blank" :download="labels.RELEASE_NOTES_PDF">
               {{ labels.RELEASE_NOTES }}
             </a>
           </v-list-tile-title>
         </v-list-tile>
         <v-list-tile>
           <v-list-tile-title>
-            <a :href="licenseDoc" target="_blank">
+            <a :href="licenseDoc" target="_blank" :download="labels.LICENSE_PDF">
               {{ labels.LICENSE }}
             </a>
           </v-list-tile-title>

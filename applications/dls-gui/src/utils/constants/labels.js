@@ -35,6 +35,7 @@ export default {
   FILTER_BY_VAL: 'Filter by values',
   LAUNCH_TB: 'Launch Tensorboard',
   LICENSE: 'License',
+  LICENSE_PDF: 'dls-evaluation-license.pdf',
   LOAD_MORE: 'Load more',
   LOADING: 'Loading',
   NAME: 'Name',
@@ -43,6 +44,7 @@ export default {
   PARAMETERS: 'Parameters',
   PODS: 'Pods',
   RELEASE_NOTES: 'Release Notes',
+  RELEASE_NOTES_PDF: 'intel-release-notes-for-dell-early-access.pdf',
   RESET: 'Reset',
   RESOURCES: 'Resources',
   RESOURCES_DASHBOARD: 'Resources dashboard',
@@ -55,5 +57,6 @@ export default {
   STATUS: 'Status',
   TERMS_OF_USE: 'Terms of Use',
   TOTAL_EXPERIMENT_DURATION: 'Total Duration',
-  USER_GUIDE: 'User Guide'
+  USER_GUIDE: 'User Guide',
+  USER_GUIDE_PDF: 'dls4e-cli-commands.pdf'
 }
