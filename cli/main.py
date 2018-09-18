@@ -47,7 +47,7 @@ logger = initialize_logger(__name__)
 BANNER = """Intel® Deep Learning Studio (Intel® DL Studio) Client
 
             To get further help on commands use COMMAND with -h or --help option."""
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)
 DEFAULT_LANG = "en_US.UTF-8"
 
 ERROR_MESSAGE = "Other error during starting application."
