@@ -30,6 +30,7 @@ from commands.predict.common import start_inference_instance, get_inference_inst
 from commands.experiment.common import validate_experiment_name
 from platform_resources.experiments import generate_name
 from cli_state import common_options, pass_state, State
+from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -77,6 +78,8 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
                                                       local_model_location=local_model_location)
+        if inference_instance.state == RunStatus.FAILED:
+            raise RuntimeError('Inference instance submission failed.')
     except Exception:
         handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)

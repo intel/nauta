@@ -113,7 +113,7 @@ def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_fi
     return runs
 
 
-def add_run(run: Run, namespace: str, labels: Dict[str, str] = None) -> KubernetesObject:
+def add_run(run: Run, namespace: str, labels: Dict[str, str] = None, annotations: Dict = None) -> KubernetesObject:
     """
     Add a new Run resource object to the platform
     :param labels: additional labels
@@ -125,7 +125,8 @@ def add_run(run: Run, namespace: str, labels: Dict[str, str] = None) -> Kubernet
     config.load_kube_config()
     api = client.CustomObjectsApi(client.ApiClient())
 
-    run_kubernetes = KubernetesObject(run, client.V1ObjectMeta(name=run.name, namespace=namespace, labels=labels),
+    run_kubernetes = KubernetesObject(run, client.V1ObjectMeta(name=run.name, namespace=namespace, labels=labels,
+                                                               annotations=annotations),
                                       kind="Run", apiVersion=f"{API_GROUP_NAME}/{RUN_VERSION}")
     schema = RunKubernetesSchema()
     body, err = schema.dump(run_kubernetes)

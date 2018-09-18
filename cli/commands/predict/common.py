@@ -66,7 +66,7 @@ def get_inference_instance_url(inference_instance: Union[Run, RunSubmission], mo
     If Run is passed as inference_instance, model name is automatically obtained from Run metadata.
     """
     service_name = inference_instance.name
-    model_name = model_name if model_name else inference_instance.metadata['labels']['modelName']
+    model_name = model_name if model_name else inference_instance.metadata['annotations']['modelName']
     k8s_host = get_kubectl_host(replace_https=False)
     k8s_namespace = get_kubectl_current_context_namespace()
 

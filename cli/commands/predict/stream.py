@@ -89,6 +89,6 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
     except Exception as e:
         error_msg = TEXTS["inference_other_error_msg"].format(exception=e)
         if hasattr(e, 'response'):
-            error_msg += TEXTS["inferenece_error_response_msg"].format(response_text=e.response.text)
+            error_msg += TEXTS["inference_error_response_msg"].format(response_text=e.response.text)
         handle_error(logger, error_msg, error_msg)
         exit(1)

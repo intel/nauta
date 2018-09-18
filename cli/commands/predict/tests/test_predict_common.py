@@ -59,7 +59,7 @@ def test_get_inference_instance_url_run(mocker):
     fake_instance = MagicMock(spec=Run)
     fake_model_name = 'fake_model'
     fake_instance.name = 'inf'
-    fake_instance.metadata = {'labels': {'modelName': fake_model_name}}
+    fake_instance.metadata = {'annotations': {'modelName': fake_model_name}}
     fake_host = 'https://localhost:8443'
     fake_namespace = 'fake_namespace'
 
