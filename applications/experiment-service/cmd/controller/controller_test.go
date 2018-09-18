@@ -8,7 +8,9 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 	core_v1 "k8s.io/api/core/v1"
+	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/testing"
 	"k8s.io/client-go/util/workqueue"
 
@@ -53,7 +55,7 @@ var _ = Describe("Controller", func() {
 			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
 
 			patch := createUpdateStatePatch(common.Complete)
-			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch}, []*core_v1.Pod{rUT.pod})
+			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch})
 
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(counter).Should(Equal(1))
@@ -75,7 +77,7 @@ var _ = Describe("Controller", func() {
 			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
 
 			patch := createUpdateStatePatch(common.Complete)
-			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch}, []*core_v1.Pod{rUT.pod})
+			err := rUT.ctrl.updateRun(rUT.runInstance, []patchSpec{patch})
 
 			Expect(err).To(Equal(updateErr))
 			Expect(counter).Should(Equal(1))
@@ -106,14 +108,9 @@ var _ = Describe("Controller", func() {
 			Expect(result).To(Equal(common.Failed))
 		})
 
-		It("it returns Failed status if no there is no pods", func() {
-			result := calculateRunState(prepareRun(1), []*core_v1.Pod{})
-			Expect(result).To(Equal(common.Failed))
-		})
-
-		It("it returns Failed status if no there is more pods then run specifies", func() {
+		It("it does not return Failed status if no there is more pods then run specifies", func() {
 			result := calculateRunState(prepareRun(1), []*core_v1.Pod{prepareRunningPod(), prepareRunningPod()})
-			Expect(result).To(Equal(common.Failed))
+			Expect(result).To(Equal(common.Running))
 		})
 	})
 
@@ -221,6 +218,47 @@ var _ = Describe("Controller", func() {
 			getRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
 				counter++
 				rUT.runInstance.Spec.State = common.Complete
+				return true, rUT.runInstance, nil
+			}
+			rUT.mock.AddReactor("get", "runs", getRunMock)
+
+			updateCounter := 0
+			updateRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
+				updateCounter++
+				return true, rUT.runInstance, nil
+			}
+			rUT.mock.AddReactor("patch", "runs", updateRunMock)
+			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
+
+			//rUT.podListenerMock.lister.On("List", mock.Anything).Return([]*core_v1.Pod{rUT.pod}, nil).Once()
+
+			err := rUT.ctrl.syncHandler(rUT.runInstance.Namespace + "/" + rUT.runInstance.Name)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(counter).Should(Equal(1))
+			Expect(updateCounter).Should(Equal(0))
+			//rUT.podListenerMock.lister.AssertExpectations(GinkgoT())
+		})
+
+		It("returns when run disappears suddenly", func() {
+			counter := 0
+			getRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
+				counter++
+				return true, nil, k8sErrors.NewNotFound(schema.GroupResource{}, "run")
+			}
+			rUT.mock.AddReactor("get", "runs", getRunMock)
+
+			rUT.ctrl.runclientset = &fake_run.Clientset{Fake: rUT.mock}
+
+			err := rUT.ctrl.syncHandler(rUT.runInstance.Namespace + "/" + rUT.runInstance.Name)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(counter).Should(Equal(1))
+		})
+
+		It("does not update run with same status", func() {
+			counter := 0
+			getRunMock := func(action testing.Action) (handled bool, ret runtime.Object, err error) {
+				counter++
+				rUT.runInstance.Spec.State = common.Running
 				return true, rUT.runInstance, nil
 			}
 			rUT.mock.AddReactor("get", "runs", getRunMock)

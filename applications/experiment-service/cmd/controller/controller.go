@@ -206,6 +206,12 @@ func (c *Controller) syncHandler(key string) error {
 
 	log.Printf("Processing Run: %s. State: %v", run.Name, run.Spec.State)
 
+	if run.Spec.State == common.Complete || run.Spec.State == common.Failed || run.Spec.State == common.Cancelled {
+		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s already processed. Final status %v",
+			run.Name, run.Spec.State))
+		return nil
+	}
+
 	selector, err := metav1.LabelSelectorAsSelector(&run.Spec.PodSelector)
 	if err != nil {
 		runtime.HandleError(fmt.Errorf("run: %s. Convert LabelSelector to Selector Fail: %v", run.Name, err))
@@ -218,15 +224,8 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	if run.Spec.State == common.Complete || run.Spec.State == common.Failed || run.Spec.State == common.Cancelled {
-		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s already processed. Final status %v",
-			run.Name, run.Spec.State))
-		return nil
-	}
-
-	if run.Spec.State == "" && len(pods) < run.Spec.PodCount {
-		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s NOT READY to start yet. Not enough pods. "+
-			"Required %d, currently: %d", run.Name, run.Spec.PodCount, len(pods)))
+	if len(pods) == 0 {
+		runtime.HandleError(fmt.Errorf("SKIPPING. Run: %s has no pods yet. ", run.Name))
 		return nil
 	}
 
@@ -238,7 +237,8 @@ func (c *Controller) syncHandler(key string) error {
 		patches = append(patches, createUpdateStartTimePatch())
 	}
 
-	if (run.Spec.State == common.Queued || run.Spec.State == common.Running) && (stateToSet != common.Queued && stateToSet != common.Running) {
+	if (run.Spec.State == common.Queued || run.Spec.State == common.Running) &&
+		(stateToSet != common.Queued && stateToSet != common.Running) {
 		patches = append(patches, createUpdateEndTimePatch())
 	}
 
@@ -246,9 +246,10 @@ func (c *Controller) syncHandler(key string) error {
 		patches = append(patches, createUpdateStatePatch(stateToSet))
 	} else {
 		log.Printf("Run: %s state (%v) not changed. Update no required", run.Name, run.Spec.State)
+		return nil
 	}
 
-	return c.updateRun(run, patches, pods)
+	return c.updateRun(run, patches)
 }
 
 type patchSpec struct {
@@ -281,8 +282,7 @@ func createUpdateEndTimePatch() patchSpec {
 	}
 }
 
-
-func (c *Controller) updateRun(run *v1.Run, patches []patchSpec, pods []*corev1.Pod) error {
+func (c *Controller) updateRun(run *v1.Run, patches []patchSpec) error {
 	if len(patches) == 0 {
 		return nil
 	}
@@ -303,43 +303,39 @@ func (c *Controller) updateRun(run *v1.Run, patches []patchSpec, pods []*corev1.
 
 func calculateRunState(run *v1.Run, pods []*corev1.Pod) common.RunState {
 	var stateToSet common.RunState
-	if len(pods) == run.Spec.PodCount {
-		stateToSet = calculateRunStateFromPods(pods, run.Name)
-		log.Printf("Run %s. New calculated state: %v", run.Name, stateToSet)
-	} else if len(pods) == 0 {
-		log.Printf("No Pods found. Setting FAILED status for Run: %s", run.Name)
-		stateToSet = common.Failed
-	} else {
-		log.Printf("Incorrect number of Pods found: %d, expected: %d. Setting FAILED status for Run: %s",
-			len(pods), run.Spec.PodCount, run.Name)
-		stateToSet = common.Failed
-	}
+
+	stateToSet = calculateRunStateFromPods(pods, run)
+	log.Printf("Run %s. New calculated state: %v", run.Name, stateToSet)
+
 	return stateToSet
 }
 
-func calculateRunStateFromPods(pods []*corev1.Pod, runName string) common.RunState {
+func calculateRunStateFromPods(pods []*corev1.Pod, run *v1.Run) common.RunState {
 	statuses := map[corev1.PodPhase]int{
 		corev1.PodPending:   0,
 		corev1.PodUnknown:   0,
 		corev1.PodRunning:   0,
 		corev1.PodSucceeded: 0,
+		corev1.PodFailed:    0,
 	}
 
 	for _, pod := range pods {
 		podPhase := pod.Status.Phase
-		if podPhase == corev1.PodFailed {
-			log.Printf("Run %s failed! Reason: pod Failed: %s", runName, pod.Status.Message)
-			return common.Failed
-		}
 		statuses[podPhase] = statuses[podPhase] + 1
 	}
 
-	if statuses[corev1.PodPending] > 0 || statuses[corev1.PodUnknown] > 0 {
+	if statuses[corev1.PodFailed] > 0 {
+		return common.Failed
+	}
+
+	if (statuses[corev1.PodPending] > 0 || statuses[corev1.PodUnknown] > 0) && run.Spec.State != common.Running {
 		return common.Queued
 	}
-	if statuses[corev1.PodSucceeded] == len(pods) {
+
+	if statuses[corev1.PodSucceeded] == run.Spec.PodCount {
 		return common.Complete
 	}
+
 	return common.Running
 }
 
