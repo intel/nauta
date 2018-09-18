@@ -10,10 +10,11 @@ metadata:
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
+  cleanPodPolicy: None # Setting cleanPodPolicy to None, so parameter servers will not be terminated by tf-operator
   tfReplicaSpecs:
     Worker:
       replicas: {{ .Values.workersCount }}
-      restartPolicy: OnFailure
+      restartPolicy: ExitCode
       template:
         metadata:
           annotations:
@@ -82,8 +83,8 @@ spec:
                   mountPath: /mnt/output/home
       backoffLimit: 5
     PS:
+      restartPolicy: ExitCode
       replicas: {{ .Values.pServersCount }}
-      restartPolicy: OnFailure
       template:
         metadata:
           annotations:
@@ -166,4 +167,3 @@ spec:
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home
-      backoffLimit: 5

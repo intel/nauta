@@ -28,6 +28,8 @@ from kubernetes import client, config
 from kubernetes.client import V1Pod, V1ObjectMeta
 
 
+JOB_SUCCESS_CONDITION = "Succeeded"
+
 LOGGING_LEVEL_MAPPING = {"DEBUG": log.DEBUG, "INFO": log.INFO, "WARNING": log.WARNING, "ERROR": log.ERROR,
                          "CRITICAL": log.CRITICAL}
 
@@ -84,17 +86,13 @@ while True:
                                                   plural="tfjobs",
                                                   name=my_tfjob_name)
 
-    workers_statuses = my_tfjob["status"]["tfReplicaStatuses"]["Worker"]
+    job_conditions = my_tfjob["status"]["conditions"]
 
-    active_workers = workers_statuses.get("active", 0)
-    succeeded_workers = workers_statuses.get("succeeded", 0)
-
-    log.info(f"active workers: {active_workers}")
-
-    if active_workers == 0 and succeeded_workers > 0:
-        log.info("active workers == 0 and succeeded_workers > 0, creating END hook")
-        open("/pod-data/END", 'a').close()
-        log.info("exiting...")
-        exit(0)
+    for condition in job_conditions:
+        if condition.get("type") == JOB_SUCCESS_CONDITION:
+            log.info("Job succeeded, creating END hook")
+            open("/pod-data/END", 'a').close()
+            log.info("exiting...")
+            exit(0)
 
     sleep(1)

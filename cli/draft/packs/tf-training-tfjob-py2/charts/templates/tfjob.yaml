@@ -11,9 +11,9 @@ metadata:
     runName: {{ .Release.Name }}
 spec:
   tfReplicaSpecs:
-    Master:
+    Worker:
       replicas: 1
-      restartPolicy: OnFailure
+      restartPolicy: ExitCode
       template:
         metadata:
           annotations:
@@ -80,4 +80,3 @@ spec:
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home
-      backoffLimit: 5

@@ -9,7 +9,7 @@ RUN git clone https://github.com/kubeflow/tf-operator.git
 
 WORKDIR ${GOPATH}/src/github.com/kubeflow/tf-operator
 
-RUN git checkout 93843edae6b2c00cfa52a83df89e2592b1832662
+RUN git checkout 1bc8425dff31f97262e7528f2e17be1a62132d3b
 
 RUN wget https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -O /usr/local/bin/dep
 
