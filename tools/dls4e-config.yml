@@ -149,10 +149,6 @@ local_images:
     version: "1.14.0"
     method: pull
     image: "nginx:1.14.0"
-  dls4e/postgres:
-    version: "10.4"
-    method: pull
-    image: "postgres:10.4"
   dls4e/tf/operator:
     version: "v2"
     required:
@@ -281,7 +277,6 @@ subcharts:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/experiment-service"
       chart_values:
-        image: "{{ image_local_url['dls4e/postgres'] }}"
         service_image: "{{ image_local_url['dls4e/experiment-service'] }}"
         etcd_image: "{{ image_local_url['dls4e/etcd'] }}"
     tf:
