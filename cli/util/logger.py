@@ -40,7 +40,9 @@ def get_verbosity_level():
 
 def set_global_logging_level(log_level):
     for key in logging.Logger.manager.loggerDict:
-        logging.getLogger(key).setLevel(log_level)
+        for handler in logging.getLogger(key).handlers:
+            if not isinstance(handler, TimedRotatingFileHandler):
+                handler.setLevel(log_level)
 
 
 # ALWAYS called on CLI command init

@@ -72,7 +72,7 @@ def configure_cli_logs():
     if os.environ.get('DLS_CTL_LOG_DISABLE'):
         return
 
-    log_level = os.environ.get('DLS_CTL_LOG_LEVEL', default=logging.DEBUG)
+    log_level = os.environ.get('DLS_CTL_FILE_LOG_LEVEL', default=logging.DEBUG)
     log_retention = os.environ.get('DLS_CTL_LOG_RETENTION', default=30)
 
     log_file_directory = os.environ.get('DLS_CTL_LOG_DIRECTORY')
