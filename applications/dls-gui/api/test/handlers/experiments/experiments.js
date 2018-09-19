@@ -598,7 +598,7 @@ describe('Handlers | Experiments', function () {
           {
             name: 'tensorflow',
             resources: {},
-            status: 'Terminated, "Completed"'
+            status: 'Terminated, Completed'
           }
         ]
       }];
@@ -607,6 +607,7 @@ describe('Handlers | Experiments', function () {
       deferred.resolve(podsList);
       process.nextTick(function () {
         expect(resMock.send.calledOnce).to.equal(true);
+        expect(resMock.send.getCall(0).args[0]).to.deep.equal(expectedResult);
         expect(resMock.send.calledWith(expectedResult)).to.equal(true);
         expect(k8sMock.listPodsByLabelValue.calledOnce).to.equal(true);
         done();

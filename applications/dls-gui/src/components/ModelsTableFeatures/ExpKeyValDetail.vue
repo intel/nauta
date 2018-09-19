@@ -25,7 +25,7 @@
       <span class="keyname">{{ keyname }}:</span>
     </v-flex>
     <v-flex xs9 class="values">
-      <span>{{ value }}</span>
+      <span>{{ value ? value : '--'}}</span>
     </v-flex>
   </v-layout>
 </template>

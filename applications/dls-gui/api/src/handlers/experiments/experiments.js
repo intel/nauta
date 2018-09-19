@@ -245,7 +245,7 @@ const getExperimentResourcesData = function (req, res) {
           containers: pod.spec.containers.map((container) => {
             return {
               name: container.name,
-              resources: container.resources,
+              resources: container.resources.requests ? container.resources.requests : container.resources,
               status: k8s.parseContainerState(containerStatuses[container.name])
             }
           })

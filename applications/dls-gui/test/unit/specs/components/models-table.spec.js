@@ -300,6 +300,34 @@ describe('VUE components ModelsTable', () => {
     expect(result).to.deep.equal(expectedResult);
   });
 
+  it('Should return default string if training type is an empty value', function () {
+    const type = null;
+    const expectedResult = '-';
+    const result = wrapper.vm.parseValue('type', type);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return upper cased string if training type is a string value', function () {
+    const type = 'inference';
+    const expectedResult = 'Inference';
+    const result = wrapper.vm.parseValue('type', type);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return default string if parameters is an empty value', function () {
+    const parameters = null;
+    const expectedResult = '--';
+    const result = wrapper.vm.parseValue('parameters', parameters);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return proper string if parameters is an array', function () {
+    const parameters = ['arg1', '-p', 'test'];
+    const expectedResult = 'arg1, -p, test';
+    const result = wrapper.vm.parseValue('parameters', parameters);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
   it('Should hide filter windows before showing others', function () {
     wrapper.vm.filterByValModals.name.visible = true;
     wrapper.vm.switchFilterWindow('namespace', true);

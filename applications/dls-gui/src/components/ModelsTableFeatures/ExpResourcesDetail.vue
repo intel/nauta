@@ -31,12 +31,13 @@
       <ol id="pods-list">
         <li v-bind:key="pod.name" v-for="pod in podsList">
           <b>{{ labels.NAME }}:</b> <i>{{ pod.name }}</i> <br/>
-          <b>{{ labels.STATE }}:</b> <i>{{ pod.state }}</i> <br/>
+          <b>{{ labels.STATE }}:</b> <i>{{ parseValue('state', pod.state) }}</i> <br/>
           <b>{{ labels.CONTAINERS }}:</b>
           <ul id="containers-list">
             <li v-bind:key="container.name" v-for="container in pod.containers">
               <b>{{ labels.NAME }}:</b> <i>{{ container.name }}</i> <br/>
-              <b>{{ labels.RESOURCES }}:</b> <i>{{ container.resources }}</i> <br/>
+              <b>{{ labels.RESOURCES }}:</b> cpu - <i>{{ parseValue('resources', 'cpu', container.resources) }}, </i>,
+                                        memory - <i>{{ parseValue('resources', 'memory', container.resources) }}</i> <br/>
               <b>{{ labels.STATUS }}:</b> <i>{{ container.status }}</i>
             </li>
           </ul>
@@ -56,7 +57,23 @@ export default {
       labels: ELEMENTS_LABELS
     }
   },
-  props: ['keyname', 'podsList']
+  props: ['keyname', 'podsList'],
+  methods: {
+    parseValue: function (key, arg1, arg2) {
+      switch (key) {
+        case 'state':
+          return Array.isArray(arg1) ? arg1.join(', ') : '--';
+        case 'resources':
+          if (!arg2) {
+            return '--';
+          }
+          const resourceType = arg1;
+          return arg2[resourceType] ? arg2[resourceType] : '--';
+        default:
+          return arg1;
+      }
+    }
+  }
 }
 </script>
 
@@ -70,8 +87,10 @@ export default {
 }
 .keyname {
   font-weight: bold;
+  font-size: 12px;
 }
 .values {
   margin-left: 20px;
+  font-size: 12px;
 }
 </style>

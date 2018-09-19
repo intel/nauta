@@ -127,9 +127,9 @@
                               <div class="vertical-line"></div>
                             </v-flex>
                             <v-flex xs6 wrap>
-                              <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="item.attributes.parameters"/>
                               <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartTime', item.attributes.trainingStartTime)"/>
                               <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDurationTime', item.attributes.trainingDurationTime)"/>
+                              <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="parseValue('parameters', item.attributes.parameters)"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -458,6 +458,11 @@ export default {
           return `${pData.days} days, ${pData.hours} hrs, ${pData.minutes} mins, ${pData.seconds} s`;
         case 'type':
           return arg1 ? arg1.charAt(0).toUpperCase() + arg1.slice(1) : '-';
+        case 'parameters':
+          if (!arg1) {
+            return '--';
+          }
+          return Array.isArray(arg1) ? arg1.join(', ') : arg1;
         default:
           return arg1;
       }

@@ -117,12 +117,12 @@ module.exports.parseContainerState = function (state) {
     return 'Not created';
   }
   if (state.running) {
-    return `Running, ${JSON.stringify(state.running)}`;
+    return `Running, ${typeof (state.running) === 'object' ? JSON.stringify(state.running) : state.running}`;
   }
   if (state.terminated) {
-    return `Terminated, ${JSON.stringify(state.terminated.reason)}`;
+    return `Terminated, ${typeof (state.terminated.reason) === 'object' ? JSON.stringify(state.terminated.reason) : state.terminated.reason}`;
   }
   if (state.waiting) {
-    return `Waiting, ${JSON.stringify(state.waiting)}`;
+    return `Waiting, ${typeof (state.waiting) === 'object' ? JSON.stringify(state.waiting) : state.waiting}`;
   }
 };

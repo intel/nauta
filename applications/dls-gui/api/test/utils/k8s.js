@@ -251,21 +251,21 @@ describe('Utils | k8s', function () {
 
     it('should return static text if state running', function () {
       const state = {running: 'running'};
-      const expectedResult = `Running, ${JSON.stringify(state.running)}`;
+      const expectedResult = `Running, running`;
       const result = k8sApi.parseContainerState(state);
       expect(result).to.deep.equal(expectedResult);
     });
 
     it('should return static text if state terminated', function () {
       const state = {terminated: {reason: 'reason'}};
-      const expectedResult = `Terminated, ${JSON.stringify(state.terminated.reason)}`;
+      const expectedResult = `Terminated, reason`;
       const result = k8sApi.parseContainerState(state);
       expect(result).to.deep.equal(expectedResult);
     });
 
     it('should return static text if state waiting', function () {
       const state = {waiting: 'waiting'};
-      const expectedResult = `Waiting, ${JSON.stringify(state.waiting)}`;
+      const expectedResult = `Waiting, waiting`;
       const result = k8sApi.parseContainerState(state);
       expect(result).to.deep.equal(expectedResult);
     });
