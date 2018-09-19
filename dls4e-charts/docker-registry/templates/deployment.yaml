@@ -60,10 +60,6 @@ spec:
             httpGet:
               path: /
               port: 5000
-          resources:
-            limits:
-              cpu: "1"
-              memory: 512Mi
           env:
             - name: REGISTRY_HTTP_SECRET
               valueFrom:
