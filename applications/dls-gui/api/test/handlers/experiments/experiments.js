@@ -30,9 +30,12 @@ const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
 
-  let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred;
+  let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred,
+    currentTime, clock;
 
   beforeEach(function () {
+    currentTime = '2018-06-11T011:35:06Z';
+    clock = sinon.useFakeTimers(new Date(currentTime).getTime());
     resMock = {
       status: sinon.stub().returns({
         send: sinon.spy()
@@ -127,7 +130,9 @@ describe('Handlers | Experiments', function () {
           trainingStartTime: k8sRunEntities[0].spec['start-time'],
           trainingEndTime: k8sRunEntities[0].spec['end-time'],
           trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
-            k8sRunEntities[0].spec['start-time'], k8sRunEntities[0].spec['end-time'])
+            k8sRunEntities[0].spec['start-time'], k8sRunEntities[0].spec['end-time']),
+          trainingTimeInQueue: datetimeUtils.calculateTimeDifferenceFromDateString(
+            k8sRunEntities[0].metadata.creationTimestamp, k8sRunEntities[0].spec['start-time'])
         }
       },
       {
@@ -144,7 +149,9 @@ describe('Handlers | Experiments', function () {
           trainingStartTime: k8sRunEntities[1].spec['start-time'],
           trainingEndTime: k8sRunEntities[1].spec['end-time'],
           trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
-            k8sRunEntities[1].spec['start-time'], k8sRunEntities[1].spec['end-time'])
+            k8sRunEntities[1].spec['start-time'], k8sRunEntities[1].spec['end-time']),
+          trainingTimeInQueue: datetimeUtils.calculateTimeDifferenceFromDateString(
+            k8sRunEntities[1].metadata.creationTimestamp, k8sRunEntities[1].spec['start-time'])
         }
       }
     ];
@@ -213,6 +220,10 @@ describe('Handlers | Experiments', function () {
       status: 500,
       message: 'error'
     };
+  });
+
+  afterEach(function () {
+    clock.restore();
   });
 
   describe('getUserExperiments', function () {
@@ -470,7 +481,7 @@ describe('Handlers | Experiments', function () {
 
     it('should return all params', function () {
       const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'type', 'accuracy', 'podSelector',
-        'podCount', 'parameters', 'trainingStartTime', 'trainingEndTime', 'trainingDurationTime'];
+        'podCount', 'parameters', 'trainingStartTime', 'trainingEndTime', 'trainingDurationTime', 'trainingTimeInQueue'];
       const result = expApi.extractAttrsNames(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
     });

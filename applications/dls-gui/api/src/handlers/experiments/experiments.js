@@ -40,6 +40,8 @@ const generateExperimentEntities = function (data) {
         trainingEndTime: item.spec['end-time'],
         trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
           item.spec['start-time'], item.spec['end-time']),
+        trainingTimeInQueue: datetimeUtils.calculateTimeDifferenceFromDateString(
+          item.metadata.creationTimestamp, item.spec['start-time']),
         type: item.metadata.labels.runKind,
         namespace: item.metadata.namespace,
         podSelector: item.spec['pod-selector']['matchLabels'],

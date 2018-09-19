@@ -29,5 +29,6 @@ export default {
   podSelector: 'Pod Selector',
   trainingEndTime: 'End Date',
   trainingStartTime: 'Start Date',
-  trainingDurationTime: 'Duration Time'
+  trainingDurationTime: 'Duration Time',
+  trainingTimeInQueue: 'Time in Queue'
 };
