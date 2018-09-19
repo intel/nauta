@@ -78,25 +78,39 @@ platform_ansible_run() {
         exit 1
     fi
     ansible_run ${CURDIR}/platform/dls.yml
-    return $?
+    ret_val=$?
+    show_error_message $ret_val
+    return $ret_val
 }
 
 dls4e_ansible_run() {
     export KIND=dls4e
     ansible_run ${CURDIR}/dls4e/install.yml
-    return $?
+    ret_val=$?
+    show_error_message $ret_val
+    return $ret_val
 }
 
 dls4e_fetch_ansible_run() {
     export KIND=dls4e
     ansible_run ${CURDIR}/dls4e/fetch.yml
-    return $?
+    ret_val=$?
+    show_error_message $ret_val
+    return $ret_val
 }
 
 platform_verify_ansible_run() {
     export KIND=platform
     ansible_run ${CURDIR}/platform/verification.yml
-    return $?
+    ret_val=$?
+    show_error_message $ret_val
+    return $ret_val
+}
+
+show_error_message() {
+    if [ "$1" != "0" ]; then
+        echo "An error during installation occurred. Please refer to installation documentation. In case of further problems please contact with technical support."
+    fi
 }
 
 COMMAND=$1
