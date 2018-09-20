@@ -40,6 +40,8 @@ endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-dls-linux-amd64.tar.gz -o draft.tar.gz
+	@cp set-autocomplete.sh dist/
+	@chmod +x dist/set-autocomplete.sh
 	@mkdir dist/dls_ctl_config/
 	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
 	@rm -f draft.tar.gz
