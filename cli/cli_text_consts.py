@@ -344,7 +344,10 @@ EXPERIMENT_INTERACT_CMD_TEXTS = {
                                     "session.",
     "proxy_closing_error_msg": "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - close "
                                "it manually.",
-    "session_launch_other_error_msg": "Other exception during launching interact session."
+    "session_launch_other_error_msg": "Other exception during launching interact session.",
+    "exp_with_the_same_name_must_be_purged": "Notebook with the same name exists but is in state other than RUNNING."
+                                             "If you want to start another notebook using the same name, please "
+                                             "purge the previous one."
 }
 
 EXPERIMENT_CANCEL_CMD_TEXTS = {

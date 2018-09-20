@@ -41,6 +41,7 @@ from commands.experiment.common import check_experiment_name, validate_pack_para
 from util.exceptions import K8sProxyCloseError
 from util.system import handle_error
 from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
+from platform_resources.experiment_model import ExperimentStatus
 
 
 JUPYTER_CHECK_POD_READY_TRIES = 60
@@ -77,6 +78,13 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
         if jupyter_experiment and jupyter_experiment.template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
             handle_error(user_msg=TEXTS["name_already_used"].format(name=name))
+            sys.exit(1)
+
+        # if experiment exists but its state is different than RUNNING - display info about a need of purging of
+        # this experiment
+        if jupyter_experiment and jupyter_experiment.state not in \
+                [ExperimentStatus.SUBMITTED, ExperimentStatus.CREATING]:
+            handle_error(user_msg=TEXTS["exp_with_the_same_name_must_be_purged"].format(name=name))
             sys.exit(1)
 
         if not jupyter_experiment and not click.confirm(TEXTS["confirm_experiment_creation"]):
