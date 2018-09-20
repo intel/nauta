@@ -301,6 +301,10 @@ EXPERIMENT_SUBMIT_CMD_TEXTS = {
               "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' ",
     "help_pr": "Values (set or range) of a single parameter.",
     "help_ps": "Set of values of one or several parameters.",
+    "user_is_admin_log_msg": "Current user is dls4e administrator. Submit cannot be performed.",
+    "user_is_admin_usr_msg": "You cannot submit experiments as dls4e administrator. Switch your KUBECONFIG "
+                             "environment variable to point to a valid dls4e user config. If you don't have one you "
+                             "can create it with command 'dlsctl user create'.",
     "script_not_found_error_msg": "Cannot find: {script_location}. Make sure that provided path is correct.",
     "default_script_not_found_error_msg": "Cannot find script: {default_script_name} in directory: {script_directory}. "
                                           "If path to directory was passed as submit command argument, then "

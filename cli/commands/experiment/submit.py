@@ -33,6 +33,7 @@ from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
+from util.k8s.k8s_info import is_current_user_administrator
 from platform_resources.run_model import RunStatus
 from util.system import handle_error
 from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
@@ -85,6 +86,10 @@ def validate_script_folder_location(script_folder_location: str):
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            script_parameters: Tuple[str, ...]):
+    if is_current_user_administrator():
+        handle_error(logger, TEXTS["user_is_admin_log_msg"], TEXTS["user_is_admin_usr_msg"])
+        exit(1)
+
     logger.debug(TEXTS["submit_start_log_msg"])
     validate_script_location(script_location)
 
