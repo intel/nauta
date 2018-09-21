@@ -5,10 +5,10 @@ verification_checks:
     condition: "{{ k8s_domain is defined and (k8s_domain | join('')) != k8s_domain }}"
 
   - message: "Param kubernetes_pod_subnet should be provided as string"
-    condition: "{{ kubernetes_pod_subnet is defined and kubernetes_pod_subnet is not iterable }}"
+    condition: "{{ kubernetes_pod_subnet is defined and (kubernetes_pod_subnet | join('')) != kubernetes_pod_subnet }}"
 
   - message: "Param kubernetes_svc_subnet should be provided as string"
-    condition: "{{ kubernetes_svc_subnet is defined and kubernetes_svc_subnet is not iterable }}"
+    condition: "{{ kubernetes_svc_subnet is defined and (kubernetes_svc_subnet | join('')) != kubernetes_svc_subnet }}"
 
   - message: "Param use_system_enabled_repos should be provided as bool (True/False)"
     condition: "{{ use_system_enabled_repos is defined and use_system_enabled_repos | string not in ['True', 'False'] }}"
