@@ -205,6 +205,13 @@ local_images:
       BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/tf-serving-sidecar"
+  dls4e/docs:
+    version: "v0.0.1"
+    required:
+      BASE_IMAGE: "shared/utils/nginx"
+      DOCS_IMAGE: "shared/centos/docs"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/docs-nginx"
 
 subcharts:
   dls4e-registry:
@@ -296,3 +303,8 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/dashboard"
       chart_values:
         image: "{{ image_local_url['dls4e/dashboard'] }}"
+    documentation-service:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../dls4e-charts/documentation-service"
+      chart_values:
+        image: "{{ image_local_url['dls4e/docs'] }}"

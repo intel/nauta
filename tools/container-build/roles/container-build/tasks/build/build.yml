@@ -14,6 +14,7 @@
     push: False
     timeout: "{{ docker_timeout }}"
     path: "{{ image.directory }}"
+    dockerfile: "{{ image.dockerfile | default(image.directory + '/Dockerfile') }}"
     buildargs: "{{ proxy | combine(local_buildargs) }}"
     force: True
   register: build_async

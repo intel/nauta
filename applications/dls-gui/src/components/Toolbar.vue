@@ -42,7 +42,7 @@
       <v-list>
         <v-list-tile class="list__tile--link">
           <v-list-tile-title>
-            <a :href="cliCommands" target="_blank" :download="labels.USER_GUIDE_PDF">
+            <a href="/documentation/" target="_blank">
               {{ labels.USER_GUIDE }}
             </a>
           </v-list-tile-title>
@@ -83,7 +83,6 @@
 import {mapActions, mapGetters} from 'vuex';
 import LicenseDoc from '../assets/dls-evaluation-license.pdf';
 import ReleaseNotesDoc from '../assets/intel-release-notes-for-dell-early-access.pdf';
-import CliCommands from '../assets/dls4e-cli-commands.pdf';
 import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {
@@ -98,8 +97,7 @@ export default {
     return {
       labels: ELEMENT_LABELS,
       licenseDoc: LicenseDoc,
-      releaseNotesDoc: ReleaseNotesDoc,
-      cliCommands: CliCommands
+      releaseNotesDoc: ReleaseNotesDoc
     }
   },
   computed: {
