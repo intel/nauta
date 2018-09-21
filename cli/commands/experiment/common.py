@@ -73,6 +73,8 @@ JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
 EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE,
                             RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
 
+EXP_SUB_SEMAPHORE_FILENAME = ".underSubmission"
+
 log = initialize_logger('commands.common')
 
 
@@ -101,6 +103,11 @@ def check_run_environment(run_environment_path: str):
     If Run environment is not empty, ask user if it should be deleted in order to proceed with Run environment creation.
     """
     if os.path.isdir(run_environment_path) and os.listdir(run_environment_path):
+        # check whether experiment is not being submitted at the moment
+        if os.path.isfile(os.path.join(run_environment_path, EXP_SUB_SEMAPHORE_FILENAME)):
+            handle_error(user_msg=TEXTS["the_same_exp_is_submitted"])
+            exit(1)
+
         if click.confirm(TEXTS["confirm_exp_dir_deletion_msg"].format(run_environment_path=run_environment_path)):
             delete_environment(run_environment_path)
         else:
@@ -142,6 +149,8 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     except Exception:
         log.exception("Create environment - creating experiment folder error.")
         raise KubectlIntError(message_prefix.format(reason=TEXTS["exp_dir_cant_be_created"]))
+    # create a semaphore saying that experiment is under submission
+    Path(os.path.join(folder_path, EXP_SUB_SEMAPHORE_FILENAME)).touch()
 
     # copy training script - it overwrites the file taken from a folder_location
     if file_location:
@@ -153,6 +162,13 @@ def create_environment(experiment_name: str, file_location: str, folder_location
 
     log.debug("Create environment - end")
     return run_environment_path
+
+
+def remove_sempahore(experiment_name: str):
+    run_environment_path = get_run_environment_path(experiment_name)
+    semaphore_file = os.path.join(run_environment_path, EXP_SUB_SEMAPHORE_FILENAME)
+    if os.path.isfile(semaphore_file):
+        os.remove(semaphore_file)
 
 
 def delete_environment(experiment_folder: str):
@@ -357,6 +373,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
             except Exception:
                 log.exception("Error during closing of a proxy for a local docker-host tunnel")
                 raise K8sProxyCloseError(TEXTS["docker_tunnel_close_error_msg"])
+        # remove semaphores from all exp folders
+        remove_sempahore(experiment_name)
 
     log.debug("Submit - finish")
     return runs_list, script_location

@@ -78,11 +78,13 @@ def test_delete_environment(config_mock, mocker):
 def test_create_environment_success(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     mocker.patch("os.makedirs")
+    sem_file_creation_mock = mocker.patch("commands.experiment.common.Path.touch")
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
     experiment_path = create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
+    assert sem_file_creation_mock.call_count == 1, "semaphore file wasn't created"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
     assert sh_copy_mock.call_count == 1, "files weren't copied"
@@ -121,6 +123,7 @@ def test_create_environment_copy_error(config_mock, mocker):
     mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
     sh_copytree_mock = mocker.patch("shutil.copytree")
+    mocker.patch("commands.experiment.common.Path.touch")
 
     with pytest.raises(KubectlIntError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
@@ -168,6 +171,7 @@ class SubmitExperimentMocks:
         self.config_mock.return_value.config_path = FAKE_CLI_CONFIG_DIR_PATH
         self.delete_k8s_object_mock = mocker.patch('commands.experiment.common.delete_k8s_object')
         self.get_pod_count_mock = mocker.patch('commands.experiment.common.get_pod_count', return_value=1)
+        self.remove_files = mocker.patch('os.remove')
 
 
 @pytest.fixture
@@ -510,7 +514,7 @@ def test_check_run_environment(mocker):
 def test_check_run_environment_clear(mocker):
     del_env = mocker.patch("commands.experiment.common.delete_environment")
     mocker.patch("click.confirm", return_value=True)
-
+    mocker.patch("commands.experiment.common.Path.touch")
     mocker.patch('os.path.isdir').return_value = True
     mocker.patch('os.listdir').return_value = True
 

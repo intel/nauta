@@ -457,7 +457,8 @@ EXPERIMENT_COMMON_TEXTS = {
                                            "Specify pack params in format 'key value' not as 'key=value'.",
     "experiment_name_too_long_error_msg": "Name given by a user cannot be longer than 30 characters.",
     "error_during_patching_run": "Error during patching a run occured {}.",
-    "problems_during_getting_draft_logs": "Error during getting draft logs : {exception}"
+    "problems_during_getting_draft_logs": "Error during getting draft logs : {exception}",
+    "the_same_exp_is_submitted": "There is another experiment with the same name submitted at this moment."
 }
 
 DRAFT_CMD_TEXTS = {
