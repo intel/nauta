@@ -20,6 +20,7 @@
 #
 
 from click.testing import CliRunner
+import copy
 import pytest
 from unittest.mock import DEFAULT
 
@@ -259,27 +260,30 @@ def check_cancel_experiment_asserts(prepare_cancel_experiment_mocks: CancelExper
 
 def test_cancel_experiment_set_cancelling_state_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks, caplog):
     import logging
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     caplog.set_level(logging.CRITICAL)
     prepare_cancel_experiment_mocks.update_experiment.side_effect = RuntimeError()
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     with pytest.raises(RuntimeError):
-        cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED], namespace="namespace")
+        cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY], namespace="namespace")
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=0, update_run_count=0)
 
 
 def test_cancel_experiment_success(prepare_cancel_experiment_mocks: CancelExperimentMocks):
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
-    cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED], namespace="namespace")
+    cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY], namespace="namespace")
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, update_experiment_count=2)
 
 
 def test_cancel_experiment_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     prepare_cancel_experiment_mocks.delete_helm_release.side_effect = RuntimeError()
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
-    del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED],
+    del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY],
                                                       namespace="namespace")
 
     assert len(del_list) == 0
@@ -288,24 +292,26 @@ def test_cancel_experiment_failure(prepare_cancel_experiment_mocks: CancelExperi
 
 
 def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     prepare_cancel_experiment_mocks.mocker.patch('commands.experiment.cancel.cancel_experiment_runs').return_value \
-        = [RUN_QUEUED], []
+        = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
-    cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED], namespace="namespace",
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
+    cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
                                     delete_images_for_experiment_count=1, delete_k8s_object_count=2)
 
 
 def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     prepare_cancel_experiment_mocks.mocker.patch('commands.experiment.cancel.cancel_experiment_runs').return_value \
-        = [RUN_QUEUED], []
+        = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.delete_helm_release.side_effect = [RuntimeError]
 
-    del_list, not_del_list = cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED],
+    del_list, not_del_list = cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY],
                                                      namespace="namespace",
                                                      k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
 
@@ -315,12 +321,13 @@ def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: Cancel
 
 
 def test_cancel_experiment_with_purge_delete_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
+    RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     prepare_cancel_experiment_mocks.mocker.patch('commands.experiment.cancel.cancel_experiment_runs').return_value \
-        = [RUN_QUEUED], []
+        = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
-    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED]
+    prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.delete_images_for_experiment.side_effect = RuntimeError()
-    cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED], namespace="namespace",
+    cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
                                     delete_k8s_object_count=2, delete_images_for_experiment_count=1)

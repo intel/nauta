@@ -367,11 +367,13 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
             logger.debug(f"Cancelling {run.name} run ...")
             click.echo(TEXTS["canceling_runs_start_msg"].format(run_name=run.name, experiment_name=experiment_name))
             try:
-                delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
-                # change a run state to CANCELLED
-                click.echo(TEXTS["cancel_setting_status_msg"].format(run_name=run.name))
-                run.state = RunStatus.CANCELLED
-                update_run(run, namespace)
+                # if run status is cancelled - omit the following steps
+                if run.state != RunStatus.CANCELLED:
+                    delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
+                    # change a run state to CANCELLED
+                    click.echo(TEXTS["cancel_setting_status_msg"].format(run_name=run.name))
+                    run.state = RunStatus.CANCELLED
+                    update_run(run, namespace)
                 deleted_runs.append(run)
             except Exception:
                 logger.exception(TEXTS["incomplete_cancel_error_msg"]
