@@ -11,7 +11,7 @@ metadata:
     runName: {{ .Release.Name }}
 spec:
   tfReplicaSpecs:
-    Worker:
+    Master:
       restartPolicy: ExitCode
       replicas: 1
       template:
