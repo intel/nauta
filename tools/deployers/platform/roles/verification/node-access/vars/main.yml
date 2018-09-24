@@ -62,8 +62,8 @@ verification_checks:
   - message: "Param disabled_repos should be provided as list"
     condition: "{{ disabled_repos is defined and not (disabled_repos | string).startswith('[') }}"
 
-  - message: "Param features should be provided as list"
-    condition: "{{ features is defined and not (features | string).startswith('[') }}"
+  - message: "Param features should be provided as map"
+    condition: "{{ features is defined and not (features | string).startswith('{') }}"
 
   - message: "Can not find ansible_host or ansible_ssh_host on host."
     condition: "{{ 'ansible_ssh_host' not in hostvars[inventory_hostname] and 'ansible_host' not in hostvars[inventory_hostname] }}"
