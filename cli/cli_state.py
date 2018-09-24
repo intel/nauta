@@ -28,6 +28,8 @@ from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
 from util.dependencies_checker import check_all_binary_dependencies, InvalidDependencyError
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
+from util.system import handle_error
+from cli_text_consts import CLI_STATE_TEXTS as TEXTS
 
 logger = initialize_logger(__name__)
 
@@ -60,21 +62,22 @@ def verify_cli_dependencies():
             else get_kubectl_current_context_namespace()
         check_all_binary_dependencies(namespace=namespace)
     except InvalidDependencyError:
-        error_msg = 'Dependency check failed. Run "dlsctl verify -vv" for more detailed information.'
-        logger.exception(error_msg)
-        click.echo(error_msg)
+        error_msg = TEXTS["invalid_dependency_error_msg"]
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
+    except FileNotFoundError:
+        error_msg = TEXTS["kubeconfig_not_found_error_msg"]
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
 
 
 def verify_cli_config_path():
     try:
         config = Config()
         if not config.config_path:
-            raise ConfigInitError('Configuration directory for dlsctl is not set.')
+            raise ConfigInitError(TEXTS["dlsctl_config_not_set_error_msg"])
     except ConfigInitError as e:
-        error_msg = 'Config initialization failed.'
-        logger.exception(error_msg)
-        click.echo(error_msg)
-        sys.exit(str(e))
+        error_msg = TEXTS["dlsctl_config_init_error_msg"].format(exception_msg=str(e))
+        handle_error(logger, error_msg, error_msg)
+        sys.exit(1)
 
 
 def common_options(verify_dependencies=True, verify_config_path=True):

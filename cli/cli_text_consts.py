@@ -582,3 +582,11 @@ UTIL_K8S_PROXY_TEXTS = {
     "proxy_exit_error_msg": "k8s_proxy - exit - error",
     "tunnel_not_ready_error_msg": "connection on {address}:{port} NOT READY!"
 }
+
+CLI_STATE_TEXTS = {
+    "invalid_dependency_error_msg": "Dependency check failed.",
+    "kubeconfig_not_found_error_msg": "File pointed to by KUBECONFIG environment variable was not found. Please make "
+                                      "sure that it exists.",
+    "dlsctl_config_not_set_error_msg": "Configuration directory for dlsctl is not set.",
+    "dlsctl_config_init_error_msg": "Config initialization failed. Reason: {exception_msg}"
+}
