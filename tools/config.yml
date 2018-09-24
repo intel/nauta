@@ -40,7 +40,7 @@ shared_images:
     required:
       BASE_IMAGE: "shared/centos"
     method: build
-    directory: "{{ playbook_dir }}/../../docs/end-user-docs/user-guide/HTML Files: Source and Output/HTML-Output"
+    directory: "{{ playbook_dir }}/../../docs/end-user-docs/user-guide/HTML Files Source and Output/HTML-Output"
     dockerfile: "{{ playbook_dir }}/../../shared-containers/docs/Dockerfile"
     push: False
   shared/centos/build:
