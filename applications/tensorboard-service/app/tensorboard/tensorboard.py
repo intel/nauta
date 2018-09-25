@@ -20,6 +20,7 @@
 #
 
 from datetime import datetime, timedelta
+from http import HTTPStatus
 import logging as log
 from os import path
 from typing import List, Optional
@@ -27,6 +28,7 @@ from uuid import uuid4
 
 from kubernetes import config
 from kubernetes.client import V1Deployment, V1ObjectMeta, V1Pod, V1ContainerStatus
+import requests
 
 from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
@@ -36,6 +38,7 @@ from tensorboard.proxy_client import try_get_last_request_datetime
 
 class TensorboardManager:
     OUTPUT_PUBLIC_MOUNT_PATH = '/mnt/output'
+    NGINX_INGRESS_ADDRESS = 'dls4enterprise-ingress.dls4e'
 
     def __init__(self, namespace: str, api_client: K8SAPIClient):
         self.client = api_client
@@ -71,7 +74,25 @@ class TensorboardManager:
         return self.client.list_deployments(namespace=self.namespace, label_selector='type=dls4e-tensorboard')
 
     @staticmethod
-    def _check_tensorboard_status(pod: V1Pod) -> TensorboardStatus:
+    def _check_tensorboard_nginx_reachable(url) -> bool:
+        log.debug("Checking if Tensorboard is reachable from Nginx...")
+        try:
+            response = requests.head(f"http://{TensorboardManager.NGINX_INGRESS_ADDRESS}{url}",
+                                     headers={'Host': 'localhost'},
+                                     timeout=5.0)
+        except Exception:
+            log.exception("Checking Tensorboard reachability failed!")
+            return False
+
+        if response.status_code == HTTPStatus.OK:
+            log.debug("Tensorboard is reachable")
+            return True
+
+        log.debug(f"Tensorboard is unreachable. Got: {response.status_code} status code")
+        return False
+
+    @staticmethod
+    def _check_tensorboard_status(pod: V1Pod, tensorboard_ingress_url: str) -> TensorboardStatus:
         pod_phase: str = pod.status.phase
 
         try:
@@ -87,6 +108,10 @@ class TensorboardManager:
         for status in container_statuses:
             if not status.ready:
                 return TensorboardStatus.CREATING
+
+        if not TensorboardManager._check_tensorboard_nginx_reachable(tensorboard_ingress_url):
+            return TensorboardStatus.CREATING
+
         return TensorboardStatus.RUNNING
 
     def get_by_id(self, id: str) -> Optional[Tensorboard]:
@@ -105,7 +130,8 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        tensorboard_status = self._check_tensorboard_status(pod)
+        tensorboard_status = self._check_tensorboard_status(pod,
+                                                            tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
@@ -131,7 +157,8 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        tensorboard_status = self._check_tensorboard_status(pod)
+        tensorboard_status = self._check_tensorboard_status(pod,
+                                                            tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
