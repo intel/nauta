@@ -224,8 +224,9 @@ class CancelExperimentMocks:
         self.get_experiment = mocker.patch("commands.experiment.cancel.get_experiment",
                                            return_value=None)
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
-        self.delete_images_for_experiment = mocker.patch('commands.experiment.cancel.'
-                                                         'delete_images_for_experiment')
+        # CAN-1099 - it should be uncommented after repairing docker gc
+        # self.delete_images_for_experiment = mocker.patch('commands.experiment.cancel.'
+        #                                                 'delete_images_for_experiment')
 
 
 @pytest.fixture
@@ -254,8 +255,9 @@ def check_cancel_experiment_asserts(prepare_cancel_experiment_mocks: CancelExper
         "run wasn't updated"
     assert prepare_cancel_experiment_mocks.get_experiment.call_count == get_experiment_count, \
         "experiment wasn't taken"
-    assert prepare_cancel_experiment_mocks.delete_images_for_experiment.call_count == \
-        delete_images_for_experiment_count, "incorrect number of calls of deleting images"
+    # CAN-1099 - it should be uncommented after repairing docker gc
+    # assert prepare_cancel_experiment_mocks.delete_images_for_experiment.call_count == \
+    #    delete_images_for_experiment_count, "incorrect number of calls of deleting images"
 
 
 def test_cancel_experiment_set_cancelling_state_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks, caplog):
@@ -300,7 +302,7 @@ def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: C
     cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
-                                    delete_images_for_experiment_count=1, delete_k8s_object_count=2)
+                                    delete_k8s_object_count=2)
 
 
 def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
@@ -326,11 +328,12 @@ def test_cancel_experiment_with_purge_delete_failure(prepare_cancel_experiment_m
         = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
-    prepare_cancel_experiment_mocks.delete_images_for_experiment.side_effect = RuntimeError()
+    # CAN-1099 - it should be uncommented after repairing docker gc
+    # prepare_cancel_experiment_mocks.delete_images_for_experiment.side_effect = RuntimeError()
     cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
-                                    delete_k8s_object_count=2, delete_images_for_experiment_count=1)
+                                    delete_k8s_object_count=2)
 
 
 def test_cancel_experiment_one_cancelled_one_not(prepare_cancel_experiment_mocks: CancelExperimentMocks):

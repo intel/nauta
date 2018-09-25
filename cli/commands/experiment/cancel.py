@@ -45,7 +45,6 @@ from util.helm import delete_helm_release
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s import pods as k8s_pods
 from util.logger import initialize_logger
-from util.docker import delete_images_for_experiment
 from util.system import handle_error
 from cli_text_consts import EXPERIMENT_CANCEL_CMD_TEXTS as TEXTS
 from util.k8s.k8s_info import PodStatus
@@ -286,11 +285,12 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             except Exception:
                 logger.exception("Error during clearing run logs.")
 
-            try:
+            # CAN-1099 - docker garbage collector has errors that prevent from correct removal of images
+            # try:
                 # try to remove images from docker registry
-                delete_images_for_experiment(exp_name=run.name)
-            except Exception:
-                logger.exception("Error during removing images.")
+            #    delete_images_for_experiment(exp_name=run.name)
+            # except Exception:
+            #    logger.exception("Error during removing images.")
 
         if cancel_whole_experiment and not not_purged_runs:
             try:
