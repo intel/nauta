@@ -197,7 +197,9 @@ PREDICT_LAUNCH_CMD_TEXTS = {
     "model_dir_not_found_error_msg": "Cannot find: {local_model_location}. local_model_location must be a path to "
                                      "existing directory.",
     "missing_model_location_error_msg": "Missing model location param - "
-                                        "'model location' or 'local model location' required"
+                                        "'model location' or 'local model location' required",
+    "help_model_name": "Name of a model passed as a servable name. By default it is the name of directory in model's " 
+                       "location.",
 }
 
 PREDICT_STREAM_CMD_TEXTS = {

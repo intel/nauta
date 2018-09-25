@@ -55,9 +55,10 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-n', '--name', default=None, help=TEXTS["help_n"], callback=validate_experiment_name)
 @click.option('-m', '--model-location', help=TEXTS["help_m"])
 @click.option("-l", "--local_model_location", type=click.Path(), help=TEXTS["help_local_model_location"])
+@click.option('-mn', '--model-name', help=TEXTS["help_model_name"])
 @common_options()
 @pass_state
-def launch(state: State, name: str, model_location: str, local_model_location: str):
+def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str):
     """
     Starts a new prediction instance that can be used for performing prediction, classification and
     regression tasks on trained model.
@@ -74,7 +75,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
     click.echo('Submitting prediction instance.')
     try:
         model_path = model_location.rstrip('/') if model_location else local_model_location.rstrip('/')
-        model_name = os.path.basename(model_path)
+        model_name = model_name if model_name else os.path.basename(model_path)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
                                                       local_model_location=local_model_location)
