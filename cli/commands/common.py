@@ -20,7 +20,6 @@
 #
 
 from typing import List
-from enum import Enum
 from sys import exit
 
 import click
@@ -28,10 +27,10 @@ from tabulate import tabulate
 
 import platform_resources.runs as runs_api
 import platform_resources.experiments as experiments_api
-from platform_resources.run_model import RunStatus, Run
+from platform_resources.run_model import RunStatus, Run, RunKinds
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
-from platform_resources.experiment_model import Experiment
+from platform_resources.experiment_model import Experiment, ExperimentStatus
 from util.system import handle_error
 from cli_text_consts import CMDS_COMMON_TEXTS as TEXTS
 
@@ -39,8 +38,50 @@ from cli_text_consts import CMDS_COMMON_TEXTS as TEXTS
 logger = initialize_logger(__name__)
 
 
-def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus, listed_runs_kinds: List[Enum],
-                     runs_list_headers: List[str], with_metrics: bool):
+def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
+                                        name: str, headers: List[str], listed_runs_kinds: List[RunKinds] = None):
+    """
+    Display a list of selected runs in the cli.
+
+    :param verbosity_lvl: level at which error messages should be logged or displayed
+    :param all_users: whether to display runs regardless of their owner or not
+    :param name: regular expression to which names of the shown runs have to match
+    :param headers: headers which will be displayed on top of a table shown in the cli
+    """
+
+    if not listed_runs_kinds:
+        listed_runs_kinds = [RunKinds.TRAINING, RunKinds.JUPYTER]
+
+    try:
+        namespace = None if all_users else get_kubectl_current_context_namespace()
+
+        creating_experiments = experiments_api.list_experiments(namespace=namespace,
+                                                                state=ExperimentStatus.CREATING,
+                                                                run_kinds_filter=listed_runs_kinds,
+                                                                name_filter=name)
+        runs = runs_api.list_runs(namespace=namespace, name_filter=name, run_kinds_filter=listed_runs_kinds)
+
+        # Get Experiments without associated Runs
+        names_of_experiment_with_runs = set()
+        for run in runs:
+            names_of_experiment_with_runs.add(run.experiment_name)
+
+        uninitialized_experiments = [experiment for experiment in creating_experiments
+                                     if experiment.name not in names_of_experiment_with_runs]
+
+        click.echo(tabulate([experiment.cli_representation for experiment in uninitialized_experiments],
+                            headers=headers, tablefmt="orgtbl"))
+    except experiments_api.InvalidRegularExpressionError:
+        handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],
+                     add_verbosity_msg=verbosity_lvl == 0)
+        exit(1)
+    except Exception:
+        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=verbosity_lvl == 0)
+        exit(1)
+
+
+def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus,
+                     listed_runs_kinds: List[RunKinds], runs_list_headers: List[str], with_metrics: bool):
     """
     Display a list of selected runs in the cli.
 

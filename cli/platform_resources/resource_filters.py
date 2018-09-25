@@ -71,5 +71,5 @@ def filter_by_experiment_name(resource_object_dict: dict, exp_name: str = None):
 
 
 def filter_by_run_kinds(resource_object_dict: dict, run_kinds: List[Enum] = None):
-    return any([resource_object_dict['metadata']['labels']['runKind'] == run_kind.value for run_kind in run_kinds]) \
+    return any([resource_object_dict['metadata']['labels'].get('runKind') == run_kind.value for run_kind in run_kinds]) \
         if run_kinds else True

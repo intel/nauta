@@ -37,11 +37,49 @@ TEMPLATE_NAMESPACE = 'template-namespace-test'
 TEST_EXPERIMENTS = [Experiment(name='test-experiment-old', parameters_spec=['a 1', 'b 2'],
                                creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
                                state=ExperimentStatus.CREATING, template_name='test-ex-template',
-                               template_namespace='test-ex-namespace'),
+                               template_namespace='test-ex-namespace',
+                               metadata={'annotations':
+                                            {'kubectl.kubernetes.io/last-applied-configuration':
+                                                 '{"apiVersion":"aipg.intel.com/v1",'
+                                                 '"kind":"Experiment",'
+                                                 '"metadata":{"annotations":{},'
+                                                 '"name":"test-experiment-old",'
+                                                 '"namespace":"namespace-1"},'
+                                                 '"spec":{"name":"test-experiment-old",'
+                                                 '"parameters-spec":["a 1", "b 2"],'
+                                                 '"state":"CREATING",'
+                                                 '"template-name":"test-ex-template",'
+                                                 '"template-namespace":"test-ex-namespace"}}\n'},
+                                        'clusterName': '',
+                                        'creationTimestamp': '2018-04-26T13:43:01Z',
+                                        'labels': {'name_origin': 'test-experiment-new', 'script_name': 'mnist_single_node.py'},
+                                        'generation': 1,
+                                        'name': 'test-experiment-old',
+                                        'namespace': 'namespace-1',
+                                        'resourceVersion': '1350906',
+                                        'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-ef-stack/experiments/test-experiment',
+                                        'uid': 'bd298c60-4957-11e8-96f7-527100002000'}),
                     Experiment(name='test-experiment-new', parameters_spec=['a 1', 'b 2'],
                                creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
                                state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
-                               template_namespace='test-ex-namespace')]
+                               template_namespace='test-ex-namespace',
+                               metadata={
+                                        'annotations': {
+                                            'kubectl.kubernetes.io/last-applied-configuration':
+                                                '{"apiVersion":"aipg.intel.com/v1",'
+                                                '"kind":"Experiment",'
+                                                '"metadata":{"annotations":{},"name":"test-experiment-2",'
+                                                '"namespace":"namespace-2"},'
+                                                '"spec":{"name":"test-experiment-new","parameters-spec":["a 1", "b 2"],'
+                                                '"state":"SUBMITTED","template-name":"test-ex-template",'
+                                                '"template-namespace":"test-ex-namespace"}}\n'},
+                                        'clusterName': '', 'creationTimestamp': '2018-05-08T13:05:04Z',
+                                        'labels': {'name_origin': 'test-experiment-new', 'script_name': 'mnist_single_node.py'},
+                                        'generation': 1,
+                                        'name': 'test-experiment-new', 'namespace': 'namespace-2',
+                                        'resourceVersion': '3129108',
+                                        'selfLink': '/apis/aipg.intel.com/v1/namespaces/mciesiel-ef-stack/experiments/test-experiment-2',
+                                        'uid': '6ce9d932-52c0-11e8-ae8b-527100001230'})]
 
 
 @pytest.fixture()
@@ -102,16 +140,20 @@ def test_add_experiment(mock_k8s_api_client: CustomObjectsApi):
 
 def test_generate_experiment_name_if_name_provided_and_exp_no_exists(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_namespaced_custom_object.return_value = LIST_EXPERIMENTS_RESPONSE_RAW
+    mock_k8s_api_client.get_namespaced_custom_object.return_value = None
     result, labels = generate_exp_name_and_labels('script', NAMESPACE, 'experiment-not-exist-yet')
     assert result == 'experiment-not-exist-yet'
-    assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 1
+    assert mock_k8s_api_client.get_namespaced_custom_object.call_count == 1
+    assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 0
 
 
-def test_generate_experiment_name_if_exp_exists_and_name_provided(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.list_namespaced_custom_object.return_value = LIST_EXPERIMENTS_RESPONSE_RAW
+def test_generate_experiment_name_if_exp_exists_and_name_provided(mock_k8s_api_client: CustomObjectsApi,
+                                                                  mocker):
+    get_experiment_mock = mocker.patch('platform_resources.experiments.get_experiment', return_value=TEST_EXPERIMENTS[0])
+    mock_k8s_api_client.get_namespaced_custom_object.return_value = TEST_EXPERIMENTS[0]
     with pytest.raises(SubmitExperimentError):
         generate_exp_name_and_labels('script', NAMESPACE, 'test-experiment-old')
-    assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 1
+    assert get_experiment_mock.call_count == 1
 
 
 def test_generate_experiment_name_if_exp_exists_and_name_no_provided(mock_k8s_api_client: CustomObjectsApi):

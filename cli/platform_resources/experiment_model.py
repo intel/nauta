@@ -28,6 +28,8 @@ from marshmallow import Schema, fields, post_load, validates
 from marshmallow_enum import EnumField
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from platform_resources.platform_resource_model import PlatformResource, KubernetesObjectSchema
+from platform_resources.run_model import Run, RunKinds
+from platform_resources.runs import list_runs
 from util.system import format_timestamp_for_cli
 
 
@@ -41,12 +43,12 @@ class ExperimentStatus(Enum):
 
 class Experiment(PlatformResource):
 
-    ExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec',
-                                                   'creation_timestamp', 'submitter', 'status'])
+    ExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter',
+                                                   'status', 'template_name'])
 
     def __init__(self, name: str, template_name: str, template_namespace: str, parameters_spec: List[str]=None,
                  state: ExperimentStatus=ExperimentStatus.CREATING, creation_timestamp: str = None,
-                 submitter: str = None):
+                 submitter: str = None, metadata: dict = None):
         self.name = name
         self.parameters_spec = parameters_spec
         self.state = state
@@ -54,6 +56,7 @@ class Experiment(PlatformResource):
         self.template_namespace = template_namespace
         self.creation_timestamp = creation_timestamp
         self.submitter = submitter
+        self.metadata = metadata
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -63,13 +66,19 @@ class Experiment(PlatformResource):
                    submitter=object_dict['metadata']['namespace'],
                    state=ExperimentStatus[object_dict['spec']['state']],
                    template_name=object_dict['spec']['template-name'],
-                   template_namespace=object_dict['spec']['template-namespace'])
+                   template_namespace=object_dict['spec']['template-namespace'],
+                   metadata=object_dict['metadata'])
 
     @property
     def cli_representation(self):
         return Experiment.ExperimentCliModel(name=self.name, parameters_spec=' '.join(self.parameters_spec),
                                              creation_timestamp=format_timestamp_for_cli(self.creation_timestamp),
-                                             submitter=self.submitter, status=self.state.value)
+                                             submitter=self.submitter, status=self.state.value,
+                                             template_name=self.template_name)
+
+
+    def get_runs(self) -> List[Run]:
+        return list_runs(namespace=self.metadata['namespace'], exp_name_filter=self.name)
 
 
 class ExperimentSchema(Schema):

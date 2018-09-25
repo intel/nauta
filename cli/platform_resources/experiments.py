@@ -31,8 +31,9 @@ from kubernetes import config, client
 from kubernetes.client.rest import ApiException
 
 import platform_resources.experiment_model as model
+from platform_resources.run_model import RunKinds
 from platform_resources.platform_resource_model import KubernetesObject
-from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
+from platform_resources.resource_filters import filter_by_name_regex, filter_by_state, filter_by_run_kinds
 from util.exceptions import InvalidRegularExpressionError, SubmitExperimentError
 from util.logger import initialize_logger
 from cli_text_consts import PLATFORM_RESOURCES_EXPERIMENTS_TEXTS as TEXTS
@@ -75,12 +76,15 @@ def get_experiment(name: str, namespace: str = None) -> Optional[model.Experimen
 
 def list_experiments(namespace: str = None,
                      state: model.ExperimentStatus = None,
+                     run_kinds_filter : List[RunKinds] = None,
                      name_filter: str = None) -> List[model.Experiment]:
     """
     Return list of experiments.
     :param namespace: If provided, only experiments from this namespace will be returned
     :param state: If provided, only experiments with given state will be returned
     :param name_filter: If provided, only experiments matching name_filter regular expression will be returned
+    :param run_kinds_filter: If provided, only experiments with a kind that matches to any of the run kinds from given
+        filtering list will be returned
     :return: List of Experiment objects
     """
     logger.debug('Listing experiments.')
@@ -93,7 +97,8 @@ def list_experiments(namespace: str = None,
         raise InvalidRegularExpressionError(error_msg) from e
 
     experiment_filters = [partial(filter_by_name_regex, name_regex=name_regex),
-                          partial(filter_by_state, state=state)]
+                          partial(filter_by_state, state=state),
+                          partial(filter_by_run_kinds, run_kinds=run_kinds_filter)]
 
     experiments = [model.Experiment.from_k8s_response_dict(experiment_dict)
                    for experiment_dict in raw_experiments['items']
@@ -149,6 +154,9 @@ def add_experiment(exp: model.Experiment, namespace: str, labels: Dict[str, str]
     config.load_kube_config()
     api = client.CustomObjectsApi(client.ApiClient())
 
+    # exclude labels with None values - labels won't be correctly added otherwise
+    labels = {key: value for key, value in labels.items() if value} if labels else None
+
     exp_kubernetes = KubernetesObject(exp, client.V1ObjectMeta(name=exp.name, namespace=namespace, labels=labels),
                                       kind="Experiment", apiVersion=f"{API_GROUP_NAME}/{EXPERIMENTS_VERSION}")
     schema = model.ExperimentKubernetesSchema()
@@ -166,20 +174,25 @@ def add_experiment(exp: model.Experiment, namespace: str, labels: Dict[str, str]
     return response
 
 
-def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = None) -> (str, Dict[str, str]):
+def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = None,
+                                 run_kind: RunKinds = RunKinds.TRAINING) -> (str, Dict[str, str]):
     if script_name:
         script_name = Path(script_name).name
 
     if name:
         # CASE 1: If user pass name as param, then use it. If experiment with this name exists - return error
-        experiments = list_experiments(namespace=namespace, name_filter=f'^{name}$')
-        if experiments and len(experiments) > 0:
+        experiment = get_experiment(namespace=namespace, name=name)
+        experiment_runs = experiment.get_runs() if experiment else []
+        if experiment and experiment_runs:
             raise SubmitExperimentError(TEXTS["experiment_already_exists_error_msg"].format(name=name))
-        return name, prepare_label(script_name, name, name)
+        # subcase when experiment has no associated runs.
+        if experiment and not experiment_runs:
+            raise SubmitExperimentError(TEXTS["experiment_invalid_state_msg"].format(name=name))
+        return name, prepare_label(script_name, name, name, run_kind=run_kind)
     else:
         # CASE 2: If user submit exp without name, but there is already exp with the same script name, then:
         # --> use existing exp name and add post-fix with next index
-        generated_name, labels = generate_name_for_existing_exps(script_name, namespace)
+        generated_name, labels = generate_name_for_existing_exps(script_name, namespace, run_kind=run_kind)
         if generated_name:
             return generated_name, labels
 
@@ -191,8 +204,8 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
         experiments = list_experiments(namespace=namespace, name_filter=result)
         if experiments and len(experiments) > 0:
             result = f'{result}-{len(experiments)}'
-            return result, prepare_label(script_name, result)
-        return result, prepare_label(script_name, result)
+            return result, prepare_label(script_name, result, run_kind=run_kind)
+        return result, prepare_label(script_name, result, run_kind=run_kind)
 
 
 def generate_name(name: str, prefix='exp') -> str:
@@ -206,17 +219,20 @@ def generate_name(name: str, prefix='exp') -> str:
            f'{time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())}'
 
 
-def prepare_label(script_name, calculated_name: str, name: str=None) -> Dict[str, str]:
+def prepare_label(script_name, calculated_name: str, name: str=None,
+                  run_kind: RunKinds = RunKinds.TRAINING) -> Dict[str, str]:
     labels = {
         "script_name": script_name,
         "calculated_name": calculated_name,
+        "runKind": run_kind.value
     }
     if name:
         labels['name_origin'] = name
     return labels
 
 
-def generate_name_for_existing_exps(script_name: str, namespace: str) -> (str or None, Dict[str, str]):
+def generate_name_for_existing_exps(script_name: str, namespace: str,
+                                    run_kind: RunKinds = RunKinds.TRAINING) -> (str or None, Dict[str, str]):
     exp_list = list_k8s_experiments_by_label(namespace=namespace,
                                              label_selector=f"script_name={script_name},name_origin")
     if not exp_list or len(exp_list) == 0:
@@ -238,7 +254,7 @@ def generate_name_for_existing_exps(script_name: str, namespace: str) -> (str or
             counter = counter+1
 
     calculated_name = f"{name_origin}-{counter}"
-    return calculated_name, prepare_label(script_name, calculated_name, name_origin)
+    return calculated_name, prepare_label(script_name, calculated_name, name_origin, run_kind=run_kind)
 
 
 def update_experiment(experiment: model.Experiment, namespace: str) -> KubernetesObject:
@@ -268,3 +284,17 @@ def update_experiment(experiment: model.Experiment, namespace: str) -> Kubernete
         err_message = TEXTS["experiment_update_error_msg"]
         logger.exception(err_message)
         raise RuntimeError(err_message) from exe
+
+
+def delete_experiment(experiment: model.Experiment, namespace: str):
+    logger.debug(f'Deleting experiment {experiment.name}.')
+
+    config.load_kube_config()
+    api = client.CustomObjectsApi(client.ApiClient())
+    try:
+        api.delete_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace,
+                                            plural=EXPERIMENTS_PLURAL, version=EXPERIMENTS_VERSION,
+                                            name=experiment.name, body={})
+    except ApiException:
+        logger.exception(f"Failed to delete experiment {experiment.name}.")
+        raise

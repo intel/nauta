@@ -20,7 +20,6 @@
 #
 
 from collections import namedtuple
-from enum import Enum
 import itertools
 import os
 import shutil
@@ -36,7 +35,7 @@ import draft.cmd as cmd
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
-from platform_resources.run_model import Run, RunStatus
+from platform_resources.run_model import Run, RunStatus, RunKinds
 import platform_resources.runs as runs_api
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.k8s.kubectl import delete_k8s_object
@@ -70,19 +69,14 @@ RUN_TEMPLATE_NAME = "Template name"
 
 JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
 
-EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE,
-                            RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
-
 EXP_SUB_SEMAPHORE_FILENAME = ".underSubmission"
 
+EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE,
+                            RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+UNINITIALIZED_EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE,
+                                          RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+
 log = initialize_logger('commands.common')
-
-
-class RunKinds(Enum):
-    """ This enum contains all allowed run kinds which are used to filter runs in "list" commands. """
-    TRAINING = "training"
-    JUPYTER = "jupyter"
-    INFERENCE = "inference"
 
 
 class RunSubmission(Run):
@@ -195,7 +189,7 @@ def convert_to_number(s: str) -> int or float:
         return float(s)
 
 
-def submit_experiment(template: str, name: str, run_kind: RunKinds,
+def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TRAINING,
                       script_location: str = None, script_parameters: Tuple[str, ...] = None,
                       pack_params: List[Tuple[str, str]] = None, parameter_range: List[Tuple[str, str]] = None,
                       parameter_set: Tuple[str, ...] = None,
@@ -207,8 +201,15 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()
+    except Exception:
+        message = TEXTS["get_namespace_error_msg"]
+        log.exception(message)
+        raise SubmitExperimentError(message)
+
+    try:
         experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
-                                                                               namespace=namespace, name=name)
+                                                                               namespace=namespace, name=name,
+                                                                               run_kind=run_kind)
         runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
                                          parameter_set=parameter_set, template_name=template)
     except KubectlIntError as exe:
@@ -316,10 +317,11 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
             parameter_range_spec = [f'-pr {param_name} {param_value}' for param_name, param_value in parameter_range]
             parameter_set_spec = [f'-ps {ps_spec}' for ps_spec in parameter_set]
             experiment_parameters_spec = list(script_parameters) + parameter_range_spec + parameter_set_spec
-            experiments_api.add_experiment(experiments_model.Experiment(name=experiment_name, template_name=template,
-                                                                        parameters_spec=experiment_parameters_spec,
-                                                                        template_namespace="template-namespace"),
-                                           namespace, labels=labels)
+            experiment = experiments_model.Experiment(name=experiment_name, template_name=template,
+                                                      parameters_spec=experiment_parameters_spec,
+                                                      template_namespace="template-namespace")
+
+            experiments_api.add_experiment(experiment, namespace, labels=labels)
 
             # submit runs
             submitted_runs = []
@@ -346,6 +348,10 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds,
             if not submitted_runs:
                 click.echo(TEXTS["submission_fail_error_msg"])
                 delete_k8s_object("experiment", experiment_name)
+
+            # Change experiment status to submitted
+            experiment.state = experiments_model.ExperimentStatus.SUBMITTED
+            experiments_api.update_experiment(experiment=experiment, namespace=namespace)
 
     except LocalPortOccupiedError as exe:
         click.echo(exe.message)

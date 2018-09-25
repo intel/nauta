@@ -36,8 +36,8 @@ from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace
 from platform_resources.run_model import Run, RunStatus
 from platform_resources.runs import list_runs, update_run
-from platform_resources.experiment_model import ExperimentStatus
-from platform_resources.experiments import update_experiment, get_experiment
+from platform_resources.experiment_model import ExperimentStatus, Experiment
+from platform_resources.experiments import update_experiment, get_experiment, delete_experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from util.app_names import DLS4EAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
@@ -65,13 +65,14 @@ experiment_name_plural = 'experiments'
 @common_options()
 @pass_state
 def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
-           listed_runs_kinds: List[Enum] = [RunKinds.TRAINING, RunKinds.JUPYTER]):
+           listed_runs_kinds: List[Enum] = None):
     """
     Cancels chosen experiments based on a name provided as a parameter.
     """
+    if not listed_runs_kinds:
+        listed_runs_kinds = [RunKinds.TRAINING, RunKinds.JUPYTER]
 
     # check whether we have runs with a given name
-
     if name and match:
         handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
         exit(1)
@@ -90,9 +91,13 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         exit(0)
 
     search_for_experiment = False
+    exp_to_be_cancelled = None
 
     if name:
         exp_to_be_cancelled = get_experiment(namespace=current_namespace, name=name)
+        exp_to_be_cancelled_kind = RunKinds(exp_to_be_cancelled.metadata['labels'].get('runKind')) \
+            if exp_to_be_cancelled else None
+        exp_to_be_cancelled = exp_to_be_cancelled if exp_to_be_cancelled_kind in listed_runs_kinds else None
 
         if exp_to_be_cancelled:
             search_for_experiment = True
@@ -120,11 +125,15 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                      TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural))
         exit(1)
 
-    if not list_of_all_runs:
-        handle_error(
-            user_msg=TEXTS["lack_of_experiments_error_msg"].format(experiment_name_plural=experiment_name_plural,
-                                                                   experiment_name=experiment_name)
-        )
+    # Handle cancellation of experiments with no associated Runs
+    if exp_to_be_cancelled and not list_of_all_runs:
+        cancel_uninitialized_experiment(experiment=exp_to_be_cancelled, namespace=current_namespace,
+                                        purge=purge)
+    # If no experiment and no runs were matched, throw an error
+    elif not list_of_all_runs:
+        handle_error(user_msg=TEXTS["lack_of_experiments_error_msg"].format(
+            experiment_name_plural=experiment_name_plural,
+            experiment_name=experiment_name))
         exit(1)
 
     # check whether we have at least one experiment in state other than CANCELLED
@@ -469,3 +478,29 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
         for pod in not_deleted_pods:
             click.echo(f"     - {pod.name}")
         sys.exit(1)
+
+
+def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purge: bool):
+    click.echo(TEXTS["uninitialized_experiment_cancel_msg"].format(experiment_name=experiment.name))
+    if not click.confirm(TEXTS["confirm_cancel_msg"].format(experiment_name_plural=experiment_name_plural)):
+        handle_error(
+            user_msg=TEXTS["cancellation_aborted_msg"].format(
+                experiment_name_plural=experiment_name_plural
+            )
+        )
+        exit(2)
+
+    try:
+        if purge:
+            click.echo(TEXTS["purging_start_msg"].format(run_name=experiment.name))
+            delete_experiment(experiment, namespace)
+        else:
+            click.echo(TEXTS["canceling_runs_start_msg"].format(experiment_name=experiment.name,
+                                                                run_name=''))
+            experiment.state = ExperimentStatus.CANCELLED
+            update_experiment(experiment, namespace)
+    except Exception:
+        handle_error(logger, TEXTS["other_cancelling_error_msg"])
+        exit(1)
+
+    exit(0)

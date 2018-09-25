@@ -30,6 +30,13 @@ from platform_resources.platform_resource_model import PlatformResource, Kuberne
 from util.system import format_timestamp_for_cli
 
 
+class RunKinds(Enum):
+    """ This enum contains all allowed run kinds which are used to filter runs in "list" commands. """
+    TRAINING = "training"
+    JUPYTER = "jupyter"
+    INFERENCE = "inference"
+
+
 class RunStatus(Enum):
     QUEUED = 'QUEUED'
     RUNNING = 'RUNNING'

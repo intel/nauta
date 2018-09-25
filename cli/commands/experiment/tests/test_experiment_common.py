@@ -145,6 +145,7 @@ class SubmitExperimentMocks:
         self.gen_exp_name = mocker.patch("platform_resources.experiments.generate_exp_name_and_labels",
                                          side_effect=[(EXPERIMENT_NAME, {})])
         self.add_exp = mocker.patch("platform_resources.experiments.add_experiment")
+        self.update_experiment = mocker.patch('platform_resources.experiments.update_experiment')
         self.add_run = mocker.patch("platform_resources.runs.add_run")
         self.update_run = mocker.patch("platform_resources.runs.update_run")
         self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0)])

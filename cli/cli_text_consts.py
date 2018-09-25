@@ -176,7 +176,9 @@ PREDICT_CMD_TEXTS = {
 PREDICT_LIST_CMD_TEXTS = {
     "help_a": "Show all prediction instances, regardless of the owner.",
     "help_n": "A regular expression to narrow down list to prediction instances that match this expression.",
-    "help_s": "List prediction instances with matching status."
+    "help_s": "List prediction instances with matching status.",
+    "help_u": "List uninitialized prediction instances, i.e. prediction instances"
+              " without resources submitted for creation.",
 }
 
 PREDICT_LAUNCH_CMD_TEXTS = {
@@ -253,7 +255,8 @@ EXPERIMENT_CMD_TEXTS = {
 EXPERIMENT_LIST_CMD_TEXTS = {
     "help_a": "Show all experiments, regardless of the owner.",
     "help_n": "A regular expression to narrow down list to experiments that match this expression.",
-    "help_s": "List experiments with matching status."
+    "help_s": "List experiments with matching status.",
+    "help_u": "List uninitialized experiments, i.e. experiments without resources submitted for creation.",
 }
 
 EXPERIMENT_TEMPLATE_LIST_CMD_TEXTS = {
@@ -396,7 +399,8 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "lack_of_pods_error_msg": "Lack of pods fulfilling given criteria. Pod ID or pod status "
                                      "parameters do not match any existing pod.",
     "canceling_pods_msg": "Cancelling the pod: {pod_name} ...",
-    "other_pod_cancelling_error_msg": "Error during cancelling the pod."
+    "other_pod_cancelling_error_msg": "Error during cancelling the pod.",
+    "uninitialized_experiment_cancel_msg": "Experiment {experiment_name} has no resources submitted for creation.",
 }
 
 EXPERIMENT_VIEW_CMD_TEXTS = {
@@ -436,6 +440,7 @@ EXPERIMENT_COMMON_TEXTS = {
     "dir_cant_be_copied_error_text": "Additional folder cannot be copied into experiment's folder.",
     "exp_dir_cant_be_created": "Folder with experiments' data cannot be created.",
     "training_script_cant_be_created": "Training script cannot be created.",
+    "get_namespace_error_msg": "Failed to get current Kubernetes namespace.",
     "submit_preparation_error_msg": "Problem during preparation of experiments' data.",
     "local_docker_tunnel_error_msg": "Error during creation of a local docker-host tunnel.",
     "env_creation_error_msg": "Problems during creation of environments.",
@@ -548,6 +553,11 @@ PLATFORM_RESOURCES_EXPERIMENTS_TEXTS = {
     "k8s_response_load_error_msg": "preparing load of ExperimentKubernetes response object error - {err}",
     "k8s_dump_preparation_error_msg": "preparing dump of ExperimentKubernetes request object error - {err}",
     "experiment_already_exists_error_msg": " experiment with name: {name} already exist!",
+    "experiment_invalid_state_msg": " experiment with name: {name} already exist, "
+                                    "but it doesn't have any resources submitted for creation. "
+                                    "In order to create experiment with desired name,"
+                                    " purge old experiment using following command: dlsctl experiment cancel --purge"
+                                    " {name}",
     "experiment_update_error_msg": "Error during patching an Experiment"
 }
 
