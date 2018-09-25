@@ -22,10 +22,12 @@
 import subprocess
 import errno
 import datetime
+from distutils.version import LooseVersion
 
 import pytest
 
-from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error
+from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
+    get_os_version, get_windows_edition, WINDOWS_EDITIONS
 from util.exceptions import KubectlIntError
 
 
@@ -135,3 +137,70 @@ def test_handle_error_no_exit(mocker):
 
     assert logger.exception.call_count == 1
     assert click_echo_mock.call_count == 1
+
+
+def test_get_os_version_windows_10(mocker):
+    system_mock = mocker.patch("util.system.platform.system")
+    system_mock.return_value = "Windows"
+    release_mock = mocker.patch("util.system.platform.release")
+    release_mock.return_value = "10"
+    get_windows_edition_mock = mocker.patch("util.system.get_windows_edition")
+    get_windows_edition_mock.return_value = "pro"
+    os_name, os_version = get_os_version()
+
+    assert os_name == "windows_pro"
+    assert os_version == LooseVersion("10")
+    assert get_windows_edition_mock.call_count == 1
+
+
+def test_get_os_version_windows_not_10(mocker):
+    system_mock = mocker.patch("util.system.platform.system")
+    system_mock.return_value = "Windows"
+    release_mock = mocker.patch("util.system.platform.release")
+    release_mock.return_value = "8"
+    get_windows_edition_mock = mocker.patch("util.system.get_windows_edition")
+    os_name, os_version = get_os_version()
+
+    assert os_name == "windows"
+    assert os_version == LooseVersion("8")
+    assert get_windows_edition_mock.call_count == 0
+
+
+def test_get_windows_edition(mocker):
+    execute_system_command_mock = mocker.patch("util.system.execute_system_command")
+    execute_system_command_mock.return_value = "4", 0
+
+    windows_edition = get_windows_edition()
+
+    assert windows_edition == WINDOWS_EDITIONS[4]
+
+
+def test_get_os_version_macos(mocker):
+    system_mock = mocker.patch("util.system.platform.system")
+    system_mock.return_value = "Darwin"
+    mac_ver_mock = mocker.patch("util.system.platform.mac_ver")
+    mac_ver_mock.return_value = ("10.0.13", )
+    os_name, os_version = get_os_version()
+
+    assert os_name == "macos"
+    assert os_version == LooseVersion("10.0.13")
+
+
+def test_get_os_version_debian(mocker):
+    system_mock = mocker.patch("util.system.platform.system")
+    system_mock.return_value = "Linux"
+    read_os_release_mock = mocker.patch("util.system.distro.info")
+    read_os_release_mock.return_value = {"id": "debian", "version": "9.3"}
+    os_name, os_version = get_os_version()
+
+    assert os_name == "debian"
+    assert os_version == LooseVersion("9.3")
+
+
+def test_get_os_version_empty(mocker):
+    system_mock = mocker.patch("util.system.platform.system")
+    system_mock.return_value = "abc"
+    os_name, os_version = get_os_version()
+
+    assert os_name == ""
+    assert os_version == LooseVersion("0")

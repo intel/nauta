@@ -26,8 +26,9 @@ import click
 
 from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
-from util.dependencies_checker import check_all_binary_dependencies, InvalidDependencyError
+from util.dependencies_checker import check_all_binary_dependencies, check_os
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
+from util.exceptions import InvalidDependencyError, InvalidOsError
 from util.system import handle_error
 from cli_text_consts import CLI_STATE_TEXTS as TEXTS
 
@@ -60,8 +61,9 @@ def verify_cli_dependencies():
     try:
         namespace = 'kube-system' if is_current_user_administrator(request_timeout=VERIFY_REQUEST_TIMEOUT) \
             else get_kubectl_current_context_namespace()
+        check_os()
         check_all_binary_dependencies(namespace=namespace)
-    except InvalidDependencyError:
+    except (InvalidDependencyError, InvalidOsError):
         error_msg = TEXTS["invalid_dependency_error_msg"]
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
     except FileNotFoundError:

@@ -24,12 +24,15 @@ import time
 from enum import Enum
 import subprocess
 import sys
-from typing import List
+from typing import List, Tuple
 import errno
 import socket
 import dateutil
 import signal
+import platform
+from distutils.version import LooseVersion
 import click
+import distro
 
 from util.exceptions import KubectlIntError
 from util.logger import initialize_logger, get_verbosity_level
@@ -37,6 +40,41 @@ from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS, VERBOSE_RERUN_MSG
 
 
 log = initialize_logger('util.system')
+
+WINDOWS_EDITIONS = {
+    0: "undefined",
+    1: "ultimate",
+    2: "home_basic",
+    3: "home_premium",
+    4: "enterprise",
+    5: "home_basic_n",
+    6: "business",
+    7: "standard_server",
+    8: "datacenter_server",
+    9: "small_business_server",
+    10: "enterprise_server",
+    11: "starter",
+    12: "datacenter_server_core",
+    13: "standard_server_core",
+    14: "enterprise_server_core",
+    15: "enterprise_server_for_itanium_based_systems",
+    16: "business_n",
+    17: "web_server",
+    18: "cluster_server",
+    19: "home_server",
+    20: "storage_express_server",
+    21: "storage_standard_server",
+    22: "storage_workgroup_server",
+    23: "storage_enterprise_server",
+    24: "server_for_small_business",
+    25: "small_business_server_premium",
+    29: "web_server_server_core",
+    39: "datacenter_edition_without_hyperv_server_core",
+    40: "standard_edition_without_hyperv_server_core",
+    41: "enterprise_edition_without_hyperv_server_core",
+    42: "hyperv_server",
+    48: "pro"
+}
 
 
 def execute_system_command(command: List[str], timeout: int or None = None,
@@ -166,3 +204,24 @@ def handle_error(logger=None, log_msg: str = None, user_msg: str = None, add_ver
     # Internationalization can be plugged in here.
     if user_msg is not None:
         click.echo(user_msg + (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
+
+
+def get_windows_edition():
+    windows_edition_number, _ = execute_system_command(
+        ["powershell.exe", "(Get-WmiObject Win32_OperatingSystem).OperatingSystemSKU"])
+    return WINDOWS_EDITIONS[int(windows_edition_number)]
+
+
+def get_os_version() -> Tuple[str, LooseVersion]:
+    system_str = platform.system()
+    if system_str == "Darwin":
+        return "macos", LooseVersion(platform.mac_ver()[0])
+    elif system_str == "Windows":
+        if LooseVersion(platform.release()) >= LooseVersion("10"):
+            return "windows" + "_" + get_windows_edition(), LooseVersion(platform.release())
+        else:
+            return "windows", LooseVersion(platform.release())
+    elif system_str == "Linux":
+        os_info = distro.info()
+        return os_info["id"], LooseVersion(os_info["version"])
+    return "", LooseVersion("0")

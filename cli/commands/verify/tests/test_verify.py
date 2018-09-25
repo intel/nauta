@@ -38,6 +38,7 @@ def test_verify_with_kubectl_connection_error(mocker):
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = KubectlConnectionError("Cannot connect to K8S cluster")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    mocker.patch.object(verify, "check_os")
 
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
@@ -54,6 +55,7 @@ def test_verify_with_kubectl_not_found_error(mocker):
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = FileNotFoundError
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    mocker.patch.object(verify, "check_os")
 
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
@@ -69,12 +71,13 @@ def test_verify_with_kubectl_connection_success(mocker):
     mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    mocker.patch.object(verify, "check_os")
 
     runner = CliRunner()
     runner.invoke(verify.verify, [])
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
-    assert check_dependency_mock.call_count != 0, "dependency was checked"
+    assert check_dependency_mock.call_count != 0, "dependency wasn't checked"
 
 
 def test_verify_with_kubectl_namespace_get_error(mocker):

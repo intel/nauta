@@ -72,3 +72,16 @@ class ProxyClosingError(ExceptionWithMessage):
 class ScriptConversionError(Exception):
     """Error raised in case of problems during conversion of python scripts into Jupyter notebooks"""
     pass
+
+
+class InvalidDependencyError(Exception):
+    """
+    Error raised when dlsctl fails to obtain some dependency version, or when this version does not meet the
+    requirements.
+    """
+    pass
+
+
+class InvalidOsError(Exception):
+    """Error raised when dlsctl fails to read user's OS version, or this version does not meet the requirements."""
+    pass

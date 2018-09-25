@@ -24,14 +24,14 @@ from sys import exit
 import click
 
 from cli_state import common_options, pass_state, State
-from util.dependencies_checker import check_dependency, DEPENDENCY_MAP
+from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
-from util.exceptions import KubectlConnectionError
 from util.system import handle_error
 from cli_text_consts import VERIFY_CMD_TEXTS as TEXTS
+from util.exceptions import KubectlConnectionError, InvalidOsError
 
 
 logger = initialize_logger(__name__)
@@ -56,6 +56,13 @@ def verify(state: State):
     except Exception:
         handle_error(logger, TEXTS["get_k8s_namespace_error_msg"], TEXTS["get_k8s_namespace_error_msg"],
                      add_verbosity_msg=state.verbosity == 0)
+        exit(1)
+
+    try:
+        check_os()
+        click.echo(TEXTS["os_supported_msg"])
+    except InvalidOsError as exception:
+        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
 
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():

@@ -78,7 +78,8 @@ VERIFY_CMD_TEXTS = {
                                    "{expected_version}",
     "dependency_not_installed_error_msg": "{dependency_name} is not installed.",
     "dependency_version_check_error_msg": "Failed to get {dependency_name} version.",
-    "dependency_verification_other_error_msg": "{dependency_name} - exception during verification."
+    "dependency_verification_other_error_msg": "{dependency_name} - exception during verification.",
+    "os_supported_msg": "This OS is supported."
 }
 
 
@@ -521,7 +522,13 @@ UTIL_DEPENDENCIES_CHECKER_TEXTS = {
     "dependency_not_installed_error_msg": "{dependency_name} is not installed.",
     "version_get_fail_msg": "Failed to get {dependency_name} version.",
     "invalid_dependency_error_msg": "{dependency_name} installed version: {installed_version}, does not match expected "
-                                    "version: {expected_version}"
+                                    "version: {expected_version}",
+    "unknown_os_error_msg": "Unknown OS version.",
+    "get_os_version_error_msg": "Could not determine OS version",
+    "unsupported_os_error_msg": "This OS ({os_name} {os_version}) is not supported. Please check the list of supported "
+                                "OS.",
+    "invalid_os_version_error_msg": "This version ({os_name} {os_version}) of the OS is not supported. Please check "
+                                    "the list of supported OS."
 }
 
 UTIL_CONFIG_TEXTS = {
