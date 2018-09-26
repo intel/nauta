@@ -77,7 +77,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
         exit(1)
 
-    if not name and not match and not (pod_ids or pod_status):
+    if not name and not match:
         handle_error(user_msg=TEXTS["name_m_none_given_error_msg"])
         exit(1)
 

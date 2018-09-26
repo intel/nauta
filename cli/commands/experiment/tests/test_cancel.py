@@ -226,7 +226,15 @@ def test_cancel_missing_parameters(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel)
     check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, gex_count=0)
 
-    assert "Name, -m or at least one of [--pod-ids, --pod-status] option must be given. Please pass one of them." \
+    assert "Name or -m option must be given. Please pass one of them." \
+           in result.output
+
+
+def test_cancel_pod_parameters_only(prepare_command_mocks: CancelMocks):
+    result = CliRunner().invoke(cancel.cancel, ["-i", "pod_id"])
+    check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, gex_count=0)
+
+    assert "Name or -m option must be given. Please pass one of them." \
            in result.output
 
 

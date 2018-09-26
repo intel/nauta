@@ -365,8 +365,7 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
     "help_i": "Comma-separated pods IDs - if given then matches pods by their IDs and deletes them.",
     "help_s": "One of: {available_statuses} - searches pods by their status and deletes them.",
     "name_m_both_given_error_msg": "Both name and -m option cannot be given. Please choose one of them.",
-    "name_m_none_given_error_msg": "Error: Name, -m or at least one of [--pod-ids, --pod-status] option must be given. "
-                                   "Please pass one of them.",
+    "name_m_none_given_error_msg": "Error: Name or -m option must be given. Please pass one of them.",
     "list_runs_error_msg": "Problems during loading a list of {experiment_name_plural}.",
     "lack_of_experiments_error_msg": "Lack of {experiment_name_plural} fulfilling given criteria. Name or match string "
                                      "parameters do not match any existing {experiment_name} in an appropriate state "
