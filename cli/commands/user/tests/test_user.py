@@ -164,7 +164,7 @@ def test_create_user_terminating(mocker):  # noqa: F811
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
-    assert TEXTS["user_being_removed_error_msg"] in result.output
+    assert TEXTS["user_being_removed_error_msg"].format(username=test_username) in result.output
 
     assert cup_mock.call_count == 1, "users presence wasn't checked"
     assert esc_mock.call_count == 0, "user was created"

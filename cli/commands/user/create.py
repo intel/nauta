@@ -95,7 +95,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
             username = username if username else getpass.getuser()
             validate_user_name(username)
         except ValueError as exe:
-            handle_error(logger, TEXTS["name_validation_error_msg"], str(exe),
+            handle_error(logger, TEXTS["name_validation_error_msg"].format(username=username), str(exe),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
 
@@ -106,15 +106,18 @@ def create(state: State, username: str, list_only: bool, filename: str):
         user_state = check_users_presence(username)
 
         if user_state == UserState.ACTIVE:
-            handle_error(logger, TEXTS["user_already_exists_error_msg"], TEXTS["user_already_exists_error_msg"])
+            handle_error(logger, TEXTS["user_already_exists_error_msg"].format(username=username),
+                         TEXTS["user_already_exists_error_msg"].format(username=username))
             exit(1)
 
         if user_state == UserState.TERMINATING:
-            handle_error(logger, TEXTS["user_being_removed_error_msg"], TEXTS["user_being_removed_error_msg"])
+            handle_error(logger, TEXTS["user_being_removed_error_msg"].format(username=username),
+                         TEXTS["user_being_removed_error_msg"].format(username=username))
             exit(1)
 
     except Exception:
-        handle_error(logger, TEXTS["user_verification_error_msg"], TEXTS["user_verification_error_msg"],
+        handle_error(logger, TEXTS["user_verification_error_msg"].format(username=username),
+                     TEXTS["user_verification_error_msg"].format(username=username),
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
@@ -134,9 +137,10 @@ def create(state: State, username: str, list_only: bool, filename: str):
         output, err_code = execute_system_command(add_user_command)
 
         if err_code:
-            handle_error(logger, output, TEXTS["user_add_error_msg"], add_verbosity_msg=state.verbosity == 0)
+            handle_error(logger, output, TEXTS["user_add_error_msg"].format(username=username),
+                         add_verbosity_msg=state.verbosity == 0)
             if not delete_user(username):
-                handle_error(user_msg=TEXTS["remove_user_error_msg"])
+                handle_error(user_msg=TEXTS["remove_user_error_msg"].format(username=username))
             sys.exit(1)
 
         try:
@@ -147,10 +151,11 @@ def create(state: State, username: str, list_only: bool, filename: str):
             users_password = ""
 
     except Exception:
-        handle_error(logger, TEXTS["user_add_error_msg"], TEXTS["user_add_error_msg"],
+        handle_error(logger, TEXTS["user_add_error_msg"].format(username=username),
+                     TEXTS["user_add_error_msg"].format(username=username),
                      add_verbosity_msg=state.verbosity == 0)
         if not delete_user(username):
-            handle_error(user_msg=TEXTS["remove_user_error_msg"])
+            handle_error(user_msg=TEXTS["remove_user_error_msg"].format(username=username))
         sys.exit(1)
 
     if is_user_created(username, 90):

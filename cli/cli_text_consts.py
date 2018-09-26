@@ -100,16 +100,16 @@ USER_CREATE_CMD_TEXTS = {
     "help_l": "If given - content of the generated user's config file is displayed on the screen only.",
     "help_f": "Name of file where user's configuration will be stored. If not given configuration is stored in the "
               "config. file.",
-    "add_user_error_msg": "User has not been created.",
-    "remove_user_error_msg": "Partially created user has not been removed successfully - please remove the user "
-                             "manually.",
+    "add_user_error_msg": "User {username} has not been created.",
+    "remove_user_error_msg": "Partially created user {username}"
+                             " has not been removed successfully - please remove the user manually.",
     "f_l_options_exclusion_error_msg": "Both -f/--filename and -l/--list_only options cannot be given. Please "
                                        "choose one of them.",
-    "name_validation_error_msg": "Error detected while validating user name.",
+    "name_validation_error_msg": "Error detected while validating user name: {username}.",
     "user_not_admin_error_msg": "Only administrators can create new users.",
-    "user_already_exists_error_msg": "User already exists.",
-    "user_being_removed_error_msg": "User is still being removed.",
-    "user_verification_error_msg": "Problems detected while verifying user with given user name.",
+    "user_already_exists_error_msg": "User {username} already exists.",
+    "user_being_removed_error_msg": "User {username} is still being removed.",
+    "user_verification_error_msg": "Problems detected while verifying user with user name: {username}.",
     "password_gather_error_msg": "The app encountered problems while gathering user's password.",
     "user_add_error_msg": "Error detected while adding of a user.",
     "user_creation_success_msg": "User {username} has been added successfully.",
