@@ -26,5 +26,7 @@ const router = express.Router();
 
 router.get('/list', expApi.getUserExperiments);
 router.get('/:experiment/resources', expApi.getExperimentResourcesData);
+router.get('/:experiment/:owner/logs/last/:mode/:number', expApi.getExperimentLogs);
+router.get('/:experiment/:owner/logs/download', expApi.getAllExperimentLogs);
 
 module.exports = router;

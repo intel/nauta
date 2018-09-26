@@ -130,6 +130,7 @@
                               <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartTime', item.attributes.trainingStartTime)"/>
                               <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDurationTime', item.attributes.trainingDurationTime)"/>
                               <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="parseValue('parameters', item.attributes.parameters)"/>
+                              <LogsDetail :keyname="labels.OUTPUT" :owner="item.attributes.namespace" :name="item.attributes.name"/>
                             </v-flex>
                           </v-layout>
                         </div>
@@ -178,6 +179,7 @@ import {mapGetters, mapActions} from 'vuex';
 import ActionHeaderButtons from './ModelsTableFeatures/ActionHeaderButtons';
 import FilterByValWindow from './ModelsTableFeatures/FilterByValWindow';
 import ExpKeyValDetail from './ModelsTableFeatures/ExpKeyValDetail';
+import LogsDetail from './ModelsTableFeatures/LogsDetail';
 import ExpResourcesDetail from './ModelsTableFeatures/ExpResourcesDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 import TimedateExtractor from '../utils/timedate-extractor';
@@ -201,6 +203,7 @@ export default {
     ExpKeyValDetail,
     ExpResourcesDetail,
     FilterByValWindow,
+    LogsDetail,
     FooterElements
   },
   data: () => {

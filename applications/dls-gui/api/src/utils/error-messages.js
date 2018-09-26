@@ -30,6 +30,9 @@ module.exports = {
     FORBIDDEN_OPERATION: 'Forbidden operation.',
     UNAUTHORIZED_OPERATION: 'Unauthorized operation.'
   },
+  ELASTICSEARCH: {
+    CANNOT_GET_SEARCH_RESULT: 'Cannot get search result'
+  },
   K8S: {
     CUSTOM_OBJECT: {
       CANNOT_LIST: 'Cannot list custom objects'

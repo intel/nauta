@@ -21,6 +21,7 @@
 
 export default {
   ADD_DEL_COLUMN: 'Add/Delete columns',
+  ALL: 'All',
   ALL_RIGHTS_RESERVED: 'All rights reserved',
   CANCEL: 'Cancel',
   CLEAR_ALL: 'Clear all',
@@ -28,6 +29,7 @@ export default {
   CLEAR_SORT: 'Clear Sort',
   CONTAINERS: 'Containers',
   DLS: 'Deep Learning Studio',
+  DOWNLOAD: 'Download',
   EXIT: 'Exit',
   EXPERIMENT_SUBMISSION_DATE: 'Submission Date',
   EXPERIMENT_START_DATE: 'Start Date',
@@ -36,11 +38,14 @@ export default {
   LAUNCH_TB: 'Launch Tensorboard',
   LICENSE: 'License',
   LICENSE_PDF: 'dls-evaluation-license.pdf',
+  LAST: 'Last',
   LOAD_MORE: 'Load more',
   LOADING: 'Loading',
+  LOGS: 'Logs',
   NAME: 'Name',
   OF: 'of',
   OK: 'OK',
+  OUTPUT: 'Output',
   PARAMETERS: 'Parameters',
   PODS: 'Pods',
   RELEASE_NOTES: 'Release Notes',
@@ -58,5 +63,6 @@ export default {
   TERMS_OF_USE: 'Terms of Use',
   TOTAL_EXPERIMENT_DURATION: 'Total Duration',
   USER_GUIDE: 'User Guide',
-  USER_GUIDE_PDF: 'dls4e-cli-commands.pdf'
+  USER_GUIDE_PDF: 'dls4e-cli-commands.pdf',
+  VIEW: 'View'
 }

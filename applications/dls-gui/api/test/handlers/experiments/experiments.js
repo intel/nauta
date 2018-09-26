@@ -31,7 +31,7 @@ const HttpStatus = require('http-status-codes');
 describe('Handlers | Experiments', function () {
 
   let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred,
-    currentTime, clock;
+    currentTime, clock, elasticsearchUtilsMock;
 
   beforeEach(function () {
     currentTime = '2018-06-11T011:35:06Z';
@@ -40,7 +40,10 @@ describe('Handlers | Experiments', function () {
       status: sinon.stub().returns({
         send: sinon.spy()
       }),
-      send: sinon.spy()
+      send: sinon.spy(),
+      writeHead: sinon.spy(),
+      write: sinon.spy(),
+      end: sinon.spy()
     };
     reqMock = {
       headers: {
@@ -623,6 +626,153 @@ describe('Handlers | Experiments', function () {
         expect(k8sMock.listPodsByLabelValue.calledOnce).to.equal(true);
         done();
       });
+    });
+
+  });
+
+  describe('getExperimentLogs', function () {
+    beforeEach(function () {
+      deferred = Q.defer();
+      elasticsearchUtilsMock = {
+        getRunLastLogs: sinon.stub().returns(deferred.promise)
+      };
+      reqMock.params = {
+        experiment: 'exp',
+        owner: 'owner',
+        mode: 'show',
+        number: 100
+      }
+    });
+
+    it('should return error missing required data', function () {
+      delete reqMock.params.experiment;
+      expApi.getExperimentLogs(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
+    });
+
+    it('should return error if cannot fetch logs', function (done) {
+      expApi.__set__('elasticsearchUtils', elasticsearchUtilsMock);
+      expApi.getExperimentLogs(reqMock, resMock);
+      deferred.reject(error);
+      process.nextTick(function () {
+        expect(resMock.status.calledOnce).to.equal(true);
+        expect(resMock.status.calledWith(error.status)).to.equal(true);
+        expect(elasticsearchUtilsMock.getRunLastLogs.calledOnce).to.equal(true);
+        done();
+      });
+    });
+
+    it('should return data if everything ok', function (done) {
+      const expectedResult = 'result';
+      expApi.__set__('elasticsearchUtils', elasticsearchUtilsMock);
+      expApi.getExperimentLogs(reqMock, resMock);
+      deferred.resolve(expectedResult);
+      process.nextTick(function () {
+        expect(resMock.send.calledOnce).to.equal(true);
+        expect(resMock.send.getCall(0).args[0]).to.deep.equal(expectedResult);
+        expect(resMock.send.calledWith(expectedResult)).to.equal(true);
+        expect(elasticsearchUtilsMock.getRunLastLogs.calledOnce).to.equal(true);
+        done();
+      });
+    });
+
+  });
+
+  describe('getAllExperimentLogs', function () {
+    let elasticsearchClientMock, data, entry, searchMock, scrollMock, searchDeferred, scrollDeferred;
+
+    beforeEach(function () {
+      scrollDeferred = Q.defer();
+      searchDeferred = Q.defer();
+      elasticsearchUtilsMock = {
+        getRunLastLogs: sinon.stub().returns(deferred.promise),
+        getElasticsearchServiceUrl: sinon.stub().returns('url'),
+        getLuceneQuery: sinon.stub().returns('query'),
+        parseLogEntry: sinon.stub().returns('log')
+      };
+      searchMock = sinon.stub().returns(searchDeferred.promise);
+      scrollMock = sinon.stub().returns(scrollDeferred.promise);
+      elasticsearchClientMock = sinon.stub().returns({
+        search: searchMock,
+        scroll: scrollMock
+      });
+      reqMock.params = {
+        experiment: 'exp',
+        owner: 'owner'
+      };
+      entry = {
+        '_source': {
+          '@timestamp': '123',
+          kubernetes: {
+            pod_name: 'pod1'
+          },
+          log: 'log1'
+        }
+      };
+      data = {
+        hits: {
+          hits: [entry, entry, entry],
+          total: 6
+        }
+      };
+    });
+
+    it('should return error missing required data', function () {
+      delete reqMock.params.experiment;
+      expApi.getAllExperimentLogs(reqMock, resMock);
+      expect(resMock.status.calledOnce).to.equal(true);
+      expect(resMock.status.calledWith(HttpStatus.BAD_REQUEST)).to.equal(true);
+    });
+
+    it('should return error if cannot fetch logs', function (done) {
+      expApi.__set__('elasticsearchUtils', elasticsearchUtilsMock);
+      expApi.__set__('elasticsearch.Client', elasticsearchClientMock);
+      searchDeferred.reject(error);
+      expApi.getAllExperimentLogs(reqMock, resMock)
+        .then(() => {
+          expect(resMock.status.calledOnce).to.equal(true);
+          expect(resMock.status.calledWith(error.status)).to.equal(true);
+          expect(elasticsearchUtilsMock.getElasticsearchServiceUrl.calledOnce).to.equal(true);
+          expect(elasticsearchUtilsMock.getLuceneQuery.calledOnce).to.equal(true);
+          expect(searchMock.calledOnce).to.equal(true);
+          expect(scrollMock.calledOnce).to.equal(false);
+          done();
+        });
+    });
+
+    it('should return result if everything ok in fetch logs', function (done) {
+      expApi.__set__('elasticsearchUtils', elasticsearchUtilsMock);
+      expApi.__set__('elasticsearch.Client', elasticsearchClientMock);
+      searchDeferred.resolve(data);
+      scrollDeferred.resolve(data);
+      expApi.getAllExperimentLogs(reqMock, resMock)
+        .then(() => {
+          expect(resMock.write.callCount).to.equal(data.hits.total);
+          expect(resMock.writeHead.calledOnce).to.equal(true);
+          expect(resMock.end.calledOnce).to.equal(true);
+          expect(elasticsearchUtilsMock.parseLogEntry.callCount).to.equal(data.hits.total);
+          expect(searchMock.calledOnce).to.equal(true);
+          expect(scrollMock.calledOnce).to.equal(true);
+          done();
+        });
+    });
+
+    it('should return error if scroll logs with fail', function (done) {
+      expApi.__set__('elasticsearchUtils', elasticsearchUtilsMock);
+      expApi.__set__('elasticsearch.Client', elasticsearchClientMock);
+      searchDeferred.resolve(data);
+      scrollDeferred.reject(error);
+      expApi.getAllExperimentLogs(reqMock, resMock)
+        .then(() => {
+          expect(resMock.write.callCount).to.equal(data.hits.hits.length);
+          expect(resMock.writeHead.calledOnce).to.equal(true);
+          expect(resMock.end.calledOnce).to.equal(false);
+          expect(elasticsearchUtilsMock.parseLogEntry.callCount).to.equal(data.hits.hits.length);
+          expect(searchMock.calledOnce).to.equal(true);
+          expect(scrollMock.calledOnce).to.equal(true);
+          done();
+        });
     });
 
   });

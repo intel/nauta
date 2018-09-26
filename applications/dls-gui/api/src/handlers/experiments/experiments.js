@@ -20,10 +20,12 @@
  */
 
 const _ = require('lodash');
+const elasticsearch = require('elasticsearch');
 const logger = require('../../utils/logger');
 const errMessages = require('../../utils/error-messages');
 const HttpStatus = require('http-status-codes');
 const k8s = require('../../utils/k8s');
+const elasticsearchUtils = require('../../utils/dls4e-elasticsearch');
 const datetimeUtils = require('../../utils/datetime-utils');
 
 const generateExperimentEntities = function (data) {
@@ -261,6 +263,103 @@ const getExperimentResourcesData = function (req, res) {
     })
 };
 
+const getExperimentLogs = function (req, res) {
+  const runName = req.params.experiment;
+  const owner = req.params.owner;
+  const mode = req.params.mode;
+  const number = req.params.number;
+
+  if (!runName || !owner || !mode || !number) {
+    res.status(HttpStatus.BAD_REQUEST).send({message: errMessages.GENERAL.BAD_REQUEST});
+    return;
+  }
+
+  const contentSeparator = mode === 'show' ? '<br/>' : '\n';
+
+  elasticsearchUtils.getRunLastLogs(contentSeparator, runName, owner, number)
+    .then(function (logs) {
+      logger.info('Sending logs');
+      res.send(logs);
+    })
+    .catch(function (err) {
+      logger.error('Cannot get logs for experiment');
+      res.status(err.status).send({message: err.message});
+    })
+};
+
+const getAllExperimentLogs = async function (req, res) {
+  const runName = req.params.experiment;
+  const owner = req.params.owner;
+
+  if (!runName || !owner) {
+    res.status(HttpStatus.BAD_REQUEST).send({message: errMessages.GENERAL.BAD_REQUEST});
+    return;
+  }
+
+  logger.info('Searching logs in Elasticsearch service');
+
+  const client = new elasticsearch.Client({
+    host: elasticsearchUtils.getElasticsearchServiceUrl()
+  });
+
+  let response = null;
+
+  try {
+    response = await client.search({
+      index: '_all',
+      scroll: '30s',
+      q: elasticsearchUtils.getLuceneQuery(runName, owner),
+      sort: '@timestamp:asc',
+      size: 20
+    });
+  } catch (err) {
+    logger.error('Cannot get logs from elasticsearch');
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: errMessages.ELASTICSEARCH.CANNOT_GET_SEARCH_RESULT});
+    return;
+  }
+
+  logger.debug('Received first chunk of logs from Elasticsearch service');
+
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Transfer-Encoding': 'chunked'
+  });
+
+  let queue = [];
+  queue.push(response);
+
+  let counter = 0;
+  while (queue.length) {
+    const response = queue.shift();
+
+    response.hits.hits.forEach(function (item) {
+      const entry = elasticsearchUtils.parseLogEntry(item);
+      res.write(entry);
+      counter++;
+    });
+
+    if (response.hits.total === counter) {
+      logger.info('Received last chunk of logs from Elasticsearch service');
+      res.end();
+      break;
+    }
+
+    try {
+      logger.debug('Scrolling logs');
+      queue.push(
+        await client.scroll({
+          scrollId: response._scroll_id,
+          scroll: '30s'
+        })
+      );
+    } catch (err) {
+      logger.error('Cannot scroll logs from elasticsearch');
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: errMessages.ELASTICSEARCH.CANNOT_GET_SEARCH_RESULT});
+      return;
+    }
+  }
+};
+
 module.exports = {
   getUserExperiments: getUserExperiments,
   parseExperiments: parseExperiments,
@@ -268,5 +367,7 @@ module.exports = {
   extractAttrsNames: extractAttrsNames,
   applyOrderParams: applyOrderParams,
   generateExperimentEntities: generateExperimentEntities,
-  getExperimentResourcesData: getExperimentResourcesData
+  getExperimentResourcesData: getExperimentResourcesData,
+  getExperimentLogs: getExperimentLogs,
+  getAllExperimentLogs: getAllExperimentLogs
 };
