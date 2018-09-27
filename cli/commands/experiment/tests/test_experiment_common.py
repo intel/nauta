@@ -148,7 +148,7 @@ class SubmitExperimentMocks:
         self.update_experiment = mocker.patch('platform_resources.experiments.update_experiment')
         self.add_run = mocker.patch("platform_resources.runs.add_run")
         self.update_run = mocker.patch("platform_resources.runs.update_run")
-        self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
+        self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0, "")])
         self.submit_one = mocker.patch("commands.experiment.common.submit_draft_pack")
         self.update_conf = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
         self.create_env = mocker.patch("commands.experiment.common.create_environment",
@@ -276,7 +276,7 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
     caplog.set_level(logging.CRITICAL)
     prepare_mocks.mocker.patch("click.confirm", return_value=True)
     prepare_mocks.create_env.side_effect = [(EXPERIMENT_FOLDER), (EXPERIMENT_FOLDER)]
-    prepare_mocks.cmd_create.side_effect = [("", 0), ("", 0)]
+    prepare_mocks.cmd_create.side_effect = [("", 0, ""), ("", 0, "")]
     prepare_mocks.update_conf.side_effect = [0, 0]
     prepare_mocks.check_run_env.side_effect = [None, None]
 

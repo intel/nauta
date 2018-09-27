@@ -49,7 +49,7 @@ def draft_mock(mocker):
     config_instance_mock.config_path = FAKE_CLI_CONFIG_DIR_PATH
 
     exe_mock = mocker.patch.object(cmd, 'execute_system_command')
-    exe_mock.return_value = ('some return', 0)
+    exe_mock.return_value = ('some return', 0, 'some_return')
 
     return cmd
 

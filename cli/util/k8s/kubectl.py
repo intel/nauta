@@ -181,16 +181,16 @@ def check_users_presence(username: str) -> UserState:
 def delete_k8s_object(kind: str, name: str):
     delete_command = ['kubectl', 'delete', kind, name]
     logger.debug(delete_command)
-    output, err_code = system.execute_system_command(delete_command)
-    logger.debug(f"delete_k8s_object - output : {err_code} - {output}")
+    output, err_code, log_output = system.execute_system_command(delete_command)
+    logger.debug(f"delete_k8s_object - output : {err_code} - {log_output}")
     if err_code:
-        raise RuntimeError(TEXTS["k8s_object_delete_error_msg"].format(output=output))
+        raise RuntimeError(TEXTS["k8s_object_delete_error_msg"].format(output=log_output))
 
 
 def check_connection_to_cluster():
     check_connection_cmd = ['kubectl', 'get', 'pods']
     logger.debug(check_connection_cmd)
-    output, err_code = system.execute_system_command(check_connection_cmd)
-    logger.debug(f"check_connection_to_cluster - output : {err_code} - {output}")
+    output, err_code, log_output = system.execute_system_command(check_connection_cmd)
+    logger.debug(f"check_connection_to_cluster - output : {err_code} - {log_output}")
     if err_code:
-        raise KubectlConnectionError(TEXTS["k8s_cluster_no_connection_error_msg"].format(output=output))
+        raise KubectlConnectionError(TEXTS["k8s_cluster_no_connection_error_msg"].format(output=log_output))

@@ -110,14 +110,16 @@ def test_start_port_forwarding_success_with_different_port(mock_k8s_svc, mocker)
 
 def test_check_connection_to_cluster_with_success(mocker):
     error_code = 0
-    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code))
+    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code,
+                                                                                               'output'))
     kubectl.check_connection_to_cluster()
     assert subprocess_command_mock.call_count == 1, "kubectl get pods command wasn't called"
 
 
 def test_check_connection_to_cluster_with_error(mocker):
     error_code = 1
-    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code))
+    subprocess_command_mock = mocker.patch('util.system.execute_system_command', return_value=('output', error_code,
+                                                                                               'output'))
     with raises(KubectlConnectionError):
         kubectl.check_connection_to_cluster()
     assert subprocess_command_mock.call_count == 1, "kubectl get pods command wasn't called"

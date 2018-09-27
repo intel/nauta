@@ -489,7 +489,8 @@ PACKS_TF_TRAINING_TEXTS = {
 UTIL_SYSTEM_TEXTS = {
     "command_exe_fail_error_msg": "COMMAND execution FAIL: {command}",
     "unsupported_platform_error_msg": "unsupported platform: {sys_platform}, supported: {supported_os}!",
-    "port_availability_check_error_msg": "Problem during checking port's availability."
+    "port_availability_check_error_msg": "Problem during checking port's availability.",
+    "incorrect_system_encoding": "System's encoding is not supported. Please change it to UTF-8."
 }
 
 UTIL_SOCAT_TEXTS = {

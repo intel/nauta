@@ -59,8 +59,8 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
     if namespace:
         delete_release_command += ["--tiller-namespace", namespace]
 
-    output, err_code = execute_system_command(delete_release_command)
+    output, err_code, log_output = execute_system_command(delete_release_command)
 
     if err_code or f"release \"{release_name}\" deleted" not in output:
-        logger.error(output)
+        logger.error(log_output)
         raise RuntimeError(TEXTS["helm_release_removal_error_msg"].format(release_name=release_name))

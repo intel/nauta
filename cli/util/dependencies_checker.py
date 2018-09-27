@@ -167,14 +167,14 @@ def check_dependency(dependency_name: str, dependency_spec: DependencySpec, name
                                  dependency_spec.match_exact_version), saved_versions[dependency_name]
 
     try:
-        output, exit_code = dependency_spec.version_command(dependency_spec.version_command_args)
+        output, exit_code, log_output = dependency_spec.version_command(dependency_spec.version_command_args)
         if exit_code != 0:
             raise RuntimeError
     except RuntimeError as e:
         raise RuntimeError(
             TEXTS["version_cmd_fail_msg"].format(
                 version_cmd=dependency_spec.version_command, version_cmd_args=dependency_spec.version_command_args,
-                output=output
+                output=log_output
             )
         ) from e
 

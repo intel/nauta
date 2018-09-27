@@ -88,7 +88,7 @@ def test_check_dependency():
     test_dependency_name = 'test-dep'
     test_version = '0.0.1'
     version_command_mock = MagicMock()
-    version_command_mock.return_value = test_version, 0
+    version_command_mock.return_value = test_version, 0, test_version
     test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
                                      version_command_args=[], version_field=None, match_exact_version=False)
 
@@ -100,7 +100,7 @@ def test_check_dependency_namespace():
     test_namespace = 'test-namespace'
     test_version = '0.0.1'
     version_command_mock = MagicMock()
-    version_command_mock.return_value = test_version, 0
+    version_command_mock.return_value = test_version, 0, test_version
     test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
                                      version_command_args=[NAMESPACE_PLACEHOLDER], version_field=None,
                                      match_exact_version=False)
@@ -115,7 +115,7 @@ def test_check_dependency_parse():
     test_version = LooseVersion('0.0.1')
     test_version_output = 'version:"0.0.1"'
     version_command_mock = MagicMock()
-    version_command_mock.return_value = test_version_output, 0
+    version_command_mock.return_value = test_version_output, 0, test_version_output
     test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
                                      version_command_args=[], version_field='version', match_exact_version=False)
 

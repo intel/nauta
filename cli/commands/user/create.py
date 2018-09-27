@@ -134,11 +134,11 @@ def create(state: State, username: str, list_only: bool, filename: str):
                             f"username={username}", "--set", "TillerImage={}".format(tiller_location),
                             "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
 
-        output, err_code = execute_system_command(add_user_command)
+        _, err_code, log_output = execute_system_command(add_user_command)
 
         if err_code:
-            handle_error(logger, output, TEXTS["user_add_error_msg"].format(username=username),
-                         add_verbosity_msg=state.verbosity == 0)
+            handle_error(logger, log_output, TEXTS["user_add_error_msg"], add_verbosity_msg=state.verbosity == 0)
+
             if not delete_user(username):
                 handle_error(user_msg=TEXTS["remove_user_error_msg"].format(username=username))
             sys.exit(1)

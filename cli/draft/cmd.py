@@ -39,7 +39,7 @@ DRAFT_LOGS_FOLDER = "logs"
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
-def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str, int):
+def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str, int, str):
     config_path = Config().config_path
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
@@ -53,22 +53,22 @@ def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str,
     return execute_system_command(full_command, env=env, cwd=cwd)
 
 
-def create(working_directory: str = None, pack_type: str = None) -> (str, int):
+def create(working_directory: str = None, pack_type: str = None) -> (str, int, str):
     command = ['create']
     if pack_type:
         command.append('--pack={}'.format(pack_type))
-    output, exit_code = call_draft(args=command, cwd=working_directory)
+    output, exit_code, log_output = call_draft(args=command, cwd=working_directory)
 
     if not exit_code:
         output, exit_code = check_create_status(output)
     else:
         output = translate_create_status_description(output)
 
-    return output, exit_code
+    return output, exit_code, log_output
 
 
-def up(working_directory: str = None, namespace: str = None) -> (str, int):
-    output, exit_code = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
+def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
+    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
     # displaying logs from draft - only in debug mode
     pattern = "Inspect the logs with `draft logs (.*)`"
 
@@ -97,7 +97,7 @@ def up(working_directory: str = None, namespace: str = None) -> (str, int):
     if not exit_code:
         output, exit_code = check_up_status(output)
 
-    return output, exit_code
+    return output, exit_code, log_output
 
 
 def check_up_status(output: str) -> (str, int):

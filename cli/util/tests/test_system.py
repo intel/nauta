@@ -29,11 +29,12 @@ import pytest
 from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
     get_os_version, get_windows_edition, WINDOWS_EDITIONS
 from util.exceptions import KubectlIntError
+from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS
 
 
 def test_execute_system_command(mocker):
     mocker.patch('subprocess.check_output')
-    output, exit_code = execute_system_command(['ls'])
+    output, exit_code, log_output = execute_system_command(['ls'])
 
     # noinspection PyUnresolvedReferences
     assert subprocess.check_output.call_count == 1
@@ -49,7 +50,7 @@ def test_execute_system_command_known_error(mocker):
 
     mocker.patch('subprocess.check_output', new=raise_command_exception)
 
-    output, exit_code = execute_system_command(['ls'])
+    output, exit_code, log_output = execute_system_command(['ls'])
 
     assert exit_code == bad_exit_code
 
@@ -204,3 +205,17 @@ def test_get_os_version_empty(mocker):
 
     assert os_name == ""
     assert os_version == LooseVersion("0")
+
+
+def test_execute_system_command_wrong_encoding(mocker):
+
+    mocker.patch('subprocess.check_output')
+    log_mock = mocker.patch('util.system.log.debug')
+    log_mock.side_effect = UnicodeEncodeError('utf_8', 'Reason', 1, 1, 'Object')
+
+    output, exit_code, log_output = execute_system_command(['ls'])
+
+    # noinspection PyUnresolvedReferences
+    assert subprocess.check_output.call_count == 1
+    assert output != log_output
+    assert log_output == TEXTS["incorrect_system_encoding"]

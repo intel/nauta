@@ -103,7 +103,8 @@ def test_generate_kubeconfig():
 
 def test_delete_helm_release_success(mocker):
     esc_mock = mocker.patch("util.helm.execute_system_command",
-                            return_value=(f"release \"{test_username}\" deleted", 0))
+                            return_value=(f"release \"{test_username}\" deleted", 0,
+                                          f"release \"{test_username}\" deleted"))
 
     delete_helm_release(test_username)
 
@@ -111,7 +112,7 @@ def test_delete_helm_release_success(mocker):
 
 
 def test_delete_helm_release_failure(mocker):
-    mocker.patch("util.helm.execute_system_command", return_value=("", 1))
+    mocker.patch("util.helm.execute_system_command", return_value=("", 1, ""))
     with pytest.raises(RuntimeError):
         delete_helm_release(test_username)
 
@@ -219,7 +220,7 @@ class CreateUserMock():
 @pytest.fixture
 def prepare_mocks(mocker) -> CreateUserMock:
     cup_mock = mocker.patch("commands.user.create.check_users_presence", return_value=False)
-    esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0))
+    esc_mock = mocker.patch("commands.user.create.execute_system_command", return_value=("", 0, ""))
     gut_mock = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
     vun_mock = mocker.patch("commands.user.create.validate_user_name")
     icu_mock = mocker.patch("commands.user.create.is_current_user_administrator", return_value=True)

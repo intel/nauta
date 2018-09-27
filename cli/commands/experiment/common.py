@@ -456,10 +456,10 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         # create an environment
         create_environment(run_name, local_script_location, script_folder_location)
         # generate draft's data
-        output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
+        output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
         if exit_code:
-            raise KubectlIntError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=output))
+            raise KubectlIntError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=log_output))
 
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
@@ -498,10 +498,10 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     log.debug(f'Submit one run: {run_folder} - start')
 
     # run training
-    output, exit_code = cmd.up(working_directory=run_folder, namespace=namespace)
+    output, exit_code, log_output = cmd.up(working_directory=run_folder, namespace=namespace)
 
     if exit_code:
-        error_message = TEXTS["job_not_deployed_error_msg"].format(reason=output)
+        error_message = TEXTS["job_not_deployed_error_msg"].format(reason=log_output)
         log.error(error_message)
         delete_environment(run_folder)
         raise KubectlIntError(error_message)
