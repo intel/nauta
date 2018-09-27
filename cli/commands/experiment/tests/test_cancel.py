@@ -74,12 +74,26 @@ RUN_COMPLETE = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-trainin
                                                  'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
                    submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                    template_name="tf-training")
+RUN_RUNNING = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training",
+                  parameters=['mnist_single_node.py', '--data_dir', '/app'],
+                  state=RunStatus.RUNNING,
+                  metrics={'accuracy': 52.322},
+                  experiment_name="experiment-3",
+                  pod_count=1,
+                  pod_selector={'matchLabels': {'app': 'tf-training',
+                                                'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
+                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
+                  submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                  template_name="tf-training")
+
 
 TEST_RUNS_CORRECT = [RUN_COMPLETE, RUN_QUEUED]
 
-TEST_RUNS_MIXED = [RUN_COMPLETE, RUN_CANCELLED]
+TEST_RUNS_MIXED = [RUN_RUNNING, RUN_CANCELLED]
 
 TEST_RUNS_CANCELLED = [RUN_CANCELLED]
+
+TEST_RUNS_TO_BE_CANCELLED = [RUN_QUEUED, RUN_RUNNING]
 
 
 class CancelMocks:
@@ -150,7 +164,7 @@ def test_cancel_all_exp_cancelled(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False)
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    assert f"{experiment_name_plural} fulfilling given criteria have been cancelled already." in result.output
+    assert "Lack of experiments fulfilling given criteria. Name or match string parameters" in result.output
 
 
 def test_cancel_some_cancelled(prepare_command_mocks: CancelMocks):
@@ -158,12 +172,13 @@ def test_cancel_some_cancelled(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="n")
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    assert f"The following {experiment_name_plural} have been cancelled already:" in result.output
+    assert f"The following {experiment_name_plural} have been cancelled already or cannot be " \
+           f"cancelled due to their current state:" in result.output
     assert f"The following {experiment_name_plural} can still be cancelled:" in result.output
 
 
 def test_cancel_none_cancelled(prepare_command_mocks: CancelMocks):
-    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_TO_BE_CANCELLED
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="n")
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
@@ -179,27 +194,26 @@ def test_cancel_user_break(prepare_command_mocks: CancelMocks):
 
 
 def test_cancel_all_cancelled_successfully(prepare_command_mocks: CancelMocks):
-    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_TO_BE_CANCELLED
 
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="y")
     check_command_asserts(prepare_command_mocks, cne_count=2)
 
     assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
-    assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
+    assert "exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training" in result.output
 
 
 def test_cancel_some_not_cancelled(prepare_command_mocks: CancelMocks):
-    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
-    prepare_command_mocks.cancel_experiment.side_effect = ([([RUN_COMPLETE], []), ([], [RUN_QUEUED])])
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_TO_BE_CANCELLED
+    prepare_command_mocks.cancel_experiment.side_effect = ([([RUN_COMPLETE], []), ([], [RUN_RUNNING])])
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="y")
 
     check_command_asserts(prepare_command_mocks, cne_count=2)
-
     assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
-    assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
+    assert "exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training" in result.output
 
 
 def test_cancel_list_of_runs_failure(prepare_command_mocks: CancelMocks):
@@ -211,7 +225,7 @@ def test_cancel_list_of_runs_failure(prepare_command_mocks: CancelMocks):
 
 
 def test_exception_during_exp_cancellation(prepare_command_mocks: CancelMocks):
-    prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
+    prepare_command_mocks.list_runs.return_value = TEST_RUNS_TO_BE_CANCELLED
     prepare_command_mocks.cancel_experiment.side_effect = [([RUN_COMPLETE], []), RuntimeError()]
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], input="y")
 
@@ -219,7 +233,7 @@ def test_exception_during_exp_cancellation(prepare_command_mocks: CancelMocks):
     assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
     assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
-    assert "exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training" in result.output
+    assert "exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training" in result.output
 
 
 def test_cancel_missing_parameters(prepare_command_mocks: CancelMocks):
@@ -250,7 +264,7 @@ def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, ["-m", EXPERIMENT_NAME])
 
     check_command_asserts(prepare_command_mocks, cne_count=0, gex_count=0)
-    assert f"{experiment_name_plural} fulfilling given criteria have been cancelled already." in result.output
+    assert f"Lack of experiments fulfilling given criteria. Name or match string parameters" in result.output
 
 
 class CancelExperimentMocks:

@@ -94,6 +94,7 @@ def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_fi
                                                             plural=RUN_PLURAL, version=RUN_VERSION)
     else:
         raw_runs = api.list_cluster_custom_object(group=API_GROUP_NAME, plural=RUN_PLURAL, version=RUN_VERSION)
+
     try:
         name_regex = re.compile(name_filter) if name_filter else None
     except sre_constants.error as e:

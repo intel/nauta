@@ -377,7 +377,8 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
                                      "find out what are the names and states of existing {experiment_name_plural}.",
     "experiments_already_cancelled_error_msg": "{experiment_name_plural} fulfilling given criteria have been cancelled "
                                                "already.",
-    "already_cancelled_list_header": "The following {experiment_name_plural} have been cancelled already:",
+    "already_cancelled_list_header": "The following {experiment_name_plural} have been cancelled already or cannot "
+                                     "be cancelled due to their current state:",
     "can_be_cancelled_list_header": "The following {experiment_name_plural} can still be cancelled:",
     "will_be_cancelled_list_header": "The following {experiment_name_plural} will be cancelled:",
     "will_be_purged_list_header": "The following {experiment_name_plural} will be purged:",

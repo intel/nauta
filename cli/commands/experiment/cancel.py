@@ -116,10 +116,10 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     try:
         if search_for_experiment:
             list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=name,
-                                         state_list=list_of_applicable_states, run_kinds_filter=listed_runs_kinds)
+                                         run_kinds_filter=listed_runs_kinds)
         else:
             list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
-                                         state_list=list_of_applicable_states, run_kinds_filter=listed_runs_kinds)
+                                         run_kinds_filter=listed_runs_kinds)
     except Exception:
         handle_error(logger, TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural),
                      TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural))
@@ -130,7 +130,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         cancel_uninitialized_experiment(experiment=exp_to_be_cancelled, namespace=current_namespace,
                                         purge=purge)
     # If no experiment and no runs were matched, throw an error
-    elif not list_of_all_runs:
+    elif not [run for run in list_of_all_runs if run.state in list_of_applicable_states]:
         handle_error(user_msg=TEXTS["lack_of_experiments_error_msg"].format(
             experiment_name_plural=experiment_name_plural,
             experiment_name=experiment_name))
@@ -143,7 +143,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     if not purge:
         # check whether we have at least one experiment in state other than CANCELLED
         for run in list_of_all_runs:
-            if run.state != RunStatus.CANCELLED:
+            if run.state in list_of_applicable_states:
                 list_of_runs_to_be_deleted.append(run)
             else:
                 names_of_cancelled_runs.append(run.name)
