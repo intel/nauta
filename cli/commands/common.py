@@ -19,6 +19,7 @@
 # and approved by Intel in writing.
 #
 
+from collections import namedtuple
 from typing import List
 from sys import exit
 
@@ -31,11 +32,26 @@ from platform_resources.run_model import RunStatus, Run, RunKinds
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from platform_resources.experiment_model import Experiment, ExperimentStatus
-from util.system import handle_error
+from util.system import handle_error, format_timestamp_for_cli
 from cli_text_consts import CMDS_COMMON_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
+
+"""
+A namedtuple representing uninitialized experiments in CLI.
+"""
+UninitializedExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec', 'metrics',
+                                                            'creation_timestamp', 'start_date', 'end_date',
+                                                            'submitter', 'status', 'template_name'])
+
+
+def uninitialized_experiment_cli_representation(experiment: Experiment):
+    return UninitializedExperimentCliModel(name=experiment.name, parameters_spec=' '.join(experiment.parameters_spec),
+                                           metrics='', start_date='', end_date='',
+                                           creation_timestamp=format_timestamp_for_cli(experiment.creation_timestamp),
+                                           submitter=experiment.submitter, status=experiment.state.value,
+                                           template_name=experiment.template_name)
 
 
 def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
@@ -69,7 +85,8 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
         uninitialized_experiments = [experiment for experiment in creating_experiments
                                      if experiment.name not in names_of_experiment_with_runs]
 
-        click.echo(tabulate([experiment.cli_representation for experiment in uninitialized_experiments],
+        click.echo(tabulate([uninitialized_experiment_cli_representation(experiment)
+                             for experiment in uninitialized_experiments],
                             headers=headers, tablefmt="orgtbl"))
     except experiments_api.InvalidRegularExpressionError:
         handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],

@@ -21,7 +21,7 @@
 
 import click
 
-from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, UNINITIALIZED_EXPERIMENTS_LIST_HEADERS, RunKinds
+from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
@@ -46,7 +46,7 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
     """ List experiments. """
     if uninitialized:
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
-                                            headers=UNINITIALIZED_EXPERIMENTS_LIST_HEADERS)
+                                            headers=EXPERIMENTS_LIST_HEADERS)
     else:
         list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS,
                          with_metrics=True)
