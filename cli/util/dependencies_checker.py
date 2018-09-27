@@ -22,12 +22,18 @@
 from collections import namedtuple
 from distutils.version import LooseVersion
 import re
+import os
+from typing import Optional, Dict
+
+import yaml
 
 from draft.cmd import call_draft
 from util.system import execute_system_command, get_os_version
 from util.logger import initialize_logger
 from util.exceptions import InvalidDependencyError, InvalidOsError
 from cli_text_consts import UTIL_DEPENDENCIES_CHECKER_TEXTS as TEXTS
+from version import VERSION
+from util.config import Config
 
 
 log = initialize_logger(__name__)
@@ -43,6 +49,8 @@ DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
 HELM_VERSION = LooseVersion('v2.9.1')
 HELM_SERVER_CONNECTION_TIMEOUT = 30
 NAMESPACE_PLACEHOLDER = '<namespace>'
+
+DEPENDENCY_VERSIONS_FILE_SUFFIX = '-dependency-versions.yaml'
 
 """
 namedtuple for holding binary dependency specification.
@@ -138,17 +146,26 @@ def check_os():
         raise InvalidOsError(TEXTS["invalid_os_version_error_msg"].format(os_name=os_name, os_version=os_version))
 
 
-def check_dependency(dependency_spec: DependencySpec, namespace: str = None) -> (bool, LooseVersion):
+def check_dependency(dependency_name: str, dependency_spec: DependencySpec, namespace: str = None,
+                     saved_versions: Dict[str, LooseVersion] = None)-> (bool, LooseVersion):
     """
     Check if dependency defined by given DependencySpec is valid
+    :param dependency_name: name of dependency to check
     :param dependency_spec: specification of dependency to check
     :param namespace: k8s namespace where server component of checked dependency is located
+    :param saved_versions: dict containing saved versions from previous dependency check. If provided, saved version
+    will be used instead of running command to check version of dependency
     :return: a tuple of validation status and installed version
     """
-
     if namespace:
         for i, arg in enumerate(dependency_spec.version_command_args):
             dependency_spec.version_command_args[i] = arg.replace(NAMESPACE_PLACEHOLDER, namespace)
+
+    if saved_versions and saved_versions.get(dependency_name):
+        log.debug(f'Reading {dependency_name} version from saved verify result.')
+        return _is_version_valid(saved_versions[dependency_name], dependency_spec.expected_version,
+                                 dependency_spec.match_exact_version), saved_versions[dependency_name]
+
     try:
         output, exit_code = dependency_spec.version_command(dependency_spec.version_command_args)
         if exit_code != 0:
@@ -173,13 +190,20 @@ def check_dependency(dependency_spec: DependencySpec, namespace: str = None) -> 
 def check_all_binary_dependencies(namespace: str):
     """
     Check versions for all dependencies of carbon CLI. In case of version validation failure,
-     an InvalidDependencyError is raised.
+     an InvalidDependencyError is raised. This function is intended to be called before most of CLI commands.
+     Behaviour of this function is similar to verify CLI command.
     :param namespace: k8s namespace where server components of checked dependencies are located
     """
+    saved_versions = load_dependency_versions()
+    dependency_versions = {}
+
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            valid, installed_version = check_dependency(dependency_spec, namespace=namespace)
+            valid, installed_version = check_dependency(dependency_name=dependency_name,
+                                                        dependency_spec=dependency_spec, namespace=namespace,
+                                                        saved_versions=saved_versions)
+            dependency_versions[dependency_name] = installed_version
             log.info(f'Checking version of {dependency_name}. '
                      f'Installed version: ({installed_version}). '
                      f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
@@ -198,3 +222,43 @@ def check_all_binary_dependencies(namespace: str):
             error_msg = TEXTS["version_get_fail_msg"].format(dependency_name=dependency_name)
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e
+    else:
+        # This block is entered if all dependencies were validated successfully
+        # Save dependency versions in a file, if there were no saved versions
+        if not saved_versions:
+            save_dependency_versions(dependency_versions)
+
+
+def get_dependency_versions_file_path() -> str:
+    dlsctl_version = VERSION
+    dlsctl_config_directory = Config().config_path
+    dependency_versions_file_path = os.path.join(dlsctl_config_directory,
+                                                 f'{dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}')
+    return dependency_versions_file_path
+
+
+def save_dependency_versions(dependency_versions: Dict[str, LooseVersion]):
+    """
+    Saves a YAML file containing versions of dlsctl dependencies under $(DLS_CTL_CONFIG)/$(dlsctl_version) path.
+    :param dependency_versions: a dictionary containing dependency names as keys and their versions as values
+    """
+    dependency_versions_file_path = get_dependency_versions_file_path()
+    log.info(f'Saving dependency versions to {dependency_versions_file_path}')
+    with open(dependency_versions_file_path, 'w', encoding='utf-8') as dependency_versions_file:
+        yaml.dump(dependency_versions, dependency_versions_file)
+
+
+def load_dependency_versions() -> Optional[Dict[str, LooseVersion]]:
+    """
+    Loads saved dependency version for current dlsctl version. Returns None if dependency version file is not present.
+    """
+    dependency_versions_file_path = get_dependency_versions_file_path()
+    log.info(f'Loading dependency versions from {dependency_versions_file_path}')
+    if os.path.exists(dependency_versions_file_path):
+        with open(dependency_versions_file_path, 'r', encoding='utf-8') as dependency_versions_file:
+            log.info(f'Loaded dependency versions from {dependency_versions_file_path}')
+            dependency_versions = yaml.load(dependency_versions_file)
+            return dependency_versions
+    else:
+        log.info(f'{dependency_versions_file_path} dependency versions file not found')
+        return None

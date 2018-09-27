@@ -19,12 +19,15 @@
 # and approved by Intel in writing.
 #
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
+import yaml
 
-from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_installed_version, check_dependency,\
-    DependencySpec, check_all_binary_dependencies, DEPENDENCY_MAP, NAMESPACE_PLACEHOLDER, check_os, SUPPORTED_OS_MAP
+from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_installed_version, check_dependency, \
+    DependencySpec, check_all_binary_dependencies, DEPENDENCY_MAP, NAMESPACE_PLACEHOLDER, check_os, SUPPORTED_OS_MAP, \
+    get_dependency_versions_file_path, save_dependency_versions, load_dependency_versions, \
+    DEPENDENCY_VERSIONS_FILE_SUFFIX
 from util.exceptions import InvalidDependencyError, InvalidOsError
 from cli_text_consts import UTIL_DEPENDENCIES_CHECKER_TEXTS as TEXTS
 
@@ -82,16 +85,18 @@ def test_parse_installed_version_failure():
 
 
 def test_check_dependency():
+    test_dependency_name = 'test-dep'
     test_version = '0.0.1'
     version_command_mock = MagicMock()
     version_command_mock.return_value = test_version, 0
     test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
                                      version_command_args=[], version_field=None, match_exact_version=False)
 
-    assert check_dependency(test_dependency) == (True, LooseVersion(test_version))
+    assert check_dependency(test_dependency_name, test_dependency) == (True, LooseVersion(test_version))
 
 
 def test_check_dependency_namespace():
+    test_dependency_name = 'test-dep'
     test_namespace = 'test-namespace'
     test_version = '0.0.1'
     version_command_mock = MagicMock()
@@ -100,11 +105,13 @@ def test_check_dependency_namespace():
                                      version_command_args=[NAMESPACE_PLACEHOLDER], version_field=None,
                                      match_exact_version=False)
 
-    assert check_dependency(test_dependency, namespace=test_namespace) == (True, LooseVersion(test_version))
+    valid_dep, installed_version = check_dependency(test_dependency_name, test_dependency, namespace=test_namespace)
+    assert (valid_dep, installed_version) == (True, LooseVersion(test_version))
     version_command_mock.assert_called_with([test_namespace])
 
 
 def test_check_dependency_parse():
+    test_dependency_name = 'test-dep'
     test_version = LooseVersion('0.0.1')
     test_version_output = 'version:"0.0.1"'
     version_command_mock = MagicMock()
@@ -112,21 +119,55 @@ def test_check_dependency_parse():
     test_dependency = DependencySpec(expected_version=test_version, version_command=version_command_mock,
                                      version_command_args=[], version_field='version', match_exact_version=False)
 
-    assert check_dependency(test_dependency) == (True, test_version)
+    assert check_dependency(test_dependency_name, test_dependency) == (True, test_version)
 
 
 def test_check_all_binary_dependencies(mocker):
     check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
     check_dependency_mock.return_value = True, LooseVersion('0.0.0')
 
+    load_dependency_versions_mock = mocker.patch('util.dependencies_checker.load_dependency_versions',
+                                                 return_value=None)
+    save_dependency_versions_mock = mocker.patch('util.dependencies_checker.save_dependency_versions',
+                                                 return_value=None)
+
     check_all_binary_dependencies(namespace='fake')
 
+    assert load_dependency_versions_mock.call_count == 1, 'Saved dependency versions were not loaded.'
+    assert save_dependency_versions_mock.call_count == 1, 'Dependency versions were not saved.'
     assert check_dependency_mock.call_count == len(DEPENDENCY_MAP), 'Not all dependencies were checked.'
+
+
+def test_check_all_binary_dependencies_saved_versions(mocker):
+    fake_namespace = 'fake'
+    fake_version = LooseVersion('0.0.0')
+    check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
+    check_dependency_mock.return_value = True, fake_version
+
+    saved_versions = {dependency_name: fake_version
+                      for dependency_name in DEPENDENCY_MAP.keys()}
+
+    load_dependency_versions_mock = mocker.patch('util.dependencies_checker.load_dependency_versions',
+                                                 return_value=saved_versions)
+    save_dependency_versions_mock = mocker.patch('util.dependencies_checker.save_dependency_versions',
+                                                 return_value=None)
+
+    check_all_binary_dependencies(namespace=fake_namespace)
+
+    assert load_dependency_versions_mock.call_count == 1, 'Saved dependency versions were not loaded.'
+    assert save_dependency_versions_mock.call_count == 0, 'Saved dependencies versions were overwritten.'
+    assert check_dependency_mock.call_count == len(DEPENDENCY_MAP), 'Not all dependencies were checked.'
+    expected_check_dependency_calls = [call(dependency_name=dependency_name, dependency_spec=dependency_spec,
+                                            namespace=fake_namespace, saved_versions=saved_versions)
+                                       for dependency_name, dependency_spec in DEPENDENCY_MAP.items()]
+    check_dependency_mock.assert_has_calls(expected_check_dependency_calls, any_order=True)
 
 
 def test_check_all_binary_dependencies_invalid_version(mocker):
     check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
     check_dependency_mock.return_value = False, LooseVersion('0.0.0')
+    mocker.patch('util.dependencies_checker.load_dependency_versions', return_value=None)
+    mocker.patch('util.dependencies_checker.save_dependency_versions', return_value=None)
 
     with pytest.raises(InvalidDependencyError):
         check_all_binary_dependencies(namespace='fake')
@@ -135,6 +176,8 @@ def test_check_all_binary_dependencies_invalid_version(mocker):
 def test_check_all_binary_dependencies_parsing_error(mocker):
     check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
     check_dependency_mock.side_effect = ValueError
+    mocker.patch('util.dependencies_checker.load_dependency_versions', return_value=None)
+    mocker.patch('util.dependencies_checker.save_dependency_versions', return_value=None)
 
     with pytest.raises(InvalidDependencyError):
         check_all_binary_dependencies(namespace='fake')
@@ -143,6 +186,8 @@ def test_check_all_binary_dependencies_parsing_error(mocker):
 def test_check_all_binary_dependencies_version_check_error(mocker):
     check_dependency_mock = mocker.patch('util.dependencies_checker.check_dependency')
     check_dependency_mock.side_effect = RuntimeError
+    mocker.patch('util.dependencies_checker.load_dependency_versions', return_value=None)
+    mocker.patch('util.dependencies_checker.save_dependency_versions', return_value=None)
 
     with pytest.raises(InvalidDependencyError):
         check_all_binary_dependencies(namespace='fake')
@@ -198,3 +243,40 @@ def test_check_os_version_supported(mocker):
         check_os()
     except InvalidOsError:
         pytest.fail("check_os failed with supported OS.")
+
+
+def test_get_dependency_version_file_path(mocker):
+    fake_dlsctl_version = '1.0.0-alpha'
+    fake_config_path = '/usr/ogorek/dlsctl_config'
+    mocker.patch('util.dependencies_checker.VERSION', fake_dlsctl_version)
+    fake_config = mocker.patch('util.dependencies_checker.Config')
+    fake_config.return_value.config_path = fake_config_path
+
+    path = get_dependency_versions_file_path()
+    assert path in {f'{fake_config_path}/{fake_dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}',
+                    f'{fake_config_path}\\{fake_dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}'}  # Windows
+
+
+def test_save_dependency_versions(mocker, tmpdir):
+    fake_config_dir = tmpdir.mkdir("/dlsctl_config")
+    fake_dependency_versions_file_path = f'{fake_config_dir}1.0.0.saved-versions.yaml'
+    mocker.patch('util.dependencies_checker.get_dependency_versions_file_path',
+                 return_value=fake_dependency_versions_file_path)
+    fake_dependency_versions = {'bla': LooseVersion('1.0.0'),
+                                'ble': LooseVersion('0.0.1-alpha')}
+    save_dependency_versions(fake_dependency_versions)
+
+    with open(fake_dependency_versions_file_path, mode='r', encoding='utf-8') as dep_versions_file:
+        assert yaml.load(dep_versions_file) == fake_dependency_versions
+
+
+def test_load_dependency_versions(mocker, tmpdir):
+    fake_dependency_versions = {'bla': LooseVersion('1.0.0'),
+                                'ble': LooseVersion('0.0.1-alpha')}
+    fake_dependency_versions_file = tmpdir.mkdir("/dlsctl_config").join("1.0.0.saved-versions.yaml")
+    fake_dependency_versions_file.write(yaml.dump(fake_dependency_versions))
+
+    mocker.patch('util.dependencies_checker.get_dependency_versions_file_path',
+                 return_value=fake_dependency_versions_file)
+
+    assert fake_dependency_versions == load_dependency_versions()

@@ -24,7 +24,7 @@ from sys import exit
 import click
 
 from cli_state import common_options, pass_state, State
-from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os
+from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
@@ -65,10 +65,13 @@ def verify(state: State):
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
 
+    dependency_versions = {}
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            valid, installed_version = check_dependency(dependency_spec, namespace=namespace)
+            valid, installed_version = check_dependency(dependency_name=dependency_name,
+                                                        dependency_spec=dependency_spec, namespace=namespace)
+            dependency_versions[dependency_name] = installed_version
             logger.info(
                 TEXTS["version_checking_msg"].format(
                     dependency_name=dependency_name, installed_version=installed_version,
@@ -102,3 +105,7 @@ def verify(state: State):
                          TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
+    else:
+        # This block is entered if all dependencies were validated successfully
+        # Save dependency versions in a file
+        save_dependency_versions(dependency_versions)
