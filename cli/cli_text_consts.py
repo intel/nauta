@@ -311,6 +311,8 @@ EXPERIMENT_SUBMIT_CMD_TEXTS = {
     "user_is_admin_usr_msg": "You cannot submit experiments as dls4e administrator. Switch your KUBECONFIG "
                              "environment variable to point to a valid dls4e user config. If you don't have one you "
                              "can create it with command 'dlsctl user create'.",
+    "help_e": "Environment variables passed to training. User can pass as many environmental variables as it is "
+              "needed - each variable should be in such case passed as a separate -e paramater.",
     "script_not_found_error_msg": "Cannot find: {script_location}. Make sure that provided path is correct.",
     "default_script_not_found_error_msg": "Cannot find script: {default_script_name} in directory: {script_directory}. "
                                           "If path to directory was passed as submit command argument, then "
@@ -321,7 +323,7 @@ EXPERIMENT_SUBMIT_CMD_TEXTS = {
     "submit_start_user_msg": "Submitting experiments.",
     "submit_error_msg": "Problems during submitting experiment: {exception_message}",
     "submit_other_error_msg": "Other problems during submitting experiment.",
-    "failed_runs_log_msg": "There are failed runs"
+    "failed_runs_log_msg": "There are failed runs",
 }
 
 EXPERIMENT_INTERACT_CMD_TEXTS = {
@@ -353,7 +355,9 @@ EXPERIMENT_INTERACT_CMD_TEXTS = {
     "session_launch_other_error_msg": "Other exception during launching interact session.",
     "exp_with_the_same_name_must_be_purged": "Notebook with the same name exists but is in state other than RUNNING."
                                              "If you want to start another notebook using the same name, please "
-                                             "purge the previous one."
+                                             "purge the previous one.",
+    "help_e": "Environment variables passed to Jupyter instance. User can pass as many environmental variables as "
+              "it is needed - each variable should be in such case passed as a separate -e paramater."
 }
 
 EXPERIMENT_CANCEL_CMD_TEXTS = {

@@ -26,7 +26,8 @@ import os
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds
+from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds, \
+    validate_env_paramater
 from cli_state import common_options, pass_state, State
 from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
@@ -80,12 +81,13 @@ def validate_script_folder_location(script_folder_location: str):
               callback=validate_pack_params_names)
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=TEXTS["help_pr"])
 @click.option("-ps", "--parameter_set", multiple=True, help=TEXTS["help_ps"])
+@click.option("-e", "--env", multiple=True, help=TEXTS["help_e"], callback=validate_env_paramater)
 @click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]')
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
-           script_parameters: Tuple[str, ...]):
+           env: List[str], script_parameters: Tuple[str, ...]):
     if is_current_user_administrator():
         handle_error(logger, TEXTS["user_is_admin_log_msg"], TEXTS["user_is_admin_usr_msg"])
         exit(1)
@@ -107,7 +109,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                                          script_folder_location=script_folder_location,
                                          template=template, name=name, pack_params=pack_param,
                                          parameter_range=parameter_range, parameter_set=parameter_set,
-                                         script_parameters=script_parameters)
+                                         script_parameters=script_parameters,
+                                         env_variables=env)
     except K8sProxyCloseError as exe:
         handle_error(user_msg=exe.message)
         click.echo(exe.message)

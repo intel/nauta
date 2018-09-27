@@ -58,7 +58,8 @@ def update_configuration(run_folder: str, script_location: str,
                          cluster_registry_port: int,
                          pack_type: str,
                          pack_params: List[Tuple[str, str]],
-                         script_folder_location: str = None):
+                         script_folder_location: str = None,
+                         env_variables: List[str] = None):
     """
     Updates configuration of a tf-training pack based on paramaters given by a user.
 
@@ -76,7 +77,8 @@ def update_configuration(run_folder: str, script_location: str,
     try:
         modify_values_yaml(run_folder, script_location, script_parameters, pack_params=pack_params,
                            experiment_name=experiment_name, run_name=run_name,
-                           pack_type=pack_type, cluster_registry_port=cluster_registry_port)
+                           pack_type=pack_type, cluster_registry_port=cluster_registry_port,
+                           env_variables=env_variables)
         modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
                           script_folder_location=script_folder_location)
         modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
@@ -123,7 +125,8 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
                        experiment_name: str, run_name: str, pack_type: str,
-                       cluster_registry_port: int, pack_params: List[Tuple[str, str]]):
+                       cluster_registry_port: int, pack_params: List[Tuple[str, str]],
+                       env_variables: List[str]):
     log.debug("Modify values.yaml - start")
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
@@ -160,6 +163,19 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
             number_of_replicas += int(v.get(P_SERV_CNT_PARAM)) if not pServersCount else int(pServersCount)
             v[POD_COUNT_PARAM] = number_of_replicas
+
+        if env_variables:
+            env_list = []
+            for variable in env_variables:
+                key, value = variable.split("=")
+
+                one_env_map = {"name": key, "value": value}
+
+                env_list.append(one_env_map)
+            if v.get("env"):
+                v["env"].extend(env_list)
+            else:
+                v["env"] = env_list
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.dump(v, values_yaml_file)

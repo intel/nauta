@@ -20,7 +20,7 @@
 #
 
 from enum import Enum
-from typing import Union
+from typing import Union, List
 
 from platform_resources.run_model import Run
 from commands.experiment.common import submit_experiment, RunSubmission, RunKinds
@@ -42,7 +42,8 @@ def start_inference_instance(name: str,
                              template: str = INFERENCE_TEMPLATE,
                              local_model_location: str = None,
                              data_location: str = None,
-                             output_location: str = None) -> RunSubmission:
+                             output_location: str = None,
+                             env_variables: List[str] = None) -> RunSubmission:
 
     pack_params = [('modelName', model_name)]
 
@@ -56,7 +57,7 @@ def start_inference_instance(name: str,
         pack_params.append(('outputPath', output_location))
 
     runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
-                                script_folder_location=local_model_location)
+                                script_folder_location=local_model_location, env_variables=env_variables)
     return runs[0]
 
 

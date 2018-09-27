@@ -1,0 +1,17 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      draft: {{ .Values.draft }}
+      release: {{ .Release.Name }}
+      runName: {{ .Release.Name }}
+  env:
+    - name: RUN_NAME
+      value: {{ .Release.Name }}
+{{ if .Values.env }}
+{{ toYaml .Values.env | indent 4 }}
+{{ end }}

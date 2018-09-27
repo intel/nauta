@@ -30,7 +30,9 @@ SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
 PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']"), ("workersCount", "2")]
 SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
+ENV_VARIABLES = ("A=B", "C=D")
 
+ENV_VARIABLES_OUTPUT = [{'name': 'A', 'value': 'B'}, {'name': 'C', 'value': 'D'}]
 TEST_POD_COUNT = 4
 TEST_YAML_FILE = f'''replicaCount: 2
 image:
@@ -92,7 +94,8 @@ def test_modify_values_yaml(mocker):
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
                                    experiment_name='test-experiment', run_name='test-experiment',
-                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
+                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
+                                   env_variables=ENV_VARIABLES)
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -100,6 +103,8 @@ def test_modify_values_yaml(mocker):
     assert 'key1' and 'key2' in output
     assert output['key1'] == 'val1'
     assert output['key2'] == ["a", "b"]
+
+    assert output['env'] == ENV_VARIABLES_OUTPUT
 
     assert yaml_dump_mock.call_count == 1, "job yaml wasn't modified"
     assert open_mock.call_count == 2, "files weren't read/written"
@@ -118,7 +123,8 @@ def test_modify_values_yaml_without_pod_count(mocker):
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
                                    experiment_name='test-experiment', run_name='test-experiment',
-                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
+                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
+                                   env_variables=None)
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -147,7 +153,8 @@ def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
         tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                        script_parameters=SCRIPT_PARAMETERS, pack_params=wrong_pack_params,
                                        experiment_name='test-experiment', run_name='test-experiment',
-                                       pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111)
+                                       pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
+                                       env_variables=None)
 
     assert sh_move_mock.call_count == 0, "job yaml should not be moved."
     assert yaml_dump_mock.call_count == 0, "yaml should not be modified."

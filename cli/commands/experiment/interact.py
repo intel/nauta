@@ -33,7 +33,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS, \
-    JUPYTER_NOTEBOOK_TEMPLATE_NAME, RunKinds
+    JUPYTER_NOTEBOOK_TEMPLATE_NAME, RunKinds, validate_env_paramater
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
@@ -55,11 +55,13 @@ logger = initialize_logger(__name__)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"],
               callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=TEXTS["help_no_launch"])
-@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"])
+@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"],
+              callback=validate_env_paramater)
+@click.option("-e", "--env", multiple=True, help=TEXTS["help_e"], callback=validate_env_paramater)
 @common_options()
 @pass_state
 def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
-             port_number: int):
+             port_number: int, env: List[str]):
     """
     Starts an interactive session with Jupyter Notebook.
     """
@@ -111,7 +113,8 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             runs, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
                                                script_folder_location=None, template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
                                                name=exp_name, parameter_range=[], parameter_set=(),
-                                               script_parameters=(), pack_params=pack_param)
+                                               script_parameters=(), pack_params=pack_param,
+                                               env_variables=env)
             click.echo(tabulate({RUN_NAME: [run.cli_representation.name for run in runs],
                                  RUN_PARAMETERS: [run.cli_representation.parameters for run in runs],
                                  RUN_STATUS: [run.cli_representation.status for run in runs],
