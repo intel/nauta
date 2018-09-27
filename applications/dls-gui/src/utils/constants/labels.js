@@ -47,6 +47,7 @@ export default {
   OK: 'OK',
   OUTPUT: 'Output',
   PARAMETERS: 'Parameters',
+  POD_CONDITIONS: 'Pod Conditions',
   PODS: 'Pods',
   RELEASE_NOTES: 'Release Notes',
   RELEASE_NOTES_PDF: 'intel-release-notes-for-dell-early-access.pdf',

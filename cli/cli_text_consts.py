@@ -417,7 +417,7 @@ EXPERIMENT_VIEW_CMD_TEXTS = {
                              """,
     "experiment_not_found_error_msg": "Experiment \"{experiment_name}\" not found.",
     "pods_participating_list_header": "\nPods participating in the execution:\n",
-    "pods_table_headers": ["Name", "Uid", "State", "Container Details"],
+    "pods_table_headers": ["Name", "Uid", "Pod Conditions", "Container Details"],
     "view_other_error_msg": "Failed to get experiment.",
     "container_not_created_msg": "Not created",
     "container_running_msg": "Running, ",

@@ -31,7 +31,7 @@
       <ol id="pods-list">
         <li v-bind:key="pod.name" v-for="pod in podsList">
           <b>{{ labels.NAME }}:</b> <i>{{ pod.name }}</i> <br/>
-          <b>{{ labels.STATE }}:</b> <i>{{ parseValue('state', pod.state) }}</i> <br/>
+          <b>{{ labels.POD_CONDITIONS }}:</b> <i>{{ parseValue('state', pod.state) }}</i> <br/>
           <b>{{ labels.CONTAINERS }}:</b>
           <ul id="containers-list">
             <li v-bind:key="container.name" v-for="container in pod.containers">
