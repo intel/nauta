@@ -256,7 +256,7 @@ def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
                                      script_parameters=(), run_kind=RunKinds.TRAINING)
 
     assert runs_list[0].state == RunStatus.FAILED
-    check_asserts(prepare_mocks, del_env_count=1, add_run_count=0, update_run_count=1, delete_k8s_object_count=1)
+    check_asserts(prepare_mocks, del_env_count=1, update_run_count=1)
 
 
 def test_submit_start_depl_and_updrun_fail(prepare_mocks: SubmitExperimentMocks):
@@ -268,7 +268,7 @@ def test_submit_start_depl_and_updrun_fail(prepare_mocks: SubmitExperimentMocks)
                                      script_parameters=(), run_kind=RunKinds.TRAINING)
 
     assert runs_list[0].state == RunStatus.FAILED
-    check_asserts(prepare_mocks, del_env_count=1, add_run_count=0, update_run_count=1, delete_k8s_object_count=1)
+    check_asserts(prepare_mocks, del_env_count=1, update_run_count=1)
 
 
 def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, capsys, caplog):

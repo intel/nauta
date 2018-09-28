@@ -327,13 +327,13 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             submitted_runs = []
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
-                    submit_draft_pack(run_folder, namespace)
                     run.state = RunStatus.QUEUED
                     # Add Run object with runKind label and pack params as annotations
                     runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
                                      annotations={pack_param_name: pack_param_value
                                                   for pack_param_name, pack_param_value in pack_params})
                     submitted_runs.append(run)
+                    submit_draft_pack(run_folder, namespace)
                 except Exception as exe:
                     delete_environment(run_folder)
                     try:
