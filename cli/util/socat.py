@@ -71,7 +71,7 @@ def _ensure_socat_running():
 
 def load_socat_image():
     config = Config()
-    if config.config_path:
+    if config.config_path and not client.images.list(name=SOCAT_IMAGE_NAME):
         with open(os.path.join(config.config_path, SOCAT_IMAGE_FILE_NAME), "rb") as file:
             client.images.load(file)
 
