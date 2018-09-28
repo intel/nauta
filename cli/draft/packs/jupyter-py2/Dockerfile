@@ -9,6 +9,9 @@ ENV PASSWORD ""
 
 ADD training.py
 
+ADD init_jupyter.sh /bin/init_jupyter
+RUN chmod +x /bin/init_jupyter
+
 # create dummy file to inform user about /mnt/input not being persistent volume
 RUN ["mkdir", "/mnt/input"]
 RUN echo "Warning - you are able to save some temporary content directly in the input directory. This content is discarded after the session ends." \
