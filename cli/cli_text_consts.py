@@ -357,7 +357,9 @@ EXPERIMENT_INTERACT_CMD_TEXTS = {
                                              "If you want to start another notebook using the same name, please "
                                              "purge the previous one.",
     "help_e": "Environment variables passed to Jupyter instance. User can pass as many environmental variables as "
-              "it is needed - each variable should be in such case passed as a separate -e paramater."
+              "it is needed - each variable should be in such case passed as a separate -e paramater.",
+    "help_t": "Name of a jupyter notebook template used to create a deployment. "
+              "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
 }
 
 EXPERIMENT_CANCEL_CMD_TEXTS = {

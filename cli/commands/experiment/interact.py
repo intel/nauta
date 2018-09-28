@@ -33,7 +33,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_
 from util.launcher import launch_app
 from util.app_names import DLS4EAppNames
 from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS, \
-    JUPYTER_NOTEBOOK_TEMPLATE_NAME, RunKinds, validate_env_paramater
+    JUPYTER_NOTEBOOK_TEMPLATES_NAMES, RunKinds, validate_env_paramater
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
 from platform_resources.experiments import get_experiment, generate_name
@@ -58,10 +58,12 @@ logger = initialize_logger(__name__)
 @click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"],
               callback=validate_env_paramater)
 @click.option("-e", "--env", multiple=True, help=TEXTS["help_e"], callback=validate_env_paramater)
+@click.option("-t", "--template", help=TEXTS["help_t"], default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
+              type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
 @common_options()
 @pass_state
 def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
-             port_number: int, env: List[str]):
+             port_number: int, env: List[str], template: str):
     """
     Starts an interactive session with Jupyter Notebook.
     """
@@ -78,7 +80,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             sys.exit(1)
 
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
-        if jupyter_experiment and jupyter_experiment.template_name != JUPYTER_NOTEBOOK_TEMPLATE_NAME:
+        if jupyter_experiment and jupyter_experiment.template_name not in JUPYTER_NOTEBOOK_TEMPLATES_NAMES:
             handle_error(user_msg=TEXTS["name_already_used"].format(name=name))
             sys.exit(1)
 
@@ -111,7 +113,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
 
             click.echo(TEXTS["submitting_experiment_user_msg"])
             runs, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
-                                               script_folder_location=None, template=JUPYTER_NOTEBOOK_TEMPLATE_NAME,
+                                               script_folder_location=None, template=template,
                                                name=exp_name, parameter_range=[], parameter_set=(),
                                                script_parameters=(), pack_params=pack_param,
                                                env_variables=env)

@@ -67,7 +67,7 @@ RUN_END_DATE = "End date"
 RUN_SUBMITTER = "Owner"
 RUN_TEMPLATE_NAME = "Template name"
 
-JUPYTER_NOTEBOOK_TEMPLATE_NAME = "jupyter"
+JUPYTER_NOTEBOOK_TEMPLATES_NAMES = ["jupyter", "jupyter-py2"]
 
 EXP_SUB_SEMAPHORE_FILENAME = ".underSubmission"
 
@@ -464,7 +464,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
 
-        if pack_type == JUPYTER_NOTEBOOK_TEMPLATE_NAME and remote_script_location.endswith(".py"):
+        if pack_type in JUPYTER_NOTEBOOK_TEMPLATES_NAMES and remote_script_location.endswith(".py"):
                 # for interact (jupyter notebooks) try to convert .py file into .ipynb
                 py_script_location = os.path.join(run_folder, FOLDER_DIR_NAME, remote_script_location)
                 ipynb_file_name = convert_py_to_ipynb(py_script_location, os.path.join(run_folder, FOLDER_DIR_NAME))
