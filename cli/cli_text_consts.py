@@ -435,7 +435,13 @@ EXPERIMENT_VIEW_CMD_TEXTS = {
     "resources_sum_list_header": "\nResources used by pods:\n",
     "resources_sum_parsing_error_msg": "There was an error when trying to parse pods resources. Error msg: {error_msg}",
     "resources_sum_table_headers": ["Resource type", "Total usage"],
-    "resources_sum_table_rows_headers": ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"]
+    "resources_sum_table_rows_headers": ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"],
+    "insufficient_resources_message": "Experiment is in PENDING status due to insuffcient {resources}.",
+    "top_cpu_consumers": "Top CPU consumers: {consumers}",
+    "top_memory_consumers": "Top memory consumers: {consumers}",
+    "problems_while_gathering_usage_data": "Reasons of pending state and top consumers and cannot "
+                                           "be displayed due to errors.",
+    "problems_while_gathering_usage_data_logs": "Error when gathering consumers data."
 }
 
 EXPERIMENT_COMMON_TEXTS = {
@@ -589,7 +595,9 @@ UTIL_KUBECTL_TEXTS = {
     "proxy_creation_missing_port_error_msg": "Missing port during creation of port proxy.",
     "user_presence_check_error_msg": "Error during checking user's presence.",
     "k8s_object_delete_error_msg": "Error when deleting k8s object: {output}",
-    "k8s_cluster_no_connection_error_msg": "Cannot connect to K8S cluster: {output}"
+    "k8s_cluster_no_connection_error_msg": "Cannot connect to K8S cluster: {output}",
+    "top_command_error": "Problems during getting usage of resources.",
+    "top_command_error_log": "Incorrect format of data returned by top command: {output}"
 }
 
 UTIL_K8S_INFO_TEXTS = {
@@ -600,7 +608,8 @@ UTIL_K8S_INFO_TEXTS = {
     "empty_list_of_tokens_error_msg": "Empty list of tokens.",
     "gathering_users_token_error_msg": "Problem during gathering users token.",
     "gathering_password_error_msg": "Error during gathering users password.",
-    "lack_of_password_error_msg": "Lack of password."
+    "lack_of_password_error_msg": "Lack of password.",
+    "gathering_events_error_msg": "Problem during gathering k8s events."
 }
 
 UTIL_K8S_PROXY_TEXTS = {

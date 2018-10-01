@@ -25,7 +25,7 @@ from typing import Set
 
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
-from util.k8s.k8s_info import get_pod_status, PodStatus
+from util.k8s.k8s_info import PodStatus, get_pod_status
 
 log = initialize_logger(__name__)
 

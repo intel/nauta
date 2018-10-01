@@ -24,7 +24,7 @@ import time
 import random
 from enum import Enum
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import platform_resources.users as users_api
 from util import system
@@ -194,3 +194,32 @@ def check_connection_to_cluster():
     logger.debug(f"check_connection_to_cluster - output : {err_code} - {log_output}")
     if err_code:
         raise KubectlConnectionError(TEXTS["k8s_cluster_no_connection_error_msg"].format(output=log_output))
+
+
+def get_top_for_pod(name: str, namespace: str) -> Tuple[str, str]:
+    """
+    Returns cpu and memory usage for a pod with a given name located in a given namespace
+    :param name: name of a pod
+    :param namespace:  namespace where the pod resided. Optional - if not given, function searches the pod in
+                        current namespace
+    :return: tuple containing two values - cpu and memory usage expressed in k8s format
+    """
+    top_command = ["kubectl", "top", "pod", name]
+
+    if namespace:
+        top_command.extend(["-n", namespace])
+    output, err_code = system.execute_system_command(top_command)
+    if err_code:
+        raise KubectlConnectionError(TEXTS["k8s_cluster_no_connection_error_msg"].format(output=output))
+
+    if output:
+        lines = output.split("\n")
+
+        if lines and len(lines) > 1:
+            second_line = lines[1]
+            if second_line:
+                split_second_line = second_line.split()
+                if split_second_line and len(split_second_line) > 2:
+                    return (split_second_line[1], split_second_line[2])
+    logger.error(TEXTS["top_command_error_log"].format(output=output))
+    raise KubernetesError(TEXTS["top_command_error"])

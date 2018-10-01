@@ -31,8 +31,10 @@ from util.exceptions import KubernetesError
 from util.app_names import DLS4EAppNames
 from cli_text_consts import UTIL_K8S_INFO_TEXTS as TEXTS
 
-
 logger = initialize_logger('util.kubectl')
+
+PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
+PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
 
 
 class PodStatus(Enum):
@@ -128,7 +130,10 @@ def get_pods(label_selector: str) -> List[client.V1Pod]:
 
     pods = []
     try:
-        pods_response = api.list_pod_for_all_namespaces(watch=False, label_selector=label_selector)
+        if label_selector:
+            pods_response = api.list_pod_for_all_namespaces(watch=False, label_selector=label_selector)
+        else:
+            pods_response = api.list_pod_for_all_namespaces(watch=False)
         pods = pods_response.items
     except ApiException as e:
         logger.exception(f'Failed to find pods with label selector: {label_selector}')
@@ -338,3 +343,89 @@ def is_current_user_administrator(request_timeout: int = None) -> bool:
             raise exe
 
     return True
+
+
+def sum_cpu_resources_unformatted(cpu_resources: List[str]):
+    """ Sum cpu resources given in k8s format and return the sum in the same format. """
+    cpu_sum = 0
+    for cpu_resource in cpu_resources:
+        if not cpu_resource:
+            continue
+        # If CPU resources are gives as for example 100m, we simply strip last character and sum leftover numbers.
+        elif cpu_resource[-1] == "m":
+            cpu_sum += int(cpu_resource[:-1])
+        # Else we assume that cpu resources are given as float value of normal CPUs instead of miliCPUs.
+        else:
+            cpu_sum += int(float(cpu_resource) * 1000)
+
+    return cpu_sum
+
+
+def format_cpu_resources(sum: int):
+    return str(sum) + "m"
+
+
+def sum_cpu_resources(cpu_resources: List[str]):
+    return format_cpu_resources(sum_cpu_resources_unformatted(cpu_resources))
+
+
+def sum_mem_resources_unformatted(mem_resources: List[str]):
+    """
+    Sum memory resources given in k8s format and return the sum as a number.
+    """
+    mem_sum = 0
+
+    for mem_resource in mem_resources:
+        if not mem_resource:
+            continue
+        # If last character is "i" then assume that resource is given as for example 1000Ki.
+        elif mem_resource[-1] == "i" and mem_resource[-2:] in PREFIX_I_VALUES:
+            prefix = mem_resource[-2:]
+            mem_sum += int(mem_resource[:-2]) * PREFIX_I_VALUES[prefix]
+        # If last character is one of the normal exponent prefixes (with base 10) then assume that resource is given
+        # as for example 1000K.
+        elif mem_resource[-1] in PREFIX_VALUES:
+            prefix = mem_resource[-1]
+            mem_sum += int(mem_resource[:-1]) * PREFIX_VALUES[prefix]
+        # If there is e contained inside resource string then assume that it is given in exponential format.
+        elif "e" in mem_resource:
+            mem_sum += int(float(mem_resource))
+        else:
+            mem_sum += int(mem_resource)
+
+    return mem_sum
+
+
+def format_mem_resources(sum: int):
+    mem_sum_partial_strs = []
+    for prefix, value in PREFIX_I_VALUES.items():
+        mem_sum_partial = sum // value
+        if mem_sum_partial != 0:
+            mem_sum_partial_strs.append(str(mem_sum_partial) + prefix + "B")
+            sum = sum % value
+    if len(mem_sum_partial_strs) == 0:
+        return "0KiB"
+    else:
+        return " ".join(mem_sum_partial_strs)
+
+
+def sum_mem_resources(mem_resources: List[str]):
+    """
+    Sum memory resources given in k8s format and return the sum converted to byte units with base 2 - for example KiB.
+    """
+    mem_sum = sum_mem_resources_unformatted(mem_resources)
+
+    return format_mem_resources(mem_sum)
+
+
+def get_pod_events(namespace: str, name: str = None):
+    try:
+        api = get_k8s_api()
+
+        events_list = api.list_namespaced_event(namespace=namespace)
+
+        return [event for event in events_list.items if name is None or event.involved_object.name == name]
+    except Exception as exe:
+        error_message = TEXTS["gathering_events_error_msg"]
+        logger.exception(error_message)
+        raise KubernetesError(error_message) from exe

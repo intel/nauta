@@ -23,7 +23,7 @@ from pytest import raises, fixture
 from kubernetes.client import V1ObjectMeta, V1ServiceList, V1Service, V1ServiceSpec, V1ServicePort
 import util.k8s.kubectl as kubectl
 from util.app_names import DLS4EAppNames
-from util.exceptions import KubectlConnectionError, LocalPortOccupiedError
+from util.exceptions import KubectlConnectionError, LocalPortOccupiedError, KubernetesError
 from cli_text_consts import UTIL_KUBECTL_TEXTS as TEXTS
 
 
@@ -31,6 +31,9 @@ SERVICES_LIST_MOCK = V1ServiceList(items=[
     V1Service(metadata=V1ObjectMeta(name="service", namespace="namespace"),
               spec=V1ServiceSpec(ports=[V1ServicePort(port=5000, node_port=33451)]))
 ]).items
+
+TOP_RESULT_SUCCESS = "NAME CPU(cores) MEMORY(bytes)\ndls4enterprise-fluentd-hdr2p 9m 155Mi"
+TOP_RESULT_FAILURE = "NAME CPU(cores) MEMORY(bytes)\ndls4enterprise-fluentd-hdr2p 9m"
 
 
 @fixture
@@ -123,3 +126,21 @@ def test_check_connection_to_cluster_with_error(mocker):
     with raises(KubectlConnectionError):
         kubectl.check_connection_to_cluster()
     assert subprocess_command_mock.call_count == 1, "kubectl get pods command wasn't called"
+
+
+def test_get_top_for_pod_success(mocker):
+    top_command_mock = mocker.patch("util.system.execute_system_command")
+    top_command_mock.return_value = TOP_RESULT_SUCCESS, 0
+
+    cpu, mem = kubectl.get_top_for_pod(name="name", namespace="namespace")
+
+    assert cpu == "9m"
+    assert mem == "155Mi"
+
+
+def test_get_top_for_pod_failure(mocker):
+    top_command_mock = mocker.patch("util.system.execute_system_command")
+    top_command_mock.return_value = TOP_RESULT_FAILURE, 0
+
+    with raises(KubernetesError):
+        kubectl.get_top_for_pod(name="name", namespace="namespace")

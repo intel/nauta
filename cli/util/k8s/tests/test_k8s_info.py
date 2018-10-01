@@ -25,13 +25,13 @@ import pytest
 from kubernetes.client.models import V1Service, V1ObjectMeta, V1Namespace, V1Status, V1ConfigMap, \
                                      V1SecretList, V1Secret, V1ClusterRoleList, V1ClusterRole, \
                                      V1PolicyRule, V1PodList, V1Pod, V1PodStatus, V1ServiceSpec, V1ServicePort, \
-                                     V1NamespaceStatus
+                                     V1NamespaceStatus, V1Event, V1EventList, V1ObjectReference
 from kubernetes.client.rest import ApiException
 
 from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
-                              PodStatus, get_app_service_node_port, get_pods, NamespaceStatus
+                              PodStatus, get_app_service_node_port, get_pods, NamespaceStatus, get_pod_events
 from util.config import DLS4EConfigMap
 from util.app_names import DLS4EAppNames
 from util.exceptions import KubernetesError
@@ -140,6 +140,13 @@ def mocked_k8s_CoreV1Api(mocker):
 
     coreV1API_instance.list_namespaced_pod.return_value = v1_pod_lists
 
+    v1_metadata_event = V1ObjectMeta(name="default-name")
+    v1_object = V1ObjectReference(name="pod_name")
+    v1_event = V1Event(message="Insufficient cpu", involved_object=v1_object, metadata=v1_metadata_event)
+    v1_event_list = V1EventList(items=[v1_event])
+
+    coreV1API_instance.list_namespaced_event.return_value = v1_event_list
+
     return coreV1API_instance
 
 
@@ -173,6 +180,12 @@ def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
     services = get_app_services(dls4e_app_name=DLS4EAppNames.DOCKER_REGISTRY)
 
     assert services
+
+
+def test_get_pod_events(mocked_k8s_config, mocked_k8s_CoreV1Api):
+    events = get_pod_events(namespace=test_namespace)
+
+    assert events
 
 
 def test_find_namespace_success(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):

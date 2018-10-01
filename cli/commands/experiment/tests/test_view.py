@@ -22,11 +22,13 @@
 from click.testing import CliRunner
 import pytest
 from unittest.mock import MagicMock
-from kubernetes.client import V1Pod
+from kubernetes.client import V1Pod, V1PodStatus, V1Event, V1ObjectReference, V1ObjectMeta
 
 from commands.experiment import view
 from platform_resources.run_model import Run, RunStatus
 from cli_text_consts import EXPERIMENT_VIEW_CMD_TEXTS as TEXTS
+from util.k8s.k8s_statistics import ResourceUsage
+from util.k8s.k8s_info import PodStatus
 
 
 TEST_RUNS = [
@@ -54,7 +56,31 @@ TEST_RUNS = [
         pod_selector={})
 ]
 
+QUEUED_RUN = [
+    Run(
+        name='test-experiment',
+        parameters=['a 1', 'b 2'],
+        creation_timestamp='2018-04-26T13:43:01Z',
+        submitter='namespace-1',
+        state=RunStatus.QUEUED,
+        template_name='test-ex-template',
+        metrics={'any metrics': 'a'},
+        experiment_name='experiment_name',
+        pod_count=1,
+        pod_selector={})
+]
+
 TEST_PODS = [MagicMock(spec=V1Pod)]
+
+pending_pod = MagicMock(spec=V1Pod)
+pending_pod.status = V1PodStatus(phase=PodStatus.PENDING.value, conditions=[])
+PENDING_POD = [pending_pod]
+
+TOP_USERS = [ResourceUsage(user_name="user_name", cpu_usage=2, mem_usage=1000)]
+
+EVENTS = [MagicMock(spec=V1Event(message="Insufficient cpu",
+                                 involved_object=V1ObjectReference(name="test-experiment"),
+                                 metadata=V1ObjectMeta(name="test-experiment")))]
 
 
 class ViewMocks:
@@ -247,3 +273,19 @@ def test_sum_mem_resources_example_with_mixed():
     result = view.sum_mem_resources(mem_resources)
 
     assert result == expected_result
+
+
+def test_displaying_pending_pod(prepare_mocks: ViewMocks, mocker):
+    prepare_mocks.get_pods.return_value = PENDING_POD
+
+    highest_usage_mock = mocker.patch("commands.experiment.view.get_highest_usage")
+    highest_usage_mock.return_value = TOP_USERS, TOP_USERS
+
+    pod_events_mock = mocker.patch("commands.experiment.view.get_pod_events")
+    pod_events_mock.return_value = EVENTS
+    runner = CliRunner()
+    result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
+
+    assert "Experiment is in PENDING status due to insuffcient amount of memory." in result.output
+    assert "Top CPU consumers: user_name" in result.output
+    assert "Top memory consumers: user_name" in result.output
