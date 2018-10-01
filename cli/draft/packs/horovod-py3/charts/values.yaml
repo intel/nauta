@@ -1,0 +1,66 @@
+# Default values for horovod.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+useHostNetwork: false
+useHostPID: false
+
+commandline:
+  args:
+    - "/app/training.py"
+    - "--data_dir=/temp"
+
+resources: {}
+
+ssh:
+  port: 32222
+  useSecrets: True
+
+image:
+  clusterRepository: '' # Filled by dlsctl
+  pullPolicy: IfNotPresent
+
+workersCount: 3
+
+volumeMounts:
+  - name: input-home
+    mountPath: /mnt/input/home
+    readOnly: True
+  - name: input-public
+    mountPath: /mnt/input/root
+    readOnly: True
+  - name: output-home
+    mountPath: /mnt/output/home
+  - name: output-public
+    mountPath: /mnt/output/root
+
+volumes:
+  - name: input-home
+    persistentVolumeClaim:
+      claimName: input-home
+  - name: input-public
+    persistentVolumeClaim:
+      claimName: input-public
+  - name: output-home
+    persistentVolumeClaim:
+      claimName: output-home
+  - name: output-public
+    persistentVolumeClaim:
+      claimName: output-public
+
+worker:
+  podManagementPolicy: Parallel
+
+master:
+  env:
+    - name: HOROVOD_TIMELINE
+      value: "/mnt/output/experiment/timeline.json"
+    - name: OMP_NUM_THREADS
+      value: "20"
+runKind: "training"
+
+experimentName: ''
+
+podCount: 1
+
+cpus: 20

@@ -1,0 +1,13 @@
+# Please don't add tensorflow here since it's being installed by the Docker
+setuptools
+h5py
+keras
+horovod
+cython
+SimpleITK
+pycodestyle==2.3.1
+scipy==1.0.1
+psutil
+nibabel
+tqdm
+kubernetes==6.0.0

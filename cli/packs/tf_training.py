@@ -108,11 +108,18 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
                 else:
                     tf_image_name = dls4e_config_map.py3_image_name
                 tf_image_repository = f'127.0.0.1:{local_registry_port}/{tf_image_name}'
-                dockerfile_temp_content = dockerfile_temp_content + \
-                                          f'FROM {tf_image_repository}'
+                dockerfile_temp_content = dockerfile_temp_content + f'FROM {tf_image_repository}'
 
                 # pull image from platform's registry
                 pull_tf_image(tf_image_repository=tf_image_repository)
+            elif line.startswith("FROM dls4e/horovod:1.9.0-py"):
+                dls4e_config_map = DLS4EConfigMap()
+                image_name = dls4e_config_map.horovod_image_name
+                image_repository = f'127.0.0.1:{local_registry_port}/{image_name}'
+                dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
+
+                # pull image from platform's registry
+                pull_tf_image(tf_image_repository=image_repository)
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 

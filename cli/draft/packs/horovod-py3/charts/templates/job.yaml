@@ -1,0 +1,138 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "horovod.fullname" . }}
+  labels:
+    app: {{ template "horovod.name" . }}
+    chart: {{ template "horovod.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    role: master
+    draft: {{ .Values.draft }}
+    runName: {{ .Release.Name }}
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: {{ template "horovod.name" . }}
+        release: {{ .Release.Name }}
+        role: master
+        draft: {{ .Values.draft }}
+        runName: {{ .Release.Name }}
+    spec:
+      {{- if .Values.useHostNetwork }}
+      hostNetwork: {{ .Values.useHostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
+      {{- if .Values.useHostPID }}
+      hostPID: {{ .Values.useHostPID }}
+      {{- end }}
+      restartPolicy: Never
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: {{ template "horovod.fullname" . }}-cm
+        configMap:
+          name: {{ template "horovod.fullname" . }}
+          items:
+          - key: hostfile.config
+            path: hostfile
+            mode: 438
+          - key: master.waitWorkerReady
+            path: waitWorkersReady.sh
+            mode: 365
+          - key: master.run
+            path: run.sh
+            mode: 365
+          - key: master.kubectl
+            path: kubectl.sh
+            mode: 365
+{{- if .Values.volumes }}
+{{ toYaml .Values.volumes | indent  6 }}
+{{- end }}
+      containers:
+      - name: horovod-master
+        image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: SSHPORT
+            value: "{{ .Values.ssh.port }}"
+         {{- if .Values.ssh.useSecrets }}
+          - name: USESECRETS
+            value: "{{ .Values.ssh.useSecrets }}"
+         {{- end }}
+{{- if .Values.master.env }}
+{{ toYaml .Values.master.env | indent 10 }}
+{{- end }}
+{{- if .Values.master.privileged }}
+        securityContext:
+            privileged: true
+{{- end }}
+        ports:
+        - containerPort: {{ .Values.ssh.port }}
+        volumeMounts:
+        - name: shared-data
+          mountPath: /horovod/init
+        - name: {{ template "horovod.fullname" . }}-cm
+          mountPath: /horovod/generated
+{{- if .Values.volumeMounts }}
+{{ toYaml .Values.volumeMounts | indent 8 }}
+{{- end }}
+        - name: output-home
+          mountPath: /mnt/output/experiment
+          subPath: {{ .Release.Name }}
+        command:
+          - /horovod/generated/run.sh
+        args:
+          - >
+            mpiexec --hostfile {{- if .Values.useHostNetwork }} /horovod/init/hostfile {{ else }} /horovod/generated/hostfile {{- end }}
+            -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe
+            {{- range $name, $value := .Values.master.env }} -x {{ $name }} {{- end }}
+            --mca orte_keep_fqdn_hostnames t --allow-run-as-root --display-map --tag-output --timestamp-output
+            {{- if .Values.useHostNetwork }} --mca btl_tcp_if_include em1 {{- end }}
+            sh -c '/usr/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}' -n {{ .Values.workersCount }}
+{{- if .Values.master.args }}
+{{ toYaml .Values.master.args | indent 10 }}
+{{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+      - name: kubectl
+        image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/kubectl:1.10.6"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: STS_NAME
+            value: {{ template "horovod.fullname" . }}
+        volumeMounts:
+          - name: shared-data
+            mountPath: /horovod/init
+          - name: {{ template "horovod.fullname" . }}-cm
+            mountPath: /horovod/generated
+        command:
+          - /horovod/generated/kubectl.sh
+{{- if .Values.ssh.useSecrets }}
+      initContainers:
+      - name: wait-workers
+        image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: SSHPORT
+            value: "{{ .Values.ssh.port }}"
+          {{- if .Values.ssh.useSecrets }}
+          - name: USESECRETS
+            value: "{{ .Values.ssh.useSecrets }}"
+          {{- end }}
+{{- if .Values.master.env }}
+{{ toYaml .Values.master.env | indent 10 }}
+{{- end }}
+        command:
+        - /horovod/generated/waitWorkersReady.sh
+        args:
+        - /horovod/generated/hostfile
+        volumeMounts:
+        - name: {{ template "horovod.fullname" . }}-cm
+          mountPath: /horovod/generated
+        - name: shared-data
+          mountPath: /horovod/init
+{{- end }}

@@ -118,6 +118,7 @@ class DLS4EConfigMap:
     It is implemented using borg pattern (http://code.activestate.com/recipes/66531/),
     so each instance of this class will have shared state, ensuring configuration consistency.
     """
+    # images keys' names must be compliant with 'export_images' in tools/dls4e-config.yml
     IMAGE_TILLER_FIELD = 'image.tiller'
     EXTERNAL_IP_FIELD = 'external_ip'
     IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
@@ -125,13 +126,13 @@ class DLS4EConfigMap:
     PLATFORM_VERSION = 'platform.version'
     PY2_IMAGE_NAME = 'image.tensorflow_1.9_py2'
     PY3_IMAGE_NAME = 'image.tensorflow_1.9_py3'
+    HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
 
     __shared_state = {}
 
     def __init__(self, config_map_request_timeout: int = None):
         self.__dict__ = self.__shared_state
-        if not hasattr(self, 'image_tiller') or not hasattr(self, 'external_ip') \
-                or not hasattr(self, 'image_tensorboard_service') or not hasattr(self, "platform.version"):
+        if not self.__dict__:
             config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE,
                                                   request_timeout=config_map_request_timeout)
             self.image_tiller = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
@@ -142,3 +143,4 @@ class DLS4EConfigMap:
             self.platform_version = config_map_data.get(self.PLATFORM_VERSION)
             self.py2_image_name = config_map_data.get(self.PY2_IMAGE_NAME)
             self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)
+            self.horovod_image_name = config_map_data.get(DLS4EConfigMap.HOROVOD_IMAGE_CONFIG_KEY)

@@ -8,6 +8,8 @@ export_images:
 # tensorflow part
   - name: tensorflow
     value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: horovod
+    value: "{{ image_local_url['dls4e/horovod'] }}"
   - name: tensorflow_1.9
     value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
   - name: tensorflow_1.9_py3
@@ -145,6 +147,13 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
+  dls4e/horovod:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/horovod"
   dls4e/nginx:
     version: "1.14.0"
     method: pull
