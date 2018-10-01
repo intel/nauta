@@ -12,7 +12,7 @@
 
 - name: "{{ message_label }} Upgrade helm chart if required"
   environment: "{{ local_envs }}"
-  shell: "{{ runtime_helm }} upgrade dls4enterprise {{ runtime_dls4e_chart }} --timeout 1200 --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
+  shell: "{{ runtime_helm }} upgrade dls4enterprise {{ runtime_dls4e_chart }} --timeout 1800 --wait -f {{ workspace }}/dls4e-{{ dls4e_version }}.values.yaml --recreate-pods"
   when:
     - not chart is changed
     - upgrade | default(False) | bool
