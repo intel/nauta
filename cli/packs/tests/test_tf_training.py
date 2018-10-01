@@ -23,7 +23,6 @@ import unittest.mock as mock
 import pytest
 
 import packs.tf_training as tf_training
-from util.exceptions import KubectlIntError
 
 
 SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
@@ -217,7 +216,7 @@ def test_update_configuration_failure(mocker):
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
 
     modify_values_yaml_mock.side_effect = Exception("Test error")
-    with pytest.raises(KubectlIntError):
+    with pytest.raises(RuntimeError):
         tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                          script_parameters=SCRIPT_PARAMETERS,
                                          experiment_name='test-experiment', run_name='test-experiment',

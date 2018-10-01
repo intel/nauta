@@ -42,7 +42,7 @@ from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.system import get_current_os, OS
 from util import socat
-from util.exceptions import KubectlIntError, K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
     SubmitExperimentError
 from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
@@ -133,14 +133,14 @@ def create_environment(experiment_name: str, file_location: str, folder_location
             shutil.copytree(folder_location, folder_path)
         except Exception:
             log.exception("Create environment - copying training folder error.")
-            raise KubectlIntError(message_prefix.format(reason=TEXTS["dir_cant_be_copied_error_text"]))
+            raise SubmitExperimentError(message_prefix.format(reason=TEXTS["dir_cant_be_copied_error_text"]))
 
     try:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
     except Exception:
         log.exception("Create environment - creating experiment folder error.")
-        raise KubectlIntError(message_prefix.format(reason=TEXTS["exp_dir_cant_be_created"]))
+        raise SubmitExperimentError(message_prefix.format(reason=TEXTS["exp_dir_cant_be_created"]))
     # create a semaphore saying that experiment is under submission
     Path(os.path.join(folder_path, EXP_SUB_SEMAPHORE_FILENAME)).touch()
 
@@ -150,7 +150,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
             shutil.copy2(file_location, folder_path)
         except Exception:
             log.exception("Create environment - copying training script error.")
-            raise KubectlIntError(message_prefix.format(reason=TEXTS["training_script_cant_be_created"]))
+            raise SubmitExperimentError(message_prefix.format(reason=TEXTS["training_script_cant_be_created"]))
 
     log.debug("Create environment - end")
     return run_environment_path
@@ -211,9 +211,6 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                                                                                run_kind=run_kind)
         runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
                                          parameter_set=parameter_set, template_name=template)
-    except KubectlIntError as exe:
-        log.exception(str(exe))
-        raise SubmitExperimentError(str(exe))
     except SubmitExperimentError as exe:
         log.exception(str(exe))
         raise exe
@@ -285,19 +282,17 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                         experiment_run.parameters = (script_name, ) + experiment_run.parameters
                     elif script_name:
                         experiment_run.parameters = (script_name, )
-            except Exception as e:
+            except SubmitExperimentError as e:
+                log.exception(TEXTS["env_creation_error_msg"])
+                e.message += f' {TEXTS["env_creation_error_msg"]}'
+                raise
+            except Exception:
                 # any error in this step breaks execution of this command
                 message = TEXTS["env_creation_error_msg"]
                 log.exception(message)
                 # just in case - remove folders that were created with a success
                 for experiment_run_folder in experiment_run_folders:
                     delete_environment(experiment_run_folder)
-
-                # reraise SubmitExperimentErrors - exception message will be displayed to user
-                if isinstance(e, SubmitExperimentError):
-                    raise
-                else:
-                    raise SubmitExperimentError(message)
 
             # if ps or pr option is used - first ask whether experiment(s) should be submitted
             if parameter_range or parameter_set:
@@ -363,12 +358,12 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         error_msg = TEXTS["proxy_open_error_msg"]
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg)
-    except SubmitExperimentError as exe:
-        raise exe
+    except SubmitExperimentError:
+        raise
     except Exception as exe:
         error_msg = TEXTS["submit_other_error_msg"]
         log.exception(error_msg)
-        raise SubmitExperimentError(error_msg)
+        raise SubmitExperimentError(error_msg) from exe
     finally:
         # noinspection PyBroadException
         # terminate socat if on Windows or Mac OS
@@ -459,7 +454,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
         if exit_code:
-            raise KubectlIntError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=log_output))
+            raise SubmitExperimentError(TEXTS["draft_templates_not_generated_error_msg"].format(reason=log_output))
 
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
@@ -480,10 +475,9 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
                              env_variables=env_variables)
 
         pod_count = get_pod_count(run_folder=run_folder, pack_type=pack_type)
-
     except Exception as exe:
         delete_environment(run_folder)
-        raise KubectlIntError(exe) from exe
+        raise SubmitExperimentError('Problems during creation of environments.') from exe
     log.debug(f'Prepare run {run_name} environment - finish')
     return PrepareExperimentResult(folder_name=run_folder, script_name=local_script_location, pod_count=pod_count)
 
@@ -504,7 +498,7 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
         error_message = TEXTS["job_not_deployed_error_msg"].format(reason=log_output)
         log.error(error_message)
         delete_environment(run_folder)
-        raise KubectlIntError(error_message)
+        raise SubmitExperimentError(error_message)
     log.debug(f'Submit one run {run_folder} - finish')
 
 
@@ -549,7 +543,7 @@ def prepare_list_of_values(param_name: str, param_values: str) -> List[str]:
     error_message = TEXTS["incorrect_param_format_error_msg"].format(param_name=param_name)
     if not check_enclosing_brackets(param_values):
         log.error(error_message)
-        raise KubectlIntError(error_message)
+        raise ValueError(error_message)
 
     try:
         param_values = str.strip(param_values, "{}")
@@ -568,7 +562,7 @@ def prepare_list_of_values(param_name: str, param_values: str) -> List[str]:
 
     except Exception:
         log.exception(error_message)
-        raise KubectlIntError(error_message)
+        raise ValueError(error_message)
 
     return ret_values
 
@@ -593,7 +587,7 @@ def analyze_pr_parameters_list(list_of_params: List[Tuple[str]]) -> List[Tuple[s
         if param_name in param_names:
             exe_message = TEXTS["param_ambiguously_defined"].format(param_name=param_name)
             log.exception(exe_message)
-            raise KubectlIntError(exe_message)
+            raise ValueError(exe_message)
 
         param_names.append(param_name)
 
@@ -617,16 +611,16 @@ def analyze_ps_parameters_list(list_of_params: List[Tuple[str]]):
     for param_set in list_of_params:
         if not check_enclosing_brackets(param_set):
             log.error(error_message)
-            raise KubectlIntError(error_message)
+            raise ValueError(error_message)
 
         try:
             param_values = str.strip(param_set, "{}")
             param_values = [l.strip() for l in param_values.split(",")]
             param_tuple = tuple([l.replace(":", "=", 1) for l in param_values])
             ret_list.append(param_tuple)
-        except Exception:
+        except Exception as e:
             log.exception(error_message)
-            raise KubectlIntError(error_message)
+            raise ValueError(error_message) from e
 
     return ret_list
 
@@ -673,7 +667,7 @@ def validate_env_paramater(ctx, param, value):
             for param in value:
                 key, t_value = param.split("=")
                 if not key or not t_value:
-                    raise KubectlIntError()
+                    raise ValueError
         return value
     except Exception as exe:
         raise click.BadParameter('-e/--env option must be in <KEY>=<VALUE> format.')

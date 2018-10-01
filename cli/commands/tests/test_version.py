@@ -28,7 +28,7 @@ from click.testing import CliRunner
 from commands import version
 from version import VERSION
 from util.config import DLS4EConfigMap
-from util.exceptions import KubectlIntError
+from util.exceptions import KubernetesError
 from cli_text_consts import VERSION_CMD_TEXTS as TEXTS, VERBOSE_RERUN_MSG
 
 
@@ -88,9 +88,9 @@ def test_version(mocked_k8s_config, mocked_k8s_CoreV1Api):
     assert_version_table_rows(result.output, on_cmd_fail=False)
 
 
-def test_version_with_kubectl_exception(mocker):
+def test_version_with_kubernetes_exception(mocker):
     config_map_mock = mocker.patch('util.config.DLS4EConfigMap.__init__')
-    config_map_mock.side_effect = KubectlIntError("")
+    config_map_mock.side_effect = KubernetesError("")
     runner = CliRunner()
     result = runner.invoke(version.version, [])
 

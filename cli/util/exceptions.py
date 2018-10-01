@@ -20,8 +20,8 @@
 #
 
 
-class KubectlIntError(Exception):
-    """Error raised in case of problems detected by the application"""
+class KubernetesError(Exception):
+    """Error raised in case of problems during interacting with Kubernetes"""
     pass
 
 

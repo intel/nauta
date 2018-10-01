@@ -29,7 +29,7 @@ from typing import Optional
 import platform_resources.users as users_api
 from util import system
 from util.logger import initialize_logger
-from util.exceptions import KubectlIntError, KubectlConnectionError, LocalPortOccupiedError
+from util.exceptions import KubernetesError, KubectlConnectionError, LocalPortOccupiedError
 from util.k8s.k8s_info import get_app_services, find_namespace, NamespaceStatus
 from util.app_names import DLS4EAppNames
 from util.system import check_port_availability
@@ -103,7 +103,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
 
         if not service_node_port and not service_container_port:
             logger.error(f'Cannot find open ports for {k8s_app_name} app')
-            raise KubectlIntError(TEXTS["proxy_creation_missing_port_error_msg"])
+            raise KubernetesError(TEXTS["proxy_creation_missing_port_error_msg"])
 
         if port:
             if check_port_availability(port):
@@ -138,7 +138,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
         if not process:
             process = system.execute_subprocess_command(port_forward_command, shell=True, join=True)
 
-    except KubectlIntError as exe:
+    except KubernetesError as exe:
         raise RuntimeError(exe)
     except LocalPortOccupiedError as exe:
         raise exe
@@ -175,7 +175,7 @@ def check_users_presence(username: str) -> UserState:
     except Exception as exe:
         error_message = TEXTS["user_presence_check_error_msg"]
         logger.error(error_message)
-        raise KubectlIntError(error_message) from exe
+        raise KubernetesError(error_message) from exe
 
 
 def delete_k8s_object(kind: str, name: str):

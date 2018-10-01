@@ -26,7 +26,7 @@ from util.aliascmd import AliasCmd
 from cli_state import common_options, pass_state, State
 from version import VERSION
 from util.config import DLS4EConfigMap
-from util.exceptions import KubectlIntError
+from util.exceptions import KubernetesError
 from util.logger import initialize_logger
 from util.system import handle_error
 from cli_text_consts import VERSION_CMD_TEXTS as TEXTS
@@ -48,7 +48,7 @@ def version(state: State):
     platform_version_fail = False
     try:
         platform_version = DLS4EConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
-    except KubectlIntError:
+    except KubernetesError:
         error_msg = TEXTS["kubectl_int_error_msg"]
         platform_version_fail = True
     except Exception:

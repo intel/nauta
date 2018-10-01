@@ -34,7 +34,6 @@ from distutils.version import LooseVersion
 import click
 import distro
 
-from util.exceptions import KubectlIntError
 from util.logger import initialize_logger, get_verbosity_level
 from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS, VERBOSE_RERUN_MSG
 
@@ -173,7 +172,7 @@ def check_port_availability(port: int) -> bool:
             # something else raised the socket.error exception
             error_msg = TEXTS["port_availability_check_error_msg"]
             log.exception(error_msg)
-            raise KubectlIntError(error_msg) from e
+            raise RuntimeError(error_msg) from e
 
     return ret_value
 

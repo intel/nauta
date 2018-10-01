@@ -37,7 +37,6 @@ from util.config import FOLDER_DIR_NAME
 from util.config import DLS4EConfigMap
 
 import packs.common as common
-from util.exceptions import KubectlIntError
 import dpath.util as dutil
 from cli_text_consts import PACKS_TF_TRAINING_TEXTS as TEXTS
 
@@ -84,7 +83,7 @@ def update_configuration(run_folder: str, script_location: str,
         modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
-        raise KubectlIntError(TEXTS["config_not_updated"])
+        raise RuntimeError(TEXTS["config_not_updated"]) from exe
 
     log.debug("Update configuration - end")
 

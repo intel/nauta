@@ -98,6 +98,7 @@ def common_options(verify_dependencies=True, verify_config_path=True):
                 verify_cli_config_path()
             if verify_dependencies:
                 verify_cli_dependencies()
+
             return func(*args, **kwargs)
         wrapper = verbosity_option(wrapper)
         return wrapper

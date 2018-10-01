@@ -28,7 +28,6 @@ import pytest
 
 from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
     get_os_version, get_windows_edition, WINDOWS_EDITIONS
-from util.exceptions import KubectlIntError
 from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS
 
 
@@ -76,7 +75,7 @@ def test_check_port_availability_failure(mocker):
     socket_local = mocker.patch("socket.socket.bind")
     socket_local.side_effect = OSError()
 
-    with pytest.raises(KubectlIntError):
+    with pytest.raises(RuntimeError):
         check_port_availability(9000)
 
 

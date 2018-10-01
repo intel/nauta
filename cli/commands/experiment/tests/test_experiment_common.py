@@ -29,7 +29,7 @@ from commands.experiment.common import submit_experiment, RunSubmission, values_
     check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
     RunKinds, validate_pack_params_names
 
-from util.exceptions import KubectlIntError, SubmitExperimentError
+from util.exceptions import SubmitExperimentError
 import util.config
 from util.system import get_current_os, OS
 from platform_resources.run_model import RunStatus
@@ -97,7 +97,7 @@ def test_create_environment_makedir_error(config_mock, mocker):
     sh_copy_mock = mocker.patch("shutil.copy2")
     sh_copytree_mock = mocker.patch("shutil.copytree")
 
-    with pytest.raises(KubectlIntError):
+    with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
@@ -110,7 +110,7 @@ def test_create_environment_lack_of_home_folder(config_mock, mocker):
     os_mkdirs_mock = mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2")
 
-    with pytest.raises(KubectlIntError):
+    with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 0, "existence of an experiment's folder was checked"
@@ -125,7 +125,7 @@ def test_create_environment_copy_error(config_mock, mocker):
     sh_copytree_mock = mocker.patch("shutil.copytree")
     mocker.patch("commands.experiment.common.Path.touch")
 
-    with pytest.raises(KubectlIntError):
+    with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
@@ -210,7 +210,7 @@ def test_submit_success(prepare_mocks: SubmitExperimentMocks):
 
 
 def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
-    prepare_mocks.create_env.side_effect = KubectlIntError
+    prepare_mocks.create_env.side_effect = SubmitExperimentError
 
     with pytest.raises(SubmitExperimentError) as exe:
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template='',
@@ -236,7 +236,7 @@ def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
 
 def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
     prepare_mocks.update_conf = prepare_mocks.mocker.patch("commands.experiment.common.update_configuration",
-                                                           side_effect=[KubectlIntError])
+                                                           side_effect=[SubmitExperimentError])
 
     with pytest.raises(SubmitExperimentError) as exe:
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
@@ -249,7 +249,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 
 
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
-    prepare_mocks.submit_one.side_effect = KubectlIntError()
+    prepare_mocks.submit_one.side_effect = SubmitExperimentError()
 
     runs_list, _ = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
                                      template=None, name=None, parameter_range=[], parameter_set=(),
@@ -260,7 +260,7 @@ def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
 
 
 def test_submit_start_depl_and_updrun_fail(prepare_mocks: SubmitExperimentMocks):
-    prepare_mocks.submit_one.side_effect = KubectlIntError()
+    prepare_mocks.submit_one.side_effect = SubmitExperimentError()
     prepare_mocks.update_run.side_effect = RuntimeError()
 
     runs_list, _ = submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, pack_params=[],
@@ -350,21 +350,21 @@ def test_analyze_pr_parameters_list_success():
 
 def test_analyze_pr_parameters_list_ambiguosly_defined():
     identical_param_list = [("param1", "{0, 1}"), ("param1", "{0...2:1}")]
-    with pytest.raises(KubectlIntError) as exe:
+    with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(identical_param_list)
     assert str(exe.value) == TEXTS["param_ambiguously_defined"].format(param_name="param1")
 
 
 def test_analyze_pr_parameters_list_missing_brackets():
     two_params_list = [("param1", "1, 2, 3"), ("param2", "{0...2:1}")]
-    with pytest.raises(KubectlIntError) as exe:
+    with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(two_params_list)
     assert str(exe.value) == TEXTS["incorrect_param_format_error_msg"].format(param_name="param1")
 
 
 def test_analyze_pr_parameters_list_wrong_format():
     two_params_list = [("param1", "1, 2, 3"), ("param2", "{a...b:1}")]
-    with pytest.raises(KubectlIntError) as exe:
+    with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(two_params_list)
     assert str(exe.value) == TEXTS["incorrect_param_format_error_msg"].format(param_name="param1")
 
@@ -389,7 +389,7 @@ def test_analyze_ps_parameters_list_success():
 
 def test_analyze_ps_parameters_wrong_format():
     three_params = ("{param1:value1, param2:value2, param3:value3",)
-    with pytest.raises(KubectlIntError) as exe:
+    with pytest.raises(ValueError) as exe:
         analyze_ps_parameters_list(three_params)
     assert str(exe.value) == TEXTS["param_set_incorrect_format_error_msg"]
 

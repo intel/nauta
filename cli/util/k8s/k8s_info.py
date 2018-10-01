@@ -27,7 +27,7 @@ from kubernetes.client.rest import ApiException
 from kubernetes import config, client
 from kubernetes.client import configuration, V1DeleteOptions, V1Secret, V1ServiceAccount
 from util.logger import initialize_logger
-from util.exceptions import KubectlIntError
+from util.exceptions import KubernetesError
 from util.app_names import DLS4EAppNames
 from cli_text_consts import UTIL_K8S_INFO_TEXTS as TEXTS
 
@@ -177,7 +177,7 @@ def find_namespace(namespace: str) -> NamespaceStatus:
         else:
             error_message = TEXTS["other_find_namespace_error"]
             logger.exception(error_message)
-            raise KubectlIntError(error_message)
+            raise KubernetesError(error_message)
 
     return NamespaceStatus.NOT_EXISTS
 
@@ -202,12 +202,12 @@ def delete_namespace(namespace: str, propagate: bool = False):
         if response.status != "{'phase': 'Terminating'}":
             error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
             logger.exception(error_description)
-            raise KubectlIntError(error_description)
+            raise KubernetesError(error_description)
 
     except Exception:
         error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
         logger.exception(error_description)
-        raise KubectlIntError(error_description)
+        raise KubernetesError(error_description)
 
 
 def get_config_map_data(name: str, namespace: str, request_timeout: int = None) -> Dict[str, str]:
@@ -226,7 +226,7 @@ def get_config_map_data(name: str, namespace: str, request_timeout: int = None) 
     except Exception:
         error_description = TEXTS["config_map_access_error_msg"].format(name=name)
         logger.exception(error_description)
-        raise KubectlIntError(error_description)
+        raise KubernetesError(error_description)
 
     return ret_dict
 
@@ -236,7 +236,7 @@ def get_users_token(namespace: str) -> str:
     Gets a default token of a user from a given namespace
 
     :param namespace: namespace of a user
-    :return: encoded token of a user - if it doesn't exist or errors occured during gathering
+    :return: encoded token of a user - if it doesn't exist or errors occurred during gathering
     the token - function returns an empty string
     """
     ret_token = ""
@@ -257,7 +257,7 @@ def get_users_token(namespace: str) -> str:
     except Exception as exe:
         error_message = TEXTS["gathering_users_token_error_msg"]
         logger.exception(error_message)
-        raise KubectlIntError(error_message) from exe
+        raise KubernetesError(error_message) from exe
 
     return ret_token
 
@@ -302,10 +302,10 @@ def get_users_samba_password(username: str) -> str:
             password = None
         else:
             logger.exception(error_message)
-            raise KubectlIntError(error_message) from exe
+            raise KubernetesError(error_message) from exe
     except Exception as exe:
         logger.exception(error_message)
-        raise KubectlIntError(error_message) from exe
+        raise KubernetesError(error_message) from exe
 
     if password is None:
         raise ValueError(TEXTS["lack_of_password_error_msg"])
