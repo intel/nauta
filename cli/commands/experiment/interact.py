@@ -147,7 +147,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         # only Jupyter notebooks are opened directly, other files are opened in edit mode
         if not jupyter_experiment:
             if ".ipynb" in filename:
-                url_end = f"/notebooks/output/experiment/{name}/"
+                url_end = f"/notebooks/output/experiment/"
             else:
                 url_end = "/edit/"
             url_end = url_end + Path(filename).name
