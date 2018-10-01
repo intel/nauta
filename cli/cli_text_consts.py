@@ -414,14 +414,7 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
 EXPERIMENT_VIEW_CMD_TEXTS = {
     "help": "Displays details of experiment with a given name.",
     "help_t": "If given, then exposes a tensorboard's instance with experiment's data.",
-    "container_details_msg": """
-                             - Name: {name}
-                                - Status: {status}
-                                - Volumes:
-                                    {volumes}
-                                - Resources:
-                             {resources}
-                             """,
+    "container_details_msg": "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:\n  {resources}",
     "experiment_not_found_error_msg": "Experiment \"{experiment_name}\" not found.",
     "pods_participating_list_header": "\nPods participating in the execution:\n",
     "pods_table_headers": ["Name", "Uid", "Pod Conditions", "Container Details"],

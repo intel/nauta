@@ -113,8 +113,8 @@ def view(context, state: State, experiment_name: str, tensorboard: bool):
         for pod in pods:
             status_string = ""
             for cond in pod.status.conditions:
-                msg = "\n" if not cond.reason else ", reason: " + cond.reason + "\n"
-                msg = msg + ", message: " + cond.message if cond.message else msg
+                msg = "\n" if not cond.reason else "\n reason: " + cond.reason
+                msg = msg + ", \n message: " + cond.message if cond.message else msg
                 status_string += cond.type + ": " + cond.status + msg
 
             if pod.status.phase.upper() == PodStatus.PENDING.value:
@@ -132,15 +132,18 @@ def view(context, state: State, experiment_name: str, tensorboard: bool):
                                                                               status=container_status_to_msg(
                                                                                   container_statuses[container.name]),
                                                                               volumes=container_volume_mounts_to_msg(
-                                                                                  container.volume_mounts),
+                                                                                  container.volume_mounts,
+                                                                                  spaces=2),
                                                                               resources=container_resources_to_msg(
-                                                                                  container.resources))
+                                                                                  container.resources, spaces=4))
                 container_details.append(container_description)
                 containers_resources.append(container.resources)
 
             container_details = ''.join(container_details)
+
+            uid = pod.metadata.uid.replace("-", "-\n")
             tabular_output.append([
-                pod.metadata.name, pod.metadata.uid, status_string,
+                pod.metadata.name, uid, status_string,
                 container_details
             ])
         click.echo(tabulate(tabular_output, TEXTS["pods_table_headers"], tablefmt="orgtbl"))
