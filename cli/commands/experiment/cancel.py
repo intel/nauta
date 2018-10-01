@@ -178,7 +178,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                 experiment_name_plural=experiment_name_plural
             )
         )
-        exit(2)
+        exit(0)
 
     # group runs by experiments
     exp_with_runs = defaultdict(list)
@@ -454,7 +454,7 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
                 experiment_name_plural='pods'
             )
         )
-        exit(2)
+        exit(0)
 
     deleted_pods = []
     not_deleted_pods = []
@@ -488,7 +488,7 @@ def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purg
                 experiment_name_plural=experiment_name_plural
             )
         )
-        exit(2)
+        exit(0)
 
     try:
         if purge:
