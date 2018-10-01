@@ -368,8 +368,8 @@ EXPERIMENT_CANCEL_CMD_TEXTS = {
               "from the system.",
     "help_m": "If given, command searches for experiments matching the value of this option. This option cannot be "
               "used along with the NAME argument.",
-    "help_i": "Comma-separated pods IDs - if given then matches pods by their IDs and deletes them.",
-    "help_s": "One of: {available_statuses} - searches pods by their status and deletes them.",
+    "help_i": "Comma-separated pods IDs - if given then matches pods by their IDs and cancels them.",
+    "help_s": "One of: {available_statuses} - searches pods by their status and cancels them.",
     "name_m_both_given_error_msg": "Both name and -m option cannot be given. Please choose one of them.",
     "name_m_none_given_error_msg": "Error: Name or -m option must be given. Please pass one of them.",
     "list_runs_error_msg": "Problems during loading a list of {experiment_name_plural}.",
