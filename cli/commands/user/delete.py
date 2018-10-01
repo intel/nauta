@@ -51,12 +51,11 @@ def delete(state: State, username: str, purge: bool):
     :param username: name of a user that should be deleted
     :param purge: if set - command removes also all artifacts associated with a user
     """
-    click.echo(TEXTS["deletion_check_presence"])
     try:
         if not is_current_user_administrator():
             handle_error(user_msg=TEXTS["user_not_admin_error_msg"])
             exit(1)
-
+        click.echo(TEXTS["deletion_check_presence"])
         user_state = check_users_presence(username)
 
         if user_state == UserState.NOT_EXISTS:
