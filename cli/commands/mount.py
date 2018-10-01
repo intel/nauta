@@ -31,7 +31,7 @@ from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_cur
     get_kubectl_host
 from util.aliascmd import AliasCmd
 from util.system import handle_error
-from cli_text_consts import MOUNTS_CMD_TEXTS as TEXTS
+from cli_text_consts import MOUNT_CMD_TEXTS as TEXTS
 
 
 logger = initialize_logger(__name__)
@@ -40,7 +40,7 @@ logger = initialize_logger(__name__)
 @click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='m')
 @common_options()
 @pass_state
-def mounts(state: State):
+def mount(state: State):
     try:
         if is_current_user_administrator():
             handle_error(logger, TEXTS["user_is_admin_error_msg"], TEXTS["user_is_admin_error_msg"])

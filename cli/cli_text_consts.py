@@ -34,7 +34,7 @@ VERSION_CMD_TEXTS = {
     "table_headers": ["Component", "Version"]
 }
 
-MOUNTS_CMD_TEXTS = {
+MOUNT_CMD_TEXTS = {
     "help": "Displays a command that can be used to mount client's folders on his/her local machine.",
     "main_msg": """
                 Use the following command to mount those folders:

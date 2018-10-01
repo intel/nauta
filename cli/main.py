@@ -34,7 +34,7 @@ from commands.launch import launch
 from commands.predict import predict
 from commands.user import user
 from commands.verify import verify
-from commands.mounts import mounts
+from commands.mount import mount
 from commands.version import version
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file
@@ -98,7 +98,7 @@ entry_point.add_command(predict.predict)
 entry_point.add_command(user.user)
 entry_point.add_command(verify.verify)
 entry_point.add_command(version)
-entry_point.add_command(mounts)
+entry_point.add_command(mount)
 
 if __name__ == '__main__':
     # Register signal handler

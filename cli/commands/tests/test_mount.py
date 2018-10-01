@@ -23,8 +23,8 @@ import platform
 
 from click.testing import CliRunner
 
-from commands.mounts import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mounts
-from cli_text_consts import MOUNTS_CMD_TEXTS as TEXTS
+from commands.mount import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mount
+from cli_text_consts import MOUNT_CMD_TEXTS as TEXTS
 
 
 TEST_USR = "test_user"
@@ -63,13 +63,13 @@ def test_get_mount_command_osx(mocker):
     assert mount == CORRECT_OSX_MOUNT
 
 
-def test_mounts(mocker):
+def test_mount(mocker):
     host_system = platform.system()
 
-    mocker.patch("commands.mounts.is_current_user_administrator", return_value=False)
-    gcu_mock = mocker.patch("commands.mounts.get_current_user", return_value=TEST_USR)
-    gus_mock = mocker.patch("commands.mounts.get_users_samba_password", return_value=TEST_PSW)
-    cmp_mock = mocker.patch("commands.mounts.get_kubectl_host", return_value=TEST_ADR)
+    mocker.patch("commands.mount.is_current_user_administrator", return_value=False)
+    gcu_mock = mocker.patch("commands.mount.get_current_user", return_value=TEST_USR)
+    gus_mock = mocker.patch("commands.mount.get_users_samba_password", return_value=TEST_PSW)
+    cmp_mock = mocker.patch("commands.mount.get_kubectl_host", return_value=TEST_ADR)
 
     runner = CliRunner()
     # os library doesn't have getuid function on Windows
@@ -78,20 +78,20 @@ def test_mounts(mocker):
 
         mocker.patch("platform.system", return_value="Linux")
 
-        result = runner.invoke(mounts)
+        result = runner.invoke(mount)
 
         assert CORRECT_LINUX_MOUNT in result.output
         assert os_getuid_mock.call_count == 1
 
     mocker.patch("platform.system", return_value="Windows")
 
-    result = runner.invoke(mounts)
+    result = runner.invoke(mount)
 
     assert CORRECT_WINDOWS_MOUNT in result.output
 
     mocker.patch("platform.system", return_value="OSX")
 
-    result = runner.invoke(mounts)
+    result = runner.invoke(mount)
 
     assert CORRECT_OSX_MOUNT in result.output
 
@@ -105,11 +105,11 @@ def test_mounts(mocker):
     assert cmp_mock.call_count == call_number
 
 
-def test_mounts_is_admin(mocker):
-    icu_mock = mocker.patch("commands.mounts.is_current_user_administrator", return_value=True)
+def test_mount_is_admin(mocker):
+    icu_mock = mocker.patch("commands.mount.is_current_user_administrator", return_value=True)
 
     runner = CliRunner()
-    result = runner.invoke(mounts)
+    result = runner.invoke(mount)
 
     assert icu_mock.call_count == 1
     assert TEXTS["user_is_admin_error_msg"] in result.output
