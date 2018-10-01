@@ -261,7 +261,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
     if not experiment:
         raise RuntimeError(TEXTS["get_experiment_error_msg"])
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=exp_name)
+    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name])
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_purge))
     if cancel_whole_experiment:
@@ -335,7 +335,7 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
     if not experiment:
         raise RuntimeError(TEXTS["get_experiment_error_msg"])
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=exp_name, excl_state=RunStatus.CANCELLED)
+    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_cancel))
     if cancel_whole_experiment:

@@ -156,10 +156,12 @@ def test_generate_experiment_name_if_exp_exists_and_name_provided(mock_k8s_api_c
     assert get_experiment_mock.call_count == 1
 
 
-def test_generate_experiment_name_if_exp_exists_and_name_no_provided(mock_k8s_api_client: CustomObjectsApi):
+def test_generate_experiment_name_if_exp_exists_and_name_no_provided(mock_k8s_api_client: CustomObjectsApi, mocker):
     mock_k8s_api_client.list_namespaced_custom_object.return_value = LIST_EXPERIMENTS_RESPONSE_RAW
+    list_runs_mock = mocker.patch("platform_resources.experiments.list_runs")
+    list_runs_mock.return_value = ['1', '2', '3']
     result, labels = generate_exp_name_and_labels('script', NAMESPACE)
-    assert result == 'test-experiment-new-3'
+    assert result == 'test-experiment-new-4'
     assert mock_k8s_api_client.list_namespaced_custom_object.call_count == 1
 
 

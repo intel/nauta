@@ -72,14 +72,15 @@ def get_run(name: str, namespace: str = None) -> Optional[Run]:
     return Run.from_k8s_response_dict(raw_run) if raw_run else None
 
 
-def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_filter: str = None, exp_name_filter: str = None,
-              excl_state: RunStatus = None, run_kinds_filter: List[Enum] = None) -> List[Run]:
+def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_filter: str = None,
+              exp_name_filter: List[str] = None, excl_state: RunStatus = None,
+              run_kinds_filter: List[Enum] = None) -> List[Run]:
     """
     Return list of experiment runs.
     :param namespace: If provided, only runs from this namespace will be returned
     :param state_list: If provided, only runs with given states will be returned
     :param name_filter: If provided, only runs matching name_filter regular expression will be returned
-    :param exp_name_filter: If provided, list of runs is filtered by experiment name
+    :param exp_name_filter: If provided, list of runs is filtered by experiment names from given list
     :param excl_state: If provided, only runs with a state other than given will be returned
     :param run_kinds_filter: If provided, only runs with a kind that matches to any of the run kinds from given
         filtering list will be returned

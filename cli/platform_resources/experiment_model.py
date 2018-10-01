@@ -78,7 +78,7 @@ class Experiment(PlatformResource):
 
 
     def get_runs(self) -> List[Run]:
-        return list_runs(namespace=self.metadata['namespace'], exp_name_filter=self.name)
+        return list_runs(namespace=self.metadata['namespace'], exp_name_filter=[self.name])
 
 
 class ExperimentSchema(Schema):

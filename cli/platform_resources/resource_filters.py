@@ -66,8 +66,8 @@ def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
     return not filter_run_by_state(resource_object_dict, [state])
 
 
-def filter_by_experiment_name(resource_object_dict: dict, exp_name: str = None):
-    return resource_object_dict['spec']['experiment-name'] == exp_name if exp_name else True
+def filter_by_experiment_name(resource_object_dict: dict, exp_name: List[str] = None):
+    return resource_object_dict['spec']['experiment-name'] in exp_name if exp_name else True
 
 
 def filter_by_run_kinds(resource_object_dict: dict, run_kinds: List[Enum] = None):

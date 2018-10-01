@@ -37,6 +37,7 @@ from platform_resources.resource_filters import filter_by_name_regex, filter_by_
 from util.exceptions import InvalidRegularExpressionError, SubmitExperimentError
 from util.logger import initialize_logger
 from cli_text_consts import PLATFORM_RESOURCES_EXPERIMENTS_TEXTS as TEXTS
+from platform_resources.runs import list_runs
 
 
 logger = initialize_logger(__name__)
@@ -247,11 +248,17 @@ def generate_name_for_existing_exps(script_name: str, namespace: str,
             newest_exp = exp
     name_origin = newest_exp.metadata.labels['name_origin']
 
-    # 2. Count experiments matching to newest exp name
-    counter = 1
+    names_of_experiments_with_the_same_origin = []
     for exp in exp_list:
         if exp.metadata.labels['name_origin'] == name_origin:
-            counter = counter+1
+            names_of_experiments_with_the_same_origin.append(exp.metadata.name)
+
+    # 2. Count experiments(runs) matching the same origin name of an experiment
+    runs_of_exp_list = list_runs(namespace=namespace, exp_name_filter=names_of_experiments_with_the_same_origin)
+
+    counter = 1
+    if runs_of_exp_list:
+        counter = len(runs_of_exp_list) + 1
 
     calculated_name = f"{name_origin}-{counter}"
     return calculated_name, prepare_label(script_name, calculated_name, name_origin, run_kind=run_kind)
