@@ -19,13 +19,17 @@
 # and approved by Intel in writing.
 #
 
+import dateutil.parser
 import os.path
 from sys import exit
+from typing import Generator
 
 import click
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
+from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
+from platform_resources.run_model import Run
 from platform_resources.runs import list_runs
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
@@ -66,8 +70,6 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
         handle_error(user_msg=TEXTS["name_m_none_given_error_msg"])
         exit(1)
 
-    experiments_logs = {}
-
     try:
         with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
@@ -83,17 +85,23 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             min_severity = SeverityLevel[min_severity] if min_severity else None
             pod_status = PodStatus[pod_status] if pod_status else None
 
-            for run in runs:
-                experiment_logs = es_client.get_experiment_logs(run=run,
-                                                                namespace=namespace,
-                                                                min_severity=min_severity,
-                                                                start_date=start_date, end_date=end_date,
-                                                                pod_ids=pod_ids,
-                                                                pod_status=pod_status)
-                experiment_logs = ''.join([f'{log_entry.date} {log_entry.pod_name} {log_entry.content}' for log_entry
-                                           in experiment_logs if not log_entry.content.isspace()])
+            if output and len(runs) > 1:
+                click.echo(TEXTS["more_exp_logs_message"])
 
-                experiments_logs[run.name] = experiment_logs
+            for run in runs:
+                start_date = start_date if start_date else run.creation_timestamp
+
+                run_logs_generator = es_client.get_experiment_logs_generator(run=run, namespace=namespace,
+                                                                             min_severity=min_severity,
+                                                                             start_date=start_date, end_date=end_date,
+                                                                             pod_ids=pod_ids, pod_status=pod_status)
+
+                if output:
+                    save_logs_to_file(run=run, run_logs_generator=run_logs_generator)
+                else:
+                    if len(runs) > 1:
+                        click.echo(f'Experiment : {run.name}')
+                    print_logs(run_logs_generator=run_logs_generator)
 
     except K8sProxyCloseError:
         handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
@@ -113,34 +121,40 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
         handle_error(logger, TEXTS["logs_get_other_error_msg"], TEXTS["logs_get_other_error_msg"])
         exit(1)
 
-    if output:
-        if len(experiments_logs) > 1:
-            click.echo(TEXTS["more_exp_logs_message"])
 
-        for key, value in experiments_logs.items():
-            filename = key + '.log'
-            confirmation_message = TEXTS["logs_storing_confirmation"].format(filename=filename,
-                                                                             experiment_name=key)
-            if os.path.isfile(filename):
-                confirmation_message = TEXTS["logs_storing_confirmation_file_exists"].format(filename=filename,
-                                                                                             experiment_name=key)
+def format_log_date(date: str):
+    log_date = dateutil.parser.parse(date)
+    log_date = log_date.replace(microsecond=0)
+    formatted_date = log_date.isoformat()
+    return formatted_date
 
-            if click.confirm(confirmation_message, default=True):
-                try:
-                    with open(filename, 'w') as file:
-                        file.write(experiment_logs)
-                except Exception as exe:
-                    handle_error(logger,
-                                 TEXTS["logs_storing_error"].format(exception_message=exe.message),
-                                 TEXTS["logs_storing_error"].format(exception_message=exe.message))
-                    exit(1)
-        click.echo(TEXTS["logs_storing_final_message"])
-    else:
-        if len(experiments_logs) == 1:
-            click.echo(experiment_logs)
-        else:
-            for key, value in experiments_logs.items():
-                click.echo(f'Experiment : {key}')
-                click.echo()
-                click.echo(value)
-                click.echo()
+
+def print_logs(run_logs_generator: Generator[LogEntry, None, None]):
+    for log_entry in run_logs_generator:
+        if not log_entry.content.isspace():
+            formatted_date = format_log_date(log_entry.date)
+            click.echo(f'{formatted_date} {log_entry.pod_name} {log_entry.content}', nl=False)
+
+
+def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, None]):
+    filename = run.name + '.log'
+    confirmation_message = TEXTS["logs_storing_confirmation"].format(filename=filename,
+                                                                     experiment_name=run.name)
+    if os.path.isfile(filename):
+        confirmation_message = TEXTS["logs_storing_confirmation_file_exists"].format(filename=filename,
+                                                                                     experiment_name=run.name)
+
+    if click.confirm(confirmation_message, default=True):
+        try:
+            with open(filename, 'w') as file:
+                for log_entry in run_logs_generator:
+                    if not log_entry.content.isspace():
+                        formatted_date = format_log_date(log_entry.date)
+                        file.write(f'{formatted_date} {log_entry.pod_name} {log_entry.content}')
+        except Exception as exe:
+            handle_error(logger,
+                         TEXTS["logs_storing_error"].format(exception_message=exe.message),
+                         TEXTS["logs_storing_error"].format(exception_message=exe.message))
+            exit(1)
+
+    click.echo(TEXTS["logs_storing_final_message"])

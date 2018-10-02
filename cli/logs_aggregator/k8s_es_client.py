@@ -34,7 +34,7 @@ from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
 from platform_resources.run_model import Run
 
-log = initialize_logger(__name__)
+logger = initialize_logger(__name__)
 
 ELASTICSEARCH_K8S_SERVICE = 'elasticsearch-svc'
 
@@ -46,19 +46,20 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                   'port': port}]
         super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
 
-    def full_log_search(self, lucene_query: str = None, index='_all',
-                        scroll='1m', filters: List[Callable] = None) -> Generator[LogEntry, None, None]:
+    def get_log_generator(self, query_body: dict = None, index='_all', scroll='1m',
+                          filters: List[Callable[[LogEntry], bool]] = None) -> Generator[LogEntry, None, None]:
         """
         A generator that yields LogEntry objects constructed from Kubernetes resource logs.
-        Logs to be returned are defined by passed Lucene query and filtered according to passed
+        Logs to be returned are defined by passed query and filtered according to passed
         filter functions, which have to accept LogEntry as argument and return a boolean value.
-        :param lucene_query: Lucene query string
+        :param query_body: ES search query
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         :param scroll: ElasticSearch scroll lifetime
         :param filters: List of filter functions with signatures f(LogEntry) -> Bool
-        :return:
+        :return: Generator yielding LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
-        for log in elasticsearch.helpers.scan(self, q=lucene_query, index=index, scroll=scroll, clear_scroll=False):
+        for log in elasticsearch.helpers.scan(self, query=query_body, index=index, scroll=scroll, size=1000,
+                                              preserve_order=True, clear_scroll=False):
             log_entry = LogEntry(date=log['_source']['@timestamp'],
                                  content=log['_source']['log'],
                                  pod_name=log['_source']['kubernetes']['pod_name'],
@@ -66,12 +67,11 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             if not filters or all(f(log_entry) for f in filters):
                 yield log_entry
 
-    def get_experiment_logs(self, run: Run, namespace: str, index='_all',
-                            start_date: str = None, end_date: str = None,
-                            pod_ids: List[str] = None, pod_status: PodStatus = None,
-                            min_severity: SeverityLevel = None) -> List[LogEntry]:
+    def get_experiment_logs_generator(self, run: Run, namespace: str, start_date: str, end_date: str = None,
+                                      index='_all', pod_ids: List[str] = None, pod_status: PodStatus = None,
+                                      min_severity: SeverityLevel = None) -> Generator[LogEntry, None, None]:
         """
-        Return logs for given experiment.
+        Return logs for given experiment (interpreted as Run object).
         :param run: instance of Run resource
         :param namespace: Name of namespace where experiment was started
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
@@ -80,17 +80,13 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param pod_ids: filter logs by pod ids
         :param pod_status: filter logs by pod status
         :param min_severity: return logs with minimum provided severity
-        :return: List of LogEntry (date, log_content, pod_name, namespace) named tuples.
+        :return: Generator yielding LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
-        log.debug(f'Searching for {run.name} Run logs.')
+        logger.debug(f'Searching for {run.name} Run logs.')
 
-        lucene_query = f'kubernetes.labels.runName.keyword:\"{run.name}\" ' \
-                       f'AND kubernetes.namespace_name.keyword:\"{namespace}\"'
-
-        if start_date or end_date:
-            start_date = start_date or '*'
-            end_date = end_date or '*'
-            lucene_query += f' AND @timestamp:[{start_date} TO {end_date}]'
+        timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date}}}
+        if end_date:
+            timestamp_range_filter = {"range": {"@timestamp":[{"gte": start_date}, {"lte": end_date}]}}
 
         filters = []
         if min_severity:
@@ -100,14 +96,17 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         if pod_ids:
             filters.append(partial(filter_log_by_pod_ids, pod_ids=set(pod_ids)))
 
-        experiment_logs = sorted(self.full_log_search(lucene_query=lucene_query, index=index, filters=filters),
-                                 key=lambda log_entry: dateutil.parser.parse(log_entry.date))
+        experiment_logs_generator = self.get_log_generator(query_body={
+            "query": {"bool": {"must":
+                                   [{'term': {'kubernetes.labels.runName.keyword': run.name}},
+                                    {'term': {'kubernetes.namespace_name.keyword': namespace}}
+                                    ],
+                               "filter": timestamp_range_filter
+                               }},
+            "sort": {"@timestamp": {"order": "asc"}}},
+            index=index, filters=filters)
 
-        if experiment_logs:
-            log.debug(f'Logs found for Run {run.name}.')
-        else:
-            log.debug(f'Logs not found for Run {run.name}.')
-        return experiment_logs
+        return experiment_logs_generator
 
     def delete_logs_for_namespace(self, namespace: str, index='_all'):
         """
@@ -116,12 +115,12 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         Throws exception in case of any errors during removing of logs.
         """
-        log.debug(f'Deleting logs for {namespace} namespace.')
+        logger.debug(f'Deleting logs for {namespace} namespace.')
 
         delete_query = {"query": {"term": {'kubernetes.namespace_name.keyword': namespace}}}
         output = self.delete_by_query(index=index, body=delete_query)
 
-        log.debug(f"Deleting logs - result: {str(output)}")
+        logger.debug(f"Deleting logs - result: {str(output)}")
 
     def delete_logs_for_run(self, run: str, namespace: str, index='_all'):
         """
@@ -131,7 +130,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
         Throws exception in case of any errors during removing of logs.
         """
-        log.debug(f'Deleting logs for {run} run and namespace {namespace}.')
+        logger.debug(f'Deleting logs for {run} run and namespace {namespace}.')
 
         delete_query = {"query": {"bool": {"must":
             [
@@ -144,4 +143,4 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
         output = self.delete_by_query(index=index, body=delete_query)
 
-        log.debug(f"Deleting logs - result: {str(output)}")
+        logger.debug(f"Deleting logs - result: {str(output)}")

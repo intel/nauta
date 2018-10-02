@@ -106,7 +106,7 @@ def test_full_log_search(mocker):
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
 
-    assert list(client.full_log_search()) == TEST_LOG_ENTRIES
+    assert list(client.get_log_generator()) == TEST_LOG_ENTRIES
 
 
 def test_full_log_search_filter(mocker):
@@ -114,7 +114,7 @@ def test_full_log_search_filter(mocker):
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
 
-    filter_all_results = list(client.full_log_search(filters=[lambda x: False]))
+    filter_all_results = list(client.get_log_generator(filters=[lambda x: False]))
     assert filter_all_results == []
 
 
@@ -123,14 +123,14 @@ def test_full_log_search_filter_idempotent(mocker):
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
 
-    filter_all_results = list(client.full_log_search(filters=[lambda x: True]))
+    filter_all_results = list(client.get_log_generator(filters=[lambda x: True]))
     assert filter_all_results == TEST_LOG_ENTRIES
 
 
 def test_get_experiment_logs(mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
-    mocked_log_search = mocker.patch.object(client, 'full_log_search')
-    mocked_log_search.return_value = TEST_LOG_ENTRIES
+    mocked_log_search = mocker.patch.object(client, 'get_log_generator')
+    mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)
 
     experiment_name = 'fake-experiment'
     namespace = 'fake-namespace'
@@ -138,18 +138,29 @@ def test_get_experiment_logs(mocker):
     run_mock = MagicMock(spec=Run)
     run_mock.name = experiment_name
 
-    experiment_logs = client.get_experiment_logs(run=run_mock, namespace=namespace)
+    run_start_date = '2018-04-17T09:28:39+00:00'
 
-    assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName.keyword:"{experiment_name}" ' \
-                                                      f'AND kubernetes.namespace_name.keyword:"{namespace}"',
-                                         filters=[], index='_all')
+    experiment_logs = client.get_experiment_logs_generator(run=run_mock, namespace=namespace,
+                                                           start_date=run_start_date)
+
+    for log, expected_log in zip(experiment_logs, TEST_LOG_ENTRIES):
+        assert log == expected_log
+
+    mocked_log_search.assert_called_with(query_body={
+        "query": {"bool": {"must":
+                               [{'term': {'kubernetes.labels.runName.keyword': experiment_name}},
+                                {'term': {'kubernetes.namespace_name.keyword': namespace}}
+                                ],
+                           "filter": {"range": {"@timestamp": {"gte": run_start_date}}}
+                           }},
+        "sort": {"@timestamp": {"order": "asc"}}},
+        filters=[], index='_all')
 
 
 def test_get_experiment_logs_time_range(mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
-    mocked_log_search = mocker.patch.object(client, 'full_log_search')
-    mocked_log_search.return_value = TEST_LOG_ENTRIES
+    mocked_log_search = mocker.patch.object(client, 'get_log_generator')
+    mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)
 
     experiment_name = 'fake-experiment'
     namespace = 'fake-namespace'
@@ -160,16 +171,23 @@ def test_get_experiment_logs_time_range(mocker):
     start_date = '2018-04-17T09:28:39+00:00'
     end_date = '2018-04-17T09:28:49+00:00'
 
-    experiment_logs = client.get_experiment_logs(run=run_mock,
-                                                 namespace=namespace,
-                                                 start_date=start_date,
-                                                 end_date=end_date)
+    experiment_logs = client.get_experiment_logs_generator(run=run_mock,
+                                                           namespace=namespace,
+                                                           start_date=start_date,
+                                                           end_date=end_date)
 
-    assert experiment_logs == TEST_LOG_ENTRIES
-    mocked_log_search.assert_called_with(lucene_query=f'kubernetes.labels.runName.keyword:"{experiment_name}" ' \
-                                                      f'AND kubernetes.namespace_name.keyword:"{namespace}" ' \
-                                                      f'AND @timestamp:[{start_date} TO {end_date}]',
-                                         filters=[], index='_all')
+    for log, expected_log in zip(experiment_logs, TEST_LOG_ENTRIES):
+        assert log == expected_log
+
+    mocked_log_search.assert_called_with(query_body={
+        "query": {"bool": {"must":
+                               [{'term': {'kubernetes.labels.runName.keyword': experiment_name}},
+                                {'term': {'kubernetes.namespace_name.keyword': namespace}}
+                                ],
+                           "filter": {"range": {"@timestamp": [{"gte": start_date}, {"lte": end_date}]}}
+                           }},
+        "sort": {"@timestamp": {"order": "asc"}}},
+        filters=[], index='_all')
 
 
 def test_delete_logs_for_namespace(mocker):

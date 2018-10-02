@@ -43,7 +43,7 @@ TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
 def test_show_logs_success(mocker):
     es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
+    es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
@@ -58,13 +58,13 @@ def test_show_logs_success(mocker):
     assert proxy_mock.call_count == 1, 'port forwarding was not initiated'
     assert get_current_namespace_mock.call_count == 1, 'namespace was not retrieved'
     assert list_runs_mock.call_count == 1, 'run was not retrieved'
-    assert es_client_instance.get_experiment_logs.call_count == 1, 'Experiment logs were not retrieved'
+    assert es_client_instance.get_experiment_logs_generator.call_count == 1, 'Experiment logs were not retrieved'
 
 
 def test_show_logs_failure(mocker):
     es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.side_effect = RuntimeError
+    es_client_instance.get_experiment_logs_generator.side_effect = RuntimeError
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
@@ -80,7 +80,7 @@ def test_show_logs_failure(mocker):
     assert proxy_mock.call_count == 1, 'port forwarding was not initiated'
     assert get_current_namespace_mock.call_count == 1, 'namespace was not retrieved'
     assert list_runs_mock.call_count == 1, 'run was not retrieved'
-    assert es_client_instance.get_experiment_logs.call_count == 1, 'Experiment logs retrieval was not called'
+    assert es_client_instance.get_experiment_logs_generator.call_count == 1, 'Experiment logs retrieval was not called'
     assert result.exit_code == 1
 
 
@@ -88,7 +88,7 @@ def test_show_logs_failure(mocker):
 def test_show_logs_failure_proxy_problem(mocker, exception):
     es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.side_effect = RuntimeError
+    es_client_instance.get_experiment_logs_generator.side_effect = RuntimeError
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
     proxy_mock.side_effect = exception
@@ -104,7 +104,7 @@ def test_show_logs_failure_proxy_problem(mocker, exception):
     assert proxy_mock.call_count == 1, 'port forwarding was not initiated'
     assert get_current_namespace_mock.call_count == 0, 'namespace was retrieved'
     assert list_runs_mock.call_count == 0, 'run was retrieved'
-    assert es_client_instance.get_experiment_logs.call_count == 0, 'Experiment logs retrieval was called'
+    assert es_client_instance.get_experiment_logs_generator.call_count == 0, 'Experiment logs retrieval was called'
     assert result.exit_code == 1
 
 
@@ -127,7 +127,7 @@ def test_show_logs_lack_of_params(mocker):
 def test_show_logs_from_two_experiments(mocker):
     es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
+    es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
@@ -149,13 +149,13 @@ def test_show_logs_from_two_experiments(mocker):
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert list_runs_mock.call_count == 1, "run was not retrieved"
-    assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs were not retrieved"
+    assert es_client_instance.get_experiment_logs_generator.call_count == 1, "Experiment logs were not retrieved"
 
 
 def test_show_logs_to_file_success(mocker):
     es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
+    es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
@@ -172,15 +172,15 @@ def test_show_logs_to_file_success(mocker):
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert list_runs_mock.call_count == 1, "run was not retrieved"
-    assert es_client_instance.get_experiment_logs.call_count == 1, "Experiment logs were not retrieved"
+    assert es_client_instance.get_experiment_logs_generator.call_count == 1, "Experiment logs were not retrieved"
     assert open_mock.call_count == 1, "File wasn't saved."
 
 
-def test_show_logs_to_file_failure(mocker):
+def test_show_logs_match(mocker):
     es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
 
     es_client_instance = es_client_mock.return_value
-    es_client_instance.get_experiment_logs.return_value = TEST_LOG_ENTRIES
+    es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
     proxy_mock = mocker.patch.object(logs, 'K8sProxy')
 
@@ -197,7 +197,7 @@ def test_show_logs_to_file_failure(mocker):
     assert proxy_mock.call_count == 1, 'port forwarding was not initiated'
     assert get_current_namespace_mock.call_count == 1, 'namespace was not retrieved'
     assert list_runs_mock.call_count == 1, 'run was not retrieved'
-    assert es_client_instance.get_experiment_logs.call_count == 2, 'Experiment logs were not retrieved'
+    assert es_client_instance.get_experiment_logs_generator.call_count == 2, 'Experiment logs were not retrieved'
 
     assert fake_experiment_1_name in result.output
     assert fake_experiment_2_name in result.output
