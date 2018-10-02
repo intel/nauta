@@ -30,10 +30,6 @@ spec:
       - name: {{ .Chart.Name }}
         image: dls4e-repository:{{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
         imagePullPolicy: "Never"
-        resources:
-          limits:
-            memory: 128Mi
-            cpu: 200m
         ports:
         - containerPort: 5000
           protocol: TCP
