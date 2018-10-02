@@ -106,6 +106,7 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
         if get_current_os() in (OS.WINDOWS, OS.MACOS):
             # noinspection PyBroadException
             try:
+                click.echo(TEXTS["web_app_closing_msg"])
                 socat.stop()
             except Exception:
                 err_message = TEXTS["proxy_close_error_msg"].format(k8s_app_name)

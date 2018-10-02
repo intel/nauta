@@ -509,6 +509,7 @@ UTIL_LAUNCHER_TEXTS = {
     "no_web_browser_error_msg": "Cannot find a suitable web browser. Try running this command with --no-launch option.",
     "proxy_close_error_msg": "Error during closing of a proxy for a {app_name}",
     "web_app_lauch_fail_msg": "Failed to launch web application.",
+    "web_app_closing_msg": "Closing all connections. Please wait...",
     "go_to_msg": "Go to {url}",
     "proxy_created_msg": "Proxy connection created.\nPress Ctrl-C key to close a port forwarding process...",
     "proxy_created_error_msg": "Error during creation of a proxy for a {app_name}.",
