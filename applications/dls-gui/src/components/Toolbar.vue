@@ -82,7 +82,7 @@
 <script>
 import {mapActions, mapGetters} from 'vuex';
 import LicenseDoc from '../assets/dls-evaluation-license.pdf';
-import ReleaseNotesDoc from '../assets/intel-release-notes-for-dell-early-access.pdf';
+import ReleaseNotesDoc from '../assets/release-notes.pdf';
 import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {

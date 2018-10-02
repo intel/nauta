@@ -50,7 +50,7 @@ export default {
   POD_CONDITIONS: 'Pod Conditions',
   PODS: 'Pods',
   RELEASE_NOTES: 'Release Notes',
-  RELEASE_NOTES_PDF: 'intel-release-notes-for-dell-early-access.pdf',
+  RELEASE_NOTES_PDF: 'release-notes.pdf',
   RESET: 'Reset',
   RESOURCES: 'Resources',
   RESOURCES_DASHBOARD: 'Resources dashboard',
