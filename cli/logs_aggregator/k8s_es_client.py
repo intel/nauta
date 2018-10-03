@@ -26,6 +26,7 @@ from typing import List, Callable, Generator
 import elasticsearch
 import elasticsearch.helpers
 import elasticsearch.client
+import time
 
 from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity, \
     filter_log_by_pod_status, filter_log_by_pod_ids
@@ -67,9 +68,35 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             if not filters or all(f(log_entry) for f in filters):
                 yield log_entry
 
+    def get_stream_log_generator(self, query_body: dict = None, index='_all', scroll='1m', time_interval=0.5,
+                                 filters: List[Callable[[LogEntry], bool]] = None) -> Generator[LogEntry, None, None]:
+        """
+        A generator that yields LogEntry objects constructed from Kubernetes resource logs.
+        Logs to be returned are defined by passed query and filtered according to passed
+        filter functions, which have to accept LogEntry as argument and return a boolean value.
+        Generator will always try to obtain new log entries, whenever it will be iterated over.
+        :param query_body: ES search query
+        :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
+        :param scroll: ElasticSearch scroll lifetime
+        :param time_interval: Time interval between attempting to get a new batch of logs
+        :param filters: List of filter functions with signatures f(LogEntry) -> Bool
+        :return: Generator yielding LogEntry (date, log_content, pod_name, namespace) named tuples.
+        """
+        last_timestamp = None
+        while True:
+            for log in self.get_log_generator(query_body=query_body, index=index, scroll=scroll, filters=filters):
+                last_timestamp = log.date
+                yield log
+            else:
+                # Scan is exhausted - try to fetch a new batch of logs
+                # Note that we expect specific query structure here
+                if last_timestamp:
+                    query_body['query']['bool']['filter']['range']['@timestamp']['gt'] = last_timestamp
+                time.sleep(time_interval)
+
     def get_experiment_logs_generator(self, run: Run, namespace: str, start_date: str, end_date: str = None,
                                       index='_all', pod_ids: List[str] = None, pod_status: PodStatus = None,
-                                      min_severity: SeverityLevel = None) -> Generator[LogEntry, None, None]:
+                                      min_severity: SeverityLevel = None, follow=False) -> Generator[LogEntry, None, None]:
         """
         Return logs for given experiment (interpreted as Run object).
         :param run: instance of Run resource
@@ -79,7 +106,8 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         :param end_date: if provided, only logs produced before this date will be returned
         :param pod_ids: filter logs by pod ids
         :param pod_status: filter logs by pod status
-        :param min_severity: return logs with minimum provided severity
+        :param min_severity: yield logs with minimum provided severity
+        :param follow: if True, generator will stream logs tail
         :return: Generator yielding LogEntry (date, log_content, pod_name, namespace) named tuples.
         """
         logger.debug(f'Searching for {run.name} Run logs.')
@@ -96,7 +124,10 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         if pod_ids:
             filters.append(partial(filter_log_by_pod_ids, pod_ids=set(pod_ids)))
 
-        experiment_logs_generator = self.get_log_generator(query_body={
+
+        log_generator = self.get_stream_log_generator if follow else self.get_log_generator
+
+        experiment_logs_generator = log_generator(query_body={
             "query": {"bool": {"must":
                                    [{'term': {'kubernetes.labels.runName.keyword': run.name}},
                                     {'term': {'kubernetes.namespace_name.keyword': namespace}}

@@ -276,6 +276,8 @@ EXPERIMENT_LOGS_CMD_TEXTS = {
     "help_m": "If given, command searches for logs from experiments matching the value of this option. "
               "This option cannot be used along with the NAME argument.",
     "help_o": "If given - logs are stored in a file with a name derived from a name of an experiment.",
+    "help_f": "Specify if logs should be streamed. Only logs from a single experiment can be streamed.",
+    "help_pager": "Display logs in interactive pager.",
     "proxy_creation_error_msg": "Error during creation of a proxy for elasticsearch.",
     "logs_get_other_error_msg": "Failed to get experiment logs.",
     "experiment_not_exists_error_msg": "Experiment with name {experiment_name} does not exist.",

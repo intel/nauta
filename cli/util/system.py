@@ -102,7 +102,7 @@ def execute_system_command(command: List[str], timeout: int or None = None,
         return output, 0, encoded_output
 
 
-def execute_subprocess_command(command: List[str], timeout: int or None = 1, stdin=None, env=None,
+def execute_subprocess_command(command: List[str], stdin=None, env=None,
                                cwd=None, shell=False, join=False) -> subprocess.Popen:
 
     # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
@@ -118,9 +118,6 @@ def execute_subprocess_command(command: List[str], timeout: int or None = 1, std
     process = subprocess.Popen(args=final_command, stdout=std_output_destination, stderr=std_error_destination,
                                universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8',
                                shell=shell)
-
-    # wait for command execution initialization
-    time.sleep(timeout)
 
     if not process or process.poll() != (0 or None):
         log.error(f'COMMAND execution FAIL: {command}')

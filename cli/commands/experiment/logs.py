@@ -55,10 +55,12 @@ logger = initialize_logger(__name__)
               help=TEXTS["help_p"])
 @click.option('-m', '--match', help=TEXTS["help_m"])
 @click.option('-o', '--output', help=TEXTS["help_o"], is_flag=True)
+@click.option('-p', '--pager', help=TEXTS["help_pager"], is_flag=True, default=False)
+@click.option('-f', '--follow', help=TEXTS["help_f"], is_flag=True, default=False)
 @common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
-         end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool):
+         end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool, pager: bool, follow: bool):
     """
     Show logs for a given experiment.
     """
@@ -84,6 +86,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             pod_ids = pod_ids.split(',') if pod_ids else None
             min_severity = SeverityLevel[min_severity] if min_severity else None
             pod_status = PodStatus[pod_status] if pod_status else None
+            follow_logs = True if follow and not output else False
 
             if output and len(runs) > 1:
                 click.echo(TEXTS["more_exp_logs_message"])
@@ -94,14 +97,15 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
                 run_logs_generator = es_client.get_experiment_logs_generator(run=run, namespace=namespace,
                                                                              min_severity=min_severity,
                                                                              start_date=start_date, end_date=end_date,
-                                                                             pod_ids=pod_ids, pod_status=pod_status)
+                                                                             pod_ids=pod_ids, pod_status=pod_status,
+                                                                             follow=follow_logs)
 
                 if output:
                     save_logs_to_file(run=run, run_logs_generator=run_logs_generator)
                 else:
                     if len(runs) > 1:
                         click.echo(f'Experiment : {run.name}')
-                    print_logs(run_logs_generator=run_logs_generator)
+                    print_logs(run_logs_generator=run_logs_generator, pager=pager)
 
     except K8sProxyCloseError:
         handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
@@ -129,11 +133,18 @@ def format_log_date(date: str):
     return formatted_date
 
 
-def print_logs(run_logs_generator: Generator[LogEntry, None, None]):
-    for log_entry in run_logs_generator:
-        if not log_entry.content.isspace():
-            formatted_date = format_log_date(log_entry.date)
-            click.echo(f'{formatted_date} {log_entry.pod_name} {log_entry.content}', nl=False)
+def print_logs(run_logs_generator: Generator[LogEntry, None, None], pager=False):
+    def formatted_logs():
+        for log_entry in run_logs_generator:
+            if not log_entry.content.isspace():
+                formatted_date = format_log_date(log_entry.date)
+                yield f'{formatted_date} {log_entry.pod_name} {log_entry.content}'
+
+    if pager:
+        click.echo_via_pager(formatted_logs)
+    else:
+        for formatted_log in formatted_logs():
+            click.echo(formatted_log, nl=False)
 
 
 def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, None]):
