@@ -184,7 +184,7 @@ def test_get_experiment_logs_time_range(mocker):
                                [{'term': {'kubernetes.labels.runName.keyword': experiment_name}},
                                 {'term': {'kubernetes.namespace_name.keyword': namespace}}
                                 ],
-                           "filter": {"range": {"@timestamp": [{"gte": start_date}, {"lte": end_date}]}}
+                           "filter": {"range": {"@timestamp":{"gte": start_date, "lte": end_date}}}
                            }},
         "sort": {"@timestamp": {"order": "asc"}}},
         filters=[], index='_all')

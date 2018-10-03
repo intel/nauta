@@ -86,7 +86,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
         timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date}}}
         if end_date:
-            timestamp_range_filter = {"range": {"@timestamp":[{"gte": start_date}, {"lte": end_date}]}}
+            timestamp_range_filter = {"range": {"@timestamp":{"gte": start_date, "lte": end_date}}}
 
         filters = []
         if min_severity:
