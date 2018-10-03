@@ -658,7 +658,7 @@ def check_experiment_name(value: str) -> str:
             validate_kubernetes_name(value)
             return value
     except ValidationError as ex:
-        raise click.BadParameter(ex)
+        raise click.BadParameter(str(ex))
 
 
 def validate_env_paramater(ctx, param, value):
