@@ -94,13 +94,12 @@ def execute_system_command(command: List[str], timeout: int or None = None,
     try:
         output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
                                          stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
-        log.debug(f'COMMAND: {command} RESULT: {output}'.replace('\n', '\\n'))
-    except UnicodeEncodeError:
-        return output, 0, TEXTS["incorrect_system_encoding"]
+        encoded_output = output.encode('utf-8')
+        log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace('\n', '\\n'))
     except subprocess.CalledProcessError as ex:
         return ex.output, ex.returncode, ex.output
     else:
-        return output, 0, output
+        return output, 0, encoded_output
 
 
 def execute_subprocess_command(command: List[str], timeout: int or None = 1, stdin=None, env=None,
