@@ -105,7 +105,7 @@ def check_run_environment(run_environment_path: str):
         else:
             handle_error(user_msg=TEXTS["unable_to_continue_exp_submission_error_msg"]
                          .format(run_environment_path=run_environment_path))
-            exit(1)
+            exit()
 
 
 def create_environment(experiment_name: str, file_location: str, folder_location: str) -> str:
@@ -305,7 +305,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                 if not click.confirm(TEXTS["confirm_submit_question_msg"], default=True):
                     for experiment_run_folder in experiment_run_folders:
                         delete_environment(experiment_run_folder)
-                    exit(1)
+                    exit()
 
             # create Experiment model
             # TODO template_name & template_namespace should be filled after Template implementation
