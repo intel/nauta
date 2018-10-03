@@ -25,16 +25,16 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 import commands.experiment.cancel
 from util.logger import initialize_logger
-from cli_text_consts import PREDICT_CANCEL_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictCancelCmdTexts as Texts
 from commands.experiment.common import RunKinds
 
 logger = initialize_logger(__name__)
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='c')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
 @click.argument("name", required=False)
-@click.option('-m', '--match', default=None, help=TEXTS["help_m"])
-@click.option('-p', '--purge', default=None, help=TEXTS["help_p"], is_flag=True)
+@click.option('-m', '--match', default=None, help=Texts.HELP_M)
+@click.option('-p', '--purge', default=None, help=Texts.HELP_P, is_flag=True)
 @common_options()
 @pass_state
 @click.pass_context
@@ -42,6 +42,6 @@ def cancel(context, state: State, name: str, match: str, purge: bool):
     """
     Cancels chosen prediction instances based on a name provided as a parameter.
     """
-    commands.experiment.cancel.experiment_name = TEXTS["experiment_name"]
-    commands.experiment.cancel.experiment_name_plural = TEXTS["experiment_name_plural"]
+    commands.experiment.cancel.experiment_name = Texts.EXPERIMENT_NAME
+    commands.experiment.cancel.experiment_name_plural = Texts.EXPERIMENT_NAME_PLURAL
     context.forward(commands.experiment.cancel.cancel, listed_runs_kinds=[RunKinds.INFERENCE])

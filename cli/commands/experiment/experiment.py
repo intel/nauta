@@ -24,13 +24,13 @@ import click
 from commands.experiment import list, cancel, logs, view, template_list, submit, interact
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
-from cli_text_consts import EXPERIMENT_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.group(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasGroup, alias='exp',
+@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='exp',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def experiment():
     pass

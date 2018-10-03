@@ -24,7 +24,7 @@ import platform
 from click.testing import CliRunner
 
 from commands.mount import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mount
-from cli_text_consts import MOUNT_CMD_TEXTS as TEXTS
+from cli_text_consts import MountCmdTexts as Texts
 
 
 TEST_USR = "test_user"
@@ -112,4 +112,4 @@ def test_mount_is_admin(mocker):
     result = runner.invoke(mount)
 
     assert icu_mock.call_count == 1
-    assert TEXTS["user_is_admin_error_msg"] in result.output
+    assert Texts.USER_IS_ADMIN_ERROR_MSG in result.output

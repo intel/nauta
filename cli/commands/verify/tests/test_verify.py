@@ -24,7 +24,7 @@ import pytest
 
 from commands.verify import verify
 from util.exceptions import KubectlConnectionError
-from cli_text_consts import VERIFY_CMD_TEXTS as TEXTS
+from cli_text_consts import VerifyCmdTexts as Texts
 
 
 @pytest.fixture(autouse=True)
@@ -63,7 +63,7 @@ def test_verify_with_kubectl_not_found_error(mocker):
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
-    assert TEXTS["kubectl_not_installed_error_msg"] in result.output, \
+    assert Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG in result.output, \
         "Bad output. FileNotFoundError indicates that kubectl is not installed."
 
 
@@ -95,7 +95,7 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
-    assert TEXTS["get_k8s_namespace_error_msg"] in result.output, \
+    assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
         "Bad output. Namespace get error should be indicated in the console."
 
 
@@ -112,5 +112,5 @@ def test_verify_with_kubectl_admin_check_error(mocker):
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
-    assert TEXTS["get_k8s_namespace_error_msg"] in result.output, \
+    assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
         "Bad output. Admin check error should be indicated in the console."

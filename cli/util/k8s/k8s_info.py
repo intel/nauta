@@ -29,7 +29,7 @@ from kubernetes.client import configuration, V1DeleteOptions, V1Secret, V1Servic
 from util.logger import initialize_logger
 from util.exceptions import KubernetesError
 from util.app_names import DLS4EAppNames
-from cli_text_consts import UTIL_K8S_INFO_TEXTS as TEXTS
+from cli_text_consts import UtilK8sInfoTexts as Texts
 
 logger = initialize_logger('util.kubectl')
 
@@ -180,7 +180,7 @@ def find_namespace(namespace: str) -> NamespaceStatus:
         if e.status == 404:
             return NamespaceStatus.NOT_EXISTS
         else:
-            error_message = TEXTS["other_find_namespace_error"]
+            error_message = Texts.OTHER_FIND_NAMESPACE_ERROR
             logger.exception(error_message)
             raise KubernetesError(error_message)
 
@@ -205,12 +205,12 @@ def delete_namespace(namespace: str, propagate: bool = False):
         response = api.delete_namespace(namespace, body)
 
         if response.status != "{'phase': 'Terminating'}":
-            error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
+            error_description = Texts.NAMESPACE_DELETE_ERROR_MSG.format(namespace=namespace)
             logger.exception(error_description)
             raise KubernetesError(error_description)
 
     except Exception:
-        error_description = TEXTS["namespace_delete_error_msg"].format(namespace=namespace)
+        error_description = Texts.NAMESPACE_DELETE_ERROR_MSG.format(namespace=namespace)
         logger.exception(error_description)
         raise KubernetesError(error_description)
 
@@ -229,7 +229,7 @@ def get_config_map_data(name: str, namespace: str, request_timeout: int = None) 
         api = get_k8s_api()
         ret_dict = api.read_namespaced_config_map(name, namespace, _request_timeout=request_timeout).data
     except Exception:
-        error_description = TEXTS["config_map_access_error_msg"].format(name=name)
+        error_description = Texts.CONFIG_MAP_ACCESS_ERROR_MSG.format(name=name)
         logger.exception(error_description)
         raise KubernetesError(error_description)
 
@@ -255,12 +255,12 @@ def get_users_token(namespace: str) -> str:
                     ret_token = str(base64.b64decode(token.data.get("token")), encoding="utf-8")
                     break
             else:
-                raise ValueError(TEXTS["lack_of_default_token_error_msg"])
+                raise ValueError(Texts.LACK_OF_DEFAULT_TOKEN_ERROR_MSG)
         else:
-            raise ValueError(TEXTS["empty_list_of_tokens_error_msg"])
+            raise ValueError(Texts.EMPTY_LIST_OF_TOKENS_ERROR_MSG)
 
     except Exception as exe:
-        error_message = TEXTS["gathering_users_token_error_msg"]
+        error_message = Texts.GATHERING_USERS_TOKEN_ERROR_MSG
         logger.exception(error_message)
         raise KubernetesError(error_message) from exe
 
@@ -294,7 +294,7 @@ def get_users_samba_password(username: str) -> str:
     In case of any problems during gathering of a password it raises KubectlIntError
     If password doesnt exist - it raises ValueError.
     """
-    error_message = TEXTS["gathering_password_error_msg"]
+    error_message = Texts.GATHERING_PASSWORD_ERROR_MSG
     password = None
     try:
         api = get_k8s_api()
@@ -313,7 +313,7 @@ def get_users_samba_password(username: str) -> str:
         raise KubernetesError(error_message) from exe
 
     if password is None:
-        raise ValueError(TEXTS["lack_of_password_error_msg"])
+        raise ValueError(Texts.LACK_OF_PASSWORD_ERROR_MSG)
 
     return str.strip(password)
 
@@ -426,6 +426,6 @@ def get_pod_events(namespace: str, name: str = None):
 
         return [event for event in events_list.items if name is None or event.involved_object.name == name]
     except Exception as exe:
-        error_message = TEXTS["gathering_events_error_msg"]
+        error_message = Texts.GATHERING_EVENTS_ERROR_MSG
         logger.exception(error_message)
         raise KubernetesError(error_message) from exe

@@ -25,7 +25,7 @@ from kubernetes.client import CustomObjectsApi
 
 from platform_resources.user_model import User, UserStatus
 from platform_resources.users import list_users, get_user_data, validate_user_name, is_user_created
-from cli_text_consts import PLATFORM_RESOURCES_USERS_TEXTS as TEXTS
+from cli_text_consts import PlatformResourcesUsersTexts as Texts
 
 
 TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
@@ -102,21 +102,21 @@ def test_validate_user_name_too_short():
     username = ""
     with pytest.raises(ValueError) as exe:
         validate_user_name(username)
-    assert str(exe.value) == TEXTS["username_cannot_be_empty_error_msg"]
+    assert str(exe.value) == Texts.USERNAME_CANNOT_BE_EMPTY_ERROR_MSG
 
 
 def test_validate_user_name_too_long():
     username = "a"*33
     with pytest.raises(ValueError) as exe:
         validate_user_name(username)
-    assert str(exe.value) == TEXTS["username_too_long_error_msg"]
+    assert str(exe.value) == Texts.USERNAME_TOO_LONG_ERROR_MSG
 
 
 def test_validate_user_name_incorrect_k8s_string():
     username = "aBBcd.=-"
     with pytest.raises(ValueError) as exe:
         validate_user_name(username)
-    assert str(exe.value) == TEXTS["incorrect_k8s_username_error_msg"]
+    assert str(exe.value) == Texts.INCORRECT_K8S_USERNAME_ERROR_MSG
 
 
 def test_is_user_created_success(mocker):

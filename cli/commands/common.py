@@ -33,7 +33,7 @@ from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from platform_resources.experiment_model import Experiment, ExperimentStatus
 from util.system import handle_error, format_timestamp_for_cli
-from cli_text_consts import CMDS_COMMON_TEXTS as TEXTS
+from cli_text_consts import CmdsCommonTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -89,11 +89,11 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
                              for experiment in uninitialized_experiments],
                             headers=headers, tablefmt="orgtbl"))
     except experiments_api.InvalidRegularExpressionError:
-        handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],
+        handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
     except Exception:
-        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=verbosity_lvl == 0)
+        handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
 
 
@@ -131,11 +131,11 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
             ]
         click.echo(tabulate(runs_table_data, headers=runs_list_headers, tablefmt="orgtbl"))
     except runs_api.InvalidRegularExpressionError:
-        handle_error(logger, TEXTS["invalid_regex_error_msg"], TEXTS["invalid_regex_error_msg"],
+        handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
     except Exception:
-        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=verbosity_lvl == 0)
+        handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
 
 

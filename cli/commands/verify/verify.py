@@ -30,14 +30,14 @@ from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.system import handle_error
-from cli_text_consts import VERIFY_CMD_TEXTS as TEXTS
+from cli_text_consts import VerifyCmdTexts as Texts
 from util.exceptions import KubectlConnectionError, InvalidOsError
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='ver')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='ver')
 @common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):
@@ -47,20 +47,20 @@ def verify(state: State):
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
         exit(1)
     except FileNotFoundError:
-        handle_error(logger, TEXTS["kubectl_not_installed_error_msg"], TEXTS["kubectl_not_installed_error_msg"],
+        handle_error(logger, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     try:
         namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
     except Exception:
-        handle_error(logger, TEXTS["get_k8s_namespace_error_msg"], TEXTS["get_k8s_namespace_error_msg"],
+        handle_error(logger, Texts.GET_K8S_NAMESPACE_ERROR_MSG, Texts.GET_K8S_NAMESPACE_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     try:
         check_os()
-        click.echo(TEXTS["os_supported_msg"])
+        click.echo(Texts.OS_SUPPORTED_MSG)
     except InvalidOsError as exception:
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
@@ -73,36 +73,36 @@ def verify(state: State):
                                                         dependency_spec=dependency_spec, namespace=namespace)
             dependency_versions[dependency_name] = installed_version
             logger.info(
-                TEXTS["version_checking_msg"].format(
+                Texts.VERSION_CHECKING_MSG.format(
                     dependency_name=dependency_name, installed_version=installed_version,
                     supported_versions_sign=supported_versions_sign,
                     expected_version=dependency_spec.expected_version
                 )
             )
             if valid:
-                click.echo(TEXTS["dependency_verification_success_msg"].format(dependency_name=dependency_name))
+                click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name=dependency_name))
             else:
                 click.echo(
-                    TEXTS["invalid_version_warning_msg"].format(
+                    Texts.INVALID_VERSION_WARNING_MSG.format(
                         dependency_name=dependency_name, installed_version=installed_version,
                         supported_versions_sign=supported_versions_sign,
                         expected_version=dependency_spec.expected_version
                     )
                 )
         except FileNotFoundError:
-            handle_error(logger, TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
-                         TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name),
+            handle_error(logger, Texts.DEPENDENCY_NOT_INSTALLED_ERROR_MSG.format(dependency_name=dependency_name),
+                         Texts.DEPENDENCY_NOT_INSTALLED_ERROR_MSG.format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
         except (RuntimeError, ValueError, TypeError):
-            handle_error(logger, TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
-                         TEXTS["dependency_version_check_error_msg"].format(dependency_name=dependency_name),
+            handle_error(logger, Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
+                         Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
         except Exception:
             handle_error(logger,
-                         TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
-                         TEXTS["dependency_verification_other_error_msg"].format(dependency_name=dependency_name),
+                         Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
+                         Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
     else:

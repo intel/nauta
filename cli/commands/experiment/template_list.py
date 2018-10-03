@@ -32,7 +32,7 @@ from draft.cmd import DRAFT_HOME_FOLDER
 from util.config import Config
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import EXPERIMENT_TEMPLATE_LIST_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentTemplateListCmdTexts as Texts
 
 
 log = initialize_logger('commands.template_list')
@@ -41,7 +41,7 @@ CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 
-@click.command("template_list", short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='t')
+@click.command("template_list", short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='t')
 @common_options()
 def template_list():
     path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")
@@ -58,5 +58,5 @@ def template_list():
                             headers=[RUN_TEMPLATE_NAME],
                             tablefmt="orgtbl"))
     else:
-        handle_error(user_msg=TEXTS["lack_of_packs_error_msg"])
+        handle_error(user_msg=Texts.LACK_OF_PACKS_ERROR_MSG)
         sys.exit(1)

@@ -36,7 +36,7 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.launcher import launch_app
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import LAUNCH_CMD_TEXTS as TEXTS
+from cli_text_consts import LaunchCmdTexts as Texts
 
 
 logger = initialize_logger('commands.launch')
@@ -45,24 +45,24 @@ FORWARDED_URL = 'http://localhost:{}'
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='ui', short_help=TEXTS["webui_help"], help=TEXTS["webui_help"])
+@click.command(cls=AliasCmd, alias='ui', short_help=Texts.WEBUI_HELP, help=Texts.WEBUI_HELP)
 @common_options()
 @pass_state
-@click.option('-n', '--no-launch', is_flag=True, help=TEXTS["help_n"])
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=TEXTS["help_p"])
+@click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
 def webui(state: State, no_launch: bool, port: int):
     """ Subcommand for launching webUI with credentials """
     launch_app_with_proxy(DLS4EAppNames.INGRESS, no_launch, port)
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='tb', help=TEXTS["tb_help"], short_help=TEXTS["tb_help"])
+@click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.TB_HELP)
 @common_options()
 @pass_state
-@click.option('-n', '--no-launch', is_flag=True, help=TEXTS["help_n"])
+@click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
 @click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),
-              help=TEXTS["tb_help_tscp"])
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=TEXTS["help_p"])
+              help=Texts.TB_HELP_TSCP)
+@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
 @click.argument("experiment_name", type=str, required=True, nargs=-1)
 def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int], port: Optional[int],
                 experiment_name: List[str]):
@@ -82,15 +82,15 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             if tb.invalid_runs:
                 list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
                                                   for item in tb.invalid_runs])
-                click.echo(TEXTS["tb_invalid_runs_msg"].format(invalid_runs=list_of_invalid_runs))
+                click.echo(Texts.TB_INVALID_RUNS_MSG.format(invalid_runs=list_of_invalid_runs))
         except Exception as exe:
-            err_message = TEXTS["tb_create_error_msg"]
+            err_message = Texts.TB_CREATE_ERROR_MSG
             if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:
                 err_message = str(exe)
             handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
 
-        click.echo(TEXTS["tb_waiting_msg"])
+        click.echo(Texts.TB_WAITING_MSG)
         for i in range(10):
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
@@ -98,14 +98,14 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
                                       namespace=current_namespace, port=port,
                                       app_name=f"tensorboard-{tb.id}")
                 return
-            logger.warning(TEXTS["tb_waiting_for_tb_msg"].format(tb_id=tb.id, tb_status_value=tb.status.value))
+            logger.warning(Texts.TB_WAITING_FOR_TB_MSG.format(tb_id=tb.id, tb_status_value=tb.status.value))
             sleep(5)
 
-        click.echo(TEXTS["tb_timeout_error_msg"])
+        click.echo(Texts.TB_TIMEOUT_ERROR_MSG)
         sys.exit(2)
 
 
-@click.group(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasGroup, alias='l',
+@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='l',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def launch():
     pass
@@ -120,9 +120,9 @@ def launch_app_with_proxy(k8s_app_name: DLS4EAppNames, no_launch: bool, port: in
         handle_error(logger, exe.message, exe.message)
         exit(1)
     except ProxyClosingError:
-        handle_error(user_msg=TEXTS["app_proxy_exists_error_msg"])
+        handle_error(user_msg=Texts.APP_PROXY_EXISTS_ERROR_MSG)
     except Exception:
-        handle_error(logger, TEXTS["app_proxy_other_error_msg"], TEXTS["app_proxy_other_error_msg"])
+        handle_error(logger, Texts.APP_PROXY_OTHER_ERROR_MSG, Texts.APP_PROXY_OTHER_ERROR_MSG)
         exit(1)
 
 

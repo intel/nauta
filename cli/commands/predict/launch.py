@@ -34,7 +34,7 @@ from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import PREDICT_LAUNCH_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictLaunchCmdTexts as Texts
 from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace, get_service_account
 
 
@@ -46,16 +46,16 @@ logger = initialize_logger(__name__)
 def validate_local_model_location(local_model_location: str):
     if not os.path.isdir(local_model_location):
         handle_error(
-            user_msg=TEXTS["model_dir_not_found_error_msg"].format(local_model_location=local_model_location)
+            user_msg=Texts.MODEL_DIR_NOT_FOUND_ERROR_MSG.format(local_model_location=local_model_location)
         )
         exit(2)
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='l')
-@click.option('-n', '--name', default=None, help=TEXTS["help_n"], callback=validate_experiment_name)
-@click.option('-m', '--model-location', help=TEXTS["help_m"])
-@click.option("-l", "--local_model_location", type=click.Path(), help=TEXTS["help_local_model_location"])
-@click.option('-mn', '--model-name', help=TEXTS["help_model_name"])
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='l')
+@click.option('-n', '--name', default=None, help=Texts.HELP_N, callback=validate_experiment_name)
+@click.option('-m', '--model-location', help=Texts.HELP_M)
+@click.option("-l", "--local_model_location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
+@click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
 @common_options()
 @pass_state
 def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str):
@@ -65,7 +65,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
     """
     if not model_location and not local_model_location:
         handle_error(
-            user_msg=TEXTS["missing_model_location_error_msg"].format(local_model_location=local_model_location)
+            user_msg=Texts.MISSING_MODEL_LOCATION_ERROR_MSG.format(local_model_location=local_model_location)
         )
         exit(1)
 
@@ -82,13 +82,13 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
         if inference_instance.state == RunStatus.FAILED:
             raise RuntimeError('Inference instance submission failed.')
     except Exception:
-        handle_error(logger, TEXTS["instance_start_error_msg"], TEXTS["instance_start_error_msg"],
+        handle_error(logger, Texts.INSTANCE_START_ERROR_MSG, Texts.INSTANCE_START_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
                           inference_instance.cli_representation.status]],
-                        headers=TEXTS["table_headers"],
+                        headers=Texts.TABLE_HEADERS,
                         tablefmt="orgtbl"))
 
     try:
@@ -96,10 +96,10 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
         authorization_header = get_authorization_header(service_account_name=name, namespace=namespace)
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance,
                                                             model_name=model_name)
-        click.echo(TEXTS["instance_info_msg"].format(inference_instance_url=inference_instance_url,
-                                                     authorization_header=authorization_header))
+        click.echo(Texts.INSTANCE_INFO_MSG.format(inference_instance_url=inference_instance_url,
+                                                  authorization_header=authorization_header))
     except Exception:
-        handle_error(logger, TEXTS["instance_url_error_msg"], TEXTS["instance_url_error_msg"],
+        handle_error(logger, Texts.INSTANCE_URL_ERROR_MSG, Texts.INSTANCE_URL_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 

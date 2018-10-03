@@ -33,15 +33,15 @@ from platform_resources.users import purge_user
 from util.k8s.k8s_info import is_current_user_administrator
 from util.aliascmd import AliasCmd
 from util.system import handle_error
-from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS
+from cli_text_consts import UserDeleteCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='d')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='d')
 @click.argument("username", nargs=1)
-@click.option("-p", "--purge", is_flag=True, help=TEXTS["help_pr"])
+@click.option("-p", "--purge", is_flag=True, help=Texts.HELP_PR)
 @common_options()
 @pass_state
 def delete(state: State, username: str, purge: bool):
@@ -53,45 +53,45 @@ def delete(state: State, username: str, purge: bool):
     """
     try:
         if not is_current_user_administrator():
-            handle_error(user_msg=TEXTS["user_not_admin_error_msg"])
+            handle_error(user_msg=Texts.USER_NOT_ADMIN_ERROR_MSG)
             exit(1)
-        click.echo(TEXTS["deletion_check_presence"])
+        click.echo(Texts.DELETION_CHECK_PRESENCE)
         user_state = check_users_presence(username)
 
         if user_state == UserState.NOT_EXISTS:
-            handle_error(user_msg=TEXTS["user_not_exists_error_msg"].format(username=username))
+            handle_error(user_msg=Texts.USER_NOT_EXISTS_ERROR_MSG.format(username=username))
             exit(1)
 
         if user_state == UserState.TERMINATING:
-            handle_error(user_msg=TEXTS["user_being_removed"])
+            handle_error(user_msg=Texts.USER_BEING_REMOVED)
             exit(1)
 
     except Exception:
-        handle_error(logger, TEXTS["user_presence_verification_error_msg"],
-                     TEXTS["user_presence_verification_error_msg"], add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG,
+                     Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     click.echo()
-    if not click.confirm(TEXTS["delete_confirm_msg"].format(username=username)):
-        click.echo(TEXTS["delete_abort_msg"])
+    if not click.confirm(Texts.DELETE_CONFIRM_MSG.format(username=username)):
+        click.echo(Texts.DELETE_ABORT_MSG)
         exit(0)
 
     click.echo()
 
     try:
-        click.echo(TEXTS["deletion_start_deleting"])
+        click.echo(Texts.DELETION_START_DELETING)
         delete_user(username)
 
         if purge:
             try:
-                click.echo(TEXTS["deletion_start_purging"])
+                click.echo(Texts.DELETION_START_PURGING)
                 # failure during purging a user doesn't mean that user wasn't deleted
                 purge_user(username)
             except Exception:
-                handle_error(logger, TEXTS["purge_error_msg"], TEXTS["purge_error_msg"])
+                handle_error(logger, Texts.PURGE_ERROR_MSG, Texts.PURGE_ERROR_MSG)
 
         # CAN-616 - wait until user has been really deleted
-        click.echo(TEXTS["deletion_verification_of_deleting"])
+        click.echo(Texts.DELETION_VERIFICATION_OF_DELETING)
         for i in range(60):
             user_state = check_users_presence(username)
             if not user_state or user_state == UserState.NOT_EXISTS:
@@ -101,16 +101,16 @@ def delete(state: State, username: str, purge: bool):
             click.echo(".", nl=False)
         else:
             click.echo()
-            click.echo(TEXTS["delete_in_progress_msg"])
+            click.echo(Texts.DELETE_IN_PROGRESS_MSG)
             exit(0)
 
         click.echo()
-        click.echo(TEXTS["delete_success_msg"].format(username=username))
+        click.echo(Texts.DELETE_SUCCESS_MSG.format(username=username))
     except K8sProxyCloseError:
-        handle_error(logger, TEXTS["proxy_error_log_msg"], TEXTS["proxy_error_user_msg"],
+        handle_error(logger, Texts.PROXY_ERROR_LOG_MSG, Texts.PROXY_ERROR_USER_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
     except Exception:
-        handle_error(logger, TEXTS["other_error_log_msg"], TEXTS["other_error_user_msg"],
+        handle_error(logger, Texts.OTHER_ERROR_LOG_MSG, Texts.OTHER_ERROR_USER_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)

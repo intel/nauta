@@ -29,7 +29,7 @@ from util.config import DLS4EConfigMap
 from util.exceptions import KubernetesError
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import VERSION_CMD_TEXTS as TEXTS
+from cli_text_consts import VersionCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -38,28 +38,28 @@ logger = initialize_logger(__name__)
 PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='v')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v')
 @common_options(verify_dependencies=False, verify_config_path=False)
 @pass_state
 def version(state: State):
     """ Returns the version of the installed dlsctl application. """
-    platform_version = TEXTS["initial_platform_version"]
+    platform_version = Texts.INITIAL_PLATFORM_VERSION
     error_msg = ""
     platform_version_fail = False
     try:
         platform_version = DLS4EConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
     except KubernetesError:
-        error_msg = TEXTS["kubectl_int_error_msg"]
+        error_msg = Texts.KUBECTL_INT_ERROR_MSG
         platform_version_fail = True
     except Exception:
-        error_msg = TEXTS["other_error_msg"]
+        error_msg = Texts.OTHER_ERROR_MSG
         platform_version_fail = True
 
-    version_table = [[TEXTS["table_app_row_name"], VERSION],
-                     [TEXTS["table_platform_row_name"], platform_version]]
+    version_table = [[Texts.TABLE_APP_ROW_NAME, VERSION],
+                     [Texts.TABLE_PLATFORM_ROW_NAME, platform_version]]
 
     click.echo(tabulate(version_table,
-                        headers=TEXTS["table_headers"],
+                        headers=Texts.TABLE_HEADERS,
                         tablefmt="orgtbl"))
 
     if platform_version_fail:

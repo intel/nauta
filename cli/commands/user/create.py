@@ -37,7 +37,7 @@ from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence, UserState
 from platform_resources.users import validate_user_name, is_user_created
-from cli_text_consts import USER_CREATE_CMD_TEXTS as TEXTS
+from cli_text_consts import UserCreateCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -73,10 +73,10 @@ users:
 DEFAULT_FILENAME = "{}.config"
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='c')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
 @click.argument('username', required=False)
-@click.option("-l", "--list_only", is_flag=True, help=TEXTS["help_l"])
-@click.option("-f", "--filename", help=TEXTS["help_f"])
+@click.option("-l", "--list_only", is_flag=True, help=Texts.HELP_L)
+@click.option("-f", "--filename", help=Texts.HELP_F)
 @common_options()
 @pass_state
 def create(state: State, username: str, list_only: bool, filename: str):
@@ -87,7 +87,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
     """
 
     if list_only and filename:
-        handle_error(user_msg=TEXTS["f_l_options_exclusion_error_msg"])
+        handle_error(user_msg=Texts.F_L_OPTIONS_EXCLUSION_ERROR_MSG)
         exit(1)
 
     try:
@@ -95,29 +95,29 @@ def create(state: State, username: str, list_only: bool, filename: str):
             username = username if username else getpass.getuser()
             validate_user_name(username)
         except ValueError as exe:
-            handle_error(logger, TEXTS["name_validation_error_msg"].format(username=username), str(exe),
+            handle_error(logger, Texts.NAME_VALIDATION_ERROR_MSG.format(username=username), str(exe),
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
 
         if not is_current_user_administrator():
-            handle_error(logger, TEXTS["user_not_admin_error_msg"], TEXTS["user_not_admin_error_msg"])
+            handle_error(logger, Texts.USER_NOT_ADMIN_ERROR_MSG, Texts.USER_NOT_ADMIN_ERROR_MSG)
             exit(1)
 
         user_state = check_users_presence(username)
 
         if user_state == UserState.ACTIVE:
-            handle_error(logger, TEXTS["user_already_exists_error_msg"].format(username=username),
-                         TEXTS["user_already_exists_error_msg"].format(username=username))
+            handle_error(logger, Texts.USER_ALREADY_EXISTS_ERROR_MSG.format(username=username),
+                         Texts.USER_ALREADY_EXISTS_ERROR_MSG.format(username=username))
             exit(1)
 
         if user_state == UserState.TERMINATING:
-            handle_error(logger, TEXTS["user_being_removed_error_msg"].format(username=username),
-                         TEXTS["user_being_removed_error_msg"].format(username=username))
+            handle_error(logger, Texts.USER_BEING_REMOVED_ERROR_MSG.format(username=username),
+                         Texts.USER_BEING_REMOVED_ERROR_MSG.format(username=username))
             exit(1)
 
     except Exception:
-        handle_error(logger, TEXTS["user_verification_error_msg"].format(username=username),
-                     TEXTS["user_verification_error_msg"].format(username=username),
+        handle_error(logger, Texts.USER_VERIFICATION_ERROR_MSG.format(username=username),
+                     Texts.USER_VERIFICATION_ERROR_MSG.format(username=username),
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
@@ -137,45 +137,45 @@ def create(state: State, username: str, list_only: bool, filename: str):
         _, err_code, log_output = execute_system_command(add_user_command)
 
         if err_code:
-            handle_error(logger, log_output, TEXTS["user_add_error_msg"], add_verbosity_msg=state.verbosity == 0)
+            handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
 
             if not delete_user(username):
-                handle_error(user_msg=TEXTS["remove_user_error_msg"].format(username=username))
+                handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
             sys.exit(1)
 
         try:
             users_password = get_users_token(username)
         except Exception:
-            handle_error(logger, TEXTS["password_gather_error_msg"], TEXTS["password_gather_error_msg"],
+            handle_error(logger, Texts.PASSWORD_GATHER_ERROR_MSG, Texts.PASSWORD_GATHER_ERROR_MSG,
                          add_verbosity_msg=state.verbosity == 0)
             users_password = ""
 
     except Exception:
-        handle_error(logger, TEXTS["user_add_error_msg"].format(username=username),
-                     TEXTS["user_add_error_msg"].format(username=username),
+        handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
+                     Texts.USER_ADD_ERROR_MSG.format(username=username),
                      add_verbosity_msg=state.verbosity == 0)
         if not delete_user(username):
-            handle_error(user_msg=TEXTS["remove_user_error_msg"].format(username=username))
+            handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
         sys.exit(1)
 
     if is_user_created(username, 90):
-        click.echo(TEXTS["user_creation_success_msg"].format(username=username))
+        click.echo(Texts.USER_CREATION_SUCCESS_MSG.format(username=username))
     else:
         # if during 90 seconds a user hasn't been created - app displays information about it
         # but don't step processing the command - config file generated here my be useful later
         # when user has been created
-        click.echo(TEXTS["user_not_ready_error_msg"].format(username=username))
+        click.echo(Texts.USER_NOT_READY_ERROR_MSG.format(username=username))
 
     try:
         kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(),
                                          users_password, "")
     except Exception:
-        handle_error(logger, TEXTS["config_creation_error_msg"], TEXTS["config_creation_error_msg"],
+        handle_error(logger, Texts.CONFIG_CREATION_ERROR_MSG, Texts.CONFIG_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     if list_only:
-        click.echo(TEXTS["list_only_header"])
+        click.echo(Texts.LIST_ONLY_HEADER)
         click.echo(kubeconfig)
     else:
         if not filename:
@@ -184,11 +184,11 @@ def create(state: State, username: str, list_only: bool, filename: str):
             with open(filename, "w") as file:
                 file.write(kubeconfig)
 
-            click.echo(TEXTS["config_save_success_msg"].format(filename=filename))
+            click.echo(Texts.CONFIG_SAVE_SUCCESS_MSG.format(filename=filename))
         except Exception:
-            handle_error(logger, TEXTS["config_save_fail_msg"], TEXTS["config_save_fail_msg"],
+            handle_error(logger, Texts.CONFIG_SAVE_FAIL_MSG, Texts.CONFIG_SAVE_FAIL_MSG,
                          add_verbosity_msg=state.verbosity == 0)
-            click.echo(TEXTS["config_save_fail_instructions_msg"])
+            click.echo(Texts.CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG)
             click.echo(kubeconfig)
             sys.exit(1)
 

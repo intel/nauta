@@ -27,7 +27,7 @@ from commands.experiment import logs
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
 from platform_resources.run_model import Run
-from cli_text_consts import EXPERIMENT_LOGS_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentLogsCmdTexts as Texts
 
 TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
                              content='Warning: Unable to load '
@@ -113,7 +113,7 @@ def test_show_logs_too_many_params(mocker):
 
     result = runner.invoke(logs.logs, ['fake_experiment', '-m', 'match_name'])
 
-    assert TEXTS['name_m_both_given_error_msg'] in result.output
+    assert Texts.NAME_M_BOTH_GIVEN_ERROR_MSG in result.output
 
 
 def test_show_logs_lack_of_params(mocker):
@@ -121,7 +121,7 @@ def test_show_logs_lack_of_params(mocker):
 
     result = runner.invoke(logs.logs)
 
-    assert TEXTS['name_m_none_given_error_msg'] in result.output
+    assert Texts.NAME_M_NONE_GIVEN_ERROR_MSG in result.output
 
 
 def test_show_logs_from_two_experiments(mocker):
@@ -145,7 +145,7 @@ def test_show_logs_from_two_experiments(mocker):
         open_mock.return_value.__enter__.side_effect = exception
         result = runner.invoke(logs.logs, ['fake-experiment', '-o'], input='y')
 
-    assert TEXTS["logs_storing_error"].format(exception_message=exception.message) in result.output
+    assert Texts.LOGS_STORING_ERROR.format(exception_message=exception.message) in result.output
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert list_runs_mock.call_count == 1, "run was not retrieved"

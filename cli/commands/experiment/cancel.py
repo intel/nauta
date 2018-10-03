@@ -46,7 +46,7 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s import pods as k8s_pods
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import EXPERIMENT_CANCEL_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentCancelCmdTexts as Texts
 from util.k8s.k8s_info import PodStatus
 
 
@@ -56,12 +56,12 @@ experiment_name = 'experiment'
 experiment_name_plural = 'experiments'
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], cls=AliasCmd, alias='c')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
 @click.argument("name", required=False)
-@click.option('-m', '--match', help=TEXTS["help_m"])
-@click.option('-p', '--purge', help=TEXTS["help_p"], is_flag=True)
-@click.option('-i', '--pod-ids', help=TEXTS["help_i"])
-@click.option('-s', '--pod-status', help=TEXTS["help_s"].format(available_statuses=PodStatus.all_members()))
+@click.option('-m', '--match', help=Texts.HELP_M)
+@click.option('-p', '--purge', help=Texts.HELP_P, is_flag=True)
+@click.option('-i', '--pod-ids', help=Texts.HELP_I)
+@click.option('-s', '--pod-status', help=Texts.HELP_S.format(available_statuses=PodStatus.all_members()))
 @common_options()
 @pass_state
 def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
@@ -74,11 +74,11 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     # check whether we have runs with a given name
     if name and match:
-        handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
+        handle_error(user_msg=Texts.NAME_M_BOTH_GIVEN_ERROR_MSG)
         exit(1)
 
     if not name and not match:
-        handle_error(user_msg=TEXTS["name_m_none_given_error_msg"])
+        handle_error(user_msg=Texts.NAME_M_NONE_GIVEN_ERROR_MSG)
         exit(1)
 
     current_namespace = get_current_namespace()
@@ -121,8 +121,8 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
             list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
                                          run_kinds_filter=listed_runs_kinds)
     except Exception:
-        handle_error(logger, TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural),
-                     TEXTS["list_runs_error_msg"].format(experiment_name_plural=experiment_name_plural))
+        handle_error(logger, Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural),
+                     Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural))
         exit(1)
 
     # Handle cancellation of experiments with no associated Runs
@@ -131,7 +131,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                                         purge=purge)
     # If no experiment and no runs were matched, throw an error
     elif not [run for run in list_of_all_runs if run.state in list_of_applicable_states]:
-        handle_error(user_msg=TEXTS["lack_of_experiments_error_msg"].format(
+        handle_error(user_msg=Texts.LACK_OF_EXPERIMENTS_ERROR_MSG.format(
             experiment_name_plural=experiment_name_plural,
             experiment_name=experiment_name))
         exit(1)
@@ -150,31 +150,31 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
         if not list_of_runs_to_be_deleted:
             handle_error(
-                user_msg=TEXTS["experiments_already_cancelled_error_msg"].format(
+                user_msg=Texts.EXPERIMENTS_ALREADY_CANCELLED_ERROR_MSG.format(
                     experiment_name_plural=experiment_name_plural
                 )
             )
             exit(1)
         elif len(list_of_runs_to_be_deleted) != len(list_of_all_runs):
-            click.echo(TEXTS["already_cancelled_list_header"].format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.ALREADY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
             for name in names_of_cancelled_runs:
                 click.echo(f"     - {name}")
-            click.echo(TEXTS["can_be_cancelled_list_header"].format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.CAN_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
         else:
-            click.echo(TEXTS["will_be_cancelled_list_header"].format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.WILL_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
     else:
         list_of_runs_to_be_deleted = list_of_all_runs
-        click.echo(TEXTS["will_be_purged_list_header"].format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
         for name in list_of_runs_to_be_deleted:
             click.echo(f"     - {name.name}")
 
-    if not click.confirm(TEXTS["confirm_cancel_msg"].format(experiment_name_plural=experiment_name_plural)):
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural)):
         handle_error(
-            user_msg=TEXTS["cancellation_aborted_msg"].format(
+            user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural=experiment_name_plural
             )
         )
@@ -204,17 +204,17 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                         deleted_runs.extend(exp_del_runs)
                         not_deleted_runs.extend(exp_not_del_runs)
                     except Exception:
-                        handle_error(logger, TEXTS["other_cancelling_error_msg"])
+                        handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
                         not_deleted_runs.extend(run_list)
         except K8sProxyCloseError:
-            handle_error(logger, TEXTS["proxy_closing_error_log_msg"], TEXTS["proxy_closing_error_user_msg"])
+            handle_error(logger, Texts.PROXY_CLOSING_ERROR_LOG_MSG, Texts.PROXY_CLOSING_ERROR_USER_MSG)
             exit(1)
         except LocalPortOccupiedError as exe:
-            handle_error(logger, TEXTS["port_occupied_error_log_msg"],
-                         TEXTS["port_occupied_error_user_msg"].format(exception_message=exe.message))
+            handle_error(logger, Texts.PORT_OCCUPIED_ERROR_LOG_MSG,
+                         Texts.PORT_OCCUPIED_ERROR_USER_MSG.format(exception_message=exe.message))
             exit(1)
         except K8sProxyOpenError:
-            handle_error(logger, TEXTS["proxy_open_error_msg"], TEXTS["proxy_open_error_msg"])
+            handle_error(logger, Texts.PROXY_OPEN_ERROR_MSG, Texts.PROXY_OPEN_ERROR_MSG)
             exit(1)
     else:
         for exp_name, run_list in exp_with_runs.items():
@@ -224,16 +224,16 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                 deleted_runs.extend(exp_del_runs)
                 not_deleted_runs.extend(exp_not_del_runs)
             except Exception:
-                handle_error(logger, TEXTS["other_cancelling_error_msg"])
+                handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
                 not_deleted_runs.extend(run_list)
 
     if deleted_runs:
-        click.echo(TEXTS["successfully_cancelled_list_header"].format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
         for run in deleted_runs:
             click.echo(f"     - {run.name}")
 
     if not_deleted_runs:
-        click.echo(TEXTS["failed_to_cancel_list_header"].format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
         for run in not_deleted_runs:
             click.echo(f"     - {run.name}")
         sys.exit(1)
@@ -259,7 +259,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
 
     experiment = get_experiment(name=exp_name, namespace=namespace)
     if not experiment:
-        raise RuntimeError(TEXTS["get_experiment_error_msg"])
+        raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
     experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name])
     # check whether experiment has more runs that should be cancelled
@@ -273,7 +273,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
         not_purged_runs = not_cancelled_runs
         for run in cancelled_runs:
             logger.debug(f"Purging {run.name} run ...")
-            click.echo(TEXTS["purging_start_msg"].format(run_name=run.name))
+            click.echo(Texts.PURGING_START_MSG.format(run_name=run.name))
             try:
                 # purge helm release
                 delete_helm_release(run.name, namespace=namespace, purge=True)
@@ -285,7 +285,7 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
                 logger.exception("Error during purging runs.")
                 # occurence of NotFound error may mean, that run has been removed earlier
                 if "NotFound" not in str(exe):
-                    click.echo(TEXTS["incomplete_purge_error_msg"].format(experiment_name=experiment_name))
+                    click.echo(Texts.INCOMPLETE_PURGE_ERROR_MSG.format(experiment_name=experiment_name))
                     raise exe
             try:
                 # clear run logs
@@ -333,7 +333,7 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
 
     experiment = get_experiment(name=exp_name, namespace=namespace)
     if not experiment:
-        raise RuntimeError(TEXTS["get_experiment_error_msg"])
+        raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
     experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
     # check whether experiment has more runs that should be cancelled
@@ -374,20 +374,20 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
     try:
         for run in runs_to_cancel:
             logger.debug(f"Cancelling {run.name} run ...")
-            click.echo(TEXTS["canceling_runs_start_msg"].format(run_name=run.name, experiment_name=experiment_name))
+            click.echo(Texts.CANCELING_RUNS_START_MSG.format(run_name=run.name, experiment_name=experiment_name))
             try:
                 # if run status is cancelled - omit the following steps
                 if run.state != RunStatus.CANCELLED:
                     delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
                     # change a run state to CANCELLED
-                    click.echo(TEXTS["cancel_setting_status_msg"].format(run_name=run.name))
+                    click.echo(Texts.CANCEL_SETTING_STATUS_MSG.format(run_name=run.name))
                     run.state = RunStatus.CANCELLED
                     update_run(run, namespace)
                 deleted_runs.append(run)
             except Exception:
-                logger.exception(TEXTS["incomplete_cancel_error_msg"]
+                logger.exception(Texts.INCOMPLETE_CANCEL_ERROR_MSG
                                  .format(run_name=run.name, experiment_name=experiment_name))
-                click.echo(TEXTS["incomplete_cancel_error_msg"]
+                click.echo(Texts.INCOMPLETE_CANCEL_ERROR_MSG
                            .format(run_name=run.name, experiment_name=experiment_name))
                 not_deleted_runs.append(run)
 
@@ -428,8 +428,8 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
             converted_pod_status = PodStatus(pod_status.upper())
         except ValueError:
             handle_error(
-                user_msg=TEXTS["bad_pod_status_passed"].format(status_passed=pod_status,
-                                                               available_statuses=PodStatus.all_members())
+                user_msg=Texts.BAD_POD_STATUS_PASSED.format(status_passed=pod_status,
+                                                            available_statuses=PodStatus.all_members())
             )
             exit(1)
             return
@@ -441,16 +441,16 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
         filtered_pods = status_filtered_pods
 
     if not filtered_pods:
-        handle_error(user_msg=TEXTS["lack_of_pods_error_msg"])
+        handle_error(user_msg=Texts.LACK_OF_PODS_ERROR_MSG)
         exit(1)
 
-    click.echo(TEXTS["will_be_purged_list_header"].format(experiment_name_plural='pods'))
+    click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural='pods'))
     for pod in filtered_pods:
         click.echo(f"     - {pod.name}")
 
-    if not click.confirm(TEXTS["confirm_cancel_msg"].format(experiment_name_plural='pods')):
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural='pods')):
         handle_error(
-            user_msg=TEXTS["cancellation_aborted_msg"].format(
+            user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural='pods'
             )
         )
@@ -460,31 +460,31 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
     not_deleted_pods = []
 
     for pod in filtered_pods:
-        click.echo(TEXTS["canceling_pods_msg"].format(pod_name=pod.name))
+        click.echo(Texts.CANCELING_PODS_MSG.format(pod_name=pod.name))
         try:
             pod.delete()
             deleted_pods.append(pod)
         except Exception:
-            handle_error(logger, TEXTS["other_pod_cancelling_error_msg"])
+            handle_error(logger, Texts.OTHER_POD_CANCELLING_ERROR_MSG)
             not_deleted_pods.append(pod)
 
     if deleted_pods:
-        click.echo(TEXTS["successfully_cancelled_list_header"].format(experiment_name_plural='pods'))
+        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural='pods'))
         for pod in deleted_pods:
             click.echo(f"     - {pod.name}")
 
     if not_deleted_pods:
-        click.echo(TEXTS["failed_to_cancel_list_header"].format(experiment_name_plural='pods'))
+        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural='pods'))
         for pod in not_deleted_pods:
             click.echo(f"     - {pod.name}")
         sys.exit(1)
 
 
 def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purge: bool):
-    click.echo(TEXTS["uninitialized_experiment_cancel_msg"].format(experiment_name=experiment.name))
-    if not click.confirm(TEXTS["confirm_cancel_msg"].format(experiment_name_plural=experiment_name_plural)):
+    click.echo(Texts.UNINITIALIZED_EXPERIMENT_CANCEL_MSG.format(experiment_name=experiment.name))
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural)):
         handle_error(
-            user_msg=TEXTS["cancellation_aborted_msg"].format(
+            user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural=experiment_name_plural
             )
         )
@@ -492,15 +492,15 @@ def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purg
 
     try:
         if purge:
-            click.echo(TEXTS["purging_start_msg"].format(run_name=experiment.name))
+            click.echo(Texts.PURGING_START_MSG.format(run_name=experiment.name))
             delete_experiment(experiment, namespace)
         else:
-            click.echo(TEXTS["canceling_runs_start_msg"].format(experiment_name=experiment.name,
-                                                                run_name=''))
+            click.echo(Texts.CANCELING_RUNS_START_MSG.format(experiment_name=experiment.name,
+                                                             run_name=''))
             experiment.state = ExperimentStatus.CANCELLED
             update_experiment(experiment, namespace)
     except Exception:
-        handle_error(logger, TEXTS["other_cancelling_error_msg"])
+        handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
         exit(1)
 
     exit(0)

@@ -33,7 +33,7 @@ from util.exceptions import SubmitExperimentError
 import util.config
 from util.system import get_current_os, OS
 from platform_resources.run_model import RunStatus
-from cli_text_consts import EXPERIMENT_COMMON_TEXTS as TEXTS
+from cli_text_consts import ExperimentCommonTexts as Texts
 
 
 EXPERIMENT_FOLDER = "\\HOME\\FOLDER\\"
@@ -216,7 +216,7 @@ def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
         submit_experiment(script_location=SCRIPT_LOCATION, script_folder_location=None, template='',
                           name='', parameter_range=[], parameter_set=(), script_parameters=(), pack_params=[],
                           run_kind=RunKinds.TRAINING)
-        assert TEXTS["env_creation_error_msg"] in str(exe)
+        assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
 
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0, add_run_count=0,
                   submit_one_count=0, socat_start_count=1, del_env_count=1)
@@ -229,7 +229,7 @@ def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
                           template=None, name=None, parameter_range=[], parameter_set=(), script_parameters=(),
                           run_kind=RunKinds.TRAINING)
 
-    assert TEXTS["env_creation_error_msg"] in str(exe)
+    assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
     check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, socat_start_count=1,
                   del_env_count=1, add_run_count=0)
 
@@ -243,7 +243,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
                           template=None, name=None, parameter_range=[], parameter_set=(), script_parameters=(),
                           run_kind=RunKinds.TRAINING)
 
-    assert TEXTS["env_creation_error_msg"] in str(exe)
+    assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
     check_asserts(prepare_mocks, add_exp_count=0, add_run_count=0,
                   submit_one_count=0, socat_start_count=1, del_env_count=1)
 
@@ -352,21 +352,21 @@ def test_analyze_pr_parameters_list_ambiguosly_defined():
     identical_param_list = [("param1", "{0, 1}"), ("param1", "{0...2:1}")]
     with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(identical_param_list)
-    assert str(exe.value) == TEXTS["param_ambiguously_defined"].format(param_name="param1")
+    assert str(exe.value) == Texts.PARAM_AMBIGUOUSLY_DEFINED.format(param_name="param1")
 
 
 def test_analyze_pr_parameters_list_missing_brackets():
     two_params_list = [("param1", "1, 2, 3"), ("param2", "{0...2:1}")]
     with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(two_params_list)
-    assert str(exe.value) == TEXTS["incorrect_param_format_error_msg"].format(param_name="param1")
+    assert str(exe.value) == Texts.INCORRECT_PARAM_FORMAT_ERROR_MSG.format(param_name="param1")
 
 
 def test_analyze_pr_parameters_list_wrong_format():
     two_params_list = [("param1", "1, 2, 3"), ("param2", "{a...b:1}")]
     with pytest.raises(ValueError) as exe:
         analyze_pr_parameters_list(two_params_list)
-    assert str(exe.value) == TEXTS["incorrect_param_format_error_msg"].format(param_name="param1")
+    assert str(exe.value) == Texts.INCORRECT_PARAM_FORMAT_ERROR_MSG.format(param_name="param1")
 
 
 def test_analyze_ps_parameters_list_success():
@@ -391,7 +391,7 @@ def test_analyze_ps_parameters_wrong_format():
     three_params = ("{param1:value1, param2:value2, param3:value3",)
     with pytest.raises(ValueError) as exe:
         analyze_ps_parameters_list(three_params)
-    assert str(exe.value) == TEXTS["param_set_incorrect_format_error_msg"]
+    assert str(exe.value) == Texts.PARAM_SET_INCORRECT_FORMAT_ERROR_MSG
 
 
 def test_check_enclosing_brackets():

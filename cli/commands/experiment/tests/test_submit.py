@@ -28,7 +28,7 @@ from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_scr
     validate_script_folder_location, get_default_script_location
 from commands.experiment.common import RunSubmission, RunStatus
 from util.exceptions import SubmitExperimentError
-from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 
 
 SCRIPT_LOCATION = "training_script.py"
@@ -87,7 +87,7 @@ def test_user_is_admin(prepare_mocks: SubmitMocks):
     prepare_mocks.is_current_user_administrator.return_value = True
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-sfl", SCRIPT_FOLDER])
-    assert TEXTS["user_is_admin_usr_msg"] in result.output
+    assert Texts.USER_IS_ADMIN_USR_MSG in result.output
     assert result.exit_code == 1
 
 
@@ -97,7 +97,7 @@ def test_submit_experiment_failure(prepare_mocks: SubmitMocks):
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
-    assert TEXTS["submit_error_msg"].format(exception_message=exe_message) in result.output
+    assert Texts.SUBMIT_ERROR_MSG.format(exception_message=exe_message) in result.output
     assert result.exit_code == 1
 
 

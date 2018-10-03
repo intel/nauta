@@ -23,7 +23,7 @@ from click.testing import CliRunner
 
 from commands.user import delete
 from util.k8s.kubectl import UserState
-from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS
+from cli_text_consts import UserDeleteCmdTexts as Texts
 
 
 TEST_USERNAME = "testusername"
@@ -42,7 +42,7 @@ def test_deleteuser_success(mocker):
     assert deu_mock.call_count == 1
     assert icu_mock.call_count == 1
 
-    assert TEXTS["delete_success_msg"].format(username=TEST_USERNAME) in result.output
+    assert Texts.DELETE_SUCCESS_MSG.format(username=TEST_USERNAME) in result.output
 
 
 def test_deleteuser_missing_user(mocker):
@@ -56,7 +56,7 @@ def test_deleteuser_missing_user(mocker):
     assert deu_mock.call_count == 0
     assert icu_mock.call_count == 1
 
-    assert TEXTS["user_not_exists_error_msg"].format(username=TEST_USERNAME) in result.output
+    assert Texts.USER_NOT_EXISTS_ERROR_MSG.format(username=TEST_USERNAME) in result.output
     assert result.exit_code == 1
 
 
@@ -71,7 +71,7 @@ def test_deleteuser_checking_user_errors(mocker):
     assert deu_mock.call_count == 0
     assert icu_mock.call_count == 1
 
-    assert TEXTS["user_presence_verification_error_msg"] in result.output
+    assert Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG in result.output
     assert result.exit_code == 1
 
 
@@ -87,7 +87,7 @@ def test_deleteuser_deleting_user_errors(mocker):
     assert deu_mock.call_count == 1
     assert icu_mock.call_count == 1
 
-    assert TEXTS["other_error_user_msg"] in result.output
+    assert Texts.OTHER_ERROR_USER_MSG in result.output
     assert result.exit_code == 1
 
 
@@ -116,7 +116,7 @@ def test_deleteuser_answer_n(mocker):
     assert deu_mock.call_count == 0
     assert icu_mock.call_count == 1
 
-    assert TEXTS["delete_abort_msg"] in result.output
+    assert Texts.DELETE_ABORT_MSG in result.output
 
 
 def test_deleteuser_purge_success(mocker):
@@ -148,7 +148,7 @@ def test_deleteuser_purge_failure(mocker):
     assert cup_mock.call_count == 2
     assert deu_mock.call_count == 1
     assert prg_mock.call_count == 1
-    assert TEXTS["purge_error_msg"] in result.output
+    assert Texts.PURGE_ERROR_MSG in result.output
     assert icu_mock.call_count == 1
 
 
@@ -157,7 +157,7 @@ def test_deleteuser_not_admin(mocker):
 
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME, "-p"])
 
-    assert TEXTS["user_not_admin_error_msg"] in result.output
+    assert Texts.USER_NOT_ADMIN_ERROR_MSG in result.output
     assert icu_mock.call_count == 1
 
 

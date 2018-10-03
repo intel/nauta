@@ -32,7 +32,7 @@ from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from platform_resources.experiments import generate_name
 from util.system import handle_error
-from cli_text_consts import PREDICT_BATCH_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictBatchCmdTexts as Texts
 
 
 BATCH_INFERENCE_TEMPLATE = 'tf-inference-batch'
@@ -43,19 +43,19 @@ logger = initialize_logger(__name__)
 def validate_local_model_location(local_model_location: str):
     if not os.path.isdir(local_model_location):
         handle_error(
-            user_msg=TEXTS["model_dir_not_found_error_msg"].format(local_model_location=local_model_location)
+            user_msg=Texts.MODEL_DIR_NOT_FOUND_ERROR_MSG.format(local_model_location=local_model_location)
         )
         exit(2)
 
 
 # noinspection PyUnusedLocal
-@click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='b')
-@click.option('-n', '--name', help=TEXTS["help_name"], callback=validate_experiment_name)
-@click.option('-m', '--model-location', help=TEXTS["help_model_location"])
-@click.option("-l", "--local_model_location", type=click.Path(), help=TEXTS["help_local_model_location"])
-@click.option('-d', '--data', required=True, help=TEXTS["help_data"])
-@click.option('-o', '--output', help=TEXTS["help_output"])
-@click.option('-mn', '--model-name', help=TEXTS["help_model_name"])
+@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b')
+@click.option('-n', '--name', help=Texts.HELP_NAME, callback=validate_experiment_name)
+@click.option('-m', '--model-location', help=Texts.HELP_MODEL_LOCATION)
+@click.option("-l", "--local_model_location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
+@click.option('-d', '--data', required=True, help=Texts.HELP_DATA)
+@click.option('-o', '--output', help=Texts.HELP_OUTPUT)
+@click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
 @common_options()
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
@@ -65,7 +65,7 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
     """
     if not model_location and not local_model_location:
         handle_error(
-            user_msg=TEXTS["missing_model_location_error_msg"].format(local_model_location=local_model_location)
+            user_msg=Texts.MISSING_MODEL_LOCATION_ERROR_MSG.format(local_model_location=local_model_location)
         )
         exit(1)
 
@@ -81,12 +81,12 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
                                                       output_location=output)
     except Exception:
-        handle_error(logger, TEXTS["other_instance_creation_error_msg"], TEXTS["other_instance_creation_error_msg"],
+        handle_error(logger, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
-    click.echo(tabulate({TEXTS["table_name_header"]: [inference_instance.cli_representation.name],
-                         TEXTS["table_model_location_header"]: [model_location],
-                         TEXTS["table_status_header"]: [inference_instance.cli_representation.status]},
-                        headers=TEXTS["table_headers"],
+    click.echo(tabulate({Texts.TABLE_NAME_HEADER: [inference_instance.cli_representation.name],
+                         Texts.TABLE_MODEL_LOCATION_HEADER: [model_location],
+                         Texts.TABLE_STATUS_HEADER: [inference_instance.cli_representation.status]},
+                        headers=Texts.TABLE_HEADERS,
                         tablefmt="orgtbl"))

@@ -33,17 +33,17 @@ from platform_resources.runs import get_run
 from platform_resources.run_model import RunStatus
 from commands.predict.common import get_inference_instance_url, InferenceVerb
 from util.system import handle_error
-from cli_text_consts import PREDICT_STREAM_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictStreamCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='s')
-@click.option('-n', '--name', required=True, help=TEXTS["help_n"])
-@click.option('-d', '--data', required=True, type=click.Path(exists=True), help=TEXTS["help_d"])
+@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='s')
+@click.option('-n', '--name', required=True, help=Texts.HELP_N)
+@click.option('-d', '--data', required=True, type=click.Path(exists=True), help=Texts.HELP_D)
 @click.option('-m', '--method-verb', default=InferenceVerb.PREDICT.value,
-              type=click.Choice([verb.value for verb in InferenceVerb]), help=TEXTS["help_m"])
+              type=click.Choice([verb.value for verb in InferenceVerb]), help=Texts.HELP_M)
 @common_options()
 @pass_state
 def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
@@ -57,18 +57,18 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         # TODO: check if kind field of inference instance Run is correct
         inference_instance = get_run(name=name, namespace=namespace)
         if not inference_instance:
-            handle_error(user_msg=TEXTS["instance_not_exists_error_msg"].format(name=name))
+            handle_error(user_msg=Texts.INSTANCE_NOT_EXISTS_ERROR_MSG.format(name=name))
             exit(1)
         if not inference_instance.state == RunStatus.RUNNING:
-            handle_error(user_msg=TEXTS["instance_not_running_error_msg"]
+            handle_error(user_msg=Texts.INSTANCE_NOT_RUNNING_ERROR_MSG
                          .format(name=name, running_code=RunStatus.RUNNING.value))
             exit(1)
 
         inference_instance_url = get_inference_instance_url(inference_instance=inference_instance)
         stream_url = f'{inference_instance_url}:{method_verb.value}'
     except Exception:
-        handle_error(logger, TEXTS["instance_get_fail_error_msg"].format(name=name),
-                     TEXTS["instance_get_fail_error_msg"].format(name=name),
+        handle_error(logger, Texts.INSTANCE_GET_FAIL_ERROR_MSG.format(name=name),
+                     Texts.INSTANCE_GET_FAIL_ERROR_MSG.format(name=name),
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
@@ -76,8 +76,8 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         with open(data, 'r', encoding='utf-8') as data_file:
             stream_data = json.load(data_file)
     except (json.JSONDecodeError, IOError):
-        handle_error(logger, TEXTS["json_load_error_msg"].format(data=data),
-                     TEXTS["json_load_error_msg"].format(data=data))
+        handle_error(logger, Texts.JSON_LOAD_ERROR_MSG.format(data=data),
+                     Texts.JSON_LOAD_ERROR_MSG.format(data=data))
         exit(1)
 
     try:
@@ -87,8 +87,8 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         stream_response.raise_for_status()
         click.echo(stream_response.text)
     except Exception as e:
-        error_msg = TEXTS["inference_other_error_msg"].format(exception=e)
+        error_msg = Texts.INFERENCE_OTHER_ERROR_MSG.format(exception=e)
         if hasattr(e, 'response'):
-            error_msg += TEXTS["inference_error_response_msg"].format(response_text=e.response.text)
+            error_msg += Texts.INFERENCE_ERROR_RESPONSE_MSG.format(response_text=e.response.text)
         handle_error(logger, error_msg, error_msg)
         exit(1)

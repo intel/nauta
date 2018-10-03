@@ -31,7 +31,7 @@ from draft.cmd import call_draft
 from util.system import execute_system_command, get_os_version
 from util.logger import initialize_logger
 from util.exceptions import InvalidDependencyError, InvalidOsError
-from cli_text_consts import UTIL_DEPENDENCIES_CHECKER_TEXTS as TEXTS
+from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 from version import VERSION
 from util.config import Config
 
@@ -121,7 +121,7 @@ def _parse_installed_version(version_output: str, version_field='SemVer') -> Loo
     matches = re.findall(regex, version_output)
 
     if len(matches) != 1:
-        raise ValueError(TEXTS["parse_fail_error_msg"]
+        raise ValueError(Texts.PARSE_FAIL_ERROR_MSG
                          .format(version_field=version_field, version_output=version_output))
 
     installed_version = LooseVersion(matches[0][0] or matches[0][1])
@@ -134,16 +134,16 @@ def check_os():
     try:
         os_name, os_version = get_os_version()
         if os_name == "":
-            raise InvalidOsError(TEXTS["unknown_os_error_msg"])
+            raise InvalidOsError(Texts.UNKNOWN_OS_ERROR_MSG)
     except InvalidOsError:
         raise
     except Exception as exe:
-        raise InvalidOsError(TEXTS["get_os_version_error_msg"]) from exe
+        raise InvalidOsError(Texts.GET_OS_VERSION_ERROR_MSG) from exe
     log.info(f"Detected OS: {os_name} {os_version}")
     if os_name not in SUPPORTED_OS_MAP:
-        raise InvalidOsError(TEXTS["unsupported_os_error_msg"].format(os_name=os_name, os_version=os_version))
+        raise InvalidOsError(Texts.UNSUPPORTED_OS_ERROR_MSG.format(os_name=os_name, os_version=os_version))
     if not _is_version_valid(os_version, SUPPORTED_OS_MAP[os_name]):
-        raise InvalidOsError(TEXTS["invalid_os_version_error_msg"].format(os_name=os_name, os_version=os_version))
+        raise InvalidOsError(Texts.INVALID_OS_VERSION_ERROR_MSG.format(os_name=os_name, os_version=os_version))
 
 
 def check_dependency(dependency_name: str, dependency_spec: DependencySpec, namespace: str = None,
@@ -172,7 +172,7 @@ def check_dependency(dependency_name: str, dependency_spec: DependencySpec, name
             raise RuntimeError
     except RuntimeError as e:
         raise RuntimeError(
-            TEXTS["version_cmd_fail_msg"].format(
+            Texts.VERSION_CMD_FAIL_MSG.format(
                 version_cmd=dependency_spec.version_command, version_cmd_args=dependency_spec.version_command_args,
                 output=log_output
             )
@@ -209,17 +209,17 @@ def check_all_binary_dependencies(namespace: str):
                      f'Supported version {supported_versions_sign} {dependency_spec.expected_version}.')
             if not valid:
                 raise InvalidDependencyError(
-                    TEXTS["invalid_dependency_error_msg"].format(
+                    Texts.INVALID_DEPENDENCY_ERROR_MSG.format(
                         dependency_name=dependency_name, installed_version=installed_version,
                         expected_version=dependency_spec.expected_version
                     )
                 )
         except FileNotFoundError as e:
-            error_msg = TEXTS["dependency_not_installed_error_msg"].format(dependency_name=dependency_name)
+            error_msg = Texts.DEPENDENCY_NOT_INSTALLED_ERROR_MSG.format(dependency_name=dependency_name)
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e
         except (RuntimeError, ValueError, TypeError) as e:
-            error_msg = TEXTS["version_get_fail_msg"].format(dependency_name=dependency_name)
+            error_msg = Texts.VERSION_GET_FAIL_MSG.format(dependency_name=dependency_name)
             log.exception(error_msg)
             raise InvalidDependencyError(error_msg) from e
     else:

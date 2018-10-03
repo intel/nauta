@@ -27,7 +27,7 @@ import re
 from util.config import Config
 from util.system import execute_system_command
 from util.logger import initialize_logger, get_verbosity_level
-from cli_text_consts import DRAFT_CMD_TEXTS as TEXTS
+from cli_text_consts import DraftCmdTexts as Texts
 
 
 logger = initialize_logger('draft.cmd')
@@ -91,7 +91,7 @@ def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
             logger.debug("Lack of logs from draft.")
     except Exception as exe:
         # exception here shouldn't block finishing of the operation
-        error_message = TEXTS["problems_during_getting_draft_logs"].format(exception=str(exe))
+        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(exception=str(exe))
         logger.error(error_message)
 
     if not exit_code:
@@ -109,11 +109,11 @@ def check_up_status(output: str) -> (str, int):
     - message - message with a description of a problem
     """
     if "Building Docker Image: SUCCESS" not in output:
-        return TEXTS["docker_image_not_built"], 100
+        return Texts.DOCKER_IMAGE_NOT_BUILT, 100
     elif "Pushing Docker Image: SUCCESS" not in output:
-        return TEXTS["docker_image_not_sent"], 101
+        return Texts.DOCKER_IMAGE_NOT_SENT, 101
     elif "Releasing Application: SUCCESS" not in output:
-        return TEXTS["app_not_released"], 102
+        return Texts.APP_NOT_RELEASED, 102
     return "", 0
 
 
@@ -126,7 +126,7 @@ def check_create_status(output: str) -> (str, int):
     - message - message with a description of a problem
     """
     if "--> Ready to sail" not in output:
-        return TEXTS["deployment_not_created"], 100
+        return Texts.DEPLOYMENT_NOT_CREATED, 100
     return "", 0
 
 
@@ -141,6 +141,6 @@ def translate_create_status_description(output: str) -> str:
     output
     """
     if "Error: could not load pack:" in output:
-        return TEXTS["pack_not_exists"]
+        return Texts.PACK_NOT_EXISTS
     else:
         return output

@@ -25,7 +25,7 @@ import pytest
 from commands.predict import stream
 from commands.predict.common import InferenceVerb
 from platform_resources.run_model import RunStatus
-from cli_text_consts import PREDICT_STREAM_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictStreamCmdTexts as Texts
 
 
 TEST_DATA = '{"instances": [1.0, 2.0, 5.0]}'
@@ -97,7 +97,7 @@ def test_stream_get_run_fail(stream_mocks: StreamPredictMocks):
     assert stream_mocks.get_inference_instance_url_mock.call_count == 0
     assert stream_mocks.get_api_key_mock.call_count == 0
 
-    assert TEXTS["instance_not_exists_error_msg"].format(name=name) in result.output
+    assert Texts.INSTANCE_NOT_EXISTS_ERROR_MSG.format(name=name) in result.output
     assert result.exit_code == 1
 
 
@@ -119,7 +119,7 @@ def test_stream_instance_not_running_fail(stream_mocks: StreamPredictMocks):
     assert stream_mocks.get_inference_instance_url_mock.call_count == 0
     assert stream_mocks.get_api_key_mock.call_count == 0
 
-    assert TEXTS["instance_not_running_error_msg"].format(name=name, running_code=RunStatus.RUNNING.value) \
+    assert Texts.INSTANCE_NOT_RUNNING_ERROR_MSG.format(name=name, running_code=RunStatus.RUNNING.value) \
         in result.output
     assert result.exit_code == 1
 
@@ -142,7 +142,7 @@ def test_stream_get_run_url_fail(stream_mocks: StreamPredictMocks):
     assert stream_mocks.get_inference_instance_url_mock.call_count == 1
     assert stream_mocks.get_api_key_mock.call_count == 0
 
-    assert TEXTS["instance_get_fail_error_msg"].format(name=name) in result.output
+    assert Texts.INSTANCE_GET_FAIL_ERROR_MSG.format(name=name) in result.output
     assert result.exit_code == 1
 
 
@@ -162,7 +162,7 @@ def test_stream_data_load_fail(stream_mocks: StreamPredictMocks):
     assert stream_mocks.get_inference_instance_url_mock.call_count == 1
     assert stream_mocks.get_api_key_mock.call_count == 0
 
-    assert TEXTS["json_load_error_msg"].format(data=data_location) in result.output
+    assert Texts.JSON_LOAD_ERROR_MSG.format(data=data_location) in result.output
     assert result.exit_code == 1
 
 
@@ -184,5 +184,5 @@ def test_stream_inference_fail(stream_mocks: StreamPredictMocks):
     assert stream_mocks.get_inference_instance_url_mock.call_count == 1
     assert stream_mocks.get_api_key_mock.call_count == 1
 
-    assert TEXTS["inference_other_error_msg"].format(exception=request_error) in result.output
+    assert Texts.INFERENCE_OTHER_ERROR_MSG.format(exception=request_error) in result.output
     assert result.exit_code == 1

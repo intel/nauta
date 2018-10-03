@@ -26,7 +26,7 @@ from typing import Optional
 import docker
 from docker.errors import NotFound
 from docker.models.containers import Container
-from cli_text_consts import UTIL_SOCAT_TEXTS as TEXTS
+from cli_text_consts import UtilSocatTexts as Texts
 from util.config import Config
 
 
@@ -66,7 +66,7 @@ def _ensure_socat_running():
 
         sleep(1)
 
-    raise RuntimeError(TEXTS["socat_container_start_fail_msg"].format(container_status=socat_container.status))
+    raise RuntimeError(Texts.SOCAT_CONTAINER_START_FAIL_MSG.format(container_status=socat_container.status))
 
 
 def load_socat_image():

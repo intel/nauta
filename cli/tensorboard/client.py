@@ -26,7 +26,7 @@ from typing import Dict, List, Optional
 import json
 import requests
 
-from cli_text_consts import TENSORBOARD_CLIENT_TEXTS as TEXTS
+from cli_text_consts import TensorboardClientTexts as Texts
 
 
 class TensorboardServiceAPIException(Exception):
@@ -128,9 +128,9 @@ class TensorboardServiceClient:
             if response_body.get('invalidRuns'):
                 list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
                                                   for item in response_body.get('invalidRuns')])
-                err_message = TEXTS["invalid_runs_error_msg"].format(invalid_runs_list=list_of_invalid_runs)
+                err_message = Texts.INVALID_RUNS_ERROR_MSG.format(invalid_runs_list=list_of_invalid_runs)
             else:
-                err_message = TEXTS["runs_not_exist_error_msg"]
+                err_message = Texts.RUNS_NOT_EXIST_ERROR_MSG
             raise TensorboardServiceAPIException(error_code=response.status_code, message=err_message)
         else:
             response_body = json.loads(response.content.decode('utf-8'))

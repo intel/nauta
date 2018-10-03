@@ -27,7 +27,7 @@ from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cl
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
-from cli_text_consts import PREDICT_LIST_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictListCmdTexts as Texts
 
 
 LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
@@ -36,10 +36,10 @@ TABLE_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_ST
 
 
 @click.command(name='list', cls=AliasCmd, alias='ls')
-@click.option('-a', '--all-users', is_flag=True, help=TEXTS["help_a"])
-@click.option('-n', '--name', type=str, help=TEXTS["help_n"])
-@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=TEXTS["help_s"])
-@click.option('-u', '--uninitialized', is_flag=True, help=TEXTS["help_u"])
+@click.option('-a', '--all-users', is_flag=True, help=Texts.HELP_A)
+@click.option('-n', '--name', type=str, help=Texts.HELP_N)
+@click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=Texts.HELP_S)
+@click.option('-u', '--uninitialized', is_flag=True, help=Texts.HELP_U)
 @common_options()
 @pass_state
 def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool):

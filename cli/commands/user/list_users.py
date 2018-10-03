@@ -29,13 +29,13 @@ import platform_resources.users as users_api
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import USER_LIST_CMD_TEXTS as TEXTS
+from cli_text_consts import UserListCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(help=TEXTS["help"], short_help=TEXTS["help"], name='list', cls=AliasCmd, alias='ls')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, name='list', cls=AliasCmd, alias='ls')
 @common_options()
 @pass_state
 def list_users(state: State):
@@ -43,8 +43,8 @@ def list_users(state: State):
     try:
         users = users_api.list_users()
         click.echo(tabulate([user.cli_representation for user in users],
-                            headers=TEXTS["table_headers"],
+                            headers=Texts.TABLE_HEADERS,
                             tablefmt="orgtbl"))
     except Exception:
-        handle_error(logger, TEXTS["other_error_msg"], TEXTS["other_error_msg"], add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
         exit(1)

@@ -23,7 +23,7 @@ import re
 
 from kubernetes import client
 from marshmallow import Schema, fields, post_load, post_dump, validates, ValidationError
-from cli_text_consts import PLATFORM_RESOURCES_CUSTOM_MODEL_TEXTS as TEXTS
+from cli_text_consts import PlatformResourcesCustomModelTexts as Texts
 
 
 # kubernetes name requirements
@@ -33,7 +33,7 @@ KUBERNETES_NAME_RE = re.compile(r'[a-z]([-.a-z0-9]*[a-z0-9])?')
 def validate_kubernetes_name(name: str):
     match = KUBERNETES_NAME_RE.fullmatch(name)
     if not match:
-        raise ValidationError(TEXTS["invalid_k8s_name"])
+        raise ValidationError(Texts.INVALID_K8S_NAME)
 
 
 class V1ObjectMetaSchema(Schema):

@@ -31,31 +31,31 @@ from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_cur
     get_kubectl_host
 from util.aliascmd import AliasCmd
 from util.system import handle_error
-from cli_text_consts import MOUNT_CMD_TEXTS as TEXTS
+from cli_text_consts import MountCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='m')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='m')
 @common_options()
 @pass_state
 def mount(state: State):
     try:
         if is_current_user_administrator():
-            handle_error(logger, TEXTS["user_is_admin_error_msg"], TEXTS["user_is_admin_error_msg"])
+            handle_error(logger, Texts.USER_IS_ADMIN_ERROR_MSG, Texts.USER_IS_ADMIN_ERROR_MSG)
             exit(1)
     except Exception:
-        handle_error(logger, TEXTS["admin_check_error_msg"], TEXTS["admin_check_error_msg"],
+        handle_error(logger, Texts.ADMIN_CHECK_ERROR_MSG, Texts.ADMIN_CHECK_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
-    click.echo(TEXTS["main_msg"])
+    click.echo(Texts.MAIN_MSG)
 
     try:
         click.echo(get_mount_command())
     except Exception:
-        handle_error(logger, TEXTS["get_mount_command_error_msg"], TEXTS["get_mount_command_error_msg"],
+        handle_error(logger, Texts.GET_MOUNT_COMMAND_ERROR_MSG, Texts.GET_MOUNT_COMMAND_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 

@@ -25,7 +25,7 @@ import nbformat
 
 from util.logger import initialize_logger
 from util.exceptions import ScriptConversionError
-from cli_text_consts import UTIL_JUPYTER_TEXTS as TEXTS
+from cli_text_consts import UtilJupyterTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -78,7 +78,7 @@ def convert_py_to_ipynb(py_filename: str, ipynb_location: str) -> bool:
             ipynb_full_path = path.join(ipynb_location, ipynb_filename)
             nbformat.write(output_notebook, ipynb_full_path, nbformat.NO_CONVERT)
     except Exception:
-        err_message = TEXTS["ipynb_conversion_error_msg"]
+        err_message = Texts.IPYNB_CONVERSION_ERROR_MSG
         logger.exception(err_message)
         raise ScriptConversionError(err_message)
 

@@ -36,7 +36,7 @@ from platform_resources.platform_resource_model import KubernetesObject
 from platform_resources.resource_filters import filter_by_name_regex, filter_by_state, filter_by_run_kinds
 from util.exceptions import InvalidRegularExpressionError, SubmitExperimentError
 from util.logger import initialize_logger
-from cli_text_consts import PLATFORM_RESOURCES_EXPERIMENTS_TEXTS as TEXTS
+from cli_text_consts import PlatformResourcesExperimentsTexts as Texts
 from platform_resources.runs import list_runs
 
 
@@ -93,7 +93,7 @@ def list_experiments(namespace: str = None,
     try:
         name_regex = re.compile(name_filter) if name_filter else None
     except sre_constants.error as e:
-        error_msg = TEXTS["regex_compilation_fail_msg"].format(name_filter=name_filter)
+        error_msg = Texts.REGEX_COMPILATION_FAIL_MSG.format(name_filter=name_filter)
         logger.exception(error_msg)
         raise InvalidRegularExpressionError(error_msg) from e
 
@@ -119,7 +119,7 @@ def list_k8s_experiments_by_label(namespace: str = None, label_selector: str = "
     schema = model.ExperimentKubernetesSchema()
     body, err = schema.load(raw_experiments['items'], many=True)
     if err:
-        raise RuntimeError(TEXTS["k8s_response_load_error_msg"].format(err=err))
+        raise RuntimeError(Texts.K8S_RESPONSE_LOAD_ERROR_MSG.format(err=err))
     return body
 
 
@@ -163,14 +163,14 @@ def add_experiment(exp: model.Experiment, namespace: str, labels: Dict[str, str]
     schema = model.ExperimentKubernetesSchema()
     body, err = schema.dump(exp_kubernetes)
     if err:
-        raise RuntimeError(TEXTS["k8s_dump_preparation_error_msg"].format(err=err))
+        raise RuntimeError(Texts.K8S_DUMP_PREPARATION_ERROR_MSG.format(err=err))
 
     raw_exp = api.create_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace, body=body,
                                                   plural=EXPERIMENTS_PLURAL, version=EXPERIMENTS_VERSION)
 
     response, err = schema.load(raw_exp)
     if err:
-        raise RuntimeError(TEXTS["k8s_response_load_error_msg"].format(err=err))
+        raise RuntimeError(Texts.K8S_RESPONSE_LOAD_ERROR_MSG.format(err=err))
 
     return response
 
@@ -185,10 +185,10 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
         experiment = get_experiment(namespace=namespace, name=name)
         experiment_runs = experiment.get_runs() if experiment else []
         if experiment and experiment_runs:
-            raise SubmitExperimentError(TEXTS["experiment_already_exists_error_msg"].format(name=name))
+            raise SubmitExperimentError(Texts.EXPERIMENT_ALREADY_EXISTS_ERROR_MSG.format(name=name))
         # subcase when experiment has no associated runs.
         if experiment and not experiment_runs:
-            raise SubmitExperimentError(TEXTS["experiment_invalid_state_msg"].format(name=name))
+            raise SubmitExperimentError(Texts.EXPERIMENT_INVALID_STATE_MSG.format(name=name))
         return name, prepare_label(script_name, name, name, run_kind=run_kind)
     else:
         # CASE 2: If user submit exp without name, but there is already exp with the same script name, then:
@@ -280,7 +280,7 @@ def update_experiment(experiment: model.Experiment, namespace: str) -> Kubernete
     schema = model.ExperimentKubernetesSchema()
     body, err = schema.dump(run_kubernetes)
     if err:
-        raise RuntimeError(TEXTS["k8s_dump_preparation_error_msg"].format(err=err))
+        raise RuntimeError(Texts.K8S_DUMP_PREPARATION_ERROR_MSG.format(err=err))
 
     try:
         raw_exp = api.patch_namespaced_custom_object(group=API_GROUP_NAME, namespace=namespace,
@@ -288,7 +288,7 @@ def update_experiment(experiment: model.Experiment, namespace: str) -> Kubernete
                                                      version=EXPERIMENTS_VERSION, name=experiment.name)
         logger.debug(f'Experiment patch response : {raw_exp}')
     except ApiException as exe:
-        err_message = TEXTS["experiment_update_error_msg"]
+        err_message = Texts.EXPERIMENT_UPDATE_ERROR_MSG
         logger.exception(err_message)
         raise RuntimeError(err_message) from exe
 

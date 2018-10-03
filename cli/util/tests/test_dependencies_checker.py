@@ -29,7 +29,7 @@ from util.dependencies_checker import _is_version_valid, LooseVersion, _parse_in
     get_dependency_versions_file_path, save_dependency_versions, load_dependency_versions, \
     DEPENDENCY_VERSIONS_FILE_SUFFIX
 from util.exceptions import InvalidDependencyError, InvalidOsError
-from cli_text_consts import UTIL_DEPENDENCIES_CHECKER_TEXTS as TEXTS
+from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 
 
 TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
@@ -200,7 +200,7 @@ def test_check_os_unknown(mocker):
     with pytest.raises(InvalidOsError) as os_error:
         check_os()
 
-    assert TEXTS["unknown_os_error_msg"] == str(os_error.value)
+    assert Texts.UNKNOWN_OS_ERROR_MSG == str(os_error.value)
 
 
 def test_check_os_get_os_version_fail(mocker):
@@ -210,7 +210,7 @@ def test_check_os_get_os_version_fail(mocker):
     with pytest.raises(InvalidOsError) as os_error:
         check_os()
 
-    assert TEXTS["get_os_version_error_msg"] == str(os_error.value)
+    assert Texts.GET_OS_VERSION_ERROR_MSG == str(os_error.value)
 
 
 def test_check_os_not_supported(mocker):
@@ -220,7 +220,7 @@ def test_check_os_not_supported(mocker):
     with pytest.raises(InvalidOsError) as os_error:
         check_os()
 
-    assert TEXTS["unsupported_os_error_msg"].format(os_name="not_supported_system", os_version="9.3") \
+    assert Texts.UNSUPPORTED_OS_ERROR_MSG.format(os_name="not_supported_system", os_version="9.3") \
         == str(os_error.value)
 
 
@@ -231,7 +231,7 @@ def test_check_os_version_not_supported(mocker):
     with pytest.raises(InvalidOsError) as os_error:
         check_os()
 
-    assert TEXTS["invalid_os_version_error_msg"].format(os_name="ubuntu", os_version="14.04") == str(os_error.value)
+    assert Texts.INVALID_OS_VERSION_ERROR_MSG.format(os_name="ubuntu", os_version="14.04") == str(os_error.value)
 
 
 def test_check_os_version_supported(mocker):

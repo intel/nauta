@@ -22,21 +22,22 @@
 
 VERBOSE_RERUN_MSG = "Use -v or -vv option for more info."
 
-VERSION_CMD_TEXTS = {
-    "help": "Displays the version of the installed dlsctl application.",
-    "initial_platform_version": "Failed to get platform version.",
-    "kubectl_int_error_msg": "Platform version check failure may occur for example due to invalid path to kubectl "
-                             "config, invalid k8s credentials or k8s cluster being unavailable. Check your "
-                             "KUBECONFIG environment variable and make sure that the k8s cluster is online.",
-    "other_error_msg": "Unexpected error occurred during platform version check.",
-    "table_app_row_name": "dlsctl application",
-    "table_platform_row_name": "dls4e platform",
-    "table_headers": ["Component", "Version"]
-}
 
-MOUNT_CMD_TEXTS = {
-    "help": "Displays a command that can be used to mount client's folders on his/her local machine.",
-    "main_msg": """
+class VersionCmdTexts:
+    HELP = "Displays the version of the installed dlsctl application."
+    INITIAL_PLATFORM_VERSION = "Failed to get platform version."
+    KUBECTL_INT_ERROR_MSG = "Platform version check failure may occur for example due to invalid path to kubectl " \
+                            "config, invalid k8s credentials or k8s cluster being unavailable. Check your " \
+                            "KUBECONFIG environment variable and make sure that the k8s cluster is online."
+    OTHER_ERROR_MSG = "Unexpected error occurred during platform version check."
+    TABLE_APP_ROW_NAME = "dlsctl application"
+    TABLE_PLATFORM_ROW_NAME = "dls4e platform"
+    TABLE_HEADERS = ["Component", "Version"]
+
+
+class MountCmdTexts:
+    HELP = "Displays a command that can be used to mount client's folders on his/her local machine."
+    MAIN_MSG = """
                 Use the following command to mount those folders:
                  - replace <MOUNTPOINT> with a proper location on your local machine)
                  - replace <DLS4E_FOLDER> with one of the following:
@@ -53,570 +54,569 @@ MOUNT_CMD_TEXTS = {
                 as /mnt/output/experiment from training script. This folder is shared by Samba
                 as output/<EXPERIMENT_NAME>.
                 --------------------------------------------------------------------
-                """,
-    "user_is_admin_error_msg": "DLS4E doesn't create shares for administrators. Please execute this command as a "
-                               "regular user.",
-    "admin_check_error_msg": "Problems detected while verifying that current user is an administrator.",
-    "get_mount_command_error_msg": "Error detected while gathering data needed for mounting Samba share."
-}
-
-CMDS_COMMON_TEXTS = {
-    "invalid_regex_error_msg": "Regular expression provided for name filtering is invalid: {name}",
-    "other_error_msg": "Failed to get experiments list."
-}
-
-VERIFY_CMD_TEXTS = {
-    "help": "Command verifies whether all external components required by dlsctl are installed in proper versions. "
-            "If something is missing, the application displays detailed information about it.",
-    "kubectl_not_installed_error_msg": "kubectl is not installed.",
-    "get_k8s_namespace_error_msg": "Failed to get current Kubernetes namespace.",
-    "version_checking_msg": "Checking version of {dependency_name}. Installed version: ({installed_version}). "
-                            "Supported version {supported_versions_sign} {expected_version}.",
-    "dependency_verification_success_msg": "{dependency_name} verified successfully.",
-    "invalid_version_warning_msg": "Warning: the installed version of {dependency_name} ({installed_version}) is "
-                                   "not supported, supported version {supported_versions_sign} "
-                                   "{expected_version}",
-    "dependency_not_installed_error_msg": "{dependency_name} is not installed.",
-    "dependency_version_check_error_msg": "Failed to get {dependency_name} version.",
-    "dependency_verification_other_error_msg": "{dependency_name} - exception during verification.",
-    "os_supported_msg": "This OS is supported."
-}
+                """
+    USER_IS_ADMIN_ERROR_MSG = "DLS4E doesn't create shares for administrators. Please execute this command as a " \
+                              "regular user."
+    ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
+    GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
 
 
-USER_CMD_TEXTS = {
-    "help": "Command for creating/deleting/listing users of the platform. Can only be run by a platform "
-            "administrator."
-}
+class CmdsCommonTexts:
+    INVALID_REGEX_ERROR_MSG = "Regular expression provided for name filtering is invalid: {name}"
+    OTHER_ERROR_MSG = "Failed to get experiments list."
 
-USER_LIST_CMD_TEXTS = {
-    "help": "List users.",
-    "table_headers": ["Name", "Creation date", "Date of last submitted job", "Number of running jobs",
-                      "Number of queued jobs"],
-    "other_error_msg": "Failed to get users list."
-}
 
-USER_CREATE_CMD_TEXTS = {
-    "help": "Command used to create a new user on the platform. Can only be run by a platform administrator.",
-    "help_l": "If given - content of the generated user's config file is displayed on the screen only.",
-    "help_f": "Name of file where user's configuration will be stored. If not given configuration is stored in the "
-              "config. file.",
-    "add_user_error_msg": "User {username} has not been created.",
-    "remove_user_error_msg": "Partially created user {username}"
-                             " has not been removed successfully - please remove the user manually.",
-    "f_l_options_exclusion_error_msg": "Both -f/--filename and -l/--list_only options cannot be given. Please "
-                                       "choose one of them.",
-    "name_validation_error_msg": "Error detected while validating user name: {username}.",
-    "user_not_admin_error_msg": "Only administrators can create new users.",
-    "user_already_exists_error_msg": "User {username} already exists.",
-    "user_being_removed_error_msg": "User {username} is still being removed.",
-    "user_verification_error_msg": "Problems detected while verifying user with user name: {username}.",
-    "password_gather_error_msg": "The app encountered problems while gathering user's password.",
-    "user_add_error_msg": "Error detected while adding of a user.",
-    "user_creation_success_msg": "User {username} has been added successfully.",
-    "user_not_ready_error_msg": "User {username} is still not ready.",
-    "config_creation_error_msg": "Problems during creation of the kubeconfig with user's configuration.",
-    "list_only_header": "Please use the following kubectl config to connect to this user.\n"
-                        "----------------------------------------------------------------",
-    "config_save_success_msg": "Configuration has been saved to the {filename} file.",
-    "config_save_fail_msg": "File with configuration wasn't saved.",
-    "config_save_fail_instructions_msg": "Content of the generated config file is as follows. Please copy it "
-                                         "to a file manually."
-}
+class VerifyCmdTexts:
+    HELP = "Command verifies whether all external components required by dlsctl are installed in proper versions. " \
+           "If something is missing, the application displays detailed information about it."
+    KUBECTL_NOT_INSTALLED_ERROR_MSG = "kubectl is not installed."
+    GET_K8S_NAMESPACE_ERROR_MSG = "Failed to get current Kubernetes namespace."
+    VERSION_CHECKING_MSG = "Checking version of {dependency_name}. Installed version: ({installed_version}). " \
+                           "Supported version {supported_versions_sign} {expected_version}."
+    DEPENDENCY_VERIFICATION_SUCCESS_MSG = "{dependency_name} verified successfully."
+    INVALID_VERSION_WARNING_MSG = "Warning: the installed version of {dependency_name} ({installed_version}) is " \
+                                  "not supported, supported version {supported_versions_sign} " \
+                                  "{expected_version}"
+    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed."
+    DEPENDENCY_VERSION_CHECK_ERROR_MSG = "Failed to get {dependency_name} version."
+    DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG = "{dependency_name} - exception during verification."
+    OS_SUPPORTED_MSG = "This OS is supported."
 
-USER_DELETE_CMD_TEXTS = {
-    "help": "Command used to delete a user from the platform. Can be only run by a platform administrator.",
-    "help_pr": "If this option is added, the command removes all of client's artifacts.",
-    "user_not_admin_error_msg": "Only administrators can delete users.",
-    "user_not_exists_error_msg": "User {username} doesn't exists.",
-    "user_being_removed_error_msg": "User is still being removed.",
-    "user_presence_verification_error_msg": "Problems during verifying users presence.",
-    "delete_confirm_msg": "User {username} is about to be deleted. Do you want to continue?",
-    "delete_abort_msg": "Operation of deleting of a user was aborted.",
-    "purge_error_msg": "Some artifacts belonging to a user weren't removed.",
-    "delete_in_progress_msg": "User is still being deleted. Please check status of this user in a while.",
-    "delete_success_msg": "User {username} has been deleted.",
-    "proxy_error_log_msg": "Error during closing of a proxy for elasticsearch.",
-    "proxy_error_user_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if "
-                            "yes - close it manually.",
-    "other_error_log_msg": "Error during deleting a user of a user.",
-    "other_error_user_msg": "User hasn't been deleted due to technical reasons.",
-    "deletion_check_presence": "Checking presence of a user that is going to be deleted...",
-    "deletion_start_deleting": "Deleting of a user is starting now...",
-    "deletion_start_purging": "Purging of a user is starting now...",
-    "deletion_verification_of_deleting": "Verifying, whether a user has been deleted properly...",
-    "deletion_deleting_namespace": "- deleting user's namespace",
-    "deletion_deleting_users_objects": "- deleting user's objects",
-    "deletion_deleting_users_experiments": "- deleting user experiments' logs"
-}
 
-LAUNCH_CMD_TEXTS = {
-    "help": "Command for launching web user-interface or tensorboard.",
-    "help_p": "Port on which service will be exposed locally.",
-    "help_n": "Run command without a web browser starting, only proxy tunnel is created",
-    "webui_help": "Subcommand for launching webUI with credentials",
-    "app_proxy_exists_error_msg": "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - "
-                                  "close it manually.",
-    "app_proxy_other_error_msg": "Other exception during launching web application.",
-    "tb_help": "Subcommand for launching tensorboard with credentials",
-    "tb_help_tscp": "Local port on which tensorboard service client will be started.",
-    "tb_invalid_runs_msg": "There is no data for the following experiments : {invalid_runs}\n"
-                           "Tensorboard will present information from the rest of given experiments.",
-    "tb_create_error_msg": "Failed to create tensorboard!",
-    "tb_waiting_msg": "Please wait for Tensorboard to run...",
-    "tb_waiting_for_tb_msg": "Tensorboard instance: {tb_id} still in {tb_status_value} status, waiting for "
-                             "RUNNING...",
-    "tb_timeout_error_msg": "Tensorboard failed to run - timeout."
-}
+class UserCmdTexts:
+    HELP = "Command for creating/deleting/listing users of the platform. Can only be run by a platform " \
+           "administrator."
 
-PREDICT_CMD_TEXTS = {
-    "help": "Command for starting, stopping, and managing prediction jobs and instances. To get further help on "
-            "commands use COMMAND with -h or --help option."
-}
 
-PREDICT_LIST_CMD_TEXTS = {
-    "help_a": "Show all prediction instances, regardless of the owner.",
-    "help_n": "A regular expression to narrow down list to prediction instances that match this expression.",
-    "help_s": "List prediction instances with matching status.",
-    "help_u": "List uninitialized prediction instances, i.e. prediction instances"
-              " without resources submitted for creation.",
-}
+class UserListCmdTexts:
+    HELP = "List users."
+    TABLE_HEADERS = ["Name", "Creation date", "Date of last submitted job", "Number of running jobs"
+                     "Number of queued jobs"]
+    OTHER_ERROR_MSG = "Failed to get users list."
 
-PREDICT_LAUNCH_CMD_TEXTS = {
-    "help": "Starts a new prediction instance that can be used for performing prediction, classification and "
-            "regression tasks on trained model.",
-    "help_n": "The name of this prediction instance.",
-    "help_m": "Path to saved model that will be used for inference. Model must be located on one of the input or "
-              "output system shares (e.g. /mnt/input/saved_model).",
-    "instance_start_error_msg": "Failed to create prediction instance.",
-    "instance_info_msg": "\nPrediction instance URL (append method verb manually, e.g. :predict):\n"
-                         "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}",
-    "instance_url_error_msg": "Failed to obtain prediction instance URL.",
-    "table_headers": ["Prediction instance", "Model Location", "State"],
-    "help_local_model_location": "Local path to saved model that will be used for inference. Model content will be "
-                                 "copied into an image",
-    "model_dir_not_found_error_msg": "Cannot find: {local_model_location}. local_model_location must be a path to "
-                                     "existing directory.",
-    "missing_model_location_error_msg": "Missing model location param - "
-                                        "'model location' or 'local model location' required",
-    "help_model_name": "Name of a model passed as a servable name. By default it is the name of directory in model's " 
-                       "location.",
-}
 
-PREDICT_STREAM_CMD_TEXTS = {
-    "help": "Perform stream prediction task on deployed prediction instance.",
-    "help_n": "Name of prediction session.",
-    "help_d": "Path to JSON data file that will be streamed to prediction instance. Data must be formatted such "
-              "that it is compatible with the SignatureDef specified within the model deployed in selected "
-              "prediction instance.",
-    "help_m": "Method verb that will be used when performing inference. Predict verb is used by default.",
-    "instance_not_exists_error_msg": "Prediction instance {name} does not exist.",
-    "instance_not_running_error_msg": "Prediction instance {name} is not in {running_code} state.",
-    "instance_get_fail_error_msg": "Failed to get prediction instance {name} URL.",
-    "json_load_error_msg": "Failed to load {data} data file. Make sure that provided file exists and is in a "
-                           "valid JSON format.",
-    "inference_other_error_msg": "Failed to perform inference. Reason: {exception}",
-    "inference_error_response_msg": "\n Response: {response_text}"
-}
+class UserCreateCmdTexts:
+    HELP = "Command used to create a new user on the platform. Can only be run by a platform administrator."
+    HELP_L = "If given - content of the generated user's config file is displayed on the screen only."
+    HELP_F = "Name of file where user's configuration will be stored. If not given configuration is stored in the " \
+             "config. file."
+    ADD_USER_ERROR_MSG = "User {username} has not been created."
+    REMOVE_USER_ERROR_MSG = "Partially created user {username}" \
+                            " has not been removed successfully - please remove the user manually."
+    F_L_OPTIONS_EXCLUSION_ERROR_MSG = "Both -f/--filename and -l/--list_only options cannot be given. Please " \
+                                      "choose one of them."
+    NAME_VALIDATION_ERROR_MSG = "Error detected while validating user name: {username}."
+    USER_NOT_ADMIN_ERROR_MSG = "Only administrators can create new users."
+    USER_ALREADY_EXISTS_ERROR_MSG = "User {username} already exists."
+    USER_BEING_REMOVED_ERROR_MSG = "User {username} is still being removed."
+    USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
+    PASSWORD_GATHER_ERROR_MSG = "The app encountered problems while gathering user's password."
+    USER_ADD_ERROR_MSG = "Error detected while adding of a user."
+    USER_CREATION_SUCCESS_MSG = "User {username} has been added successfully."
+    USER_NOT_READY_ERROR_MSG = "User {username} is still not ready."
+    CONFIG_CREATION_ERROR_MSG = "Problems during creation of the kubeconfig with user's configuration."
+    LIST_ONLY_HEADER = "Please use the following kubectl config to connect to this user.\n" \
+                       "----------------------------------------------------------------"
+    CONFIG_SAVE_SUCCESS_MSG = "Configuration has been saved to the {filename} file."
+    CONFIG_SAVE_FAIL_MSG = "File with configuration wasn't saved."
+    CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG = "Content of the generated config file is as follows. Please copy it " \
+                                        "to a file manually."
 
-PREDICT_CANCEL_CMD_TEXTS = {
-    "help": "Cancels prediction instance/s chosen based on criteria given as a parameter.",
-    "help_p": "If given, then all information concerning all prediction instances, completed and currently "
-              "running, is removed from the system.",
-    "help_m": "If given, command searches for prediction instances matching the value of this option.",
-    "experiment_name": "prediction instance",
-    "experiment_name_plural": "prediction instances",
-}
 
-PREDICT_BATCH_CMD_TEXTS = {
-    "help": "Uses specified dataset to perform inference. Results stored in output file",
-    "help_data": "location of a folder with data that will be used to perform the batch inference. Value should points "
-                 "out the location from one of the system's shares.",
-    "help_model_location": "Path to saved model that will be used for inference. Model must be located on one of the " 
-                           "input or output system shares (e.g. /mnt/input/saved_model).",
-    "help_local_model_location": "Local path to saved model that will be used for inference. Model content will be copied into an image",
-    "help_model_name": "Name of a model passed as a servable name. By default it is the name of directory in model's " 
-                       "location.",
-    "help_name": "name of a predict session",
-    "help_output": "location of a folder where outputs from inferences will be stored. Value should points out the "
-                   "location from one of the system's shares.",
-    "other_instance_creation_error_msg": "Failed to create batch prediction instance.",
-    "table_name_header": "Prediction instance",
-    "table_model_location_header": "Model location",
-    "table_status_header": "State",
-    "table_headers": ["Prediction instance", "Model location", "State"],
-    "model_dir_not_found_error_msg": "Cannot find: {local_model_location}. local_model_location must be a path to "
-                                     "existing directory.",
-    "missing_model_location_error_msg": "Missing model location param - "
-                                        "'model location' or 'local model location' required"
-}
+class UserDeleteCmdTexts:
+    HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
+    HELP_PR = "If this option is added, the command removes all of client's artifacts."
+    USER_NOT_ADMIN_ERROR_MSG = "Only administrators can delete users."
+    USER_NOT_EXISTS_ERROR_MSG = "User {username} doesn't exists."
+    USER_BEING_REMOVED_ERROR_MSG = "User is still being removed."
+    USER_PRESENCE_VERIFICATION_ERROR_MSG = "Problems during verifying users presence."
+    DELETE_CONFIRM_MSG = "User {username} is about to be deleted. Do you want to continue?"
+    DELETE_ABORT_MSG = "Operation of deleting of a user was aborted."
+    PURGE_ERROR_MSG = "Some artifacts belonging to a user weren't removed."
+    DELETE_IN_PROGRESS_MSG = "User is still being deleted. Please check status of this user in a while."
+    DELETE_SUCCESS_MSG = "User {username} has been deleted."
+    PROXY_ERROR_LOG_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_ERROR_USER_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
+                           "yes - close it manually."
+    OTHER_ERROR_LOG_MSG = "Error during deleting a user of a user."
+    OTHER_ERROR_USER_MSG = "User hasn't been deleted due to technical reasons."
+    DELETION_CHECK_PRESENCE = "Checking presence of a user that is going to be deleted..."
+    DELETION_START_DELETING = "Deleting of a user is starting now..."
+    DELETION_START_PURGING = "Purging of a user is starting now..."
+    DELETION_VERIFICATION_OF_DELETING = "Verifying, whether a user has been deleted properly..."
+    DELETION_DELETING_NAMESPACE = "- deleting user's namespace"
+    DELETION_DELETING_USERS_OBJECTS = "- deleting user's objects"
+    DELETION_DELETING_USERS_EXPERIMENTS = "- deleting user experiments' logs"
 
-EXPERIMENT_CMD_TEXTS = {
-    "help": "Command for starting, stopping, and managing training jobs."
-}
 
-EXPERIMENT_LIST_CMD_TEXTS = {
-    "help_a": "Show all experiments, regardless of the owner.",
-    "help_n": "A regular expression to narrow down list to experiments that match this expression.",
-    "help_s": "List experiments with matching status.",
-    "help_u": "List uninitialized experiments, i.e. experiments without resources submitted for creation.",
-}
+class LaunchCmdTexts:
+    HELP = "Command for launching web user-interface or tensorboard."
+    HELP_P = "Port on which service will be exposed locally."
+    HELP_N = "Run command without a web browser starting, only proxy tunnel is created"
+    WEBUI_HELP = "Subcommand for launching webUI with credentials"
+    APP_PROXY_EXISTS_ERROR_MSG = "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - " \
+                                 "close it manually."
+    APP_PROXY_OTHER_ERROR_MSG = "Other exception during launching web application."
+    TB_HELP = "Subcommand for launching tensorboard with credentials"
+    TB_HELP_TSCP = "Local port on which tensorboard service client will be started."
+    TB_INVALID_RUNS_MSG = "There is no data for the following experiments : {invalid_runs}\n" \
+                          "Tensorboard will present information from the rest of given experiments."
+    TB_CREATE_ERROR_MSG = "Failed to create tensorboard!"
+    TB_WAITING_MSG = "Please wait for Tensorboard to run..."
+    TB_WAITING_FOR_TB_MSG = "Tensorboard instance: {tb_id} still in {tb_status_value} status, waiting for " \
+                            "RUNNING..."
+    TB_TIMEOUT_ERROR_MSG = "Tensorboard failed to run - timeout."
 
-EXPERIMENT_TEMPLATE_LIST_CMD_TEXTS = {
-    "help": "Returns a list of available templates that can be used to submit training jobs.",
-    "lack_of_packs_error_msg": "Lack of installed packs."
-}
 
-EXPERIMENT_LOGS_CMD_TEXTS = {
-    "help": "Show logs for a given experiment.",
-    "help_s": "Show all events with this specified minimal and greater severity.",
-    "help_sd": "Retrieve all logs produced on and after this date (use ISO 8601 date format).",
-    "help_ed": "Retrieve all logs produced on and before this date (use ISO 8601 date format).",
-    "help_i": "Comma separated list of pod IDs. If provided, only logs from these pods will be returned.",
-    "help_p": "Get logs only for pods with given status.",
-    "help_m": "If given, command searches for logs from experiments matching the value of this option. "
-              "This option cannot be used along with the NAME argument.",
-    "help_o": "If given - logs are stored in a file with a name derived from a name of an experiment.",
-    "help_f": "Specify if logs should be streamed. Only logs from a single experiment can be streamed.",
-    "help_pager": "Display logs in interactive pager.",
-    "proxy_creation_error_msg": "Error during creation of a proxy for elasticsearch.",
-    "logs_get_other_error_msg": "Failed to get experiment logs.",
-    "experiment_not_exists_error_msg": "Experiment with name {experiment_name} does not exist.",
-    "local_port_occupied_error_msg": "Error during creation of a proxy for elasticsearch. {exe.message}",
-    "proxy_close_log_error_msg": "Error during closing of a proxy for elasticsearch.",
-    "proxy_close_user_error_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if "
-                                  "yes - close it manually.",
-    "name_m_both_given_error_msg": "Both experiment name and -m option cannot be given. Please choose one of them.",
-    "name_m_none_given_error_msg": "Error: Experiment name or -m option must be given. Please pass one of them.",
-    "logs_storing_confirmation": "Logs from the {experiment_name} experiment will be stored in "
-                                 "the {filename} file. Should the app proceed?",
-    "logs_storing_confirmation_file_exists": "Logs from the {experiment_name} experiment will be stored in the "
-                                             "{filename} file. The file with this "
-                                             "name already exists. Should the app proceed?",
-    "logs_storing_error": "Some problems occurred during storing a file with logs. {exception_message}",
-    "logs_storing_final_message": "Logs have been written to the file mentioned above.",
-    "more_exp_logs_message": "There is more than one log to be stored. Each log will be stored in a separate file."
-}
+class PredictCmdTexts:
+    HELP = "Command for starting, stopping, and managing prediction jobs and instances. To get further help on " \
+           "commands use COMMAND with -h or --help option."
 
-EXPERIMENT_SUBMIT_CMD_TEXTS = {
-    "help": "Command used to submitting training scripts.",
-    "help_n": "Name for this experiment.",
-    "help_sfl": "Name of a folder with additional files used by a script, e.g., other .py files, data etc. If not "
-                "given - its content won't be copied into an image.",
-    "help_t": "Name of a template used to create a deployment. By default, this is a single-node tensorflow training."
-              " Template is chosen. List of available templates might be obtained by"
-              " Issuing dlsctl experiment template_list command.",
-    "help_p": " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: "
-              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' ",
-    "help_pr": "Values (set or range) of a single parameter.",
-    "help_ps": "Set of values of one or several parameters.",
-    "user_is_admin_log_msg": "Current user is dls4e administrator. Submit cannot be performed.",
-    "user_is_admin_usr_msg": "You cannot submit experiments as dls4e administrator. Switch your KUBECONFIG "
-                             "environment variable to point to a valid dls4e user config. If you don't have one you "
-                             "can create it with command 'dlsctl user create'.",
-    "help_e": "Environment variables passed to training. User can pass as many environmental variables as it is "
-              "needed - each variable should be in such case passed as a separate -e paramater.",
-    "script_not_found_error_msg": "Cannot find: {script_location}. Make sure that provided path is correct.",
-    "default_script_not_found_error_msg": "Cannot find script: {default_script_name} in directory: {script_directory}. "
-                                          "If path to directory was passed as submit command argument, then "
-                                          "{default_script_name} file has to exist in that directory.",
-    "script_dir_not_found_error_msg": "Cannot find: {script_folder_location}. script_folder_location must be a path to "
-                                      "existing directory. ",
-    "submit_start_log_msg": "Submit - start",
-    "submit_start_user_msg": "Submitting experiments.",
-    "submit_error_msg": "Problems during submitting experiment: {exception_message}",
-    "submit_other_error_msg": "Other problems during submitting experiment.",
-    "failed_runs_log_msg": "There are failed runs",
-}
 
-EXPERIMENT_INTERACT_CMD_TEXTS = {
-    "help": "Launches a local browser with Jupyter Notebook. If the script name argument is given, then script is put "
-            "into the opened notebook.",
-    "help_n": "The name of this Jupyter Notebook session.",
-    "help_f": "File with a notebook that should be opened in Jupyter notebook.",
-    "help_pn": "Port on which service will be exposed locally.",
-    "help_p": " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: "
-              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' ",
-    "help_no_launch": "Run command without a web browser starting, only proxy tunnel is created",
-    "experiment_get_error_msg": "Problems during loading a list of experiments.",
-    "name_already_used": "The chosen name ({name}) is already used by an experiment other than Jupyter Notebook. "
-                         "Please choose another one.",
-    "confirm_experiment_creation": "Experiment with a given name doesn't exist. Should the app continue and create a "
-                                   "new one? ",
-    "submitting_experiment_user_msg": "Submitting interactive experiment.",
-    "submit_error_msg": "Error during starting jupyter notebook session: {exception_message}",
-    "submit_other_error_msg": "Other error during starting jupyter notebook session.",
-    "session_exists_msg": "Jupyter notebook's session exists. dlsctl connects to this session ...",
-    "notebook_state_check_error_msg": "Error during checking state of Jupyter notebook.",
-    "attaching_script_not_supported_msg": "Attaching script to existing Jupyter notebook's session is not supported. "
-                                          "Please create a new Jupyter notebook's session to attach script.",
-    "notebook_not_ready_error_msg": "Jupyter notebook is still not ready. Please try to connect to it by running "
-                                    "interact command another time passing a name of a current Jupyter notebook "
-                                    "session.",
-    "proxy_closing_error_msg": "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - close "
-                               "it manually.",
-    "session_launch_other_error_msg": "Other exception during launching interact session.",
-    "exp_with_the_same_name_must_be_purged": "Notebook with the same name exists but is in state other than RUNNING."
-                                             "If you want to start another notebook using the same name, please "
-                                             "purge the previous one.",
-    "help_e": "Environment variables passed to Jupyter instance. User can pass as many environmental variables as "
-              "it is needed - each variable should be in such case passed as a separate -e paramater.",
-    "help_t": "Name of a jupyter notebook template used to create a deployment. "
-              "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
-}
+class PredictListCmdTexts:
+    HELP_A = "Show all prediction instances, regardless of the owner."
+    HELP_N = "A regular expression to narrow down list to prediction instances that match this expression."
+    HELP_S = "List prediction instances with matching status."
+    HELP_U = "List uninitialized prediction instances, i.e. prediction instances" \
+             " without resources submitted for creation."
 
-EXPERIMENT_CANCEL_CMD_TEXTS = {
-    "help": "Cancels experiment/s or pods chosen based on criteria given as parameters.",
-    "help_p": "If given, then all information concerning all experiments, completed and currently running, is removed "
-              "from the system.",
-    "help_m": "If given, command searches for experiments matching the value of this option. This option cannot be "
-              "used along with the NAME argument.",
-    "help_i": "Comma-separated pods IDs - if given then matches pods by their IDs and cancels them.",
-    "help_s": "One of: {available_statuses} - searches pods by their status and cancels them.",
-    "name_m_both_given_error_msg": "Both name and -m option cannot be given. Please choose one of them.",
-    "name_m_none_given_error_msg": "Error: Name or -m option must be given. Please pass one of them.",
-    "list_runs_error_msg": "Problems during loading a list of {experiment_name_plural}.",
-    "lack_of_experiments_error_msg": "Lack of {experiment_name_plural} fulfilling given criteria. Name or match string "
-                                     "parameters do not match any existing {experiment_name} in an appropriate state "
-                                     "for the command. Run 'dlsctl exp list' to "
-                                     "find out what are the names and states of existing {experiment_name_plural}.",
-    "experiments_already_cancelled_error_msg": "{experiment_name_plural} fulfilling given criteria have been cancelled "
-                                               "already.",
-    "already_cancelled_list_header": "The following {experiment_name_plural} have been cancelled already or cannot "
-                                     "be cancelled due to their current state:",
-    "can_be_cancelled_list_header": "The following {experiment_name_plural} can still be cancelled:",
-    "will_be_cancelled_list_header": "The following {experiment_name_plural} will be cancelled:",
-    "will_be_purged_list_header": "The following {experiment_name_plural} will be purged:",
-    "confirm_cancel_msg": "Do you want to continue with cancellation of those {experiment_name_plural}?",
-    "cancellation_aborted_msg": "Operation of cancellation of {experiment_name_plural} was aborted.",
-    "other_cancelling_error_msg": "Error during cancelling an experiment.",
-    "proxy_closing_error_log_msg": "Error during closing of a proxy for elasticsearch.",
-    "proxy_closing_error_user_msg": "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, "
-                                    "if yes - close it manually.",
-    "port_occupied_error_log_msg": "Error during creation of proxy - port is occupied.",
-    "port_occupied_error_user_msg": "Error during creation of a proxy for elasticsearch. {exception_message}",
-    "proxy_open_error_msg": "Error during creation of a proxy for elasticsearch.",
-    "successfully_cancelled_list_header": "The following {experiment_name_plural} were cancelled successfully:",
-    "failed_to_cancel_list_header": "The following {experiment_name_plural} weren't cancelled properly:",
-    "get_experiment_error_msg": "Error during loading experiment's data.",
-    "purging_start_msg": "Purging {run_name} experiment ...",
-    "incomplete_purge_error_msg": "Not all {experiment_name}'s components were removed properly.",
-    "canceling_runs_start_msg": "Cancelling {run_name} {experiment_name} ...",
-    "deleting_related_objects_msg": "Deleting objects related to {run_name} {experiment_name} ...",
-    "cancel_setting_status_msg": "Setting {run_name} status to CANCELLED ...",
-    "incomplete_cancel_error_msg": "Not all components of {run_name} {experiment_name} were deleted ...\nExperiment "
-                                   "remains in its previous state.",
-    "bad_pod_status_passed": "Wrong status: {status_passed} , available: {available_statuses}",
-    "lack_of_pods_error_msg": "Lack of pods fulfilling given criteria. Pod ID or pod status "
-                                     "parameters do not match any existing pod.",
-    "canceling_pods_msg": "Cancelling the pod: {pod_name} ...",
-    "other_pod_cancelling_error_msg": "Error during cancelling the pod.",
-    "uninitialized_experiment_cancel_msg": "Experiment {experiment_name} has no resources submitted for creation.",
-}
 
-EXPERIMENT_VIEW_CMD_TEXTS = {
-    "help": "Displays details of experiment with a given name.",
-    "help_t": "If given, then exposes a tensorboard's instance with experiment's data.",
-    "container_details_msg": "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:\n  {resources}",
-    "experiment_not_found_error_msg": "Experiment \"{experiment_name}\" not found.",
-    "pods_participating_list_header": "\nPods participating in the execution:\n",
-    "pods_table_headers": ["Name", "Uid", "Pod Conditions", "Container Details"],
-    "view_other_error_msg": "Failed to get experiment.",
-    "container_not_created_msg": "Not created",
-    "container_running_msg": "Running, ",
-    "container_terminated_msg": "Terminated, ",
-    "container_waiting_msg": "Waiting, ",
-    "container_requests_list_header": "- Requests:\n{}",
-    "container_limits_list_header": "- Limits:\n{}",
-    "resources_sum_list_header": "\nResources used by pods:\n",
-    "resources_sum_parsing_error_msg": "There was an error when trying to parse pods resources. Error msg: {error_msg}",
-    "resources_sum_table_headers": ["Resource type", "Total usage"],
-    "resources_sum_table_rows_headers": ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"],
-    "insufficient_resources_message": "Experiment is in PENDING status due to insuffcient {resources}.",
-    "top_cpu_consumers": "Top CPU consumers: {consumers}",
-    "top_memory_consumers": "Top memory consumers: {consumers}",
-    "problems_while_gathering_usage_data": "Reasons of pending state and top consumers and cannot "
-                                           "be displayed due to errors.",
-    "problems_while_gathering_usage_data_logs": "Error when gathering consumers data."
-}
+class PredictLaunchCmdTexts:
+    HELP = "Starts a new prediction instance that can be used for performing prediction, classification and " \
+           "regression tasks on trained model."
+    HELP_N = "The name of this prediction instance."
+    HELP_M = "Path to saved model that will be used for inference. Model must be located on one of the input or " \
+             "output system shares (e.g. /mnt/input/saved_model)."
+    INSTANCE_START_ERROR_MSG = "Failed to create prediction instance."
+    INSTANCE_INFO_MSG = "\nPrediction instance URL (append method verb manually, e.g. :predict):\n" \
+                        "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}"
+    INSTANCE_URL_ERROR_MSG = "Failed to obtain prediction instance URL."
+    TABLE_HEADERS = ["Prediction instance", "Model Location", "State"]
+    HELP_LOCAL_MODEL_LOCATION = "Local path to saved model that will be used for inference. Model content will be " \
+                                "copied into an image"
+    MODEL_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {local_model_location}. local_model_location must be a path to " \
+                                    "existing directory."
+    MISSING_MODEL_LOCATION_ERROR_MSG = "Missing model location param - " \
+                                       "'model location' or 'local model location' required"
+    HELP_MODEL_NAME = "Name of a model passed as a servable name. By default it is the name of directory in model's " \
+                      "location."
 
-EXPERIMENT_COMMON_TEXTS = {
-    "confirm_exp_dir_deletion_msg": "Experiment data directory: {run_environment_path} already exists. It will be "
-                                    "deleted in order to proceed with experiment submission. Do you want to continue?",
-    "unable_to_continue_exp_submission_error_msg": "Cannot continue experiment submission. Please delete experiment's " 
-                                                   "data directory {run_environment_path} manually or use different " 
-                                                   "name for experiment.",
-    "create_env_msg_prefix": "Experiment's environment hasn't been created. Reason - {reason}",
-    "dir_cant_be_copied_error_text": "Additional folder cannot be copied into experiment's folder.",
-    "exp_dir_cant_be_created": "Folder with experiments' data cannot be created.",
-    "training_script_cant_be_created": "Training script cannot be created.",
-    "get_namespace_error_msg": "Failed to get current Kubernetes namespace.",
-    "submit_preparation_error_msg": "Problem during preparation of experiments' data.",
-    "local_docker_tunnel_error_msg": "Error during creation of a local docker-host tunnel.",
-    "env_creation_error_msg": "Problems during creation of environments.",
-    "confirm_submit_msg": "Please confirm that the following experiments should be submitted.",
-    "confirm_submit_question_msg": "Do you want to continue?",
-    "submission_fail_error_msg": "Experiment submission failed. Try verbose option for more detailed information about "
-                                 "failure cause.",
-    "proxy_close_error_msg": "Docker proxy hasn't been closed properly. Check whether it still exists, if yes - close " 
-                             "it manually.",
-    "proxy_open_error_msg": "Error during opening of a proxy for a docker registry.",
-    "submit_other_error_msg": "Other error during submitting experiments.",
-    "docker_tunnel_close_error_msg": "Local Docker-host tunnel hasn't been closed properly. Check whether it still "
-                                     "exists, if yes - close it manually.",
-    "draft_templates_not_generated_error_msg": "Draft templates haven't been generated. Reason - {reason}",
-    "job_not_deployed_error_msg": "Job hasn't been deployed. Reason - {reason}",
-    "incorrect_param_format_error_msg": "Parameter {param_name} has incorrect format.",
-    "param_ambiguously_defined": "Parameter {param_name} ambiguously defined.",
-    "param_set_incorrect_format_error_msg": "One of -ps options has incorrect format.",
-    "invalid_pack_param_format_error_msg": "Invalid pack params format for param: {key}. Key cannot contain '='. "
-                                           "Specify pack params in format 'key value' not as 'key=value'.",
-    "experiment_name_too_long_error_msg": "Name given by a user cannot be longer than 30 characters.",
-    "error_during_patching_run": "Error during patching a run occured {}.",
-    "problems_during_getting_draft_logs": "Error during getting draft logs : {exception}",
-    "the_same_exp_is_submitted": "There is another experiment with the same name submitted at this moment."
-}
 
-DRAFT_CMD_TEXTS = {
-    "docker_image_not_built": "Docker image hasn't been built.",
-    "docker_image_not_sent": "Docker image hasn't been sent to the cluster.",
-    "app_not_released": "Application hasn't been released.",
-    "deployment_not_created": "Deployment hasn't been created.",
-    "pack_not_exists": "Chosen pack doesn't exist."
-}
+class PredictStreamCmdTexts:
+    HELP = "Perform stream prediction task on deployed prediction instance."
+    HELP_N = "Name of prediction session."
+    HELP_D = "Path to JSON data file that will be streamed to prediction instance. Data must be formatted such " \
+             "that it is compatible with the SignatureDef specified within the model deployed in selected " \
+             "prediction instance."
+    HELP_M = "Method verb that will be used when performing inference. Predict verb is used by default."
+    INSTANCE_NOT_EXISTS_ERROR_MSG = "Prediction instance {name} does not exist."
+    INSTANCE_NOT_RUNNING_ERROR_MSG = "Prediction instance {name} is not in {running_code} state."
+    INSTANCE_GET_FAIL_ERROR_MSG = "Failed to get prediction instance {name} URL."
+    JSON_LOAD_ERROR_MSG = "Failed to load {data} data file. Make sure that provided file exists and is in a " \
+                          "valid JSON format."
+    INFERENCE_OTHER_ERROR_MSG = "Failed to perform inference. Reason: {exception}"
+    INFERENCE_ERROR_RESPONSE_MSG = "\n Response: {response_text}"
 
-PACKS_TF_TRAINING_TEXTS = {
-    "config_not_updated": "Configuration hasn't been updated.",
-    "cant_parse_value": "Can not parse value: \"{value}\" to list/dict. Error: {error}"
-}
 
-UTIL_SYSTEM_TEXTS = {
-    "command_exe_fail_error_msg": "COMMAND execution FAIL: {command}",
-    "unsupported_platform_error_msg": "unsupported platform: {sys_platform}, supported: {supported_os}!",
-    "port_availability_check_error_msg": "Problem during checking port's availability."
-}
+class PredictCancelCmdTexts:
+    HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
+    HELP_P = "If given, then all information concerning all prediction instances, completed and currently " \
+             "running, is removed from the system."
+    HELP_M = "If given, command searches for prediction instances matching the value of this option."
+    EXPERIMENT_NAME = "prediction instance"
+    EXPERIMENT_NAME_PLURAL = "prediction instances"
 
-UTIL_SOCAT_TEXTS = {
-    "socat_container_start_fail_msg": "failed to start socat container! expected status: 'running', got: "
-                                      "{container_status}"
-}
 
-UTIL_JUPYTER_TEXTS = {
-    "ipynb_conversion_error_msg": "Py to Ipynb conversion error."
-}
+class PredictBatchCmdTexts:
+    HELP = "Uses specified dataset to perform inference. Results stored in output file"
+    HELP_DATA = "location of a folder with data that will be used to perform the batch inference. Value should " \
+                "points out the location from one of the system's shares."
+    HELP_MODEL_LOCATION = "Path to saved model that will be used for inference. Model must be located on one of the " \
+                          "input or output system shares (e.g. /mnt/input/saved_model)."
+    HELP_LOCAL_MODEL_LOCATION = "Local path to saved model that will be used for inference. Model content will be " \
+                                "copied into an image"
+    HELP_MODEL_NAME = "Name of a model passed as a servable name. By default it is the name of directory in model's " \
+                      "location."
+    HELP_NAME = "name of a predict session"
+    HELP_OUTPUT = "location of a folder where outputs from inferences will be stored. Value should points out the " \
+                  "location from one of the system's shares."
+    OTHER_INSTANCE_CREATION_ERROR_MSG = "Failed to create batch prediction instance."
+    TABLE_NAME_HEADER = "Prediction instance"
+    TABLE_MODEL_LOCATION_HEADER = "Model location"
+    TABLE_STATUS_HEADER = "State"
+    TABLE_HEADERS = ["Prediction instance", "Model location", "State"]
+    MODEL_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {local_model_location}. local_model_location must be a path to " \
+                                    "existing directory."
+    MISSING_MODEL_LOCATION_ERROR_MSG = "Missing model location param - " \
+                                       "'model location' or 'local model location' required"
 
-UTIL_LAUNCHER_TEXTS = {
-    "local_docker_tunnel_error_msg": "Error during creation of a local docker-host tunnel.",
-    "browser_starting_msg": "Browser will start in few seconds. Please wait...",
-    "no_web_browser_error_msg": "Cannot find a suitable web browser. Try running this command with --no-launch option.",
-    "proxy_close_error_msg": "Error during closing of a proxy for a {app_name}",
-    "web_app_lauch_fail_msg": "Failed to launch web application.",
-    "web_app_closing_msg": "Closing all connections. Please wait...",
-    "go_to_msg": "Go to {url}",
-    "proxy_created_msg": "Proxy connection created.\nPress Ctrl-C key to close a port forwarding process...",
-    "proxy_created_error_msg": "Error during creation of a proxy for a {app_name}.",
-    "proxy_created_extended_error_msg": "Error during creation of a proxy for a {app_name}. {reason}"
-}
 
-UTIL_HELM_TEXTS = {
-    "helm_release_removal_error_msg": "Error during removal of helm release {release_name}."
-}
+class ExperimentCmdTexts:
+    HELP = "Command for starting, stopping, and managing training jobs."
 
-TENSORBOARD_CLIENT_TEXTS = {
-    "invalid_runs_error_msg": "There is no data for the following experiments : {invalid_runs_list}",
-    "runs_not_exist_error_msg": "Experiments given as parameters of the command don't exist."
-}
 
-UTIL_DOCKER_TEXTS = {
-    "tags_get_error_msg": "Error during getting list of tags for an image.",
-    "image_delete_error_msg": "Error during deletion of an image."
-}
+class ExperimentListCmdTexts:
+    HELP_A = "Show all experiments, regardless of the owner."
+    HELP_N = "A regular expression to narrow down list to experiments that match this expression."
+    HELP_S = "List experiments with matching status."
+    HELP_U = "List uninitialized experiments, i.e. experiments without resources submitted for creation."
 
-UTIL_DEPENDENCIES_CHECKER_TEXTS = {
-    "parse_fail_error_msg": "Failed to parse version({version_field}) from following input: {version_output}",
-    "version_cmd_fail_msg": "Failed to run {version_cmd} with args {version_cmd_args}. Output: {output}",
-    "dependency_not_installed_error_msg": "{dependency_name} is not installed.",
-    "version_get_fail_msg": "Failed to get {dependency_name} version.",
-    "invalid_dependency_error_msg": "{dependency_name} installed version: {installed_version}, does not match expected "
-                                    "version: {expected_version}",
-    "unknown_os_error_msg": "Unknown OS version.",
-    "get_os_version_error_msg": "Could not determine OS version",
-    "unsupported_os_error_msg": "This OS ({os_name} {os_version}) is not supported. Please check the list of supported "
-                                "OS.",
-    "invalid_os_version_error_msg": "This version ({os_name} {os_version}) of the OS is not supported. Please check "
-                                    "the list of supported OS."
-}
 
-UTIL_CONFIG_TEXTS = {
-    "user_dir_not_found_error_msg": "Cannot find {user_path} directory from {config_env_name} env!",
-    "dls_ctl_config_dir_not_found_error_msg": "Cannot find {config_dir_name} directory in {binary_config_dir_path} and "
-                                              "{user_local_config_dir_path}. Use {config_env_name} env to point "
-                                              "{config_dir_name} directory location"
-}
+class ExperimentTemplateListCmdTexts:
+    HELP = "Returns a list of available templates that can be used to submit training jobs."
+    LACK_OF_PACKS_ERROR_MSG = "Lack of installed packs."
 
-PLATFORM_RESOURCES_CUSTOM_MODEL_TEXTS = {
-    "invalid_k8s_name": "name must consist of lower case alphanumeric characters, '-' or '.', and must start with "
-                        "alphabetic character and end with an alphanumeric character "
-}
 
-PLATFORM_RESOURCES_EXPERIMENTS_TEXTS = {
-    "regex_compilation_fail_msg": "Failed to compile regular expression: {name_filter}",
-    "k8s_response_load_error_msg": "preparing load of ExperimentKubernetes response object error - {err}",
-    "k8s_dump_preparation_error_msg": "preparing dump of ExperimentKubernetes request object error - {err}",
-    "experiment_already_exists_error_msg": " experiment with name: {name} already exist!",
-    "experiment_invalid_state_msg": " experiment with name: {name} already exist, "
-                                    "but it doesn't have any resources submitted for creation. "
-                                    "In order to create experiment with desired name,"
-                                    " purge old experiment using following command: dlsctl experiment cancel --purge"
-                                    " {name}",
-    "experiment_update_error_msg": "Error during patching an Experiment"
-}
+class ExperimentLogsCmdTexts:
+    HELP = "Show logs for a given experiment."
+    HELP_S = "Show all events with this specified minimal and greater severity."
+    HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
+    HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
+    HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
+    HELP_P = "Get logs only for pods with given status."
+    HELP_M = "If given, command searches for logs from experiments matching the value of this option. " \
+             "This option cannot be used along with the NAME argument."
+    HELP_O = "If given - logs are stored in a file with a name derived from a name of an experiment."
+    HELP_F = "Specify if logs should be streamed. Only logs from a single experiment can be streamed."
+    HELP_PAGER = "Display logs in interactive pager."
+    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    LOGS_GET_OTHER_ERROR_MSG = "Failed to get experiment logs."
+    EXPERIMENT_NOT_EXISTS_ERROR_MSG = "Experiment with name {experiment_name} does not exist."
+    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
+    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
+                                 "yes - close it manually."
+    NAME_M_BOTH_GIVEN_ERROR_MSG = "Both experiment name and -m option cannot be given. Please choose one of them."
+    NAME_M_NONE_GIVEN_ERROR_MSG = "Error: Experiment name or -m option must be given. Please pass one of them."
+    LOGS_STORING_CONFIRMATION = "Logs from the {experiment_name} experiment will be stored in " \
+                                "the {filename} file. Should the app proceed?"
+    LOGS_STORING_CONFIRMATION_FILE_EXISTS = "Logs from the {experiment_name} experiment will be stored in the " \
+                                            "{filename} file. The file with this name already exists. Should the app " \
+                                            "proceed?"
+    LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
+    LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
+    MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
 
-PLATFORM_RESOURCES_RUNS_TEXTS = {
-    "regex_compilation_fail_msg": "Failed to compile regular expression: {name_filter}",
-    "k8s_response_load_error_msg": "preparing load of RunKubernetes response object error - {err}",
-    "k8s_dump_preparation_error_msg": "preparing dump of RunKubernetes request object error - {err}",
-    "run_update_error_msg": "Error during patching a Run"
-}
 
-PLATFORM_RESOURCES_USERS_TEXTS = {
-    "username_cannot_be_empty_error_msg": "Name of a user cannot be an empty string.",
-    "username_too_long_error_msg": "Name of a user cannot be longer than 32 characters.",
-    "incorrect_k8s_username_error_msg": "Incorrect k8s user name."
-}
+class ExperimentSubmitCmdTexts:
+    HELP = "Command used to submitting training scripts."
+    HELP_N = "Name for this experiment."
+    HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. If not " \
+               "given - its content won't be copied into an image."
+    HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
+             " Template is chosen. List of available templates might be obtained by" \
+             " Issuing dlsctl experiment template_list command."
+    HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
+             "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+    HELP_PR = "Values (set or range) of a single parameter."
+    HELP_PS = "Set of values of one or several parameters."
+    USER_IS_ADMIN_LOG_MSG = "Current user is dls4e administrator. Submit cannot be performed."
+    USER_IS_ADMIN_USR_MSG = "You cannot submit experiments as dls4e administrator. Switch your KUBECONFIG " \
+                            "environment variable to point to a valid dls4e user config. If you don't have one you " \
+                            "can create it with command 'dlsctl user create'."
+    HELP_E = "Environment variables passed to training. User can pass as many environmental variables as it is " \
+             "needed - each variable should be in such case passed as a separate -e paramater."
+    SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find: {script_location}. Make sure that provided path is correct."
+    DEFAULT_SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find script: {default_script_name} in directory: " \
+                                         "{script_directory}. If path to directory was passed as submit command " \
+                                         "argument, then {default_script_name} file has to exist in that directory."
+    SCRIPT_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {script_folder_location}. script_folder_location must be a path " \
+                                     "to existing directory. "
+    SUBMIT_START_LOG_MSG = "Submit - start"
+    SUBMIT_START_USER_MSG = "Submitting experiments."
+    SUBMIT_ERROR_MSG = "Problems during submitting experiment: {exception_message}"
+    SUBMIT_OTHER_ERROR_MSG = "Other problems during submitting experiment."
+    FAILED_RUNS_LOG_MSG = "There are failed runs"
 
-UTIL_KUBECTL_TEXTS = {
-    "no_available_port_error_msg": "Available port cannot be found.",
-    "proxy_creation_other_error_msg": "Other error during creation of port proxy.",
-    "proxy_creation_missing_port_error_msg": "Missing port during creation of port proxy.",
-    "user_presence_check_error_msg": "Error during checking user's presence.",
-    "k8s_object_delete_error_msg": "Error when deleting k8s object: {output}",
-    "k8s_cluster_no_connection_error_msg": "Cannot connect to K8S cluster: {output}",
-    "top_command_error": "Problems during getting usage of resources.",
-    "top_command_error_log": "Incorrect format of data returned by top command: {output}"
-}
 
-UTIL_K8S_INFO_TEXTS = {
-    "other_find_namespace_error_msg": "Other find_namespace error",
-    "namespace_delete_error_msg": "Error during deleting namespace {namespace}",
-    "config_map_access_error_msg": "Problem during accessing ConfigMap : {name}.",
-    "lack_of_default_token_error_msg": "Lack of default-token on a list of tokens.",
-    "empty_list_of_tokens_error_msg": "Empty list of tokens.",
-    "gathering_users_token_error_msg": "Problem during gathering users token.",
-    "gathering_password_error_msg": "Error during gathering users password.",
-    "lack_of_password_error_msg": "Lack of password.",
-    "gathering_events_error_msg": "Problem during gathering k8s events."
-}
+class ExperimentInteractCmdTexts:
+    HELP = "Launches a local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
+           "into the opened notebook."
+    HELP_N = "The name of this Jupyter Notebook session."
+    HELP_F = "File with a notebook that should be opened in Jupyter notebook."
+    HELP_PN = "Port on which service will be exposed locally."
+    HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
+             "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+    HELP_NO_LAUNCH = "Run command without a web browser starting, only proxy tunnel is created"
+    EXPERIMENT_GET_ERROR_MSG = "Problems during loading a list of experiments."
+    NAME_ALREADY_USED = "The chosen name ({name}) is already used by an experiment other than Jupyter Notebook. " \
+                        "Please choose another one."
+    CONFIRM_EXPERIMENT_CREATION = "Experiment with a given name doesn't exist. Should the app continue and create a " \
+                                  "new one? "
+    SUBMITTING_EXPERIMENT_USER_MSG = "Submitting interactive experiment."
+    SUBMIT_ERROR_MSG = "Error during starting jupyter notebook session: {exception_message}"
+    SUBMIT_OTHER_ERROR_MSG = "Other error during starting jupyter notebook session."
+    SESSION_EXISTS_MSG = "Jupyter notebook's session exists. dlsctl connects to this session ..."
+    NOTEBOOK_STATE_CHECK_ERROR_MSG = "Error during checking state of Jupyter notebook."
+    ATTACHING_SCRIPT_NOT_SUPPORTED_MSG = "Attaching script to existing Jupyter notebook's session is not supported. " \
+                                         "Please create a new Jupyter notebook's session to attach script."
+    NOTEBOOK_NOT_READY_ERROR_MSG = "Jupyter notebook is still not ready. Please try to connect to it by running " \
+                                   "interact command another time passing a name of a current Jupyter notebook " \
+                                   "session."
+    PROXY_CLOSING_ERROR_MSG = "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - close " \
+                              "it manually."
+    SESSION_LAUNCH_OTHER_ERROR_MSG = "Other exception during launching interact session."
+    EXP_WITH_THE_SAME_NAME_MUST_BE_PURGED = "Notebook with the same name exists but is in state other than RUNNING. " \
+                                            "If you want to start another notebook using the same name, please " \
+                                            "purge the previous one."
+    HELP_E = "Environment variables passed to Jupyter instance. User can pass as many environmental variables as " \
+             "it is needed - each variable should be in such case passed as a separate -e paramater."
+    HELP_T = "Name of a jupyter notebook template used to create a deployment. " \
+             "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
 
-UTIL_K8S_PROXY_TEXTS = {
-    "proxy_enter_error_msg": "k8s_proxy - enter - error",
-    "proxy_exit_error_msg": "k8s_proxy - exit - error",
-    "tunnel_not_ready_error_msg": "connection on {address}:{port} NOT READY!"
-}
 
-CLI_STATE_TEXTS = {
-    "invalid_dependency_error_msg": "Dependency check failed.",
-    "kubeconfig_not_found_error_msg": "File pointed to by KUBECONFIG environment variable was not found. Please make "
-                                      "sure that it exists.",
-    "dlsctl_config_not_set_error_msg": "Configuration directory for dlsctl is not set.",
-    "dlsctl_config_init_error_msg": "Config initialization failed. Reason: {exception_msg}"
-}
+class ExperimentCancelCmdTexts:
+    HELP = "Cancels experiment/s or pods chosen based on criteria given as parameters."
+    HELP_P = "If given, then all information concerning all experiments, completed and currently running, is removed " \
+             "from the system."
+    HELP_M = "If given, command searches for experiments matching the value of this option. This option cannot be " \
+             "used along with the NAME argument."
+    HELP_I = "Comma-separated pods IDs - if given then matches pods by their IDs and cancels them."
+    HELP_S = "One of: {available_statuses} - searches pods by their status and cancels them."
+    NAME_M_BOTH_GIVEN_ERROR_MSG = "Both name and -m option cannot be given. Please choose one of them."
+    NAME_M_NONE_GIVEN_ERROR_MSG = "Error: Name or -m option must be given. Please pass one of them."
+    LIST_RUNS_ERROR_MSG = "Problems during loading a list of {experiment_name_plural}."
+    LACK_OF_EXPERIMENTS_ERROR_MSG = "Lack of {experiment_name_plural} fulfilling given criteria. Name or match " \
+                                    "string parameters do not match any existing {experiment_name} in an appropriate " \
+                                    "state for the command. Run 'dlsctl exp list' to find out what are the names and " \
+                                    "states of existing {experiment_name_plural}."
+    EXPERIMENTS_ALREADY_CANCELLED_ERROR_MSG = "{experiment_name_plural} fulfilling given criteria have been " \
+                                              "cancelled already."
+    ALREADY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} have been cancelled already or cannot " \
+                                    "be cancelled due to their current state:"
+    CAN_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} can still be cancelled:"
+    WILL_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} will be cancelled:"
+    WILL_BE_PURGED_LIST_HEADER = "The following {experiment_name_plural} will be purged:"
+    CONFIRM_CANCEL_MSG = "Do you want to continue with cancellation of those {experiment_name_plural}?"
+    CANCELLATION_ABORTED_MSG = "Operation of cancellation of {experiment_name_plural} was aborted."
+    OTHER_CANCELLING_ERROR_MSG = "Error during cancelling an experiment."
+    PROXY_CLOSING_ERROR_LOG_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_CLOSING_ERROR_USER_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, " \
+                                   "if yes - close it manually."
+    PORT_OCCUPIED_ERROR_LOG_MSG = "Error during creation of proxy - port is occupied."
+    PORT_OCCUPIED_ERROR_USER_MSG = "Error during creation of a proxy for elasticsearch. {exception_message}"
+    PROXY_OPEN_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    SUCCESSFULLY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} were cancelled successfully:"
+    FAILED_TO_CANCEL_LIST_HEADER = "The following {experiment_name_plural} weren't cancelled properly:"
+    GET_EXPERIMENT_ERROR_MSG = "Error during loading experiment's data."
+    PURGING_START_MSG = "Purging {run_name} experiment ..."
+    INCOMPLETE_PURGE_ERROR_MSG = "Not all {experiment_name}'s components were removed properly."
+    CANCELING_RUNS_START_MSG = "Cancelling {run_name} {experiment_name} ..."
+    DELETING_RELATED_OBJECTS_MSG = "Deleting objects related to {run_name} {experiment_name} ..."
+    CANCEL_SETTING_STATUS_MSG = "Setting {run_name} status to CANCELLED ..."
+    INCOMPLETE_CANCEL_ERROR_MSG = "Not all components of {run_name} {experiment_name} were deleted ...\nExperiment " \
+                                  "remains in its previous state."
+    BAD_POD_STATUS_PASSED = "Wrong status: {status_passed} , available: {available_statuses}"
+    LACK_OF_PODS_ERROR_MSG = "Lack of pods fulfilling given criteria. Pod ID or pod status parameters do not match " \
+                             "any existing pod."
+    CANCELING_PODS_MSG = "Cancelling the pod: {pod_name} ..."
+    OTHER_POD_CANCELLING_ERROR_MSG = "Error during cancelling the pod."
+    UNINITIALIZED_EXPERIMENT_CANCEL_MSG = "Experiment {experiment_name} has no resources submitted for creation."
+
+
+class ExperimentViewCmdTexts:
+    HELP = "Displays details of experiment with a given name."
+    HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
+    CONTAINER_DETAILS_MSG = "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:\n  {resources}"
+    EXPERIMENT_NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
+    PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
+    PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]
+    VIEW_OTHER_ERROR_MSG = "Failed to get experiment."
+    CONTAINER_NOT_CREATED_MSG = "Not created"
+    CONTAINER_RUNNING_MSG = "Running, "
+    CONTAINER_TERMINATED_MSG = "Terminated, "
+    CONTAINER_WAITING_MSG = "Waiting, "
+    CONTAINER_REQUESTS_LIST_HEADER = "- Requests:\n{}"
+    CONTAINER_LIMITS_LIST_HEADER = "- Limits:\n{}"
+    RESOURCES_SUM_LIST_HEADER = "\nResources used by pods:\n"
+    RESOURCES_SUM_PARSING_ERROR_MSG = "There was an error when trying to parse pods resources. Error msg: {error_msg}"
+    RESOURCES_SUM_TABLE_HEADERS = ["Resource type", "Total usage"]
+    RESOURCES_SUM_TABLE_ROWS_HEADERS = ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"]
+    INSUFFICIENT_RESOURCES_MESSAGE = "Experiment is in PENDING status due to insuffcient {resources}."
+    TOP_CPU_CONSUMERS = "Top CPU consumers: {consumers}"
+    TOP_MEMORY_CONSUMERS = "Top memory consumers: {consumers}"
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of pending state and top consumers and cannot be displayed due to " \
+                                          "errors."
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error when gathering consumers data."
+
+
+class ExperimentCommonTexts:
+    CONFIRM_EXP_DIR_DELETION_MSG = "Experiment data directory: {run_environment_path} already exists. It will be " \
+                                   "deleted in order to proceed with experiment submission. Do you want to continue?"
+    UNABLE_TO_CONTINUE_EXP_SUBMISSION_ERROR_MSG = "Cannot continue experiment submission. Please delete experiment's " \
+                                                  "data directory {run_environment_path} manually or use different " \
+                                                  "name for experiment."
+    CREATE_ENV_MSG_PREFIX = "Experiment's environment hasn't been created. Reason - {reason}"
+    DIR_CANT_BE_COPIED_ERROR_TEXT = "Additional folder cannot be copied into experiment's folder."
+    EXP_DIR_CANT_BE_CREATED = "Folder with experiments' data cannot be created."
+    TRAINING_SCRIPT_CANT_BE_CREATED = "Training script cannot be created."
+    GET_NAMESPACE_ERROR_MSG = "Failed to get current Kubernetes namespace."
+    SUBMIT_PREPARATION_ERROR_MSG = "Problem during preparation of experiments' data."
+    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error during creation of a local docker-host tunnel."
+    ENV_CREATION_ERROR_MSG = "Problems during creation of environments."
+    CONFIRM_SUBMIT_MSG = "Please confirm that the following experiments should be submitted."
+    CONFIRM_SUBMIT_QUESTION_MSG = "Do you want to continue?"
+    SUBMISSION_FAIL_ERROR_MSG = "Experiment submission failed. Try verbose option for more detailed information " \
+                                "about failure cause."
+    PROXY_CLOSE_ERROR_MSG = "Docker proxy hasn't been closed properly. Check whether it still exists, if yes - close " \
+                            "it manually."
+    PROXY_OPEN_ERROR_MSG = "Error during opening of a proxy for a docker registry."
+    SUBMIT_OTHER_ERROR_MSG = "Other error during submitting experiments."
+    DOCKER_TUNNEL_CLOSE_ERROR_MSG = "Local Docker-host tunnel hasn't been closed properly. Check whether it still " \
+                                    "exists, if yes - close it manually."
+    DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Draft templates haven't been generated. Reason - {reason}"
+    JOB_NOT_DEPLOYED_ERROR_MSG = "Job hasn't been deployed. Reason - {reason}"
+    INCORRECT_PARAM_FORMAT_ERROR_MSG = "Parameter {param_name} has incorrect format."
+    PARAM_AMBIGUOUSLY_DEFINED = "Parameter {param_name} ambiguously defined."
+    PARAM_SET_INCORRECT_FORMAT_ERROR_MSG = "One of -ps options has incorrect format."
+    INVALID_PACK_PARAM_FORMAT_ERROR_MSG = "Invalid pack params format for param: {key}. Key cannot contain '='. " \
+                                          "Specify pack params in format 'key value' not as 'key=value'."
+    EXPERIMENT_NAME_TOO_LONG_ERROR_MSG = "Name given by a user cannot be longer than 30 characters."
+    ERROR_DURING_PATCHING_RUN = "Error during patching a run occured {}."
+    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error during getting draft logs : {exception}"
+    THE_SAME_EXP_IS_SUBMITTED = "There is another experiment with the same name submitted at this moment."
+
+
+class DraftCmdTexts:
+    DOCKER_IMAGE_NOT_BUILT = "Docker image hasn't been built."
+    DOCKER_IMAGE_NOT_SENT = "Docker image hasn't been sent to the cluster."
+    APP_NOT_RELEASED = "Application hasn't been released."
+    DEPLOYMENT_NOT_CREATED = "Deployment hasn't been created."
+    PACK_NOT_EXISTS = "Chosen pack doesn't exist."
+
+
+class PacksTfTrainingTexts:
+    CONFIG_NOT_UPDATED = "Configuration hasn't been updated."
+    CANT_PARSE_VALUE = "Can not parse value: \"{value}\" to list/dict. Error: {error}"
+
+
+class UtilSystemTexts:
+    COMMAND_EXE_FAIL_ERROR_MSG = "COMMAND execution FAIL: {command}"
+    UNSUPPORTED_PLATFORM_ERROR_MSG = "unsupported platform: {sys_platform}, supported: {supported_os}!"
+    PORT_AVAILABILITY_CHECK_ERROR_MSG = "Problem during checking port's availability."
+
+
+class UtilSocatTexts:
+    SOCAT_CONTAINER_START_FAIL_MSG = "failed to start socat container! expected status: 'running', got: " \
+                                     "{container_status}"
+
+
+class UtilJupyterTexts:
+    IPYNB_CONVERSION_ERROR_MSG = "Py to Ipynb conversion error."
+
+
+class UtilLauncherTexts:
+    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error during creation of a local docker-host tunnel."
+    BROWSER_STARTING_MSG = "Browser will start in few seconds. Please wait..."
+    NO_WEB_BROWSER_ERROR_MSG = "Cannot find a suitable web browser. Try running this command with --no-launch option."
+    PROXY_CLOSE_ERROR_MSG = "Error during closing of a proxy for a {app_name}"
+    WEB_APP_LAUCH_FAIL_MSG = "Failed to launch web application."
+    WEB_APP_CLOSING_MSG = "Closing all connections. Please wait..."
+    GO_TO_MSG = "Go to {url}"
+    PROXY_CREATED_MSG = "Proxy connection created.\nPress Ctrl-C key to close a port forwarding process..."
+    PROXY_CREATED_ERROR_MSG = "Error during creation of a proxy for a {app_name}."
+    PROXY_CREATED_EXTENDED_ERROR_MSG = "Error during creation of a proxy for a {app_name}. {reason}"
+
+
+class UtilHelmTexts:
+    HELM_RELEASE_REMOVAL_ERROR_MSG = "Error during removal of helm release {release_name}."
+
+
+class TensorboardClientTexts:
+    INVALID_RUNS_ERROR_MSG = "There is no data for the following experiments : {invalid_runs_list}"
+    RUNS_NOT_EXIST_ERROR_MSG = "Experiments given as parameters of the command don't exist."
+
+
+class UtilDockerTexts:
+    TAGS_GET_ERROR_MSG = "Error during getting list of tags for an image."
+    IMAGE_DELETE_ERROR_MSG = "Error during deletion of an image."
+
+
+class UtilDependenciesCheckerTexts:
+    PARSE_FAIL_ERROR_MSG = "Failed to parse version({version_field}) from following input: {version_output}"
+    VERSION_CMD_FAIL_MSG = "Failed to run {version_cmd} with args {version_cmd_args}. Output: {output}"
+    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed."
+    VERSION_GET_FAIL_MSG = "Failed to get {dependency_name} version."
+    INVALID_DEPENDENCY_ERROR_MSG = "{dependency_name} installed version: {installed_version}, does not match " \
+                                   "expected version: {expected_version}"
+    UNKNOWN_OS_ERROR_MSG = "Unknown OS version."
+    GET_OS_VERSION_ERROR_MSG = "Could not determine OS version"
+    UNSUPPORTED_OS_ERROR_MSG = "This OS ({os_name} {os_version}) is not supported. Please check the list of " \
+                               "supported OS."
+    INVALID_OS_VERSION_ERROR_MSG = "This version ({os_name} {os_version}) of the OS is not supported. Please check " \
+                                   "the list of supported OS."
+
+
+class UtilConfigTexts:
+    USER_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {user_path} directory from {config_env_name} env!"
+    DLS_CTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {config_dir_name} directory in {binary_config_dir_path} " \
+                                             "and {user_local_config_dir_path}. Use {config_env_name} env to point " \
+                                             "{config_dir_name} directory location"
+
+
+class PlatformResourcesCustomModelTexts:
+    INVALID_K8S_NAME = "name must consist of lower case alphanumeric characters, '-' or '.', and must start with " \
+                       "alphabetic character and end with an alphanumeric character "
+
+
+class PlatformResourcesExperimentsTexts:
+    REGEX_COMPILATION_FAIL_MSG = "Failed to compile regular expression: {name_filter}"
+    K8S_RESPONSE_LOAD_ERROR_MSG = "preparing load of ExperimentKubernetes response object error - {err}"
+    K8S_DUMP_PREPARATION_ERROR_MSG = "preparing dump of ExperimentKubernetes request object error - {err}"
+    EXPERIMENT_ALREADY_EXISTS_ERROR_MSG = " experiment with name: {name} already exist!"
+    EXPERIMENT_INVALID_STATE_MSG = " experiment with name: {name} already exist, " \
+                                   "but it doesn't have any resources submitted for creation. " \
+                                   "In order to create experiment with desired name," \
+                                   " purge old experiment using following command: dlsctl experiment cancel --purge" \
+                                   " {name}"
+    EXPERIMENT_UPDATE_ERROR_MSG = "Error during patching an Experiment"
+
+
+class PlatformResourcesRunsTexts:
+    REGEX_COMPILATION_FAIL_MSG = "Failed to compile regular expression: {name_filter}"
+    K8S_RESPONSE_LOAD_ERROR_MSG = "preparing load of RunKubernetes response object error - {err}"
+    K8S_DUMP_PREPARATION_ERROR_MSG = "preparing dump of RunKubernetes request object error - {err}"
+    RUN_UPDATE_ERROR_MSG = "Error during patching a Run"
+
+
+class PlatformResourcesUsersTexts:
+    USERNAME_CANNOT_BE_EMPTY_ERROR_MSG = "Name of a user cannot be an empty string."
+    USERNAME_TOO_LONG_ERROR_MSG = "Name of a user cannot be longer than 32 characters."
+    INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
+
+
+class UtilKubectlTexts:
+    NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
+    PROXY_CREATION_OTHER_ERROR_MSG = "Other error during creation of port proxy."
+    PROXY_CREATION_MISSING_PORT_ERROR_MSG = "Missing port during creation of port proxy."
+    USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
+    K8S_OBJECT_DELETE_ERROR_MSG = "Error when deleting k8s object: {output}"
+    K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to K8S cluster: {output}"
+    TOP_COMMAND_ERROR = "Problems during getting usage of resources."
+    TOP_COMMAND_ERROR_LOG = "Incorrect format of data returned by top command: {output}"
+
+
+class UtilK8sInfoTexts:
+    OTHER_FIND_NAMESPACE_ERROR_MSG = "Other find_namespace error"
+    NAMESPACE_DELETE_ERROR_MSG = "Error during deleting namespace {namespace}"
+    CONFIG_MAP_ACCESS_ERROR_MSG = "Problem during accessing ConfigMap : {name}."
+    LACK_OF_DEFAULT_TOKEN_ERROR_MSG = "Lack of default-token on a list of tokens."
+    EMPTY_LIST_OF_TOKENS_ERROR_MSG = "Empty list of tokens."
+    GATHERING_USERS_TOKEN_ERROR_MSG = "Problem during gathering users token."
+    GATHERING_PASSWORD_ERROR_MSG = "Error during gathering users password."
+    LACK_OF_PASSWORD_ERROR_MSG = "Lack of password."
+    GATHERING_EVENTS_ERROR_MSG = "Problem during gathering k8s events."
+
+
+class UtilK8sProxyTexts:
+    PROXY_ENTER_ERROR_MSG = "k8s_proxy - enter - error"
+    PROXY_EXIT_ERROR_MSG = "k8s_proxy - exit - error"
+    TUNNEL_NOT_READY_ERROR_MSG = "connection on {address}:{port} NOT READY!"
+
+
+class CliStateTexts:
+    INVALID_DEPENDENCY_ERROR_MSG = "Dependency check failed."
+    KUBECONFIG_NOT_FOUND_ERROR_MSG = "File pointed to by KUBECONFIG environment variable was not found. Please make " \
+                                     "sure that it exists."
+    DLSCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for dlsctl is not set."
+    DLSCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"

@@ -34,7 +34,7 @@ from platform_resources.resource_filters import filter_by_name_regex, filter_run
     filter_by_experiment_name, filter_run_by_state, filter_by_run_kinds
 from util.logger import initialize_logger
 from util.exceptions import InvalidRegularExpressionError
-from cli_text_consts import PLATFORM_RESOURCES_RUNS_TEXTS as TEXTS
+from cli_text_consts import PlatformResourcesRunsTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -99,7 +99,7 @@ def list_runs(namespace: str = None, state_list: List[RunStatus] = None, name_fi
     try:
         name_regex = re.compile(name_filter) if name_filter else None
     except sre_constants.error as e:
-        error_msg = TEXTS["regex_compilation_fail_msg"].format(name_filter=name_filter)
+        error_msg = Texts.REGEX_COMPILATION_FAIL_MSG.format(name_filter=name_filter)
         logger.exception(error_msg)
         raise InvalidRegularExpressionError(error_msg) from e
 
@@ -157,7 +157,7 @@ def update_run(run: Run, namespace: str) -> (KubernetesObject, Run):
     schema = RunKubernetesSchema()
     body, err = schema.dump(run_kubernetes)
     if err:
-        raise RuntimeError(TEXTS["k8s_dump_preparation_error_msg"].format(err=err))
+        raise RuntimeError(Texts.K8S_DUMP_PREPARATION_ERROR_MSG.format(err=err))
     return _update(run.name, namespace, body)
 
 
@@ -195,10 +195,10 @@ def _update(name: str, namespace: str, body: object) -> (KubernetesObject, Run):
         schema = RunKubernetesSchema()
         run, err = schema.load(raw_run)
         if err:
-            raise RuntimeError(TEXTS["k8s_response_load_error_msg"].format(err=err))
+            raise RuntimeError(Texts.K8S_RESPONSE_LOAD_ERROR_MSG.format(err=err))
         logger.debug(f"Run patch response : {raw_run}")
         return run, Run.from_k8s_response_dict(raw_run)
     except ApiException as exe:
-        err_message = TEXTS["run_update_error_msg"]
+        err_message = Texts.RUN_UPDATE_ERROR_MSG
         logger.exception(err_message)
         raise RuntimeError(err_message) from exe

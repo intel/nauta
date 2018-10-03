@@ -39,24 +39,24 @@ from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.system import handle_error
-from cli_text_consts import EXPERIMENT_LOGS_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentLogsCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.command(help=TEXTS["help"], cls=AliasCmd, alias='lg')
+@click.command(help=Texts.HELP, cls=AliasCmd, alias='lg')
 @click.argument('experiment-name', required=False)
-@click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=TEXTS["help_s"])
-@click.option('-sd', '--start-date', help=TEXTS["help_sd"])
-@click.option('-ed', '--end-date', help=TEXTS["help_ed"])
-@click.option('-i', '--pod-ids', help=TEXTS["help_i"])
+@click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=Texts.HELP_S)
+@click.option('-sd', '--start-date', help=Texts.HELP_SD)
+@click.option('-ed', '--end-date', help=Texts.HELP_ED)
+@click.option('-i', '--pod-ids', help=Texts.HELP_I)
 @click.option('-p', '--pod-status', type=click.Choice([status.name for status in PodStatus]),
-              help=TEXTS["help_p"])
-@click.option('-m', '--match', help=TEXTS["help_m"])
-@click.option('-o', '--output', help=TEXTS["help_o"], is_flag=True)
-@click.option('-p', '--pager', help=TEXTS["help_pager"], is_flag=True, default=False)
-@click.option('-f', '--follow', help=TEXTS["help_f"], is_flag=True, default=False)
+              help=Texts.HELP_P)
+@click.option('-m', '--match', help=Texts.HELP_M)
+@click.option('-o', '--output', help=Texts.HELP_O, is_flag=True)
+@click.option('-p', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
+@click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options()
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
@@ -66,10 +66,10 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
     """
     # check whether we have runs with a given name
     if experiment_name and match:
-        handle_error(user_msg=TEXTS["name_m_both_given_error_msg"])
+        handle_error(user_msg=Texts.NAME_M_BOTH_GIVEN_ERROR_MSG)
         exit(1)
     elif not experiment_name and not match:
-        handle_error(user_msg=TEXTS["name_m_none_given_error_msg"])
+        handle_error(user_msg=Texts.NAME_M_NONE_GIVEN_ERROR_MSG)
         exit(1)
 
     try:
@@ -89,7 +89,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             follow_logs = True if follow and not output else False
 
             if output and len(runs) > 1:
-                click.echo(TEXTS["more_exp_logs_message"])
+                click.echo(Texts.MORE_EXP_LOGS_MESSAGE)
 
             for run in runs:
                 start_date = start_date if start_date else run.creation_timestamp
@@ -108,21 +108,21 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
                     print_logs(run_logs_generator=run_logs_generator, pager=pager)
 
     except K8sProxyCloseError:
-        handle_error(logger, TEXTS["proxy_close_log_error_msg"], TEXTS["proxy_close_user_error_msg"])
+        handle_error(logger, Texts.PROXY_CLOSE_LOG_ERROR_MSG, Texts.PROXY_CLOSE_USER_ERROR_MSG)
         exit(1)
     except LocalPortOccupiedError as exe:
-        handle_error(logger, TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message),
-                     TEXTS["local_port_occupied_error_msg"].format(exception_message=exe.message))
+        handle_error(logger, Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message),
+                     Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message))
         exit(1)
     except K8sProxyOpenError:
-        handle_error(logger, TEXTS["proxy_creation_error_msg"], TEXTS["proxy_creation_error_msg"])
+        handle_error(logger, Texts.PROXY_CREATION_ERROR_MSG, Texts.PROXY_CREATION_ERROR_MSG)
         exit(1)
     except ValueError:
-        handle_error(logger, TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name),
-                     TEXTS["experiment_not_exists_error_msg"].format(experiment_name=experiment_name))
+        handle_error(logger, Texts.EXPERIMENT_NOT_EXISTS_ERROR_MSG.format(experiment_name=experiment_name),
+                     Texts.EXPERIMENT_NOT_EXISTS_ERROR_MSG.format(experiment_name=experiment_name))
         exit(1)
     except Exception:
-        handle_error(logger, TEXTS["logs_get_other_error_msg"], TEXTS["logs_get_other_error_msg"])
+        handle_error(logger, Texts.LOGS_GET_OTHER_ERROR_MSG, Texts.LOGS_GET_OTHER_ERROR_MSG)
         exit(1)
 
 
@@ -149,11 +149,11 @@ def print_logs(run_logs_generator: Generator[LogEntry, None, None], pager=False)
 
 def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, None]):
     filename = run.name + '.log'
-    confirmation_message = TEXTS["logs_storing_confirmation"].format(filename=filename,
-                                                                     experiment_name=run.name)
+    confirmation_message = Texts.LOGS_STORING_CONFIRMATION.format(filename=filename,
+                                                                  experiment_name=run.name)
     if os.path.isfile(filename):
-        confirmation_message = TEXTS["logs_storing_confirmation_file_exists"].format(filename=filename,
-                                                                                     experiment_name=run.name)
+        confirmation_message = Texts.LOGS_STORING_CONFIRMATION_FILE_EXISTS.format(filename=filename,
+                                                                                  experiment_name=run.name)
 
     if click.confirm(confirmation_message, default=True):
         try:
@@ -164,8 +164,8 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
                         file.write(f'{formatted_date} {log_entry.pod_name} {log_entry.content}')
         except Exception as exe:
             handle_error(logger,
-                         TEXTS["logs_storing_error"].format(exception_message=exe.message),
-                         TEXTS["logs_storing_error"].format(exception_message=exe.message))
+                         Texts.LOGS_STORING_ERROR.format(exception_message=exe.message),
+                         Texts.LOGS_STORING_ERROR.format(exception_message=exe.message))
             exit(1)
 
-    click.echo(TEXTS["logs_storing_final_message"])
+    click.echo(Texts.LOGS_STORING_FINAL_MESSAGE)

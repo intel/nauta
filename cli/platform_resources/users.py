@@ -40,8 +40,8 @@ from util.exceptions import K8sProxyCloseError
 from util.app_names import DLS4EAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
-from cli_text_consts import PLATFORM_RESOURCES_USERS_TEXTS as TEXTS
-from cli_text_consts import USER_DELETE_CMD_TEXTS as TEXTS_DEL
+from cli_text_consts import PlatformResourcesUsersTexts as Texts
+from cli_text_consts import UserDeleteCmdTexts as TextsDel
 
 logger = initialize_logger(__name__)
 
@@ -87,7 +87,7 @@ def purge_user(username: str):
     """
     # remove data from elasticsearch
     try:
-        click.echo(TEXTS_DEL["deletion_deleting_users_experiments"])
+        click.echo(TextsDel.DELETION_DELETING_USERS_EXPERIMENTS)
         with k8s_proxy_context_manager.K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
@@ -134,16 +134,16 @@ def validate_user_name(username: str) -> bool:
     # name cannot be longer than 32 and shorter than 1 character - due to lmitations
     # of a mechanism responsible for creating user/public shares
     if not username:
-        raise ValueError(TEXTS["username_cannot_be_empty_error_msg"])
+        raise ValueError(Texts.USERNAME_CANNOT_BE_EMPTY_ERROR_MSG)
 
     if len(username) > 32:
-        raise ValueError(TEXTS["username_too_long_error_msg"])
+        raise ValueError(Texts.USERNAME_TOO_LONG_ERROR_MSG)
 
     # name must be a correct k8s name
     try:
         validate_kubernetes_name(username)
     except ValidationError:
-        raise ValueError(TEXTS["incorrect_k8s_username_error_msg"])
+        raise ValueError(Texts.INCORRECT_K8S_USERNAME_ERROR_MSG)
 
 
 def is_user_created(username: str, timeout: int = 1) -> bool:

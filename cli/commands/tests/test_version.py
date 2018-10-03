@@ -29,19 +29,19 @@ from commands import version
 from version import VERSION
 from util.config import DLS4EConfigMap
 from util.exceptions import KubernetesError
-from cli_text_consts import VERSION_CMD_TEXTS as TEXTS, VERBOSE_RERUN_MSG
+from cli_text_consts import VersionCmdTexts as Texts, VERBOSE_RERUN_MSG
 
 
 PLATFORM_VERSION = "1.2"
 
 APPLICATION_VERSION_REGEX = r"{application_row_name}[ ]+\| {version}".format(
-    application_row_name=TEXTS["table_app_row_name"], version=VERSION
+    application_row_name=Texts.TABLE_APP_ROW_NAME, version=VERSION
 )
 PLATFORM_VERSION_ON_SUCCESS_REGEX = r"{platform_row_name}[ ]+\| {version}".format(
-    platform_row_name=TEXTS["table_platform_row_name"], version=PLATFORM_VERSION
+    platform_row_name=Texts.TABLE_PLATFORM_ROW_NAME, version=PLATFORM_VERSION
 )
 PLATFORM_VERSION_ON_FAIL_REGEX = r"{platform_row_name}[ ]+\| {version}".format(
-    platform_row_name=TEXTS["table_platform_row_name"], version=TEXTS["initial_platform_version"]
+    platform_row_name=Texts.TABLE_PLATFORM_ROW_NAME, version=Texts.INITIAL_PLATFORM_VERSION
 )
 
 
@@ -96,7 +96,7 @@ def test_version_with_kubernetes_exception(mocker):
 
     assert_version_table_rows(result.output, on_cmd_fail=True)
 
-    assert TEXTS["kubectl_int_error_msg"] + " " + VERBOSE_RERUN_MSG in result.output
+    assert Texts.KUBECTL_INT_ERROR_MSG + " " + VERBOSE_RERUN_MSG in result.output
 
 
 def test_version_with_unknown_exception(mocker):
@@ -107,4 +107,4 @@ def test_version_with_unknown_exception(mocker):
 
     assert_version_table_rows(result.output, on_cmd_fail=True)
 
-    assert TEXTS["other_error_msg"] + " " + VERBOSE_RERUN_MSG in result.output
+    assert Texts.OTHER_ERROR_MSG + " " + VERBOSE_RERUN_MSG in result.output

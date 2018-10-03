@@ -24,13 +24,13 @@ import click
 from commands.predict import launch, list, cancel, stream, batch
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
-from cli_text_consts import PREDICT_CMD_TEXTS as TEXTS
+from cli_text_consts import PredictCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.group(short_help=TEXTS["help"], cls=AliasGroup, alias='p', help=TEXTS["help"],
+@click.group(short_help=Texts.HELP, cls=AliasGroup, alias='p', help=Texts.HELP,
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def predict():
     pass

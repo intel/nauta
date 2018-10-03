@@ -26,7 +26,7 @@ from kubernetes.client import V1Pod, V1PodStatus, V1Event, V1ObjectReference, V1
 
 from commands.experiment import view
 from platform_resources.run_model import Run, RunStatus
-from cli_text_consts import EXPERIMENT_VIEW_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentViewCmdTexts as Texts
 from util.k8s.k8s_statistics import ResourceUsage
 from util.k8s.k8s_info import PodStatus
 
@@ -124,7 +124,7 @@ def test_view_experiment_cpu_resources_parse_fail(prepare_mocks: ViewMocks):
     runner = CliRunner()
     result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
 
-    assert TEXTS["resources_sum_parsing_error_msg"].format(error_msg="error") in result.output, "Bad output"
+    assert Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg="error") in result.output, "Bad output"
 
     assert result.exit_code == 1
 
@@ -135,7 +135,7 @@ def test_view_experiment_mem_resources_parse_fail(prepare_mocks: ViewMocks):
     runner = CliRunner()
     result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
 
-    assert TEXTS["resources_sum_parsing_error_msg"].format(error_msg="error") in result.output, "Bad output"
+    assert Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg="error") in result.output, "Bad output"
 
     assert result.exit_code == 1
 
@@ -147,7 +147,7 @@ def test_view_experiments_not_found(prepare_mocks: ViewMocks):
 
     assert prepare_mocks.get_run.call_count == 1, "Run retrieval was not called"
     assert result.exit_code == 2
-    assert TEXTS["experiment_not_found_error_msg"].format(experiment_name="missing") in result.output, "Bad output."
+    assert Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name="missing") in result.output, "Bad output."
 
 
 def test_view_experiments_no_argument(prepare_mocks: ViewMocks):
@@ -194,7 +194,7 @@ def test_container_resources_to_msg():
 
     msg = view.container_resources_to_msg(resources=resources)
 
-    assert TEXTS["container_requests_list_header"].format("") in msg
+    assert Texts.CONTAINER_REQUESTS_LIST_HEADER.format("") in msg
     assert f'cpu: {resources.requests["cpu"]}' in msg
     assert f'mem: {resources.requests["mem"]}' in msg
 

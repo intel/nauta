@@ -26,13 +26,13 @@ from commands.user.delete import delete
 from commands.user.list_users import list_users
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger
-from cli_text_consts import USER_CMD_TEXTS as TEXTS
+from cli_text_consts import UserCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.group(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasGroup, alias='u',
+@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='u',
              subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
 def user():
     pass

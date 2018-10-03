@@ -37,7 +37,7 @@ from commands.experiment.common import validate_experiment_name, validate_pack_p
 from util.k8s.k8s_info import is_current_user_administrator
 from platform_resources.run_model import RunStatus
 from util.system import handle_error
-from cli_text_consts import EXPERIMENT_SUBMIT_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 
 
 logger = initialize_logger('commands.submit')
@@ -47,7 +47,7 @@ DEFAULT_SCRIPT_NAME = "experiment.py"
 
 def validate_script_location(script_location: str):
     if not (os.path.isfile(script_location) or os.path.isdir(script_location)):
-        handle_error(user_msg=TEXTS["script_not_found_error_msg"].format(script_location=script_location))
+        handle_error(user_msg=Texts.SCRIPT_NOT_FOUND_ERROR_MSG.format(script_location=script_location))
         exit(2)
 
 
@@ -55,7 +55,7 @@ def get_default_script_location(script_directory: str) -> str:
     default_script_location = os.path.join(script_directory, DEFAULT_SCRIPT_NAME)
     if not os.path.isfile(default_script_location):
         handle_error(
-            user_msg=TEXTS["default_script_not_found_error_msg"].format(
+            user_msg=Texts.DEFAULT_SCRIPT_NOT_FOUND_ERROR_MSG.format(
                 script_directory=script_directory, default_script_name=default_script_location
             )
         )
@@ -67,21 +67,21 @@ def get_default_script_location(script_directory: str) -> str:
 def validate_script_folder_location(script_folder_location: str):
     if not os.path.isdir(script_folder_location):
         handle_error(
-            user_msg=TEXTS["script_dir_not_found_error_msg"].format(script_folder_location=script_folder_location)
+            user_msg=Texts.SCRIPT_DIR_NOT_FOUND_ERROR_MSG.format(script_folder_location=script_folder_location)
         )
         exit(2)
 
 
-@click.command(short_help=TEXTS["help"], help=TEXTS["help"], cls=AliasCmd, alias='s')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
-@click.option("-sfl", "--script_folder_location", type=click.Path(), help=TEXTS["help_sfl"])
-@click.option("-t", "--template", help=TEXTS["help_t"], default="tf-training-tfjob")
-@click.option("-n", "--name", help=TEXTS["help_n"], callback=validate_experiment_name)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"],
+@click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
+@click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob")
+@click.option("-n", "--name", help=Texts.HELP_N, callback=validate_experiment_name)
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
-@click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=TEXTS["help_pr"])
-@click.option("-ps", "--parameter_set", multiple=True, help=TEXTS["help_ps"])
-@click.option("-e", "--env", multiple=True, help=TEXTS["help_e"], callback=validate_env_paramater)
+@click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=Texts.HELP_PR)
+@click.option("-ps", "--parameter_set", multiple=True, help=Texts.HELP_PS)
+@click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]')
 @common_options()
 @pass_state
@@ -89,10 +89,10 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            env: List[str], script_parameters: Tuple[str, ...]):
     if is_current_user_administrator():
-        handle_error(logger, TEXTS["user_is_admin_log_msg"], TEXTS["user_is_admin_usr_msg"])
+        handle_error(logger, Texts.USER_IS_ADMIN_LOG_MSG, Texts.USER_IS_ADMIN_USR_MSG)
         exit(1)
 
-    logger.debug(TEXTS["submit_start_log_msg"])
+    logger.debug(Texts.SUBMIT_START_LOG_MSG)
     validate_script_location(script_location)
 
     if os.path.isdir(script_location):
@@ -101,7 +101,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     if script_folder_location:
         validate_script_folder_location(script_folder_location)
 
-    click.echo(TEXTS["submit_start_user_msg"])
+    click.echo(Texts.SUBMIT_START_USER_MSG)
 
     # noinspection PyBroadException
     try:
@@ -115,10 +115,10 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         handle_error(user_msg=exe.message)
         click.echo(exe.message)
     except SubmitExperimentError as exe:
-        handle_error(user_msg=TEXTS["submit_error_msg"].format(exception_message=exe.message))
+        handle_error(user_msg=Texts.SUBMIT_ERROR_MSG.format(exception_message=exe.message))
         exit(1)
     except Exception:
-        handle_error(user_msg=TEXTS["submit_other_error_msg"])
+        handle_error(user_msg=Texts.SUBMIT_OTHER_ERROR_MSG)
         exit(1)
 
     # display information about status of a training
@@ -128,5 +128,5 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # if there is at least one FAILED experiment - application has to return exit code != 0
     if any(run.state == RunStatus.FAILED for run in runs_list):
-        handle_error(logger, TEXTS["failed_runs_log_msg"])
+        handle_error(logger, Texts.FAILED_RUNS_LOG_MSG)
         exit(1)

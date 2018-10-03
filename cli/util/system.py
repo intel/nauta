@@ -35,7 +35,7 @@ import click
 import distro
 
 from util.logger import initialize_logger, get_verbosity_level
-from cli_text_consts import UTIL_SYSTEM_TEXTS as TEXTS, VERBOSE_RERUN_MSG
+from cli_text_consts import UtilSystemTexts as Texts, VERBOSE_RERUN_MSG
 
 
 log = initialize_logger('util.system')
@@ -121,7 +121,7 @@ def execute_subprocess_command(command: List[str], stdin=None, env=None,
 
     if not process or process.poll() != (0 or None):
         log.error(f'COMMAND execution FAIL: {command}')
-        raise RuntimeError(TEXTS["command_exe_fail_error_msg"].format(command=command))
+        raise RuntimeError(Texts.COMMAND_EXE_FAIL_ERROR_MSG.format(command=command))
     return process
 
 
@@ -144,7 +144,7 @@ def get_current_os() -> OS:
     elif sys_platform.startswith(OS.MACOS.value):
         return OS.MACOS
 
-    raise RuntimeError(TEXTS["unsupported_platform_error_msg"]
+    raise RuntimeError(Texts.UNSUPPORTED_PLATFORM_ERROR_MSG
                        .format(sys_platform=sys_platform, supported_os=OS.all_str()))
 
 
@@ -166,7 +166,7 @@ def check_port_availability(port: int) -> bool:
             ret_value = False
         else:
             # something else raised the socket.error exception
-            error_msg = TEXTS["port_availability_check_error_msg"]
+            error_msg = Texts.PORT_AVAILABILITY_CHECK_ERROR_MSG
             log.exception(error_msg)
             raise RuntimeError(error_msg) from e
 

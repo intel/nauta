@@ -29,7 +29,7 @@ from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
-from cli_text_consts import UTIL_K8S_PROXY_TEXTS as TEXTS
+from cli_text_consts import UtilK8sProxyTexts as Texts
 
 
 logger = initialize_logger(__name__)
@@ -65,7 +65,7 @@ class K8sProxy:
         except LocalPortOccupiedError as exe:
             raise exe
         except Exception as exe:
-            error_message = TEXTS["proxy_enter_error_msg"]
+            error_message = Texts.PROXY_ENTER_ERROR_MSG
             logger.exception(error_message)
             raise K8sProxyOpenError(error_message) from exe
 
@@ -76,7 +76,7 @@ class K8sProxy:
         try:
             self._close_tunnel()
         except Exception as exe:
-            error_message = TEXTS["proxy_exit_error_msg"]
+            error_message = Texts.PROXY_EXIT_ERROR_MSG
             logger.exception(error_message)
             raise K8sProxyCloseError(error_message) from exe
 
@@ -89,7 +89,7 @@ class K8sProxy:
             except ConnectionError as e:
                 logger.error(f'can not connect to {address}:{port}. Error: {e}')
                 time.sleep(1)
-        raise TunnelSetupError(TEXTS["tunnel_not_ready_error_msg"].format(address=address, port=port))
+        raise TunnelSetupError(Texts.TUNNEL_NOT_READY_ERROR_MSG.format(address=address, port=port))
 
     def _close_tunnel(self):
         children = psutil.Process(self.process.pid).children(recursive=True)

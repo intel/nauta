@@ -28,7 +28,7 @@ import pytest
 
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, TensorboardServiceAPIException, \
     TensorboardRun, build_tensorboard_run_list
-from cli_text_consts import TENSORBOARD_CLIENT_TEXTS as TEXTS
+from cli_text_consts import TensorboardClientTexts as Texts
 
 
 def test_get_tensorboard(mocker):
@@ -172,7 +172,7 @@ def test_create_tensorboard_missing_experiments(mocker):
     with pytest.raises(TensorboardServiceAPIException) as exe:
         client.create_tensorboard(runs=fake_runs_list)
 
-    assert TEXTS["invalid_runs_error_msg"].format(invalid_runs_list=f"{fake_owner}/{fake_exp_name}") in str(exe.value)
+    assert Texts.INVALID_RUNS_ERROR_MSG.format(invalid_runs_list=f"{fake_owner}/{fake_exp_name}") in str(exe.value)
 
     content['invalidRuns'] = []
     content_bytes = json.dumps(content).encode('utf-8')
@@ -185,4 +185,4 @@ def test_create_tensorboard_missing_experiments(mocker):
     with pytest.raises(TensorboardServiceAPIException) as exe:
         client.create_tensorboard(runs=fake_runs_list)
 
-    assert TEXTS["runs_not_exist_error_msg"] in str(exe.value)
+    assert Texts.RUNS_NOT_EXIST_ERROR_MSG in str(exe.value)

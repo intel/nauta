@@ -40,7 +40,7 @@ from platform_resources.experiments import get_experiment, generate_name
 from commands.experiment.common import check_experiment_name, validate_pack_params_names
 from util.exceptions import K8sProxyCloseError
 from util.system import handle_error
-from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentInteractCmdTexts as Texts
 from platform_resources.experiment_model import ExperimentStatus
 
 
@@ -49,16 +49,16 @@ JUPYTER_CHECK_POD_READY_TRIES = 60
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=TEXTS["help"], cls=AliasCmd, alias='i')
-@click.option('-n', '--name', default=None, help=TEXTS["help_n"])
-@click.option('-f', '--filename', default=None, help=TEXTS["help_f"])
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=TEXTS["help_p"],
+@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='i')
+@click.option('-n', '--name', default=None, help=Texts.HELP_N)
+@click.option('-f', '--filename', default=None, help=Texts.HELP_F)
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
-@click.option('--no-launch', is_flag=True, help=TEXTS["help_no_launch"])
-@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=TEXTS["help_pn"],
+@click.option('--no-launch', is_flag=True, help=Texts.HELP_NO_LAUNCH)
+@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=Texts.HELP_PN,
               callback=validate_env_paramater)
-@click.option("-e", "--env", multiple=True, help=TEXTS["help_e"], callback=validate_env_paramater)
-@click.option("-t", "--template", help=TEXTS["help_t"], default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
+@click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
+@click.option("-t", "--template", help=Texts.HELP_T, default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
               type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
 @common_options()
 @pass_state
@@ -76,22 +76,22 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         try:
             jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
         except Exception:
-            handle_error(logger, TEXTS["experiment_get_error_msg"], TEXTS["experiment_get_error_msg"])
+            handle_error(logger, Texts.EXPERIMENT_GET_ERROR_MSG, Texts.EXPERIMENT_GET_ERROR_MSG)
             sys.exit(1)
 
         # if experiment exists and is not based on jupyter image - we need to ask a user to choose another name
         if jupyter_experiment and jupyter_experiment.template_name not in JUPYTER_NOTEBOOK_TEMPLATES_NAMES:
-            handle_error(user_msg=TEXTS["name_already_used"].format(name=name))
+            handle_error(user_msg=Texts.NAME_ALREADY_USED.format(name=name))
             sys.exit(1)
 
         # if experiment exists but its state is different than RUNNING - display info about a need of purging of
         # this experiment
         if jupyter_experiment and jupyter_experiment.state not in \
                 [ExperimentStatus.SUBMITTED, ExperimentStatus.CREATING]:
-            handle_error(user_msg=TEXTS["exp_with_the_same_name_must_be_purged"].format(name=name))
+            handle_error(user_msg=Texts.EXP_WITH_THE_SAME_NAME_MUST_BE_PURGED.format(name=name))
             sys.exit(1)
 
-        if not jupyter_experiment and not click.confirm(TEXTS["confirm_experiment_creation"]):
+        if not jupyter_experiment and not click.confirm(Texts.CONFIRM_EXPERIMENT_CREATION):
             sys.exit(0)
 
         if jupyter_experiment:
@@ -111,7 +111,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             if not name and not filename:
                 exp_name = generate_name("jup")
 
-            click.echo(TEXTS["submitting_experiment_user_msg"])
+            click.echo(Texts.SUBMITTING_EXPERIMENT_USER_MSG)
             runs, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
                                                script_folder_location=None, template=template,
                                                name=exp_name, parameter_range=[], parameter_set=(),
@@ -132,15 +132,15 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             handle_error(user_msg=exe.message)
             sys.exit(1)
         except SubmitExperimentError as exe:
-            handle_error(logger, TEXTS["submit_error_msg"].format(exception_message=exe.message),
-                         TEXTS["submit_error_msg"].format(exception_message=exe.message))
+            handle_error(logger, Texts.SUBMIT_ERROR_MSG.format(exception_message=exe.message),
+                         Texts.SUBMIT_ERROR_MSG.format(exception_message=exe.message))
             sys.exit(1)
         except Exception:
-            handle_error(logger, TEXTS["submit_other_error_msg"], TEXTS["submit_other_error_msg"])
+            handle_error(logger, Texts.SUBMIT_OTHER_ERROR_MSG, Texts.SUBMIT_OTHER_ERROR_MSG)
             sys.exit(1)
     else:
         # if jupyter service exists - the system only connects to it
-        click.echo(TEXTS["session_exists_msg"])
+        click.echo(Texts.SESSION_EXISTS_MSG)
 
     url_end = ""
     if filename:
@@ -152,7 +152,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 url_end = "/edit/"
             url_end = url_end + Path(filename).name
         else:
-            click.echo(TEXTS["attaching_script_not_supported_msg"])
+            click.echo(Texts.ATTACHING_SCRIPT_NOT_SUPPORTED_MSG)
 
     # wait until all jupyter pods are ready
     for i in range(JUPYTER_CHECK_POD_READY_TRIES):
@@ -160,11 +160,11 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
             if check_pods_status(run_name=name, namespace=current_namespace, status=PodStatus.RUNNING):
                 break
         except Exception:
-            handle_error(logger, TEXTS["notebook_state_check_error_msg"])
+            handle_error(logger, Texts.NOTEBOOK_STATE_CHECK_ERROR_MSG)
             sys.exit(1)
         time.sleep(1)
     else:
-        handle_error(user_msg=TEXTS["notebook_not_ready_error_msg"])
+        handle_error(user_msg=Texts.NOTEBOOK_NOT_READY_ERROR_MSG)
         sys.exit(1)
 
     try:
@@ -174,8 +174,8 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         handle_error(logger, exe.message, exe.message)
         sys.exit(1)
     except ProxyClosingError:
-        handle_error(user_msg=TEXTS["proxy_closing_error_msg"])
+        handle_error(user_msg=Texts.PROXY_CLOSING_ERROR_MSG)
         sys.exit(1)
     except Exception:
-        handle_error(logger, TEXTS["session_launch_other_error_msg"], TEXTS["session_launch_other_error_msg"])
+        handle_error(logger, Texts.SESSION_LAUNCH_OTHER_ERROR_MSG, Texts.SESSION_LAUNCH_OTHER_ERROR_MSG)
         sys.exit(1)

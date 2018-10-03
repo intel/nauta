@@ -25,7 +25,7 @@ import pytest
 from unittest.mock import call, ANY
 
 from draft import cmd
-from cli_text_consts import DRAFT_CMD_TEXTS as TEXTS
+from cli_text_consts import DraftCmdTexts as Texts
 
 
 FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
@@ -86,14 +86,14 @@ def test_check_up_status_lack_of_push():
                                                            CORRECT_UP_OUTPUT_DEPLOY))
 
     assert exit_code == 101
-    assert output == TEXTS["docker_image_not_sent"]
+    assert output == Texts.DOCKER_IMAGE_NOT_SENT
 
 
 def test_check_up_status_lack_of_build():
     output, exit_code = cmd.check_up_status('{}'.format(CORRECT_UP_OUTPUT_DEPLOY))
 
     assert exit_code == 100
-    assert output == TEXTS["docker_image_not_built"]
+    assert output == Texts.DOCKER_IMAGE_NOT_BUILT
 
 
 def test_check_up_status_lack_of_deploy():
@@ -101,7 +101,7 @@ def test_check_up_status_lack_of_deploy():
                                                            CORRECT_UP_OUTPUT_PUSH_IMAGE))
 
     assert exit_code == 102
-    assert output == TEXTS["app_not_released"]
+    assert output == Texts.APP_NOT_RELEASED
 
 
 def test_check_create_status_success():
@@ -115,4 +115,4 @@ def test_check_create_status_fail():
     output, exit_code = cmd.check_create_status(INCORRECT_UP_OUTPUT)
 
     assert exit_code == 100
-    assert output == TEXTS["deployment_not_created"]
+    assert output == Texts.DEPLOYMENT_NOT_CREATED

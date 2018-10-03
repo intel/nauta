@@ -25,7 +25,7 @@ import pytest
 from platform_resources.experiment_model import Experiment, ExperimentStatus
 from commands.experiment import interact
 from commands.experiment.common import RunSubmission, RunStatus, SubmitExperimentError
-from cli_text_consts import EXPERIMENT_INTERACT_CMD_TEXTS as TEXTS
+from cli_text_consts import ExperimentInteractCmdTexts as Texts
 
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
@@ -93,7 +93,7 @@ def test_error_when_listing_experiments(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
-    assert TEXTS["experiment_get_error_msg"] in result.output
+    assert Texts.EXPERIMENT_GET_ERROR_MSG in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
@@ -103,7 +103,7 @@ def test_incorrect_experiment_type(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME])
 
-    assert TEXTS["name_already_used"].format(name=CORRECT_INTERACT_NAME) in result.output
+    assert Texts.NAME_ALREADY_USED.format(name=CORRECT_INTERACT_NAME) in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
                   launch_app_count=0)
 
@@ -144,7 +144,7 @@ def test_interact_pods_not_created(prepare_mocks: InteractMocks):
 
     result = CliRunner().invoke(interact.interact, ["-n", CORRECT_INTERACT_NAME], input="y")
 
-    assert TEXTS["notebook_not_ready_error_msg"] in result.output
+    assert Texts.NOTEBOOK_NOT_READY_ERROR_MSG in result.output
 
 
 def test_interact_error_when_submitting(prepare_mocks: InteractMocks):
@@ -153,7 +153,7 @@ def test_interact_error_when_submitting(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact)
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=0)
-    assert TEXTS["submit_error_msg"].format(exception_message="error") in result.output
+    assert Texts.SUBMIT_ERROR_MSG.format(exception_message="error") in result.output
 
 
 def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
@@ -162,4 +162,4 @@ def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
     result = CliRunner().invoke(interact.interact)
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=0)
-    assert TEXTS["submit_other_error_msg"] in result.output
+    assert Texts.SUBMIT_OTHER_ERROR_MSG in result.output

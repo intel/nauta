@@ -27,7 +27,7 @@ import yaml
 
 from util.k8s.k8s_info import get_config_map_data
 from util.logger import initialize_logger
-from cli_text_consts import UTIL_CONFIG_TEXTS as TEXTS
+from cli_text_consts import UtilConfigTexts as Texts
 
 
 # environmental variable with a dlsctl HOME folder
@@ -75,15 +75,15 @@ class Config:
             if os.path.exists(user_path):
                 return user_path
             else:
-                message = TEXTS["user_dir_not_found_error_msg"].format(user_path=user_path,
-                                                                       config_env_name=DLS_CTL_CONFIG_ENV_NAME)
+                message = Texts.USER_DIR_NOT_FOUND_ERROR_MSG.format(user_path=user_path,
+                                                                    config_env_name=DLS_CTL_CONFIG_ENV_NAME)
                 raise ConfigInitError(message)
         elif user_local_config_dir_path and os.path.exists(user_local_config_dir_path):
             return user_local_config_dir_path
         elif binary_config_dir_path and os.path.exists(binary_config_dir_path):
             return binary_config_dir_path
         else:
-            message = TEXTS["dls_ctl_config_dir_not_found_error_msg"].format(
+            message = Texts.DLS_CTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG.format(
                 config_dir_name=DLS_CTL_CONFIG_DIR_NAME, binary_config_dir_path=binary_config_dir_path,
                 config_env_name=DLS_CTL_CONFIG_ENV_NAME, user_local_config_dir_path=user_local_config_dir_path
             )

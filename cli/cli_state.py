@@ -30,7 +30,7 @@ from util.dependencies_checker import check_all_binary_dependencies, check_os
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.exceptions import InvalidDependencyError, InvalidOsError
 from util.system import handle_error
-from cli_text_consts import CLI_STATE_TEXTS as TEXTS
+from cli_text_consts import CliStateTexts as Texts
 
 logger = initialize_logger(__name__)
 
@@ -64,10 +64,10 @@ def verify_cli_dependencies():
         check_os()
         check_all_binary_dependencies(namespace=namespace)
     except (InvalidDependencyError, InvalidOsError):
-        error_msg = TEXTS["invalid_dependency_error_msg"]
+        error_msg = Texts.INVALID_DEPENDENCY_ERROR_MSG
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
     except FileNotFoundError:
-        error_msg = TEXTS["kubeconfig_not_found_error_msg"]
+        error_msg = Texts.KUBECONFIG_NOT_FOUND_ERROR_MSG
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
 
 
@@ -75,9 +75,9 @@ def verify_cli_config_path():
     try:
         config = Config()
         if not config.config_path:
-            raise ConfigInitError(TEXTS["dlsctl_config_not_set_error_msg"])
+            raise ConfigInitError(Texts.DLSCTL_CONFIG_NOT_SET_ERROR_MSG)
     except ConfigInitError as e:
-        error_msg = TEXTS["dlsctl_config_init_error_msg"].format(exception_msg=str(e))
+        error_msg = Texts.DLSCTL_CONFIG_INIT_ERROR_MSG.format(exception_msg=str(e))
         handle_error(logger, error_msg, error_msg)
         sys.exit(1)
 
