@@ -55,8 +55,7 @@ logger = initialize_logger(__name__)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=Texts.HELP_NO_LAUNCH)
-@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=Texts.HELP_PN,
-              callback=validate_env_paramater)
+@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=Texts.HELP_PN)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.option("-t", "--template", help=Texts.HELP_T, default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
               type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
