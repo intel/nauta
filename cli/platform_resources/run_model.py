@@ -91,9 +91,8 @@ class Run(PlatformResource):
     def cli_representation(self):
         return Run.RunCliModel(name=self.name,
                                parameters=textwrap.fill(' '.join(self.parameters), width=30) if self.parameters else "",
-                               metrics=textwrap.fill(
-                                   ' '.join(f'{key}: {value}' for key, value in self.metrics.items()),
-                                   width=30) if self.metrics else "",
+                               metrics='\n'.join(textwrap.fill(f'{key}: {value}', width=30)
+                                                 for key, value in self.metrics.items()) if self.metrics else "",
                                submission_date=format_timestamp_for_cli(self.creation_timestamp) if self.creation_timestamp else "",
                                submitter=self.submitter if self.submitter else "",
                                status=self.state.value if self.state else "",
