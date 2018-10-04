@@ -151,19 +151,33 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         if not list_of_runs_to_be_deleted:
             handle_error(
                 user_msg=Texts.EXPERIMENTS_ALREADY_CANCELLED_ERROR_MSG.format(
-                    experiment_name_plural=experiment_name_plural
+                    experiment_name_plural=experiment_name_plural,
+                    operation_word=Texts.DELETE_OPERATION["deleted"] if experiment_name_plural == 'pods'
+                    else Texts.CANCEL_OPERATION["cancelled"]
                 )
             )
             exit(1)
         elif len(list_of_runs_to_be_deleted) != len(list_of_all_runs):
-            click.echo(Texts.ALREADY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.ALREADY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                                  operation_word=Texts.DELETE_OPERATION[
+                                                                      "deleted"] if experiment_name_plural == 'pods'
+                                                                  else Texts.CANCEL_OPERATION["cancelled"]
+                                                                  ))
             for name in names_of_cancelled_runs:
                 click.echo(f"     - {name}")
-            click.echo(Texts.CAN_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.CAN_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                                 operation_word=Texts.DELETE_OPERATION[
+                                                                     "deleted"] if experiment_name_plural == 'pods'
+                                                                 else Texts.CANCEL_OPERATION["cancelled"]
+                                                                 ))
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
         else:
-            click.echo(Texts.WILL_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+            click.echo(Texts.WILL_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                                  operation_word=Texts.DELETE_OPERATION[
+                                                                      "deleted"] if experiment_name_plural == 'pods'
+                                                                  else Texts.CANCEL_OPERATION["cancelled"]
+                                                                  ))
             for name in list_of_runs_to_be_deleted:
                 click.echo(f"     - {name.name}")
     else:
@@ -172,10 +186,16 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         for name in list_of_runs_to_be_deleted:
             click.echo(f"     - {name.name}")
 
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural)):
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural,
+                                                         operation_word=Texts.DELETE_OPERATION[
+                                                             "deletion"] if experiment_name_plural == 'pods'
+                                                         else Texts.CANCEL_OPERATION["cancellation"]
+                                                         )):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
-                experiment_name_plural=experiment_name_plural
+                experiment_name_plural=experiment_name_plural,
+                operation_word=Texts.DELETE_OPERATION["deletion"] if experiment_name_plural == 'pods'
+                else Texts.CANCEL_OPERATION["cancellation"]
             )
         )
         exit(0)
@@ -228,12 +248,20 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                 not_deleted_runs.extend(run_list)
 
     if deleted_runs:
-        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                                   operation_word=Texts.DELETE_OPERATION[
+                                                                       "deleted"] if experiment_name_plural == 'pods'
+                                                                   else Texts.CANCEL_OPERATION["cancelled"]
+                                                                   ))
         for run in deleted_runs:
             click.echo(f"     - {run.name}")
 
     if not_deleted_runs:
-        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                             operation_word=Texts.DELETE_OPERATION[
+                                                                 "deleted"] if experiment_name_plural == 'pods'
+                                                             else Texts.CANCEL_OPERATION["cancelled"]
+                                                             ))
         for run in not_deleted_runs:
             click.echo(f"     - {run.name}")
         sys.exit(1)
@@ -448,10 +476,13 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
     for pod in filtered_pods:
         click.echo(f"     - {pod.name}")
 
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural='pods')):
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural='pods',
+                                                         operation_word=Texts.DELETE_OPERATION["deletion"])):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
-                experiment_name_plural='pods'
+                experiment_name_plural='pods',
+                operation_word=Texts.DELETE_OPERATION["deletion"] if experiment_name_plural == 'pods'
+                else Texts.CANCEL_OPERATION["cancellation"]
             )
         )
         exit(0)
@@ -469,12 +500,14 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
             not_deleted_pods.append(pod)
 
     if deleted_pods:
-        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural='pods'))
+        click.echo(Texts.SUCCESSFULLY_CANCELLED_LIST_HEADER.format(experiment_name_plural='pods',
+                                                                   operation_word=Texts.DELETE_OPERATION["deleted"]))
         for pod in deleted_pods:
             click.echo(f"     - {pod.name}")
 
     if not_deleted_pods:
-        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural='pods'))
+        click.echo(Texts.FAILED_TO_CANCEL_LIST_HEADER.format(experiment_name_plural='pods',
+                                                             operation_word=Texts.DELETE_OPERATION["deleted"]))
         for pod in not_deleted_pods:
             click.echo(f"     - {pod.name}")
         sys.exit(1)
@@ -482,10 +515,16 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
 
 def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purge: bool):
     click.echo(Texts.UNINITIALIZED_EXPERIMENT_CANCEL_MSG.format(experiment_name=experiment.name))
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural)):
+    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural,
+                                                         operation_word=Texts.DELETE_OPERATION[
+                                                             "deletion"] if experiment_name_plural == 'pods'
+                                                         else Texts.CANCEL_OPERATION["cancellation"]
+                                                         )):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
-                experiment_name_plural=experiment_name_plural
+                experiment_name_plural=experiment_name_plural,
+                operation_word=Texts.DELETE_OPERATION["deletion"] if experiment_name_plural == 'pods'
+                else Texts.CANCEL_OPERATION["cancellation"]
             )
         )
         exit(0)

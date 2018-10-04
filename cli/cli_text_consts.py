@@ -366,13 +366,13 @@ class ExperimentInteractCmdTexts:
 
 
 class ExperimentCancelCmdTexts:
-    HELP = "Cancels experiment/s or pods chosen based on criteria given as parameters."
+    HELP = "Cancels experiment/s or deletes pods chosen based on criteria given as parameters."
     HELP_P = "If given, then all information concerning all experiments, completed and currently running, is removed " \
              "from the system."
     HELP_M = "If given, command searches for experiments matching the value of this option. This option cannot be " \
              "used along with the NAME argument."
-    HELP_I = "Comma-separated pods IDs - if given then matches pods by their IDs and cancels them."
-    HELP_S = "One of: {available_statuses} - searches pods by their status and cancels them."
+    HELP_I = "Comma-separated pods IDs - if given then matches pods by their IDs and deletes them."
+    HELP_S = "One of: {available_statuses} - searches pods by their status and deletes them."
     NAME_M_BOTH_GIVEN_ERROR_MSG = "Both name and -m option cannot be given. Please choose one of them."
     NAME_M_NONE_GIVEN_ERROR_MSG = "Error: Name or -m option must be given. Please pass one of them."
     LIST_RUNS_ERROR_MSG = "Problems during loading a list of {experiment_name_plural}."
@@ -380,15 +380,23 @@ class ExperimentCancelCmdTexts:
                                     "string parameters do not match any existing {experiment_name} in an appropriate " \
                                     "state for the command. Run 'dlsctl exp list' to find out what are the names and " \
                                     "states of existing {experiment_name_plural}."
+    CANCEL_OPERATION = {
+        "cancelled": "cancelled",
+        "cancellation": "cancellation"
+    }
+    DELETE_OPERATION = {
+        "deleted": "deleted",
+        "deletion": "deletion"
+    }
     EXPERIMENTS_ALREADY_CANCELLED_ERROR_MSG = "{experiment_name_plural} fulfilling given criteria have been " \
-                                              "cancelled already."
-    ALREADY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} have been cancelled already or cannot " \
-                                    "be cancelled due to their current state:"
-    CAN_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} can still be cancelled:"
-    WILL_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} will be cancelled:"
+                                              "{operation_word} already."
+    ALREADY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} have been {operation_word} already or " \
+                                    "cannot be {operation_word} due to their current state:"
+    CAN_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} can still be {operation_word}:"
+    WILL_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} will be {operation_word}:"
     WILL_BE_PURGED_LIST_HEADER = "The following {experiment_name_plural} will be purged:"
-    CONFIRM_CANCEL_MSG = "Do you want to continue with cancellation of those {experiment_name_plural}?"
-    CANCELLATION_ABORTED_MSG = "Operation of cancellation of {experiment_name_plural} was aborted."
+    CONFIRM_CANCEL_MSG = "Do you want to continue with {operation_word} of those {experiment_name_plural}?"
+    CANCELLATION_ABORTED_MSG = "Operation of {operation_word} of {experiment_name_plural} was aborted."
     OTHER_CANCELLING_ERROR_MSG = "Error during cancelling an experiment."
     PROXY_CLOSING_ERROR_LOG_MSG = "Error during closing of a proxy for elasticsearch."
     PROXY_CLOSING_ERROR_USER_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, " \
@@ -396,8 +404,8 @@ class ExperimentCancelCmdTexts:
     PORT_OCCUPIED_ERROR_LOG_MSG = "Error during creation of proxy - port is occupied."
     PORT_OCCUPIED_ERROR_USER_MSG = "Error during creation of a proxy for elasticsearch. {exception_message}"
     PROXY_OPEN_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
-    SUCCESSFULLY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} were cancelled successfully:"
-    FAILED_TO_CANCEL_LIST_HEADER = "The following {experiment_name_plural} weren't cancelled properly:"
+    SUCCESSFULLY_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} were {operation_word} successfully:"
+    FAILED_TO_CANCEL_LIST_HEADER = "The following {experiment_name_plural} weren't {operation_word} properly:"
     GET_EXPERIMENT_ERROR_MSG = "Error during loading experiment's data."
     PURGING_START_MSG = "Purging {run_name} experiment ..."
     INCOMPLETE_PURGE_ERROR_MSG = "Not all {experiment_name}'s components were removed properly."
@@ -409,8 +417,8 @@ class ExperimentCancelCmdTexts:
     BAD_POD_STATUS_PASSED = "Wrong status: {status_passed} , available: {available_statuses}"
     LACK_OF_PODS_ERROR_MSG = "Lack of pods fulfilling given criteria. Pod ID or pod status parameters do not match " \
                              "any existing pod."
-    CANCELING_PODS_MSG = "Cancelling the pod: {pod_name} ..."
-    OTHER_POD_CANCELLING_ERROR_MSG = "Error during cancelling the pod."
+    CANCELING_PODS_MSG = "Deleting the pod: {pod_name} ..."
+    OTHER_POD_CANCELLING_ERROR_MSG = "Error during deleting the pod."
     UNINITIALIZED_EXPERIMENT_CANCEL_MSG = "Experiment {experiment_name} has no resources submitted for creation."
 
 
