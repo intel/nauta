@@ -11,6 +11,7 @@ metadata:
     dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
 data:
   external_ip: {{ required "DLS4E Release version is required" .Values.global.dls4e_configuration.external_ip }}
+  tensorboard.timeout: "1800"
   registry: {{ required "DLS4E registry address is required" .Values.global.dls4e_configuration.registry }}
 {{- $root := . -}}
 {{- range (required "List of images is required" .Values.global.images) }}

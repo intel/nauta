@@ -34,24 +34,31 @@ from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
 from tensorboard.models import Tensorboard, TensorboardStatus, Run
 from tensorboard.proxy_client import try_get_last_request_datetime
+from dls4e.config import Dls4ePlatformConfig
 
 
 class TensorboardManager:
     OUTPUT_PUBLIC_MOUNT_PATH = '/mnt/output'
     NGINX_INGRESS_ADDRESS = 'dls4enterprise-ingress.dls4e'
 
-    def __init__(self, namespace: str, api_client: K8SAPIClient):
+    def __init__(self, namespace: str, api_client: K8SAPIClient,
+                 config: Dls4ePlatformConfig):
         self.client = api_client
         self.namespace = namespace
+        self._config = config
+        self._tb_timeout = self._config.get_tensorboard_timeout()
+        self._last_tb_timeout_load = TensorboardManager._get_current_datetime()
 
     @classmethod
     def incluster_init(cls):
         config.load_incluster_config()
 
+        dls4e_config = Dls4ePlatformConfig.incluster_init()
+
         with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", mode='r') as file:
             my_current_namespace = file.read()
 
-        return cls(namespace=my_current_namespace, api_client=K8SAPIClient())
+        return cls(namespace=my_current_namespace, api_client=K8SAPIClient(), config=dls4e_config)
 
     @staticmethod
     def _get_current_datetime() -> datetime:
@@ -130,8 +137,8 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        tensorboard_status = self._check_tensorboard_status(pod,
-                                                            tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
+        tensorboard_status = \
+            self._check_tensorboard_status(pod, tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
@@ -157,8 +164,8 @@ class TensorboardManager:
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)
 
-        tensorboard_status = self._check_tensorboard_status(pod,
-                                                            tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
+        tensorboard_status = \
+            self._check_tensorboard_status(pod, tensorboard_ingress_url=ingress.spec.rules[0].http.paths[0].path)
 
         return Tensorboard(id=id, status=tensorboard_status, url=ingress.spec.rules[0].http.paths[0].path)
 
@@ -171,9 +178,26 @@ class TensorboardManager:
 
         self.client.delete_deployment(name=common_name, namespace=self.namespace)
 
+    def refresh_garbage_timeout(self):
+        delta = TensorboardManager._get_current_datetime() - self._last_tb_timeout_load
+
+        if delta >= timedelta(seconds=60):
+            self._tb_timeout = self._config.get_tensorboard_timeout()
+            self._last_tb_timeout_load = TensorboardManager._get_current_datetime()
+
+    def get_garbage_timeout(self):
+        try:
+            log.debug(f'Garbage collection timeout : {self._tb_timeout}')
+            return int(self._tb_timeout)
+        except Exception:
+            log.exception('Error during getting garbage collection timeout value')
+            return 1800
+
     def delete_garbage(self):
         log.debug("searching for garbage...")
         tensorboards = self.list()
+
+        self.refresh_garbage_timeout()
 
         for deployment in tensorboards:
             meta: V1ObjectMeta = deployment.metadata
@@ -184,7 +208,7 @@ class TensorboardManager:
                 continue
 
             delta = TensorboardManager._get_current_datetime() - last_request_datetime
-            if delta >= timedelta(seconds=1800):
+            if delta >= timedelta(seconds=self.get_garbage_timeout()):
                 log.debug(f'garbage detected: {meta.name} , removing...')
                 self.delete(deployment)
                 log.debug(f'garbage removed: {meta.name}')

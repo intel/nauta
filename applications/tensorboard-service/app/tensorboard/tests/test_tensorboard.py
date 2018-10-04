@@ -40,7 +40,7 @@ FAKE_NAMESPACE = "fake-namespace"
 def tensorboard_manager_mocked(mocker) -> TensorboardManager:
     mocker.patch('k8s.models.Dls4ePlatformConfig')
     # noinspection PyTypeChecker
-    mgr = TensorboardManager(api_client=mock.MagicMock(), namespace=FAKE_NAMESPACE)
+    mgr = TensorboardManager(api_client=mock.MagicMock(), namespace=FAKE_NAMESPACE, config=mock.MagicMock())
 
     return mgr
 
@@ -48,6 +48,7 @@ def tensorboard_manager_mocked(mocker) -> TensorboardManager:
 def test_incluster_init(mocker: MockFixture):
     fake_namespace = 'some-namespace'
     mocker.patch.object(tensorboard.tensorboard, 'config')
+    mocker.patch('dls4e.config.Dls4ePlatformConfig.incluster_init')
     mocker.patch('builtins.open', new=lambda *args, **kwargs: mock.MagicMock(
         __enter__=lambda *args, **kwargs: mock.MagicMock(
             read=lambda: fake_namespace
@@ -151,7 +152,7 @@ def test_get_by_id(mocker: MockFixture,
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_deployment').return_value = fake_deployment
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_ingress').return_value = fake_ingress
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_pod').return_value = fake_pod
-
+    mocker.patch('tensorboard.tensorboard.TensorboardManager._check_tensorboard_nginx_reachable').return_value = True
     tensorboard = tensorboard_manager_mocked.get_by_id(id=fake_tensorboard_id)
 
     assert tensorboard.id == fake_tensorboard_id
@@ -263,6 +264,7 @@ def test_get_by_runs(mocker: MockFixture, tensorboard_manager_mocked: Tensorboar
     mocker.patch.object(tensorboard_manager_mocked.client, 'list_deployments', new=_fake_list_deployments)
     mocker.patch.object(tensorboard_manager_mocked.client, 'list_ingresses').return_value = [k8s_tensorboard.ingress]
     mocker.patch.object(tensorboard_manager_mocked.client, 'get_pod').return_value = fake_pod
+    mocker.patch('tensorboard.tensorboard.TensorboardManager._check_tensorboard_nginx_reachable').return_value = True
 
     get_runs = [
         Run(
@@ -373,7 +375,10 @@ def test_delete_garbage(mocker, tensorboard_manager_mocked: TensorboardManager,
         V1Deployment(metadata=V1ObjectMeta(name='fake-name'))
     ]
     mocker.patch.object(tensorboard_manager_mocked, 'delete')
-    mocker.patch.object(tensorboard.tensorboard, 'try_get_last_request_datetime').return_value = datetime(year=2018, month=6, day=19, hour=12, minute=0)
+    mocker.patch.object(tensorboard.tensorboard, 'try_get_last_request_datetime').\
+        return_value = datetime(year=2018, month=6, day=19, hour=12, minute=0)
+    mocker.patch.object(tensorboard_manager_mocked, 'refresh_garbage_timeout')
+    mocker.patch.object(tensorboard_manager_mocked, 'get_garbage_timeout').return_value = 1800
     tensorboard_manager_mocked.delete_garbage()
 
     # noinspection PyUnresolvedReferences

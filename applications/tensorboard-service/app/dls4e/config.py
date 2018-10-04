@@ -27,6 +27,9 @@ from kubernetes.client import V1ConfigMap
 DLS4E_CONFIG_CONFIGMAP_NAME = 'dls4enterprise'
 DLS4E_CONFIG_CONFIGMAP_NAMESPACE = 'dls4e'
 
+DLS4E_CONFIG_TENSORBOARD_TIMEOUT = 'tensorboard.timeout'
+DLS4E_DEFAULT_TENSORBOARD_TIMEOUT = '1800'
+
 
 class Dls4ePlatformConfig:
     def __init__(self, k8s_api_client: client.CoreV1Api):
@@ -53,3 +56,9 @@ class Dls4ePlatformConfig:
     def get_activity_proxy_image(self) -> str:
         data = self._fetch_platform_configmap()
         return f"{data['registry']}/{data['image.activity-proxy']}"
+
+    def get_tensorboard_timeout(self):
+        data = self._fetch_platform_configmap()
+        if data.get(DLS4E_CONFIG_TENSORBOARD_TIMEOUT):
+            return data.get(DLS4E_CONFIG_TENSORBOARD_TIMEOUT)
+        return DLS4E_CONFIG_TENSORBOARD_TIMEOUT
