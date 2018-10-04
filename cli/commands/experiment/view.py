@@ -29,8 +29,8 @@ from commands.experiment.common import EXPERIMENTS_LIST_HEADERS
 from commands.launch.launch import tensorboard as tensorboard_command
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_pods, sum_mem_resources, sum_cpu_resources, \
-    PodStatus, get_pod_events
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
+    sum_cpu_resources, PodStatus, get_pod_events
 from util.k8s.k8s_statistics import get_highest_usage
 from util.logger import initialize_logger
 import platform_resources.runs as runs_api
@@ -81,15 +81,20 @@ def container_resources_to_msg(resources, spaces=9) -> str:
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v')
 @click.argument("experiment_name")
 @click.option('-tb', '--tensorboard', default=None, help=Texts.HELP_T, is_flag=True)
+@click.option('-u', '--username', help=Texts.HELP_U)
 @common_options()
 @pass_state
 @click.pass_context
-def view(context, state: State, experiment_name: str, tensorboard: bool):
+def view(context, state: State, experiment_name: str, tensorboard: bool, username: str):
     """
     Displays details of an experiment.
     """
     try:
-        namespace = get_kubectl_current_context_namespace()
+        if username:
+            namespace = username
+        else:
+            namespace = get_kubectl_current_context_namespace()
+
         run = runs_api.get_run(name=experiment_name,
                                namespace=namespace)
         if not run:
@@ -104,7 +109,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool):
 
         click.echo(Texts.PODS_PARTICIPATING_LIST_HEADER)
 
-        pods = get_pods(label_selector="runName=" + experiment_name)
+        pods = get_namespaced_pods(label_selector="runName=" + experiment_name, namespace=namespace)
 
         tabular_output = []
         containers_resources = []

@@ -87,7 +87,7 @@ class ViewMocks:
     def __init__(self, mocker):
         self.get_run = mocker.patch('commands.experiment.view.runs_api.get_run')
         self.get_run.return_value = TEST_RUNS[0]
-        self.get_pods = mocker.patch('commands.experiment.view.get_pods')
+        self.get_pods = mocker.patch('commands.experiment.view.get_namespaced_pods')
         self.get_pods.return_value = TEST_PODS
         self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
         self.format_timestamp = mocker.patch('platform_resources.run_model.format_timestamp_for_cli')

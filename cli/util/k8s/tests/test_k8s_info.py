@@ -31,7 +31,8 @@ from kubernetes.client.rest import ApiException
 from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
-                              PodStatus, get_app_service_node_port, get_pods, NamespaceStatus, get_pod_events
+                              PodStatus, get_app_service_node_port, get_pods, NamespaceStatus, get_pod_events, \
+                              get_namespaced_pods
 from util.config import DLS4EConfigMap
 from util.app_names import DLS4EAppNames
 from util.exceptions import KubernetesError
@@ -249,6 +250,23 @@ def test_get_pods_error(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     mocked_k8s_CoreV1Api.list_pod_for_all_namespaces.side_effect = ApiException(status=500)
     with pytest.raises(ApiException):
         get_pods(label_selector='')
+
+
+def test_get_namespaced_pods(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    pods = get_namespaced_pods(label_selector='', namespace=test_namespace)
+    assert pods
+
+
+def test_get_namespaced_pods_not_found(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.list_namespaced_pod.side_effect = ApiException(status=404)
+    pods = get_namespaced_pods(label_selector='', namespace=test_namespace)
+    assert pods == []
+
+
+def test_get_namespaced_pods_error(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
+    mocked_k8s_CoreV1Api.list_namespaced_pod.side_effect = ApiException(status=500)
+    with pytest.raises(ApiException):
+        get_namespaced_pods(label_selector='', namespace=test_namespace)
 
 
 def test_get_cluster_roles(mocked_k8s_config, mocked_k8s_RbacAuthorizationV1Api):

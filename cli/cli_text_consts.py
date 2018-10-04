@@ -438,6 +438,8 @@ class ExperimentViewCmdTexts:
     PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of pending state and top consumers and cannot be displayed due to " \
                                           "errors."
     PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error when gathering consumers data."
+    HELP_U = "Name of a user to who belongs viewed experiment. If not given - only experiments of a current " \
+             "user are taken into account."
 
 
 class ExperimentCommonTexts:

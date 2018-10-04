@@ -143,6 +143,25 @@ def get_pods(label_selector: str) -> List[client.V1Pod]:
     return pods
 
 
+def get_namespaced_pods(label_selector: str, namespace: str) -> List[client.V1Pod]:
+    logger.debug(f'Getting namespaced pods with label selector: {label_selector}')
+    api = get_k8s_api()
+
+    pods = []
+    try:
+        if label_selector:
+            pods_response = api.list_namespaced_pod(watch=False, label_selector=label_selector, namespace=namespace)
+        else:
+            pods_response = api.list_namespaced_pod(watch=False, namespace=namespace)
+        pods = pods_response.items
+    except ApiException as e:
+        logger.exception(f'Failed to find namespaced pods with label selector: {label_selector}')
+        if e.status != 404:
+            raise
+
+    return pods
+
+
 def get_app_services(dls4e_app_name: DLS4EAppNames, namespace: str = None,
                      app_name: str = None) -> List[client.V1Service]:
     api = get_k8s_api()
