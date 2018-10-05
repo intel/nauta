@@ -31,6 +31,10 @@ def initialize_logger(package_name) -> logging.Logger:
     STREAM_HANDLER.setLevel(logging.CRITICAL)
     logger = logging.getLogger(package_name)
     logging.basicConfig(level=logging.DEBUG, handlers=[STREAM_HANDLER])
+    # CAN-1237 - by setting level of logs for k8s rest client to INFO I'm removing displaying content of
+    # every rest request sent by k8s client
+    k8s_rest_logger = logging.getLogger('kubernetes.client.rest')
+    k8s_rest_logger.setLevel(logging.INFO)
     return logger
 
 
