@@ -20,6 +20,8 @@
 #
 
 import os
+import random
+import string
 from time import sleep
 from typing import Optional
 
@@ -86,7 +88,10 @@ def start(docker_registry_port: str):
     :return:
     """
     global socat_container_name
-    socat_container_name = f'{SOCAT_CONTAINER_NAME_PREFIX}-{docker_registry_port}'
+    random_part = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+                          for _ in range(5))
+    socat_container_name = f'{SOCAT_CONTAINER_NAME_PREFIX}-{random_part}-' \
+                           f'{docker_registry_port}'
     load_socat_image()
     client.containers.run(detach=True, remove=True, network_mode='host', name=socat_container_name,
                           image=SOCAT_IMAGE_NAME, command=f'{docker_registry_port}')
