@@ -41,6 +41,7 @@ log = initialize_logger(__name__)
 UBUNTU_MIN_VERSION = LooseVersion('16')
 WINDOWS_MIN_VERSION = LooseVersion('10')
 MACOS_MIN_VERSION = LooseVersion('10.13')
+REDHAT_MIN_VERSION = LooseVersion('7.5')
 
 DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
@@ -106,6 +107,7 @@ DEPENDENCY_MAP = {'draft': DependencySpec(expected_version=DRAFT_MIN_VERSION,
                   }
 
 SUPPORTED_OS_MAP = {'ubuntu': UBUNTU_MIN_VERSION,
+                    'rhel': REDHAT_MIN_VERSION,
                     'macos': MACOS_MIN_VERSION,
                     'windows_pro': WINDOWS_MIN_VERSION,
                     'windows_enterprise': WINDOWS_MIN_VERSION}
