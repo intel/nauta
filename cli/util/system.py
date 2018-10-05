@@ -217,7 +217,7 @@ def handle_error(logger=None, log_msg: str = None, user_msg: str = None, add_ver
 
 
 def get_windows_edition():
-    windows_edition_number, _ = execute_system_command(
+    windows_edition_number, _, _ = execute_system_command(
         ["powershell.exe", "(Get-WmiObject Win32_OperatingSystem).OperatingSystemSKU"])
     return WINDOWS_EDITIONS[int(windows_edition_number)]
 

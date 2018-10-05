@@ -208,9 +208,9 @@ def get_top_for_pod(name: str, namespace: str) -> Tuple[str, str]:
 
     if namespace:
         top_command.extend(["-n", namespace])
-    output, err_code = system.execute_system_command(top_command)
+    output, err_code, log_output = system.execute_system_command(top_command)
     if err_code:
-        raise KubectlConnectionError(Texts.K8S_CLUSTER_NO_CONNECTION_ERROR_MSG.format(output=output))
+        raise KubectlConnectionError(Texts.K8S_CLUSTER_NO_CONNECTION_ERROR_MSG.format(output=log_output))
 
     if output:
         lines = output.split("\n")
@@ -221,5 +221,6 @@ def get_top_for_pod(name: str, namespace: str) -> Tuple[str, str]:
                 split_second_line = second_line.split()
                 if split_second_line and len(split_second_line) > 2:
                     return (split_second_line[1], split_second_line[2])
-    logger.error(Texts.TOP_COMMAND_ERROR_LOG.format(output=output))
+
+    logger.error(Texts.TOP_COMMAND_ERROR_LOG.format(output=log_output))
     raise KubernetesError(Texts.TOP_COMMAND_ERROR)

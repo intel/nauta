@@ -167,7 +167,7 @@ def test_get_os_version_windows_not_10(mocker):
 
 def test_get_windows_edition(mocker):
     execute_system_command_mock = mocker.patch("util.system.execute_system_command")
-    execute_system_command_mock.return_value = "4", 0
+    execute_system_command_mock.return_value = "4", 0, "4"
 
     windows_edition = get_windows_edition()
 

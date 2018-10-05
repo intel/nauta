@@ -130,7 +130,7 @@ def test_check_connection_to_cluster_with_error(mocker):
 
 def test_get_top_for_pod_success(mocker):
     top_command_mock = mocker.patch("util.system.execute_system_command")
-    top_command_mock.return_value = TOP_RESULT_SUCCESS, 0
+    top_command_mock.return_value = TOP_RESULT_SUCCESS, 0, TOP_RESULT_SUCCESS
 
     cpu, mem = kubectl.get_top_for_pod(name="name", namespace="namespace")
 
@@ -140,7 +140,7 @@ def test_get_top_for_pod_success(mocker):
 
 def test_get_top_for_pod_failure(mocker):
     top_command_mock = mocker.patch("util.system.execute_system_command")
-    top_command_mock.return_value = TOP_RESULT_FAILURE, 0
+    top_command_mock.return_value = TOP_RESULT_FAILURE, 0, TOP_RESULT_FAILURE
 
     with raises(KubernetesError):
         kubectl.get_top_for_pod(name="name", namespace="namespace")
