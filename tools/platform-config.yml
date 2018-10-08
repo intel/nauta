@@ -62,7 +62,10 @@ local_images:
   core/registry:
     version: "v2"
     image: "registry:2"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/registry"
 
 chart_values:
   features: {}
