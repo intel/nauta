@@ -32,7 +32,7 @@ from cli_text_consts import UtilConfigTexts as Texts
 
 # environmental variable with a dlsctl HOME folder
 DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
-DLS_CTL_CONFIG_DIR_NAME = 'dls_ctl_config'
+DLS_CTL_CONFIG_DIR_NAME = 'config'
 
 # name of a directory with EXPERIMENT's data
 EXPERIMENTS_DIR_NAME = 'experiments'

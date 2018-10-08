@@ -32,32 +32,35 @@ build: $(ACTIVATE) set-version metrics-lib
 ifeq (Windows,$(OS))
 	@. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n dlsctl;
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-dls-windows-amd64.7z -o draft.7z
-	@mkdir dist/dls_ctl_config/
-	@7z x draft.7z -odist/dls_ctl_config/
+	@mkdir dist/config/
+	@7z x draft.7z -odist/config/
 	@rm -f draft.7z
-	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/dls_ctl_config/socat-container-image.tar.gz
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-dls-linux-amd64.tar.gz -o draft.tar.gz
 	@cp set-autocomplete.sh dist/
 	@chmod +x dist/set-autocomplete.sh
-	@mkdir dist/dls_ctl_config/
-	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
+	@mkdir dist/config/
+	@tar -zxf draft.tar.gz -C dist/config/
 	@rm -f draft.tar.gz
 endif
 ifeq (Darwin,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-dls-darwin-amd64.tar.gz -o draft.tar.gz
-	@mkdir dist/dls_ctl_config/
-	@tar -zxf draft.tar.gz -C dist/dls_ctl_config/
+	@mkdir dist/config/
+	@tar -zxf draft.tar.gz -C dist/config/
 	@rm -f draft.tar.gz
-	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/dls_ctl_config/socat-container-image.tar.gz
+	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 endif
 
 
-	@cp -Rf draft/packs/* dist/dls_ctl_config/.draft/packs/
-	@cp -Rf ../dls4e-user dist/dls_ctl_config/
+	@mkdir dist/config/packs/
+	@cp -Rf draft/packs/* dist/config/packs/
+	@rm -rf dist/config/.draft/packs
+	@cd dist/config/.draft && ln -s ../packs packs
+	@cp -Rf ../dls4e-user dist/config/
 	@mkdir -p dist/lib/
 	@mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	@cp -f license.txt dist/
