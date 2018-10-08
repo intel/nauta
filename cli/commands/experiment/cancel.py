@@ -115,7 +115,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     try:
         if search_for_experiment:
-            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=name,
+            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=[name],
                                          run_kinds_filter=listed_runs_kinds)
         else:
             list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
