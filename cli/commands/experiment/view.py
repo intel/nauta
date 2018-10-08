@@ -30,7 +30,7 @@ from commands.launch.launch import tensorboard as tensorboard_command
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
-    sum_cpu_resources, PodStatus, get_pod_events
+    sum_cpu_resources, PodStatus, get_pod_events, add_bytes_to_unit
 from util.k8s.k8s_statistics import get_highest_usage
 from util.logger import initialize_logger
 import platform_resources.runs as runs_api
@@ -67,12 +67,12 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     if resources.requests:
         msg += header_indent
         msg += Texts.CONTAINER_REQUESTS_LIST_HEADER.format(indent)
-        msg += indent.join([f'{request_name}: {request_value}\n' for request_name, request_value
+        msg += indent.join([f'{request_name}: {add_bytes_to_unit(request_value)}\n' for request_name, request_value
                             in resources.requests.items()])
     if resources.limits:
         msg += header_indent
         msg += Texts.CONTAINER_LIMITS_LIST_HEADER.format(indent)
-        msg += indent.join([f'{limit_name}: {limit_value}\n' for limit_name, limit_value
+        msg += indent.join([f'{limit_name}: {add_bytes_to_unit(limit_value)}\n' for limit_name, limit_value
                             in resources.limits.items()])
 
     return msg

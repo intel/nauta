@@ -196,7 +196,7 @@ def test_container_resources_to_msg():
 
     assert Texts.CONTAINER_REQUESTS_LIST_HEADER.format("") in msg
     assert f'cpu: {resources.requests["cpu"]}' in msg
-    assert f'mem: {resources.requests["mem"]}' in msg
+    assert f'mem: {resources.requests["mem"]}B' in msg
 
     assert '- Limits:' in msg
     assert f'cpu: {resources.limits["cpu"]}' in msg

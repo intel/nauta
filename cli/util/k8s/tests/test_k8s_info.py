@@ -32,7 +32,7 @@ from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               find_namespace, delete_namespace, get_config_map_data, get_users_token, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
                               PodStatus, get_app_service_node_port, get_pods, NamespaceStatus, get_pod_events, \
-                              get_namespaced_pods
+                              get_namespaced_pods, add_bytes_to_unit
 from util.config import DLS4EConfigMap
 from util.app_names import DLS4EAppNames
 from util.exceptions import KubernetesError
@@ -327,3 +327,11 @@ def test_get_app_service_node_port(mocker):
         ))
     ]
     assert get_app_service_node_port(DLS4EAppNames.DOCKER_REGISTRY) == test_node_port
+
+
+def test_add_bytes_to_unit():
+    negatives = {"2gi", 2.0, 11, "5m", "4MiB"}
+
+    for test in negatives:
+        assert add_bytes_to_unit(test) == test
+    assert add_bytes_to_unit("5Ti") == "5TiB"

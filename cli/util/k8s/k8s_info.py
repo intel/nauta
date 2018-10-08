@@ -448,3 +448,12 @@ def get_pod_events(namespace: str, name: str = None):
         error_message = Texts.GATHERING_EVENTS_ERROR_MSG
         logger.exception(error_message)
         raise KubernetesError(error_message) from exe
+
+
+def add_bytes_to_unit(value: str) -> str:
+    """
+    Method adds 'B' suffix to memory values represented in format like Gi, Mi, etc
+    """
+    if type(value) == str and value[-2:] in PREFIX_I_VALUES:
+            value += "B"
+    return value
