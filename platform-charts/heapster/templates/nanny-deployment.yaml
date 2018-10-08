@@ -68,5 +68,4 @@ spec:
           - "--extra-cpu=10m"
           - "--memory=200Mi"
           - "--extra-memory=6Mi"
-          - "--threshold=5"
           - "--poll-period=300000"

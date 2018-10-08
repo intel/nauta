@@ -65,7 +65,8 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 3
           timeoutSeconds: 5
-        args:
+        command:
+        - /kube-dns
         - --domain={{ required "Domain is required" .Values.Domain }}.
         - --dns-port=10053
         - --config-dir=/kube-dns-config
@@ -101,7 +102,8 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-        args:
+        command:
+        - /dnsmasq-nanny
         - -v=2
         - -logtostderr
         - -configDir=/etc/k8s/dns/dnsmasq-nanny
@@ -139,7 +141,8 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-        args:
+        command:
+        - /sidecar
         - --v=2
         - --logtostderr
         - --probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.{{ required "Domain is required" .Values.Domain }},5,SRV

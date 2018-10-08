@@ -110,6 +110,32 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.6.tar.gz
         dest: kubernetes.tar.gz
         checksum: d91a77a65199f835ad68372fabd99a1f764ec59d9bde222c74224c1bf976ab20
+  shared/build/tiller:
+    version: "v2.9.1"
+    required:
+      BASE_IMAGE: "shared/centos"
+      HELM_DATA_IMAGE: "shared/build/helm"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tiller"
+    push: False
+  shared/build/ingress:
+    version: "0.14.0"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/authbind/authbind_2.1.2.tar.gz
+        dest: authbind_2.1.2.tar.gz
+        checksum: 7dfb138b6ceeab34d58906be2598812d6dcc83885e650f93414d4851027c968c
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/ingress"
+    push: False
+  shared/build/kubernetes-addons:
+    version: "v1.10.6"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes-addons"
+    push: False
   shared/build/nginx:
     version: "v1.13.9"
     required:

@@ -10,44 +10,72 @@ local_images:
     directory: "{{ playbook_dir }}/../../platform-containers/flannel"
   core/kube-proxy:
     version: "v1.10.6"
-    image: "gcr.io/google-containers/kube-proxy-amd64:v1.10.6"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/kube-proxy"
   core/pause:
     version: "3.1"
-    image: "gcr.io/google-containers/pause-amd64:3.1"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-addons"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/pause"
+  core/addon-resizer:
+    version: "1.7"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-addons"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/addon-resizer"
   core/tiller:
     version: "v2.9.1"
-    image: "gcr.io/kubernetes-helm/tiller:v2.9.1"
-    method: "pull"
-  core/addon-resizer:
-    version: "v1.7"
-    image: "k8s.gcr.io/addon-resizer:1.7"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/build/tiller"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/tiller"
   core/heapster:
     version: "v1.4.2"
     image: "k8s.gcr.io/heapster-amd64:v1.4.2"
     method: "pull"
   core/defaultbackend:
     version: "1.4"
-    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      INGRESS_DATA_IMAGE: "shared/build/ingress"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/defaultbackend"
   core/ingress:
     version: "0.14.0"
-    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      INGRESS_DATA_IMAGE: "shared/build/ingress"
+      NGINX_DATA_IMAGE: "shared/build/nginx"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/ingress-nginx"
   core/kube-dns:
     version: "1.14.8"
-    image: "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.8"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-addons"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/kube-dns"
   core/dnsmasq-nanny:
     version: "1.14.8"
-    image: "gcr.io/google-containers/k8s-dns-dnsmasq-nanny-amd64:1.14.8"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-addons"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/dnsmasq-nanny"
   core/dns-sidecar:
     version: "1.14.8"
-    image: "gcr.io/google-containers/k8s-dns-sidecar-amd64:1.14.8"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-addons"
+    directory: "{{ playbook_dir }}/../../platform-containers/dns-sidecar"
+    method: build
   core/etcd:
     version: "3.3.9"
     required:

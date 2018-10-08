@@ -48,6 +48,12 @@ spec:
             - --tcp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-tcp
             - --udp-services-configmap=$(POD_NAMESPACE)/{{ .Release.Name }}-{{ .Chart.Name }}-udp
             - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --enable-dynamic-configuration=false
+            - --v=2
+          # --v: 2=diff config changes
+          #      3=svc,ingress,endpoint + nginx rules as json
+          #      5=nginx in debug mode
+          #     10= everything possible.
           env:
             - name: POD_NAME
               valueFrom:
@@ -81,3 +87,4 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
+
