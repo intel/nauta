@@ -22,6 +22,7 @@
 from sys import exit
 
 import click
+from yaspin import yaspin
 
 from cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os, save_dependency_versions
@@ -30,7 +31,7 @@ from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.system import handle_error
-from cli_text_consts import VerifyCmdTexts as Texts
+from cli_text_consts import VerifyCmdTexts as Texts, SPINNER_COLOR
 from util.exceptions import KubectlConnectionError, InvalidOsError
 
 
@@ -42,7 +43,8 @@ logger = initialize_logger(__name__)
 @pass_state
 def verify(state: State):
     try:
-        check_connection_to_cluster()
+        with yaspin(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG, color=SPINNER_COLOR):
+            check_connection_to_cluster()
     except KubectlConnectionError as e:
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
         exit(1)
@@ -59,7 +61,8 @@ def verify(state: State):
         exit(1)
 
     try:
-        check_os()
+        with yaspin(text=Texts.CHECKING_OS_MSG, color=SPINNER_COLOR):
+            check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
     except InvalidOsError as exception:
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
@@ -69,8 +72,10 @@ def verify(state: State):
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            valid, installed_version = check_dependency(dependency_name=dependency_name,
-                                                        dependency_spec=dependency_spec, namespace=namespace)
+            with yaspin(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=dependency_name),
+                        color=SPINNER_COLOR):
+                valid, installed_version = check_dependency(dependency_name=dependency_name,
+                                                            dependency_spec=dependency_spec, namespace=namespace)
             dependency_versions[dependency_name] = installed_version
             logger.info(
                 Texts.VERSION_CHECKING_MSG.format(

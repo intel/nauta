@@ -19,12 +19,12 @@
 # and approved by Intel in writing.
 #
 
-import click
+from yaspin import yaspin
 
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
 from util.logger import initialize_logger
-from cli_text_consts import UtilHelmTexts as Texts
+from cli_text_consts import UtilHelmTexts as Texts, SPINNER_COLOR
 from cli_text_consts import UserDeleteCmdTexts as TextsDel
 
 logger = initialize_logger(__name__)
@@ -37,10 +37,11 @@ def delete_user(username: str):
     :param username: name of a user to be deleted
     Throws an excpetion in case of any errors
     """
-    click.echo(TextsDel.DELETION_DELETING_NAMESPACE)
-    delete_namespace(username)
-    click.echo(TextsDel.DELETION_DELETING_USERS_OBJECTS)
-    delete_helm_release(username, purge=True)
+    with yaspin(text=TextsDel.DELETION_DELETING_NAMESPACE, color=SPINNER_COLOR):
+        delete_namespace(username)
+
+    with yaspin(text=TextsDel.DELETION_DELETING_USERS_OBJECTS, color=SPINNER_COLOR):
+        delete_helm_release(username, purge=True)
 
 
 def delete_helm_release(release_name: str, purge=False, namespace: str = None):

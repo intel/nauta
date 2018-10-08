@@ -26,6 +26,7 @@ import getpass
 from sys import exit
 
 import click
+from yaspin import yaspin
 
 from util.config import Config
 from util.logger import initialize_logger
@@ -37,8 +38,7 @@ from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence, UserState
 from platform_resources.users import validate_user_name, is_user_created
-from cli_text_consts import UserCreateCmdTexts as Texts
-
+from cli_text_consts import UserCreateCmdTexts as Texts, SPINNER_COLOR
 
 logger = initialize_logger(__name__)
 
@@ -122,19 +122,20 @@ def create(state: State, username: str, list_only: bool, filename: str):
         exit(1)
 
     try:
-        chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
+        with yaspin(text=Texts.CREATING_USER_PROGRESS_MSG.format(username=username), color=SPINNER_COLOR):
+            chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
 
-        dls4e_config_map = DLS4EConfigMap()
+            dls4e_config_map = DLS4EConfigMap()
 
-        tiller_location = dls4e_config_map.image_tiller
-        tensorboard_service_location = dls4e_config_map.image_tensorboard_service
+            tiller_location = dls4e_config_map.image_tiller
+            tensorboard_service_location = dls4e_config_map.image_tensorboard_service
 
-        add_user_command = ["helm", "install", "--wait", "--namespace", username, "--name", username,
-                            chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
-                            f"username={username}", "--set", "TillerImage={}".format(tiller_location),
-                            "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
+            add_user_command = ["helm", "install", "--wait", "--namespace", username, "--name", username,
+                                chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
+                                f"username={username}", "--set", "TillerImage={}".format(tiller_location),
+                                "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
 
-        _, err_code, log_output = execute_system_command(add_user_command)
+            _, err_code, log_output = execute_system_command(add_user_command)
 
         if err_code:
             handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)

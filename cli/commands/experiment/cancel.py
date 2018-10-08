@@ -28,6 +28,7 @@ from enum import Enum
 
 import click
 from typing import List, Tuple
+from yaspin import yaspin
 
 from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
@@ -46,7 +47,7 @@ from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s import pods as k8s_pods
 from util.logger import initialize_logger
 from util.system import handle_error
-from cli_text_consts import ExperimentCancelCmdTexts as Texts
+from cli_text_consts import ExperimentCancelCmdTexts as Texts, SPINNER_COLOR
 from util.k8s.k8s_info import PodStatus
 
 
@@ -303,11 +304,12 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             logger.debug(f"Purging {run.name} run ...")
             click.echo(Texts.PURGING_START_MSG.format(run_name=run.name))
             try:
-                # purge helm release
-                delete_helm_release(run.name, namespace=namespace, purge=True)
-                # delete run
-                kubectl.delete_k8s_object("run", run.name)
-                purged_runs.append(run)
+                with yaspin(text=Texts.PURGING_PROGRESS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                    # purge helm release
+                    delete_helm_release(run.name, namespace=namespace, purge=True)
+                    # delete run
+                    kubectl.delete_k8s_object("run", run.name)
+                    purged_runs.append(run)
             except Exception as exe:
                 not_purged_runs.append(run)
                 logger.exception("Error during purging runs.")
@@ -318,7 +320,8 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             try:
                 # clear run logs
                 logger.debug(f"Clearing logs for {run.name} run.")
-                k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
+                with yaspin(text=Texts.PURGING_LOGS_PROGRESS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                    k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
             except Exception:
                 logger.exception("Error during clearing run logs.")
 
@@ -406,11 +409,11 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
             try:
                 # if run status is cancelled - omit the following steps
                 if run.state != RunStatus.CANCELLED:
-                    delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
-                    # change a run state to CANCELLED
-                    click.echo(Texts.CANCEL_SETTING_STATUS_MSG.format(run_name=run.name))
-                    run.state = RunStatus.CANCELLED
-                    update_run(run, namespace)
+                    with yaspin(text=Texts.CANCEL_SETTING_STATUS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                        delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
+                        # change a run state to CANCELLED
+                        run.state = RunStatus.CANCELLED
+                        update_run(run, namespace)
                 deleted_runs.append(run)
             except Exception:
                 logger.exception(Texts.INCOMPLETE_CANCEL_ERROR_MSG

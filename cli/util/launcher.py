@@ -20,10 +20,12 @@
 #
 
 import webbrowser
-import click
 
+import click
 from kubernetes import config
 from kubernetes.client import configuration
+from yaspin import yaspin
+
 from util.system import get_current_os, OS
 from util import socat
 from util.network import wait_for_connection
@@ -33,8 +35,7 @@ from util.app_names import DLS4EAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, LaunchError, \
     ProxyClosingError
-from cli_text_consts import UtilLauncherTexts as Texts
-
+from cli_text_consts import UtilLauncherTexts as Texts, SPINNER_COLOR
 
 logger = initialize_logger(__name__)
 
@@ -54,7 +55,8 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                number_of_retries: int = 0, url_end: str = "", namespace: str = None):
     try:
         with K8sProxy(dls4e_app_name=k8s_app_name, port=port, app_name=app_name,
-                      number_of_retries=number_of_retries, namespace=namespace) as proxy:
+                      number_of_retries=number_of_retries, namespace=namespace) as proxy,\
+                yaspin(text=Texts.LAUNCHING_APP_MSG, color=SPINNER_COLOR) as spinner:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
             # run socat if on Windows or Mac OS
             if get_current_os() in (OS.WINDOWS, OS.MACOS):
@@ -73,10 +75,11 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                 url = f'{url}?token={prepared_user_token}'
 
             if not no_launch:
+
                 if is_gui_browser_available():
-                    click.echo(Texts.BROWSER_STARTING_MSG)
                     wait_for_connection(url)
                     webbrowser.open_new(url)
+                    spinner.hide()
                 else:
                     raise LaunchError(Texts.NO_WEB_BROWSER_ERROR_MSG)
 
@@ -106,8 +109,8 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
         if get_current_os() in (OS.WINDOWS, OS.MACOS):
             # noinspection PyBroadException
             try:
-                click.echo(Texts.WEB_APP_CLOSING_MSG)
-                socat.stop()
+                with yaspin(text=Texts.WEB_APP_CLOSING_MSG, color=SPINNER_COLOR):
+                    socat.stop()
             except Exception:
                 err_message = Texts.PROXY_CLOSE_ERROR_MSG.format(k8s_app_name)
                 raise ProxyClosingError(err_message)

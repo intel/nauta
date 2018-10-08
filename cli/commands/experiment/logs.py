@@ -25,6 +25,7 @@ from sys import exit
 from typing import Generator
 
 import click
+from yaspin import yaspin
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
@@ -39,8 +40,7 @@ from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.system import handle_error
-from cli_text_consts import ExperimentLogsCmdTexts as Texts
-
+from cli_text_consts import ExperimentLogsCmdTexts as Texts, SPINNER_COLOR
 
 logger = initialize_logger(__name__)
 
@@ -159,7 +159,7 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
 
     if click.confirm(confirmation_message, default=True):
         try:
-            with open(filename, 'w') as file:
+            with open(filename, 'w') as file, yaspin(Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
                 for log_entry in run_logs_generator:
                     if not log_entry.content.isspace():
                         formatted_date = format_log_date(log_entry.date)

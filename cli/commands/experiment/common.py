@@ -30,6 +30,7 @@ from typing import Tuple, List
 from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
+from yaspin import yaspin
 
 import draft.cmd as cmd
 from packs.tf_training import update_configuration, get_pod_count
@@ -50,8 +51,7 @@ from util.k8s.k8s_info import get_app_service_node_port, get_kubectl_current_con
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.jupyter_notebook_creator import convert_py_to_ipynb
 from util.system import handle_error
-from cli_text_consts import ExperimentCommonTexts as Texts
-
+from cli_text_consts import ExperimentCommonTexts as Texts, SPINNER_COLOR
 
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
@@ -206,11 +206,12 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         raise SubmitExperimentError(message)
 
     try:
-        experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
-                                                                               namespace=namespace, name=name,
-                                                                               run_kind=run_kind)
-        runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
-                                         parameter_set=parameter_set, template_name=template)
+        with yaspin(text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG, color=SPINNER_COLOR):
+            experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
+                                                                                   namespace=namespace, name=name,
+                                                                                   run_kind=run_kind)
+            runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
+                                             parameter_set=parameter_set, template_name=template)
     except SubmitExperimentError as exe:
         log.exception(str(exe))
         raise exe
@@ -235,7 +236,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                 if get_current_os() in (OS.WINDOWS, OS.MACOS):
                     # noinspection PyBroadException
                     try:
-                        socat.start(proxy.tunnel_port)
+                        with yaspin(text=Texts.CLUSTER_CONNECTION_MSG, color=SPINNER_COLOR):
+                            socat.start(proxy.tunnel_port)
                     except Exception:
                         error_msg = Texts.LOCAL_DOCKER_TUNNEL_ERROR_MSG
                         log.exception(error_msg)
@@ -254,16 +256,18 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                     else:
                         current_script_parameters = ""
 
-                    run_folder, script_location, pod_count = \
-                        prepare_experiment_environment(experiment_name=experiment_name,
-                                                       run_name=experiment_run.name,
-                                                       local_script_location=script_location,
-                                                       script_folder_location=script_folder_location,  # noqa: E501
-                                                       script_parameters=current_script_parameters,
-                                                       pack_type=template, pack_params=pack_params,
-                                                       local_registry_port=proxy.tunnel_port,
-                                                       cluster_registry_port=cluster_registry_port,
-                                                       env_variables=env_variables)
+                    with yaspin(text=Texts.PREPARING_ENVIRONMENT_MSG.format(run_name=experiment_run.name),
+                                color=SPINNER_COLOR):
+                        run_folder, script_location, pod_count = \
+                            prepare_experiment_environment(experiment_name=experiment_name,
+                                                           run_name=experiment_run.name,
+                                                           local_script_location=script_location,
+                                                           script_folder_location=script_folder_location,  # noqa: E501
+                                                           script_parameters=current_script_parameters,
+                                                           pack_type=template, pack_params=pack_params,
+                                                           local_registry_port=proxy.tunnel_port,
+                                                           cluster_registry_port=cluster_registry_port,
+                                                           env_variables=env_variables)
                     # Set correct pod count
                     if not pod_count or pod_count < 1:
                         raise SubmitExperimentError('Unable to determine pod count: make sure that values.yaml '
@@ -323,12 +327,13 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
                     run.state = RunStatus.QUEUED
-                    # Add Run object with runKind label and pack params as annotations
-                    runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
-                                     annotations={pack_param_name: pack_param_value
-                                                  for pack_param_name, pack_param_value in pack_params})
-                    submitted_runs.append(run)
-                    submit_draft_pack(run_folder, namespace)
+                    with yaspin(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                        # Add Run object with runKind label and pack params as annotations
+                        runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
+                                         annotations={pack_param_name: pack_param_value
+                                                      for pack_param_name, pack_param_value in pack_params})
+                        submitted_runs.append(run)
+                        submit_draft_pack(run_folder, namespace)
                 except Exception as exe:
                     delete_environment(run_folder)
                     try:
@@ -365,9 +370,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg) from exe
     finally:
-        # noinspection PyBroadException
-        # terminate socat if on Windows or Mac OS
-        if get_current_os() in (OS.WINDOWS, OS.MACOS):
+        with yaspin(text=Texts.CLUSTER_CONNECTION_CLOSING_MSG, color=SPINNER_COLOR):
             # noinspection PyBroadException
             try:
                 socat.stop()
@@ -448,10 +451,11 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     try:
         # check environment directory
         check_run_environment(run_folder)
-        # create an environment
-        create_environment(run_name, local_script_location, script_folder_location)
-        # generate draft's data
-        output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
+        with yaspin(text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name), color=SPINNER_COLOR):
+            # create an environment
+            create_environment(run_name, local_script_location, script_folder_location)
+            # generate draft's data
+            output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
 
         if exit_code:
             raise SubmitExperimentError(Texts.DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=log_output))

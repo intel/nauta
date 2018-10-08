@@ -21,7 +21,7 @@
 
 
 VERBOSE_RERUN_MSG = "Use -v or -vv option for more info."
-
+SPINNER_COLOR = "green"
 
 class VersionCmdTexts:
     HELP = "Displays the version of the installed dlsctl application."
@@ -81,6 +81,9 @@ class VerifyCmdTexts:
     DEPENDENCY_VERSION_CHECK_ERROR_MSG = "Failed to get {dependency_name} version."
     DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG = "{dependency_name} - exception during verification."
     OS_SUPPORTED_MSG = "This OS is supported."
+    CHECKING_CONNECTION_TO_CLUSTER_MSG = "Checking connection to cluster..."
+    CHECKING_OS_MSG = "Checking operating system..."
+    VERIFYING_DEPENDENCY_MSG = "Verifying {dependency_name} ..."
 
 
 class UserCmdTexts:
@@ -121,6 +124,7 @@ class UserCreateCmdTexts:
     CONFIG_SAVE_FAIL_MSG = "File with configuration wasn't saved."
     CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG = "Content of the generated config file is as follows. Please copy it " \
                                         "to a file manually."
+    CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
 
 
 class UserDeleteCmdTexts:
@@ -216,6 +220,7 @@ class PredictStreamCmdTexts:
                           "valid JSON format."
     INFERENCE_OTHER_ERROR_MSG = "Failed to perform inference. Reason: {exception}"
     INFERENCE_ERROR_RESPONSE_MSG = "\n Response: {response_text}"
+    WAITING_FOR_RESPONSE_MSG = "Waiting for prediction instance response..."
 
 
 class PredictCancelCmdTexts:
@@ -296,6 +301,7 @@ class ExperimentLogsCmdTexts:
     LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
     LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
     MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
+    SAVING_LOGS_TO_FILE_PROGRESS_MSG = "Saving logs to a file..."
 
 
 class ExperimentSubmitCmdTexts:
@@ -420,6 +426,8 @@ class ExperimentCancelCmdTexts:
     CANCELING_PODS_MSG = "Deleting the pod: {pod_name} ..."
     OTHER_POD_CANCELLING_ERROR_MSG = "Error during deleting the pod."
     UNINITIALIZED_EXPERIMENT_CANCEL_MSG = "Experiment {experiment_name} has no resources submitted for creation."
+    PURGING_PROGRESS_MSG = 'Purging experiment {run_name}...'
+    PURGING_LOGS_PROGRESS_MSG = 'Purging experiment {run_name} logs...'
 
 
 class ExperimentViewCmdTexts:
@@ -485,6 +493,13 @@ class ExperimentCommonTexts:
     ERROR_DURING_PATCHING_RUN = "Error during patching a run occured {}."
     PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error during getting draft logs : {exception}"
     THE_SAME_EXP_IS_SUBMITTED = "There is another experiment with the same name submitted at this moment."
+    PREPARING_RESOURCE_DEFINITIONS_MSG = "Preparing resources' definitions..."
+    CLUSTER_CONNECTION_MSG = "Connecting to the cluster..."
+    PREPARING_ENVIRONMENT_MSG = "Preparing {run_name} environment..."
+    CREATING_ENVIRONMENT_MSG = "Creating {run_name} environment..."
+    CREATING_RESOURCES_MSG = "Creating {run_name} resources..."
+    CLUSTER_CONNECTION_CLOSING_MSG = "Closing tunnel to the cluster..."
+
 
 
 class DraftCmdTexts:
@@ -526,6 +541,7 @@ class UtilLauncherTexts:
     PROXY_CREATED_MSG = "Proxy connection created.\nPress Ctrl-C key to close a port forwarding process..."
     PROXY_CREATED_ERROR_MSG = "Error during creation of a proxy for a {app_name}."
     PROXY_CREATED_EXTENDED_ERROR_MSG = "Error during creation of a proxy for a {app_name}. {reason}"
+    LAUNCHING_APP_MSG = "Launching..."
 
 
 class UtilHelmTexts:

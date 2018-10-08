@@ -23,6 +23,7 @@ from sys import exit
 import time
 
 import click
+from yaspin import yaspin
 
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
@@ -33,8 +34,7 @@ from platform_resources.users import purge_user
 from util.k8s.k8s_info import is_current_user_administrator
 from util.aliascmd import AliasCmd
 from util.system import handle_error
-from cli_text_consts import UserDeleteCmdTexts as Texts
-
+from cli_text_consts import UserDeleteCmdTexts as Texts, SPINNER_COLOR
 
 logger = initialize_logger(__name__)
 
@@ -91,18 +91,17 @@ def delete(state: State, username: str, purge: bool):
                 handle_error(logger, Texts.PURGE_ERROR_MSG, Texts.PURGE_ERROR_MSG)
 
         # CAN-616 - wait until user has been really deleted
-        click.echo(Texts.DELETION_VERIFICATION_OF_DELETING)
-        for i in range(60):
-            user_state = check_users_presence(username)
-            if not user_state or user_state == UserState.NOT_EXISTS:
-                break
-
-            time.sleep(1)
-            click.echo(".", nl=False)
-        else:
-            click.echo()
-            click.echo(Texts.DELETE_IN_PROGRESS_MSG)
-            exit(0)
+        with yaspin(text=Texts.DELETION_VERIFICATION_OF_DELETING, color=SPINNER_COLOR) as spinner:
+            for i in range(60):
+                    user_state = check_users_presence(username)
+                    if not user_state or user_state == UserState.NOT_EXISTS:
+                        break
+                    time.sleep(1)
+            else:
+                spinner.hide()
+                click.echo()
+                click.echo(Texts.DELETE_IN_PROGRESS_MSG)
+                exit(0)
 
         click.echo()
         click.echo(Texts.DELETE_SUCCESS_MSG.format(username=username))
