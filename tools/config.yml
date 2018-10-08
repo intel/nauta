@@ -261,6 +261,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/cni-plugins/v0.7.1.tar.gz
         dest: cni-plugins.tar.gz
         checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
+  shared/build/flannel:
+    version: "0.9.1"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/flannel"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/flannel/flannel-0.9.1.tar.gz
+        dest: flannel-0.9.1.tar.gz
+        checksum: 9e1ba3d52895f98b8fcc6157725735e4c446e3f3addf4971b0edb1d296f098e3
   shared/build/etcd:
     version: "3.3.9"
     required:

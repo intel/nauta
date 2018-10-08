@@ -3,8 +3,11 @@
 local_images:
   core/flannel:
     version: "v0.9.1"
-    image: "quay.io/coreos/flannel:v0.9.1-amd64"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/flannel"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/flannel"
   core/kube-proxy:
     version: "v1.10.6"
     image: "gcr.io/google-containers/kube-proxy-amd64:v1.10.6"
