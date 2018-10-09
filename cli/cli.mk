@@ -67,6 +67,11 @@ endif
 	@mkdir -p dist/docs/
 	@cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
 
+ifneq (,$(SCM_DUMP_DIRECTORY))
+	@mkdir dist/config/scm/
+	@cp -Rf $(SCM_DUMP_DIRECTORY)/sha*.json dist/config/scm/
+endif
+
 metrics-lib:
 	@. $(ACTIVATE); cd experiment_metrics && python setup.py sdist
 
