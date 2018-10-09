@@ -55,7 +55,8 @@ def uninitialized_experiment_cli_representation(experiment: Experiment):
 
 
 def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
-                                        name: str, headers: List[str], listed_runs_kinds: List[RunKinds] = None):
+                                        name: str, headers: List[str], listed_runs_kinds: List[RunKinds] = None,
+                                        count: int = None):
     """
     Display a list of selected runs in the cli.
 
@@ -63,6 +64,7 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
     :param all_users: whether to display runs regardless of their owner or not
     :param name: regular expression to which names of the shown runs have to match
     :param headers: headers which will be displayed on top of a table shown in the cli
+    :param count: number of rows displayed on a list. If not given - content of a list is not limited
     """
 
     if not listed_runs_kinds:
@@ -85,8 +87,9 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
         uninitialized_experiments = [experiment for experiment in creating_experiments
                                      if experiment.name not in names_of_experiment_with_runs]
 
+        displayed_items_count = count if count else len(uninitialized_experiments)
         click.echo(tabulate([uninitialized_experiment_cli_representation(experiment)
-                             for experiment in uninitialized_experiments],
+                             for experiment in uninitialized_experiments][-displayed_items_count:],
                             headers=headers, tablefmt="orgtbl"))
     except experiments_api.InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
@@ -98,7 +101,8 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
 
 
 def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus,
-                     listed_runs_kinds: List[RunKinds], runs_list_headers: List[str], with_metrics: bool):
+                     listed_runs_kinds: List[RunKinds], runs_list_headers: List[str], with_metrics: bool,
+                     count: int = None):
     """
     Display a list of selected runs in the cli.
 
@@ -109,6 +113,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
     :param listed_runs_kinds: list of kinds of runs that will be listed out
     :param runs_list_headers: headers which will be displayed on top of a table shown in the cli
     :param with_metrics: whether to show metrics column or not
+    :param count: number of rows displayed on a list. If not given - content of a list is not limited
     """
 
     try:
@@ -129,7 +134,8 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
                  run_representation.submitter, run_representation.status, run_representation.template_name)
                 for run_representation in runs_representations
             ]
-        click.echo(tabulate(runs_table_data, headers=runs_list_headers, tablefmt="orgtbl"))
+        click.echo(tabulate(runs_table_data if not count else runs_table_data[-count:],
+                            headers=runs_list_headers, tablefmt="orgtbl"))
     except runs_api.InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)

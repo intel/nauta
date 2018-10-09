@@ -55,3 +55,16 @@ def test_list_users_failure(mocker):
 
     assert api_list_users_mock.call_count == 1, "Users retrieval was not called"
     assert sys_exit_mock.called_once_with(1)
+
+
+def test_list_users_only_one(mocker):
+    api_list_users_mock = mocker.patch("commands.user.list_users.users_api.list_users")
+    api_list_users_mock.return_value = TEST_USERS
+
+    runner = CliRunner()
+    result = runner.invoke(list_users.list_users, ["-c", "1"])
+
+    assert "test-user" in result.output
+    assert "test-dev" not in result.output
+
+    assert api_list_users_mock.call_count == 1, "Users were not retrieved"

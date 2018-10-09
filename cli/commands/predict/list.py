@@ -40,14 +40,16 @@ TABLE_HEADERS = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_ST
 @click.option('-n', '--name', type=str, help=Texts.HELP_N)
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=Texts.HELP_S)
 @click.option('-u', '--uninitialized', is_flag=True, help=Texts.HELP_U)
+@click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @common_options()
 @pass_state
-def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool):
+def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool,
+                             count: int):
     """ List inference instances. """
     if uninitialized:
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
                                             headers=TABLE_HEADERS,
-                                            listed_runs_kinds=LISTED_RUNS_KINDS)
+                                            listed_runs_kinds=LISTED_RUNS_KINDS, count=count)
     else:
         list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, TABLE_HEADERS,
-                         with_metrics=False)
+                         with_metrics=False, count=count)

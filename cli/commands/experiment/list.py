@@ -40,13 +40,14 @@ LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 @click.option('-n', '--name', type=str, help=Texts.HELP_N)
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=Texts.HELP_S)
 @click.option('-u', '--uninitialized', is_flag=True, help=Texts.HELP_U)
+@click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @common_options()
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool):
+def list_experiments(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool, count: int):
     """ List experiments. """
     if uninitialized:
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
-                                            headers=EXPERIMENTS_LIST_HEADERS)
+                                            headers=EXPERIMENTS_LIST_HEADERS, count=count)
     else:
         list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS,
-                         with_metrics=True)
+                         with_metrics=True, count=count)

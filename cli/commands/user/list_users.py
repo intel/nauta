@@ -36,13 +36,15 @@ logger = initialize_logger(__name__)
 
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, name='list', cls=AliasCmd, alias='ls')
+@click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @common_options()
 @pass_state
-def list_users(state: State):
+def list_users(state: State, count: int):
     """ List users. """
     try:
         users = users_api.list_users()
-        click.echo(tabulate([user.cli_representation for user in users],
+        displayed_items_count = count if count else len(users)
+        click.echo(tabulate([user.cli_representation for user in users[-displayed_items_count:]],
                             headers=Texts.TABLE_HEADERS,
                             tablefmt="orgtbl"))
     except Exception:

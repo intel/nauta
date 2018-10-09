@@ -55,12 +55,63 @@ TEST_EXPERIMENT = Experiment(name="test-experiment", parameters_spec=["param1"],
                              submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
                              template_name="template_name", template_namespace="template_namespace")
 
+TEST_NONINITIALIZED_EXPERIMENTS = [Experiment(name="noninit-test-experiment", parameters_spec=["param1"],
+                                              submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
+                                              template_name="template_name", template_namespace="template_namespace"),
+                                   Experiment(name="noninit2-test-experiment", parameters_spec=["param1"],
+                                              submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
+                                              template_name="template_name", template_namespace="template_namespace")]
+
 TEST_RUN = Run(name="test-experiment", experiment_name="test-experiment", metrics={},
                parameters=["param1"], pod_count=0, pod_selector={}, state=RunStatus.CREATING,
                submitter="submitter", creation_timestamp="2018-05-08T13:05:04Z",
                template_name="template_name")
 
 TEST_LIST_HEADERS = ["Name", "Parameters", "Metrics", "Submission date", "Owner", "State", "Template name"]
+
+
+def test_list_unitialized_experiments_in_cli_success(mocker, capsys):
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
+
+    api_list_experiments_mock = mocker.patch("commands.common.experiments_api.list_experiments")
+    api_list_experiments_mock.return_value = TEST_NONINITIALIZED_EXPERIMENTS
+
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
+
+    common.list_unitialized_experiments_in_cli(verbosity_lvl=0, all_users=False, name="", listed_runs_kinds=[],
+                                               headers=TEST_LIST_HEADERS)
+
+    captured = capsys.readouterr()
+
+    assert "noninit-test-experiment" in captured.out
+    assert "noninit2-test-experiment" in captured.out
+
+    assert get_namespace_mock.call_count == 1
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
+    assert api_list_experiments_mock.call_count == 1, "Experiments weren't retrieved"
+
+
+def test_list_unitialized_experiments_in_cli_one_row(mocker, capsys):
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
+
+    api_list_experiments_mock = mocker.patch("commands.common.experiments_api.list_experiments")
+    api_list_experiments_mock.return_value = TEST_NONINITIALIZED_EXPERIMENTS
+
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
+
+    common.list_unitialized_experiments_in_cli(verbosity_lvl=0, all_users=False, name="", listed_runs_kinds=[],
+                                               headers=TEST_LIST_HEADERS, count=1)
+
+    captured = capsys.readouterr()
+
+    assert "noninit-test-experiment" not in captured.out
+    assert "noninit2-test-experiment" in captured.out
+
+    assert get_namespace_mock.call_count == 1
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
+    assert api_list_experiments_mock.call_count == 1, "Experiments weren't retrieved"
 
 
 def test_list_experiments_success(mocker):
@@ -102,6 +153,23 @@ def test_list_experiments_failure(mocker):
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs retrieval was not called"
     assert sys_exit_mock.called_once_with(1)
+
+
+def test_list_experiments_one_user_success(mocker, capsys):
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
+
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
+
+    common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, count=1)
+
+    captured = capsys.readouterr()
+
+    assert "2018-04-26 15:43:01" not in captured.out
+    assert "2018-05-08 15:05:04" in captured.out
+    assert get_namespace_mock.call_count == 0
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 
 
 def test_create_fake_run():

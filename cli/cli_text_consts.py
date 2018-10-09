@@ -93,6 +93,7 @@ class UserCmdTexts:
 
 class UserListCmdTexts:
     HELP = "List users."
+    HELP_C = "If given - command displays c last rows."
     TABLE_HEADERS = ["Name", "Creation date", "Date of last submitted job", "Number of running jobs"
                      "Number of queued jobs"]
     OTHER_ERROR_MSG = "Failed to get users list."
@@ -183,6 +184,7 @@ class PredictListCmdTexts:
     HELP_S = "List prediction instances with matching status."
     HELP_U = "List uninitialized prediction instances, i.e. prediction instances" \
              " without resources submitted for creation."
+    HELP_C = "If given - command displays c last rows."
 
 
 class PredictLaunchCmdTexts:
@@ -267,6 +269,7 @@ class ExperimentListCmdTexts:
     HELP_N = "A regular expression to narrow down list to experiments that match this expression."
     HELP_S = "List experiments with matching status."
     HELP_U = "List uninitialized experiments, i.e. experiments without resources submitted for creation."
+    HELP_C = "If given - command displays c last rows."
 
 
 class ExperimentTemplateListCmdTexts:
