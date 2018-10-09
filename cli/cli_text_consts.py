@@ -26,8 +26,8 @@ SPINNER_COLOR = "green"
 class VersionCmdTexts:
     HELP = "Displays the version of the installed dlsctl application."
     INITIAL_PLATFORM_VERSION = "Failed to get platform version."
-    KUBECTL_INT_ERROR_MSG = "Platform version check failure may occur for example due to invalid path to kubectl " \
-                            "config, invalid k8s credentials or k8s cluster being unavailable. Check your " \
+    KUBECTL_INT_ERROR_MSG = "Falied to check platform version. This may occur for example due to invalid path to " \
+                            "kubectl config, invalid k8s credentials or k8s cluster being unavailable. Check your " \
                             "KUBECONFIG environment variable and make sure that the k8s cluster is online."
     OTHER_ERROR_MSG = "Unexpected error occurred during platform version check."
     TABLE_APP_ROW_NAME = "dlsctl application"
@@ -644,7 +644,9 @@ class UtilK8sProxyTexts:
 
 class CliStateTexts:
     INVALID_DEPENDENCY_ERROR_MSG = "Dependency check failed."
-    KUBECONFIG_NOT_FOUND_ERROR_MSG = "File pointed to by KUBECONFIG environment variable was not found. Please make " \
-                                     "sure that it exists."
+    KUBECTL_NAMESPACE_ERROR_MSG = "Failed to determine kubectl namespace during verification. This may occur for " \
+                                  "example due to invalid path to kubectl config, invalid k8s credentials or k8s " \
+                                  "cluster being unavailable. Check your KUBECONFIG environment variable and make " \
+                                  "sure that the k8s cluster is online."
     DLSCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for dlsctl is not set."
     DLSCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"

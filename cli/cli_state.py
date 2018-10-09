@@ -61,13 +61,15 @@ def verify_cli_dependencies():
     try:
         namespace = 'kube-system' if is_current_user_administrator(request_timeout=VERIFY_REQUEST_TIMEOUT) \
             else get_kubectl_current_context_namespace()
+    except Exception:
+        error_msg = Texts.KUBECTL_NAMESPACE_ERROR_MSG
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
+        sys.exit(1)
+    try:
         check_os()
         check_all_binary_dependencies(namespace=namespace)
     except (InvalidDependencyError, InvalidOsError):
         error_msg = Texts.INVALID_DEPENDENCY_ERROR_MSG
-        handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
-    except FileNotFoundError:
-        error_msg = Texts.KUBECONFIG_NOT_FOUND_ERROR_MSG
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
 
 
