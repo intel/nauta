@@ -497,7 +497,6 @@ class ExperimentCommonTexts:
     THE_SAME_EXP_IS_SUBMITTED = "There is another experiment with the same name submitted at this moment."
     PREPARING_RESOURCE_DEFINITIONS_MSG = "Preparing resources' definitions..."
     CLUSTER_CONNECTION_MSG = "Connecting to the cluster..."
-    PREPARING_ENVIRONMENT_MSG = "Preparing {run_name} environment..."
     CREATING_ENVIRONMENT_MSG = "Creating {run_name} environment..."
     CREATING_RESOURCES_MSG = "Creating {run_name} resources..."
     CLUSTER_CONNECTION_CLOSING_MSG = "Closing tunnel to the cluster..."

@@ -256,18 +256,16 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                     else:
                         current_script_parameters = ""
 
-                    with yaspin(text=Texts.PREPARING_ENVIRONMENT_MSG.format(run_name=experiment_run.name),
-                                color=SPINNER_COLOR):
-                        run_folder, script_location, pod_count = \
-                            prepare_experiment_environment(experiment_name=experiment_name,
-                                                           run_name=experiment_run.name,
-                                                           local_script_location=script_location,
-                                                           script_folder_location=script_folder_location,  # noqa: E501
-                                                           script_parameters=current_script_parameters,
-                                                           pack_type=template, pack_params=pack_params,
-                                                           local_registry_port=proxy.tunnel_port,
-                                                           cluster_registry_port=cluster_registry_port,
-                                                           env_variables=env_variables)
+                    run_folder, script_location, pod_count = \
+                        prepare_experiment_environment(experiment_name=experiment_name,
+                                                       run_name=experiment_run.name,
+                                                       local_script_location=script_location,
+                                                       script_folder_location=script_folder_location,  # noqa: E501
+                                                       script_parameters=current_script_parameters,
+                                                       pack_type=template, pack_params=pack_params,
+                                                       local_registry_port=proxy.tunnel_port,
+                                                       cluster_registry_port=cluster_registry_port,
+                                                       env_variables=env_variables)
                     # Set correct pod count
                     if not pod_count or pod_count < 1:
                         raise SubmitExperimentError('Unable to determine pod count: make sure that values.yaml '
