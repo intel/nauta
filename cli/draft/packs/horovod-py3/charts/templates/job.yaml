@@ -88,11 +88,11 @@ spec:
         args:
           - >
             mpiexec --hostfile {{- if .Values.useHostNetwork }} /horovod/init/hostfile {{ else }} /horovod/generated/hostfile {{- end }}
-            -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe
-            {{- range $name, $value := .Values.master.env }} -x {{ $name }} {{- end }}
+            -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe -n {{ .Values.workersCount | add 1 }}
+            {{- range .Values.master.env }} -x {{ .name }} {{- end }}
             --mca orte_keep_fqdn_hostnames t --allow-run-as-root --display-map --tag-output --timestamp-output
             {{- if .Values.useHostNetwork }} --mca btl_tcp_if_include em1 {{- end }}
-            sh -c '/usr/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}' -n {{ .Values.workersCount }}
+            sh -c '/usr/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}'
 {{- if .Values.master.args }}
 {{ toYaml .Values.master.args | indent 10 }}
 {{- end }}
