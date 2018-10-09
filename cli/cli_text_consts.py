@@ -400,7 +400,7 @@ class ExperimentCancelCmdTexts:
                                     "cannot be {operation_word} due to their current state:"
     CAN_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} can still be {operation_word}:"
     WILL_BE_CANCELLED_LIST_HEADER = "The following {experiment_name_plural} will be {operation_word}:"
-    WILL_BE_PURGED_LIST_HEADER = "The following {experiment_name_plural} will be purged:"
+    WILL_BE_PURGED_LIST_HEADER = "The following {experiment_name_plural} will be {operation_word}:"
     CONFIRM_CANCEL_MSG = "Do you want to continue with {operation_word} of those {experiment_name_plural}?"
     CANCELLATION_ABORTED_MSG = "Operation of {operation_word} of {experiment_name_plural} was aborted."
     OTHER_CANCELLING_ERROR_MSG = "Error during cancelling an experiment."

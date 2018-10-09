@@ -183,7 +183,11 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                 click.echo(f"     - {name.name}")
     else:
         list_of_runs_to_be_deleted = list_of_all_runs
-        click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural))
+        click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
+                                                           operation_word=Texts.DELETE_OPERATION[
+                                                               "deleted"] if experiment_name_plural == 'pods'
+                                                           else Texts.CANCEL_OPERATION["cancelled"]
+                                                           ))
         for name in list_of_runs_to_be_deleted:
             click.echo(f"     - {name.name}")
 
@@ -475,7 +479,10 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
         handle_error(user_msg=Texts.LACK_OF_PODS_ERROR_MSG)
         exit(1)
 
-    click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural='pods'))
+    click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural='pods',
+                                                       operation_word=Texts.DELETE_OPERATION[
+                                                           "deleted"]
+                                                       ))
     for pod in filtered_pods:
         click.echo(f"     - {pod.name}")
 
