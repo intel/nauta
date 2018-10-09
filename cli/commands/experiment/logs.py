@@ -55,7 +55,7 @@ logger = initialize_logger(__name__)
               help=Texts.HELP_P)
 @click.option('-m', '--match', help=Texts.HELP_M)
 @click.option('-o', '--output', help=Texts.HELP_O, is_flag=True)
-@click.option('-p', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
+@click.option('-pa', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
 @click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options()
 @pass_state
