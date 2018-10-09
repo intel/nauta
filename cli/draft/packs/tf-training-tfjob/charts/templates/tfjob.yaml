@@ -1,3 +1,4 @@
+{{- $command_args := join " " $.Values.commandline.args -}}
 apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
@@ -28,11 +29,7 @@ spec:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              command: ["python"]
-              args:
-              {{- range .Values.commandline.args }}
-                - "{{ . }}"
-              {{- end }}
+              command: ["/bin/bash", "-c", "python {{ $command_args }}"]
               ports:
                 - containerPort: {{ .Values.TensorBoardPort }}
                   name: "tensorboard"

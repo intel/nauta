@@ -25,7 +25,7 @@ from click.testing import CliRunner
 import pytest
 
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
-    validate_script_folder_location, get_default_script_location
+    validate_script_folder_location, get_default_script_location, clean_script_parameters
 from commands.experiment.common import RunSubmission, RunStatus
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
@@ -62,6 +62,7 @@ class SubmitMocks:
             "commands.experiment.submit.validate_script_folder_location")
         self.get_default_script_location = mocker.patch(
             "commands.experiment.submit.get_default_script_location")
+        self.clean_script_parameters = mocker.patch("commands.experiment.submit.clean_script_parameters")
 
 
 @pytest.fixture
@@ -192,3 +193,11 @@ def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
     assert FAILED_RUNS[1].state.value in result.output
 
     assert result.exit_code == 1
+
+
+def test_clean_script_parameters_empty(prepare_mocks: SubmitMocks):
+    assert () == clean_script_parameters(None, None, ())
+
+
+def test_clean_script_parameters_with_backslash(prepare_mocks: SubmitMocks):
+    assert ("aaa", "bbb", "ccc") == clean_script_parameters(None, None, ("\\aaa", "bbb", "ccc"))

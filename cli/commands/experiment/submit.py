@@ -72,6 +72,16 @@ def validate_script_folder_location(script_folder_location: str):
         exit(2)
 
 
+def clean_script_parameters(ctx: click.Context, param, value: Tuple[str, ...]):
+    new_value = []
+    for parameter in value:
+        if "\\" == parameter[0]:
+            new_value.append(parameter[1:])
+        else:
+            new_value.append(parameter)
+    return tuple(new_value)
+
+
 @click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
@@ -82,7 +92,7 @@ def validate_script_folder_location(script_folder_location: str):
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=Texts.HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=Texts.HELP_PS)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
-@click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]')
+@click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]', callback=clean_script_parameters)
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
