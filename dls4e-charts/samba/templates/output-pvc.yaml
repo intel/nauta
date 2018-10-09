@@ -15,7 +15,14 @@ spec:
   resources:
     requests:
       storage: 32Gi
-{{- if .Values.global.output_nfs }}
+{{- if .Values.global.features.nfs }}
+  storageClassName: ""
+  selector:
+    matchLabels:
+      kind: internal
+      type: output
+      app: samba
+{{- else if .Values.global.output_nfs }}
   storageClassName: ""
   selector:
     matchLabels:

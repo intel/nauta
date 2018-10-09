@@ -69,8 +69,9 @@
       samba-forward:
         ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
       nfs:
-        node: "{{ ansible_nodename }}"
-        path: "{{ local_data_path }}"
+        ip: "{{ hostvars[groups['master'][0]].dls_configuration.internal_interface.ipv4_address }}"
+        input: "{{ local_data_path }}/local/nfs/input"
+        output: "{{ local_data_path }}/local/nfs/output"
       skydns:
         ClusterIP: "{{ kubernetes_network.svc_list.dns.ip }}"
         Domain: "{{ k8s_domain }}.{{ domain }}"

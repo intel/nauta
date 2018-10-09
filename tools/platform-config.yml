@@ -125,6 +125,9 @@ subcharts:
     admin:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../platform-charts/admin"
+    nfs:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/nfs"
     skydns:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/skydns"

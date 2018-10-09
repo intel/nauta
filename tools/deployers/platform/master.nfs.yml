@@ -1,0 +1,7 @@
+---
+
+- hosts: master
+  become: True
+  any_errors_fatal: True
+  roles:
+    - role: master/nfs

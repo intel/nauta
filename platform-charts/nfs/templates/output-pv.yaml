@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Release.Namespace }}-output
+  labels:
+    kind: internal
+    type: output
+    app: samba
+spec:
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  capacity:
+    storage: 32Gi
+  nfs:
+    path: {{ .Values.output }}
+    server: {{ .Values.ip }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""

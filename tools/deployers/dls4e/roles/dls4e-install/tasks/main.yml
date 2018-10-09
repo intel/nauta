@@ -7,6 +7,16 @@
   changed_when: chart.rc == 1
   failed_when: chart.rc not in [0, 1]
 
+- set_fact:
+    calc_features: "{{ features }}"
+
+- name: Append calc features with default values
+  set_fact:
+    calc_features: "{{ calc_features | combine({item.key: item.value}) }}"
+  with_dict:
+    nfs: True
+  when: item.key not in calc_features
+
 - name: "{{ message_label }} Set global values in configuration"
   set_fact:
     global_values:
@@ -17,12 +27,13 @@
       dls4e_storage: "{{ calculated_storage }}"
       MasterHost: "{{ (calculated_storage | default({})).local_selector | default('') }}"
       images: "{{ registry_images }}"
+      features: "{{ calc_features | default({}) }}"
 
 - name: "{{ message_label }} Render configuration"
   set_fact:
     dls4e_config_values:
       global: "{{ dls4e_configuration | default({}) | combine(global_values) }}"
-      features: "{{ features | default({}) }}"
+      features: "{{ calc_features | default({}) }}"
 
 - name: "{{ message_label }} Ensure that dls4e registry chart exists"
   file:

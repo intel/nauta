@@ -1,0 +1,25 @@
+---
+
+- name: "{{ message_label }} Create NFS IO directories"
+  file:
+    path: "{{ local_data_path }}/local/nfs/{{ item }}"
+    state: directory
+  with_items:
+    - input
+    - output
+
+- name: "{{ message_label }} Render exports file"
+  template:
+    src: exports.j2
+    dest: /etc/exports
+
+- name: "{{ message_label }} Start NFS server"
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - rpcbind
+    - nfs-server
+    - nfs-lock
+    - nfs-idmap
