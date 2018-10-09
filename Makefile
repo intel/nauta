@@ -35,7 +35,7 @@ k8s-installer-build:
 	@make tools-release
 
 dlsctl-build:
-	@(cd $(CURDIR)/cli && make clean && make push)
+	@(cd $(CURDIR)/cli && make full_clean && make push)
 
 tools-%:
 	@(cd $(CURDIR)/tools && make -j 2 $*)
