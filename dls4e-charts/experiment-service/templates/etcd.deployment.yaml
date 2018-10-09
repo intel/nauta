@@ -77,9 +77,9 @@ spec:
           httpGet:
             port: 2379
             path: /health
-          failureThreshold: 3
-          initialDelaySeconds: 10
-          periodSeconds: 10
+          failureThreshold: 4
+          initialDelaySeconds: 120
+          periodSeconds: 60
           successThreshold: 1
           timeoutSeconds: 2
       volumes:
