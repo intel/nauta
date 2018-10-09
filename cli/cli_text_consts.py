@@ -254,6 +254,8 @@ class PredictBatchCmdTexts:
                                     "existing directory."
     MISSING_MODEL_LOCATION_ERROR_MSG = "Missing model location param - " \
                                        "'model location' or 'local model location' required"
+    HELP_TF_RECORD = "If given - batch prediction accepts files in TFRecord formats. Otherwise files should be " \
+                     "delivered in protobuf format."
 
 
 class ExperimentCmdTexts:

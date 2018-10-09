@@ -20,11 +20,15 @@
 #
 
 import argparse
+from enum import Enum
 import logging
 import os
 from time import sleep
 from threading import Thread
 from typing import Optional
+import pickle
+
+import tensorflow as tf
 
 from experiment_metrics.api import publish
 import grpc
@@ -37,11 +41,17 @@ API_GROUP_NAME = 'aggregator.aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
+LABEL_KEY = "label"
+RESULT_KEY = "result"
+
 progress = 0
 max_progress = 1
 stop_thread = False
 
 log_level_env_var = os.getenv('LOG_LEVEL')
+
+class APPLICABLE_FORMATS(Enum):
+    TF_RECORD = "tf-record"
 
 if log_level_env_var:
     desired_log_level = logging.getLevelName(log_level_env_var.upper())
@@ -53,7 +63,8 @@ else:
 logging.basicConfig(level=desired_log_level)
 
 
-def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path: str, related_run_name: str):
+def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path: str, related_run_name: str,
+                       input_format: str):
     detected_files = []
 
     for root, _, files in os.walk(input_dir_path):
@@ -80,25 +91,78 @@ def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path
     files_to_process = detected_files[progress:]
 
     for data_file in files_to_process:
-        request = predict_pb2.PredictRequest()
         logging.debug(f"processing file: {data_file}")
-        with open(data_file, mode='rb') as fi:
-            pb_bytes = fi.read()
 
-        try:
-            request.ParseFromString(pb_bytes)
-        except Exception as ex:
-            raise RuntimeError(f"failed to parse {data_file}") from ex
+        if input_format == APPLICABLE_FORMATS.TF_RECORD.value:
+            record_iterator = tf.python_io.tf_record_iterator(path=data_file)
 
-        result = stub.Predict(request, timeout=30.0)  # timeout 30 seconds
+            id = 0
+            # if tf-record input format is chosen, results are stored in Python list containing dictionary items
+            # each item contains label (key - label) and binary object (key - result)
+            output_list = []
 
-        result_pb_serialized: bytes = result.SerializeToString()
+            filename, _ = os.path.splitext(data_file)
 
-        with open(f'{output_dir_path}/{os.path.basename(data_file)}', mode='wb') as fi:
-            fi.write(result_pb_serialized)
+            for string_record in record_iterator:
+                example = tf.train.Example()
+                example.ParseFromString(string_record)
+
+                label = example.features.feature['label'].bytes_list.value[0].decode('utf_8') \
+                    if example.features.feature.get('label') else None
+
+                if not label:
+                    label = data_file
+                    if len(record_iterator)>1:
+                        label = "{}_{}".format(filename, id)
+                        id += 1
+
+                binary_result = make_prediction(input=example.features.feature['data_pb'].bytes_list.value[0],
+                                stub=stub)
+
+
+                output_list.append({LABEL_KEY: label, RESULT_KEY: binary_result})
+
+            output_filename = "{}.result".format(data_file)
+
+            with open(f'{output_dir_path}/{os.path.basename(output_filename)}', mode='wb') as fi:
+                pickle.dump(obj=output_list, file=fi, protocol=pickle.HIGHEST_PROTOCOL)
+
+        else:
+            with open(data_file, mode='rb') as fi:
+                pb_bytes = fi.read()
+
+                make_prediction(input=pb_bytes,
+                                stub=stub,
+                                output_filename=data_file,
+                                output_dir_path=output_dir_path)
 
         progress += 1
         logging.info(f'progress: {progress}/{max_progress}')
+
+
+def build_label_from_filename(filename: str, id: int):
+    name, _ = os.path.splitext(filename)
+
+    return "{}_{}".format(name, id)
+
+
+def make_prediction(input: bytes, stub: prediction_service_pb2_grpc.PredictionServiceStub,
+                    output_filename: str = None, output_dir_path: str = None):
+    request = predict_pb2.PredictRequest()
+    try:
+        request.ParseFromString(input)
+    except Exception as ex:
+        raise RuntimeError(f"failed to parse {output_filename}") from ex
+
+    result = stub.Predict(request, timeout=30.0)  # timeout 30 seconds
+
+    result_pb_serialized: bytes = result.SerializeToString()
+
+    if output_filename:
+        with open(f'{output_dir_path}/{os.path.basename(output_filename)}', mode='wb') as fi:
+            fi.write(result_pb_serialized)
+
+    return result_pb_serialized
 
 
 def publish_progress():
@@ -162,6 +226,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_dir_path', type=str)
     parser.add_argument('--output_dir_path', type=str)
+    parser.add_argument('--input_format', type=str)
 
     args = parser.parse_args()
 
@@ -170,6 +235,7 @@ def main():
 
     input_dir_path = args.input_dir_path
     output_dir_path = args.output_dir_path if args.output_dir_path else '/mnt/output/experiment'
+    input_format = args.input_format
 
     progress_thread = Thread(target=publish_progress)
     progress_thread.start()
@@ -178,7 +244,8 @@ def main():
         do_batch_inference(server_address=os.getenv('TENSORFLOW_MODEL_SERVER_SVC_NAME', ''),
                            input_dir_path=input_dir_path,
                            output_dir_path=output_dir_path,
-                           related_run_name=related_run_name)
+                           related_run_name=related_run_name,
+                           input_format=input_format)
     except Exception:
         global stop_thread
         stop_thread = True

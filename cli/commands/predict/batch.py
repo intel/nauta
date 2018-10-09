@@ -49,6 +49,7 @@ def validate_local_model_location(local_model_location: str):
 
 
 # noinspection PyUnusedLocal
+
 @click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b')
 @click.option('-n', '--name', help=Texts.HELP_NAME, callback=validate_experiment_name)
 @click.option('-m', '--model-location', help=Texts.HELP_MODEL_LOCATION)
@@ -56,10 +57,11 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-d', '--data', required=True, help=Texts.HELP_DATA)
 @click.option('-o', '--output', help=Texts.HELP_OUTPUT)
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
+@click.option('-tr', '--tf-record', help=Texts.HELP_TF_RECORD,  is_flag=True)
 @common_options()
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
-          model_name: str):
+          model_name: str, tf_record: bool):
     """
     Starts a new batch instance that will perform prediction on provided data.
     """
@@ -79,7 +81,8 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
         inference_instance = start_inference_instance(name=name, model_location=model_location,
                                                       local_model_location=local_model_location, model_name=model_name,
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
-                                                      output_location=output)
+                                                      output_location=output,
+                                                      tf_record=tf_record)
     except Exception:
         handle_error(logger, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)

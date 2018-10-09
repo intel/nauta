@@ -6,6 +6,7 @@ dataPath: '/mnt/input/home/data'
 modelPath: '/mnt/input/home/models'
 modelName: 'mnist'
 outputPath: '/mnt/output/experiment'
+inputFormat: 'pb'
 
 containerPort: 8500
 

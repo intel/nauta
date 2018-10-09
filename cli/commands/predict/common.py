@@ -43,7 +43,8 @@ def start_inference_instance(name: str,
                              local_model_location: str = None,
                              data_location: str = None,
                              output_location: str = None,
-                             env_variables: List[str] = None) -> RunSubmission:
+                             env_variables: List[str] = None,
+                             tf_record: bool = False) -> RunSubmission:
 
     pack_params = [('modelName', model_name)]
 
@@ -55,6 +56,8 @@ def start_inference_instance(name: str,
         pack_params.append(('dataPath', data_location))
     if output_location:
         pack_params.append(('outputPath', output_location))
+    if tf_record:
+        pack_params.append(('inputFormat', 'tf-record'))
 
     runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
                                 script_folder_location=local_model_location, env_variables=env_variables)
