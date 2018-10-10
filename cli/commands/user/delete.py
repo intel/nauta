@@ -31,12 +31,15 @@ from util.k8s.kubectl import check_users_presence, UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
-from util.k8s.k8s_info import is_current_user_administrator
+from util.k8s.k8s_info import is_current_user_administrator, get_config_map_data, patch_config_map_data
 from util.aliascmd import AliasCmd
 from util.system import handle_error
 from cli_text_consts import UserDeleteCmdTexts as Texts, SPINNER_COLOR
 
 logger = initialize_logger(__name__)
+
+USER_DEL_CM = "dls4enterprise-user-del"
+DLS4E_NAMESPACE = "dls4e"
 
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='d')
@@ -63,7 +66,7 @@ def delete(state: State, username: str, purge: bool):
             exit(1)
 
         if user_state == UserState.TERMINATING:
-            handle_error(user_msg=Texts.USER_BEING_REMOVED)
+            handle_error(user_msg=Texts.USER_BEING_REMOVED_ERROR_MSG)
             exit(1)
 
     except Exception:
@@ -82,6 +85,8 @@ def delete(state: State, username: str, purge: bool):
         click.echo(Texts.DELETION_START_DELETING)
         delete_user(username)
 
+        patch_config_map_data(name=USER_DEL_CM, namespace=DLS4E_NAMESPACE, key=username, value="1")
+
         if purge:
             try:
                 click.echo(Texts.DELETION_START_PURGING)
@@ -94,7 +99,10 @@ def delete(state: State, username: str, purge: bool):
         with yaspin(text=Texts.DELETION_VERIFICATION_OF_DELETING, color=SPINNER_COLOR) as spinner:
             for i in range(60):
                     user_state = check_users_presence(username)
-                    if not user_state or user_state == UserState.NOT_EXISTS:
+
+                    user_del_cm_content = get_config_map_data(name=USER_DEL_CM, namespace=DLS4E_NAMESPACE,
+                                                              request_timeout=1)
+                    if (not user_state or user_state == UserState.NOT_EXISTS) and not user_del_cm_content.get(username):
                         break
                     time.sleep(1)
             else:

@@ -636,6 +636,7 @@ class UtilK8sInfoTexts:
     GATHERING_PASSWORD_ERROR_MSG = "Error during gathering users password."
     LACK_OF_PASSWORD_ERROR_MSG = "Lack of password."
     GATHERING_EVENTS_ERROR_MSG = "Problem during gathering k8s events."
+    PATCHING_CM_ERROR_MSG = "Problem during patching configmap."
 
 
 class UtilK8sProxyTexts:

@@ -457,3 +457,25 @@ def add_bytes_to_unit(value: str) -> str:
     if type(value) == str and value[-2:] in PREFIX_I_VALUES:
             value += "B"
     return value
+
+
+def patch_config_map_data(key: str, value: str, name: str, namespace: str):
+    """
+    Function patches configmap with a given name and located in a given namespace.
+    :param key: key identifying valueto be patched
+    :param value: value
+    :param name: name of a configmap
+    :param namespace: namespace where configmap is located
+    :return: raises an exception in case of any errors
+    """
+    api = get_k8s_api()
+
+    try:
+        api.patch_namespaced_config_map(name=name,
+                                        namespace=namespace,
+                                        body={"data": {key: value}})
+
+    except ApiException as exe:
+        error_message = Texts.PATCHING_CM_ERROR_MSG
+        logger.exception(error_message)
+        raise KubernetesError(error_message) from exe

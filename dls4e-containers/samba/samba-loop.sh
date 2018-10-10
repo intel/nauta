@@ -22,6 +22,7 @@ done
 FIRST_RUN=--init
 while true; do
   /bin/samba-create.sh $FIRST_RUN || echo "Samba creation loop failed"
+  /bin/samba-delete-users.sh
   FIRST_RUN=
   sleep 5
 done

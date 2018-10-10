@@ -33,6 +33,9 @@ def test_deleteuser_success(mocker):
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
     cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
+    gcm_mock = mocker.patch("commands.user.delete.get_config_map_data")
+    pcm_mock = mocker.patch("commands.user.delete.patch_config_map_data")
+    gcm_mock.return_value = {}
 
     mocker.patch("click.confirm", return_value=True)
 
@@ -41,6 +44,8 @@ def test_deleteuser_success(mocker):
     assert cup_mock.call_count == 2
     assert deu_mock.call_count == 1
     assert icu_mock.call_count == 1
+    assert gcm_mock.call_count == 1
+    assert pcm_mock.call_count == 1
 
     assert Texts.DELETE_SUCCESS_MSG.format(username=TEST_USERNAME) in result.output
 
@@ -108,6 +113,9 @@ def test_deleteuser_answer_n(mocker):
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
     cup_mock = mocker.patch("commands.user.delete.check_users_presence", return_value=True)
     deu_mock = mocker.patch("commands.user.delete.delete_user")
+    gcm_mock = mocker.patch("commands.user.delete.get_config_map_data")
+    pcm_mock = mocker.patch("commands.user.delete.patch_config_map_data")
+
     mocker.patch("click.confirm", return_value=False)
 
     result = CliRunner().invoke(delete.delete, [TEST_USERNAME])
@@ -115,6 +123,8 @@ def test_deleteuser_answer_n(mocker):
     assert cup_mock.call_count == 1
     assert deu_mock.call_count == 0
     assert icu_mock.call_count == 1
+    assert gcm_mock.call_count == 0
+    assert pcm_mock.call_count == 0
 
     assert Texts.DELETE_ABORT_MSG in result.output
 
@@ -124,6 +134,9 @@ def test_deleteuser_purge_success(mocker):
     cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
     prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=True)
+    gcm_mock = mocker.patch("commands.user.delete.get_config_map_data")
+    pcm_mock = mocker.patch("commands.user.delete.patch_config_map_data")
+    gcm_mock.return_value = {}
 
     mocker.patch("click.confirm", return_value=True)
 
@@ -133,6 +146,8 @@ def test_deleteuser_purge_success(mocker):
     assert deu_mock.call_count == 1
     assert prg_mock.call_count == 1
     assert icu_mock.call_count == 1
+    assert gcm_mock.call_count == 1
+    assert pcm_mock.call_count == 1
 
 
 def test_deleteuser_purge_failure(mocker):
@@ -140,6 +155,9 @@ def test_deleteuser_purge_failure(mocker):
     deu_mock = mocker.patch("commands.user.delete.delete_user")
     prg_mock = mocker.patch("commands.user.delete.purge_user", side_effect=RuntimeError)
     icu_mock = mocker.patch("commands.user.delete.is_current_user_administrator", return_value=True)
+    gcm_mock = mocker.patch("commands.user.delete.get_config_map_data")
+    pcm_mock = mocker.patch("commands.user.delete.patch_config_map_data")
+    gcm_mock.return_value = {}
 
     mocker.patch("click.confirm", return_value=True)
 
@@ -150,6 +168,8 @@ def test_deleteuser_purge_failure(mocker):
     assert prg_mock.call_count == 1
     assert Texts.PURGE_ERROR_MSG in result.output
     assert icu_mock.call_count == 1
+    assert gcm_mock.call_count == 1
+    assert pcm_mock.call_count == 1
 
 
 def test_deleteuser_not_admin(mocker):
@@ -166,6 +186,9 @@ def test_deleteuser_purge_success_wait_for_deletion(mocker):
     cup_mock = mocker.patch("commands.user.delete.check_users_presence", side_effect=[True, True, True, True, False])
     deu_mock = mocker.patch("commands.user.delete.delete_user")
     prg_mock = mocker.patch("commands.user.delete.purge_user", return_value=True)
+    gcm_mock = mocker.patch("commands.user.delete.get_config_map_data")
+    pcm_mock = mocker.patch("commands.user.delete.patch_config_map_data")
+    gcm_mock.return_value = {}
 
     mocker.patch("click.confirm", return_value=True)
 
@@ -175,3 +198,5 @@ def test_deleteuser_purge_success_wait_for_deletion(mocker):
     assert deu_mock.call_count == 1
     assert prg_mock.call_count == 1
     assert icu_mock.call_count == 1
+    assert gcm_mock.call_count == 4
+    assert pcm_mock.call_count == 1

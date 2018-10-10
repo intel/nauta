@@ -29,6 +29,7 @@ rules:
       - list
       - get
       - create
+      - delete
   - apiGroups:
       - ""
     resources:

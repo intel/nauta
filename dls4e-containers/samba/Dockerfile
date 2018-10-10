@@ -31,6 +31,7 @@ COPY samba-create-user.sh /bin
 COPY samba-create-pv.sh /bin
 COPY smb.conf /etc/samba/smb.conf
 COPY samba-health.sh /bin
+COPY samba-delete-users.sh /bin
 
 RUN mkdir -vp /etc/secrets/samba-users
 RUN chmod +x /bin/samba-*
