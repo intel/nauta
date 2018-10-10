@@ -10,8 +10,6 @@ commandline:
     - "/app/training.py"
     - "--data_dir=/temp"
 
-resources: {}
-
 ssh:
   port: 32222
   useSecrets: True
@@ -63,4 +61,9 @@ experimentName: ''
 
 podCount: 1
 
+resources:
+  requests:
+    cpu: 40 # Minimal number of logical processors requested 
+
+# Number of physical processors that will be used by Horovod
 cpus: 20

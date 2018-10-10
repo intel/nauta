@@ -18,7 +18,7 @@ spec:
       role: worker
   serviceName: {{ template "horovod.fullname" . }}
   podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
-  replicas: {{.Values.workersCount}}
+  replicas: {{ .Values.workersCount }}
   template:
     metadata:
       labels:
