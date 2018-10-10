@@ -228,6 +228,9 @@ subcharts:
       version: 2.6.2
       path: "{{ playbook_dir }}/../../dls4e-registry-charts/registry"
   dls4e:
+    priority-classes:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/priority-classes"
     gui:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../dls4e-charts/gui"
