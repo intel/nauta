@@ -31,6 +31,7 @@ export default {
   DLS: 'Deep Learning Studio',
   DOWNLOAD: 'Download',
   EXIT: 'Exit',
+  EXPERIMENT_END_DATE: 'End Date',
   EXPERIMENT_SUBMISSION_DATE: 'Submission Date',
   EXPERIMENT_START_DATE: 'Start Date',
   EXPERIMENTS: 'Experiments',

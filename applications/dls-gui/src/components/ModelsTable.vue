@@ -128,6 +128,7 @@
                             </v-flex>
                             <v-flex xs6 wrap>
                               <ExpKeyValDetail :keyname="labels.EXPERIMENT_START_DATE" :value="parseValue('trainingStartTime', item.attributes.trainingStartTime)"/>
+                              <ExpKeyValDetail :keyname="labels.EXPERIMENT_END_DATE" :value="parseValue('trainingEndTime', item.attributes.trainingEndTime)"/>
                               <ExpKeyValDetail :keyname="labels.TOTAL_EXPERIMENT_DURATION" :value="parseValue('trainingDurationTime', item.attributes.trainingDurationTime)"/>
                               <ExpKeyValDetail :keyname="labels.PARAMETERS" :value="parseValue('parameters', item.attributes.parameters)"/>
                               <LogsDetail :keyname="labels.OUTPUT" :owner="item.attributes.namespace" :name="item.attributes.name"/>
