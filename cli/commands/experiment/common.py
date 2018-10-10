@@ -95,6 +95,10 @@ def check_run_environment(run_environment_path: str):
     If Run environment is not empty, ask user if it should be deleted in order to proceed with Run environment creation.
     """
     if os.path.isdir(run_environment_path) and os.listdir(run_environment_path):
+        log.debug("---------------------------------------")
+        log.debug(run_environment_path)
+        log.debug(os.listdir(run_environment_path))
+        log.debug("---------------------------------------")
         # check whether experiment is not being submitted at the moment
         if os.path.isfile(os.path.join(run_environment_path, EXP_SUB_SEMAPHORE_FILENAME)):
             handle_error(user_msg=Texts.THE_SAME_EXP_IS_SUBMITTED)
@@ -142,7 +146,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
         log.exception("Create environment - creating experiment folder error.")
         raise SubmitExperimentError(message_prefix.format(reason=Texts.EXP_DIR_CANT_BE_CREATED))
     # create a semaphore saying that experiment is under submission
-    Path(os.path.join(folder_path, EXP_SUB_SEMAPHORE_FILENAME)).touch()
+    Path(os.path.join(run_environment_path, EXP_SUB_SEMAPHORE_FILENAME)).touch()
 
     # copy training script - it overwrites the file taken from a folder_location
     if file_location:
