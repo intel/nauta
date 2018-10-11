@@ -25,6 +25,9 @@ from typing import List, Tuple
 from util.k8s.kubectl import get_top_for_pod
 from util.k8s.k8s_info import get_pods, sum_cpu_resources_unformatted, sum_mem_resources_unformatted, \
     format_mem_resources, format_cpu_resources, PodStatus
+from util.logger import initialize_logger
+
+logger = initialize_logger(__name__)
 
 
 class ResourceUsage():
@@ -57,14 +60,17 @@ def get_highest_usage() -> Tuple[List[str], List[str]]:
     for item in available_pods:
         name = item.metadata.name
         namespace = item.metadata.namespace
-        # omit technical namespaces and
+        # omit technical namespaces
         if namespace not in ["dls4e", "kube-system"] and item.status.phase.upper() == PodStatus.RUNNING.value:
-            cpu, mem = get_top_for_pod(name=name, namespace=namespace)
-            if namespace in users_data:
-                users_data.get(namespace).get(CPU_KEY).append(cpu)
-                users_data.get(namespace).get(MEM_KEY).append(mem)
-            else:
-                users_data[namespace] = {CPU_KEY: [cpu], MEM_KEY: [mem]}
+            try:
+                cpu, mem = get_top_for_pod(name=name, namespace=namespace)
+                if namespace in users_data:
+                    users_data.get(namespace).get(CPU_KEY).append(cpu)
+                    users_data.get(namespace).get(MEM_KEY).append(mem)
+                else:
+                    users_data[namespace] = {CPU_KEY: [cpu], MEM_KEY: [mem]}
+            except Exception as exe:
+                logger.exception("Error during gathering pod resources usage.")
 
     for user_name, usage in users_data.items():
         summarized_usage.append({NAME_KEY: user_name,

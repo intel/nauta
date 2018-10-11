@@ -156,16 +156,20 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
         try:
             cpu_requests_sum = sum_cpu_resources(
                 [container_resource.requests["cpu"]
-                 for container_resource in containers_resources if container_resource.requests])
+                 for container_resource in containers_resources if container_resource.requests and
+                 container_resource.requests.get("cpu")])
             mem_requests_sum = sum_mem_resources(
                 [container_resource.requests["memory"]
-                 for container_resource in containers_resources if container_resource.requests])
+                 for container_resource in containers_resources if container_resource.requests and
+                 container_resource.requests.get("memory")])
             cpu_limits_sum = sum_cpu_resources(
                 [container_resource.limits["cpu"]
-                 for container_resource in containers_resources if container_resource.limits])
+                 for container_resource in containers_resources if container_resource.limits and
+                 container_resource.limits.get("cpu")])
             mem_limits_sum = sum_mem_resources(
                 [container_resource.limits["memory"]
-                 for container_resource in containers_resources if container_resource.limits])
+                 for container_resource in containers_resources if container_resource.limits and
+                 container_resource.limits.get("memory")])
         except ValueError as exception:
             handle_error(logger, Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg=str(exception)),
                          Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg=str(exception)))
