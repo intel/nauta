@@ -51,6 +51,15 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_optio
 DEFAULT_LANG = "en_US.UTF-8"
 
 ERROR_MESSAGE = "Other error during starting application."
+UTF_ERROR_MESSAGE = f"""Environment localization settings are incorrect. Please set following environment variables:
+export LC_ALL={DEFAULT_LANG}
+export LC_CTYPE={DEFAULT_LANG}
+
+(en_US part can be replaced by your local language settings in <language>_<territory> format)
+
+On Windows, run following command in order to enable UTF-8 encoding:
+chcp 65001
+"""
 
 
 def signal_handler(sig, frame):
@@ -110,18 +119,23 @@ if __name__ == '__main__':
     try:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         entry_point()
-    except RuntimeError as exe:
-        if "was configured to use ASCII as encoding for the environment" in str(exe):
-            os.environ["LC_ALL"] = DEFAULT_LANG
-            os.environ["LANG"] = DEFAULT_LANG
-            os.environ["LANGUAGE"] = DEFAULT_LANG
-            os.environ["LC_CTYPE"] = DEFAULT_LANG
-            try:
-                entry_point()
-            except Exception as add_exe:
-                print(ERROR_MESSAGE)
-                if verbose_option:
-                    traceback.print_tb(add_exe.__traceback__)
+    except (RuntimeError, UnicodeError) as exe:
+        if type(exe) == RuntimeError and "was configured to use ASCII as encoding for the environment" not in str(exe):
+            # Reraise exception if it is not related to encoding settings
+            raise
+        os.environ["LC_ALL"] = DEFAULT_LANG
+        os.environ["LANG"] = DEFAULT_LANG
+        os.environ["LANGUAGE"] = DEFAULT_LANG
+        os.environ["LC_CTYPE"] = DEFAULT_LANG
+        try:
+            entry_point()
+        except Exception as add_exe:
+            # Print a message indicating problems with Encoding/Decoding settings
+            print(UTF_ERROR_MESSAGE)
+            logger.exception(ERROR_MESSAGE)
+            print(ERROR_MESSAGE)
+            if verbose_option:
+                traceback.print_tb(add_exe.__traceback__)
         else:
             # click may not work here due to an exception
             print(ERROR_MESSAGE)
