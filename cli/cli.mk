@@ -67,9 +67,9 @@ endif
 	@mkdir -p dist/docs/
 	@cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
 
-ifneq (,$(SCM_DUMP_DIRECTORY))
+ifneq (,$(SCM_REPOSITORY_STATE))
 	@mkdir dist/config/scm/
-	@cp -Rf $(SCM_DUMP_DIRECTORY)/sha*.json dist/config/scm/
+	@echo "$(SCM_REPOSITORY_STATE)" > dist/config/scm/sha_sum.json
 endif
 
 metrics-lib:
