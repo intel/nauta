@@ -28,7 +28,7 @@ from cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
-from util.k8s.kubectl import check_connection_to_cluster
+from util.k8s.kubectl import check_connection_to_cluster, check_port_forwarding
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.system import handle_error
 from cli_text_consts import VerifyCmdTexts as Texts, SPINNER_COLOR
@@ -45,6 +45,8 @@ def verify(state: State):
     try:
         with yaspin(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG, color=SPINNER_COLOR):
             check_connection_to_cluster()
+        with yaspin(text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG, color=SPINNER_COLOR):
+            check_port_forwarding()
     except KubectlConnectionError as e:
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
         exit(1)

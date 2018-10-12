@@ -70,6 +70,7 @@ def test_verify_with_kubectl_not_found_error(mocker):
 def test_verify_with_kubectl_connection_success(mocker):
     mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
     mocker.patch.object(verify, "check_os")
 
@@ -77,12 +78,14 @@ def test_verify_with_kubectl_connection_success(mocker):
     runner.invoke(verify.verify, [])
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
     assert check_dependency_mock.call_count != 0, "dependency wasn't checked"
 
 
 def test_verify_with_kubectl_namespace_get_error(mocker):
     mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
     admin_check_mock = mocker.patch("commands.verify.verify.is_current_user_administrator")
     admin_check_mock.return_value = False
@@ -93,6 +96,7 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
     result = runner.invoke(verify.verify, [])
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
     assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
@@ -102,6 +106,7 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
 def test_verify_with_kubectl_admin_check_error(mocker):
     mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
     admin_check_mock = mocker.patch("commands.verify.verify.is_current_user_administrator")
     admin_check_mock.side_effect = Exception
@@ -110,7 +115,26 @@ def test_verify_with_kubectl_admin_check_error(mocker):
     result = runner.invoke(verify.verify, [])
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
     assert check_dependency_mock.call_count == 0, "dependency was checked"
 
     assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
         "Bad output. Admin check error should be indicated in the console."
+
+
+def test_verify_with_post_forwarding_error(mocker):
+    mocker.patch("cli_state.verify_cli_config_path")
+    check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
+    check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
+    check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    check_port_forwarding_mock.side_effect = Exception
+
+    runner = CliRunner()
+    result = runner.invoke(verify.verify, [])
+
+    assert check_connection_mock.call_count == 1, "connection wasn't checked"
+    assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
+    assert check_dependency_mock.call_count == 0, "dependency was checked"
+
+    assert Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG in result.output, \
+        "Bad output. Port forwarding error should be indicated in the console."

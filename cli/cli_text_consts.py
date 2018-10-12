@@ -84,6 +84,7 @@ class VerifyCmdTexts:
     CHECKING_CONNECTION_TO_CLUSTER_MSG = "Checking connection to cluster..."
     CHECKING_OS_MSG = "Checking operating system..."
     VERIFYING_DEPENDENCY_MSG = "Verifying {dependency_name} ..."
+    CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG = "Checking port forwarding from cluster..."
 
 
 class UserCmdTexts:
@@ -624,6 +625,8 @@ class UtilKubectlTexts:
     K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to K8S cluster: {output}"
     TOP_COMMAND_ERROR = "Problems during getting usage of resources."
     TOP_COMMAND_ERROR_LOG = "Incorrect format of data returned by top command: {output}"
+    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from K8S cluster. Check cluster configuration and " \
+                                    "proxy settings."
 
 
 class UtilK8sInfoTexts:
