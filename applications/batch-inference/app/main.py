@@ -169,7 +169,7 @@ def publish_progress():
     logging.debug("starting publish_progress ...")
     progress_percent = 0
     while progress_percent != 100 and not stop_thread:
-        new_progress_percent = progress/max_progress * 100
+        new_progress_percent = progress/max_progress * 100 if max_progress else 100
         logging.debug(f"new_progress_percent: %.1f" % new_progress_percent)
         if new_progress_percent != progress_percent:
             progress_percent = new_progress_percent
@@ -212,7 +212,7 @@ def try_revert_progress(run_name: str) -> Optional[int]:
     logging.debug(f"progress reverted! progress from metrics: {saved_progress}")
     saved_progress: float = float(saved_progress)
 
-    real_progress = saved_progress/100 * max_progress
+    real_progress = saved_progress/100 * max_progress if max_progress else 100
 
     progress = int(real_progress)
     return progress
