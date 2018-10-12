@@ -60,6 +60,19 @@ def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
     return indent.join([f'{mount.name} @ {mount.mount_path}\n' for mount in volume_mounts]) if volume_mounts else ''
 
 
+def unify_units(name: str, value: str) -> str:
+    if name == "cpu":
+        if not value.endswith("m"):
+            value = float(value) * 1000
+            if value.is_integer():
+                value = str(int(value)) + "m"
+            else:
+                value = str(value) + "m"
+    elif name == "mem":
+        value = add_bytes_to_unit(value)
+    return f'{name}: {value}\n'
+
+
 def container_resources_to_msg(resources, spaces=9) -> str:
     msg = ''
     header_indent = ' ' * (spaces - 4)
@@ -67,12 +80,12 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     if resources.requests:
         msg += header_indent
         msg += Texts.CONTAINER_REQUESTS_LIST_HEADER.format(indent)
-        msg += indent.join([f'{request_name}: {add_bytes_to_unit(request_value)}\n' for request_name, request_value
+        msg += indent.join([unify_units(request_name, request_value) for request_name, request_value
                             in resources.requests.items()])
     if resources.limits:
         msg += header_indent
         msg += Texts.CONTAINER_LIMITS_LIST_HEADER.format(indent)
-        msg += indent.join([f'{limit_name}: {add_bytes_to_unit(limit_value)}\n' for limit_name, limit_value
+        msg += indent.join([unify_units(limit_name, limit_value) for limit_name, limit_value
                             in resources.limits.items()])
 
     return msg

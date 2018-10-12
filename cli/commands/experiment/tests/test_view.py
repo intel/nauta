@@ -187,15 +187,36 @@ def test_container_volume_mounts_to_msg():
     assert f'{volume_mount.name} @ {volume_mount.mount_path}' in msg
 
 
+def test_unify_units():
+    cpu_checks = [{'test': '4.3', 'expected': '4300m'},
+                  {'test': '1m', 'expected': '1m'},
+                  {'test': '0.1', 'expected': '100m'}
+                  ]
+
+    mem_checks = [{'test': '5Gi', 'expected': '5GiB'},
+                  {'test': '2Mi', 'expected': '2MiB'},
+                  {'test': '1kb', 'expected': '1kb'}
+                  ]
+
+    for check in cpu_checks:
+        resource_values = view.unify_units("cpu", check['test'])
+        assert check['expected'] in resource_values
+
+    for check in mem_checks:
+        resource_values = view.unify_units("mem", check['test'])
+        assert check['expected'] in resource_values
+
+
 def test_container_resources_to_msg():
     resources = MagicMock()
-    resources.requests = {'cpu': 1.0, 'mem': '1Gi'}
-    resources.limits = {'cpu': 4.0, 'mem': '2gi'}
+
+    resources.requests = {'cpu': '1.0', 'mem': '1Gi'}
+    resources.limits = {'cpu': '4000m', 'mem': '2gi'}
 
     msg = view.container_resources_to_msg(resources=resources)
 
     assert Texts.CONTAINER_REQUESTS_LIST_HEADER.format("") in msg
-    assert f'cpu: {resources.requests["cpu"]}' in msg
+    assert 'cpu: 1000m' in msg
     assert f'mem: {resources.requests["mem"]}B' in msg
 
     assert '- Limits:' in msg
