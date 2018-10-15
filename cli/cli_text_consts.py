@@ -95,7 +95,7 @@ class UserCmdTexts:
 class UserListCmdTexts:
     HELP = "List users."
     HELP_C = "If given - command displays c last rows."
-    TABLE_HEADERS = ["Name", "Creation date", "Date of last submitted job", "Number of running jobs"
+    TABLE_HEADERS = ["Name", "Creation date", "Date of last submitted job", "Number of running jobs",
                      "Number of queued jobs"]
     OTHER_ERROR_MSG = "Failed to get users list."
 
