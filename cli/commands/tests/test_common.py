@@ -80,7 +80,7 @@ def test_list_unitialized_experiments_in_cli_success(mocker, capsys):
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_unitialized_experiments_in_cli(verbosity_lvl=0, all_users=False, name="", listed_runs_kinds=[],
-                                               headers=TEST_LIST_HEADERS)
+                                               headers=TEST_LIST_HEADERS, brief=False)
 
     captured = capsys.readouterr()
 
@@ -102,7 +102,7 @@ def test_list_unitialized_experiments_in_cli_one_row(mocker, capsys):
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_unitialized_experiments_in_cli(verbosity_lvl=0, all_users=False, name="", listed_runs_kinds=[],
-                                               headers=TEST_LIST_HEADERS, count=1)
+                                               headers=TEST_LIST_HEADERS, count=1, brief=False)
 
     captured = capsys.readouterr()
 
@@ -121,7 +121,7 @@ def test_list_experiments_success(mocker):
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
-                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, brief=False)
 
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
@@ -134,7 +134,7 @@ def test_list_experiments_all_users_success(mocker):
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
-                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, brief=False)
 
     assert get_namespace_mock.call_count == 0
     assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
@@ -148,7 +148,7 @@ def test_list_experiments_failure(mocker):
     sys_exit_mock = mocker.patch.object(common, "exit")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
-                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False)
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, brief=False)
 
     assert get_namespace_mock.call_count == 1
     assert api_list_runs_mock.call_count == 1, "Runs retrieval was not called"
@@ -161,13 +161,34 @@ def test_list_experiments_one_user_success(mocker, capsys):
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
+    headers = ["Name", "Submission date", "Owner", "State"]
+
     common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
-                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, count=1)
+                            runs_list_headers=headers, with_metrics=False, count=1, brief=False)
 
     captured = capsys.readouterr()
 
     assert "2018-04-26 15:43:01" not in captured.out
     assert "2018-05-08 15:05:04" in captured.out
+    assert "Parameters" not in captured.out
+    assert "Owner" in captured.out
+    assert get_namespace_mock.call_count == 0
+    assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
+
+
+def test_list_experiments_brief_success(mocker, capsys):
+    api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
+    api_list_runs_mock.return_value = TEST_RUNS
+
+    get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
+
+    common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
+                            runs_list_headers=TEST_LIST_HEADERS, with_metrics=False, brief=True)
+
+    captured = capsys.readouterr()
+
+    assert "a 1 b 2" not in captured.out
+    assert "test-experiment-2" in captured.out
     assert get_namespace_mock.call_count == 0
     assert api_list_runs_mock.call_count == 1, "Runs were not retrieved"
 

@@ -56,7 +56,7 @@ def uninitialized_experiment_cli_representation(experiment: Experiment):
 
 def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
                                         name: str, headers: List[str], listed_runs_kinds: List[RunKinds] = None,
-                                        count: int = None):
+                                        count: int = None, brief: bool = False):
     """
     Display a list of selected runs in the cli.
 
@@ -102,7 +102,7 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
 
 def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus,
                      listed_runs_kinds: List[RunKinds], runs_list_headers: List[str], with_metrics: bool,
-                     count: int = None):
+                     count: int = None, brief: bool = False):
     """
     Display a list of selected runs in the cli.
 
@@ -114,6 +114,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
     :param runs_list_headers: headers which will be displayed on top of a table shown in the cli
     :param with_metrics: whether to show metrics column or not
     :param count: number of rows displayed on a list. If not given - content of a list is not limited
+    :param brief: when true only experiment name, submission date, owner and state will be print
     """
 
     try:
@@ -125,7 +126,13 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
         runs = replace_initializing_runs(runs_api.list_runs(namespace=namespace, state_list=[status], name_filter=name,
                                                             run_kinds_filter=listed_runs_kinds))
         runs_representations = [run.cli_representation for run in runs]
-        if with_metrics:
+        if brief:
+            runs_table_data = [
+                (run_representation.name, run_representation.submission_date, run_representation.submitter,
+                 run_representation.status)
+                for run_representation in runs_representations
+            ]
+        elif with_metrics:
             runs_table_data = runs_representations
         else:
             runs_table_data = [

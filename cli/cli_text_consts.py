@@ -186,6 +186,8 @@ class PredictListCmdTexts:
     HELP_U = "List uninitialized prediction instances, i.e. prediction instances" \
              " without resources submitted for creation."
     HELP_C = "If given - command displays c last rows."
+    HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
+             " be print."
 
 
 class PredictLaunchCmdTexts:
@@ -271,6 +273,8 @@ class ExperimentListCmdTexts:
     HELP_S = "List experiments with matching status."
     HELP_U = "List uninitialized experiments, i.e. experiments without resources submitted for creation."
     HELP_C = "If given - command displays c last rows."
+    HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
+             " be print."
 
 
 class ExperimentTemplateListCmdTexts:

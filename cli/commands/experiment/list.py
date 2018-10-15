@@ -21,7 +21,8 @@
 
 import click
 
-from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds
+from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds, RUN_NAME, RUN_STATUS, RUN_SUBMISSION_DATE,\
+    RUN_SUBMITTER
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
 from cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
@@ -41,13 +42,19 @@ LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=Texts.HELP_S)
 @click.option('-u', '--uninitialized', is_flag=True, help=Texts.HELP_U)
 @click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
+@click.option('-b', '--brief', is_flag=True, help=Texts.HELP_B)
 @common_options()
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool, count: int):
+def list_experiments(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool, count: int,
+                     brief: bool):
     """ List experiments. """
+    if brief:
+        list_headers = [RUN_NAME, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS]
+    else:
+        list_headers = EXPERIMENTS_LIST_HEADERS
     if uninitialized:
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
-                                            headers=EXPERIMENTS_LIST_HEADERS, count=count)
+                                            headers=list_headers, count=count, brief=brief)
     else:
-        list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, EXPERIMENTS_LIST_HEADERS,
-                         with_metrics=True, count=count)
+        list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, list_headers, with_metrics=True,
+                         count=count, brief=brief)
