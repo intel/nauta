@@ -49,6 +49,7 @@ BANNER = """Intel® Deep Learning Studio (Intel® DL Studio) Client
             To get further help on commands use COMMAND with -h or --help option."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)
 DEFAULT_LANG = "en_US.UTF-8"
+DEFAULT_ENCODING = "UTF-8"
 
 ERROR_MESSAGE = "Other error during starting application."
 UTF_ERROR_MESSAGE = f"""Environment localization settings are incorrect. Please set following environment variables:
@@ -118,6 +119,7 @@ if __name__ == '__main__':
     verbose_option = any(x.startswith("-vv") or x == "-v" or x == "--verbose" for x in sys.argv)
     try:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        os.environ["PYTHONIOENCODING"] = DEFAULT_ENCODING
         entry_point()
     except (RuntimeError, UnicodeError) as exe:
         if type(exe) == RuntimeError and "was configured to use ASCII as encoding for the environment" not in str(exe):

@@ -32,7 +32,7 @@ from yaspin import yaspin
 
 from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
-from cli_state import common_options, pass_state, State
+from cli_state import common_options, pass_state, State, DlsctlSpinner
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace
 from platform_resources.run_model import Run, RunStatus
@@ -308,7 +308,8 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             logger.debug(f"Purging {run.name} run ...")
             click.echo(Texts.PURGING_START_MSG.format(run_name=run.name))
             try:
-                with yaspin(text=Texts.PURGING_PROGRESS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                with yaspin(spinner=DlsctlSpinner, text=Texts.PURGING_PROGRESS_MSG.format(run_name=run.name),
+                            color=SPINNER_COLOR):
                     # purge helm release
                     delete_helm_release(run.name, namespace=namespace, purge=True)
                     # delete run
@@ -324,7 +325,8 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
             try:
                 # clear run logs
                 logger.debug(f"Clearing logs for {run.name} run.")
-                with yaspin(text=Texts.PURGING_LOGS_PROGRESS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                with yaspin(spinner=DlsctlSpinner,
+                            text=Texts.PURGING_LOGS_PROGRESS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
                     k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
             except Exception:
                 logger.exception("Error during clearing run logs.")
@@ -413,7 +415,8 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
             try:
                 # if run status is cancelled - omit the following steps
                 if run.state != RunStatus.CANCELLED:
-                    with yaspin(text=Texts.CANCEL_SETTING_STATUS_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                    with yaspin(spinner=DlsctlSpinner, text=Texts.CANCEL_SETTING_STATUS_MSG.format(run_name=run.name),
+                                color=SPINNER_COLOR):
                         delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
                         # change a run state to CANCELLED
                         run.state = RunStatus.CANCELLED

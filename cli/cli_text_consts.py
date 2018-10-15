@@ -19,9 +19,9 @@
 # and approved by Intel in writing.
 #
 
-
 VERBOSE_RERUN_MSG = "Use -v or -vv option for more info."
 SPINNER_COLOR = "green"
+
 
 class VersionCmdTexts:
     HELP = "Displays the version of the installed dlsctl application."

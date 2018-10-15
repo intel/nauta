@@ -21,6 +21,7 @@
 
 from yaspin import yaspin
 
+from cli_state import DlsctlSpinner
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
 from util.logger import initialize_logger
@@ -37,10 +38,10 @@ def delete_user(username: str):
     :param username: name of a user to be deleted
     Throws an excpetion in case of any errors
     """
-    with yaspin(text=TextsDel.DELETION_DELETING_NAMESPACE, color=SPINNER_COLOR):
+    with yaspin(spinner=DlsctlSpinner, text=TextsDel.DELETION_DELETING_NAMESPACE, color=SPINNER_COLOR):
         delete_namespace(username)
 
-    with yaspin(text=TextsDel.DELETION_DELETING_USERS_OBJECTS, color=SPINNER_COLOR):
+    with yaspin(spinner=DlsctlSpinner, text=TextsDel.DELETION_DELETING_USERS_OBJECTS, color=SPINNER_COLOR):
         delete_helm_release(username, purge=True)
 
 

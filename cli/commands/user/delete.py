@@ -26,7 +26,7 @@ import click
 from yaspin import yaspin
 
 from util.logger import initialize_logger
-from cli_state import common_options, pass_state, State
+from cli_state import common_options, pass_state, State, DlsctlSpinner
 from util.k8s.kubectl import check_users_presence, UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
@@ -96,7 +96,8 @@ def delete(state: State, username: str, purge: bool):
                 handle_error(logger, Texts.PURGE_ERROR_MSG, Texts.PURGE_ERROR_MSG)
 
         # CAN-616 - wait until user has been really deleted
-        with yaspin(text=Texts.DELETION_VERIFICATION_OF_DELETING, color=SPINNER_COLOR) as spinner:
+        with yaspin(spinner=DlsctlSpinner, text=Texts.DELETION_VERIFICATION_OF_DELETING,
+                    color=SPINNER_COLOR) as spinner:
             for i in range(60):
                     user_state = check_users_presence(username)
 

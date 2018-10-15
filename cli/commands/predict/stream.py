@@ -26,7 +26,7 @@ import click
 import requests
 from yaspin import yaspin
 
-from cli_state import common_options, pass_state, State
+from cli_state import common_options, pass_state, State, DlsctlSpinner
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key
@@ -83,7 +83,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
     try:
         api_key = get_api_key()
         headers = {'Authorization': api_key, 'Accept': 'application/json', 'Content-Type': 'application/json'}
-        with yaspin(text=Texts.WAITING_FOR_RESPONSE_MSG, color=SPINNER_COLOR):
+        with yaspin(spinner=DlsctlSpinner, text=Texts.WAITING_FOR_RESPONSE_MSG, color=SPINNER_COLOR):
             stream_response = requests.post(stream_url, data=json.dumps(stream_data), verify=False, headers=headers)
         stream_response.raise_for_status()
         click.echo(stream_response.text)

@@ -33,6 +33,7 @@ from marshmallow import ValidationError
 from yaspin import yaspin
 
 import draft.cmd as cmd
+from cli_state import DlsctlSpinner
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
@@ -210,7 +211,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         raise SubmitExperimentError(message)
 
     try:
-        with yaspin(text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG, color=SPINNER_COLOR):
+        with yaspin(spinner=DlsctlSpinner, text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG, color=SPINNER_COLOR):
             experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
                                                                                    namespace=namespace, name=name,
                                                                                    run_kind=run_kind)
@@ -240,7 +241,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                 if get_current_os() in (OS.WINDOWS, OS.MACOS):
                     # noinspection PyBroadException
                     try:
-                        with yaspin(text=Texts.CLUSTER_CONNECTION_MSG, color=SPINNER_COLOR):
+                        with yaspin(spinner=DlsctlSpinner, text=Texts.CLUSTER_CONNECTION_MSG, color=SPINNER_COLOR):
                             socat.start(proxy.tunnel_port)
                     except Exception:
                         error_msg = Texts.LOCAL_DOCKER_TUNNEL_ERROR_MSG
@@ -329,7 +330,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
                     run.state = RunStatus.QUEUED
-                    with yaspin(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name), color=SPINNER_COLOR):
+                    with yaspin(spinner=DlsctlSpinner, text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name),
+                                color=SPINNER_COLOR):
                         # Add Run object with runKind label and pack params as annotations
                         runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
                                          annotations={pack_param_name: pack_param_value
@@ -372,7 +374,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg) from exe
     finally:
-        with yaspin(text=Texts.CLUSTER_CONNECTION_CLOSING_MSG, color=SPINNER_COLOR):
+        with yaspin(spinner=DlsctlSpinner, text=Texts.CLUSTER_CONNECTION_CLOSING_MSG, color=SPINNER_COLOR):
             # noinspection PyBroadException
             try:
                 socat.stop()
@@ -453,7 +455,8 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     try:
         # check environment directory
         check_run_environment(run_folder)
-        with yaspin(text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name), color=SPINNER_COLOR):
+        with yaspin(spinner=DlsctlSpinner, text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name),
+                    color=SPINNER_COLOR):
             # create an environment
             create_environment(run_name, local_script_location, script_folder_location)
             # generate draft's data

@@ -32,7 +32,7 @@ from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
 from platform_resources.run_model import Run
 from platform_resources.runs import list_runs
-from cli_state import common_options, pass_state, State
+from cli_state import common_options, pass_state, State, DlsctlSpinner
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
@@ -159,7 +159,8 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
 
     if click.confirm(confirmation_message, default=True):
         try:
-            with open(filename, 'w') as file, yaspin(Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
+            with open(filename, 'w') as file, yaspin(spinner=DlsctlSpinner,
+                                                     text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
                 for log_entry in run_logs_generator:
                     if not log_entry.content.isspace():
                         formatted_date = format_log_date(log_entry.date)
