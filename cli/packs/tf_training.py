@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 from typing import Tuple, List, Optional
+import jinja2
 
 import docker
 import docker.errors
@@ -137,19 +138,26 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
 
-    with open(values_yaml_filename, "r") as values_yaml_file:
-        v = yaml.load(values_yaml_file)
 
-        if "commandline" in v:
-            v["commandline"]["args"] = common.prepare_script_paramaters(script_parameters, script_location)
-        v["experimentName"] = experiment_name
-        v["registry_port"] = str(cluster_registry_port)
-        v["image"]["clusterRepository"] = f'127.0.0.1:{cluster_registry_port}/{run_name}'
-        regex = re.compile("^\[.*|^\{.*")
+    
+    with open(values_yaml_filename, "r") as values_yaml_file:
+        
+        template = jinja2.Template(values_yaml_file.read())
+
+        rendered_values = template.render(DLS4e = {
+            'ExperimentName' : experiment_name,
+            'CommandLine' : common.prepare_script_paramaters(script_parameters, script_location),
+            'RegistryPort' : str(cluster_registry_port),
+            'ExperimentImage' : f'127.0.0.1:{cluster_registry_port}/{run_name}',
+            'ImageRepository' : f'127.0.0.1:{cluster_registry_port}'
+        })
+    
+        v = yaml.load(rendered_values)
 
         workersCount = None
         pServersCount = None
 
+        regex = re.compile("^\[.*|^\{.*")
         for key, value in pack_params:
             if re.match(regex, value):
                 try:

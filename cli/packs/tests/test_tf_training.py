@@ -25,7 +25,7 @@ import pytest
 import packs.tf_training as tf_training
 
 
-SCRIPT_PARAMETERS = "--param1=value1 -param2=value2 param3=value3"
+SCRIPT_PARAMETERS = ["--param1=value1", "-param2=value2", "param3=value3"]
 PACK_PARAMETERS = [("key1", "val1"), ("key2", "['a', 'b']"), ("workersCount", "2")]
 SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
@@ -33,12 +33,16 @@ ENV_VARIABLES = ("A=B", "C=D")
 
 ENV_VARIABLES_OUTPUT = [{'name': 'A', 'value': 'B'}, {'name': 'C', 'value': 'D'}]
 TEST_POD_COUNT = 4
-TEST_YAML_FILE = f'''replicaCount: 2
+TEST_YAML_FILE = r'''replicaCount: 2
 image:
   pullPolicy: IfNotPresent
 commandline:
   args:
-  - param4=value4
+{% for arg in DLS4e.CommandLine %}
+    - {{ arg }}
+{% endfor %}
+
+experimentName: {{ DLS4e.ExperimentName }}
 resources:
   limits:
     cpu: 100m
@@ -57,6 +61,27 @@ image:
   pullPolicy: IfNotPresent
 commandline:
   args:
+{{% for arg in DLS4e.CommandLine %}}
+  - {{{{ arg }}}}
+{{% endfor %}}
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+ingress:
+  enabled: false
+workersCount: 3
+pServersCount: 1
+'''
+
+TEST_YAML_FILE_WITH_POD_COUNT = f'''replicaCount: 2
+image:
+  pullPolicy: IfNotPresent
+commandline:
+  args:
   - param4=value4
 resources:
   limits:
@@ -67,6 +92,7 @@ resources:
     memory: 128Mi
 ingress:
   enabled: false
+podCount: {TEST_POD_COUNT}
 workersCount: 3
 pServersCount: 1
 '''
@@ -102,6 +128,7 @@ def test_modify_values_yaml(mocker):
     assert 'key1' and 'key2' in output
     assert output['key1'] == 'val1'
     assert output['key2'] == ["a", "b"]
+    assert output['experimentName'] == 'test-experiment'
 
     assert output['env'] == ENV_VARIABLES_OUTPUT
 
@@ -228,6 +255,6 @@ def test_update_configuration_failure(mocker):
 
 
 def test_get_pod_count(mocker):
-    mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
+    mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE_WITH_POD_COUNT)
     pod_count = tf_training.get_pod_count(run_folder=EXPERIMENT_FOLDER, pack_type=EXAMPLE_PACK_TYPE)
     assert pod_count == TEST_POD_COUNT

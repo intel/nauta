@@ -12,7 +12,7 @@ containerPort: 8500
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: ''
+  clusterRepository: {{ DLS4e.ExperimentImage }}
 
 workersCount: 1
 
@@ -21,7 +21,7 @@ resources:
     cpu: 0.01
     memory: 1Gi
 
-experimentName: ''
+experimentName: {{ DLS4e.ExperimentName }} 
 podCount: 2
 
 logLevel: 'INFO'
