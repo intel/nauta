@@ -110,6 +110,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.6.tar.gz
         dest: kubernetes.tar.gz
         checksum: d91a77a65199f835ad68372fabd99a1f764ec59d9bde222c74224c1bf976ab20
+  shared/build/heapster:
+    version: "v1.4.3"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/heapster"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/heapster/heapster-v1.4.3.tar.gz
+        dest: heapster-v1.4.3.tar.gz
+        checksum: 5a0e6fa74c8602d466338eb881af3bf4260940291e3eeb130e0ef9136c821f6c
   shared/build/tiller:
     version: "v2.9.1"
     required:

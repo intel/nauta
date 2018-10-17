@@ -36,9 +36,12 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/tiller"
   core/heapster:
-    version: "v1.4.2"
-    image: "k8s.gcr.io/heapster-amd64:v1.4.2"
-    method: "pull"
+    version: "v1.4.3"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/heapster"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/heapster"
   core/defaultbackend:
     version: "1.4"
     required:
