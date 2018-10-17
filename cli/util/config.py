@@ -62,8 +62,8 @@ class Config:
         if not hasattr(self, 'config_path'):
             self.config_path = self.get_config_path()
 
-    @classmethod
-    def get_config_path(self) -> str:
+    @staticmethod
+    def get_config_path() -> str:
         binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), DLS_CTL_CONFIG_DIR_NAME)
         user_local_config_dir_path = os.path.join(os.path.expanduser('~'), DLS_CTL_CONFIG_DIR_NAME)
 

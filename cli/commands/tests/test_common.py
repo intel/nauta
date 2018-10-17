@@ -19,6 +19,8 @@
 # and approved by Intel in writing.
 #
 
+import dateutil
+
 from commands import common
 from platform_resources.run_model import Run, RunStatus
 from platform_resources.experiment_model import Experiment
@@ -157,6 +159,7 @@ def test_list_experiments_failure(mocker):
 
 def test_list_experiments_one_user_success(mocker, capsys):
     api_list_runs_mock = mocker.patch("commands.common.runs_api.list_runs")
+    mocker.patch("dateutil.tz.tzlocal").return_value = dateutil.tz.UTC
     api_list_runs_mock.return_value = TEST_RUNS
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
@@ -168,8 +171,8 @@ def test_list_experiments_one_user_success(mocker, capsys):
 
     captured = capsys.readouterr()
 
-    assert "2018-04-26 15:43:01" not in captured.out
-    assert "2018-05-08 15:05:04" in captured.out
+    assert "2018-04-26 13:43:01" not in captured.out
+    assert "2018-05-08 13:05:04" in captured.out
     assert "Parameters" not in captured.out
     assert "Owner" in captured.out
     assert get_namespace_mock.call_count == 0

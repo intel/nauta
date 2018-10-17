@@ -660,3 +660,11 @@ class CliStateTexts:
                                   "sure that the k8s cluster is online."
     DLSCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for dlsctl is not set."
     DLSCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
+
+
+class LicenseAcceptanceTexts:
+    LICENSE_ACCEPTANCE_QUESTION_MSG = "DO NOT ACCESS, COPY OR PERFORM ANY PORTION OF THE PRE-RELEASE SOFTWARE " \
+                                      "UNTIL YOU HAVE READ AND ACCEPTED THE TERMS AND CONDITIONS OF THIS " \
+                                      "AGREEMENT LICENSE.TXT . BY COPYING, ACCESSING, OR PERFORMING " \
+                                      "THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND " \
+                                      "CONDITIONS OF THIS AGREEMENT. Agree?"
