@@ -78,6 +78,7 @@ local_images:
     version: "18.03.1-ce"
     required:
       BASE_IMAGE: "shared/centos/rpm-packer"
+      DATA_IMAGE: "shared/build/docker"
     method: build
     directory: "{{ playbook_dir }}/../../rpm-containers/docker"
     push: False
@@ -85,9 +86,6 @@ local_images:
       - src: /out/*
         dest: rpms
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.06.1.ce-3.el7.x86_64.rpm
-        dest: docker-ce-18.06.1.ce-3.el7.x86_64.rpm
-        checksum: 352909b3df327d10a6ee27e2c6ee8638d90481ee93580ae79c9d1ff7530a196e
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/pigz-2.3.3-1.el7.centos.x86_64.rpm
         dest: pigz-2.3.3-1.el7.centos.x86_64.rpm
         checksum: b95f8ffa8beae245197eda2b019cfbe05480ae6bc9c0e860bc54d58522f6b522

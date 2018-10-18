@@ -147,6 +147,23 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes-addons"
     push: False
+  shared/build/docker:
+    version: "v18.06.0"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/docker"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/container-selinux-2.66-1.el7.noarch.rpm
+        dest: container-selinux-2.66-1.el7.noarch.rpm
+        checksum: ae35c1cd94b6c54c3678526ac6527d69c80453a8574b223bd6a6cbf9c5cc9134
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
+        dest: docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
+        checksum: 994c76793afde01ae467ead3aef7ad30369dbd9447b2752f62bb251e6f0a24ba
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
+        dest: docker-ce-18.06.0.ce-3.el7.centos.src.rpm
+        checksum: 2926f66a94f5b3bcd1e3feb0d7107f2fd2713cf3f412f84dcc8fe89120c43392
   shared/build/nginx:
     version: "v1.13.9"
     required:
