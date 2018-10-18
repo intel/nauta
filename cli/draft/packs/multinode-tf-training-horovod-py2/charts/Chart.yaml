@@ -5,7 +5,7 @@ home: https://eng.uber.com/horovod/
 maintainers:
 - email: cheyang@163.com
   name: cheyang
-name: horovod-py3
+name: multinode-tf-training-horovod-py2
 sources:
 - https://github.com/uber/horovod
 - https://github.com/uber/horovod/blob/master/docs/docker.md

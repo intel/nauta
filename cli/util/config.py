@@ -126,7 +126,8 @@ class DLS4EConfigMap:
     PLATFORM_VERSION = 'platform.version'
     PY2_IMAGE_NAME = 'image.tensorflow_1.9_py2'
     PY3_IMAGE_NAME = 'image.tensorflow_1.9_py3'
-    HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
+    PY2_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod_py2'
+    PY3_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
 
     __shared_state = {}
 
@@ -143,4 +144,5 @@ class DLS4EConfigMap:
             self.platform_version = config_map_data.get(self.PLATFORM_VERSION)
             self.py2_image_name = config_map_data.get(self.PY2_IMAGE_NAME)
             self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)
-            self.horovod_image_name = config_map_data.get(DLS4EConfigMap.HOROVOD_IMAGE_CONFIG_KEY)
+            self.py2_horovod_image_name = config_map_data.get(DLS4EConfigMap.PY2_HOROVOD_IMAGE_CONFIG_KEY)
+            self.py3_horovod_image_name = config_map_data.get(DLS4EConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)
