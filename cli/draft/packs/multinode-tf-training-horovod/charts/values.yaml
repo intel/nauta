@@ -67,3 +67,5 @@ resources:
 
 # Number of physical processors that will be used by Horovod
 cpus: 20
+
+processesPerSocket: 2

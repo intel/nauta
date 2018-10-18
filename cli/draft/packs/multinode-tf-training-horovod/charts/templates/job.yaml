@@ -88,7 +88,7 @@ spec:
         args:
           - >
             mpiexec --hostfile {{- if .Values.useHostNetwork }} /horovod/init/hostfile {{ else }} /horovod/generated/hostfile {{- end }}
-            -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe -n {{ .Values.workersCount | add 1 }}
+            -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe -n {{ .Values.workersCount | add 1 | mul .Values.processesPerSocket }}
             {{- range .Values.master.env }} -x {{ .name }} {{- end }}
             --mca orte_keep_fqdn_hostnames t --allow-run-as-root --display-map --tag-output --timestamp-output
             {{- if .Values.useHostNetwork }} --mca btl_tcp_if_include em1 {{- end }}
