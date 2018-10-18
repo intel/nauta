@@ -68,7 +68,7 @@ def unify_units(name: str, value: str) -> str:
                 value = str(int(value)) + "m"
             else:
                 value = str(value) + "m"
-    elif name == "mem":
+    elif name == "memory":
         value = add_bytes_to_unit(value)
     return f'{name}: {value}\n'
 

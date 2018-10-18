@@ -203,25 +203,25 @@ def test_unify_units():
         assert check['expected'] in resource_values
 
     for check in mem_checks:
-        resource_values = view.unify_units("mem", check['test'])
+        resource_values = view.unify_units("memory", check['test'])
         assert check['expected'] in resource_values
 
 
 def test_container_resources_to_msg():
     resources = MagicMock()
 
-    resources.requests = {'cpu': '1.0', 'mem': '1Gi'}
-    resources.limits = {'cpu': '4000m', 'mem': '2gi'}
+    resources.requests = {'cpu': '1.0', 'memory': '1Gi'}
+    resources.limits = {'cpu': '4000m', 'memory': '2gi'}
 
     msg = view.container_resources_to_msg(resources=resources)
 
     assert Texts.CONTAINER_REQUESTS_LIST_HEADER.format("") in msg
     assert 'cpu: 1000m' in msg
-    assert f'mem: {resources.requests["mem"]}B' in msg
+    assert f'memory: {resources.requests["memory"]}B' in msg
 
     assert '- Limits:' in msg
     assert f'cpu: {resources.limits["cpu"]}' in msg
-    assert f'mem: {resources.limits["mem"]}' in msg
+    assert f'memory: {resources.limits["memory"]}' in msg
 
 
 def test_sum_cpu_resources_empty_list():
