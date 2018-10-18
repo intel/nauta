@@ -11,7 +11,12 @@
   register: node_access
   ignore_errors: True
 
-- name: "{{ message_label }} Fail if node is not accessible or system is not supported"
+- name: "{{ message_label }} Fail if node is not accessible (check suggestions)"
+  debug:
+    msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - please check your network settings"
+  when: node_access is failed
+
+- name: "{{ message_label }} Fail if node is not accessible"
   fail:
     msg: "Unable to connect via ssh to host {{ ansible_ssh_host | default(ansible_host) }} - {{ node_access.msg }}"
   when: node_access is failed
@@ -24,7 +29,7 @@
 
 - name: "{{ message_label }} Fail if we are not able to get system version"
   fail:
-    msg: Unable to check system - check supported systems list
+    msg: "Cannot find python on node {{ ansible_ssh_host | default(ansible_host) }} - please check system requirements"
   when: python_exists is changed
 
 - name: "{{ message_label }} Collect facts"
