@@ -20,7 +20,8 @@
 #
 
 from sys import exit
-from typing import Tuple, List
+import textwrap
+from typing import Tuple, List, Optional
 import os
 
 import click
@@ -82,6 +83,10 @@ def clean_script_parameters(ctx: click.Context, param, value: Tuple[str, ...]):
     return tuple(new_value)
 
 
+def format_run_message(run_message: Optional[str]) -> str:
+    return textwrap.fill(run_message, width=60) if run_message else ''
+
+
 @click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
@@ -133,7 +138,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # display information about status of a training
     click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
-                          run.cli_representation.status, run.message) for run in runs_list],
+                          run.cli_representation.status, format_run_message(run.message)) for run in runs_list],
                         headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
 
     # if there is at least one FAILED experiment - application has to return exit code != 0
