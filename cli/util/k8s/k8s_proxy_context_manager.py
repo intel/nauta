@@ -82,12 +82,13 @@ class K8sProxy:
 
     @staticmethod
     def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
-        for _ in range(tries):
+        for retry in range(tries):
             try:
                 requests.get(f'http://{address}:{port}')
                 return
             except ConnectionError as e:
-                logger.error(f'can not connect to {address}:{port}. Error: {e}')
+                error_msg = f'can not connect to {address}:{port}. Error: {e}'
+                logger.exception(error_msg) if retry == tries-1 else logger.debug(error_msg)
                 time.sleep(1)
         raise TunnelSetupError(Texts.TUNNEL_NOT_READY_ERROR_MSG.format(address=address, port=port))
 
