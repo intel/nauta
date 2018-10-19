@@ -36,6 +36,7 @@ ifeq (Windows,$(OS))
 	@7z x draft.7z -odist/config/
 	@rm -f draft.7z
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
+	@cp -Rf draft/packs/* dist/config/.draft/packs/
 endif
 ifeq (Linux,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
@@ -45,6 +46,10 @@ ifeq (Linux,$(OS))
 	@mkdir dist/config/
 	@tar -zxf draft.tar.gz -C dist/config/
 	@rm -f draft.tar.gz
+	@mkdir dist/config/packs/
+	@cp -Rf draft/packs/* dist/config/packs/
+	@rm -rf dist/config/.draft/packs
+	@cd dist/config/.draft && ln -s ../packs packs
 endif
 ifeq (Darwin,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
@@ -53,13 +58,13 @@ ifeq (Darwin,$(OS))
 	@tar -zxf draft.tar.gz -C dist/config/
 	@rm -f draft.tar.gz
 	@curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
-endif
-
-
 	@mkdir dist/config/packs/
 	@cp -Rf draft/packs/* dist/config/packs/
 	@rm -rf dist/config/.draft/packs
 	@cd dist/config/.draft && ln -s ../packs packs
+endif
+
+
 	@cp -Rf ../dls4e-user dist/config/
 	@mkdir -p dist/lib/
 	@mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
