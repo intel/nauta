@@ -100,7 +100,7 @@ def verify(state: State):
         except FileNotFoundError:
             handle_error(logger, Texts.DEPENDENCY_NOT_INSTALLED_ERROR_MSG.format(dependency_name=dependency_name),
                          Texts.DEPENDENCY_NOT_INSTALLED_ERROR_MSG.format(dependency_name=dependency_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg="client" not in dependency_name)
             exit(1)
         except (RuntimeError, ValueError, TypeError):
             handle_error(logger, Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),

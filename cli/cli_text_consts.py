@@ -77,7 +77,8 @@ class VerifyCmdTexts:
     INVALID_VERSION_WARNING_MSG = "Warning: the installed version of {dependency_name} ({installed_version}) is " \
                                   "not supported, supported version {supported_versions_sign} " \
                                   "{expected_version}"
-    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed."
+    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed. Check installation manual for more " \
+                                         "information."
     DEPENDENCY_VERSION_CHECK_ERROR_MSG = "Failed to get {dependency_name} version."
     DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG = "{dependency_name} - exception during verification."
     OS_SUPPORTED_MSG = "This OS is supported."
