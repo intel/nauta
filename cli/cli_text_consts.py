@@ -157,7 +157,9 @@ class UserDeleteCmdTexts:
 
 
 class LaunchCmdTexts:
-    HELP = "Command for launching web user-interface or tensorboard."
+    HELP = "Command for launching web user-interface or tensorboard. It works as process in the system console " \
+           "until user does not stop it. If process should be run as background process, please add '&' at the end " \
+           "of line"
     HELP_P = "Port on which service will be exposed locally."
     HELP_N = "Run command without a web browser starting, only proxy tunnel is created"
     WEBUI_HELP = "Subcommand for launching webUI with credentials"
