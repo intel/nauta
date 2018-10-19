@@ -102,9 +102,10 @@ def test_generate_kubeconfig():
 
 
 def test_delete_helm_release_success(mocker):
-    esc_mock = mocker.patch("util.helm.execute_system_command",
-                            return_value=(f"release \"{test_username}\" deleted", 0,
-                                          f"release \"{test_username}\" deleted"))
+    esc_mock = mocker.patch("util.helm.execute_system_command")
+
+    esc_mock.side_effect = [(f"release \"{test_username}\" deleted", 0, f"release \"{test_username}\" deleted"),
+                            (f"release: \"{test_username}\" not found", 0, f"release: \"{test_username}\" not found")]
 
     delete_helm_release(test_username)
 

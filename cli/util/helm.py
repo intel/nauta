@@ -63,6 +63,7 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
 
     output, err_code, log_output = execute_system_command(delete_release_command)
 
-    if err_code or f"release \"{release_name}\" deleted" not in output:
+    if (f"release \"{release_name}\" deleted" not in output and
+            f"release: \"{release_name}\" not found" not in output):
         logger.error(log_output)
         raise RuntimeError(Texts.HELM_RELEASE_REMOVAL_ERROR_MSG.format(release_name=release_name))
