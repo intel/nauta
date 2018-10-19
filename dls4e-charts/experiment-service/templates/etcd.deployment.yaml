@@ -59,6 +59,7 @@ spec:
         - http://0.0.0.0:2379
         - --advertise-client-urls
         - http://localhost:2379
+        - --quota-backend-bytes=429496729600
         ports:
         - containerPort: 2379
         volumeMounts:

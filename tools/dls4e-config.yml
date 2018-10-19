@@ -310,6 +310,7 @@ subcharts:
       chart_values:
         service_image: "{{ image_local_url['dls4e/experiment-service'] }}"
         etcd_image: "{{ image_local_url['dls4e/etcd'] }}"
+        etcd_gc_image: "{{ image_local_url['dls4e/kubectl'] }}"
     tf:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../dls4e-charts/tf"
