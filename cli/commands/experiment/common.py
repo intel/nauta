@@ -20,6 +20,7 @@
 #
 
 from collections import namedtuple
+from distutils.dir_util import copy_tree
 import itertools
 import os
 import shutil
@@ -132,13 +133,6 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     # create a folder for experiment's purposes
     run_environment_path = get_run_environment_path(experiment_name)
     folder_path = os.path.join(run_environment_path, FOLDER_DIR_NAME)
-    # copy folder content
-    if folder_location:
-        try:
-            shutil.copytree(folder_location, folder_path)
-        except Exception:
-            log.exception("Create environment - copying training folder error.")
-            raise SubmitExperimentError(message_prefix.format(reason=Texts.DIR_CANT_BE_COPIED_ERROR_TEXT))
 
     try:
         if not os.path.exists(folder_path):
@@ -146,6 +140,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     except Exception:
         log.exception("Create environment - creating experiment folder error.")
         raise SubmitExperimentError(message_prefix.format(reason=Texts.EXP_DIR_CANT_BE_CREATED))
+
     # create a semaphore saying that experiment is under submission
     Path(os.path.join(run_environment_path, EXP_SUB_SEMAPHORE_FILENAME)).touch()
 
@@ -153,9 +148,19 @@ def create_environment(experiment_name: str, file_location: str, folder_location
     if file_location:
         try:
             shutil.copy2(file_location, folder_path)
+            if get_current_os() == OS.WINDOWS:
+                os.chmod(os.path.join(folder_path, os.path.basename(file_location)), 0o666)
         except Exception:
             log.exception("Create environment - copying training script error.")
             raise SubmitExperimentError(message_prefix.format(reason=Texts.TRAINING_SCRIPT_CANT_BE_CREATED))
+
+    # copy folder content
+    if folder_location:
+        try:
+            copy_tree(folder_location, folder_path)
+        except Exception:
+            log.exception("Create environment - copying training folder error.")
+            raise SubmitExperimentError(message_prefix.format(reason=Texts.DIR_CANT_BE_COPIED_ERROR_TEXT))
 
     log.debug("Create environment - end")
     return run_environment_path

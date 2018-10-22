@@ -78,9 +78,10 @@ def test_delete_environment(config_mock, mocker):
 def test_create_environment_success(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     mocker.patch("os.makedirs")
+    mocker.patch("os.chmod")
     sem_file_creation_mock = mocker.patch("commands.experiment.common.Path.touch")
     sh_copy_mock = mocker.patch("shutil.copy2")
-    sh_copytree_mock = mocker.patch("shutil.copytree")
+    sh_copytree_mock = mocker.patch("commands.experiment.common.copy_tree")
 
     experiment_path = create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
@@ -95,26 +96,26 @@ def test_create_environment_makedir_error(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
     sh_copy_mock = mocker.patch("shutil.copy2")
-    sh_copytree_mock = mocker.patch("shutil.copytree")
+    copytree_mock = mocker.patch("commands.experiment.common.copy_tree")
 
     with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
-    assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
+    assert copytree_mock.call_count == 0, "additional folder was copied"
     assert sh_copy_mock.call_count == 0, "files were copied"
 
 
-def test_create_environment_lack_of_home_folder(config_mock, mocker):
+def test_create_environment_lack_of_home_folder_error(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
-    os_mkdirs_mock = mocker.patch("os.makedirs")
+    os_mkdirs_mock = mocker.patch("os.makedirs", side_effect=RuntimeError())
     sh_copy_mock = mocker.patch("shutil.copy2")
 
     with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
-    assert os_pexists_mock.call_count == 0, "existence of an experiment's folder was checked"
-    assert os_mkdirs_mock.call_count == 0, "experiment's folder was created"
+    assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
+    assert os_mkdirs_mock.call_count == 1, "experiment's folder was created"
     assert sh_copy_mock.call_count == 0, "files were copied"
 
 
@@ -122,13 +123,13 @@ def test_create_environment_copy_error(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     mocker.patch("os.makedirs")
     sh_copy_mock = mocker.patch("shutil.copy2", side_effect=Exception("Test exception"))
-    sh_copytree_mock = mocker.patch("shutil.copytree")
+    copytree_mock = mocker.patch("commands.experiment.common.copy_tree")
     mocker.patch("commands.experiment.common.Path.touch")
 
     with pytest.raises(SubmitExperimentError):
         create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, EXPERIMENT_FOLDER)
 
-    assert sh_copytree_mock.call_count == 1, "additional folder wan't copied"
+    assert copytree_mock.call_count == 0, "additional folder was copied"
     assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
     assert sh_copy_mock.call_count == 1, "files were copied"
 
