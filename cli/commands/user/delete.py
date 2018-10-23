@@ -103,7 +103,8 @@ def delete(state: State, username: str, purge: bool):
 
                     user_del_cm_content = get_config_map_data(name=USER_DEL_CM, namespace=DLS4E_NAMESPACE,
                                                               request_timeout=1)
-                    if (not user_state or user_state == UserState.NOT_EXISTS) and not user_del_cm_content.get(username):
+                    if (not user_state or user_state == UserState.NOT_EXISTS) and \
+                            (not user_del_cm_content or not user_del_cm_content.get(username)):
                         break
                     time.sleep(1)
             else:
