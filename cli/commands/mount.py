@@ -59,6 +59,19 @@ def mount(state: State):
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
+    click.echo()
+    click.echo(Texts.UNMOUNT_COMMAND_MSG)
+    click.echo(get_unmount_command())
+
+
+def get_unmount_command() -> str:
+    if platform.system() == 'Linux':
+        return get_unmount_command_linux()
+    elif platform.system() == 'Windows':
+        return get_unmount_command_windows()
+    else:  # OSX
+        return get_unmount_command_osx()
+
 
 def get_mount_command() -> str:
     adr = get_kubectl_host(with_port=False)
@@ -78,9 +91,21 @@ def get_mount_command_linux(usr: str, psw: str, adr: str) -> str:
     return f"sudo mount.cifs -o username={usr},password={psw},rw,uid={usr_id} //{adr}/<DLS4E_FOLDER> <MOUNTPOINT>"
 
 
+def get_unmount_command_linux() -> str:
+    return f"sudo umount <MOUNTPOINT>"
+
+
 def get_mount_command_windows(usr: str, psw: str, adr: str) -> str:
-    return f"net use \\\\{adr}\\<DLS4E_FOLDER> /user:{usr} {psw}"
+    return f"net use <MOUNTPOINT> \\\\{adr}\\<DLS4E_FOLDER> /user:{usr} {psw}"
+
+
+def get_unmount_command_windows() -> str:
+    return f"net use <MOUNTPOINT> /d"
 
 
 def get_mount_command_osx(usr: str, psw: str, adr: str) -> str:
     return f"mount_smbfs //'{usr}:{psw}'@{adr}/<DLS4E_FOLDER> <MOUNTPOINT>"
+
+
+def get_unmount_command_osx() -> str:
+    return f"umount <MOUNTPOINT>"

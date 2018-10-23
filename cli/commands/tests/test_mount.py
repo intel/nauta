@@ -23,7 +23,8 @@ import platform
 
 from click.testing import CliRunner
 
-from commands.mount import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mount
+from commands.mount import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mount, \
+    get_unmount_command_linux, get_unmount_command_windows, get_unmount_command_osx
 from cli_text_consts import MountCmdTexts as Texts
 
 
@@ -33,10 +34,13 @@ TEST_ADR = "test_address"
 
 CORRECT_LINUX_MOUNT = f"sudo mount.cifs -o username={TEST_USR},password=" \
                       f"{TEST_PSW},rw,uid=10001 //{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
+CORRECT_LINUX_UNMOUNT = "sudo umount <MOUNTPOINT>"
 
-CORRECT_WINDOWS_MOUNT = f"net use \\\\{TEST_ADR}\\<DLS4E_FOLDER> /user:{TEST_USR} {TEST_PSW}"
+CORRECT_WINDOWS_MOUNT = f"net use <MOUNTPOINT> \\\\{TEST_ADR}\\<DLS4E_FOLDER> /user:{TEST_USR} {TEST_PSW}"
+CORRECT_WINDOWS_UNMOUNT = "net use <MOUNTPOINT> /d"
 
 CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
+CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT>"
 
 
 def test_get_mount_command_linux(mocker):
@@ -63,6 +67,25 @@ def test_get_mount_command_osx(mocker):
     assert mount == CORRECT_OSX_MOUNT
 
 
+def test_get_unmount_command_linux(mocker):
+    # os library doesn't have getuid function on Windows
+    unmount = get_unmount_command_linux()
+
+    assert unmount == CORRECT_LINUX_UNMOUNT
+
+
+def test_get_unmount_command_windows(mocker):
+    unmount = get_unmount_command_windows()
+
+    assert unmount == CORRECT_WINDOWS_UNMOUNT
+
+
+def test_get_unmount_command_osx(mocker):
+    unmount = get_unmount_command_osx()
+
+    assert unmount == CORRECT_OSX_UNMOUNT
+
+
 def test_mount(mocker):
     host_system = platform.system()
 
@@ -81,6 +104,7 @@ def test_mount(mocker):
         result = runner.invoke(mount)
 
         assert CORRECT_LINUX_MOUNT in result.output
+        assert CORRECT_LINUX_UNMOUNT in result.output
         assert os_getuid_mock.call_count == 1
 
     mocker.patch("platform.system", return_value="Windows")
@@ -88,12 +112,14 @@ def test_mount(mocker):
     result = runner.invoke(mount)
 
     assert CORRECT_WINDOWS_MOUNT in result.output
+    assert CORRECT_WINDOWS_UNMOUNT in result.output
 
     mocker.patch("platform.system", return_value="OSX")
 
     result = runner.invoke(mount)
 
     assert CORRECT_OSX_MOUNT in result.output
+    assert CORRECT_OSX_UNMOUNT in result.output
 
     if host_system != 'Windows':
         call_number = 3

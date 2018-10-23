@@ -37,28 +37,27 @@ class VersionCmdTexts:
 
 class MountCmdTexts:
     HELP = "Displays a command that can be used to mount client's folders on his/her local machine."
-    MAIN_MSG = """
-                Use the following command to mount those folders:
-                 - replace <MOUNTPOINT> with a proper location on your local machine)
-                 - replace <DLS4E_FOLDER> with one of the following:
-                        - input - User's private input folder (read/write)
-                          (can be accessed as /mnt/input/home from training script).
-                        - output - User's private output folder (read/write)
-                          (can be accessed as /mnt/output/home from training script).
-                        - input-shared - Shared input folder (read/write)
-                          (can be accessed as /mnt/input/root/public from training script).
-                        - output-shared - Shared output folder (read/write)
-                          (can be accessed as /mnt/output/root/public from training script).
-                        - input-output-ro - Full input and output directories, read only.
-                Additionally, each experiment has a special folder that can be accessed
-                as /mnt/output/experiment from training script. This folder is shared by Samba
-                as output/<EXPERIMENT_NAME>.
-                --------------------------------------------------------------------
-                """
+    MAIN_MSG = """Use the following command to mount those folders:
+ - replace <MOUNTPOINT> with a proper location on your local machine)
+ - replace <DLS4E_FOLDER> with one of the following:
+        - input - User's private input folder (read/write)
+          (can be accessed as /mnt/input/home from training script).
+        - output - User's private output folder (read/write)
+          (can be accessed as /mnt/output/home from training script).
+        - input-shared - Shared input folder (read/write)
+          (can be accessed as /mnt/input/root/public from training script).
+        - output-shared - Shared output folder (read/write)
+          (can be accessed as /mnt/output/root/public from training script).
+        - input-output-ro - Full input and output directories, read only.
+Additionally, each experiment has a special folder that can be accessed
+as /mnt/output/experiment from training script. This folder is shared by Samba
+as output/<EXPERIMENT_NAME>.
+--------------------------------------------------------------------"""
     USER_IS_ADMIN_ERROR_MSG = "DLS4E doesn't create shares for administrators. Please execute this command as a " \
                               "regular user."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
+    UNMOUNT_COMMAND_MSG = "Use following command to unmount previously mounted folder:"
 
 
 class CmdsCommonTexts:
