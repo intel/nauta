@@ -494,8 +494,7 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural='pods',
-                operation_word=Texts.DELETE_OPERATION["deletion"] if experiment_name_plural == 'pods'
-                else Texts.CANCEL_OPERATION["cancellation"]
+                operation_word=Texts.DELETE_OPERATION["deletion"]
             )
         )
         exit(0)
