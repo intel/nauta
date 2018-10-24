@@ -42,7 +42,7 @@
   </v-btn>
   <v-dialog
     v-model="showColumnMgmtModal"
-    max-width="320px"
+    max-width="295px"
   >
       <v-card>
         <v-card-title>
@@ -57,12 +57,19 @@
                 <div id="options" class="scroll-y">
                   <div v-for="header in customizableVisibilityColumns" v-bind:key="header" class="option">
                     <v-icon
-                      :id="header + '_on'"
-                      class="pointer-btn"
-                      :color="isHidden(header) ? 'grey lighten-3' : 'success'"
-                      v-on:click="showColumn(header)"
-                    >
-                      done
+                      :id="header + '_switch'"
+                      v-if="!isHidden(header)"
+                      color="success"
+                      v-on:click="switchColumn(header)"
+                      class="pointer-btn">
+                      check_circle
+                    </v-icon>
+                    <v-icon
+                      :id="header + '_switch'"
+                      v-if="isHidden(header)"
+                      v-on:click="switchColumn(header)"
+                      class="pointer-btn">
+                      panorama_fish_eye
                     </v-icon>
                     <v-tooltip bottom class="label-box">
                       <span slot="activator" v-on:click="showColumn(header)">
@@ -70,14 +77,6 @@
                       </span>
                       <span>{{ getLabel(header) }}</span>
                     </v-tooltip>
-                    <v-icon
-                      :id="header + '_off'"
-                      class="pointer-btn"
-                      :color="isHidden(header) ? 'grey lighten-3' : 'grey darken-2'"
-                      v-on:click="hideColumn(header)"
-                    >
-                      delete
-                    </v-icon>
                   </div>
                 </div>
               </v-flex>
@@ -139,13 +138,14 @@ export default {
       this.setVisibleColumnsHandler([]);
       this.showColumnMgmtModal = false;
     },
-    showColumn: function (name) {
-      this.draft.push(name);
-    },
-    hideColumn: function (name) {
-      this.draft = this.draft.filter((column) => {
-        return column !== name;
-      });
+    switchColumn: function (name) {
+      if (this.draft.includes(name)) {
+        this.draft = this.draft.filter((item) => {
+          return item !== name;
+        });
+      } else {
+        this.draft.push(name);
+      }
     },
     isHidden: function (name) {
       return !this.draft.includes(name);

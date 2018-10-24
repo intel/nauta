@@ -84,13 +84,13 @@ describe('VUE components ActionHeaderButtons', () => {
   });
 
   it('Should add to draft if visible', function () {
-    wrapper.vm.showColumn('test');
+    wrapper.vm.switchColumn('test');
     expect(wrapper.vm.draft.includes('test')).to.equal(true);
   });
 
   it('Should remove from draft if hidden', function () {
     wrapper.vm.draft = ['test'];
-    wrapper.vm.hideColumn('test');
+    wrapper.vm.switchColumn('test');
     expect(wrapper.vm.draft.includes('test')).to.equal(false);
   });
 
