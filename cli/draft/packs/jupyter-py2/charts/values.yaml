@@ -13,11 +13,8 @@ service:
 
 resources:
   requests:
-    cpu: 0.01
+    cpu: 2
     memory: 1Gi
-  #limits:
-  #  cpu: 2
-  #  memory: 4Gi
 
 
 experimentName: ''

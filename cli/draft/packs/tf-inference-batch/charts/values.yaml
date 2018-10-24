@@ -18,7 +18,7 @@ workersCount: 1
 
 resources:
   requests:
-    cpu: 0.01
+    cpu: 2
     memory: 1Gi
 
 experimentName: ''

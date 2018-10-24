@@ -63,7 +63,11 @@ podCount: 1
 
 resources:
   requests:
-    cpu: 40 # Minimal number of logical processors requested 
+    cpu: 76 # Minimal number of logical processors requested
+    memory: 240Gi
+  limits:
+    cpu: 76 # Maximal number of logical processors requested
+    memory: 240Gi
 
 # Number of physical processors that will be used by Horovod
 cpus: 20

@@ -19,12 +19,11 @@ service:
 
 resources:
   requests:
-    cpu: 0.01
-    memory: 1Gi
-  #limits:
-  #  cpu: 2
-  #  memory: 4Gi
-
+    cpu: 38
+    memory: 120Gi
+  limits:
+    cpu: 38
+    memory: 120Gi
 
 experimentName: ''
 podCount: 1

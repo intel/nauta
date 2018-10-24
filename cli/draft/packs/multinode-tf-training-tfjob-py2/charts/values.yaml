@@ -19,21 +19,24 @@ service:
 
 worker_resources:
   requests:
-    cpu: 0.01
-    memory: 1Gi
+    cpu: 76
+    memory: 240Gi
+  limits:
+    cpu: 76
+    memory: 240Gi
 
 ps_resources:
   requests:
-    cpu: 0.01
-    memory: 1Gi
+    cpu: 76
+    memory: 240Gi
+  limits:
+    cpu: 76
+    memory: 240Gi
 
 sidecar_resources:
   requests:
     cpu: 0.01
     memory: 1Gi
-  #limits:
-  #  cpu: 2
-  #  memory: 4Gi
 
 
 experimentName: ''
