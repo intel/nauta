@@ -90,7 +90,8 @@ class Run(PlatformResource):
     @property
     def cli_representation(self):
         return Run.RunCliModel(name=self.name,
-                               parameters=textwrap.fill(' '.join(self.parameters), width=30) if self.parameters else "",
+                               parameters=textwrap.fill(' '.join(self.parameters), width=30,
+                                                        drop_whitespace=False) if self.parameters else "",
                                metrics='\n'.join(textwrap.fill(f'{key}: {value}', width=30)
                                                  for key, value in self.metrics.items()) if self.metrics else "",
                                submission_date=format_timestamp_for_cli(self.creation_timestamp) if self.creation_timestamp else "",
