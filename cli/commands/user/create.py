@@ -22,7 +22,6 @@
 import os
 import base64
 import sys
-import getpass
 from sys import exit
 
 import click
@@ -74,7 +73,7 @@ DEFAULT_FILENAME = "{}.config"
 
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
-@click.argument('username', required=False)
+@click.argument('username', required=True)
 @click.option("-l", "--list_only", is_flag=True, help=Texts.HELP_L)
 @click.option("-f", "--filename", help=Texts.HELP_F)
 @common_options()
@@ -92,7 +91,6 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
     try:
         try:
-            username = username if username else getpass.getuser()
             validate_user_name(username)
         except ValueError as exe:
             handle_error(logger, Texts.NAME_VALIDATION_ERROR_MSG.format(username=username), str(exe),
