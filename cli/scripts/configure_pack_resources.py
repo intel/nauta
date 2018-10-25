@@ -126,7 +126,7 @@ def get_horovod_resources(k8s_worker_resources: dict, physical_cpus=1):
 
 
 def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_resources: dict, horovod_cpus=1):
-    values_yaml_paths = f'{dlsctl_config_dir_path}/packs/*/Charts/values.yaml'
+    values_yaml_paths = f'{dlsctl_config_dir_path}/packs/*/charts/values.yaml'
     for values_yaml_path in glob.glob(values_yaml_paths):
         logger.info(f'Changing resources for pack: {values_yaml_path}')
         pack_resources = k8s_worker_resources.copy()
