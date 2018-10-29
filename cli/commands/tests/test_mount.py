@@ -24,7 +24,9 @@ import platform
 from click.testing import CliRunner
 
 from commands.mount import get_mount_command_linux, get_mount_command_windows, get_mount_command_osx, mount, \
-    get_unmount_command_linux, get_unmount_command_windows, get_unmount_command_osx
+    get_unmount_command_linux, get_unmount_command_windows, get_unmount_command_osx, get_mounts_windows, \
+    get_mounts_linux_osx
+
 from cli_text_consts import MountCmdTexts as Texts
 
 
@@ -41,6 +43,51 @@ CORRECT_WINDOWS_UNMOUNT = "net use <MOUNTPOINT> /d"
 
 CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
 CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT>"
+
+MOUNT_IP = "1.2.3.4"
+
+WIN_NET_USE_OUTPUT = f"Status       Local     Remote                    Network \n " \
+                     f"-------------------------------------------------------------------------------\n" \
+                     f"Disconnected S:        \\\\{MOUNT_IP}\input\n" \
+                                                "Microsoft Windows Network\n" \
+                     f"Disconnected Z:        \\\\{MOUNT_IP}\input\n" \
+                                                "Microsoft Windows Network\n" \
+                     "Disconnected X:        \\\\1.1.1.1\input\n" \
+                                                "Microsoft Windows Network\n" \
+                     f"Disconnected           \\\\{MOUNT_IP}\input\n" \
+                                                "Microsoft Windows Network\n" \
+                     f"Disconnected           \\\\{MOUNT_IP}\output\n" \
+                                                "Microsoft Windows Network\n" \
+                     f"The command completed successfully."
+
+
+LINUX_MOUNT_OUTPUT = "freezer on /run/lxcfs/controllers/freezer type cgroup (rw,relatime,freezer)\n" \
+                     "name=systemd on /run/lxcfs/controllers/name=systemd type cgroup (rw,relatime,xattr," \
+                     "release_agent=/lib/systemd/systemd-cgroups-agent,name=systemd)\n" \
+                     "lxcfs on /var/lib/lxcfs type fuse.lxcfs (rw,nosuid,nodev,relatime,user_id=0," \
+                     "group_id=0,allow_other)\n" \
+                     f"//{MOUNT_IP}/input on /home/username/input type cifs " \
+                     "(rw,relatime,vers=1.0,cache=strict,username=username,domain=DLS4ENTERPRISE-SAMBA-6DBF869D46" \
+                     "-7SNF6,uid=10001,forceuid,gid=0,noforcegid,addr=10.91.120.87,unix,posixpaths," \
+                     "serverino,mapposix,acl,rsize=1048576,wsize=65536,actimeo=1)\n" \
+                     f"//{MOUNT_IP}/input on /home/username/input type cifs " \
+                     "(rw,relatime,vers=1.0,cache=strict,username=username2,domain=DLS4ENTERPRISE-SAMBA-6DBF869D46" \
+                     "-7SNF6,uid=10001,forceuid,gid=0,noforcegid,addr=10.91.120.87,unix,posixpaths," \
+                     "serverino,mapposix,acl,rsize=1048576,wsize=65536,actimeo=1)"
+
+
+OSX_MOUNT_OUTPUT = "/dev/disk1s1 on / (apfs, local, journaled)\n" \
+                   "devfs on /dev (devfs, local, nobrowse)\n" \
+                   "/dev/disk1s4 on /private/var/vm (apfs, local, noexec, journaled, noatime, nobrowse)\n" \
+                   "map -hosts on /net (autofs, nosuid, automounted, nobrowse)\n" \
+                   "map auto_home on /home (autofs, automounted, nobrowse)\n" \
+                   "map -static on /nfs/test_data (autofs, automounted, nobrowse)\n" \
+                   "ftp.nervana.sclab.intel.com:/home/nervana/fileshare/data on /nfs/test_data (nfs, nodev, noexec," \
+                   " nosuid, read-only, automounted, nobrowse)\n" \
+                   f"//username@{MOUNT_IP}/input on /Users/tester/username/mounted_dir " \
+                   "(smbfs, nodev, nosuid, mounted by tester)\n" \
+                   f"//username2@{MOUNT_IP}/input on /Users/tester/username2/mounted_dir " \
+                   "(smbfs, nodev, nosuid, mounted by tester)\n"
 
 
 def test_get_mount_command_linux(mocker):
@@ -139,3 +186,88 @@ def test_mount_is_admin(mocker):
 
     assert icu_mock.call_count == 1
     assert Texts.USER_IS_ADMIN_ERROR_MSG in result.output
+
+
+def test_get_mounts_windows(mocker, capsys):
+    esc_mock = mocker.patch("commands.mount.execute_system_command")
+    esc_mock.return_value = WIN_NET_USE_OUTPUT, 0, WIN_NET_USE_OUTPUT
+    gkh_mock = mocker.patch("commands.mount.get_kubectl_host")
+    gkh_mock.return_value = MOUNT_IP
+
+    get_mounts_windows()
+    out, err = capsys.readouterr()
+
+    split_output = out.split("\n")
+    assert len(split_output) == 7
+    assert f"\\\\{MOUNT_IP}\input" in split_output[2]
+    assert "S:" in split_output[2]
+    assert "Z:" in split_output[3]
+    assert "Microsoft Windows Network" in split_output[4]
+    assert f"\\\\{MOUNT_IP}\output" in split_output[5]
+
+
+def test_get_mounts_linux_non_admin(mocker, capsys):
+    esc_mock = mocker.patch("commands.mount.execute_system_command")
+    esc_mock.return_value = LINUX_MOUNT_OUTPUT, 0, LINUX_MOUNT_OUTPUT
+    gkh_mock = mocker.patch("commands.mount.get_kubectl_host")
+    gkh_mock.return_value = MOUNT_IP
+
+    get_mounts_linux_osx(username="username", is_admin=False)
+    out, err = capsys.readouterr()
+
+    split_output = out.split("\n")
+    assert len(split_output) == 4
+    assert f"//{MOUNT_IP}/input" in split_output[2]
+    assert "username" in split_output[2]
+    assert "/home/username/input" in split_output[2]
+
+
+def test_get_mounts_linux_admin(mocker, capsys):
+    esc_mock = mocker.patch("commands.mount.execute_system_command")
+    esc_mock.return_value = LINUX_MOUNT_OUTPUT, 0, LINUX_MOUNT_OUTPUT
+    gkh_mock = mocker.patch("commands.mount.get_kubectl_host")
+    gkh_mock.return_value = MOUNT_IP
+
+    get_mounts_linux_osx(username="username", is_admin=True)
+    out, err = capsys.readouterr()
+
+    split_output = out.split("\n")
+    assert len(split_output) == 5
+    assert f"//{MOUNT_IP}/input" in split_output[2]
+    assert "username" in split_output[2]
+    assert "/home/username/input" in split_output[2]
+    assert "username2" in split_output[3]
+
+
+def test_get_mounts_osx_non_admin(mocker, capsys):
+    esc_mock = mocker.patch("commands.mount.execute_system_command")
+    esc_mock.return_value = OSX_MOUNT_OUTPUT, 0, OSX_MOUNT_OUTPUT
+    gkh_mock = mocker.patch("commands.mount.get_kubectl_host")
+    gkh_mock.return_value = MOUNT_IP
+
+    get_mounts_linux_osx(username="username", is_admin=False, osx=True)
+    out, err = capsys.readouterr()
+
+    split_output = out.split("\n")
+    assert len(split_output) == 4
+    assert f"{MOUNT_IP}/input" in split_output[2]
+    assert "username" in split_output[2]
+    assert "/Users/tester/username/mounted_dir" in split_output[2]
+
+
+def test_get_mounts_osx_admin(mocker, capsys):
+    esc_mock = mocker.patch("commands.mount.execute_system_command")
+    esc_mock.return_value = OSX_MOUNT_OUTPUT, 0, OSX_MOUNT_OUTPUT
+    gkh_mock = mocker.patch("commands.mount.get_kubectl_host")
+    gkh_mock.return_value = MOUNT_IP
+
+    get_mounts_linux_osx(username="username", is_admin=True, osx=True)
+    out, err = capsys.readouterr()
+
+    split_output = out.split("\n")
+    assert len(split_output) == 5
+    assert f"{MOUNT_IP}/input" in split_output[2]
+    assert "username" in split_output[2]
+    assert "/Users/tester/username/mounted_dir" in split_output[2]
+    assert "username2" in split_output[3]
+    assert "/Users/tester/username2/mounted_dir" in split_output[3]

@@ -53,11 +53,15 @@ Additionally, each experiment has a special folder that can be accessed
 as /mnt/output/experiment from training script. This folder is shared by Samba
 as output/<EXPERIMENT_NAME>.
 --------------------------------------------------------------------"""
+
+    HELP_L = "Displays a list of dls4e folders mounted on a local machine. If run using admin credentials, displays " \
+             "mounts of all users."
     USER_IS_ADMIN_ERROR_MSG = "DLS4E doesn't create shares for administrators. Please execute this command as a " \
                               "regular user."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
     UNMOUNT_COMMAND_MSG = "Use following command to unmount previously mounted folder:"
+    MOUNTS_LIST_COMMAND_ERROR_MSG = "Error detected while gathering list of mounted shares."
 
 
 class CmdsCommonTexts:
