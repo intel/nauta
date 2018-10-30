@@ -49,7 +49,6 @@ spec:
               command: ["/down.sh"]
         resources:
           limits:
-            memory: 256Mi
             cpu: 250m
         env:
         - name: IP
