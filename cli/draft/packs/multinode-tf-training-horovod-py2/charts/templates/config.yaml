@@ -105,6 +105,8 @@ data:
         done
         $cmd
         if [ $? -ne 0 ]; then
+          # Delete horovod stateful set
+          kubectl delete sts $STS_NAME
           exit 1
         fi
         set -e

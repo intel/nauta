@@ -1,7 +1,10 @@
 ARG TENSORFLOW_BUILD_IMAGE
+ARG KUBERNETES_DATA_IMAGE
 ARG BASE_IMAGE
 FROM ${TENSORFLOW_BUILD_IMAGE} as data
+FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${BASE_IMAGE}
+
 
 ENV TENSORFLOW_VERSION=1.9.0
 
@@ -45,3 +48,8 @@ RUN echo "y" | ssh-keygen -N "" -f /root/.ssh/id_rsa && \
     cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys && chmod og-rwx /root/.ssh/ -R
 
 RUN ln -sf /opt/rh/rh-python36/root/usr/bin/${PYTHON} /usr/bin/python
+
+# Install kubectl
+COPY --from=kubectl_data /build-output/kubernetes/kubectl /bin/kubectl
+
+RUN chmod +x /bin/kubectl

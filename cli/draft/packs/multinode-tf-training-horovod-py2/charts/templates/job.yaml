@@ -120,6 +120,8 @@ spec:
         image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+          - name: STS_NAME
+            value: {{ template "horovod.fullname" . }}
           - name: SSHPORT
             value: "{{ .Values.ssh.port }}"
           {{- if .Values.ssh.useSecrets }}
