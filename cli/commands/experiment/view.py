@@ -220,6 +220,9 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
                     if cpu and memory:
                         break
 
+                if not cpu and not memory:
+                    exit(0)
+
                 if cpu and memory:
                     resources = "number of cpus and amount of memory"
                 elif cpu:

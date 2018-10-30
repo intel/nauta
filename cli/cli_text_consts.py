@@ -464,10 +464,10 @@ class ExperimentViewCmdTexts:
     RESOURCES_SUM_PARSING_ERROR_MSG = "There was an error when trying to parse pods resources. Error msg: {error_msg}"
     RESOURCES_SUM_TABLE_HEADERS = ["Resource type", "Total usage"]
     RESOURCES_SUM_TABLE_ROWS_HEADERS = ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"]
-    INSUFFICIENT_RESOURCES_MESSAGE = "Experiment is in PENDING status due to insuffcient {resources}."
+    INSUFFICIENT_RESOURCES_MESSAGE = "Experiment is in QUEUED state due to insufficient {resources}."
     TOP_CPU_CONSUMERS = "Top CPU consumers: {consumers}"
     TOP_MEMORY_CONSUMERS = "Top memory consumers: {consumers}"
-    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of pending state and top consumers and cannot be displayed due to " \
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of QUEUED state and top consumers cannot be displayed due to " \
                                           "errors."
     PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error when gathering consumers data."
     HELP_U = "Name of a user to who belongs viewed experiment. If not given - only experiments of a current " \

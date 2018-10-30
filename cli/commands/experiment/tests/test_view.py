@@ -78,9 +78,11 @@ PENDING_POD = [pending_pod]
 
 TOP_USERS = [ResourceUsage(user_name="user_name", cpu_usage=2, mem_usage=1000)]
 
-EVENTS = [MagicMock(spec=V1Event(message="Insufficient cpu",
-                                 involved_object=V1ObjectReference(name="test-experiment"),
-                                 metadata=V1ObjectMeta(name="test-experiment")))]
+event = MagicMock(spec=V1Event)
+event.message = "insufficient memory"
+event.involved_object = V1ObjectReference(name="test-experiment")
+event.metadata = V1ObjectMeta(name="test-experiment")
+EVENTS = [event]
 
 
 class ViewMocks:
@@ -307,6 +309,6 @@ def test_displaying_pending_pod(prepare_mocks: ViewMocks, mocker):
     runner = CliRunner()
     result = runner.invoke(view.view, [TEST_RUNS[0].name], catch_exceptions=False)
 
-    assert "Experiment is in PENDING status due to insuffcient amount of memory." in result.output
+    assert "Experiment is in QUEUED state due to insufficient amount of memory." in result.output
     assert "Top CPU consumers: user_name" in result.output
     assert "Top memory consumers: user_name" in result.output
