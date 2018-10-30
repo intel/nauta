@@ -101,14 +101,14 @@ def get_k8s_worker_allocatable_resources(cpu_threshold: 0.2, mem_threshold: 0.2)
 
     return {'resources': {
                 'requests': {'cpu': cpu_request, 'memory': memory_request},
-                'limit': {'cpu': cpu_limit, 'memory': memory_limit}
+                'limits': {'cpu': cpu_limit, 'memory': memory_limit}
             }}
 
 
 def get_fixed_resources(fixed_cpu: str, fixed_memory: str):
     return {'resources': {
         'requests': {'cpu': fixed_cpu, 'memory': fixed_memory},
-        'limit': {'cpu': fixed_cpu, 'memory': fixed_memory}
+        'limits': {'cpu': fixed_cpu, 'memory': fixed_memory}
     }}
 
 
