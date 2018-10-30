@@ -23,15 +23,11 @@ import time
 
 from typing import List
 
-import click
-
 from kubernetes import config, client
 
 from kubernetes.client.rest import ApiException
 from marshmallow import ValidationError
-from yaspin import yaspin
 
-from cli_state import DlsctlSpinner
 from platform_resources.user_model import User
 from platform_resources.runs import list_runs
 import platform_resources.user_model as model
@@ -42,8 +38,9 @@ from util.exceptions import K8sProxyCloseError
 from util.app_names import DLS4EAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
-from cli_text_consts import PlatformResourcesUsersTexts as Texts, SPINNER_COLOR
+from cli_text_consts import PlatformResourcesUsersTexts as Texts
 from cli_text_consts import UserDeleteCmdTexts as TextsDel
+from util.spinner import spinner
 
 logger = initialize_logger(__name__)
 
@@ -90,7 +87,7 @@ def purge_user(username: str):
     # remove data from elasticsearch
     try:
         with k8s_proxy_context_manager.K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy,\
-            yaspin(spinner=DlsctlSpinner, text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS, color=SPINNER_COLOR):
+            spinner(text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS):
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             es_client.delete_logs_for_namespace(username)

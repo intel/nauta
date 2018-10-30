@@ -22,16 +22,16 @@
 from sys import exit
 
 import click
-from yaspin import yaspin
 
-from cli_state import common_options, pass_state, State, DlsctlSpinner
+from cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster, check_port_forwarding
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
+from util.spinner import spinner
 from util.system import handle_error
-from cli_text_consts import VerifyCmdTexts as Texts, SPINNER_COLOR
+from cli_text_consts import VerifyCmdTexts as Texts
 from util.exceptions import KubectlConnectionError, InvalidOsError
 
 
@@ -43,9 +43,9 @@ logger = initialize_logger(__name__)
 @pass_state
 def verify(state: State):
     try:
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG, color=SPINNER_COLOR):
+        with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):
             check_connection_to_cluster()
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG, color=SPINNER_COLOR):
+        with spinner(text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG):
             check_port_forwarding()
     except KubectlConnectionError as e:
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
@@ -63,7 +63,7 @@ def verify(state: State):
         exit(1)
 
     try:
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CHECKING_OS_MSG, color=SPINNER_COLOR):
+        with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
     except InvalidOsError as exception:
@@ -74,9 +74,7 @@ def verify(state: State):
     for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
-            with yaspin(spinner=DlsctlSpinner,
-                        text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=dependency_name),
-                        color=SPINNER_COLOR):
+            with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=dependency_name)):
                 valid, installed_version = check_dependency(dependency_name=dependency_name,
                                                             dependency_spec=dependency_spec, namespace=namespace)
             dependency_versions[dependency_name] = installed_version

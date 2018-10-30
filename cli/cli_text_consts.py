@@ -85,7 +85,7 @@ class VerifyCmdTexts:
     DEPENDENCY_VERSION_CHECK_ERROR_MSG = "Failed to get {dependency_name} version."
     DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG = "{dependency_name} - exception during verification."
     OS_SUPPORTED_MSG = "This OS is supported."
-    CHECKING_CONNECTION_TO_CLUSTER_MSG = "Checking connection to cluster..."
+    CHECKING_CONNECTION_TO_CLUSTER_MSG = "Checking connection to the cluster..."
     CHECKING_OS_MSG = "Checking operating system..."
     VERIFYING_DEPENDENCY_MSG = "Verifying {dependency_name} ..."
     CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG = "Checking port forwarding from cluster..."

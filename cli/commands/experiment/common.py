@@ -31,10 +31,8 @@ from typing import Tuple, List
 from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
-from yaspin import yaspin
 
 import draft.cmd as cmd
-from cli_state import DlsctlSpinner
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiments as experiments_api
 import platform_resources.experiment_model as experiments_model
@@ -43,6 +41,7 @@ import platform_resources.runs as runs_api
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
+from util.spinner import spinner
 from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
@@ -53,7 +52,7 @@ from util.k8s.k8s_info import get_app_service_node_port, get_kubectl_current_con
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.jupyter_notebook_creator import convert_py_to_ipynb
 from util.system import handle_error
-from cli_text_consts import ExperimentCommonTexts as Texts, SPINNER_COLOR
+from cli_text_consts import ExperimentCommonTexts as Texts
 
 # definitions of headers content for different commands
 # run name table header should be displayed as "Experiment" to hide term "Run" from the user
@@ -216,7 +215,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         raise SubmitExperimentError(message)
 
     try:
-        with yaspin(spinner=DlsctlSpinner, text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG, color=SPINNER_COLOR):
+        with spinner(text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG):
             experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
                                                                                    namespace=namespace, name=name,
                                                                                    run_kind=run_kind)
@@ -246,7 +245,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                 if get_current_os() in (OS.WINDOWS, OS.MACOS):
                     # noinspection PyBroadException
                     try:
-                        with yaspin(spinner=DlsctlSpinner, text=Texts.CLUSTER_CONNECTION_MSG, color=SPINNER_COLOR):
+                        with spinner(text=Texts.CLUSTER_CONNECTION_MSG):
                             socat.start(proxy.tunnel_port)
                     except Exception:
                         error_msg = Texts.LOCAL_DOCKER_TUNNEL_ERROR_MSG
@@ -335,8 +334,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
                     run.state = RunStatus.QUEUED
-                    with yaspin(spinner=DlsctlSpinner, text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name),
-                                color=SPINNER_COLOR):
+                    with spinner(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name)):
                         # Add Run object with runKind label and pack params as annotations
                         runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
                                          annotations={pack_param_name: pack_param_value
@@ -379,7 +377,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg) from exe
     finally:
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CLUSTER_CONNECTION_CLOSING_MSG, color=SPINNER_COLOR):
+        with spinner(text=Texts.CLUSTER_CONNECTION_CLOSING_MSG):
             # noinspection PyBroadException
             try:
                 socat.stop()
@@ -460,8 +458,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     try:
         # check environment directory
         check_run_environment(run_folder)
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name),
-                    color=SPINNER_COLOR):
+        with spinner(text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name)):
             # create an environment
             create_environment(run_name, local_script_location, script_folder_location)
             # generate draft's data

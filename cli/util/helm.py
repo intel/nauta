@@ -19,13 +19,11 @@
 # and approved by Intel in writing.
 #
 
-from yaspin import yaspin
-
-from cli_state import DlsctlSpinner
+from util.spinner import spinner
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
 from util.logger import initialize_logger
-from cli_text_consts import UtilHelmTexts as Texts, SPINNER_COLOR
+from cli_text_consts import UtilHelmTexts as Texts
 from cli_text_consts import UserDeleteCmdTexts as TextsDel
 
 logger = initialize_logger(__name__)
@@ -38,10 +36,10 @@ def delete_user(username: str):
     :param username: name of a user to be deleted
     Throws an excpetion in case of any errors
     """
-    with yaspin(spinner=DlsctlSpinner, text=TextsDel.DELETION_DELETING_NAMESPACE, color=SPINNER_COLOR):
+    with spinner(text=TextsDel.DELETION_DELETING_NAMESPACE):
         delete_namespace(username)
 
-    with yaspin(spinner=DlsctlSpinner, text=TextsDel.DELETION_DELETING_USERS_OBJECTS, color=SPINNER_COLOR):
+    with spinner(text=TextsDel.DELETION_DELETING_USERS_OBJECTS):
         delete_helm_release(username, purge=True)
 
 

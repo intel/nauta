@@ -25,19 +25,19 @@ import sys
 from sys import exit
 
 import click
-from yaspin import yaspin
 
 from util.config import Config
 from util.logger import initialize_logger
+from util.spinner import spinner
 from util.system import execute_system_command, handle_error
 from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
 from util.config import DLS4EConfigMap
-from cli_state import common_options, pass_state, State, DlsctlSpinner
+from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence, UserState
 from platform_resources.users import validate_user_name, is_user_created
-from cli_text_consts import UserCreateCmdTexts as Texts, SPINNER_COLOR
+from cli_text_consts import UserCreateCmdTexts as Texts
 
 logger = initialize_logger(__name__)
 
@@ -120,8 +120,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
         exit(1)
 
     try:
-        with yaspin(spinner=DlsctlSpinner, text=Texts.CREATING_USER_PROGRESS_MSG.format(username=username),
-                    color=SPINNER_COLOR):
+        with spinner(text=Texts.CREATING_USER_PROGRESS_MSG.format(username=username)):
             chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
 
             dls4e_config_map = DLS4EConfigMap()

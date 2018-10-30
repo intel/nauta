@@ -25,20 +25,20 @@ from sys import exit
 from typing import Generator
 
 import click
-from yaspin import yaspin
 
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
 from platform_resources.run_model import Run
 from platform_resources.runs import list_runs
-from cli_state import common_options, pass_state, State, DlsctlSpinner
+from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import DLS4EAppNames
 from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.spinner import spinner, DlsctlSpinner
 from util.system import handle_error
 from cli_text_consts import ExperimentLogsCmdTexts as Texts, SPINNER_COLOR
 
@@ -159,8 +159,8 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
 
     if click.confirm(confirmation_message, default=True):
         try:
-            with open(filename, 'w') as file, yaspin(spinner=DlsctlSpinner,
-                                                     text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
+            with open(filename, 'w') as file, spinner(spinner=DlsctlSpinner,
+                                                      text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
                 for log_entry in run_logs_generator:
                     if not log_entry.content.isspace():
                         formatted_date = format_log_date(log_entry.date)

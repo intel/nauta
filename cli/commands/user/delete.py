@@ -23,18 +23,18 @@ from sys import exit
 import time
 
 import click
-from yaspin import yaspin
 
 from util.logger import initialize_logger
-from cli_state import common_options, pass_state, State, DlsctlSpinner
+from cli_state import common_options, pass_state, State
 from util.k8s.kubectl import check_users_presence, UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
 from util.k8s.k8s_info import is_current_user_administrator, get_config_map_data, patch_config_map_data
 from util.aliascmd import AliasCmd
+from util.spinner import spinner
 from util.system import handle_error
-from cli_text_consts import UserDeleteCmdTexts as Texts, SPINNER_COLOR
+from cli_text_consts import UserDeleteCmdTexts as Texts
 
 logger = initialize_logger(__name__)
 
@@ -96,8 +96,7 @@ def delete(state: State, username: str, purge: bool):
                 handle_error(logger, Texts.PURGE_ERROR_MSG, Texts.PURGE_ERROR_MSG)
 
         # CAN-616 - wait until user has been really deleted
-        with yaspin(spinner=DlsctlSpinner, text=Texts.DELETION_VERIFICATION_OF_DELETING,
-                    color=SPINNER_COLOR) as spinner:
+        with spinner(text=Texts.DELETION_VERIFICATION_OF_DELETING) as user_del_spinner:
             for i in range(60):
                     user_state = check_users_presence(username)
 
@@ -108,7 +107,7 @@ def delete(state: State, username: str, purge: bool):
                         break
                     time.sleep(1)
             else:
-                spinner.hide()
+                user_del_spinner.hide()
                 click.echo()
                 click.echo(Texts.DELETE_IN_PROGRESS_MSG)
                 exit(0)

@@ -38,8 +38,6 @@ logger = initialize_logger(__name__)
 # Timeout for dependency verification request in seconds. This request is repeated 3 times.
 VERIFY_REQUEST_TIMEOUT = 10
 
-DlsctlSpinner = yaspin.Spinner(frames='\\|/-', interval=80) if get_current_os() == OS.WINDOWS \
-    else yaspin.Spinner('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏', interval=80)
 
 class State:
     def __init__(self):
