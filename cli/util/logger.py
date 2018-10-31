@@ -20,6 +20,7 @@
 #
 
 import sys
+import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
@@ -67,6 +68,15 @@ def setup_log_file(log_file_directory: str, log_level=logging.DEBUG, log_backup_
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s  - %(message)s')
     file_handler = TimedRotatingFileHandler(filename=f'{log_file_directory}/dlsctl_logs',
                                             when='d', interval=1, backupCount=log_backup_count)
+    file_handler.rotator = dlse_log_rotator
     file_handler.setFormatter(formatter)
     file_handler.setLevel(log_level)
     root_logger.addHandler(file_handler)
+
+
+def dlse_log_rotator(source, dest):
+    if os.path.exists(source):
+        try:
+            os.rename(source, dest)
+        except PermissionError:
+            pass  # When DLSe doesn't have permissions to log file, just skip this log rotation iteration.
