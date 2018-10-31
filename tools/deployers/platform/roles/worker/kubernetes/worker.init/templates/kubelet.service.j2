@@ -23,7 +23,11 @@ ExecStart=/opt/dls4e/kubernetes/kubelet \
                   --client-ca-file /etc/dls-cluster/client/kubernetes/ca.pem \
                   --tls-cert-file /etc/dls-cluster/client/kubernetes/node.crt \
                   --tls-private-key-file /etc/dls-cluster/client/kubernetes/node.key --maximum-dead-containers 512 \
-                  --maximum-dead-containers-per-container 1 --minimum-container-ttl-duration 0
+                  --maximum-dead-containers-per-container 1 --minimum-container-ttl-duration 0 \
+                  --cpu-manager-policy={{ cpu_manager_policy }} \
+                  --system-reserved={{ system_reserved }} \
+                  --kube-reserved={{ kube_reserved }} \
+                  --cgroups-per-qos={{ cgroups_per_qos }}
 RestartSec=10
 StartLimitInterval=0
 
