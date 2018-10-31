@@ -79,9 +79,10 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
             namespace = get_kubectl_current_context_namespace()
             if match:
                 experiment_name = match
+                name_filter = match
             else:
-                experiment_name = f'^{experiment_name}$'
-            runs = list_runs(namespace=namespace, name_filter=experiment_name)
+                name_filter = f'^{experiment_name}$'
+            runs = list_runs(namespace=namespace, name_filter=name_filter)
             if not runs:
                 raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
 
