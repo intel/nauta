@@ -203,3 +203,14 @@ def test_get_os_version_empty(mocker):
 
     assert os_name == ""
     assert os_version == LooseVersion("0")
+
+
+def test_execute_system_command_limited_logs(mocker):
+    cop_mock = mocker.patch('subprocess.check_output')
+    cop_mock.return_value = 50*"a"
+    output, exit_code, log_output = execute_system_command(['ls'], logs_size=20)
+
+    assert len(log_output) == 20
+    assert len(output) == 50
+    # noinspection PyUnresolvedReferences
+    assert subprocess.check_output.call_count == 1

@@ -77,7 +77,7 @@ WINDOWS_EDITIONS = {
 
 
 def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None) -> (str, int, str):
+                           stdin=None, env=None, cwd=None, logs_size: int = 0) -> (str, int, str):
     """
     Executes system's command
     :param command: command to be exeucted
@@ -85,6 +85,7 @@ def execute_system_command(command: List[str], timeout: int or None = None,
     :param stdin: stream with input data for command
     :param env: environment within which command is run
     :param cwd: command working directory
+    :param logs_size: if other than 0 - system sends to looger logs_size last characters
     :return: output - output of the command
              exit_code - exit code returned by a command
              log_output - output that should be passed to logs. If a real output contains
@@ -94,7 +95,7 @@ def execute_system_command(command: List[str], timeout: int or None = None,
     try:
         output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
                                          stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
-        encoded_output = output.encode('utf-8')
+        encoded_output = output[-logs_size:].encode('utf-8')
         log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace('\n', '\\n'))
     except subprocess.CalledProcessError as ex:
         return ex.output, ex.returncode, ex.output

@@ -39,7 +39,8 @@ DRAFT_LOGS_FOLDER = "logs"
 DOCKER_IP_ADDRESS = "127.0.0.1"
 
 
-def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str, int, str):
+def call_draft(args: List[str], cwd: str = None, namespace: str = None, logs_size: int = 0) \
+        -> (str, int, str):
     config_path = Config().config_path
     full_command = [os.path.join(config_path, DRAFT_BIN)]
     full_command.extend(args)
@@ -50,7 +51,7 @@ def call_draft(args: List[str], cwd: str = None, namespace: str = None) -> (str,
     env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)
     if namespace:
         env['TILLER_NAMESPACE'] = namespace
-    return execute_system_command(full_command, env=env, cwd=cwd)
+    return execute_system_command(full_command, env=env, cwd=cwd, logs_size=logs_size)
 
 
 def create(working_directory: str = None, pack_type: str = None) -> (str, int, str):
@@ -68,7 +69,7 @@ def create(working_directory: str = None, pack_type: str = None) -> (str, int, s
 
 
 def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
-    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
+    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace, logs_size=200)
     # displaying logs from draft - only in debug mode
     pattern = "Inspect the logs with `draft logs (.*)`"
 
