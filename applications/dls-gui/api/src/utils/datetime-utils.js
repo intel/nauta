@@ -38,3 +38,10 @@ module.exports.calculateTimeDifferenceFromDateString = function (timeA, timeB) {
   const timedateB = new Date(timeB).getTime();
   return timedateB - timedateA;
 };
+
+module.exports.getLocaleStringForOffset = function (timeString, offset) {
+  const serverOffset = new Date().getTimezoneOffset();
+  const offsetDifference = offset - serverOffset;
+  const unifiedTimestamp = new Date(timeString).getTime() - offsetDifference * 60 * 1000; // add miliseconds offset
+  return new Date(unifiedTimestamp).toLocaleString();
+};

@@ -47,7 +47,8 @@ describe('Handlers | Experiments', function () {
     };
     reqMock = {
       headers: {
-        authorization: 'token'
+        authorization: 'token',
+        'timezone-offset': new Date().getTimezoneOffset()
       }
     };
     k8sMock = {
@@ -301,7 +302,8 @@ describe('Handlers | Experiments', function () {
           namespace: [],
           state: [],
           type: [],
-          searchPattern: ''
+          searchPattern: '',
+          searchTimezone: reqMock.headers['timezone-offset']
         },
         valuesForFilterableAttrs: {
           name: [],
@@ -322,7 +324,8 @@ describe('Handlers | Experiments', function () {
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
+          searchPattern: '',
+          searchTimezone: reqMock.headers['timezone-offset']
         },
         valuesForFilterableAttrs: {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
@@ -343,7 +346,8 @@ describe('Handlers | Experiments', function () {
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
+          searchPattern: '',
+          searchTimezone: reqMock.headers['timezone-offset']
         },
         valuesForFilterableAttrs: {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
@@ -365,7 +369,8 @@ describe('Handlers | Experiments', function () {
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: ''
+          searchPattern: '',
+          searchTimezone: reqMock.headers['timezone-offset']
         },
         valuesForFilterableAttrs: {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
@@ -387,7 +392,8 @@ describe('Handlers | Experiments', function () {
           namespace: [generatedEntities[0].attributes.namespace],
           state: [generatedEntities[0].attributes.state, generatedEntities[1].attributes.state],
           type: [generatedEntities[0].attributes.type, generatedEntities[1].attributes.type],
-          searchPattern: 'MNIST-SING-18-06-11-09-34-45-41'
+          searchPattern: 'MNIST-SING-18-06-11-09-34-45-41',
+          searchTimezone: reqMock.headers['timezone-offset']
         },
         valuesForFilterableAttrs: {
           name: [generatedEntities[0].attributes.name, generatedEntities[1].attributes.name],
@@ -397,7 +403,8 @@ describe('Handlers | Experiments', function () {
         }
       };
       const searchPattern = 'mnist-SING-18-06-11-09-34-45-41';
-      const result = expApi.prepareDataUsingFilters(generatedEntities, null, searchPattern);
+      const result = expApi.prepareDataUsingFilters(generatedEntities, null, {
+        pattern: searchPattern, timezoneOffset: reqMock.headers['timezone-offset']});
       expect(result).to.deep.equal(expectedResult);
     });
   });

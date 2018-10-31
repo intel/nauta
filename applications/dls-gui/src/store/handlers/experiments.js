@@ -39,7 +39,10 @@ export function getExperiments (limitPerPage, pageNo, orderBy, order, searchBy, 
   };
   const options = {
     url: DECODE_TOKEN_ENDPOINT,
-    headers: {'Authorization': token},
+    headers: {
+      'Authorization': token,
+      'timezone-offset': new Date().getTimezoneOffset()
+    },
     params: queryParams,
     method: 'GET'
   };

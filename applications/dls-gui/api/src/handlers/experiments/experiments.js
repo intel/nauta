@@ -60,7 +60,9 @@ const generateExperimentEntities = function (data) {
   });
 };
 
-const prepareDataUsingFilters = function (entities, valuesPattern, searchPattern) {
+const TIME_ATTRIBUTES = ['creationTimestamp', 'trainingStartTime', 'trainingEndTime'];
+
+const prepareDataUsingFilters = function (entities, valuesPattern, searchbox) {
   if (!Array.isArray(entities)) {
     throw 'Incorrect Array Data';
   }
@@ -80,7 +82,8 @@ const prepareDataUsingFilters = function (entities, valuesPattern, searchPattern
     namespace: Array.from(new Set(entities.map((entity) => entity.attributes.namespace))),
     state: Array.from(new Set(entities.map((entity) => entity.attributes.state))),
     type: Array.from(new Set(entities.map((entity) => entity.attributes.type))),
-    searchPattern: searchPattern ? searchPattern.toUpperCase() : ''
+    searchPattern: searchbox && searchbox.pattern ? searchbox.pattern.toUpperCase() : '',
+    searchTimezone: searchbox && searchbox.timezoneOffset ? searchbox.timezoneOffset : new Date().getTimezoneOffset()
   };
 
   if (valuesPattern) {
@@ -101,7 +104,10 @@ const prepareDataUsingFilters = function (entities, valuesPattern, searchPattern
       filterParams.state.includes(item.attributes.state) &&
       filterParams.type.includes(item.attributes.type);
     const filterBySearchCondition = Object.keys(item.attributes).some((key) => {
-      const attrValue = String(item.attributes[key]);
+      let attrValue = String(item.attributes[key]);
+      if (attrValue && TIME_ATTRIBUTES.includes(key)) {
+        attrValue = datetimeUtils.getLocaleStringForOffset(attrValue, filterParams.searchTimezone);
+      }
       return attrValue.toUpperCase().includes(filterParams.searchPattern);
     });
     return filterByValueCondition && filterBySearchCondition;
@@ -169,7 +175,10 @@ const parseExperiments = function (experiments, queryParams) {
     namespace: queryParams.namespaces,
     state: queryParams.states,
     type: queryParams.types
-  }, queryParams.searchBy);
+  }, {
+    pattern: queryParams.searchBy,
+    timezoneOffset: queryParams.timezoneOffset
+  });
   const orderedData = applyOrderParams(preparedData.data, queryParams.orderBy, queryParams.order, queryParams.limit, queryParams.page);
   return {
     stats: {
@@ -198,7 +207,10 @@ const getUserExperiments = function (req, res) {
     return;
   }
   const token = req.headers.authorization;
-  const queryParams = req.query;
+  const queryParams = {
+    ...req.query,
+    timezoneOffset: req.headers['timezone-offset']
+  };
   logger.debug(queryParams);
   k8s.listClusterCustomObject(token, runsResourceName)
     .then(function (data) {
