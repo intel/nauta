@@ -75,10 +75,9 @@ spec:
           timeoutSeconds: 30
         resources:
           limits:
-            cpu: 100m
+            cpu: 500m
           requests:
             cpu: 100m
-            memory: 50Mi
       volumes:
       - name: kubernetes-dashboard-certs
         secret:
