@@ -64,6 +64,7 @@ spec:
           env:
           - name: BATCH_WRAPPER_JOB_NAME
             value: {{ .Release.Name }}-batch-wrapper
+          command: ["/bin/bash", "-c", "python3.6 main.py && exit"]
           volumeMounts:
           - name: shared-data
             mountPath: /pod-data
