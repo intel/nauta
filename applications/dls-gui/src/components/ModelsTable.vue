@@ -107,6 +107,14 @@
                         </div>
                       </td>
                       <td v-for="param in experimentsParams" v-bind:key="param" v-if="isVisibleColumn(param)">
+                        <v-icon v-if="param === 'name' && areDetailsVisible(item.attributes.name)"
+                                class="pointer-btn exp-icon" v-on:click="toggleDetails(item.attributes.name)">
+                          keyboard_arrow_down
+                        </v-icon>
+                        <v-icon v-if="param === 'name' && !areDetailsVisible(item.attributes.name)"
+                                class="pointer-btn exp-icon" v-on:click="toggleDetails(item.attributes.name)">
+                          keyboard_arrow_up
+                        </v-icon>
                         <span v-if="param === 'name'" id="exp-name" v-on:click="toggleDetails(item.attributes.name)">
                           {{ parseValue(param, item.attributes[param]) || '-' }}
                         </span>
@@ -508,6 +516,12 @@ export default {
   float: right;
   padding-left: 5px;
   padding-right: 5px;
+}
+.exp-icon {
+  float: left;
+  width: 25px;
+  padding-right: 5px;
+  margin-top: -3px;
 }
 .overflow {
   width: 100%;
