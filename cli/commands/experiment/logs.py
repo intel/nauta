@@ -144,6 +144,8 @@ def print_logs(run_logs_generator: Generator[LogEntry, None, None], pager=False)
                 yield f'{formatted_date} {log_entry.pod_name} {log_entry.content}'
 
     if pager:
+        # set -K option for less, so ^C will be respected
+        os.environ['LESS'] = os.environ.get('LESS', '') + ' -K'
         click.echo_via_pager(formatted_logs)
     else:
         for formatted_log in formatted_logs():
