@@ -28,6 +28,14 @@ data:
      set -x
      sleep 5
 
+     # Check if requested number of cpus (physical cores) is available
+     available_cpus=$(grep '^core id' /proc/cpuinfo |sort -u|wc -l)
+     if [ $REQUESTED_CPUS -ge $available_cpus ]; then
+        echo "Requested number CPUs: $REQUESTED_CPUS is greater than available number of CPUs: $available_cpus"
+        touch /horovod/init/done # Mark workers for deletion
+        exit 1
+     fi
+
      mkdir -p /root/.ssh
      rm -f /root/.ssh/config
      touch /root/.ssh/config

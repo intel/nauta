@@ -63,6 +63,8 @@ spec:
           - name: USESECRETS
             value: "{{ .Values.ssh.useSecrets }}"
          {{- end }}
+          - name: REQUESTED_CPUS
+            value: "{{ .Values.cpus }}"
 {{- if .Values.master.env }}
 {{ toYaml .Values.master.env | indent 10 }}
 {{- end }}
