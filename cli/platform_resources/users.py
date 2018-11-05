@@ -48,6 +48,17 @@ API_GROUP_NAME = 'aipg.intel.com'
 USERS_PLURAL = 'users'
 USERS_VERSION = 'v1'
 
+# Samba users must match system users, therefore there is a need to blacklist some names.
+# This list is genetated by running shell on samba containers and listing all users
+# and groups (/etc/passwd and /etc/groups)
+SAMBA_USERNAME_BLACKLIST = [ 'root', 'bin', 'daemon', 'adm', 'lp', 'sync', 'shutdown',
+                             'halt', 'mail', 'operator', 'games', 'ftp', 'nobody',
+                             'systemd-network', 'dbus',
+                             'root', 'bin', 'daemon', 'sys', 'adm', 'tty', 'disk', 'lp',
+                             'mem', 'kmem', 'wheel', 'cdrom', 'mail', 'man', 'dialout',
+                             'floppy', 'games', 'tape', 'video', 'ftp', 'lock', 'audio',
+                             'nobody', 'users', 'utmp', 'utempter', 'input',
+                             'systemd-journal', 'systemd-network', 'dbus', 'printadmin' ]
 
 def list_users() -> List[User]:
     """
@@ -143,6 +154,10 @@ def validate_user_name(username: str) -> bool:
         validate_kubernetes_name(username)
     except ValidationError:
         raise ValueError(Texts.INCORRECT_K8S_USERNAME_ERROR_MSG)
+
+    if username in SAMBA_USERNAME_BLACKLIST:
+        raise ValueError(Texts.USERNAME_IS_RESERVED_FOR_SYSTEM_USE)
+
 
 
 def is_user_created(username: str, timeout: int = 1) -> bool:

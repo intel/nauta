@@ -132,7 +132,6 @@ class UserCreateCmdTexts:
                                         "to a file manually."
     CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
 
-
 class UserDeleteCmdTexts:
     HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
     HELP_PR = "If this option is added, the command removes all of client's artifacts."
@@ -624,7 +623,7 @@ class PlatformResourcesUsersTexts:
     USERNAME_CANNOT_BE_EMPTY_ERROR_MSG = "Name of a user cannot be an empty string."
     USERNAME_TOO_LONG_ERROR_MSG = "Name of a user cannot be longer than 32 characters."
     INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
-
+    USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
 
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
