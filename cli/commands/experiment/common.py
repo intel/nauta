@@ -25,6 +25,7 @@ import itertools
 import os
 import shutil
 from sys import exit
+import textwrap
 
 import click
 from typing import Tuple, List
@@ -682,3 +683,7 @@ def validate_env_paramater(ctx, param, value):
         return value
     except Exception as exe:
         raise click.BadParameter('-e/--env option must be in <KEY>=<VALUE> format.')
+
+
+def wrap_text(text: str, width: int, spaces: int = 2) -> str:
+    return ("\n"+" " * spaces).join(textwrap.wrap(text, width))

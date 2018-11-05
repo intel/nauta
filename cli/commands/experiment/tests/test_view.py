@@ -70,10 +70,15 @@ QUEUED_RUN = [
         pod_selector={})
 ]
 
-TEST_PODS = [MagicMock(spec=V1Pod)]
+mocked_test_pod = MagicMock(spec=V1Pod)
+mocked_test_pod.metadata.name = "test"
+mocked_test_pod.metadata.uid = "uid"
+TEST_PODS = [mocked_test_pod]
 
 pending_pod = MagicMock(spec=V1Pod)
 pending_pod.status = V1PodStatus(phase=PodStatus.PENDING.value, conditions=[])
+pending_pod.metadata.name = "test"
+pending_pod.metadata.uid = "uid"
 PENDING_POD = [pending_pod]
 
 TOP_USERS = [ResourceUsage(user_name="user_name", cpu_usage=2, mem_usage=1000)]

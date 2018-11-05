@@ -25,7 +25,7 @@ from sys import exit
 from tabulate import tabulate
 import click
 
-from commands.experiment.common import EXPERIMENTS_LIST_HEADERS
+from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -44,6 +44,11 @@ PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M":
 PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
 
 
+POD_CONDITIONS_MAX_WIDTH = 30
+UID_MAX_WIDTH = 15
+CONTAINER_DETAILS_MAX_WIDTH = 50
+
+
 def container_status_to_msg(state) -> str:
     if not state:
         return Texts.CONTAINER_NOT_CREATED_MSG
@@ -57,7 +62,8 @@ def container_status_to_msg(state) -> str:
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
     indent = ' ' * spaces
-    return indent.join([f'{mount.name} @ {mount.mount_path}\n' for mount in volume_mounts]) if volume_mounts else ''
+    return indent.join([(wrap_text(f'{mount.name} @ {mount.mount_path}', width=CONTAINER_DETAILS_MAX_WIDTH,
+                                   spaces=spaces + 2) + "\n") for mount in volume_mounts]) if volume_mounts else ''
 
 
 def unify_units(name: str, value: str) -> str:
@@ -79,14 +85,16 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     indent = ' ' * spaces
     if resources.requests:
         msg += header_indent
+
         msg += Texts.CONTAINER_REQUESTS_LIST_HEADER.format(indent)
-        msg += indent.join([unify_units(request_name, request_value) for request_name, request_value
-                            in resources.requests.items()])
+
+        msg += indent.join([wrap_text(unify_units(request_name, request_value), width=CONTAINER_DETAILS_MAX_WIDTH,
+                                      spaces=spaces + 2) for request_name, request_value in resources.requests.items()])
     if resources.limits:
         msg += header_indent
         msg += Texts.CONTAINER_LIMITS_LIST_HEADER.format(indent)
-        msg += indent.join([unify_units(limit_name, limit_value) for limit_name, limit_value
-                            in resources.limits.items()])
+        msg += indent.join([wrap_text(unify_units(limit_name, limit_value), width=CONTAINER_DETAILS_MAX_WIDTH,
+                                      spaces=spaces + 2) for limit_name, limit_value in resources.limits.items()])
 
     return msg
 
@@ -131,9 +139,11 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
         for pod in pods:
             status_string = ""
             for cond in pod.status.conditions:
-                msg = "\n" if not cond.reason else "\n reason: " + cond.reason
-                msg = msg + ", \n message: " + cond.message if cond.message else msg
-                status_string += cond.type + ": " + cond.status + msg
+                msg = "\n" if not cond.reason else "\n reason: " + \
+                                                   wrap_text(cond.reason, width=POD_CONDITIONS_MAX_WIDTH)
+                msg = msg + ", \n message: " + wrap_text(cond.message, width=POD_CONDITIONS_MAX_WIDTH) \
+                    if cond.message else msg
+                status_string += wrap_text(cond.type + ": " + cond.status, width=POD_CONDITIONS_MAX_WIDTH) + msg + "\n"
 
             if pod.status.phase.upper() == PodStatus.PENDING.value:
                 pending_pods.append(pod.metadata.name)
@@ -159,11 +169,9 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
 
             container_details = ''.join(container_details)
 
-            uid = pod.metadata.uid.replace("-", "-\n")
-            tabular_output.append([
-                pod.metadata.name, uid, status_string,
-                container_details
-            ])
+            tabular_output.append([pod.metadata.name,
+                                   wrap_text(pod.metadata.uid, width=UID_MAX_WIDTH, spaces=0),
+                                   status_string, container_details])
         click.echo(tabulate(tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
 
         try:
