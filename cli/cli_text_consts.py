@@ -110,8 +110,8 @@ class UserCreateCmdTexts:
     HELP_F = "Name of file where user's configuration will be stored. If not given configuration is stored in the " \
              "config. file."
     ADD_USER_ERROR_MSG = "User {username} has not been created."
-    REMOVE_USER_ERROR_MSG = "Partially created user {username}" \
-                            " has not been removed successfully - please remove the user manually."
+    REMOVE_USER_ERROR_MSG = "Additional error appeared when the system tried to remove artifacts of a non-created " \
+                            "{username} user. Please contact an administrator to completely remove those artifacts."
     F_L_OPTIONS_EXCLUSION_ERROR_MSG = "Both -f/--filename and -l/--list_only options cannot be given. Please " \
                                       "choose one of them."
     NAME_VALIDATION_ERROR_MSG = "Error detected while validating user name: {username}."
