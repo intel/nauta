@@ -148,7 +148,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         v["experimentName"] = experiment_name
         v["registry_port"] = str(cluster_registry_port)
         v["image"]["clusterRepository"] = f'127.0.0.1:{cluster_registry_port}/{run_name}'
-        regex = re.compile("^\[.*|^\{.*")
+        regex = re.compile("^\[.*|^\{.*")  # Regex used for detecting dicts/arrays in pack params
 
         workersCount = None
         pServersCount = None
@@ -159,6 +159,9 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                     value = ast.literal_eval(value)
                 except Exception as e:
                     raise AttributeError(Texts.CANT_PARSE_VALUE.format(value=value, error=e))
+            # Handle boolean params
+            elif value in {"true", "false"}:
+                value = _parse_yaml_boolean(value)
             if key == WORK_CNT_PARAM:
                 workersCount = value
             if key == P_SERV_CNT_PARAM:
@@ -235,3 +238,19 @@ def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:
     log.debug(f"Pod count for Run: {run_folder} = {pod_count}")
 
     return int(pod_count) if pod_count else None
+
+
+def _parse_yaml_boolean(value: str) -> bool:
+    """
+    Parse string according to YAML 1.2 boolean spec:
+    http://yaml.org/spec/1.2/spec.html#id2803231
+    :param value: YAML boolean string
+    :return: bool if string matches YAML boolean spec
+    """
+    value = str(value)
+    if value == 'true':
+        return True
+    elif value == 'false':
+        return False
+    else:
+        raise ValueError(f'Passed string: {value} is not valid YAML boolean.')
