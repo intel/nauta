@@ -77,39 +77,49 @@ platform_ansible_run() {
         >&2 echo "Config file should be provided for platform installation"
         exit 1
     fi
+    set +e
     ansible_run ${CURDIR}/platform/dls.yml
     ret_val=$?
+    set -e
     show_error_message $ret_val
     return $ret_val
 }
 
 dls4e_ansible_run() {
     export KIND=dls4e
+    set +e
     ansible_run ${CURDIR}/dls4e/install.yml
     ret_val=$?
+    set -e
     show_error_message $ret_val
     return $ret_val
 }
 
 dls4e_fetch_ansible_run() {
     export KIND=dls4e
+    set +e
     ansible_run ${CURDIR}/dls4e/fetch.yml
     ret_val=$?
+    set -e
     show_error_message $ret_val
     return $ret_val
 }
 
 platform_verify_ansible_run() {
     export KIND=platform
+    set +e
     ansible_run ${CURDIR}/platform/verification.yml
     ret_val=$?
+    set -e
     show_error_message $ret_val
     return $ret_val
 }
 
 show_error_message() {
     if [ "$1" != "0" ]; then
-        echo "An error during installation occurred. Please refer to installation documentation. In case of further problems please contact with technical support."
+        echo ""
+        echo "\033[0;31mAn error during installation occurred. Please refer to installation documentation. In case of further problems please contact with technical support.\033[0m"
+        echo ""
     fi
 }
 
