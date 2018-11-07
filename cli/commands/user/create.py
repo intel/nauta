@@ -72,7 +72,7 @@ users:
 DEFAULT_FILENAME = "{}.config"
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c', options_metavar='[options]')
 @click.argument('username', required=True)
 @click.option("-l", "--list_only", is_flag=True, help=Texts.HELP_L)
 @click.option("-f", "--filename", help=Texts.HELP_F)

@@ -38,7 +38,7 @@ logger = initialize_logger(__name__)
 PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v', options_metavar='[options]')
 @common_options(verify_dependencies=False, verify_config_path=False)
 @pass_state
 def version(state: State):

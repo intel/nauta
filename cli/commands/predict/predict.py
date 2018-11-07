@@ -31,7 +31,7 @@ logger = initialize_logger(__name__)
 
 
 @click.group(short_help=Texts.HELP, cls=AliasGroup, alias='p', help=Texts.HELP,
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
+             subcommand_metavar="COMMAND [options] [args]...")
 def predict():
     pass
 

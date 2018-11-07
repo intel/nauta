@@ -50,7 +50,7 @@ def validate_local_model_location(local_model_location: str):
 
 # noinspection PyUnusedLocal
 
-@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b')
+@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b', options_metavar='[options]')
 @click.option('-n', '--name', help=Texts.HELP_NAME, callback=validate_experiment_name)
 @click.option('-m', '--model-location', help=Texts.HELP_MODEL_LOCATION)
 @click.option("-l", "--local_model_location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)

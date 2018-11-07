@@ -39,7 +39,7 @@ from cli_text_consts import PredictStreamCmdTexts as Texts
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='s')
+@click.command(short_help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.option('-n', '--name', required=True, help=Texts.HELP_N)
 @click.option('-d', '--data', required=True, type=click.Path(exists=True), help=Texts.HELP_D)
 @click.option('-m', '--method-verb', default=InferenceVerb.PREDICT.value,

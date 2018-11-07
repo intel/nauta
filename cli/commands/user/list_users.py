@@ -35,7 +35,8 @@ from cli_text_consts import UserListCmdTexts as Texts
 logger = initialize_logger(__name__)
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, name='list', cls=AliasCmd, alias='ls')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, name='list', cls=AliasCmd, alias='ls',
+               options_metavar='[options]')
 @click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @common_options()
 @pass_state

@@ -57,8 +57,8 @@ experiment_name = 'experiment'
 experiment_name_plural = 'experiments'
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c')
-@click.argument("name", required=False)
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c', options_metavar='[options]')
+@click.argument("name", required=False, metavar="[name]")
 @click.option('-m', '--match', help=Texts.HELP_M)
 @click.option('-p', '--purge', help=Texts.HELP_P, is_flag=True)
 @click.option('-i', '--pod-ids', help=Texts.HELP_I)

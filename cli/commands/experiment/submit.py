@@ -87,7 +87,7 @@ def format_run_message(run_message: Optional[str]) -> str:
     return textwrap.fill(run_message, width=60) if run_message else ''
 
 
-@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
 @click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob")
@@ -97,7 +97,7 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=Texts.HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=Texts.HELP_PS)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
-@click.argument("script_parameters", nargs=-1, metavar='[-- SCRIPT_PARAMETERS]', callback=clean_script_parameters)
+@click.argument("script_parameters", nargs=-1, metavar='[-- script_parameters]', callback=clean_script_parameters)
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,

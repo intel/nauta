@@ -42,7 +42,7 @@ USER_DEL_CM = "dls4enterprise-user-del"
 DLS4E_NAMESPACE = "dls4e"
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='d')
+@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='d', options_metavar='[options]')
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=Texts.HELP_PR)
 @common_options()

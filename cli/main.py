@@ -97,7 +97,7 @@ def configure_cli_logs():
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup, help=BANNER,
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
+             subcommand_metavar="COMMAND [options] [args]...")
 def entry_point():
     configure_cli_logs()
 

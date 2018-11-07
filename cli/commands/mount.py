@@ -60,7 +60,7 @@ class ShareData():
         return [self.status, self.local_share, self.remote_share, self.network]
 
 
-@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='m')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='m', options_metavar='[options]')
 @click.option('-l', '--list', help=Texts.HELP_L, is_flag=True)
 @common_options()
 @pass_state

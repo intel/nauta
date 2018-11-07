@@ -41,7 +41,8 @@ CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 
-@click.command("template_list", short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='t')
+@click.command("template_list", short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='t',
+               options_metavar='[options]')
 @common_options()
 def template_list():
     path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")

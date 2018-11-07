@@ -38,7 +38,7 @@ from util.exceptions import KubectlConnectionError, InvalidOsError
 logger = initialize_logger(__name__)
 
 
-@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='ver')
+@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='ver', options_metavar='[options]')
 @common_options(verify_dependencies=False, verify_config_path=True)
 @pass_state
 def verify(state: State):

@@ -33,7 +33,7 @@ logger = initialize_logger(__name__)
 
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='u',
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
+             subcommand_metavar="COMMAND [options] [args]...")
 def user():
     pass
 

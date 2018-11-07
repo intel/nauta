@@ -105,7 +105,11 @@ class UserListCmdTexts:
 
 
 class UserCreateCmdTexts:
-    HELP = "Command used to create a new user on the platform. Can only be run by a platform administrator."
+    HELP = """
+    Command used to create a new user on the platform. Can only be run by a platform administrator. 
+
+    USERNAME - is a name of user which should be created.
+    """
     HELP_L = "If given - content of the generated user's config file is displayed on the screen only."
     HELP_F = "Name of file where user's configuration will be stored. If not given configuration is stored in the " \
              "config. file."
@@ -133,7 +137,11 @@ class UserCreateCmdTexts:
     CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
 
 class UserDeleteCmdTexts:
-    HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
+    HELP = """
+    Command used to delete a user from the platform. Can be only run by a platform administrator.
+
+    USERNAME - is a name of user which should be deleted.
+    """
     HELP_PR = "If this option is added, the command removes all of client's artifacts."
     USER_NOT_ADMIN_ERROR_MSG = "Only administrators can delete users."
     USER_NOT_EXISTS_ERROR_MSG = "User {username} doesn't exists."
@@ -168,7 +176,11 @@ class LaunchCmdTexts:
     APP_PROXY_EXISTS_ERROR_MSG = "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - " \
                                  "close it manually."
     APP_PROXY_OTHER_ERROR_MSG = "Other exception during launching web application."
-    TB_HELP = "Subcommand for launching tensorboard with credentials"
+    TB_HELP = """
+    Subcommand for launching tensorboard with credentials.
+
+    EXPERIMENT_NAME - is a name of experiment for which tensorboard instance should be launched.
+    """
     TB_HELP_TSCP = "Local port on which tensorboard service client will be started."
     TB_INVALID_RUNS_MSG = "There is no data for the following experiments : {invalid_runs}\n" \
                           "Tensorboard will present information from the rest of given experiments."
@@ -234,7 +246,11 @@ class PredictStreamCmdTexts:
 
 
 class PredictCancelCmdTexts:
-    HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
+    HELP = """
+    Cancels prediction instance/s chosen based on criteria given as a parameter.
+
+    name - is a name of prediction instance which should be cancelled, name argument value can be empty when 'match' option is used.
+    """
     HELP_P = "If given, then all information concerning all prediction instances, completed and currently " \
              "running, is removed from the system."
     HELP_M = "If given, command searches for prediction instances matching the value of this option."
@@ -288,7 +304,12 @@ class ExperimentTemplateListCmdTexts:
 
 
 class ExperimentLogsCmdTexts:
-    HELP = "Show logs for a given experiment."
+    HELP = """
+    Show logs for a given experiment.
+
+    experiment_name - is a name of experiment whose logs should be displayed, experiment_name argument value can be
+    empty when 'match' option is used.
+    """
     HELP_S = "Show all events with this specified minimal and greater severity."
     HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
     HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
@@ -320,7 +341,14 @@ class ExperimentLogsCmdTexts:
 
 
 class ExperimentSubmitCmdTexts:
-    HELP = "Command used to submitting training scripts."
+    HELP = """
+    Command used to submitting training scripts.
+
+    SCRIPT_LOCATION - is a location of the script used for training purposes - it is an obligatory argument.
+
+    script_parameters - contains parameters passed directly to the script - all such parameters should be added
+    at the end of command after '--' string.
+    """
     HELP_N = "Name for this experiment."
     HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. If not " \
                "given - its content won't be copied into an image."
@@ -387,11 +415,16 @@ class ExperimentInteractCmdTexts:
 
 
 class ExperimentCancelCmdTexts:
-    HELP = "Cancels experiment/s or deletes pods chosen based on criteria given as parameters."
+    HELP = """
+    Cancels experiment/s or deletes pods chosen based on criteria given as parameters.
+
+    name - is a name of experiment which should be cancelled, name argument value can be empty when 'match'
+    option is used.
+    """
     HELP_P = "If given, then all information concerning all experiments, completed and currently running, is removed " \
              "from the system."
     HELP_M = "If given, command searches for experiments matching the value of this option. This option cannot be " \
-             "used along with the NAME argument."
+             "used along with the name argument."
     HELP_I = "Comma-separated pods IDs - if given then matches pods by their IDs and deletes them."
     HELP_S = "One of: {available_statuses} - searches pods by their status and deletes them."
     NAME_M_BOTH_GIVEN_ERROR_MSG = "Both name and -m option cannot be given. Please choose one of them."
@@ -446,7 +479,11 @@ class ExperimentCancelCmdTexts:
 
 
 class ExperimentViewCmdTexts:
-    HELP = "Displays details of experiment with a given name."
+    HELP = """
+    Displays details of experiment with a given name.
+
+    EXPERIMENT_NAME - is a name of experiment whose details should be displayed.
+    """
     HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
     CONTAINER_DETAILS_MSG = "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:\n  {resources}"
     EXPERIMENT_NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
@@ -513,7 +550,6 @@ class ExperimentCommonTexts:
     CREATING_ENVIRONMENT_MSG = "Creating {run_name} environment..."
     CREATING_RESOURCES_MSG = "Creating {run_name} resources..."
     CLUSTER_CONNECTION_CLOSING_MSG = "Closing tunnel to the cluster..."
-
 
 
 class DraftCmdTexts:

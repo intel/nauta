@@ -45,7 +45,8 @@ FORWARDED_URL = 'http://localhost:{}'
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='ui', short_help=Texts.WEBUI_HELP, help=Texts.WEBUI_HELP)
+@click.command(cls=AliasCmd, alias='ui', short_help=Texts.WEBUI_HELP, help=Texts.WEBUI_HELP,
+               options_metavar='[options]')
 @common_options()
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
@@ -56,7 +57,7 @@ def webui(state: State, no_launch: bool, port: int):
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.TB_HELP)
+@click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.TB_HELP, options_metavar='[options]')
 @common_options()
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
@@ -106,7 +107,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
 
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='l',
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
+             subcommand_metavar="COMMAND [options] [args]...")
 def launch():
     pass
 

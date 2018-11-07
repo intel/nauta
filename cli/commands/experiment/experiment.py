@@ -31,7 +31,7 @@ logger = initialize_logger(__name__)
 
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='exp',
-             subcommand_metavar="COMMAND [OPTIONS] [ARGS]...")
+             subcommand_metavar="COMMAND [options] [args]...")
 def experiment():
     pass
 
