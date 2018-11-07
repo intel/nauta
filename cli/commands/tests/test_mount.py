@@ -36,13 +36,13 @@ TEST_ADR = "test_address"
 
 CORRECT_LINUX_MOUNT = f"sudo mount.cifs -o username={TEST_USR},password=" \
                       f"{TEST_PSW},rw,uid=10001 //{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
-CORRECT_LINUX_UNMOUNT = "sudo umount <MOUNTPOINT>"
+CORRECT_LINUX_UNMOUNT = "sudo umount <MOUNTPOINT> [-fl]"
 
 CORRECT_WINDOWS_MOUNT = f"net use <MOUNTPOINT> \\\\{TEST_ADR}\\<DLS4E_FOLDER> /user:{TEST_USR} {TEST_PSW}"
 CORRECT_WINDOWS_UNMOUNT = "net use <MOUNTPOINT> /d"
 
 CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
-CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT>"
+CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT> [-fl]"
 
 MOUNT_IP = "1.2.3.4"
 
@@ -152,6 +152,7 @@ def test_mount(mocker):
 
         assert CORRECT_LINUX_MOUNT in result.output
         assert CORRECT_LINUX_UNMOUNT in result.output
+        assert Texts.UNMOUNT_OPTIONS_MSG in result.output
         assert os_getuid_mock.call_count == 1
 
     mocker.patch("platform.system", return_value="Windows")
@@ -160,6 +161,7 @@ def test_mount(mocker):
 
     assert CORRECT_WINDOWS_MOUNT in result.output
     assert CORRECT_WINDOWS_UNMOUNT in result.output
+    assert Texts.UNMOUNT_OPTIONS_MSG not in result.output
 
     mocker.patch("platform.system", return_value="OSX")
 
@@ -167,6 +169,7 @@ def test_mount(mocker):
 
     assert CORRECT_OSX_MOUNT in result.output
     assert CORRECT_OSX_UNMOUNT in result.output
+    assert Texts.UNMOUNT_OPTIONS_MSG in result.output
 
     if host_system != 'Windows':
         call_number = 3

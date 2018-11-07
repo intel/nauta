@@ -92,6 +92,9 @@ def mount(state: State, list: bool):
     click.echo(Texts.UNMOUNT_COMMAND_MSG)
     click.echo(get_unmount_command())
 
+    if platform.system() != "Windows":
+        click.echo(Texts.UNMOUNT_OPTIONS_MSG)
+
 
 def get_unmount_command() -> str:
     if platform.system() == 'Linux':
@@ -121,7 +124,7 @@ def get_mount_command_linux(usr: str, psw: str, adr: str) -> str:
 
 
 def get_unmount_command_linux() -> str:
-    return f"sudo umount <MOUNTPOINT>"
+    return f"sudo umount <MOUNTPOINT> [-fl]"
 
 
 def get_mount_command_windows(usr: str, psw: str, adr: str) -> str:
@@ -137,7 +140,7 @@ def get_mount_command_osx(usr: str, psw: str, adr: str) -> str:
 
 
 def get_unmount_command_osx() -> str:
-    return f"umount <MOUNTPOINT>"
+    return f"umount <MOUNTPOINT> [-fl]"
 
 
 def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool = False):

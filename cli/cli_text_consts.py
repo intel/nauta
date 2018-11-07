@@ -61,6 +61,8 @@ as output/<EXPERIMENT_NAME>.
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
     UNMOUNT_COMMAND_MSG = "Use following command to unmount previously mounted folder:"
+    UNMOUNT_OPTIONS_MSG = "In case of problems with unmounting (disconnected disk etc.) try out -f (force) or -l " \
+                          "(lazy) options. For more info about these options refer to man umount."
     MOUNTS_LIST_COMMAND_ERROR_MSG = "Error detected while gathering list of mounted shares."
 
 
