@@ -1,4 +1,0 @@
-apiVersion: v1
-name: priority-classes
-description: Definition of priority classes
-version: 1.0.0

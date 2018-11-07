@@ -69,7 +69,6 @@ spec:
           - name: shared-data
             mountPath: /pod-data
       restartPolicy: OnFailure
-      priorityClassName: low-priority
       volumes:
         - name: input-home
           persistentVolumeClaim:

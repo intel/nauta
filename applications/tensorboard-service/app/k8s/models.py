@@ -102,7 +102,6 @@ class K8STensorboardInstance:
                                                   labels=deployment_labels
                                               ),
                                               spec=k8s.V1PodSpec(
-                                                  priority_class_name="medium-priority",
                                                   containers=[
                                                       k8s.V1Container(
                                                           name='app',

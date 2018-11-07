@@ -12,7 +12,7 @@ kubernetes_default_admission_control:
   - PodPreset
 
 kubernetes_default_feature_gates:
-  PodPriority: true # enable POD prioritizing
+  PodPriority: false # enable POD prioritizing
   TaintBasedEvictions: true # secured schedule
   TaintNodesByCondition: true
   VolumeScheduling: true
