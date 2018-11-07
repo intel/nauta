@@ -22,7 +22,7 @@
 <template>
 <div id="buttons_block">
   <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">
-    {{ labels.LAUNCH_TB }}
+    {{ labels.LAUNCH_TB }}*
   </v-btn>
   <v-menu bottom offset-y>
     <v-btn slot="activator" dark small>

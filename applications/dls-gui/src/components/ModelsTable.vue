@@ -53,8 +53,8 @@
               <table class="datatable table">
                 <thead>
                 <tr>
-                  <th width="55px">
-                    <div class="select-icon"></div>
+                  <th width="150px">
+                    <div>{{ labels.TENSORBOARD_ELIGIBILITY }}</div>
                   </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
                       @mouseover="hoveredColumnIdx = idx" @mouseleave="hoveredColumnIdx = null" width="210px">
@@ -549,9 +549,6 @@ export default {
   background-color: #f2f2f2;
   border-right: 1px solid #ffffff;
 }
-.table-style th:first-child {
-  background-color: #ffffff;
-}
 .table-style tr:nth-child(even) {
   background-color: #f2f2f2;
 }
@@ -559,6 +556,8 @@ export default {
   font-size: 12px;
 }
 .select-icon {
+  margin-left: auto;
+  margin-right: auto;
   width: 24px;
 }
 .pointer-btn {
