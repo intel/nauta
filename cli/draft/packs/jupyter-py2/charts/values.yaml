@@ -6,7 +6,7 @@ JupyterPort: 8888
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: '' # Filled by dlsctl
+  clusterRepository: {{ DLS4e.ExperimentImage }}
 
 service:
   type: ClusterIP
@@ -17,5 +17,5 @@ resources:
     memory: 1Gi
 
 
-experimentName: ''
+experimentName:  {{ DLS4e.ExperimentName }} 
 podCount: 1

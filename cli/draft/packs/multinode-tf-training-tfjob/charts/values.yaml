@@ -7,12 +7,13 @@ TensorIPythonPort: 6006
 
 commandline:
   args:
-    - "/app/training.py"
-    - "--data_dir=/temp"
+    {% for arg in DLS4e.CommandLine %}
+    - {{ arg }}
+    {% endfor %}
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: ''
+  clusterRepository: {{ DLS4e.ExperimentImage }}
 
 service:
   type: ClusterIP
@@ -39,7 +40,8 @@ sidecar_resources:
     memory: 1Gi
 
 
-experimentName: ''
+experimentName: {{ DLS4e.ExperimentName }} 
+registryPort: {{ DLS4e.RegistryPort }}
 
 workersCount: 3
 psSidecarLoggingLevel: "WARNING"

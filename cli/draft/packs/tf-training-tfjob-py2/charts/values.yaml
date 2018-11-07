@@ -7,12 +7,13 @@ TensorIPythonPort: 6006
 
 commandline:
   args:
-    - "/app/training.py"
-    - "--data_dir=/temp"
+    {% for arg in DLS4e.CommandLine %}
+    - {{ arg }}
+    {% endfor %}
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: ''
+  clusterRepository: {{ DLS4e.ExperimentImage }}
 
 service:
   type: ClusterIP
@@ -25,5 +26,5 @@ resources:
     cpu: 38
     memory: 120Gi
 
-experimentName: ''
+experimentName: {{ DLS4e.ExperimentName }} 
 podCount: 1

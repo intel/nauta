@@ -125,7 +125,7 @@ spec:
               resources:
 {{ toYaml .Values.ps_resources | indent 16 }}
             - name: sidecar
-              image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/ps-sidecar:1.0.0"
+              image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/ps-sidecar:1.0.0"
               imagePullPolicy: Always
               env:
                 - name: MY_POD_NAME
