@@ -29,7 +29,6 @@ from util.system import execute_system_command
 from util.logger import initialize_logger, get_verbosity_level
 from cli_text_consts import DraftCmdTexts as Texts
 
-
 logger = initialize_logger('draft.cmd')
 
 DRAFT_BIN = 'draft'
@@ -46,19 +45,22 @@ def call_draft(args: List[str], cwd: str = None, namespace: str = None, logs_siz
     full_command.extend(args)
     if get_verbosity_level() == logging.DEBUG:
         full_command.append('--debug')
-
     env = os.environ.copy()
+    env['PATH'] = config_path + os.pathsep + env['PATH']
     env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)
     if namespace:
         env['TILLER_NAMESPACE'] = namespace
-    return execute_system_command(full_command, env=env, cwd=cwd, logs_size=logs_size)
+    return execute_system_command(
+        full_command, env=env, cwd=cwd, logs_size=logs_size)
 
 
-def create(working_directory: str = None, pack_type: str = None) -> (str, int, str):
+def create(working_directory: str = None,
+           pack_type: str = None) -> (str, int, str):
     command = ['create']
     if pack_type:
         command.append('--pack={}'.format(pack_type))
-    output, exit_code, log_output = call_draft(args=command, cwd=working_directory)
+    output, exit_code, log_output = call_draft(
+        args=command, cwd=working_directory)
 
     if not exit_code:
         output, exit_code = check_create_status(output)
@@ -68,8 +70,10 @@ def create(working_directory: str = None, pack_type: str = None) -> (str, int, s
     return output, exit_code, log_output
 
 
-def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
-    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace, logs_size=200)
+def up(working_directory: str = None,
+       namespace: str = None) -> (str, int, str):
+    output, exit_code, log_output = call_draft(
+        args=['up'], cwd=working_directory, namespace=namespace, logs_size=200)
     # displaying logs from draft - only in debug mode
     pattern = "Inspect the logs with `draft logs (.*)`"
 
@@ -82,17 +86,19 @@ def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
             draft_logs_filename = search_result.group(1)
 
             config_path = Config().config_path
-            filename = os.path.join(config_path, DRAFT_HOME_FOLDER, DRAFT_LOGS_FOLDER, draft_logs_filename)
+            filename = os.path.join(config_path, DRAFT_HOME_FOLDER,
+                                    DRAFT_LOGS_FOLDER, draft_logs_filename)
 
             with open(filename, "r") as file:
                 logger.debug("Draft logs:")
                 logger.debug(file.read())
-                logger.debug(20*"-")
+                logger.debug(20 * "-")
         else:
             logger.debug("Lack of logs from draft.")
     except Exception as exe:
         # exception here shouldn't block finishing of the operation
-        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(exception=str(exe))
+        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(
+            exception=str(exe))
         logger.error(error_message)
 
     if not exit_code:

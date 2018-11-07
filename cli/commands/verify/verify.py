@@ -24,7 +24,7 @@ from sys import exit
 import click
 
 from cli_state import common_options, pass_state, State
-from util.dependencies_checker import check_dependency, DEPENDENCY_MAP, check_os, save_dependency_versions
+from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster, check_port_forwarding
@@ -71,7 +71,7 @@ def verify(state: State):
         exit(1)
 
     dependency_versions = {}
-    for dependency_name, dependency_spec in DEPENDENCY_MAP.items():
+    for dependency_name, dependency_spec in get_dependency_map().items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=dependency_name)):

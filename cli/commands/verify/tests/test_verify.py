@@ -74,6 +74,10 @@ def test_verify_with_kubectl_connection_success(mocker):
     check_dependency_mock = mocker.patch.object(verify, "check_dependency")
     mocker.patch.object(verify, "check_os")
 
+    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config = mocker.patch('util.dependencies_checker.Config')
+    fake_config.return_value.config_path = fake_config_path
+
     runner = CliRunner()
     runner.invoke(verify.verify, [])
 
