@@ -31,7 +31,7 @@ from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
     get_kubectl_host
-from util.aliascmd import AliasCmd
+from util.aliascmd import AliasGroup, AliasCmd
 from util.system import handle_error, execute_system_command
 from cli_text_consts import MountCmdTexts as Texts
 
@@ -60,22 +60,33 @@ class ShareData():
         return [self.status, self.local_share, self.remote_share, self.network]
 
 
-@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='m', options_metavar='[options]')
-@click.option('-l', '--list', help=Texts.HELP_L, is_flag=True)
-@common_options()
-@pass_state
-def mount(state: State, list: bool):
+def is_admin(state: State):
     try:
-        is_admin = is_current_user_administrator()
+        return is_current_user_administrator()
     except Exception:
         handle_error(logger, Texts.ADMIN_CHECK_ERROR_MSG, Texts.ADMIN_CHECK_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
-    if list:
-        display_mounts(is_admin)
-    else:
-        if is_admin:
+
+def print_unmount():
+    click.echo()
+    click.echo(Texts.UNMOUNT_COMMAND_MSG)
+    click.echo(get_unmount_command())
+
+    if platform.system() != "Windows":
+        click.echo(Texts.UNMOUNT_OPTIONS_MSG)
+
+
+@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='m', invoke_without_command=True,
+             subcommand_metavar='command [options]')
+@common_options()
+@pass_state
+@click.pass_context
+def mount(context, state: State):
+
+    if context.invoked_subcommand is None:
+        if is_admin(state):
             handle_error(logger, Texts.USER_IS_ADMIN_ERROR_MSG, Texts.USER_IS_ADMIN_ERROR_MSG)
             exit(1)
 
@@ -88,12 +99,7 @@ def mount(state: State, list: bool):
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
 
-    click.echo()
-    click.echo(Texts.UNMOUNT_COMMAND_MSG)
-    click.echo(get_unmount_command())
-
-    if platform.system() != "Windows":
-        click.echo(Texts.UNMOUNT_OPTIONS_MSG)
+        print_unmount()
 
 
 def get_unmount_command() -> str:
@@ -238,12 +244,17 @@ def get_mounts_windows():
                         tablefmt="orgtbl"))
 
 
-def display_mounts(is_admin: bool = False):
+@mount.command(help=Texts.HELP_L, short_help=Texts.HELP_L, cls=AliasCmd, alias='ls', options_metavar='[options]')
+@common_options()
+@pass_state
+def list(state: State):
     username = get_current_user()
 
     if platform.system() == 'Linux':
-        get_mounts_linux_osx(username=username, is_admin=is_admin)
+        get_mounts_linux_osx(username=username, is_admin=is_admin(state))
     elif platform.system() == 'Windows':
         get_mounts_windows()
     else:  # OSX
-        get_mounts_linux_osx(username=username, is_admin=is_admin, osx=True)
+        get_mounts_linux_osx(username=username, is_admin=is_admin(state), osx=True)
+
+    print_unmount()
