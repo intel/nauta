@@ -41,7 +41,7 @@ sidecar_resources:
 
 
 experimentName: {{ DLS4e.ExperimentName }} 
-
+registryPort: {{ DLS4e.RegistryPort }}
 workersCount: 3
 psSidecarLoggingLevel: "WARNING"
 pServersCount: 1

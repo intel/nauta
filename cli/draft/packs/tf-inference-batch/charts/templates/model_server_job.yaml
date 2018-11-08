@@ -59,7 +59,7 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
         - name: sidecar
-          image: "127.0.0.1:{{ .Values.registry_port }}/dls4e/tf-serving-sidecar:v1.0.0"
+          image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/tf-serving-sidecar:v1.0.0"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: BATCH_WRAPPER_JOB_NAME

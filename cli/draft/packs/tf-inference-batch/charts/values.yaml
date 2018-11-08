@@ -23,5 +23,6 @@ resources:
 
 experimentName: {{ DLS4e.ExperimentName }} 
 podCount: 2
+registryPort: {{ DLS4e.RegistryPort }}
 
 logLevel: 'INFO'
