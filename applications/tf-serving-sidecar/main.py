@@ -42,6 +42,10 @@ with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", mode='r') a
 if not my_current_namespace:
     raise RuntimeError(f"error reading my current namespace {str(my_current_namespace)}")
 
+# CAN-1237 - by setting level of logs for k8s rest client to INFO I'm removing displaying content of
+# every rest request sent by k8s client
+k8s_rest_logger = log.getLogger('kubernetes.client.rest')
+k8s_rest_logger.setLevel(log.INFO)
 
 v1 = client.BatchV1Api()
 
