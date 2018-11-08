@@ -171,8 +171,8 @@ def test_list_experiments_one_user_success(mocker, capsys):
 
     captured = capsys.readouterr()
 
-    assert "2018-04-26 13:43:01" not in captured.out
-    assert "2018-05-08 13:05:04" in captured.out
+    assert "2018-04-26 01:43:01 PM" not in captured.out
+    assert "2018-05-08 01:05:04 PM" in captured.out
     assert "Parameters" not in captured.out
     assert "Owner" in captured.out
     assert get_namespace_mock.call_count == 0

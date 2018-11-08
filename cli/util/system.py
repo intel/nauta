@@ -176,12 +176,13 @@ def check_port_availability(port: int) -> bool:
 
 def format_timestamp_for_cli(timestamp: str) -> str:
     """
-    Change timestamp from e.g. "2018-10-11T20:20:30Z" to "2018-10-11 21:20:30" (assuming that local timezone is +01:00).
+    Change timestamp from e.g. "2018-10-11T20:20:30Z" to "2018-10-11 9:20:30 PM"
+    (assuming that local timezone is +01:00).
 
     :param timestamp: timestamp which will be converted
     :return: formatted version of the timestamp
     """
-    cli_timestamp = dateutil.parser.parse(timestamp).astimezone(dateutil.tz.tzlocal()).strftime("%Y-%m-%d %H:%M:%S")
+    cli_timestamp = dateutil.parser.parse(timestamp).astimezone(dateutil.tz.tzlocal()).strftime("%Y-%m-%d %I:%M:%S %p")
     return cli_timestamp
 
 

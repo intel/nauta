@@ -19,7 +19,9 @@
  * and approved by Intel in writing.
  */
 
-export default function (timedate) {
+import moment from 'moment';
+
+export function TimedateExtractor (timedate) {
   const timestamp = timedate.getTime();
   if (timestamp < 0) {
     return {
@@ -44,3 +46,7 @@ export default function (timedate) {
     seconds
   };
 }
+
+export const toLocaleFormat = function (timedate) {
+  return moment(timedate).format('MM/DD/YYYY hh:mm:ss a');
+};

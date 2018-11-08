@@ -91,7 +91,7 @@ def test_format_timestamp_for_cli(mocker):
 
     cli_timestamp = format_timestamp_for_cli("2018-10-11T20:30:30Z")
 
-    assert cli_timestamp == "2018-10-11 21:30:30"
+    assert cli_timestamp == "2018-10-11 09:30:30 PM"
 
 
 def test_handle_error_no_logger(mocker):

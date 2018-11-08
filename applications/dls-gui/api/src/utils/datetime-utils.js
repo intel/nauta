@@ -19,6 +19,8 @@
  * and approved by Intel in writing.
  */
 
+const moment = require('moment');
+
 module.exports.parseStringToUTC = function (str) {
   const timestamp = Date.parse(str);
   const result = new Date(timestamp);
@@ -43,5 +45,5 @@ module.exports.getLocaleStringForOffset = function (timeString, offset) {
   const serverOffset = new Date().getTimezoneOffset();
   const offsetDifference = offset - serverOffset;
   const unifiedTimestamp = new Date(timeString).getTime() - offsetDifference * 60 * 1000; // add miliseconds offset
-  return new Date(unifiedTimestamp).toLocaleString();
+  return moment(unifiedTimestamp).format('MM/DD/YYYY hh:mm:ss a');
 };

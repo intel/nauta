@@ -53,7 +53,7 @@
               <table class="datatable table">
                 <thead>
                 <tr>
-                  <th width="150px">
+                  <th v-if="filteredDataCount !== 0" width="150px">
                     <div>{{ labels.TENSORBOARD_ELIGIBILITY }}</div>
                   </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
@@ -191,7 +191,7 @@ import ExpKeyValDetail from './ModelsTableFeatures/ExpKeyValDetail';
 import LogsDetail from './ModelsTableFeatures/LogsDetail';
 import ExpResourcesDetail from './ModelsTableFeatures/ExpResourcesDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
-import TimedateExtractor from '../utils/timedate-extractor';
+import {TimedateExtractor, toLocaleFormat} from '../utils/timedate-utils';
 
 const SORTING_ORDER = {
   ASC: 'asc',
@@ -460,10 +460,10 @@ export default {
     parseValue (key, arg1) {
       switch (key) {
         case 'creationTimestamp':
-          return new Date(arg1).toLocaleString();
+          return toLocaleFormat(arg1);
         case 'trainingStartTime':
         case 'trainingEndTime':
-          return arg1 ? new Date(arg1).toLocaleString() : '---';
+          return arg1 ? toLocaleFormat(arg1) : '---';
         case 'trainingDurationTime':
         case 'trainingTimeInQueue':
           const duration = new Date(arg1);
