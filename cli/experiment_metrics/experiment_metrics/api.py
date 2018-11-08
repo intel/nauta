@@ -49,11 +49,12 @@ if run_k8s_name:
     api = client.CustomObjectsApi(client.ApiClient())
 
 
-def publish(metrics):
+def publish(metrics, raise_exception=False):
     """
     Update metrics in specific Run object
     :param metrics Dict[str,str] of a data to apply
-    :return: in case of any problems during update it throws an exception
+    :param raise_exception raise exception if any error occurs during metrics publishing, e.g. key conflict
+    :return: with raise_exception=True in case of any problems during update it throws an exception
     """
     if not run_k8s_name:
         logger.info('[no-persist mode] Metrics: {}'.format(metrics))
@@ -76,4 +77,5 @@ def publish(metrics):
         except ApiException as e:
             if e.status != HTTPStatus.CONFLICT or i == MAX_RETRIES_COUNT-1:
                 logger.exception("Exception during saving metrics. All {} retries failed!".format(MAX_RETRIES_COUNT), e)
-                raise e
+                if raise_exception:
+                    raise e
