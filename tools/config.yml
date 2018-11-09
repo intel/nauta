@@ -140,20 +140,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/ingress"
     push: False
-  shared/build/kubernetes-dashboard:
-    version: "v1.8.3"
-    required:
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes-dashboard"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/go/go1.10.2.linux-amd64.tar.gz
-        dest: go1.10.2.linux-amd64.tar.gz
-        checksum: 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3.tar.gz
-        dest: kubernetes-dashboard-v1.8.3.tar.gz
-        checksum: 9096f86d4107a6d23f2cff5edd1acae2faf25719a343c319860fd6a7408f761d
   shared/build/kubernetes-addons:
     version: "v1.10.6"
     required:
@@ -178,17 +164,6 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
         dest: docker-ce-18.06.0.ce-3.el7.centos.src.rpm
         checksum: 2926f66a94f5b3bcd1e3feb0d7107f2fd2713cf3f412f84dcc8fe89120c43392
-  shared/build/nodejs:
-    version: "v8.12.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/nodejs"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nodejs/node-v8.12.0.tar.gz
-        dest: node-v8.12.0.tar.gz
-        checksum: b4797843136edd9195c28221a1680ae52c29d867fc5fc1c99f7d6e2f2126a67b
   shared/build/nginx:
     version: "v1.13.9"
     required:

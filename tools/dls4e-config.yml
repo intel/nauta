@@ -67,11 +67,8 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/fluentd"
   dls4e/registry:
     version: "2.6.2"
-    required:
-      BUILD_IMAGE: "shared/centos/build-go"
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/registry"
+    image: "registry:2.6.2"
+    method: pull
   dls4e/samba:
     version: "1.0.0"
     required:
@@ -173,11 +170,8 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/2.7"
   dls4e/nginx:
     version: "1.14.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      NGINX_BUILD_IMAGE: "shared/build/nginx"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/utils/nginx"
+    method: pull
+    image: "nginx:1.14.0"
   dls4e/tf/operator:
     version: "v2"
     required:
@@ -199,27 +193,16 @@ local_images:
     directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
   dls4e/ingress:
     version: "0.14.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-      NGINX_DATA_IMAGE: "shared/build/nginx"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/ingress-nginx"
+    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
+    method: "pull"
   dls4e/defaultbackend:
     version: "1.4"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/defaultbackend"
+    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
+    method: "pull"
   dls4e/dashboard:
     version: "v1.8.3"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-dashboard"
-    directory: "{{ playbook_dir }}/../../platform-containers/kubernetes-dashboard"
-    method: build
+    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
+    method: "pull"
   dls4e/tensorboard-service:
     version: "v1.0.0"
     required:
