@@ -7,15 +7,16 @@ useHostPID: false
 
 commandline:
   args:
-    - "/app/training.py"
-    - "--data_dir=/temp"
+    {% for arg in DLS4e.CommandLine %}
+    - {{ arg }}
+    {% endfor %}
 
 ssh:
   port: 32222
   useSecrets: True
 
 image:
-  clusterRepository: '' # Filled by dlsctl
+  clusterRepository: {{ DLS4e.ExperimentImage }}
   pullPolicy: IfNotPresent
 
 workersCount: 3
@@ -57,7 +58,8 @@ master:
       value: "20"
 runKind: "training"
 
-experimentName: ''
+experimentName: {{ DLS4e.ExperimentName }}
+registryPort: {{ DLS4e.RegistryPort }}
 
 podCount: 1
 
