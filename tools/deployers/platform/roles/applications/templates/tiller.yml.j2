@@ -148,6 +148,15 @@ spec:
       - effect: NoExecute
         key: node.kubernetes.io/network-unavailable
         operator: Exists
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
 ---
 kind: Service
 apiVersion: v1

@@ -31,3 +31,4 @@ cpu_manager_policy: static
 system_reserved: "cpu=500m"
 kube_reserved: "cpu=500m"
 cgroups_per_qos: true
+max_pods: 210

@@ -40,11 +40,16 @@ spec:
         nodeSelector:
 {{ toYaml . | indent 10 }}
       {{- end }}
-      {{- with .Values.affinity }}
-        affinity:
-{{ toYaml . | indent 10 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
         tolerations:
-{{ toYaml . | indent 10 }}
-      {{- end }}
+        - key: "master"
+          operator: "Exists"
+          effect: "NoSchedule"
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: master
+                  operator: In
+                  values:
+                  - "True"

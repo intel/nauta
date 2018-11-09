@@ -31,3 +31,16 @@ spec:
             - -c
             - kubectl exec -it $(kubectl get --no-headers=true pods -l app=experiment-service-etcd -n dls4e -o custom-columns=:metadata.name) -n dls4e -- bash -c 'if [ "$(ETCDCTL_API=3 etcdctl alarm list | grep -c '\''alarm:NOSPACE'\'')" -ne 0 ]; then echo "Alarm NOSPACE, compacting"; rev=$(ETCDCTL_API=3 etcdctl --endpoints=:2379 endpoint status --write-out="json" | egrep -o '\''"revision":[0-9]*'\'' | egrep -o '\''[0-9].*'\''); ETCDCTL_API=3 etcdctl compact $rev; ETCDCTL_API=3 etcdctl defrag; ETCDCTL_API=3 etcdctl alarm disarm; else echo "No alarms found. OK"; fi'
           restartPolicy: OnFailure
+          tolerations:
+          - key: "master"
+            operator: "Exists"
+            effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: master
+                    operator: In
+                    values:
+                    - "True"
