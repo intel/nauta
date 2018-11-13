@@ -47,6 +47,9 @@ verification_checks:
   - message: "Param domain should be provided as string"
     condition: "{{ domain is defined and (domain | join('')) != domain }}"
 
+  - message: "Param k8s_domain should be provided as string"
+    condition: "{{ k8s_domain is defined and (k8s_domain | join('')) != k8s_domain }}"
+
   - message: "Param nodes_domain should be provided as string"
     condition: "{{ nodes_domain is defined and (nodes_domain | join('')) != nodes_domain }}"
 
