@@ -1,9 +1,6 @@
 ---
 
 verification_checks:
-  - message: "Param dls4e_configuration should be provided as a map with items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
-    condition: "{{ dls4e_configuration is not defined }}"
-
   - message: "Param dls4e_configuration should be provided as a map with not empty items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
     condition: "{{ dls4e_configuration is defined and not (dls4e_configuration | string).startswith('{') }}"
 
