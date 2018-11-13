@@ -63,6 +63,14 @@ class Config:
             self.config_path = self.get_config_path()
 
     @staticmethod
+    def validate_config_path(path: str) -> bool:
+        if os.path.isdir(path):
+            directory_content = os.listdir(path)
+            expected_content = ['draft', 'helm']
+            return set(expected_content).issubset(directory_content)
+        return False
+
+    @staticmethod
     def get_config_path() -> str:
         binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), DLS_CTL_CONFIG_DIR_NAME)
         user_local_config_dir_path = os.path.join(os.path.expanduser('~'), DLS_CTL_CONFIG_DIR_NAME)

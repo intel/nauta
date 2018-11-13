@@ -24,13 +24,28 @@ import pytest
 from licensing import license_acceptance_manager
 
 
-def test_save_license_accepted(mocker):
+def test_save_license_accepted_with_valid_config(mocker):
+    mocker.patch.object(license_acceptance_manager.Config, 'validate_config_path', new=lambda x: True)
+    sys_exit_mock = mocker.patch("sys.exit")
     open_mock = mocker.patch('builtins.open')
     mocker.patch.object(license_acceptance_manager.Config, 'get_config_path', new=lambda: "/fake/path")
 
     license_acceptance_manager.save_license_accepted()
 
     assert open_mock.call_count == 1
+    assert sys_exit_mock.call_count == 0
+
+
+def test_save_license_accepted_with_invalid_config(mocker):
+    mocker.patch.object(license_acceptance_manager.Config, 'validate_config_path', new=lambda x: False)
+    sys_exit_mock = mocker.patch("sys.exit")
+    open_mock = mocker.patch('builtins.open')
+    mocker.patch.object(license_acceptance_manager.Config, 'get_config_path', new=lambda: "/fake/path")
+
+    license_acceptance_manager.save_license_accepted()
+
+    assert open_mock.call_count == 0
+    sys_exit_mock.assert_called_once_with(1)
 
 
 @pytest.mark.parametrize(['path_isfile_return_value', 'license_accepted_expected_value'],

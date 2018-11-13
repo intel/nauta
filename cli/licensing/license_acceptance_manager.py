@@ -20,6 +20,7 @@
 #
 
 from os import path
+import sys
 
 import click
 
@@ -29,7 +30,11 @@ from util.config import Config
 
 def save_license_accepted():
     config_dir_path = Config.get_config_path()
-    open(path.join(config_dir_path, "license_accepted"), mode='a').close()
+    if Config.validate_config_path(config_dir_path):
+        open(path.join(config_dir_path, "license_accepted"), mode='a').close()
+    else:
+        click.echo(LicenseAcceptanceTexts.CANNOT_ACCEPT_LICENSE_MSG.format(dlsctl_config_path=config_dir_path))
+        sys.exit(1)
 
 
 def is_license_already_accepted() -> bool:

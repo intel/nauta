@@ -711,3 +711,6 @@ class LicenseAcceptanceTexts:
                                       "AGREEMENT LICENSE.TXT . BY COPYING, ACCESSING, OR PERFORMING " \
                                       "THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND " \
                                       "CONDITIONS OF THIS AGREEMENT. Agree?"
+    CANNOT_ACCEPT_LICENSE_MSG = "Cannot save license agreement - \"config\" file or directory already exists in " \
+                                "{dlsctl_config_path} but this name is reserved for dlsctl app. Please remove it " \
+                                "and try again."

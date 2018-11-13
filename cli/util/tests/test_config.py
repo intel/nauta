@@ -30,6 +30,38 @@ APP_DIR_PATH = '/my/App'
 APP_BINARY_PATH = os.path.join(APP_DIR_PATH, 'binary')
 USER_HOME_PATH = '/User/Fake/home'
 USER_CUSTOM_PATH = '/custom/path'
+FAKE_PATH = '/fake/path'
+
+
+def test_validate_config_path_for_existing_config_file(mocker):
+    os_path_mock = mocker.patch('os.path.isdir')
+    os_path_mock.return_value = False
+
+    result = Config.validate_config_path(FAKE_PATH)
+
+    assert not result
+
+
+def test_validate_config_path_for_existing_config_dir_with_invalid_data(mocker):
+    os_path_mock = mocker.patch('os.path.isdir')
+    os_path_mock.return_value = True
+    os_listdir_mock = mocker.patch('os.listdir')
+    os_listdir_mock.return_value = ['not_dlsctl_dir', 'not_dlsctl_file']
+
+    result = Config.validate_config_path(FAKE_PATH)
+
+    assert not result
+
+
+def test_validate_config_path_for_existing_config_dir_with_valid_data(mocker):
+    os_path_mock = mocker.patch('os.path.isdir')
+    os_path_mock.return_value = True
+    os_listdir_mock = mocker.patch('os.listdir')
+    os_listdir_mock.return_value = ['helm', 'draft']
+
+    result = Config.validate_config_path(FAKE_PATH)
+
+    assert result
 
 
 @patch('sys.executable', APP_BINARY_PATH)
