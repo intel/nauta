@@ -102,11 +102,11 @@ class K8STensorboardInstance:
                                                   labels=deployment_labels
                                               ),
                                               spec=k8s.V1PodSpec(
-                                                  tolerations=k8s.V1Toleration(
+                                                  tolerations=[k8s.V1Toleration(
                                                       key='master',
                                                       operator='Exists',
                                                       effect='NoSchedule'
-                                                  ),
+                                                  )],
                                                   affinity=k8s.V1Affinity(
                                                       node_affinity=k8s.V1NodeAffinity(
                                                           required_during_scheduling_ignored_during_execution=
