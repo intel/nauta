@@ -394,7 +394,7 @@ class ExperimentInteractCmdTexts:
     HELP = "Launches a local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
            "into the opened notebook."
     HELP_N = "The name of this Jupyter Notebook session."
-    HELP_F = "File with a notebook that should be opened in Jupyter notebook."
+    HELP_F = "File with a notebook or a python script that should be opened in Jupyter notebook."
     HELP_PN = "Port on which service will be exposed locally."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
