@@ -132,8 +132,9 @@ def create(state: State, username: str, list_only: bool, filename: str):
                                 chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
                                 f"username={username}", "--set", "TillerImage={}".format(tiller_location),
                                 "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
-
-            _, err_code, log_output = execute_system_command(add_user_command)
+            env = os.environ.copy()
+            env['PATH'] = Config().config_path + os.pathsep + env['PATH']
+            _, err_code, log_output = execute_system_command(add_user_command, env=env)
 
         if err_code:
             handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
