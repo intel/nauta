@@ -99,7 +99,7 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     return msg
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v', options_metavar='[options]')
+@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='v', options_metavar='[options]')
 @click.argument("experiment_name")
 @click.option('-tb', '--tensorboard', default=None, help=Texts.HELP_T, is_flag=True)
 @click.option('-u', '--username', help=Texts.HELP_U)

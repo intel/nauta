@@ -45,7 +45,7 @@ from cli_text_consts import ExperimentLogsCmdTexts as Texts, SPINNER_COLOR
 logger = initialize_logger(__name__)
 
 
-@click.command(help=Texts.HELP, cls=AliasCmd, alias='lg', options_metavar='[options]')
+@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='lg', options_metavar='[options]')
 @click.argument('experiment-name', required=False, metavar='[experiment_name]')
 @click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=Texts.HELP_S)
 @click.option('-sd', '--start-date', help=Texts.HELP_SD)

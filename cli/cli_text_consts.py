@@ -107,6 +107,7 @@ class UserListCmdTexts:
 
 
 class UserCreateCmdTexts:
+    SHORT_HELP = "Command used to create a new user on the platform. Can only be run by a platform administrator."
     HELP = """
     Command used to create a new user on the platform. Can only be run by a platform administrator. 
 
@@ -139,6 +140,7 @@ class UserCreateCmdTexts:
     CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
 
 class UserDeleteCmdTexts:
+    SHORT_HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
     HELP = """
     Command used to delete a user from the platform. Can be only run by a platform administrator.
 
@@ -178,6 +180,7 @@ class LaunchCmdTexts:
     APP_PROXY_EXISTS_ERROR_MSG = "K8s proxy hasn't been closed properly. Check whether it still exists, if yes - " \
                                  "close it manually."
     APP_PROXY_OTHER_ERROR_MSG = "Other exception during launching web application."
+    SHORT_TB_HELP = "Subcommand for launching tensorboard with credentials."
     TB_HELP = """
     Subcommand for launching tensorboard with credentials.
 
@@ -199,6 +202,7 @@ class PredictCmdTexts:
 
 
 class PredictListCmdTexts:
+    HELP = "Show prediction instances"
     HELP_A = "Show all prediction instances, regardless of the owner."
     HELP_N = "A regular expression to narrow down list to prediction instances that match this expression."
     HELP_S = "List prediction instances with matching status."
@@ -248,6 +252,7 @@ class PredictStreamCmdTexts:
 
 
 class PredictCancelCmdTexts:
+    SHORT_HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
     HELP = """
     Cancels prediction instance/s chosen based on criteria given as a parameter.
 
@@ -291,6 +296,7 @@ class ExperimentCmdTexts:
 
 
 class ExperimentListCmdTexts:
+    SHORT_HELP = "Show logs for a given experiment."
     HELP_A = "Show all experiments, regardless of the owner."
     HELP_N = "A regular expression to narrow down list to experiments that match this expression."
     HELP_S = "List experiments with matching status."
@@ -301,11 +307,13 @@ class ExperimentListCmdTexts:
 
 
 class ExperimentTemplateListCmdTexts:
+    SHORT_HELP = "Show logs for a given experiment."
     HELP = "Returns a list of available templates that can be used to submit training jobs."
     LACK_OF_PACKS_ERROR_MSG = "Lack of installed packs."
 
 
 class ExperimentLogsCmdTexts:
+    SHORT_HELP = "Show logs for a given experiment."
     HELP = """
     Show logs for a given experiment.
 
@@ -343,6 +351,7 @@ class ExperimentLogsCmdTexts:
 
 
 class ExperimentSubmitCmdTexts:
+    SHORT_HELP = "Command used to submitting training scripts."
     HELP = """
     Command used to submitting training scripts.
 
@@ -381,6 +390,7 @@ class ExperimentSubmitCmdTexts:
 
 
 class ExperimentInteractCmdTexts:
+    SHORT_HELP = "Launches a local browser with Jupyter Notebook."
     HELP = "Launches a local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
            "into the opened notebook."
     HELP_N = "The name of this Jupyter Notebook session."
@@ -417,6 +427,7 @@ class ExperimentInteractCmdTexts:
 
 
 class ExperimentCancelCmdTexts:
+    SHORT_HELP = "Cancels experiment/s or deletes pods chosen based on criteria given as parameters."
     HELP = """
     Cancels experiment/s or deletes pods chosen based on criteria given as parameters.
 
@@ -481,6 +492,7 @@ class ExperimentCancelCmdTexts:
 
 
 class ExperimentViewCmdTexts:
+    SHORT_HELP = "Displays details of experiment with a given name."
     HELP = """
     Displays details of experiment with a given name.
 

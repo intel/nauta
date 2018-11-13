@@ -31,7 +31,7 @@ from commands.experiment.common import RunKinds
 logger = initialize_logger(__name__)
 
 
-@click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='c', options_metavar='[options]')
+@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='c', options_metavar='[options]')
 @click.argument("name", required=False, metavar='[name]')
 @click.option('-m', '--match', default=None, help=Texts.HELP_M)
 @click.option('-p', '--purge', default=None, help=Texts.HELP_P, is_flag=True)

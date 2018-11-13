@@ -33,7 +33,8 @@ from cli_text_consts import PredictListCmdTexts as Texts
 LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
 
 
-@click.command(name='list', cls=AliasCmd, alias='ls', options_metavar='[options]')
+@click.command(name='list', help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='ls',
+               options_metavar='[options]')
 @click.option('-a', '--all-users', is_flag=True, help=Texts.HELP_A)
 @click.option('-n', '--name', type=str, help=Texts.HELP_N)
 @click.option('-s', '--status', type=click.Choice([status.name for status in RunStatus]), help=Texts.HELP_S)

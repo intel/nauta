@@ -57,7 +57,8 @@ def webui(state: State, no_launch: bool, port: int):
 
 
 # noinspection PyUnusedLocal
-@click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.TB_HELP, options_metavar='[options]')
+@click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.SHORT_TB_HELP,
+               options_metavar='[options]')
 @common_options()
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)

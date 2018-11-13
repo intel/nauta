@@ -87,7 +87,7 @@ def format_run_message(run_message: Optional[str]) -> str:
     return textwrap.fill(run_message, width=60) if run_message else ''
 
 
-@click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
+@click.command(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
 @click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob")
