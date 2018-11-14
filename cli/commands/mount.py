@@ -74,8 +74,10 @@ def print_unmount():
     click.echo(Texts.UNMOUNT_COMMAND_MSG)
     click.echo(get_unmount_command())
 
-    if platform.system() != "Windows":
+    if platform.system() == "Linux":
         click.echo(Texts.UNMOUNT_OPTIONS_MSG)
+    elif platform.system() == "Darwin":
+        click.echo(Texts.UNMOUNT_OPTIONS_OSX_MSG)
 
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='m', invoke_without_command=True,
@@ -146,7 +148,7 @@ def get_mount_command_osx(usr: str, psw: str, adr: str) -> str:
 
 
 def get_unmount_command_osx() -> str:
-    return f"umount <MOUNTPOINT> [-fl]"
+    return f"umount <MOUNTPOINT> [-f]"
 
 
 def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool = False):

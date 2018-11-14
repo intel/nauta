@@ -42,7 +42,7 @@ CORRECT_WINDOWS_MOUNT = f"net use <MOUNTPOINT> \\\\{TEST_ADR}\\<DLS4E_FOLDER> /u
 CORRECT_WINDOWS_UNMOUNT = "net use <MOUNTPOINT> /d"
 
 CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
-CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT> [-fl]"
+CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT> [-f]"
 
 MOUNT_IP = "1.2.3.4"
 
@@ -163,13 +163,13 @@ def test_mount(mocker):
     assert CORRECT_WINDOWS_UNMOUNT in result.output
     assert Texts.UNMOUNT_OPTIONS_MSG not in result.output
 
-    mocker.patch("platform.system", return_value="OSX")
+    mocker.patch("platform.system", return_value="Darwin")
 
     result = runner.invoke(mount)
 
     assert CORRECT_OSX_MOUNT in result.output
     assert CORRECT_OSX_UNMOUNT in result.output
-    assert Texts.UNMOUNT_OPTIONS_MSG in result.output
+    assert Texts.UNMOUNT_OPTIONS_OSX_MSG in result.output
 
     if host_system != 'Windows':
         call_number = 3
