@@ -598,7 +598,7 @@ class UtilJupyterTexts:
 class UtilLauncherTexts:
     LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error during creation of a local docker-host tunnel."
     BROWSER_STARTING_MSG = "Browser will start in few seconds. Please wait..."
-    NO_WEB_BROWSER_ERROR_MSG = "Cannot find a suitable web browser. Try running this command with --no-launch option."
+    NO_WEB_BROWSER_ERROR_MSG = "Cannot find a suitable web browser - running with --no-launch option."
     PROXY_CLOSE_ERROR_MSG = "Error during closing of a proxy for a {app_name}"
     WEB_APP_LAUCH_FAIL_MSG = "Failed to launch web application."
     WEB_APP_CLOSING_MSG = "Closing all connections. Please wait..."

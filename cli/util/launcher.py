@@ -81,7 +81,7 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                     webbrowser.open_new(url)
                     proxy_spinner.hide()
                 else:
-                    raise LaunchError(Texts.NO_WEB_BROWSER_ERROR_MSG)
+                    click.echo(Texts.NO_WEB_BROWSER_ERROR_MSG)
 
             click.echo(Texts.GO_TO_MSG.format(url=url))
 
