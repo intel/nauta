@@ -26,6 +26,13 @@
     packages:
       - "{{ repo_local_path }}/dls4e-commons-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.x86_64.rpm"
     update_cache: True
+  ignore_errors: True
+  register: install_package
+
+- name: "{{ message_label }} Install package failed"
+  debug:
+    msg: "Warning: enabled_repos is not configured, please either install external dependencies locally or provide repository in config using enabled_repos."
+  when: install_package is failed
 
 - name: "{{ message_label }} Install data"
   include_tasks: yum_static_install.yml
