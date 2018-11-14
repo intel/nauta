@@ -382,6 +382,7 @@ class ExperimentSubmitCmdTexts:
                                          "argument, then {default_script_name} file has to exist in that directory."
     SCRIPT_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {script_folder_location}. script_folder_location must be a path " \
                                      "to existing directory. "
+    DUPLICATED_PACK_PARAM = "Pack param was provided more than once. Set '{pack_param}' param correctly."
     SUBMIT_START_LOG_MSG = "Submit - start"
     SUBMIT_START_USER_MSG = "Submitting experiments."
     SUBMIT_ERROR_MSG = "Problems during submitting experiment: {exception_message}"

@@ -25,7 +25,8 @@ from click.testing import CliRunner
 import pytest
 
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
-    validate_script_folder_location, get_default_script_location, clean_script_parameters
+    validate_script_folder_location, get_default_script_location, clean_script_parameters, validate_pack_params, \
+    check_duplicated_params
 from commands.experiment.common import RunSubmission, RunStatus
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
@@ -56,6 +57,8 @@ class SubmitMocks:
                                               return_value=(SUBMITTED_RUNS, ""))
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
         self.isdir = mocker.patch("os.path.isdir", return_value=False)
+        self.check_duplicated_params = mocker.patch("commands.experiment.submit.check_duplicated_params")
+        self.validate_pack_params = mocker.patch("commands.experiment.submit.validate_pack_params")
         self.validate_experiment_name = mocker.patch("commands.experiment.submit.validate_experiment_name")
         self.validate_script_location = mocker.patch("commands.experiment.submit.validate_script_location")
         self.validate_script_folder_location = mocker.patch(
@@ -81,6 +84,14 @@ def test_missing_folder(prepare_mocks: SubmitMocks):
     prepare_mocks.validate_script_folder_location.side_effect = SystemExit(2)
 
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-sfl", SCRIPT_FOLDER])
+    assert result.exit_code == 2
+
+
+def test_invalid_pack_param_arguments(prepare_mocks: SubmitMocks):
+    prepare_mocks.validate_pack_params.side_effect = SystemExit(2)
+
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "--pack_param", "arg1", "val1", "--pack_param", "arg1",
+                                         "val2", "-sfl", SCRIPT_FOLDER])
     assert result.exit_code == 2
 
 
@@ -139,6 +150,19 @@ def test_submit_default_script_name_wrong_dir(prepare_mocks: SubmitMocks):
     result = runner.invoke(submit, parameters, input="y")
 
     assert result.exit_code == 2
+
+
+def test_duplicated_pack_params(prepare_mocks: SubmitMocks):
+    pack_params = [('arg1', 'val1'), ('arg2', 'val1'), ('arg1', 'val3'), ('arg3', 'val6')]
+    with pytest.raises(SystemExit):
+        check_duplicated_params(pack_params)
+
+
+def test_validate_pack_params(prepare_mocks: SubmitMocks):
+    prepare_mocks.check_duplicated_params.side_effect = SystemExit(2)
+
+    with pytest.raises(SystemExit):
+        validate_pack_params([('arg1', 'val1'), ('arg1', 'val2')])
 
 
 def test_submit_invalid_script_folder_location(prepare_mocks: SubmitMocks):

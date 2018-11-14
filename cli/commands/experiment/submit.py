@@ -73,6 +73,22 @@ def validate_script_folder_location(script_folder_location: str):
         exit(2)
 
 
+def check_duplicated_params(pack_params: List[Tuple[str, str]]):
+    provided_keys = []
+    for key, val in pack_params:
+        if key not in provided_keys:
+            provided_keys.append(key)
+        else:
+            handle_error(
+                user_msg=Texts.DUPLICATED_PACK_PARAM.format(pack_param=key)
+            )
+            exit(2)
+
+
+def validate_pack_params(pack_params: List[Tuple[str, str]]):
+    check_duplicated_params(pack_params)
+
+
 def clean_script_parameters(ctx: click.Context, param, value: Tuple[str, ...]):
     new_value = []
     for parameter in value:
@@ -109,6 +125,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     logger.debug(Texts.SUBMIT_START_LOG_MSG)
     validate_script_location(script_location)
+    validate_pack_params(pack_param)
 
     if os.path.isdir(script_location):
         script_location = get_default_script_location(script_directory=script_location)
