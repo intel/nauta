@@ -43,7 +43,11 @@ describe('VUE components ActionHeaderButtons', () => {
       clearSort: sinon.spy(),
       setVisibleColumnsHandler: sinon.spy(),
       selectedByUserColumns: [],
-      customizableVisibilityColumns: ['test_01'],
+      columns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
+        'type', 'test_01'],
+      alwaysVisibleColumns: ['name', 'state'],
+      initiallyVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
+        'type'],
       onLaunchTensorHandler: sinon.spy(),
       onDiscardTensorHandler: sinon.spy(),
       disabled: false
@@ -61,11 +65,13 @@ describe('VUE components ActionHeaderButtons', () => {
   });
 
   it('Should call setVisibleColumnsHandler on revert click', function () {
+    const initiallyVisibleColumns = ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
+        'type'];
     wrapper.vm.showColumnMgmtModal = true;
     wrapper.vm.revertToDefault();
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
     expect(props.setVisibleColumnsHandler.calledTwice).to.equal(true);
-    expect(props.setVisibleColumnsHandler.calledWith([])).to.equal(true);
+    expect(props.setVisibleColumnsHandler.calledWith(props.initiallyVisibleColumns)).to.equal(true);
   });
 
   it('Should call setVisibleColumnsHandler on apply visible headers action', function () {

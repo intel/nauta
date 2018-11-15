@@ -34,13 +34,15 @@
             <h2>{{ labels.EXPERIMENTS }}</h2>
             <v-spacer></v-spacer>
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
-              :clearSort="clearSort"
-              :clearFilterHandler="clearFilter"
+              :columns="experimentsParams"
               :selectedByUserColumns="selectedByUserColumns"
-              :customizableVisibilityColumns="customizableVisibilityColumns"
+              :initiallyVisibleColumns="initiallyVisibleColumns"
+              :alwaysVisibleColumns="alwaysVisibleColumns"
               :setVisibleColumnsHandler="setVisibleColumns"
               :onLaunchTensorHandler="onLaunchTensorboardClick"
               :launchTensorDisabled="!tensorBtnAvailable"
+              :clearSort="clearSort"
+              :clearFilterHandler="clearFilter"
             ></ActionHeaderButtons>
             <v-flex xs12 md3 v-if="(experimentsTotal !== 0 || searchPattern)">
               <v-card-title>
@@ -223,7 +225,8 @@ export default {
       tbCompatibleExpKinds: ['training'],
       searchPattern: '',
       selectedByUserColumns: [],
-      alwaysVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
+      alwaysVisibleColumns: ['name', 'state'],
+      initiallyVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
         'type'],
       filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
@@ -305,13 +308,6 @@ export default {
           return header;
         }
       });
-    },
-    customizableVisibilityColumns: function () {
-      return this.experimentsParams.filter((header) => {
-        if (!this.alwaysVisibleColumns.includes(header)) {
-          return header;
-        }
-      }).sort();
     },
     refreshTableDataTriggers: function () {
       return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|

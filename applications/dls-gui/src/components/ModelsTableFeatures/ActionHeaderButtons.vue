@@ -55,13 +55,14 @@
             <v-layout row wrap>
               <v-flex xs12>
                 <div id="options" class="scroll-y">
-                  <div v-for="header in customizableVisibilityColumns" v-bind:key="header" class="option">
+                  <div v-for="header in columns" v-bind:key="header" class="option">
                     <v-icon
                       :id="header + '_switch'"
                       v-if="!isHidden(header)"
                       color="success"
                       v-on:click="switchColumn(header)"
-                      class="pointer-btn">
+                      class="pointer-btn"
+                      :disabled="isAlwaysVisible(header)">
                       check_circle
                     </v-icon>
                     <v-icon
@@ -109,8 +110,9 @@ import ELEMENTS_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns', 'customizableVisibilityColumns',
-    'onLaunchTensorHandler', 'launchTensorDisabled', 'disabled'],
+  props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns',
+    'columns', 'alwaysVisibleColumns', 'initiallyVisibleColumns', 'onLaunchTensorHandler',
+    'launchTensorDisabled', 'disabled'],
   data: () => {
     return {
       showColumnMgmtModal: false,
@@ -124,7 +126,7 @@ export default {
     }
   },
   created: function () {
-    this.setVisibleColumnsHandler(this.selectedByUserColumns)
+    this.setVisibleColumnsHandler(this.selectedByUserColumns.concat(this.initiallyVisibleColumns))
   },
   methods: {
     getLabel: function (header) {
@@ -134,8 +136,8 @@ export default {
       return str.length > limit ? `${str.substr(0, limit)}...` : str;
     },
     revertToDefault: function () {
-      this.draft = [];
-      this.setVisibleColumnsHandler([]);
+      this.draft = this.initiallyVisibleColumns;
+      this.setVisibleColumnsHandler(this.draft);
       this.showColumnMgmtModal = false;
     },
     switchColumn: function (name) {
@@ -149,6 +151,9 @@ export default {
     },
     isHidden: function (name) {
       return !this.draft.includes(name);
+    },
+    isAlwaysVisible: function (name) {
+      return this.alwaysVisibleColumns.includes(name);
     },
     applyVisibleHeaders: function () {
       this.setVisibleColumnsHandler(this.draft);

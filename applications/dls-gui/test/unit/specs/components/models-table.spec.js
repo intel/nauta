@@ -141,12 +141,6 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.filterByValModals.namespace.params).to.deep.equal([]);
   });
 
-  it('Should return customizable visible columns without permament columns', function () {
-    wrapper.vm.$store.state.experiments.params = ['name', 'param1'];
-    expect(wrapper.vm.customizableVisibilityColumns.includes('param1')).to.equal(true);
-    expect(wrapper.vm.customizableVisibilityColumns.includes('name')).to.equal(false);
-  });
-
   it('Should return visible columns (default)', function () {
     expect(wrapper.vm.currentlyVisibleColumns).to.deep.equal([]);
   });
