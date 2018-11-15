@@ -24,6 +24,7 @@ from unittest.mock import patch, mock_open, ANY
 
 import pytest
 
+from util import system
 from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME, Config, ConfigInitError
 
 APP_DIR_PATH = '/my/App'
@@ -57,7 +58,8 @@ def test_validate_config_path_for_existing_config_dir_with_valid_data(mocker):
     os_path_mock = mocker.patch('os.path.isdir')
     os_path_mock.return_value = True
     os_listdir_mock = mocker.patch('os.listdir')
-    os_listdir_mock.return_value = ['helm', 'draft']
+    os_listdir_mock.return_value = ['draft.exe', 'helm.exe'] if system.get_current_os() == system.OS.WINDOWS \
+        else ['draft', 'helm']
 
     result = Config.validate_config_path(FAKE_PATH)
 
