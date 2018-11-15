@@ -88,13 +88,17 @@ local_images:
     directory: "{{ playbook_dir }}/../../platform-containers/etcd"
   core/dashboard:
     version: "v1.8.3"
-    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
-    method: "pull"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-dashboard"
+    directory: "{{ playbook_dir }}/../../platform-containers/kubernetes-dashboard"
+    method: build
   core/registry:
     version: "v2"
-    image: "registry:2"
+    #image: "registry:2"
     required:
-      BASE_IMAGE: "shared/centos/build-go"
+      BUILD_IMAGE: "shared/centos/build-go"
+      BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/registry"
 

@@ -18,6 +18,8 @@ RUN chmod +x /bin/dumb-init
 RUN mkdir -vp /elasticsearch 
 COPY --from=build /build-output/archives/oss-tar/build/distributions/elasticsearch-*.tar.gz /
 
+RUN rm -f rm -rf /etc/security/limits.d/20-nproc.conf
+
 WORKDIR /elasticsearch
 RUN tar --strip-components=1 -xf ../elasticsearch-*.tar.gz
 
