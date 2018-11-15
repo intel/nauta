@@ -75,6 +75,8 @@ class K8sProxy:
         logger.debug("k8s_proxy - exiting")
         try:
             self._close_tunnel()
+        except psutil.NoSuchProcess:
+            logger.debug(Texts.TUNNEL_ALREADY_CLOSED)
         except Exception as exe:
             error_message = Texts.PROXY_EXIT_ERROR_MSG
             logger.exception(error_message)

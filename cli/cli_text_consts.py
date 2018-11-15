@@ -708,6 +708,7 @@ class UtilK8sProxyTexts:
     PROXY_ENTER_ERROR_MSG = "k8s_proxy - enter - error"
     PROXY_EXIT_ERROR_MSG = "k8s_proxy - exit - error"
     TUNNEL_NOT_READY_ERROR_MSG = "connection on {address}:{port} NOT READY!"
+    TUNNEL_ALREADY_CLOSED = "Proxy tunnel is already closed."
 
 
 class CliStateTexts:
