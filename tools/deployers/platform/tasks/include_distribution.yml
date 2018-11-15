@@ -1,12 +1,25 @@
 ---
 
+- name: "{{ message_label }} Detect platform"
+  set_fact:
+    current_distribution: "{{ ansible_distribution }}"
+
+- name: "{{ message_label }} Checking if platform {{ ansible_distribution }} is officially supported"
+  debug:
+    msg: "Currently only RedHat is officially supported. Installation will be continued but can cause some issues."
+  when: current_distribution != "RedHat"
+
+- name: "{{ message_label }} Set distribution type to RedHat"
+  set_fact:
+    current_distribution: "RedHat"
+
 - name: "{{ message_label }} Include distribution based task"
   include_tasks: "{{ distribution_resolved_file }}"
   loop_control:
     loop_var: distribution_resolved_file
   with_first_found:
     - files:
-        - "{{ ansible_distribution }}/{{ distribution_file }}"
+        - "{{ current_distribution }}/{{ distribution_file }}"
         - "default_distribution.yml"
       paths:
         - "{{ role_path }}/tasks"

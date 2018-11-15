@@ -36,8 +36,8 @@
   setup:
 
 - name: "{{ message_label }} Check if system is supported"
-  fail:
-    msg: "Your system is not supported - detected {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  debug:
+    msg: "Your system is not oficially supported - detected {{ ansible_distribution }} {{ ansible_distribution_version }}"
   when: ansible_distribution_version not in supported_systems[ansible_distribution] | default([])
 
 - name: "{{ message_label }} Check if regular user is accessible"
