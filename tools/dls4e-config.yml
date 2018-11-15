@@ -157,18 +157,28 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
   dls4e/horovod/py3:
     version: "1.9.0-py3"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/horovod/horovod-v0.15.1.tar.gz
+        dest: horovod-v0.15.1.tar.gz
+        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/3.6"
   dls4e/horovod/py2:
     version: "1.9.0-py2"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/horovod/horovod-v0.15.1.tar.gz
+        dest: horovod-v0.15.1.tar.gz
+        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/2.7"
   dls4e/nginx:
