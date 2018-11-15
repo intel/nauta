@@ -122,7 +122,6 @@ subcharts:
       path: "{{ playbook_dir }}/../../platform-charts/heapster"
       chart_values:
         image: "{{ image_local_url['core/heapster'] }}"
-        nanny_image: "{{ image_local_url['core/addon-resizer'] }}"
     samba-forward:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../platform-charts/samba-forward"
