@@ -40,6 +40,11 @@
     msg: "Your system is not oficially supported - detected {{ ansible_distribution }} {{ ansible_distribution_version }}"
   when: ansible_distribution_version not in supported_systems[ansible_distribution] | default([])
 
+- name: "{{ message_label }} Check if enabled_repos is set"
+  debug:
+    msg: "Warning: enabled_repos is not configured, please either install external dependencies locally or provide repository in config using enabled_repos."
+  when: enabled_repos is not defined
+
 - name: "{{ message_label }} Check if regular user is accessible"
   shell: echo
   changed_when: False
