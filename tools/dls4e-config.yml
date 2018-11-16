@@ -166,6 +166,7 @@ local_images:
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/3.6"
   dls4e/horovod/py2:
@@ -177,6 +178,7 @@ local_images:
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
     method: build

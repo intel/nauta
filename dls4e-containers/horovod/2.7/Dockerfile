@@ -2,21 +2,25 @@ ARG TENSORFLOW_BUILD_IMAGE
 ARG DUMBINIT_DATA_IMAGE
 ARG KUBERNETES_DATA_IMAGE
 ARG BASE_IMAGE
+ARG METRICS_IMAGE
 FROM ${TENSORFLOW_BUILD_IMAGE} as data
 FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
+FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
 ENV TENSORFLOW_VERSION=1.9.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
+COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
 COPY --from=dumbinitdata /build-output/dumb-init /usr/bin/dumb-init
 COPY --from=dumbinitdata /build-output/dumb-init /dumb-init
 RUN chmod +x /bin/dumb-init /usr/bin/dumb-init /dumb-init
 
-RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl
+RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
+    ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
 RUN yum clean all && yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
@@ -34,8 +38,8 @@ RUN HOROVOD_WITHOUT_PYTORCH=1 python setup.py bdist_wheel
 RUN ${PIP} install --no-cache-dir --no-clean --force-reinstall /horovod/horovod-0.15.1/dist/horovod-0.15.1-cp27-cp27mu-linux_x86_64.whl
 
 ADD requirements.txt /horovod/
-RUN ${PIP} install --no-binary :all: --ignore-installed scikit-build 
-RUN ${PIP} install -r /horovod/requirements.txt --no-binary :all: --no-clean --ignore-installed ipaddress 
+RUN ${PIP} install --no-binary :all: --ignore-installed scikit-build
+RUN ${PIP} install -r /horovod/requirements.txt --no-binary :all: --no-clean --ignore-installed ipaddress
 
 ENV MPIRUN_BIN /usr/lib64/openmpi/bin/mpirun
 RUN mv ${MPIRUN_BIN} ${MPIRUN_BIN}.real && \

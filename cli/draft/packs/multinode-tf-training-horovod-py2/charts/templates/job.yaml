@@ -62,6 +62,8 @@ spec:
         env:
           - name: SSHPORT
             value: "{{ .Values.ssh.port }}"
+          - name: RUN_NAME
+            value: "{{ .Release.Name }}"
          {{- if .Values.ssh.useSecrets }}
           - name: USESECRETS
             value: "{{ .Values.ssh.useSecrets }}"

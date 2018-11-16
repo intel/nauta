@@ -45,7 +45,7 @@ ifeq (Windows,$(OS))
 	tar --strip-components=1 -xvf helm-v2.9.1-windows-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm.exe dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-windows-amd64.tar.gz 
+	rm -f helm-v2.9.1-windows-amd64.tar.gz
 	rm -rf helm_tmp
 endif
 ifeq (Linux,$(OS))
@@ -103,6 +103,8 @@ endif
 	cp -f license.txt dist/
 	mkdir -p dist/docs/
 	cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
+	mkdir -p dist/examples/
+	cp -Rf example-python/package_examples/* dist/examples/
 
 ifneq (,$(SCM_REPOSITORY_STATE))
 	mkdir dist/config/scm/

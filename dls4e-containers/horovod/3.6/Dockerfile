@@ -1,15 +1,19 @@
 ARG TENSORFLOW_BUILD_IMAGE
 ARG KUBERNETES_DATA_IMAGE
 ARG BASE_IMAGE
+ARG METRICS_IMAGE
 FROM ${TENSORFLOW_BUILD_IMAGE} as data
+FROM ${METRICS_IMAGE} as metrics
 FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${BASE_IMAGE}
 
 ENV TENSORFLOW_VERSION=1.9.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
+COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 
-RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl
+RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
+    ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN yum clean all && yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
