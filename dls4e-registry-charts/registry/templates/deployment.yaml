@@ -24,8 +24,19 @@ spec:
         chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         heritage: {{ .Release.Service }}
     spec:
-      nodeSelector:
-        dls4e-release-version-{{ required "DLS4E Release standarized version is required" .Values.global.dls4e_release_standarized }}: "True"
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
       containers:
       - name: {{ .Chart.Name }}
         image: dls4e-repository:{{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
