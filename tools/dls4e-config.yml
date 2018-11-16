@@ -359,3 +359,6 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/documentation-service"
       chart_values:
         image: "{{ image_local_url['dls4e/docs'] }}"
+    kube-batch-queue:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../dls4e-charts/kube-batch-queue"

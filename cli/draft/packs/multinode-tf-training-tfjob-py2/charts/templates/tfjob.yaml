@@ -26,6 +26,7 @@ spec:
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
+          schedulerName: kube-batch
           containers:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
@@ -91,6 +92,7 @@ spec:
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
+          schedulerName: kube-batch
           containers:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"

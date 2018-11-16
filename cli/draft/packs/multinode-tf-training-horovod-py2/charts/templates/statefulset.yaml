@@ -28,7 +28,10 @@ spec:
         heritage: {{ .Release.Service }}
         role: worker
         runName: {{ .Release.Name }}
+      annotations:
+        scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
     spec:
+      schedulerName: kube-batch
       {{- if .Values.useHostNetwork }}
       hostNetwork: {{ .Values.useHostNetwork }}
       dnsPolicy: ClusterFirstWithHostNet

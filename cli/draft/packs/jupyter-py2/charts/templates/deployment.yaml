@@ -21,6 +21,7 @@ spec:
     metadata:
       annotations:
         buildID: {{ .Values.buildID }}
+        scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
       labels:
         app: {{ template "name" . }}
         draft: {{ .Values.draft }}
@@ -70,4 +71,5 @@ spec:
         - name: output-public
           persistentVolumeClaim:
             claimName: output-public
+      schedulerName: kube-batch
   backoffLimit: 5

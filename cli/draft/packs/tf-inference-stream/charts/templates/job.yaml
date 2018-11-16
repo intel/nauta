@@ -16,6 +16,7 @@ spec:
     metadata:
       annotations:
         buildID: {{ .Values.buildID }}
+        scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
       labels:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}
@@ -25,6 +26,7 @@ spec:
         runName: {{ .Release.Name }}
     spec:
       serviceAccountName: {{ .Release.Name }}
+      schedulerName: kube-batch
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"

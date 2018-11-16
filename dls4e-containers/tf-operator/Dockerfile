@@ -1,4 +1,4 @@
-ARG BUILD_IMAGE=golang:1.10.2
+ARG BUILD_IMAGE=golang:1.11.2
 ARG BASE_IMAGE=centos:7.4.1708
 FROM ${BUILD_IMAGE} as build
 
@@ -9,13 +9,14 @@ RUN git clone https://github.com/kubeflow/tf-operator.git
 
 WORKDIR ${GOPATH}/src/github.com/kubeflow/tf-operator
 
-RUN git checkout 1bc8425dff31f97262e7528f2e17be1a62132d3b
+# v0.3.0 release
+RUN git checkout fac8eff892f0e8ffa331952ab2d89e0ab18d99a3
 
-RUN wget https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -O /usr/local/bin/dep
+RUN wget https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -O /usr/local/bin/dep
 
 RUN chmod +x /usr/local/bin/dep
 
-RUN dep ensure
+RUN dep ensure -v
 
 RUN go build -o /tf-operator.v2 github.com/kubeflow/tf-operator/cmd/tf-operator.v2
 
@@ -27,4 +28,4 @@ COPY --from=build /tf-operator.v2 /opt/kubeflow/tf-operator.v2
 
 RUN chmod +x /opt/kubeflow/tf-operator.v2
 
-ENTRYPOINT ["/opt/kubeflow/tf-operator.v2", "-alsologtostderr"]
+ENTRYPOINT ["/opt/kubeflow/tf-operator.v2", "-alsologtostderr", "-enable-gang-scheduling=true"]

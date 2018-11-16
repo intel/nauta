@@ -15,6 +15,7 @@ spec:
     metadata:
       annotations:
         buildID: {{ .Values.buildID }}
+        scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
       labels:
         app: {{ template "name" . }}
         draft: {{ .Values.draft }}
@@ -22,6 +23,7 @@ spec:
         runName: {{ .Release.Name }}
         batchType: wrapper
     spec:
+      schedulerName: kube-batch
       containers:
         - name: {{ .Chart.Name }}
           image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/batch-inference:v1.0.0"

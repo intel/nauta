@@ -1,0 +1,7 @@
+apiVersion: scheduling.incubator.k8s.io/v1alpha1
+kind: PodGroup
+metadata:
+  name: {{ .Release.Name }}-podgroup
+spec:
+  minMember: 1
+  queue: main

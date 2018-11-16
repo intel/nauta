@@ -52,3 +52,9 @@ rules:
   - deployments
   verbs:
   - "*"
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - "*"
