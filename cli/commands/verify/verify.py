@@ -43,6 +43,14 @@ logger = initialize_logger(__name__)
 @pass_state
 def verify(state: State):
     try:
+        with spinner(text=Texts.CHECKING_OS_MSG):
+            check_os()
+        click.echo(Texts.OS_SUPPORTED_MSG)
+    except InvalidOsError as exception:
+        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
+        exit(1)
+
+    try:
         with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):
             check_connection_to_cluster()
         with spinner(text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG):
@@ -60,14 +68,6 @@ def verify(state: State):
     except Exception:
         handle_error(logger, Texts.GET_K8S_NAMESPACE_ERROR_MSG, Texts.GET_K8S_NAMESPACE_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
-        exit(1)
-
-    try:
-        with spinner(text=Texts.CHECKING_OS_MSG):
-            check_os()
-        click.echo(Texts.OS_SUPPORTED_MSG)
-    except InvalidOsError as exception:
-        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
 
     dependency_versions = {}
