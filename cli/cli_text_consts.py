@@ -601,6 +601,7 @@ class UtilJupyterTexts:
 class UtilLauncherTexts:
     LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error during creation of a local docker-host tunnel."
     BROWSER_STARTING_MSG = "Browser will start in few seconds. Please wait..."
+    CANNOT_USE_PORT = "Cannot use required port {required_port}. Port has been set automatically to {random_port}"
     NO_WEB_BROWSER_ERROR_MSG = "Cannot find a suitable web browser - running with --no-launch option."
     PROXY_CLOSE_ERROR_MSG = "Error during closing of a proxy for a {app_name}"
     WEB_APP_LAUCH_FAIL_MSG = "Failed to launch web application."
