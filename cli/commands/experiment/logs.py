@@ -168,10 +168,11 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
                     if not log_entry.content.isspace():
                         formatted_date = format_log_date(log_entry.date)
                         file.write(f'{formatted_date} {log_entry.pod_name} {log_entry.content}')
+            click.echo(Texts.LOGS_STORING_FINAL_MESSAGE)
         except Exception as exe:
             handle_error(logger,
                          Texts.LOGS_STORING_ERROR.format(exception_message=exe.message),
                          Texts.LOGS_STORING_ERROR.format(exception_message=exe.message))
             exit(1)
-
-    click.echo(Texts.LOGS_STORING_FINAL_MESSAGE)
+    else:
+        click.echo(Texts.LOGS_STORING_CANCEL_MESSAGE)

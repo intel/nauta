@@ -348,6 +348,7 @@ class ExperimentLogsCmdTexts:
                                             "proceed?"
     LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
     LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
+    LOGS_STORING_CANCEL_MESSAGE = "Logs have not been written to the file mentioned above - cancelled by user."
     MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
     SAVING_LOGS_TO_FILE_PROGRESS_MSG = "Saving logs to a file..."
 
