@@ -59,12 +59,6 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                 spinner(text=Texts.LAUNCHING_APP_MSG) as proxy_spinner:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
 
-            if port != proxy.tunnel_port:
-                click.echo(Texts.CANNOT_USE_PORT.format(
-                    required_port=port,
-                    random_port=proxy.tunnel_port
-                ))
-
             # run socat if on Windows or Mac OS
             if get_current_os() in (OS.WINDOWS, OS.MACOS):
                 # noinspection PyBroadException
@@ -89,6 +83,12 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                     proxy_spinner.hide()
                 else:
                     click.echo(Texts.NO_WEB_BROWSER_ERROR_MSG)
+
+            if port and port != proxy.tunnel_port:
+                click.echo(Texts.CANNOT_USE_PORT.format(
+                    required_port=port,
+                    random_port=proxy.tunnel_port
+                ))
 
             click.echo(Texts.GO_TO_MSG.format(url=url))
 
