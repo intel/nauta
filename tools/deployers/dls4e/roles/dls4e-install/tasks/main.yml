@@ -8,7 +8,7 @@
   failed_when: chart.rc not in [0, 1]
 
 - set_fact:
-    calc_features: "{{ features }}"
+    calc_features: "{{ features | default({}) }}"
 
 - name: Append calc features with default values
   set_fact:
