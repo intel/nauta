@@ -71,7 +71,7 @@ def test_up(draft_mock, mocker):
 
     assert draft_mock.execute_system_command.call_count == 1
     draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'], env=ANY, cwd=None,
-                                                             logs_size=200)])
+                                                             logs_size=0)])
 
 
 def test_check_up_status_success():

@@ -73,7 +73,7 @@ def create(working_directory: str = None,
 def up(working_directory: str = None,
        namespace: str = None) -> (str, int, str):
     output, exit_code, log_output = call_draft(
-        args=['up'], cwd=working_directory, namespace=namespace, logs_size=200)
+        args=['up'], cwd=working_directory, namespace=namespace)
     # displaying logs from draft - only in debug mode
     pattern = "Inspect the logs with `draft logs (.*)`"
 

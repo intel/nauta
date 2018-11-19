@@ -27,7 +27,7 @@ import pytest
 from commands.experiment.common import submit_experiment, RunSubmission, values_range, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
     check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
-    RunKinds, validate_pack_params_names
+    RunKinds, validate_pack_params_names, get_log_filename
 
 from util.exceptions import SubmitExperimentError
 import util.config
@@ -57,6 +57,16 @@ FAKE_CLI_EXPERIMENT_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, util.config.EX
 EXAMPLE_PACK_PARAM_KEY = "key"
 INVALID_PACK_PARAM_KEY = "key=value"
 EXAMPLE_PACK_PARAM_VALUE = "value"
+
+LOG_FILENAME = "01CTJNM0YFPHVWHBSWMB7YE7H1"
+LOG_WITH_FILE = "Application nmnist-horo-418-18-10-24-05-13-49: Releasing  Application " \
+                "nmnist-horo-418-18-10-24-05-13-49: Releasing   Application nmnist-horo-418-18-10-24-05-13-49 " \
+                ": Releasing Application -\\nmnist-horo-418-18-10-24-05-13-49: Releasing Application: " \
+                "FAIL \\xe2\\x9d\\x8c  (0.2356s)\\nInspect the logs with `draft logs {}`\\n".format(LOG_FILENAME)
+
+LOG_WITHOUT_FILE = "Application nmnist-horo-418-18-10-24-05-13-49: Releasing  Application " \
+                   "nmnist-horo-418-18-10-24-05-13-49: Releasing   Application nmnist-horo-418-18-10-24-05-13-49 " \
+                   ": Releasing Application -\\nmnist-horo-418-18-10-24-05-13-49: Releasing Application: "
 
 
 @pytest.fixture()
@@ -545,3 +555,15 @@ def test_validate_pack_params_names_valid(mocker):
 def test_validate_pack_params_names_invalid(mocker):
     with pytest.raises(SystemExit):
         validate_pack_params_names(None, None, [(INVALID_PACK_PARAM_KEY, EXAMPLE_PACK_PARAM_VALUE)])
+
+
+def test_get_log_filename_log_found():
+    log_filename = get_log_filename(LOG_WITH_FILE)
+
+    assert log_filename == LOG_FILENAME
+
+
+def test_get_log_filename_log_not_found():
+    log_filename = get_log_filename(LOG_WITHOUT_FILE)
+
+    assert not log_filename

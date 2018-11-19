@@ -85,7 +85,7 @@ def execute_system_command(command: List[str], timeout: int or None = None,
     :param stdin: stream with input data for command
     :param env: environment within which command is run
     :param cwd: command working directory
-    :param logs_size: if other than 0 - system sends to looger logs_size last characters
+    :param logs_size: if other than 0 - system sends to logger logs_size last characters
     :return: output - output of the command
              exit_code - exit code returned by a command
              log_output - output that should be passed to logs. If a real output contains

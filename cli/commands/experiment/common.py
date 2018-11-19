@@ -23,6 +23,7 @@ from collections import namedtuple
 from distutils.dir_util import copy_tree
 import itertools
 import os
+import re
 import shutil
 from sys import exit
 import textwrap
@@ -494,6 +495,19 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     return PrepareExperimentResult(folder_name=run_folder, script_name=local_script_location, pod_count=pod_count)
 
 
+def get_log_filename(log_output: str):
+    logs_location = 'Inspect the logs with `draft logs '
+
+    if logs_location in log_output:
+        m = re.search(logs_location + '(.*)`', log_output)
+        try:
+            return m.group(1)
+        except IndexError:
+            pass
+
+    return None
+
+
 def submit_draft_pack(run_folder: str, namespace: str = None):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
@@ -507,8 +521,12 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     output, exit_code, log_output = cmd.up(working_directory=run_folder, namespace=namespace)
 
     if exit_code:
-        error_message = Texts.JOB_NOT_DEPLOYED_ERROR_MSG.format(reason=log_output)
-        log.error(error_message)
+        error_message = Texts.JOB_NOT_DEPLOYED_ERROR_MSG
+
+        log_filename = get_log_filename(log_output)
+        if log_filename:
+            error_message = error_message + Texts.JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE.format(log_filename)
+        log.error(log_output)
         delete_environment(run_folder)
         raise SubmitExperimentError(error_message)
     log.debug(f'Submit one run {run_folder} - finish')
