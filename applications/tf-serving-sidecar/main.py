@@ -20,8 +20,7 @@
 #
 
 import logging as log
-from os import getenv
-from sys import exit
+from os import getenv, _exit
 from time import sleep
 
 from kubernetes import client, config
@@ -64,6 +63,6 @@ while True:
         log.info("active_pods == 0 and succeeded_pods > 0, creating END hook")
         open("/pod-data/END", 'a').close()
         log.info("exiting...")
-        exit(0)
+        _exit(0)
 
     sleep(1)
