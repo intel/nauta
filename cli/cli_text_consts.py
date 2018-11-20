@@ -509,7 +509,7 @@ class ExperimentViewCmdTexts:
     PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]
     VIEW_OTHER_ERROR_MSG = "Failed to get experiment."
     CONTAINER_NOT_CREATED_MSG = "Not created"
-    CONTAINER_RUNNING_MSG = "Running, "
+    CONTAINER_RUNNING_MSG = "Running, started at: "
     CONTAINER_TERMINATED_MSG = "Terminated, "
     CONTAINER_WAITING_MSG = "Waiting, "
     CONTAINER_REQUESTS_LIST_HEADER = "- Requests:\n{}"

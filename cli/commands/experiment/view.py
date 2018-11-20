@@ -34,7 +34,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespa
 from util.k8s.k8s_statistics import get_highest_usage
 from util.logger import initialize_logger
 import platform_resources.runs as runs_api
-from util.system import handle_error
+from util.system import handle_error, format_timestamp_for_cli
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 
 
@@ -53,11 +53,11 @@ def container_status_to_msg(state) -> str:
     if not state:
         return Texts.CONTAINER_NOT_CREATED_MSG
     if state.running is not None:
-        return Texts.CONTAINER_RUNNING_MSG + str(state.running)
+        return Texts.CONTAINER_RUNNING_MSG + format_timestamp_for_cli(str(state.running.started_at))
     if state.terminated is not None:
         return Texts.CONTAINER_TERMINATED_MSG + str(state.terminated.reason)
     if state.waiting is not None:
-        return Texts.CONTAINER_WAITING_MSG + str(state.waiting)
+        return Texts.CONTAINER_WAITING_MSG + str(state.waiting.reason)
 
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
