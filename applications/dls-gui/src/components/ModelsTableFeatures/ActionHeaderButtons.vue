@@ -54,7 +54,7 @@
           <v-container grid-list-md>
             <v-layout row wrap>
               <v-flex xs12>
-                <div id="options" class="scroll-y">
+                <div id="options" v-if="columns.length" class="scroll-y">
                   <div v-for="header in columns" v-bind:key="header" class="option">
                     <v-icon
                       :id="header + '_switch'"
@@ -80,18 +80,21 @@
                     </v-tooltip>
                   </div>
                 </div>
+                <div v-if="!columns.length">
+                  {{ messages.SUCCESS.NO_DATA_FOR_CURRENT_USER }}
+                </div>
               </v-flex>
               <v-flex md8 xs12 offset-md2>
-                <v-btn id="revert" block dark small v-on:click="revertToDefault()">
+                <v-btn id="revert" v-if="columns.length" block dark small v-on:click="revertToDefault()">
                   {{ labels.REVERT_TO_DEFAULT }}
                 </v-btn>
               </v-flex>
               <v-flex md6 xs12>
                 <v-btn color="intel_primary" block dark small v-on:click="discardVisibleHeaders()">
-                  {{ labels.CANCEL }}
+                  {{ columns.length ? labels.CANCEL : labels.OK }}
                 </v-btn>
               </v-flex>
-              <v-flex md6 xs12>
+              <v-flex v-if="columns.length" md6 xs12>
                 <v-btn color="intel_primary" block dark small v-on:click="applyVisibleHeaders()">
                   {{ labels.SAVE }}
                 </v-btn>
@@ -107,6 +110,7 @@
 <script>
 import HEADERS_LABELS from '../../utils/header-titles';
 import ELEMENTS_LABELS from '../../utils/constants/labels';
+import MESSAGES from '../../utils/constants/messages';
 
 export default {
   name: 'ActionHeaderButtons',
@@ -117,7 +121,8 @@ export default {
     return {
       showColumnMgmtModal: false,
       draft: [],
-      labels: ELEMENTS_LABELS
+      labels: ELEMENTS_LABELS,
+      messages: MESSAGES
     }
   },
   watch: {
