@@ -37,7 +37,6 @@ import distro
 from util.logger import initialize_logger, get_verbosity_level
 from cli_text_consts import UtilSystemTexts as Texts, VERBOSE_RERUN_MSG
 
-
 log = initialize_logger('util.system')
 
 WINDOWS_EDITIONS = {
@@ -76,8 +75,13 @@ WINDOWS_EDITIONS = {
 }
 
 
-def execute_system_command(command: List[str], timeout: int or None = None,
-                           stdin=None, env=None, cwd=None, logs_size: int = 0) -> (str, int, str):
+def execute_system_command(command: List[str],
+                           timeout: int or None = None,
+                           stdin=None,
+                           env=None,
+                           cwd=None,
+                           logs_size: int = 0,
+                           shell=False) -> (str, int, str):
     """
     Executes system's command
     :param command: command to be exeucted
@@ -93,18 +97,31 @@ def execute_system_command(command: List[str], timeout: int or None = None,
              attribute contains information about a need of changing system's encoding
     """
     try:
-        output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.STDOUT, universal_newlines=True,
-                                         stdin=stdin, env=env, cwd=cwd, encoding='utf-8')
+        output = subprocess.check_output(
+            command,
+            timeout=timeout,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            stdin=stdin,
+            env=env,
+            cwd=cwd,
+            encoding='utf-8',
+            shell=shell)
         encoded_output = output[-logs_size:].encode('utf-8')
-        log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace('\n', '\\n'))
+        log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace(
+            '\n', '\\n'))
     except subprocess.CalledProcessError as ex:
         return ex.output, ex.returncode, ex.output
     else:
         return output, 0, encoded_output
 
 
-def execute_subprocess_command(command: List[str], stdin=None, env=None,
-                               cwd=None, shell=False, join=False) -> subprocess.Popen:
+def execute_subprocess_command(command: List[str],
+                               stdin=None,
+                               env=None,
+                               cwd=None,
+                               shell=False,
+                               join=False) -> subprocess.Popen:
 
     # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
     std_output_destination = None if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
@@ -116,13 +133,21 @@ def execute_subprocess_command(command: List[str], stdin=None, env=None,
         final_command = command
 
     log.debug(f'executing COMMAND in subprocess: {final_command}')
-    process = subprocess.Popen(args=final_command, stdout=std_output_destination, stderr=std_error_destination,
-                               universal_newlines=True, stdin=stdin, env=env, cwd=cwd, encoding='utf-8',
-                               shell=shell)
+    process = subprocess.Popen(
+        args=final_command,
+        stdout=std_output_destination,
+        stderr=std_error_destination,
+        universal_newlines=True,
+        stdin=stdin,
+        env=env,
+        cwd=cwd,
+        encoding='utf-8',
+        shell=shell)
 
     if not process or process.poll() != (0 or None):
         log.error(f'COMMAND execution FAIL: {command}')
-        raise RuntimeError(Texts.COMMAND_EXE_FAIL_ERROR_MSG.format(command=command))
+        raise RuntimeError(
+            Texts.COMMAND_EXE_FAIL_ERROR_MSG.format(command=command))
     return process
 
 
@@ -145,8 +170,9 @@ def get_current_os() -> OS:
     elif sys_platform.startswith(OS.MACOS.value):
         return OS.MACOS
 
-    raise RuntimeError(Texts.UNSUPPORTED_PLATFORM_ERROR_MSG
-                       .format(sys_platform=sys_platform, supported_os=OS.all_str()))
+    raise RuntimeError(
+        Texts.UNSUPPORTED_PLATFORM_ERROR_MSG.format(
+            sys_platform=sys_platform, supported_os=OS.all_str()))
 
 
 def check_port_availability(port: int) -> bool:
@@ -182,7 +208,8 @@ def format_timestamp_for_cli(timestamp: str) -> str:
     :param timestamp: timestamp which will be converted
     :return: formatted version of the timestamp
     """
-    cli_timestamp = dateutil.parser.parse(timestamp).astimezone(dateutil.tz.tzlocal()).strftime("%Y-%m-%d %I:%M:%S %p")
+    cli_timestamp = dateutil.parser.parse(timestamp).astimezone(
+        dateutil.tz.tzlocal()).strftime("%Y-%m-%d %I:%M:%S %p")
     return cli_timestamp
 
 
@@ -199,7 +226,10 @@ def wait_for_ctrl_c():
         time.sleep(0.1)
 
 
-def handle_error(logger=None, log_msg: str = None, user_msg: str = None, add_verbosity_msg: bool = False):
+def handle_error(logger=None,
+                 log_msg: str = None,
+                 user_msg: str = None,
+                 add_verbosity_msg: bool = False):
     """
     Handle error in cli. Log message may be printed. User message may be printed or not, with or without verbosity
     usage info. Execution may end with an exit code. Each combination of these 3 possibilities is achievable by
@@ -215,12 +245,15 @@ def handle_error(logger=None, log_msg: str = None, user_msg: str = None, add_ver
         logger.exception(log_msg)
     # Internationalization can be plugged in here.
     if user_msg is not None:
-        click.echo(user_msg + (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
+        click.echo(user_msg +
+                   (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
 
 
 def get_windows_edition():
-    windows_edition_number, _, _ = execute_system_command(
-        ["powershell.exe", "(Get-WmiObject Win32_OperatingSystem).OperatingSystemSKU"])
+    windows_edition_number, _, _ = execute_system_command([
+        "powershell.exe",
+        "(Get-WmiObject Win32_OperatingSystem).OperatingSystemSKU"
+    ])
     return WINDOWS_EDITIONS[int(windows_edition_number)]
 
 
@@ -230,7 +263,8 @@ def get_os_version() -> Tuple[str, LooseVersion]:
         return "macos", LooseVersion(platform.mac_ver()[0])
     elif system_str == "Windows":
         if LooseVersion(platform.release()) >= LooseVersion("10"):
-            return "windows" + "_" + get_windows_edition(), LooseVersion(platform.release())
+            return "windows" + "_" + get_windows_edition(), LooseVersion(
+                platform.release())
         else:
             return "windows", LooseVersion(platform.release())
     elif system_str == "Linux":

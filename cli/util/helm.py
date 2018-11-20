@@ -19,6 +19,9 @@
 # and approved by Intel in writing.
 #
 
+import os
+
+from util.config import Config
 from util.spinner import spinner
 from util.system import execute_system_command
 from util.k8s.k8s_info import delete_namespace
@@ -58,8 +61,9 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
 
     if namespace:
         delete_release_command += ["--tiller-namespace", namespace]
-
-    output, err_code, log_output = execute_system_command(delete_release_command)
+    env = os.environ.copy()
+    env['PATH'] = Config().config_path + os.pathsep + env['PATH']
+    output, err_code, log_output = execute_system_command(' '.join(delete_release_command), env=env, shell=True)
 
     if (f"release \"{release_name}\" deleted" not in output and
             f"release: \"{release_name}\" not found" not in output):

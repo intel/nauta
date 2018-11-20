@@ -19,9 +19,9 @@
 # and approved by Intel in writing.
 #
 
+import sys
 import os
 import base64
-import sys
 from sys import exit
 
 import click
@@ -134,7 +134,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
                                 "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
             env = os.environ.copy()
             env['PATH'] = Config().config_path + os.pathsep + env['PATH']
-            _, err_code, log_output = execute_system_command(add_user_command, env=env)
+            _, err_code, log_output = execute_system_command(' '.join(add_user_command), env=env, shell=True)
 
         if err_code:
             handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
