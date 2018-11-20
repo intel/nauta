@@ -66,6 +66,5 @@ export default {
   TENSORBOARD_ELIGIBILITY: 'TensorBoard* Eligibility',
   TOTAL_EXPERIMENT_DURATION: 'Total Duration',
   USER_GUIDE: 'User Guide',
-  USER_GUIDE_PDF: 'dls4e-cli-commands.pdf',
   VIEW: 'View'
 }

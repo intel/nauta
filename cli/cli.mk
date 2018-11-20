@@ -103,6 +103,7 @@ endif
 	cp -f license.txt dist/
 	mkdir -p dist/docs/
 	cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
+	cp -f ../docs/release/*.pdf dist/docs/
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
 
