@@ -13,9 +13,11 @@ service:
 
 resources:
   requests:
-    cpu: 2
-    memory: 1Gi
-
+    cpu: 38
+    memory: 120Gi
+  limits:
+    cpu: 38
+    memory: 120Gi
 
 experimentName:  {{ DLS4e.ExperimentName }} 
 podCount: 1

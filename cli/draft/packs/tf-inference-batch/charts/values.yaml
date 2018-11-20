@@ -18,6 +18,14 @@ workersCount: 1
 
 resources:
   requests:
+    cpu: 38
+    memory: 120Gi
+  limits:
+    cpu: 38
+    memory: 120Gi
+
+batch_wrapper_resources:
+  requests:
     cpu: 2
     memory: 1Gi
 

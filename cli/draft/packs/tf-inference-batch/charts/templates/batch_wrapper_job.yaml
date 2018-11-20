@@ -54,7 +54,7 @@ spec:
           securityContext:
             privileged: true
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.batch_wrapper_resources | indent 12 }}
       restartPolicy: OnFailure
       volumes:
         - name: input-home
