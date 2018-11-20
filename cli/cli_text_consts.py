@@ -503,7 +503,7 @@ class ExperimentViewCmdTexts:
     EXPERIMENT_NAME - is a name of experiment whose details should be displayed.
     """
     HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
-    CONTAINER_DETAILS_MSG = "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:\n  {resources}"
+    CONTAINER_DETAILS_MSG = "- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:  {resources}"
     EXPERIMENT_NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
     PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
     PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]

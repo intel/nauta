@@ -81,13 +81,11 @@ def unify_units(name: str, value: str) -> str:
 
 def container_resources_to_msg(resources, spaces=9) -> str:
     msg = ''
-    header_indent = ' ' * (spaces - 4)
+    header_indent = '\n' + ' ' * (spaces - 2)
     indent = ' ' * spaces
     if resources.requests:
         msg += header_indent
-
         msg += Texts.CONTAINER_REQUESTS_LIST_HEADER.format(indent)
-
         msg += indent.join([wrap_text(unify_units(request_name, request_value), width=CONTAINER_DETAILS_MAX_WIDTH,
                                       spaces=spaces + 2) for request_name, request_value in resources.requests.items()])
     if resources.limits:
