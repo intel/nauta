@@ -70,7 +70,7 @@ spec:
           volumeMounts:
           - name: shared-data
             mountPath: /pod-data
-      restartPolicy: OnFailure
+      restartPolicy: Never
       volumes:
         - name: input-home
           persistentVolumeClaim:
@@ -86,4 +86,4 @@ spec:
             claimName: output-public
         - name: shared-data
           emptyDir: {}
-  backoffLimit: 5
+  backoffLimit: 0

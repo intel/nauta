@@ -55,7 +55,7 @@ spec:
             privileged: true
           resources:
 {{ toYaml .Values.batch_wrapper_resources | indent 12 }}
-      restartPolicy: OnFailure
+      restartPolicy: Never
       volumes:
         - name: input-home
           persistentVolumeClaim:
@@ -76,4 +76,4 @@ spec:
           volumeMounts:
             - name: output-home
               mountPath: /mnt/output/home
-  backoffLimit: 5
+  backoffLimit: 0
