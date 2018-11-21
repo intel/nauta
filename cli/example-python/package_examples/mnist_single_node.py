@@ -1,23 +1,17 @@
+# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
-#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
 
 
 import argparse
@@ -43,6 +37,7 @@ MODEL_OUTPUT_NAME = "scores"
 
 
 def build_net(images_placeholder, dense_dropout_placeholder):
+    """ Build example mnist conv net. """
     images_input = tf.reshape(images_placeholder, [-1, 28, 28, 1])
 
     conv_1 = tf.layers.conv2d(images_input, filters=32, kernel_size=5, activation=tf.nn.relu, padding="same")
@@ -79,6 +74,9 @@ def main(_):
     tf.summary.scalar("loss", loss)
     tf.summary.scalar("accuracy", accuracy)
     summary_op = tf.summary.merge_all()
+
+    # As previously mentioned summaries are saved to EXPERIMNET_OUTPUT_PATH which makes them accessible by user and
+    # tensorboard.
     summary_writer = tf.summary.FileWriter(os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"))
 
     session = tf.Session()
@@ -104,17 +102,21 @@ def main(_):
         # them and call publish. Old values of the same key will be overwritten.
         publish({"global_step": str(i), "loss": str(loss_val), "accuracy": str(accuracy_val)})
 
+    # Validate trained model on MNIST validation set.
     validation_accuracy_val = session.run(
         accuracy,
         feed_dict={images_placeholder: mnist.validation.images,
                    labels_placeholder: mnist.validation.labels}
     )
     print("Validation accuracy: {}".format(validation_accuracy_val))
+
+    # As previously mentioned checkpoints are saved to EXPERIMNET_OUTPUT_PATH which makes them accessible by user.
     saver.save(session, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model.ckpt"))
 
     # Publish validation accuracy the same way as before.
     publish({"validation_accuracy": str(validation_accuracy_val)})
 
+    # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
     builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(EXPERIMENT_OUTPUT_PATH, "models", "00001"))
 
     prediction_signature = (

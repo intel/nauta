@@ -1,24 +1,3 @@
-#
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
-#
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
-#
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
-#
-
 # Copyright 2017 Uber Technologies, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,6 +42,7 @@ MODEL_OUTPUT_NAME = "scores"
 
 
 def build_net(images_placeholder, dense_dropout_placeholder):
+    """ Build example mnist conv net. """
     images_input = tf.reshape(images_placeholder, [-1, 28, 28, 1])
 
     conv_1 = tf.layers.conv2d(images_input, filters=32, kernel_size=5, activation=tf.nn.relu, padding="same")
@@ -89,6 +69,7 @@ def build_net(images_placeholder, dense_dropout_placeholder):
 def main(_):
     hvd.init()
 
+    # Read/download local dataset. Different copy for each process.
     mnist = tf.contrib.learn.datasets.mnist.read_data_sets("mnist_data_{}".format(hvd.rank()))
 
     # Name images placeholder to be able to retrieve it from saved meta graph.
@@ -105,6 +86,7 @@ def main(_):
     loss = tf.losses.softmax_cross_entropy(tf.one_hot(labels_placeholder, 10), logits)
     accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, labels_placeholder), tf.float32))
 
+    # Define summary ops to save summaries for later use in tensorboard.
     tf.summary.scalar("accuracy", accuracy)
     tf.summary.scalar("loss", loss)
     summary_op = tf.summary.merge_all()
@@ -134,11 +116,13 @@ def main(_):
     # Only master saves summaries.
     if hvd.rank() == 0:
         hooks += [
+            # As previously mentioned summaries are saved to EXPERIMENT_OUTPUT_PATH so that they can be discovered by
+            # tensorboard.
             tf.train.SummarySaverHook(save_steps=1, output_dir=os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"),
                                       summary_op=summary_op)]
 
-    # Horovod: save checkpoints only on worker 0 to prevent other workers from
-    # corrupting them.
+    # Horovod: save checkpoints only on worker 0 to prevent other workers from corrupting them. As previously mentioned
+    # checkpoints are saved to EXPERIMNET_OUTPUT_PATH which makes them accessible by user.
     checkpoint_dir = os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints") if hvd.rank() == 0 else None
 
     # The MonitoredTrainingSession takes care of session initialization,
@@ -172,6 +156,7 @@ def main(_):
                 images_placeholder = tf.get_default_graph().get_tensor_by_name(INPUT_NAME + ":0")
                 scores = tf.get_default_graph().get_tensor_by_name(SCORES_NAME + ":0")
 
+                # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
                 builder = tf.saved_model.builder.SavedModelBuilder(
                     os.path.join(EXPERIMENT_OUTPUT_PATH, "models", "00001"))
 
