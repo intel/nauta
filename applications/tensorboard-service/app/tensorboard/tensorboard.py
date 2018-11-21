@@ -28,6 +28,7 @@ from uuid import uuid4
 
 from kubernetes import config
 from kubernetes.client import V1Deployment, V1ObjectMeta, V1Pod, V1ContainerStatus
+from kubernetes.client.rest import ApiException
 import requests
 
 from k8s.client import K8SAPIClient, K8SPodPhase
@@ -195,7 +196,14 @@ class TensorboardManager:
 
     def delete_garbage(self):
         log.debug("searching for garbage...")
-        tensorboards = self.list()
+
+        try:
+            tensorboards = self.list()
+        except ApiException as ex:
+            if ex.status == HTTPStatus.GATEWAY_TIMEOUT:
+                log.exception("gateway timeout occurred when searching for garbage")
+                return
+            raise ex
 
         self.refresh_garbage_timeout()
 

@@ -20,11 +20,13 @@
 #
 
 from datetime import datetime
+from http import HTTPStatus
 from unittest import mock
 
 from kubernetes.client import V1Deployment, V1ObjectMeta, V1beta1Ingress, V1Pod, V1beta1IngressSpec, \
     V1beta1IngressRule, V1beta1HTTPIngressRuleValue, V1beta1HTTPIngressPath, V1PodStatus, V1beta1IngressBackend, \
     V1ContainerStatus
+from kubernetes.client.rest import ApiException
 import pytest
 from pytest_mock import MockFixture
 
@@ -383,6 +385,27 @@ def test_delete_garbage(mocker, tensorboard_manager_mocked: TensorboardManager,
 
     # noinspection PyUnresolvedReferences
     assert tensorboard_manager_mocked.delete.call_count == delete_count
+
+
+def test_delete_garbage_gateway_timeout(mocker, tensorboard_manager_mocked: TensorboardManager):
+    mocker.patch.object(tensorboard_manager_mocked, 'list').side_effect = ApiException(
+        status=HTTPStatus.GATEWAY_TIMEOUT.value
+    )
+    mocker.spy(tensorboard_manager_mocked, 'refresh_garbage_timeout')
+
+    tensorboard_manager_mocked.delete_garbage()
+
+    # noinspection PyUnresolvedReferences
+    assert tensorboard_manager_mocked.refresh_garbage_timeout.call_count == 0
+
+
+def test_delete_garbage_other_exception(mocker, tensorboard_manager_mocked: TensorboardManager):
+    mocker.patch.object(tensorboard_manager_mocked, 'list').side_effect = ApiException(
+        status=HTTPStatus.NOT_FOUND.value
+    )
+
+    with pytest.raises(ApiException):
+        tensorboard_manager_mocked.delete_garbage()
 
 
 # noinspection PyShadowingNames
