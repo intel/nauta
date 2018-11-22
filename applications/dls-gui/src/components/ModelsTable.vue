@@ -44,7 +44,7 @@
               :clearSort="clearSort"
               :clearFilterHandler="clearFilter"
             ></ActionHeaderButtons>
-            <v-flex xs12 md3 v-if="(experimentsTotal !== 0 || searchPattern)">
+            <v-flex v-if="(experimentsTotal !== 0 || searchPattern)" xs12 md3>
               <v-card-title>
                 <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
               </v-card-title>
@@ -52,10 +52,10 @@
           </v-card-title>
           <div class="elevation">
             <div v-bind:class="{overflow: filteredDataCount !== 0, 'table-style': true, 'static-height': filterByValWindowVisible }">
-              <table class="datatable table">
+              <table v-if="experimentsParams.length !== 0" class="datatable table">
                 <thead>
                 <tr>
-                  <th v-if="filteredDataCount !== 0" width="150px">
+                  <th width="150px">
                     <div>{{ labels.TENSORBOARD_ELIGIBILITY }}</div>
                   </th>
                   <th v-for="(header, idx) in experimentsParams" v-if="isVisibleColumn(header)" :id="header" v-bind:key="header"
@@ -151,18 +151,14 @@
                 </tbody>
               </table>
             </div>
-            <div id="nodata" v-if="experimentsTotal === 0">
-              <v-alert :value="true" type="info">
+            <div v-if="filteredDataCount === 0" id="nodata">
+              <v-alert v-if="experimentsTotal === 0" :value="true" type="info">
                 {{ messages.SUCCESS.NO_DATA }}
               </v-alert>
-            </div>
-            <div id="nodata" v-if="filteredDataCount === 0 && experimentsTotal !== 0 && customFiltersActive">
-              <v-alert :value="true" type="info">
+              <v-alert v-if="filteredDataCount === 0 && experimentsTotal !== 0 && customFiltersActive" :value="true" type="info">
                 {{ messages.SUCCESS.NO_DATA_FOR_FILTER }}
               </v-alert>
-            </div>
-            <div id="nodata" v-if="filteredDataCount === 0 && experimentsTotal !== 0 && !customFiltersActive">
-              <v-alert :value="true" type="info">
+              <v-alert v-if="filteredDataCount === 0 && experimentsTotal !== 0 && !customFiltersActive" :value="true" type="info">
                 {{ messages.SUCCESS.NO_DATA_FOR_CURRENT_USER }}
                 Click <u class="pointer-btn" v-on:click="showAllUsersData()">here</u> to load all users data.
               </v-alert>
