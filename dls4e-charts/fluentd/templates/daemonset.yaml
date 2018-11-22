@@ -68,10 +68,13 @@ spec:
               - '-c'
               - >
                 set -e;
+                echo "Log rotate" >> /var/log/containers/dummy.log;
+                sleep 30;
                 LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-120};
-                LAST_MODIFIED_DATE=$(stat /var/log/fluentd-containers.log.pos | grep Modify | cut -d ':' -f 1 --complement)
+                LAST_MODIFIED_DATE=$(stat /var/log/fluentd-containers.log.pos | grep Modify | cut -d ':' -f 1 --complement);
                 LAST_MODIFIED_TIMESTAMP=$(date --date "${LAST_MODIFIED_DATE}" +%s);
                 if [ $(date +%s) -gt $(expr ${LAST_MODIFIED_TIMESTAMP} + ${LIVENESS_THRESHOLD_SECONDS}) ]; then exit 1; fi;
+                if [ $(wc -l < /var/log/containers/dummy.log) -gt 100 ]; then rm /var/log/containers/dummy.log; fi;
       terminationGracePeriodSeconds: 30
       volumes:
       - name: varlog
