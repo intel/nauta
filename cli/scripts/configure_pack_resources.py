@@ -23,8 +23,8 @@ import argparse
 import glob
 import logging
 import os
+from ruamel.yaml import YAML
 
-import yaml
 from kubernetes import config, client
 
 PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
@@ -36,11 +36,6 @@ MULTINODE_PACKS = {'multinode-tf-training-tfjob', 'multinode-tf-training-tfjob-p
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-
-class SimpleDumper(yaml.Dumper):
-    def ignore_aliases(self, data):
-        return True
 
 
 def convert_k8s_cpu_resource(cpu_resource: str) -> float:
@@ -100,9 +95,9 @@ def get_k8s_worker_allocatable_resources(cpu_threshold: 0.2, mem_threshold: 0.2)
     memory_limit *= mem_threshold
 
     return {'resources': {
-                'requests': {'cpu': cpu_request, 'memory': memory_request},
-                'limits': {'cpu': cpu_limit, 'memory': memory_limit}
-            }}
+        'requests': {'cpu': cpu_request, 'memory': memory_request},
+        'limits': {'cpu': cpu_limit, 'memory': memory_limit}
+    }}
 
 
 def get_fixed_resources(fixed_cpu: str, fixed_memory: str):
@@ -126,6 +121,7 @@ def get_horovod_resources(k8s_worker_resources: dict, physical_cpus=1):
 
 
 def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_resources: dict, horovod_cpus=1):
+    yaml_parser = YAML(typ="jinja2")
     values_yaml_paths = f'{dlsctl_config_dir_path}/packs/*/charts/values.yaml'
     for values_yaml_path in glob.glob(values_yaml_paths):
         logger.info(f'Changing resources for pack: {values_yaml_path}')
@@ -138,7 +134,7 @@ def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_
         logger.info(f'Calculated resources: {pack_resources}')
 
         with open(values_yaml_path, mode='r') as values_yaml_file:
-            pack_values = yaml.safe_load(values_yaml_file)
+            pack_values = yaml_parser.load(values_yaml_file)
             if not pack_values:
                 logger.error(f'{values_yaml_path} file empty!')
                 raise ValueError
@@ -149,7 +145,7 @@ def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_
                 exit(1)
 
         with open(values_yaml_path, mode='w') as values_yaml_file:
-            yaml.dump(updated_pack_values, values_yaml_file, default_flow_style=False, Dumper=SimpleDumper)
+            yaml_parser.dump(updated_pack_values, values_yaml_file)
             logger.info(f'Resources for pack: {values_yaml_path} were changed.\n')
 
 
@@ -175,6 +171,7 @@ def argument_parser():
                         help='Set desired number of physical CPUs for Horovod (e.g. 1 or 20)',
                         type=int, default=1, required=False)
     return parser
+
 
 if __name__ == '__main__':
     parser = argument_parser()
