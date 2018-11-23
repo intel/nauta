@@ -76,7 +76,7 @@ mocked_test_pod.metadata.uid = "uid"
 TEST_PODS = [mocked_test_pod]
 
 pending_pod = MagicMock(spec=V1Pod)
-pending_pod.status = V1PodStatus(phase=PodStatus.PENDING.value, conditions=[])
+pending_pod.status = V1PodStatus(phase=PodStatus.PENDING.value)
 pending_pod.metadata.name = "test"
 pending_pod.metadata.uid = "uid"
 PENDING_POD = [pending_pod]
@@ -85,6 +85,7 @@ TOP_USERS = [ResourceUsage(user_name="user_name", cpu_usage=2, mem_usage=1000)]
 
 event = MagicMock(spec=V1Event)
 event.message = "insufficient memory"
+event.reason = "insufficient memory"
 event.involved_object = V1ObjectReference(name="test-experiment")
 event.metadata = V1ObjectMeta(name="test-experiment")
 EVENTS = [event]

@@ -114,8 +114,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
         else:
             namespace = get_kubectl_current_context_namespace()
 
-        run = runs_api.get_run(name=experiment_name,
-                               namespace=namespace)
+        run = runs_api.get_run(name=experiment_name, namespace=namespace)
         if not run:
             handle_error(user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name=experiment_name))
             exit(2)
@@ -124,7 +123,9 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
             tabulate(
                 [run.cli_representation],
                 headers=EXPERIMENTS_LIST_HEADERS,
-                tablefmt="orgtbl"))
+                tablefmt="orgtbl"
+            )
+        )
 
         click.echo(Texts.PODS_PARTICIPATING_LIST_HEADER)
 
@@ -136,12 +137,24 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
 
         for pod in pods:
             status_string = ""
-            for cond in pod.status.conditions:
-                msg = "\n" if not cond.reason else "\n reason: " + \
-                                                   wrap_text(cond.reason, width=POD_CONDITIONS_MAX_WIDTH)
-                msg = msg + ", \n message: " + wrap_text(cond.message, width=POD_CONDITIONS_MAX_WIDTH) \
-                    if cond.message else msg
-                status_string += wrap_text(cond.type + ": " + cond.status, width=POD_CONDITIONS_MAX_WIDTH) + msg + "\n"
+
+            if pod.status.conditions:
+                for cond in pod.status.conditions:
+                    msg = "\n" if not cond.reason else "\n reason: " + \
+                                                       wrap_text(cond.reason, width=POD_CONDITIONS_MAX_WIDTH)
+                    msg = msg + ", \n message: " + wrap_text(cond.message, width=POD_CONDITIONS_MAX_WIDTH) \
+                        if cond.message else msg
+                    status_string += wrap_text(cond.type + ": " + cond.status,
+                                               width=POD_CONDITIONS_MAX_WIDTH) + msg + "\n"
+            else:
+                pod_events = get_pod_events(namespace=namespace, name=pod.metadata.name)
+
+                for event in pod_events:
+                    msg = "\n" if not event.reason else "\n reason: " + \
+                                                        wrap_text(event.reason, width=POD_CONDITIONS_MAX_WIDTH)
+                    msg = msg + ", \n message: " + wrap_text(event.message, width=POD_CONDITIONS_MAX_WIDTH) \
+                        if event.message else msg
+                    status_string += msg + "\n"
 
             if pod.status.phase.upper() == PodStatus.PENDING.value:
                 pending_pods.append(pod.metadata.name)

@@ -20,12 +20,14 @@
 #
 
 import base64
-
 from enum import Enum
+from http import HTTPStatus
 from typing import List, Dict
+
 from kubernetes.client.rest import ApiException
 from kubernetes import config, client
 from kubernetes.client import configuration, V1DeleteOptions, V1Secret, V1ServiceAccount
+
 from util.logger import initialize_logger
 from util.exceptions import KubernetesError
 from util.app_names import DLS4EAppNames
@@ -137,7 +139,7 @@ def get_pods(label_selector: str) -> List[client.V1Pod]:
         pods = pods_response.items
     except ApiException as e:
         logger.exception(f'Failed to find pods with label selector: {label_selector}')
-        if e.status != 404:
+        if e.status != HTTPStatus.NOT_FOUND:
             raise
 
     return pods
@@ -156,7 +158,7 @@ def get_namespaced_pods(label_selector: str, namespace: str) -> List[client.V1Po
         pods = pods_response.items
     except ApiException as e:
         logger.exception(f'Failed to find namespaced pods with label selector: {label_selector}')
-        if e.status != 404:
+        if e.status != HTTPStatus.NOT_FOUND:
             raise
 
     return pods
@@ -322,7 +324,7 @@ def get_users_samba_password(username: str) -> str:
 
         password = str(base64.b64decode(secret.data["password"]), encoding="utf-8")
     except ApiException as exe:
-        if exe.status == 404:
+        if exe.status == HTTPStatus.NOT_FOUND:
             password = None
         else:
             logger.exception(error_message)
@@ -356,7 +358,7 @@ def is_current_user_administrator(request_timeout: int = None) -> bool:
         get_cluster_roles(request_timeout=request_timeout)
     except ApiException as exe:
         # 403 - forbidden
-        if exe.status == 403:
+        if exe.status == HTTPStatus.FORBIDDEN:
             return False
         else:
             raise exe
@@ -437,13 +439,25 @@ def sum_mem_resources(mem_resources: List[str]):
     return format_mem_resources(mem_sum)
 
 
-def get_pod_events(namespace: str, name: str = None):
+def get_pod_events(namespace: str, name: str = None) -> List[client.V1Event]:
     try:
         api = get_k8s_api()
 
-        events_list = api.list_namespaced_event(namespace=namespace)
+        events = []
 
-        return [event for event in events_list.items if name is None or event.involved_object.name == name]
+        try:
+            if name:
+                event_list: client.V1EventList = api.list_namespaced_event(namespace=namespace,
+                                                                           field_selector=f"involvedObject.name={name}")
+            else:
+                event_list: client.V1EventList = api.list_namespaced_event(namespace=namespace)
+            events = event_list.items
+        except ApiException as ex:
+            if ex.status != HTTPStatus.NOT_FOUND:
+                logger.exception('Exception when getting pod events')
+                raise
+
+        return events
     except Exception as exe:
         error_message = Texts.GATHERING_EVENTS_ERROR_MSG
         logger.exception(error_message)
