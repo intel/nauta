@@ -147,13 +147,13 @@ endif
 
 pack-ipplan:
 ifeq (Windows,$(OS))
-	@cd $(CURDIR)/../.. && 7z a -tzip ipplan-$(CLI_ARTIFACT_NAME) ./cli/*
+	@cd $(CURDIR)/../.. && 7z a -tzip ipplan-$(CLI_ARTIFACT_NAME) ./applications/cli/*
 endif
 ifeq (Linux,$(OS))
-	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
+	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C applications/cli .
 endif
 ifeq (Darwin,$(OS))
-	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
+	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C applications/cli .
 endif
 
 pack: build
