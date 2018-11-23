@@ -11,7 +11,7 @@ metadata:
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
-  backoffLimit: 0
+  backoffLimit: 5
   replicas: {{ .Values.workersCount }}
   template:
     metadata:
@@ -63,7 +63,7 @@ spec:
             privileged: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-      restartPolicy: Never
+      restartPolicy: OnFailure
       volumes:
         - name: input-home
           persistentVolumeClaim:
