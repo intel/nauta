@@ -97,13 +97,13 @@ ifeq (Darwin,$(OS))
 endif
 
 
-	cp -Rf ../dls4e-user dist/config/
+	cp -Rf ../../dls4e-user dist/config/
 	mkdir -p dist/lib/
 	mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	cp -f license.txt dist/
 	mkdir -p dist/docs/
-	cp -f ../applications/dls-gui/src/assets/*.pdf dist/docs/
-	cp -f ../docs/end-user-docs/Beta_Release_Docs/DL_Studio_User_Guide_Files/release/*.pdf dist/docs/
+	cp -f ../dls-gui/src/assets/*.pdf dist/docs/
+	cp -f ../../docs/end-user-docs/Beta_Release_Docs/DL_Studio_User_Guide_Files/release/*.pdf dist/docs/
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
 
@@ -147,13 +147,13 @@ endif
 
 pack-ipplan:
 ifeq (Windows,$(OS))
-	@cd $(CURDIR)/.. && 7z a -tzip ipplan-$(CLI_ARTIFACT_NAME) ./cli/*
+	@cd $(CURDIR)/../.. && 7z a -tzip ipplan-$(CLI_ARTIFACT_NAME) ./cli/*
 endif
 ifeq (Linux,$(OS))
-	@cd $(CURDIR)/.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
+	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
 endif
 ifeq (Darwin,$(OS))
-	@cd $(CURDIR)/.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
+	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C cli .
 endif
 
 pack: build
@@ -173,7 +173,7 @@ ifeq (True,$(ENV_IPPLAN))
 endif
 	@echo Upload artifacts to the releases directory
 ifneq (Windows,$(OS))
-	@cd $(CURDIR)/.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)
 else
 	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
 	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
@@ -182,10 +182,10 @@ endif
 ifeq (True,$(ENV_IPPLAN))
 	@echo Upload artifacts to the ipplan directory
 ifneq (Windows,$(OS))
-	@cd $(CURDIR)/.. && make tools-push ENV_SRC=$(CURDIR)/../ipplan-$(CLI_ARTIFACT_NAME) ENV_DEST=releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME) ENV_DEST=releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)
 else
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
+	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
+	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
 endif
 endif
 
@@ -193,11 +193,11 @@ ifeq (True,$(ENV_CALCULATESUM))
 	@echo Calculate file control sum and upload to the releases directory
 ifeq (Linux,$(OS))
 	sha256sum "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Darwin,$(OS))
 	shasum -a 256 "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Windows,$(OS))
 	powershell -Command "& { Get-FileHash -Algorithm SHA256 -Path $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) > $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum }"

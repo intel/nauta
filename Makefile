@@ -35,7 +35,7 @@ k8s-installer-build:
 	@make tools-release
 
 dlsctl-build:
-	@(cd $(CURDIR)/cli && make full_clean && make push)
+	@(cd $(CURDIR)/applications/cli && make full_clean && make push)
 
 tools-%:
 	@(cd $(CURDIR)/tools && make -j 2 $*)
@@ -44,16 +44,16 @@ single-tools-%:
 	@(cd $(CURDIR)/tools && make $*)
 
 unit-tests:
-	@(cd $(CURDIR)/cli && make test)
+	@(cd $(CURDIR)/applications/cli && make test)
 
 build-conditional-deep-clean:
-	@(cd $(CURDIR)/cli && make build-conditional-deep-clean)
+	@(cd $(CURDIR)/applications/cli && make build-conditional-deep-clean)
 
 cli-style:
-	@(cd $(CURDIR)/cli && make style)
+	@(cd $(CURDIR)/applications/cli && make style)
 
 unit-tests-with-code-cov:
-	@(cd $(CURDIR)/cli && make test-with-code-cov)
+	@(cd $(CURDIR)/applications/cli && make test-with-code-cov)
 
 gui-unit-tests:
 	@(cd $(CURDIR)/applications/dls-gui && make test)

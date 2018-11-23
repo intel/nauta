@@ -422,7 +422,7 @@ shared_images:
     required:
       BASE_IMAGE: "shared/centos/python36"
     method: build
-    directory: "{{ playbook_dir }}/../../cli/experiment_metrics"
+    directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
     push: False
   shared/utils/nginx:
     version: "v1.13.9"

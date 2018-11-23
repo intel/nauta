@@ -1,1 +1,1 @@
-../../cli/experiment_metrics
+../../cli/applications/experiment_metrics
