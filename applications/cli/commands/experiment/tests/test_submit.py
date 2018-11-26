@@ -30,6 +30,7 @@ from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_scr
 from commands.experiment.common import RunSubmission, RunStatus
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
+from cli_text_consts import ExperimentCommonTexts as CommonTexts
 
 
 SCRIPT_LOCATION = "training_script.py"
@@ -66,6 +67,9 @@ class SubmitMocks:
         self.get_default_script_location = mocker.patch(
             "commands.experiment.submit.get_default_script_location")
         self.clean_script_parameters = mocker.patch("commands.experiment.submit.clean_script_parameters")
+        self.get_list_of_packs = mocker.patch("commands.experiment.common.get_list_of_packs",
+                                              return_value=["tf-training-tfjob"])
+        self.validate_pack = mocker.patch("commands.experiment.submit.validate_pack")
 
 
 @pytest.fixture
@@ -225,3 +229,10 @@ def test_clean_script_parameters_empty(prepare_mocks: SubmitMocks):
 
 def test_clean_script_parameters_with_backslash(prepare_mocks: SubmitMocks):
     assert ("aaa", "bbb", "ccc") == clean_script_parameters(None, None, ("\\aaa", "bbb", "ccc"))
+
+
+def test_submit_experiment_wrong_template(prepare_mocks: SubmitMocks):
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-t", "wrong_template"])
+
+    assert CommonTexts.INCORRECT_TEMPLATE_NAME in result.output
+    assert result.exit_code == 2

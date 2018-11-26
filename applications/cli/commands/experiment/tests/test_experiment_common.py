@@ -23,11 +23,12 @@
 import os
 
 import pytest
+from unittest.mock import patch, mock_open
 
 from commands.experiment.common import submit_experiment, RunSubmission, values_range, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
     check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
-    RunKinds, validate_pack_params_names, get_log_filename
+    RunKinds, validate_pack_params_names, get_log_filename, validate_pack
 
 from util.exceptions import SubmitExperimentError
 import util.config
@@ -67,6 +68,10 @@ LOG_WITH_FILE = "Application nmnist-horo-418-18-10-24-05-13-49: Releasing  Appli
 LOG_WITHOUT_FILE = "Application nmnist-horo-418-18-10-24-05-13-49: Releasing  Application " \
                    "nmnist-horo-418-18-10-24-05-13-49: Releasing   Application nmnist-horo-418-18-10-24-05-13-49 " \
                    ": Releasing Application -\\nmnist-horo-418-18-10-24-05-13-49: Releasing Application: "
+
+PACK_NAME = "test"
+CHART_FILE_CONTENT = "name: test"
+CHART_FILE_CONTENT_INCORRECT = "name: test-wrong"
 
 
 @pytest.fixture()
@@ -567,3 +572,36 @@ def test_get_log_filename_log_not_found():
     log_filename = get_log_filename(LOG_WITHOUT_FILE)
 
     assert not log_filename
+
+
+def test_validate_pack_success(mocker):
+    mocker.patch("os.path.join").return_value = "Chart.yaml"
+    mocker.patch("os.path.isfile").return_value = True
+
+    with patch("builtins.open", mock_open(read_data=CHART_FILE_CONTENT)),\
+         patch.object(util.config.Config, 'get_config_path', return_value=""): # noqa
+        validate_pack(PACK_NAME)
+
+
+def test_validate_pack_lack_of_file(mocker):
+    mocker.patch("os.path.join").return_value = "Chart.yaml"
+    mocker.patch("os.path.isfile").return_value = False
+    mocker.patch("commands.experiment.common.handle_error")
+
+    with patch("builtins.open", mock_open(read_data=CHART_FILE_CONTENT)), \
+         patch.object(util.config.Config, "get_config_path", return_value=""), \
+         patch('commands.experiment.common.exit') as exit_mock: # noqa
+            validate_pack(PACK_NAME)
+            assert exit_mock.called
+
+
+def test_validate_pack_wrong_name(mocker):
+    mocker.patch("os.path.join").return_value = "Chart.yaml"
+    mocker.patch("os.path.isfile").return_value = False
+    mocker.patch("commands.experiment.common.handle_error")
+
+    with patch("builtins.open", mock_open(read_data=CHART_FILE_CONTENT_INCORRECT)), \
+         patch.object(util.config.Config, "get_config_path", return_value=""), \
+         patch('commands.experiment.common.exit') as exit_mock: # noqa
+        validate_pack(PACK_NAME)
+        assert exit_mock.called

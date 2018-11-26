@@ -34,7 +34,8 @@ from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
-from commands.experiment.common import validate_experiment_name, validate_pack_params_names
+from commands.experiment.common import validate_experiment_name, validate_pack_params_names, validate_template_name, \
+    validate_pack
 from util.k8s.k8s_info import is_current_user_administrator
 from platform_resources.run_model import RunStatus
 from util.system import handle_error
@@ -106,7 +107,7 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.command(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.argument("script_location", type=click.Path(), required=True)
 @click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
-@click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob")
+@click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob", callback=validate_template_name)
 @click.option("-n", "--name", help=Texts.HELP_N, callback=validate_experiment_name)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
@@ -126,6 +127,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     logger.debug(Texts.SUBMIT_START_LOG_MSG)
     validate_script_location(script_location)
     validate_pack_params(pack_param)
+    validate_pack(template)
 
     if os.path.isdir(script_location):
         script_location = get_default_script_location(script_directory=script_location)

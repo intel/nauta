@@ -19,17 +19,14 @@
 # and approved by Intel in writing.
 #
 
-import os
 import sys
 
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import RUN_TEMPLATE_NAME
+from commands.experiment.common import RUN_TEMPLATE_NAME, get_list_of_packs
 from cli_state import common_options
 from util.aliascmd import AliasCmd
-from draft.cmd import DRAFT_HOME_FOLDER
-from util.config import Config
 from util.logger import initialize_logger
 from util.system import handle_error
 from cli_text_consts import ExperimentTemplateListCmdTexts as Texts
@@ -45,14 +42,7 @@ TEMPL_FOLDER_NAME = "templates"
                options_metavar='[options]')
 @common_options()
 def template_list():
-    path = os.path.join(Config().config_path, DRAFT_HOME_FOLDER, "packs")
-
-    list_of_packs = []
-    for (dirpath, dirnames, filenames) in os.walk(path):
-
-        if CHART_YAML_FILENAME in filenames and TEMPL_FOLDER_NAME in dirnames:
-            pack_name = os.path.split(os.path.split(dirpath)[0])[1]
-            list_of_packs.append(pack_name)
+    list_of_packs = get_list_of_packs()
 
     if list_of_packs:
         click.echo(tabulate([[row] for row in list_of_packs],

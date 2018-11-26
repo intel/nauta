@@ -569,6 +569,9 @@ class ExperimentCommonTexts:
     CREATING_ENVIRONMENT_MSG = "Creating {run_name} environment..."
     CREATING_RESOURCES_MSG = "Creating {run_name} resources..."
     CLUSTER_CONNECTION_CLOSING_MSG = "Closing tunnel to the cluster..."
+    INCORRECT_TEMPLATE_NAME = "Incorrect template name."
+    INCORRECT_ENV_PARAMETER = "-e/--env option must be in <KEY>=<VALUE> format."
+    INCORRECT_PACK_DEFINITION = "Definition of the {pack_name} pack is incorrect."
 
 
 class DraftCmdTexts:

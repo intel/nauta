@@ -27,6 +27,7 @@ import re
 import shutil
 from sys import exit
 import textwrap
+import yaml
 
 import click
 from typing import Tuple, List
@@ -76,6 +77,9 @@ EXP_SUB_SEMAPHORE_FILENAME = ".underSubmission"
 
 EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_END_DATE,
                             RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+
+CHART_YAML_FILENAME = "Chart.yaml"
+TEMPL_FOLDER_NAME = "templates"
 
 log = initialize_logger('commands.common')
 
@@ -164,6 +168,7 @@ def create_environment(experiment_name: str, file_location: str, folder_location
             raise SubmitExperimentError(message_prefix.format(reason=Texts.DIR_CANT_BE_COPIED_ERROR_TEXT))
 
     log.debug("Create environment - end")
+
     return run_environment_path
 
 
@@ -700,8 +705,42 @@ def validate_env_paramater(ctx, param, value):
                     raise ValueError
         return value
     except Exception as exe:
-        raise click.BadParameter('-e/--env option must be in <KEY>=<VALUE> format.')
+        raise click.BadParameter(Texts.INCORRECT_ENV_PARAMETER)
 
 
 def wrap_text(text: str, width: int, spaces: int = 2) -> str:
     return ("\n"+" " * spaces).join(textwrap.wrap(text, width))
+
+
+def get_list_of_packs():
+    path = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER, "packs")
+
+    list_of_packs = []
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        if CHART_YAML_FILENAME in filenames and TEMPL_FOLDER_NAME in dirnames:
+            pack_name = os.path.split(os.path.split(dirpath)[0])[1]
+            list_of_packs.append(pack_name)
+
+    return list_of_packs
+
+
+def validate_template_name(ctx, param, value):
+    if value not in get_list_of_packs():
+        raise click.BadParameter(Texts.INCORRECT_TEMPLATE_NAME)
+    return value
+
+
+def validate_pack(name: str):
+    # check corectenss of the Chart.yaml file
+    chart_location = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER,
+                                  "packs", name, "charts", CHART_YAML_FILENAME)
+
+    if not os.path.isfile(chart_location):
+        handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))
+        exit(2)
+
+    with open(chart_location, 'r', encoding='utf-8') as chart_file:
+            chart_content = yaml.load(chart_file)
+            if chart_content.get("name") != name:
+                handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))
+                exit(2)
