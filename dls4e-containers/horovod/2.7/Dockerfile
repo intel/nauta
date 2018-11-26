@@ -48,8 +48,7 @@ RUN mv ${MPIRUN_BIN} ${MPIRUN_BIN}.real && \
     chmod a+x ${MPIRUN_BIN}
 
 RUN echo "hwloc_base_binding_policy = none" >> /etc/openmpi-x86_64/openmpi-mca-params.conf && \
-    echo "rmaps_base_mapping_policy = slot" >> /etc/openmpi-x86_64/openmpi-mca-params.conf && \
-    echo "btl_tcp_if_exclude = lo,docker0" >> /etc/openmpi-x86_64/openmpi-mca-params.conf
+    echo "rmaps_base_mapping_policy = slot" >> /etc/openmpi-x86_64/openmpi-mca-params.conf
 
 RUN yum install -y openssh-clients openssh-server && \
     sshd-keygen && \
@@ -72,3 +71,4 @@ RUN echo "y" | ssh-keygen -N "" -f /root/.ssh/id_rsa && \
 COPY --from=kubectl_data /build-output/kubernetes/kubectl /bin/kubectl
 
 RUN chmod +x /bin/kubectl
+
