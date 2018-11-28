@@ -39,7 +39,8 @@ def test_batch(launch_mocks):
     data_location = '/fake/data/location'
 
     runner = CliRunner()
-    result = runner.invoke(batch.batch, ['--model-location', model_location, '--data', data_location])
+    result = runner.invoke(batch.batch, ['--model-location', model_location, '--data', data_location,
+                                         '-p', 'test.param', '1'])
 
     assert batch.generate_name.call_count == 1
     assert batch.start_inference_instance.call_count == 1

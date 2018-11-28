@@ -234,6 +234,8 @@ class PredictLaunchCmdTexts:
                                        "'model location' or 'local model location' required"
     HELP_MODEL_NAME = "Name of a model passed as a servable name. By default it is the name of directory in model's " \
                       "location."
+    HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
+             "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
 
 
 class PredictStreamCmdTexts:
@@ -291,6 +293,8 @@ class PredictBatchCmdTexts:
                                        "'model location' or 'local model location' required"
     HELP_TF_RECORD = "If given - batch prediction accepts files in TFRecord formats. Otherwise files should be " \
                      "delivered in protobuf format."
+    HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
+             "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
 
 
 class ExperimentCmdTexts:
