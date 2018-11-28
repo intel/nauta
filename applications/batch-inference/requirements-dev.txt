@@ -1,1 +1,3 @@
-../../cli/applications/experiment_metrics
+../cli/experiment_metrics
+pytest==4.0.1
+pytest-mock==1.10.0

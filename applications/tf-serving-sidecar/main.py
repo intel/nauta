@@ -49,7 +49,6 @@ k8s_rest_logger.setLevel(log.INFO)
 v1 = client.BatchV1Api()
 
 while True:
-    #log.info(f"fetching tfjob: {my_tfjob_name} ...")
     batch_wrapper_job: V1Job = v1.read_namespaced_job(name=batch_wrapper_job_name, namespace=my_current_namespace)
 
     batch_wrapper_job_status: V1JobStatus = batch_wrapper_job.status
@@ -57,10 +56,15 @@ while True:
     active_pods = batch_wrapper_job_status.active if batch_wrapper_job_status.active is not None else 0
     succeeded_pods = batch_wrapper_job_status.succeeded if batch_wrapper_job_status.succeeded is not None else 0
 
-    #log.info(f"active workers: {active_workers}")
+    # model server should also be closed when there is failure in batch wrapper job
+    if hasattr(batch_wrapper_job_status, 'failed') and batch_wrapper_job_status.failed is not None:
+        failed_pods = batch_wrapper_job_status.failed
+    else:
+        failed_pods = 0
 
-    if active_pods == 0 and succeeded_pods > 0:
-        log.info("active_pods == 0 and succeeded_pods > 0, creating END hook")
+    if active_pods == 0 and (succeeded_pods > 0 or failed_pods > 0):
+        log.info(f"active_pods == {active_pods}, succeeded_pods == {succeeded_pods}, failed_pods == {failed_pods}, "
+                 f"creating END hook")
         open("/pod-data/END", 'a').close()
         log.info("exiting...")
         _exit(0)
