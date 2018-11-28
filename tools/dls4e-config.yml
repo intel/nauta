@@ -108,7 +108,7 @@ local_images:
       BUILD_IMAGE: "shared/centos/build"
     method: build
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/redsocks/release-0.5.tar.gz
+      - src: https://github.com/darkk/redsocks/archive/release-0.5.tar.gz
         dest: redsocks-0.5.tar.gz
         checksum: bbeb531d7f1986d7102f1bd6733dacce41d3f3ba7d604f1aab61c63e0ba2ee62
     directory: "{{ playbook_dir }}/../../dls4e-containers/redsocks"
@@ -158,9 +158,9 @@ local_images:
   dls4e/horovod/py3:
     version: "1.9.0-py3"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/horovod/horovod-v0.15.1.tar.gz
+      - src: https://files.pythonhosted.org/packages/d2/5e/4221d3e54ab79670bb654f2b139d0d4c46af7efd8ce953d3adaa73c12122/horovod-0.15.1.tar.gz
         dest: horovod-v0.15.1.tar.gz
-        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+        checksum: bcf6c43e2ad66f480cdba9cb915e6c4b9f0a930c81fe2f9c74f823250a423b6a
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
@@ -172,9 +172,9 @@ local_images:
   dls4e/horovod/py2:
     version: "1.9.0-py2"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/horovod/horovod-v0.15.1.tar.gz
+      - src: https://files.pythonhosted.org/packages/d2/5e/4221d3e54ab79670bb654f2b139d0d4c46af7efd8ce953d3adaa73c12122/horovod-0.15.1.tar.gz
         dest: horovod-v0.15.1.tar.gz
-        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+        checksum: bcf6c43e2ad66f480cdba9cb915e6c4b9f0a930c81fe2f9c74f823250a423b6a
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
