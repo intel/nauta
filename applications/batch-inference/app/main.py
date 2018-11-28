@@ -28,6 +28,7 @@ from threading import Thread
 from typing import Optional
 import pickle
 
+from retry.api import retry_call
 import tensorflow as tf
 
 from experiment_metrics.api import publish
@@ -50,8 +51,10 @@ stop_thread = False
 
 log_level_env_var = os.getenv('LOG_LEVEL')
 
+
 class APPLICABLE_FORMATS(Enum):
     TF_RECORD = "tf-record"
+
 
 if log_level_env_var:
     desired_log_level = logging.getLevelName(log_level_env_var.upper())
@@ -66,6 +69,7 @@ logging.basicConfig(level=desired_log_level)
 # every rest request sent by k8s client
 k8s_rest_logger = logging.getLogger('kubernetes.client.rest')
 k8s_rest_logger.setLevel(logging.INFO)
+
 
 def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path: str, related_run_name: str,
                        input_format: str):
@@ -91,7 +95,6 @@ def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path
     else:
         logging.debug("no progress reverted")
 
-
     files_to_process = detected_files[progress:]
 
     for data_file in files_to_process:
@@ -116,13 +119,12 @@ def do_batch_inference(server_address: str, input_dir_path: str, output_dir_path
 
                 if not label:
                     label = data_file
-                    if len(record_iterator)>1:
+                    if len(record_iterator) > 1:
                         label = "{}_{}".format(filename, id)
                         id += 1
 
                 binary_result = make_prediction(input=example.features.feature['data_pb'].bytes_list.value[0],
-                                stub=stub)
-
+                                                stub=stub)
 
                 output_list.append({LABEL_KEY: label, RESULT_KEY: binary_result})
 
@@ -158,7 +160,9 @@ def make_prediction(input: bytes, stub: prediction_service_pb2_grpc.PredictionSe
     except Exception as ex:
         raise RuntimeError(f"failed to parse {output_filename}") from ex
 
-    result = stub.Predict(request, timeout=30.0)  # timeout 30 seconds
+    # actual call without retry:
+    # result = stub.Predict(request, timeout=30.0)  # timeout 30 seconds
+    result = retry_call(stub.Predict, fargs=[request], fkwargs={"timeout": 30.0}, tries=5)
 
     result_pb_serialized: bytes = result.SerializeToString()
 

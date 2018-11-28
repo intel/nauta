@@ -3,5 +3,5 @@ kind: PodGroup
 metadata:
   name: {{ .Release.Name }}-podgroup
 spec:
-  minMember: 1
+  minMember: 2
   queue: main
