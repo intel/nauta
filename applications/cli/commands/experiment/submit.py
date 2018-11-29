@@ -45,6 +45,7 @@ from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 logger = initialize_logger('commands.submit')
 
 DEFAULT_SCRIPT_NAME = "experiment.py"
+DEFAULT_REQUIREMENTS_NAME = "requirements.txt"
 
 
 def validate_script_location(script_location: str):
@@ -64,6 +65,14 @@ def get_default_script_location(script_directory: str) -> str:
         exit(2)
     else:
         return default_script_location
+
+
+def get_default_requirements_location(script_directory: str) -> Optional[str]:
+    default_requirements_location = os.path.join(script_directory, DEFAULT_REQUIREMENTS_NAME)
+    if os.path.isfile(default_requirements_location):
+        return default_requirements_location
+    else:
+        return None
 
 
 def validate_script_folder_location(script_folder_location: str):
@@ -114,12 +123,13 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=Texts.HELP_PR)
 @click.option("-ps", "--parameter_set", multiple=True, help=Texts.HELP_PS)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
+@click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
 @click.argument("script_parameters", nargs=-1, metavar='[-- script_parameters]', callback=clean_script_parameters)
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
-           env: List[str], script_parameters: Tuple[str, ...]):
+           env: List[str], script_parameters: Tuple[str, ...], requirements: str):
     if is_current_user_administrator():
         handle_error(logger, Texts.USER_IS_ADMIN_LOG_MSG, Texts.USER_IS_ADMIN_USR_MSG)
         exit(1)
@@ -130,6 +140,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     validate_pack(template)
 
     if os.path.isdir(script_location):
+        if not requirements:
+            requirements = get_default_requirements_location(script_directory=script_location)
         script_location = get_default_script_location(script_directory=script_location)
 
     if script_folder_location:
@@ -144,7 +156,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
                                          template=template, name=name, pack_params=pack_param,
                                          parameter_range=parameter_range, parameter_set=parameter_set,
                                          script_parameters=script_parameters,
-                                         env_variables=env)
+                                         env_variables=env, requirements_file=requirements)
     except K8sProxyCloseError as exe:
         handle_error(user_msg=exe.message)
         click.echo(exe.message)

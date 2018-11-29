@@ -57,7 +57,7 @@ def update_configuration(run_folder: str, script_location: str,
                          local_registry_port: int,
                          cluster_registry_port: int,
                          pack_type: str,
-                         pack_params: List[Tuple[str, str]],
+                         pack_params: List[Tuple[str, str]] = None,
                          script_folder_location: str = None,
                          env_variables: List[str] = None):
     """

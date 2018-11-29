@@ -28,7 +28,7 @@ from unittest.mock import patch, mock_open
 from commands.experiment.common import submit_experiment, RunSubmission, values_range, \
     analyze_ps_parameters_list, analyze_pr_parameters_list, prepare_list_of_values, prepare_list_of_runs, \
     check_enclosing_brackets, delete_environment, create_environment, get_run_environment_path, check_run_environment, \
-    RunKinds, validate_pack_params_names, get_log_filename, validate_pack
+    RunKinds, validate_pack_params_names, get_log_filename, validate_pack, prepare_experiment_environment
 
 from util.exceptions import SubmitExperimentError
 import util.config
@@ -183,6 +183,7 @@ class SubmitExperimentMocks:
             if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
         self.isdir = mocker.patch("os.path.isdir", return_value=True)
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
+        self.touch = mocker.patch("commands.experiment.common.Path.touch")
 
         self.config_mock = mocker.patch('commands.experiment.common.Config')
         self.config_mock.return_value.config_path = FAKE_CLI_CONFIG_DIR_PATH
@@ -605,3 +606,55 @@ def test_validate_pack_wrong_name(mocker):
          patch('commands.experiment.common.exit') as exit_mock: # noqa
         validate_pack(PACK_NAME)
         assert exit_mock.called
+
+
+class ExpEnvMocks:
+    def __init__(self, mocker):
+        self.create_env_mock = mocker.patch('commands.experiment.common.create_environment')
+        self.create_draft_env_mock = mocker.patch('commands.experiment.common.cmd.create',
+                                                  return_value=('env created', 0, ''))
+        self.get_pod_count_mock = mocker.patch('commands.experiment.common.get_pod_count', return_value=1)
+        self.copy_requirements_file_mock = mocker.patch('commands.experiment.common.shutil.copyfile')
+        self.create_requirements_file_mock = mocker.patch('commands.experiment.common.Path.touch')
+        self.update_configuration_mock = mocker.patch('commands.experiment.common.update_configuration')
+
+
+@pytest.fixture()
+def exp_env_mocks(mocker):
+    return ExpEnvMocks(mocker=mocker)
+
+
+def test_prepare_experiment_environment_requirements_file(tmpdir, config_mock, exp_env_mocks: ExpEnvMocks):
+    experiment_dir = tmpdir.mkdir("text-exp")
+    fake_requirements_file = experiment_dir.join("requirements.txt")
+    fake_requirements_file.write('fake-dependency==0.0.1')
+
+    prepare_experiment_environment(requirements_file=fake_requirements_file.strpath, experiment_name='bla',
+                                   run_name='bla', script_folder_location=None, local_registry_port=1,
+                                   cluster_registry_port=1, local_script_location=experiment_dir.strpath,
+                                   pack_type='fake_pack', script_parameters=('experiment.py',))
+
+    assert exp_env_mocks.create_env_mock.call_count == 1
+    assert exp_env_mocks.create_draft_env_mock.call_count == 1
+    assert exp_env_mocks.get_pod_count_mock.call_count == 1
+    assert exp_env_mocks.update_configuration_mock.call_count == 1
+
+    assert exp_env_mocks.copy_requirements_file_mock.call_count == 1
+    assert exp_env_mocks.create_requirements_file_mock.call_count == 0
+
+
+def test_prepare_experiment_environment_requirements_file_not_provided(tmpdir, config_mock, exp_env_mocks: ExpEnvMocks):
+    experiment_dir = tmpdir.mkdir("text-exp")
+
+    prepare_experiment_environment(requirements_file=None, experiment_name='bla',
+                                   run_name='bla', script_folder_location=None, local_registry_port=1,
+                                   cluster_registry_port=1, local_script_location=experiment_dir.strpath,
+                                   pack_type='fake_pack', script_parameters=('experiment.py',))
+
+    assert exp_env_mocks.create_env_mock.call_count == 1
+    assert exp_env_mocks.create_draft_env_mock.call_count == 1
+    assert exp_env_mocks.get_pod_count_mock.call_count == 1
+    assert exp_env_mocks.update_configuration_mock.call_count == 1
+
+    assert exp_env_mocks.copy_requirements_file_mock.call_count == 0
+    assert exp_env_mocks.create_requirements_file_mock.call_count == 1
