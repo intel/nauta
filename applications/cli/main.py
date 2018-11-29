@@ -37,7 +37,7 @@ from commands.verify import verify
 from commands.mount import mount
 from commands.version import version
 from util.aliascmd import AliasGroup
-from util.logger import initialize_logger, setup_log_file
+from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
 from util.config import Config
 from cli_state import verify_cli_config_path
 from licensing.license_acceptance_manager import check_license_acceptance
@@ -93,7 +93,17 @@ def configure_cli_logs():
     if not os.path.isdir(log_file_directory):
         os.mkdir(log_file_directory)
 
-    setup_log_file(log_file_directory=log_file_directory, log_level=log_level, log_backup_count=log_retention)
+    file_handler = setup_log_file(log_file_directory=log_file_directory, log_level=log_level,
+                                  log_backup_count=log_retention)
+
+    # CAN-1237 - by setting level of logs for k8s rest client to INFO I'm removing displaying content of
+    # every rest request sent by k8s client
+    configure_logger_for_external_packages(pack_name='kubernetes.client.rest',
+                                           initial_log_level=logging.INFO,
+                                           handlers=[file_handler])
+    configure_logger_for_external_packages(pack_name='urllib3',
+                                           initial_log_level=logging.CRITICAL,
+                                           handlers=[file_handler])
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, cls=AliasGroup, help=BANNER,
