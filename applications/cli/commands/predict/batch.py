@@ -21,11 +21,12 @@
 
 import os
 from sys import exit
+from typing import Tuple, List
 
 import click
 from tabulate import tabulate
 
-from commands.experiment.common import validate_experiment_name
+from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -58,10 +59,12 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-o', '--output', help=Texts.HELP_OUTPUT)
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
 @click.option('-tr', '--tf-record', help=Texts.HELP_TF_RECORD,  is_flag=True)
+@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
+              callback=validate_pack_params_names)
 @common_options()
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
-          model_name: str, tf_record: bool):
+          model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]]):
     """
     Starts a new batch instance that will perform prediction on provided data.
     """
@@ -82,7 +85,8 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
                                                       local_model_location=local_model_location, model_name=model_name,
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
                                                       output_location=output,
-                                                      tf_record=tf_record)
+                                                      tf_record=tf_record,
+                                                      pack_params=pack_param)
     except Exception:
         handle_error(logger, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)

@@ -20,7 +20,7 @@
 #
 
 from enum import Enum
-from typing import Union, List
+from typing import Union, List, Tuple
 
 from platform_resources.run_model import Run
 from commands.experiment.common import submit_experiment, RunSubmission, RunKinds
@@ -44,9 +44,15 @@ def start_inference_instance(name: str,
                              data_location: str = None,
                              output_location: str = None,
                              env_variables: List[str] = None,
-                             tf_record: bool = False) -> RunSubmission:
+                             tf_record: bool = False,
+                             pack_params: List[Tuple[str, str]] = None) -> RunSubmission:
 
-    pack_params = [('modelName', model_name)]
+    if pack_params is None:
+        pack_params = []
+    else:
+        pack_params = list(pack_params)
+
+    pack_params.append(('modelName', model_name))
 
     if model_location:
         pack_params.append(('modelPath', model_location))
