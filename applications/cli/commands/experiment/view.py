@@ -55,7 +55,10 @@ def container_status_to_msg(state) -> str:
     if state.running is not None:
         return Texts.CONTAINER_RUNNING_MSG + format_timestamp_for_cli(str(state.running.started_at))
     if state.terminated is not None:
-        return Texts.CONTAINER_TERMINATED_MSG + str(state.terminated.reason)
+        msg = Texts.CONTAINER_TERMINATED_MSG + str(state.terminated.reason)
+        msg += Texts.REASON + wrap_text(str(state.terminated.message), width=CONTAINER_DETAILS_MAX_WIDTH) \
+            if state.terminated.message else ''
+        return msg
     if state.waiting is not None:
         return Texts.CONTAINER_WAITING_MSG + str(state.waiting.reason)
 
