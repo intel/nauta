@@ -17,3 +17,6 @@ RUN ["mkdir", "/mnt/input"]
 RUN echo "Warning - you are able to save some temporary content directly in the input directory. This content is discarded after the session ends." \
     > /mnt/input/README
 CMD ["jupyter", "notebook", "--allow-root"]
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt

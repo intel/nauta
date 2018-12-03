@@ -59,10 +59,11 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
+@click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
 @common_options()
 @pass_state
 def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str,
-           pack_param: List[Tuple[str, str]]):
+           pack_param: List[Tuple[str, str]], requirements: str):
     """
     Starts a new prediction instance that can be used for performing prediction, classification and
     regression tasks on trained model.
@@ -82,7 +83,8 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
         model_name = model_name if model_name else os.path.basename(model_path)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
-                                                      local_model_location=local_model_location, pack_params=pack_param)
+                                                      local_model_location=local_model_location,
+                                                      requirements=requirements, pack_params=pack_param)
         if inference_instance.state == RunStatus.FAILED:
             raise RuntimeError('Inference instance submission failed.')
     except Exception:

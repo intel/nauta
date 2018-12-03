@@ -45,7 +45,8 @@ def start_inference_instance(name: str,
                              output_location: str = None,
                              env_variables: List[str] = None,
                              tf_record: bool = False,
-                             pack_params: List[Tuple[str, str]] = None) -> RunSubmission:
+                             pack_params: List[Tuple[str, str]] = None,
+                             requirements: str = None) -> RunSubmission:
 
     if pack_params is None:
         pack_params = []
@@ -66,7 +67,8 @@ def start_inference_instance(name: str,
         pack_params.append(('inputFormat', 'tf-record'))
 
     runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
-                                script_folder_location=local_model_location, env_variables=env_variables)
+                                script_folder_location=local_model_location, env_variables=env_variables,
+                                requirements_file=requirements)
     return runs[0]
 
 

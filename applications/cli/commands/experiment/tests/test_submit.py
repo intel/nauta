@@ -235,4 +235,24 @@ def test_submit_experiment_wrong_template(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-t", "wrong_template"])
 
     assert CommonTexts.INCORRECT_TEMPLATE_NAME in result.output
+
+
+def test_submit_requirements(prepare_mocks: SubmitMocks, tmpdir):
+    experiment_dir = tmpdir.mkdir("text-exp")
+    fake_requirements_file = experiment_dir.join("requirements.txt")
+    fake_requirements_file.write('fake-dependency==0.0.1')
+
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '--requirements', fake_requirements_file.strpath])
+
+    _, submit_experiment_kwargs = prepare_mocks.submit_experiment.call_args
+    assert submit_experiment_kwargs.get('requirements_file') == fake_requirements_file.strpath
+    assert result.exit_code == 0
+
+
+def test_submit_requirements_wrong_path(prepare_mocks: SubmitMocks, tmpdir):
+    empty_dir = tmpdir.mkdir("text-exp")
+    wrong_requirements_file_path = os.path.join(empty_dir.strpath, 'requirements.txt')
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '--requirements', wrong_requirements_file_path])
+
+    assert wrong_requirements_file_path in result.output
     assert result.exit_code == 2

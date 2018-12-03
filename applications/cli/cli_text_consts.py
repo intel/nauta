@@ -221,6 +221,8 @@ class PredictLaunchCmdTexts:
     HELP_N = "The name of this prediction instance."
     HELP_M = "Path to saved model that will be used for inference. Model must be located on one of the input or " \
              "output system shares (e.g. /mnt/input/saved_model)."
+    HELP_R = "Path to file with experiment's pip requirements." \
+             " Dependencies listed in this file will be automatically installed using pip."
     INSTANCE_START_ERROR_MSG = "Failed to create prediction instance."
     INSTANCE_INFO_MSG = "\nPrediction instance URL (append method verb manually, e.g. :predict):\n" \
                         "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}"
@@ -282,6 +284,8 @@ class PredictBatchCmdTexts:
     HELP_NAME = "name of a predict session"
     HELP_OUTPUT = "location of a folder where outputs from inferences will be stored. Value should points out the " \
                   "location from one of the system's shares."
+    HELP_REQUIREMENTS = "Path to file with experiment's pip requirements." \
+                        " Dependencies listed in this file will be automatically installed using pip."
     OTHER_INSTANCE_CREATION_ERROR_MSG = "Failed to create batch prediction instance."
     TABLE_NAME_HEADER = "Prediction instance"
     TABLE_MODEL_LOCATION_HEADER = "Model location"
@@ -382,7 +386,9 @@ class ExperimentSubmitCmdTexts:
                             "environment variable to point to a valid dls4e user config. If you don't have one you " \
                             "can create it with command 'dlsctl user create'."
     HELP_E = "Environment variables passed to training. User can pass as many environmental variables as it is " \
-             "needed - each variable should be in such case passed as a separate -e paramater."
+             "needed - each variable should be in such case passed as a separate -e parameter."
+    HELP_R = "Path to file with experiment's pip requirements." \
+             " Dependencies listed in this file will be automatically installed using pip."
     SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find: {script_location}. Make sure that provided path is correct."
     DEFAULT_SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find script: {default_script_name} in directory: " \
                                          "{script_directory}. If path to directory was passed as submit command " \

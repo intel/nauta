@@ -208,7 +208,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                       pack_params: List[Tuple[str, str]] = None, parameter_range: List[Tuple[str, str]] = None,
                       parameter_set: Tuple[str, ...] = None,
                       script_folder_location: str = None,
-                      env_variables: List[str] = None) -> (List[RunSubmission], str):
+                      env_variables: List[str] = None,
+                      requirements_file: str = None) -> (List[RunSubmission], str):
     script_parameters = script_parameters if script_parameters else ()
     parameter_set = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []
@@ -281,7 +282,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                                                        pack_type=template, pack_params=pack_params,
                                                        local_registry_port=proxy.tunnel_port,
                                                        cluster_registry_port=cluster_registry_port,
-                                                       env_variables=env_variables)
+                                                       env_variables=env_variables,
+                                                       requirements_file=requirements_file)
                     # Set correct pod count
                     if not pod_count or pod_count < 1:
                         raise SubmitExperimentError('Unable to determine pod count: make sure that values.yaml '
@@ -440,10 +442,12 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, local_script_location: str,
-                                   script_folder_location: str, script_parameters: Tuple[str, ...],
+                                   script_parameters: Tuple[str, ...],
                                    pack_type: str, local_registry_port: int, cluster_registry_port: int,
-                                   pack_params: List[Tuple[str, str]],
-                                   env_variables: List[str]) -> PrepareExperimentResult:
+                                   script_folder_location: str = None,
+                                   pack_params: List[Tuple[str, str]] = None,
+                                   env_variables: List[str] = None,
+                                   requirements_file: str = None) -> PrepareExperimentResult:
     """
     Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
@@ -456,6 +460,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     :param cluster_registry_port: port on which docker registry is accessible within dls4e cluster
     :param pack_params: additional pack params
     :param env_variables: environmental variables to be passed to training
+    :param requirements_file: path to a file with experiment requirements
     :return: name of folder with an environment created for this run, a name of script used for training purposes
             and count of Pods
     In case of any problems - an exception with a description of a problem is thrown
@@ -470,6 +475,13 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
             create_environment(run_name, local_script_location, script_folder_location)
             # generate draft's data
             output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
+
+            # copy requirements file if it was provided, create empty requirements file otherwise
+            dest_requirements_file = os.path.join(run_folder, 'requirements.txt')
+            if requirements_file:
+                shutil.copyfile(requirements_file, dest_requirements_file)
+            else:
+                Path(dest_requirements_file).touch()
 
         if exit_code:
             raise SubmitExperimentError(Texts.DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=log_output))

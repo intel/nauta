@@ -61,10 +61,12 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-tr', '--tf-record', help=Texts.HELP_TF_RECORD,  is_flag=True)
 @click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
+@click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False,
+              help=Texts.HELP_REQUIREMENTS)
 @common_options()
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
-          model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]]):
+          model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]], requirements: str):
     """
     Starts a new batch instance that will perform prediction on provided data.
     """
@@ -86,7 +88,8 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
                                                       template=BATCH_INFERENCE_TEMPLATE, data_location=data,
                                                       output_location=output,
                                                       tf_record=tf_record,
-                                                      pack_params=pack_param)
+                                                      pack_params=pack_param,
+                                                      requirements=requirements)
     except Exception:
         handle_error(logger, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
