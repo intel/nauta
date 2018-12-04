@@ -9,6 +9,10 @@
       name: "{{ registry_name }}"
       state: absent
   roles:
+    - role: cache-registry-init
+      when: not docker_repository_cache.external
     - role: prepare
     - role: container-build
     - role: finalize
+    - role: cache-registry-final
+      when: not docker_repository_cache.external

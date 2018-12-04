@@ -8,7 +8,7 @@
     - name: Start artifact container
       docker_container:
         name: "{{ artifact_container }}"
-        image: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+        image: "{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
         stop_timeout: 0
         recreate: True
         restart_policy: no

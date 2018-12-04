@@ -1,0 +1,33 @@
+---
+
+- name: Create docker registry cache directory
+  file:
+    path: "{{ build_dir }}/../registry_cache"
+    state: directory
+
+- name: Set dir facts for registry cache
+  set_fact:
+    registry_cache_dir: "{{ build_dir }}/../registry_cache"
+
+- name: Register fact
+  set_fact:
+    registry_cache_name: "yum-registry-cache-{{ version }}-{{ 9999999999999999999999 | random | to_uuid }}"
+
+- name: Start cache registry container
+  docker_container:
+    name: "{{ registry_cache_name }}"
+    env: "{{ proxy }}"
+    volumes:
+      - "{{ registry_cache_dir }}:/var/lib/registry"
+    ports:
+      - 5000
+    image: "registry:2"
+    stop_timeout: 0
+    restart_policy: no
+    user: "{{ user_id }}"
+    recreate: True
+  register: registry_cache
+
+- set_fact:
+    docker_repository_cache_registry: "127.0.0.1:{{ registry_cache.ansible_facts.docker_container.NetworkSettings.Ports['5000/tcp'][0].HostPort }}"
+    docker_repository_cache_url: "http://127.0.0.1:{{ registry_cache.ansible_facts.docker_container.NetworkSettings.Ports['5000/tcp'][0].HostPort }}"

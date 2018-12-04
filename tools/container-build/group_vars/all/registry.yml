@@ -1,11 +1,13 @@
 ---
 
-docker_repository:
-  url: registry.toolbox.nervana.sclab.intel.com
+docker_repository_cache:
+  external: False
   schema: http
+  # params below are ignored when 'external' flag is set to 'False'
+  url: 127.0.0.1
   port: 80
 
-docker_repository_registry: "{{ docker_repository.url }}:{{ docker_repository.port }}"
-docker_repository_url: "{{ docker_repository.schema }}://{{ docker_repository.url }}:{{ docker_repository.port }}"
+docker_repository_cache_registry: "{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
+docker_repository_cache_url: "{{ docker_repository_cache.schema }}://{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
 docker_version_prefix: dls4e
-docker_timeout: 600
+docker_timeout: 1200

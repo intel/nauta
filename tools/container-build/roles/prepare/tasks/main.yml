@@ -1,5 +1,9 @@
 ---
 
+- name: Show cache repository settings
+  debug:
+    msg: "{{ docker_repository_cache }}"
+
 - name: Create docker registry directories
   file:
     path: "{{ build_dir }}/data/{{ item }}"

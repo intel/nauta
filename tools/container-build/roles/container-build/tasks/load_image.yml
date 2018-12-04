@@ -1,8 +1,8 @@
 ---
 
-- name: Load image {{ name }} as "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+- name: Load image {{ name }} as "{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
   docker_image:
-    name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    name: "{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
     pull: True
     push: False
     timeout: "{{ docker_timeout }}"

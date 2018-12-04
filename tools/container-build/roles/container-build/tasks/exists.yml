@@ -3,7 +3,7 @@
 - name: Find base image in repo
   environment: "{{ proxy }}"
   uri:
-    url: "{{ docker_repository_url }}/v2/{{ docker_version_prefix }}/{{ name }}/manifests/{{ docker_images_remote_tags[name] }}"
+    url: "{{ docker_repository_cache_url }}/v2/{{ docker_version_prefix }}/{{ name }}/manifests/{{ docker_images_remote_tags[name] }}"
     status_code: 200,404
     validate_certs: False
   register: image_present
