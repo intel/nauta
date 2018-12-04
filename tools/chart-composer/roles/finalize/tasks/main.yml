@@ -10,13 +10,35 @@
     - "output"
     - "tmp"
 
-- name: Download helm bin
+- name: Download helm package
   environment: "{{ proxy }}"
   get_url:
     url: "{{ helm_url }}"
     checksum: "sha256:{{ helm_sha }}"
-    dest: "{{ helm_local }}"
+    dest: "{{ build_dir }}/helm.tar.gz"
+    mode: 0666
+
+- name: Extract helm tar gz package
+  unarchive:
+    src: "{{ build_dir }}/helm.tar.gz"
+    dest: "{{ build_dir }}"
+
+- name: Remove unecessary helm tar gz package
+  file:
+    path: "{{ build_dir }}/helm.tar.gz"
+    state: absent
+
+- name: Move helm binary to suitable location
+  copy:
+    src: "{{ build_dir }}/linux-amd64/helm"
+    remote_src: False
+    dest: "{{ build_dir}}/helm"
     mode: 0755
+
+- name: Remove unecessary files
+  file:
+    path: "{{ build_dir }}/linux-amd64"
+    state: absent
 
 - name: Init helm
   shell: "{{ helm_local }} init -c --home {{ build_dir }}/helm-cache --skip-refresh"
