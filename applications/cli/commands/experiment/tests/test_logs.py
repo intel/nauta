@@ -26,7 +26,7 @@ import pytest
 from commands.experiment import logs
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
-from platform_resources.run_model import Run
+from platform_resources.run import Run
 from cli_text_consts import ExperimentLogsCmdTexts as Texts
 
 TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
@@ -49,7 +49,7 @@ def test_show_logs_success(mocker):
 
     get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -70,7 +70,7 @@ def test_show_logs_failure(mocker):
 
     get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -94,7 +94,7 @@ def test_show_logs_failure_proxy_problem(mocker, exception):
     proxy_mock.side_effect = exception
     get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -134,7 +134,7 @@ def test_show_logs_from_two_experiments(mocker):
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
 
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -161,7 +161,7 @@ def test_show_logs_to_file_success(mocker):
 
     get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -187,7 +187,7 @@ def test_show_logs_match(mocker):
     get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
     fake_experiment_1_name = 'fake-experiment-1'
     fake_experiment_2_name = 'fake-experiment-2'
-    list_runs_mock = mocker.patch('commands.experiment.logs.list_runs')
+    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_1_name, experiment_name=fake_experiment_1_name),
                                    Run(name=fake_experiment_2_name, experiment_name=fake_experiment_2_name)]
 

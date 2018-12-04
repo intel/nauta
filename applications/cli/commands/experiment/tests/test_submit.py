@@ -27,7 +27,8 @@ import pytest
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
     validate_script_folder_location, get_default_script_location, clean_script_parameters, validate_pack_params, \
     check_duplicated_params
-from commands.experiment.common import RunSubmission, RunStatus
+from commands.experiment.common import RunStatus
+from platform_resources.run import Run
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 from cli_text_consts import ExperimentCommonTexts as CommonTexts
@@ -36,17 +37,16 @@ from cli_text_consts import ExperimentCommonTexts as CommonTexts
 SCRIPT_LOCATION = "training_script.py"
 SCRIPT_FOLDER = "/a/b/c"
 
-SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                experiment_name='test-experiment',
-                                state=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                      experiment_name='test-experiment',
+                      state=RunStatus.QUEUED)]
 
-FAILED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                             experiment_name='test-experiment',
-                             state=RunStatus.QUEUED),
-               RunSubmission(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
-                             experiment_name='test-experiment',
-                             state=RunStatus.FAILED)
-               ]
+FAILED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                   experiment_name='test-experiment',
+                   state=RunStatus.QUEUED),
+               Run(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
+                   experiment_name='test-experiment',
+                   state=RunStatus.FAILED)]
 
 
 class SubmitMocks:
@@ -55,7 +55,7 @@ class SubmitMocks:
         self.is_current_user_administrator = mocker.patch(
             "commands.experiment.submit.is_current_user_administrator", return_value=False)
         self.submit_experiment = mocker.patch("commands.experiment.submit.submit_experiment",
-                                              return_value=(SUBMITTED_RUNS, ""))
+                                              return_value=(SUBMITTED_RUNS, {}, ""))
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
         self.isdir = mocker.patch("os.path.isdir", return_value=False)
         self.check_duplicated_params = mocker.patch("commands.experiment.submit.check_duplicated_params")
@@ -212,7 +212,7 @@ def test_get_default_script_location(prepare_mocks: SubmitMocks):
 
 
 def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
-    prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, "")
+    prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, {}, "")
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert FAILED_RUNS[0].name in result.output

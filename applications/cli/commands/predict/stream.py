@@ -29,8 +29,7 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key
-from platform_resources.runs import get_run
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus, Run
 from commands.predict.common import get_inference_instance_url, InferenceVerb
 from util.spinner import spinner
 from util.system import handle_error
@@ -55,7 +54,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         namespace = get_kubectl_current_context_namespace()
 
         # TODO: check if kind field of inference instance Run is correct
-        inference_instance = get_run(name=name, namespace=namespace)
+        inference_instance = Run.get(name=name, namespace=namespace)
         if not inference_instance:
             handle_error(user_msg=Texts.INSTANCE_NOT_EXISTS_ERROR_MSG.format(name=name))
             exit(1)

@@ -21,11 +21,9 @@
 
 from unittest.mock import MagicMock
 
-import pytest
-
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
-from platform_resources.run_model import Run
+from platform_resources.run import Run
 
 TEST_SCAN_OUTPUT = [{'_index': 'fluentd-20180417',
                                     '_type': 'access_log',

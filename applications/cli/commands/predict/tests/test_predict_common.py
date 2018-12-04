@@ -21,15 +21,14 @@
 
 from unittest.mock import MagicMock
 
-from platform_resources.run_model import Run
-from commands.experiment.common import RunSubmission
+from platform_resources.run import Run
 from commands.predict.common import start_inference_instance, get_inference_instance_url
 
 
 def test_start_inference_instance(mocker):
     submit_experiment_mock = mocker.patch('commands.predict.common.submit_experiment')
     fake_experiment = MagicMock()
-    submit_experiment_mock.return_value = [fake_experiment], 'bla'
+    submit_experiment_mock.return_value = [fake_experiment], {}, 'bla'
 
     inference_instance = start_inference_instance(name='', model_location='', model_name='', local_model_location='')
 
@@ -37,7 +36,7 @@ def test_start_inference_instance(mocker):
 
 
 def test_get_inference_instance_url_run_description(mocker):
-    fake_instance = MagicMock(spec=RunSubmission)
+    fake_instance = MagicMock(spec=Run)
     fake_instance.name = 'inf'
     fake_host = 'https://localhost:8443'
     fake_namespace = 'fake_namespace'

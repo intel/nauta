@@ -22,7 +22,7 @@
 from click.testing import CliRunner
 
 from commands.user import list_users
-from platform_resources.user_model import User, UserStatus
+from platform_resources.user import User, UserStatus
 
 
 TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
@@ -34,7 +34,7 @@ TEST_USERS = [User(name='test-dev', uid=1, state=UserStatus.DEFINED,
 
 
 def test_list_users_success(mocker):
-    api_list_users_mock = mocker.patch("commands.user.list_users.users_api.list_users")
+    api_list_users_mock = mocker.patch("commands.user.list_users.User.list")
     api_list_users_mock.return_value = TEST_USERS
 
     runner = CliRunner()
@@ -44,7 +44,7 @@ def test_list_users_success(mocker):
 
 
 def test_list_users_failure(mocker):
-    api_list_users_mock = mocker.patch("commands.user.list_users.users_api.list_users")
+    api_list_users_mock = mocker.patch("commands.user.list_users.User.list")
     api_list_users_mock.side_effect = RuntimeError
 
     sys_exit_mock = mocker.patch("sys.exit")
@@ -58,7 +58,7 @@ def test_list_users_failure(mocker):
 
 
 def test_list_users_only_one(mocker):
-    api_list_users_mock = mocker.patch("commands.user.list_users.users_api.list_users")
+    api_list_users_mock = mocker.patch("commands.user.list_users.User.list")
     api_list_users_mock.return_value = TEST_USERS
 
     runner = CliRunner()

@@ -26,3 +26,8 @@ import pytest
 def mock_cli_validation(mocker):
     mocker.patch('cli_state.verify_cli_dependencies')
     mocker.patch('cli_state.verify_cli_config_path')
+
+
+@pytest.fixture(autouse=True)
+def mock_k8s_client(mocker):
+    mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')

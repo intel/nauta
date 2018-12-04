@@ -19,18 +19,20 @@
 # and approved by Intel in writing.
 #
 
+import socket
+
 import requests
 from requests.exceptions import ConnectionError
 import time
 
 import psutil
 
+from util.config import Config
 from util.k8s import kubectl
 from util.app_names import DLS4EAppNames
 from util.logger import initialize_logger
-from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
+from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, KubectlConnectionError
 from cli_text_consts import UtilK8sProxyTexts as Texts
-
 
 logger = initialize_logger(__name__)
 
@@ -102,3 +104,12 @@ class K8sProxy:
         gone, alive = psutil.wait_procs(children, timeout=3)
         for survivor in alive:
             survivor.kill()
+
+
+def check_port_forwarding():
+    config = Config()
+    with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        address = "127.0.0.1", proxy.tunnel_port
+        if sock.connect_ex(address) != 0:
+            raise KubectlConnectionError(Texts.K8S_PORT_FORWARDING_ERROR_MSG)

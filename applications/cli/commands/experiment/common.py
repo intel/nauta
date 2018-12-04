@@ -30,17 +30,16 @@ import textwrap
 import yaml
 
 import click
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
 
 import draft.cmd as cmd
+from platform_resources.experiment_utils import generate_exp_name_and_labels
 from packs.tf_training import update_configuration, get_pod_count
-import platform_resources.experiments as experiments_api
-import platform_resources.experiment_model as experiments_model
-from platform_resources.run_model import Run, RunStatus, RunKinds
-import platform_resources.runs as runs_api
+import platform_resources.experiment as experiments_model
+from platform_resources.run import Run, RunStatus, RunKinds
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
@@ -82,12 +81,6 @@ CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 log = initialize_logger('commands.common')
-
-
-class RunSubmission(Run):
-    def __init__(self, message: str = None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.message = message
 
 
 PrepareExperimentResult = namedtuple('PrepareExperimentResult', ['folder_name', 'script_name', 'pod_count'])
@@ -209,7 +202,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                       parameter_set: Tuple[str, ...] = None,
                       script_folder_location: str = None,
                       env_variables: List[str] = None,
-                      requirements_file: str = None) -> (List[RunSubmission], str):
+                      requirements_file: str = None) -> (List[Run], Dict[str, str], str):
     script_parameters = script_parameters if script_parameters else ()
     parameter_set = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []
@@ -224,9 +217,9 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
 
     try:
         with spinner(text=Texts.PREPARING_RESOURCE_DEFINITIONS_MSG):
-            experiment_name, labels = experiments_api.generate_exp_name_and_labels(script_name=script_location,
-                                                                                   namespace=namespace, name=name,
-                                                                                   run_kind=run_kind)
+            experiment_name, labels = generate_exp_name_and_labels(script_name=script_location,
+                                                                   namespace=namespace, name=name,
+                                                                   run_kind=run_kind)
             runs_list = prepare_list_of_runs(experiment_name=experiment_name, parameter_range=parameter_range,
                                              parameter_set=parameter_set, template_name=template)
     except SubmitExperimentError as exe:
@@ -336,26 +329,27 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                                                       parameters_spec=experiment_parameters_spec,
                                                       template_namespace="template-namespace")
 
-            experiments_api.add_experiment(experiment, namespace, labels=labels)
+            experiment.create(namespace=namespace, labels=labels)
 
             # submit runs
             submitted_runs = []
+            run_errors = {}
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
                     run.state = RunStatus.QUEUED
                     with spinner(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name)):
                         # Add Run object with runKind label and pack params as annotations
-                        runs_api.add_run(run=run, namespace=namespace, labels={'runKind': run_kind.value},
-                                         annotations={pack_param_name: pack_param_value
-                                                      for pack_param_name, pack_param_value in pack_params})
+                        run.create(namespace=namespace, labels={'runKind': run_kind.value},
+                                   annotations={pack_param_name: pack_param_value
+                                                for pack_param_name, pack_param_value in pack_params})
                         submitted_runs.append(run)
                         submit_draft_pack(run_folder, namespace)
                 except Exception as exe:
                     delete_environment(run_folder)
                     try:
                         run.state = RunStatus.FAILED
-                        run.message = str(exe)
-                        runs_api.update_run(run=run, namespace=namespace)
+                        run_errors[run.name] = str(exe)
+                        run.update()
                     except Exception as rexe:
                         # update of non-existing run may fail
                         log.debug(Texts.ERROR_DURING_PATCHING_RUN.format(str(rexe)))
@@ -367,7 +361,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
 
             # Change experiment status to submitted
             experiment.state = experiments_model.ExperimentStatus.SUBMITTED
-            experiments_api.update_experiment(experiment=experiment, namespace=namespace)
+            experiment.update()
 
     except LocalPortOccupiedError as exe:
         click.echo(exe.message)
@@ -397,19 +391,19 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         remove_sempahore(experiment_name)
 
     log.debug("Submit - finish")
-    return runs_list, script_location
+    return runs_list, run_errors, script_location
 
 
 def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name: str,
-                         parameter_set: Tuple[str, ...], template_name: str) -> List[RunSubmission]:
+                         parameter_set: Tuple[str, ...], template_name: str) -> List[Run]:
 
     run_list = []
 
     if not parameter_range and not parameter_set:
-        run_list = [RunSubmission(name=experiment_name, experiment_name=experiment_name,
-                                  pod_selector={'matchLabels': {'app': template_name,
-                                                                'draft': experiment_name,
-                                                                'release': experiment_name}})]
+        run_list = [Run(name=experiment_name, experiment_name=experiment_name,
+                        pod_selector={'matchLabels': {'app': template_name,
+                                                      'draft': experiment_name,
+                                                      'release': experiment_name}})]
     else:
         list_of_range_parameters = [("", )]
         list_of_set_parameters = [("", )]
@@ -432,11 +426,11 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
                 if len(range_param) >= 1 and range_param[0]:
                     current_params = current_params + range_param
 
-                run_list.append(RunSubmission(name=current_run_name, experiment_name=experiment_name,
-                                              parameters=current_params,
-                                              pod_selector={'matchLabels': {'app': template_name,
-                                                                            'draft': current_run_name,
-                                                                            'release': current_run_name}}))
+                run_list.append(Run(name=current_run_name, experiment_name=experiment_name,
+                                    parameters=current_params,
+                                    pod_selector={'matchLabels': {'app': template_name,
+                                                                  'draft': current_run_name,
+                                                                  'release': current_run_name}}))
                 run_index = run_index + 1
     return run_list
 

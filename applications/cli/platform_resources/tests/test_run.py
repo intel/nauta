@@ -24,9 +24,8 @@ import pytest
 from kubernetes.client import CustomObjectsApi
 from kubernetes.client.rest import ApiException
 
-from platform_resources.platform_resource_model import KubernetesObject
-from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs, update_run, get_run, add_run
+from platform_resources.platform_resource import KubernetesObject
+from platform_resources.run import Run, RunStatus
 from util.exceptions import InvalidRegularExpressionError
 
 TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
@@ -38,7 +37,7 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                  pod_selector={'matchLabels': {'app': 'tf-training',
                                                'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                 namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                  template_name="tf-training",
                  metadata={'clusterName': '', 'creationTimestamp': '2018-05-17T14:05:52Z', 'generation': 1,
                            'name': 'exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training',
@@ -55,7 +54,7 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                  pod_selector={
                      'matchLabels': {'app': 'tf-training', 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.56-2',
                                      'release': 'exp-mnist-single-node.py-18.05.17-16.05.56-2'}},
-                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:06:03Z",
+                 namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:06:03Z",
                  template_name="tf-training",
                  metadata={'clusterName': '', 'creationTimestamp': '2018-05-17T14:06:03Z', 'generation': 1,
                            'name': 'exp-mnist-single-node.py-18.05.17-16.05.56-2-tf-training',
@@ -72,13 +71,13 @@ TEST_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
 def mock_k8s_api_client(mocker) -> CustomObjectsApi:
     mocker.patch('kubernetes.config.load_kube_config')
     mocker.patch('kubernetes.client.ApiClient')
-    custom_objects_api_mocked_class = mocker.patch('kubernetes.client.CustomObjectsApi')
+    custom_objects_api_mocked_class = mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')
     return custom_objects_api_mocked_class.return_value
 
 
 def test_list_runs(mock_k8s_api_client):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
-    runs = list_runs()
+    runs = Run.list()
     assert runs == TEST_RUNS
 
 
@@ -87,28 +86,44 @@ def test_list_runs_from_namespace(mock_k8s_api_client: CustomObjectsApi):
     raw_runs_single_namespace['items'] = [raw_runs_single_namespace['items'][0]]
     mock_k8s_api_client.list_namespaced_custom_object.return_value = raw_runs_single_namespace
 
-    runs = list_runs(namespace='namespace-1')
+    runs = Run.list(namespace='namespace-1')
 
     assert [TEST_RUNS[0]] == runs
 
 
 def test_list_runs_filter_status(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
-    runs = list_runs(state_list=[RunStatus.QUEUED])
+    runs = Run.list(state_list=[RunStatus.QUEUED])
     assert [TEST_RUNS[0]] == runs
 
 
 def test_list_runs_name_filter(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
-    runs = list_runs(name_filter=TEST_RUNS[1].name)
+    runs = Run.list(name_filter=TEST_RUNS[1].name)
     assert [TEST_RUNS[1]] == runs
 
 
 def test_list_runs_invalid_name_filter(mock_k8s_api_client: CustomObjectsApi):
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_RUNS_RESPONSE_RAW
     with pytest.raises(InvalidRegularExpressionError):
-        list_runs(name_filter='*')
+        Run.list(name_filter='*')
 
+def test_get_run_from_namespace(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
+    run = Run.get(name=RUN_NAME, namespace=NAMESPACE)
+    assert run is not None and type(run) is Run
+
+
+def test_get_run_not_found(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_namespaced_custom_object.side_effect = ApiException(status=404)
+    run = Run.get(name=RUN_NAME, namespace=NAMESPACE)
+    assert run is None
+
+
+def test_get_run_failure(mock_k8s_api_client: CustomObjectsApi):
+    mock_k8s_api_client.get_namespaced_custom_object.side_effect = ApiException(status=500)
+    with pytest.raises(ApiException):
+        Run.get(name=RUN_NAME, namespace=NAMESPACE)
 
 LIST_RUNS_RESPONSE_RAW = \
     {
@@ -222,55 +237,39 @@ GET_RUN_RESPONSE_RAW = {
     }
 }
 
+@pytest.fixture()
+def mock_k8s_run_api_client(mocker) -> CustomObjectsApi:
+    for run in TEST_RUNS:
+        mocker.patch.object(run, 'k8s_custom_object_api')
+    mocker.patch('kubernetes.config.load_kube_config')
+    mocker.patch('kubernetes.client.ApiClient')
+    custom_objects_api_mocked_class = mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')
+    return custom_objects_api_mocked_class.return_value
 
-def test_update_run_success(mock_k8s_api_client):
-    mock_k8s_api_client.patch_namespaced_custom_object.return_value = LIST_RUNS_RESPONSE_RAW['items'][0]
+def test_update_run_success(mock_k8s_run_api_client):
+    TEST_RUNS[0].k8s_custom_object_api.patch_namespaced_custom_object.return_value = LIST_RUNS_RESPONSE_RAW['items'][0]
 
-    update_run(TEST_RUNS[0], "namespace-1")
+    TEST_RUNS[0].update()
 
-    assert mock_k8s_api_client.patch_namespaced_custom_object.call_count == 1
-
-
-def test_update_run_failure(mock_k8s_api_client):
-    mock_k8s_api_client.patch_namespaced_custom_object.side_effect = ApiException()
-
-    with pytest.raises(RuntimeError):
-        update_run(TEST_RUNS[0], "namespace-1")
-
-
-def test_get_run(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.get_cluster_custom_object.return_value = GET_RUN_RESPONSE_RAW
-    run = get_run(name=RUN_NAME)
-    assert run is not None and type(run) is Run
+    assert TEST_RUNS[0].k8s_custom_object_api.patch_namespaced_custom_object.call_count == 1
 
 
-def test_get_run_from_namespace(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.get_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
-    run = get_run(name=RUN_NAME, namespace=NAMESPACE)
-    assert run is not None and type(run) is Run
+def test_update_run_failure(mock_k8s_run_api_client):
+    TEST_RUNS[0].k8s_custom_object_api.patch_namespaced_custom_object.side_effect = ApiException()
 
-
-def test_get_run_not_found(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=404)
-    run = get_run(name=RUN_NAME)
-    assert run is None
-
-
-def test_get_run_failure(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.get_cluster_custom_object.side_effect = ApiException(status=500)
     with pytest.raises(ApiException):
-        get_run(name=RUN_NAME)
+        TEST_RUNS[0].update()
 
 
-def test_add_run(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.create_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
+def test_add_run(mock_k8s_run_api_client: CustomObjectsApi):
+    mock_k8s_run_api_client.create_namespaced_custom_object.return_value = GET_RUN_RESPONSE_RAW
     run = Run(name=RUN_NAME, experiment_name='fake')
-    added_run = add_run(run, NAMESPACE)
+    added_run = run.create(namespace=NAMESPACE)
     assert added_run is not None and type(added_run) is KubernetesObject
 
 
-def test_add_run_failure(mock_k8s_api_client: CustomObjectsApi):
-    mock_k8s_api_client.create_namespaced_custom_object.side_effect = ApiException(status=500)
+def test_add_run_failure(mock_k8s_run_api_client: CustomObjectsApi):
+    mock_k8s_run_api_client.create_namespaced_custom_object.side_effect = ApiException(status=500)
     run = Run(name=RUN_NAME, experiment_name='fake')
     with pytest.raises(ApiException):
-        add_run(run, NAMESPACE)
+        run.create(namespace=NAMESPACE)

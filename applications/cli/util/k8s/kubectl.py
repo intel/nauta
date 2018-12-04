@@ -22,22 +22,17 @@
 import subprocess
 import time
 import random
-import socket
 from enum import Enum
 
 from typing import Optional, Tuple
 
-import platform_resources.users as users_api
 from util import system
-from util.config import Config
 from util.logger import initialize_logger
 from util.exceptions import KubernetesError, KubectlConnectionError, LocalPortOccupiedError
-from util.k8s.k8s_info import get_app_services, find_namespace, NamespaceStatus
+from util.k8s.k8s_info import get_app_services
 from util.app_names import DLS4EAppNames
 from util.system import check_port_availability
 from cli_text_consts import UtilKubectlTexts as Texts
-from util.k8s.k8s_proxy_context_manager import K8sProxy
-
 
 logger = initialize_logger('util.kubectl')
 
@@ -152,35 +147,6 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
     return process, tunnel_port, service_container_port
 
 
-def check_users_presence(username: str) -> UserState:
-    """
-    Checks whether a user with a given name exists. It searches also for a namespace
-    with a name equal to the given username
-
-    :param username: username
-    :return: returns a current state of user - as an item for UserState enum
-    In case of problems during gathering user's data - it raises an exception.
-    """
-    namespace = find_namespace(username)
-
-    if namespace != NamespaceStatus.NOT_EXISTS:
-        logger.debug("Namespace {} already exists.".format(username))
-        return UserState(namespace.value)
-
-    try:
-        user_data = users_api.get_user_data(username)
-
-        if user_data and user_data.name == username:
-            return UserState.ACTIVE
-        else:
-            return UserState.NOT_EXISTS
-
-    except Exception as exe:
-        error_message = Texts.USER_PRESENCE_CHECK_ERROR_MSG
-        logger.error(error_message)
-        raise KubernetesError(error_message) from exe
-
-
 def delete_k8s_object(kind: str, name: str):
     delete_command = ['kubectl', 'delete', kind, name]
     logger.debug(delete_command)
@@ -197,15 +163,6 @@ def check_connection_to_cluster():
     logger.debug(f"check_connection_to_cluster - output : {err_code} - {log_output}")
     if err_code:
         raise KubectlConnectionError(Texts.K8S_CLUSTER_NO_CONNECTION_ERROR_MSG.format(output=log_output))
-
-
-def check_port_forwarding():
-    config = Config()
-    with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        address = "127.0.0.1", proxy.tunnel_port
-        if sock.connect_ex(address) != 0:
-            raise KubectlConnectionError(Texts.K8S_PORT_FORWARDING_ERROR_MSG)
 
 
 def get_top_for_pod(name: str, namespace: str) -> Tuple[str, str]:

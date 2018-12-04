@@ -35,8 +35,8 @@ from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
-from util.k8s.kubectl import check_users_presence, UserState
-from platform_resources.users import validate_user_name, is_user_created
+from util.k8s.kubectl import UserState
+from platform_resources.user_utils import validate_user_name, is_user_created, check_users_presence
 from cli_text_consts import UserCreateCmdTexts as Texts
 
 logger = initialize_logger(__name__)

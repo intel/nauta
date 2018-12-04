@@ -28,12 +28,12 @@ import click
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
 from cli_state import common_options, pass_state, State
+from platform_resources.run import Run
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
     sum_cpu_resources, PodStatus, get_pod_events, add_bytes_to_unit
 from util.k8s.k8s_statistics import get_highest_usage
 from util.logger import initialize_logger
-import platform_resources.runs as runs_api
 from util.system import handle_error, format_timestamp_for_cli
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 
@@ -117,7 +117,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
         else:
             namespace = get_kubectl_current_context_namespace()
 
-        run = runs_api.get_run(name=experiment_name, namespace=namespace)
+        run = Run.get(name=experiment_name, namespace=namespace)
         if not run:
             handle_error(user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name=experiment_name))
             exit(2)

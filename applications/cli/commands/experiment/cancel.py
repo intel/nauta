@@ -34,10 +34,8 @@ import util.k8s.kubectl as kubectl
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace
-from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs, update_run
-from platform_resources.experiment_model import ExperimentStatus, Experiment
-from platform_resources.experiments import update_experiment, get_experiment, delete_experiment
+from platform_resources.run import Run, RunStatus
+from platform_resources.experiment import ExperimentStatus, Experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from util.app_names import DLS4EAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
@@ -95,7 +93,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     exp_to_be_cancelled = None
 
     if name:
-        exp_to_be_cancelled = get_experiment(namespace=current_namespace, name=name)
+        exp_to_be_cancelled = Experiment.get(namespace=current_namespace, name=name)
         exp_to_be_cancelled_kind = RunKinds(exp_to_be_cancelled.metadata['labels'].get('runKind')) \
             if exp_to_be_cancelled else None
         exp_to_be_cancelled = exp_to_be_cancelled if exp_to_be_cancelled_kind in listed_runs_kinds else None
@@ -116,11 +114,11 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     try:
         if search_for_experiment:
-            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=[name],
-                                         run_kinds_filter=listed_runs_kinds)
+            list_of_all_runs = Run.list(namespace=current_namespace, exp_name_filter=[name],
+                                        run_kinds_filter=listed_runs_kinds)
         else:
-            list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
-                                         run_kinds_filter=listed_runs_kinds)
+            list_of_all_runs = Run.list(namespace=current_namespace, name_filter=name,
+                                        run_kinds_filter=listed_runs_kinds)
     except Exception:
         handle_error(logger, Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural),
                      Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural))
@@ -290,16 +288,16 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
     purged_runs = []
     not_purged_runs = []
 
-    experiment = get_experiment(name=exp_name, namespace=namespace)
+    experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:
         raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name])
+    experiment_runs = Run.list(namespace=namespace, exp_name_filter=[exp_name])
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_purge))
     if cancel_whole_experiment:
         experiment.state = ExperimentStatus.CANCELLING
-        update_experiment(experiment, namespace)
+        experiment.update()
 
     try:
         cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge, namespace=namespace)
@@ -366,16 +364,16 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
     deleted_runs = []
     not_deleted_runs = []
 
-    experiment = get_experiment(name=exp_name, namespace=namespace)
+    experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:
         raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
+    experiment_runs = Run.list(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_cancel))
     if cancel_whole_experiment:
         experiment.state = ExperimentStatus.CANCELLING
-        update_experiment(experiment, namespace)
+        experiment.update()
 
     try:
         deleted_runs, not_deleted_runs = cancel_experiment_runs(runs_to_cancel=runs_to_cancel, namespace=namespace)
@@ -384,7 +382,7 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
             try:
                 # change an experiment state to CANCELLED
                 experiment.state = ExperimentStatus.CANCELLED
-                update_experiment(experiment, namespace)
+                experiment.update()
             except Exception:
                 # problems during deleting experiments are hidden as if runs were
                 # cancelled user doesn't have a possibility to remove them
@@ -417,7 +415,7 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
                         delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
                         # change a run state to CANCELLED
                         run.state = RunStatus.CANCELLED
-                        update_run(run, namespace)
+                        run.update()
                 deleted_runs.append(run)
             except Exception:
                 logger.exception(Texts.INCOMPLETE_CANCEL_ERROR_MSG
@@ -541,12 +539,12 @@ def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purg
     try:
         if purge:
             click.echo(Texts.PURGING_START_MSG.format(run_name=experiment.name))
-            delete_experiment(experiment, namespace)
+            experiment.delete()
         else:
             click.echo(Texts.CANCELING_RUNS_START_MSG.format(experiment_name=experiment.name,
                                                              run_name=''))
             experiment.state = ExperimentStatus.CANCELLED
-            update_experiment(experiment, namespace)
+            experiment.update()
     except Exception:
         handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
         exit(1)

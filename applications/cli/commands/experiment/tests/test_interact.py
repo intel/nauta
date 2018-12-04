@@ -22,11 +22,11 @@
 from click.testing import CliRunner
 import pytest
 
-from platform_resources.experiment_model import Experiment, ExperimentStatus
+from platform_resources.experiment import Experiment, ExperimentStatus
 from commands.experiment import interact
-from commands.experiment.common import RunSubmission, RunStatus, SubmitExperimentError
+from commands.experiment.common import RunStatus, SubmitExperimentError
 from cli_text_consts import ExperimentInteractCmdTexts as Texts
-
+from platform_resources.run import Run
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -35,17 +35,17 @@ CORRECT_INTERACT_NAME = "interact-experiment"
 EXPERIMENT_NAMESPACE = "namespace"
 
 JUPYTER_EXPERIMENT = Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
-                                creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                                creation_timestamp='2018-04-26T13:43:01Z', namespace='namespace-1',
                                 state=ExperimentStatus.CREATING, template_name='jupyter',
                                 template_namespace='test-ex-namespace')
 
 NON_JUPYTER_EXPERIMENT = Experiment(name='test-experiment-2', parameters_spec=['a 1', 'b 2'],
-                                    creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                                    creation_timestamp='2018-05-08T13:05:04Z', namespace='namespace-2',
                                     state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
                                     template_namespace='test-ex-namespace')
-SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                experiment_name=CORRECT_INTERACT_NAME,
-                                state=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                      experiment_name=CORRECT_INTERACT_NAME,
+                      state=RunStatus.QUEUED)]
 
 
 class InteractMocks:
@@ -53,10 +53,10 @@ class InteractMocks:
         self.mocker = mocker
         self.get_namespace = mocker.patch("commands.experiment.interact.get_kubectl_current_context_namespace",
                                           side_effect=[EXPERIMENT_NAMESPACE, EXPERIMENT_NAMESPACE])
-        self.get_experiment = mocker.patch("commands.experiment.interact.get_experiment",
+        self.get_experiment = mocker.patch("commands.experiment.interact.Experiment.get",
                                            return_value=None)
         self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment",
-                                              return_value=(SUBMITTED_RUNS, ""))
+                                              return_value=(SUBMITTED_RUNS, {}, ""))
         self.launch_app = mocker.patch("commands.experiment.interact.launch_app")
         self.check_pods_status = mocker.patch("commands.experiment.interact.check_pods_status", return_value=True)
 

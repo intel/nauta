@@ -27,7 +27,8 @@ from cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
-from util.k8s.kubectl import check_connection_to_cluster, check_port_forwarding
+from util.k8s.kubectl import check_connection_to_cluster
+from util.k8s.k8s_proxy_context_manager import check_port_forwarding
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.spinner import spinner
 from util.system import handle_error

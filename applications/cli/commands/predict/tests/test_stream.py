@@ -24,7 +24,7 @@ import pytest
 
 from commands.predict import stream
 from commands.predict.common import InferenceVerb
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus
 from cli_text_consts import PredictStreamCmdTexts as Texts
 
 
@@ -37,7 +37,7 @@ TEST_API_KEY = 'Bearer blablebla'
 class StreamPredictMocks:
     def __init__(self, mocker):
         self.get_namespace_mock = mocker.patch('commands.predict.stream.get_kubectl_current_context_namespace')
-        self.get_run_mock = mocker.patch('commands.predict.stream.get_run')
+        self.get_run_mock = mocker.patch('commands.predict.stream.Run.get')
         self.get_run_mock.return_value.state = RunStatus.RUNNING
         self.get_inference_instance_url_mock = mocker.patch('commands.predict.stream.get_inference_instance_url')
         self.get_inference_instance_url_mock.return_value = TEST_URL

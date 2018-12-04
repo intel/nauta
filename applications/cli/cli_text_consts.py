@@ -141,6 +141,7 @@ class UserCreateCmdTexts:
                                         "to a file manually."
     CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
 
+
 class UserDeleteCmdTexts:
     SHORT_HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
     HELP = """
@@ -694,12 +695,12 @@ class PlatformResourcesUsersTexts:
     USERNAME_TOO_LONG_ERROR_MSG = "Name of a user cannot be longer than 32 characters."
     INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
     USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
+    USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
 
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
     PROXY_CREATION_OTHER_ERROR_MSG = "Other error during creation of port proxy."
     PROXY_CREATION_MISSING_PORT_ERROR_MSG = "Missing port during creation of port proxy."
-    USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
     K8S_OBJECT_DELETE_ERROR_MSG = "Error when deleting k8s object: {output}"
     K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to K8S cluster: {output}"
     TOP_COMMAND_ERROR = "Problems during getting usage of resources."
@@ -726,6 +727,8 @@ class UtilK8sProxyTexts:
     PROXY_EXIT_ERROR_MSG = "k8s_proxy - exit - error"
     TUNNEL_NOT_READY_ERROR_MSG = "connection on {address}:{port} NOT READY!"
     TUNNEL_ALREADY_CLOSED = "Proxy tunnel is already closed."
+    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from K8S cluster. Check cluster configuration and " \
+                                    "proxy settings."
 
 
 class CliStateTexts:

@@ -20,10 +20,10 @@
 #
 
 from enum import Enum
-from typing import Union, List, Tuple
+from typing import List, Tuple
 
-from platform_resources.run_model import Run
-from commands.experiment.common import submit_experiment, RunSubmission, RunKinds
+from platform_resources.run import Run
+from commands.experiment.common import submit_experiment, RunKinds
 from util.k8s.k8s_info import get_kubectl_host, get_kubectl_current_context_namespace
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
@@ -46,7 +46,7 @@ def start_inference_instance(name: str,
                              env_variables: List[str] = None,
                              tf_record: bool = False,
                              pack_params: List[Tuple[str, str]] = None,
-                             requirements: str = None) -> RunSubmission:
+                             requirements: str = None) -> Run:
 
     if pack_params is None:
         pack_params = []
@@ -66,16 +66,15 @@ def start_inference_instance(name: str,
     if tf_record:
         pack_params.append(('inputFormat', 'tf-record'))
 
-    runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
-                                script_folder_location=local_model_location, env_variables=env_variables,
-                                requirements_file=requirements)
+    runs, _, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
+                                   script_folder_location=local_model_location, env_variables=env_variables,
+                                   requirements_file=requirements)
     return runs[0]
 
 
-def get_inference_instance_url(inference_instance: Union[Run, RunSubmission], model_name: str = None) -> str:
+def get_inference_instance_url(inference_instance: Run, model_name: str = None) -> str:
     """
-    Get URL to inference instance. If RunDescription is passed as inference_instance, model_name must be also provided.
-    If Run is passed as inference_instance, model name is automatically obtained from Run metadata.
+    Get URL to inference instance.
     """
     service_name = inference_instance.name
     model_name = model_name if model_name else inference_instance.metadata['annotations']['modelName']

@@ -29,8 +29,7 @@ import click
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
-from platform_resources.run_model import Run
-from platform_resources.runs import list_runs
+from platform_resources.run import Run
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
@@ -82,7 +81,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
                 name_filter = match
             else:
                 name_filter = f'^{experiment_name}$'
-            runs = list_runs(namespace=namespace, name_filter=name_filter)
+            runs = Run.list(namespace=namespace, name_filter=name_filter)
             if not runs:
                 raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
 

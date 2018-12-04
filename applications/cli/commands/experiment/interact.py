@@ -36,13 +36,12 @@ from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME,
     JUPYTER_NOTEBOOK_TEMPLATES_NAMES, RunKinds, validate_env_paramater
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
 from util.logger import initialize_logger
-from platform_resources.experiments import get_experiment, generate_name
 from commands.experiment.common import check_experiment_name, validate_pack_params_names
 from util.exceptions import K8sProxyCloseError
 from util.system import handle_error
 from cli_text_consts import ExperimentInteractCmdTexts as Texts
-from platform_resources.experiment_model import ExperimentStatus
-
+from platform_resources.experiment import ExperimentStatus, Experiment
+from platform_resources.experiment_utils import generate_name
 
 JUPYTER_CHECK_POD_READY_TRIES = 60
 
@@ -73,7 +72,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
 
     if name:
         try:
-            jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
+            jupyter_experiment = Experiment.get(name=name, namespace=current_namespace)
         except Exception:
             handle_error(logger, Texts.EXPERIMENT_GET_ERROR_MSG, Texts.EXPERIMENT_GET_ERROR_MSG)
             sys.exit(1)
@@ -111,15 +110,15 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                 exp_name = generate_name("jup")
 
             click.echo(Texts.SUBMITTING_EXPERIMENT_USER_MSG)
-            runs, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
-                                               script_folder_location=None, template=template,
-                                               name=exp_name, parameter_range=[], parameter_set=(),
-                                               script_parameters=(), pack_params=pack_param,
-                                               env_variables=env)
+            runs, runs_errors, filename = submit_experiment(run_kind=RunKinds.JUPYTER, script_location=filename,
+                                                            script_folder_location=None, template=template,
+                                                            name=exp_name, parameter_range=[], parameter_set=(),
+                                                            script_parameters=(), pack_params=pack_param,
+                                                            env_variables=env)
             click.echo(tabulate({RUN_NAME: [run.cli_representation.name for run in runs],
                                  RUN_PARAMETERS: [run.cli_representation.parameters for run in runs],
                                  RUN_STATUS: [run.cli_representation.status for run in runs],
-                                 RUN_MESSAGE: [run.message for run in runs]},
+                                 RUN_MESSAGE: [runs_errors.get(run.name, "") for run in runs]},
                                 headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
             if runs:
                 name = runs[0].name

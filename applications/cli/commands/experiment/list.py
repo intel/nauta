@@ -25,7 +25,7 @@ from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds, RUN_N
     RUN_SUBMITTER
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
 from cli_state import common_options, pass_state, State
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from cli_text_consts import ExperimentListCmdTexts as Texts

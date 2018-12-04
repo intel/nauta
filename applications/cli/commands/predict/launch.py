@@ -29,9 +29,9 @@ from tabulate import tabulate
 
 from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
-from platform_resources.experiments import generate_name
+from platform_resources.experiment_utils import generate_name
 from cli_state import common_options, pass_state, State
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error

@@ -25,11 +25,12 @@ import pytest
 from click.testing import CliRunner
 from unittest.mock import patch, mock_open
 
-from platform_resources.user_model import User, UserStatus
-from commands.user.create import check_users_presence, generate_kubeconfig, create, UserState
+from platform_resources.user import User, UserStatus
+from commands.user.create import generate_kubeconfig, create, UserState
+from platform_resources.user_utils import check_users_presence
 from util.helm import delete_user, delete_helm_release
-from util.k8s.kubectl import NamespaceStatus
 from cli_text_consts import VERBOSE_RERUN_MSG, UserCreateCmdTexts as Texts
+from util.k8s.k8s_info import NamespaceStatus
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -75,28 +76,20 @@ user_data = User(
 
 
 def test_check_users_presence_success(mocker):
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace",
-        return_value=NamespaceStatus.NOT_EXISTS)
-    mocker.patch(
-        "util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
+    mocker.patch("platform_resources.user.User.get", return_value=user_data)
 
     assert check_users_presence(test_username) == UserState.ACTIVE
 
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace", return_value=NamespaceStatus.ACTIVE)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.ACTIVE)
     assert check_users_presence(test_username) == UserState.ACTIVE
 
 
 def test_check_users_presence_failure(mocker):
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace",
-        return_value=NamespaceStatus.NOT_EXISTS)
-    mocker.patch(
-        "util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
+    mocker.patch("platform_resources.user.User.get", return_value=user_data)
 
-    assert check_users_presence(
-        test_username + "_wrong") == UserState.NOT_EXISTS
+    assert check_users_presence(test_username + "_wrong") == UserState.NOT_EXISTS
 
 
 def test_generate_kubeconfig():
@@ -124,7 +117,7 @@ def test_delete_helm_release_success(mocker):
 
     delete_helm_release(test_username)
 
-    esc_mock.call_count == 1
+    assert esc_mock.call_count == 1
 
 
 def test_delete_helm_release_failure(mocker):

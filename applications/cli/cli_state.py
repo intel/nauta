@@ -23,14 +23,13 @@ from functools import wraps
 import sys
 
 import click
-import yaspin
 
 from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
 from util.dependencies_checker import check_all_binary_dependencies, check_os
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.exceptions import InvalidDependencyError, InvalidOsError
-from util.system import handle_error, get_current_os, OS
+from util.system import handle_error
 from cli_text_consts import CliStateTexts as Texts
 
 logger = initialize_logger(__name__)

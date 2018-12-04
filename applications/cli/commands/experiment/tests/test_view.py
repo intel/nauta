@@ -25,7 +25,7 @@ from unittest.mock import MagicMock
 from kubernetes.client import V1Pod, V1PodStatus, V1Event, V1ObjectReference, V1ObjectMeta
 
 from commands.experiment import view
-from platform_resources.run_model import Run, RunStatus
+from platform_resources.run import Run, RunStatus
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 from util.k8s.k8s_statistics import ResourceUsage
 from util.k8s.k8s_info import PodStatus
@@ -36,7 +36,7 @@ TEST_RUNS = [
         name='test-experiment',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-04-26T13:43:01Z',
-        submitter='namespace-1',
+        namespace='namespace-1',
         state=RunStatus.RUNNING,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -47,7 +47,7 @@ TEST_RUNS = [
         name='test-experiment-2',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-05-08T13:05:04Z',
-        submitter='namespace-2',
+        namespace='namespace-2',
         state=RunStatus.COMPLETE,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -61,7 +61,7 @@ QUEUED_RUN = [
         name='test-experiment',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-04-26T13:43:01Z',
-        submitter='namespace-1',
+        namespace='namespace-1',
         state=RunStatus.QUEUED,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -93,12 +93,12 @@ EVENTS = [event]
 
 class ViewMocks:
     def __init__(self, mocker):
-        self.get_run = mocker.patch('commands.experiment.view.runs_api.get_run')
+        self.get_run = mocker.patch('commands.experiment.view.Run.get')
         self.get_run.return_value = TEST_RUNS[0]
         self.get_pods = mocker.patch('commands.experiment.view.get_namespaced_pods')
         self.get_pods.return_value = TEST_PODS
         self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
-        self.format_timestamp = mocker.patch('platform_resources.run_model.format_timestamp_for_cli')
+        self.format_timestamp = mocker.patch('platform_resources.run.format_timestamp_for_cli')
         self.format_timestamp.return_value = '2018-04-26 13:43:01'
         self.sum_cpu_resources = mocker.patch("commands.experiment.view.sum_cpu_resources")
         self.sum_cpu_resources.return_value = "100m"
@@ -118,7 +118,7 @@ def test_view_experiment_success(prepare_mocks: ViewMocks):
     assert prepare_mocks.get_run.call_count == 1, "Run was not retrieved"
 
     assert TEST_RUNS[0].name in result.output, "Bad output."
-    assert TEST_RUNS[0].submitter in result.output, "Bad output."
+    assert TEST_RUNS[0].namespace in result.output, "Bad output."
     assert "2018-04-26 13:43:01" in result.output, result.output
     assert "100m" in result.output, "Bad output"
     assert "1Gi" in result.output, "Bad output"

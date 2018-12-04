@@ -23,8 +23,8 @@ import pytest
 
 from kubernetes.client import CustomObjectsApi
 
-from platform_resources.user_model import User, UserStatus
-from platform_resources.users import list_users, get_user_data, validate_user_name, is_user_created
+from platform_resources.user import User, UserStatus
+from platform_resources.user_utils import validate_user_name, is_user_created
 from cli_text_consts import PlatformResourcesUsersTexts as Texts
 
 
@@ -43,14 +43,14 @@ USER_CREATED = User(name='user-created', uid=1, state=UserStatus.CREATED,
 def mock_k8s_api_client(mocker) -> CustomObjectsApi:
     mocker.patch('kubernetes.config.load_kube_config')
     mocker.patch('kubernetes.client.ApiClient')
-    custom_objects_api_mocked_class = mocker.patch('kubernetes.client.CustomObjectsApi')
+    custom_objects_api_mocked_class = mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')
     return custom_objects_api_mocked_class.return_value
 
 
 def test_list_users(mock_k8s_api_client, mocker):
-    mocker.patch('platform_resources.users.list_runs')
+    mocker.patch('platform_resources.user.Run.list')
     mock_k8s_api_client.list_cluster_custom_object.return_value = LIST_USERS_RESPONSE_RAW
-    users = list_users()
+    users = User.list()
     assert users == TEST_USERS
 
 
@@ -94,7 +94,7 @@ LIST_USERS_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1',
 def test_get_user_data(mock_k8s_api_client, mocker):
     mock_k8s_api_client.get_cluster_custom_object.return_value = LIST_USERS_RESPONSE_RAW["items"][0]
 
-    user = get_user_data("user_name")
+    user = User.get("user_name")
     assert user == TEST_USERS[0]
 
 
@@ -120,7 +120,7 @@ def test_validate_user_name_incorrect_k8s_string():
 
 
 def test_is_user_created_success(mocker):
-    gud_mock = mocker.patch("platform_resources.users.get_user_data", return_value = USER_CREATED)
+    gud_mock = mocker.patch("platform_resources.user.User.get", return_value = USER_CREATED)
     result = is_user_created("test_user", timeout=10)
 
     assert result
@@ -128,7 +128,7 @@ def test_is_user_created_success(mocker):
 
 
 def test_is_user_created_failure(mocker):
-    gud_mock = mocker.patch("platform_resources.users.get_user_data", return_value = TEST_USERS[0])
+    gud_mock = mocker.patch("platform_resources.user.User.get", return_value = TEST_USERS[0])
     result = is_user_created("test_user", timeout=1)
 
     assert not result
@@ -136,7 +136,7 @@ def test_is_user_created_failure(mocker):
 
 
 def test_is_user_created_success_with_wait(mocker):
-    gud_mock = mocker.patch("platform_resources.users.get_user_data", side_effect = [TEST_USERS[0], USER_CREATED])
+    gud_mock = mocker.patch("platform_resources.user.User.get", side_effect = [TEST_USERS[0], USER_CREATED])
     result = is_user_created("test_user", timeout=1)
 
     assert result

@@ -25,7 +25,7 @@ import click
 from tabulate import tabulate
 
 from cli_state import common_options, pass_state, State
-import platform_resources.users as users_api
+from platform_resources.user import User
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -43,7 +43,7 @@ logger = initialize_logger(__name__)
 def list_users(state: State, count: int):
     """ List users. """
     try:
-        users = users_api.list_users()
+        users = User.list()
         displayed_items_count = count if count else len(users)
         click.echo(tabulate([user.cli_representation for user in users[-displayed_items_count:]],
                             headers=Texts.TABLE_HEADERS,

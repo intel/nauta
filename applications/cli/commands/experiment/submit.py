@@ -37,7 +37,7 @@ from util.exceptions import SubmitExperimentError, K8sProxyCloseError
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names, validate_template_name, \
     validate_pack
 from util.k8s.k8s_info import is_current_user_administrator
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus
 from util.system import handle_error
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 
@@ -151,12 +151,12 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # noinspection PyBroadException
     try:
-        runs_list, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
-                                         script_folder_location=script_folder_location,
-                                         template=template, name=name, pack_params=pack_param,
-                                         parameter_range=parameter_range, parameter_set=parameter_set,
-                                         script_parameters=script_parameters,
-                                         env_variables=env, requirements_file=requirements)
+        runs_list, runs_errors, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
+                                                      script_folder_location=script_folder_location,
+                                                      template=template, name=name, pack_params=pack_param,
+                                                      parameter_range=parameter_range, parameter_set=parameter_set,
+                                                      script_parameters=script_parameters,
+                                                      env_variables=env, requirements_file=requirements)
     except K8sProxyCloseError as exe:
         handle_error(user_msg=exe.message)
         click.echo(exe.message)
@@ -169,7 +169,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # display information about status of a training
     click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
-                          run.cli_representation.status, format_run_message(run.message)) for run in runs_list],
+                          run.cli_representation.status, format_run_message(runs_errors.get(run.name, "")))
+                         for run in runs_list],
                         headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
 
     # if there is at least one FAILED experiment - application has to return exit code != 0

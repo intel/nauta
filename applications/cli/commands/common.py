@@ -26,12 +26,11 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-import platform_resources.runs as runs_api
-import platform_resources.experiments as experiments_api
-from platform_resources.run_model import RunStatus, Run, RunKinds
+from platform_resources.run import RunStatus, Run, RunKinds
+from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
-from platform_resources.experiment_model import Experiment, ExperimentStatus
+from platform_resources.experiment import Experiment, ExperimentStatus
 from util.system import handle_error, format_timestamp_for_cli
 from cli_text_consts import CmdsCommonTexts as Texts
 
@@ -50,7 +49,7 @@ def uninitialized_experiment_cli_representation(experiment: Experiment):
     return UninitializedExperimentCliModel(name=experiment.name, parameters_spec=' '.join(experiment.parameters_spec),
                                            metrics='', start_date='', end_date='',
                                            creation_timestamp=format_timestamp_for_cli(experiment.creation_timestamp),
-                                           submitter=experiment.submitter, status=experiment.state.value,
+                                           submitter=experiment.namespace, status=experiment.state.value,
                                            template_name=experiment.template_name)
 
 
@@ -73,11 +72,11 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
     try:
         namespace = None if all_users else get_kubectl_current_context_namespace()
 
-        creating_experiments = experiments_api.list_experiments(namespace=namespace,
-                                                                state=ExperimentStatus.CREATING,
-                                                                run_kinds_filter=listed_runs_kinds,
-                                                                name_filter=name)
-        runs = runs_api.list_runs(namespace=namespace, name_filter=name, run_kinds_filter=listed_runs_kinds)
+        creating_experiments = Experiment.list(namespace=namespace,
+                                               state=ExperimentStatus.CREATING,
+                                               run_kinds_filter=listed_runs_kinds,
+                                               name_filter=name)
+        runs = Run.list(namespace=namespace, name_filter=name, run_kinds_filter=listed_runs_kinds)
 
         # Get Experiments without associated Runs
         names_of_experiment_with_runs = set()
@@ -91,7 +90,7 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
         click.echo(tabulate([uninitialized_experiment_cli_representation(experiment)
                              for experiment in uninitialized_experiments][-displayed_items_count:],
                             headers=headers, tablefmt="orgtbl"))
-    except experiments_api.InvalidRegularExpressionError:
+    except InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
@@ -123,8 +122,8 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
 
         # List experiments command is actually listing Run resources instead of Experiment resources with one
         # exception - if run is initialized - dlsctl displays data of an experiment instead of data of a run
-        runs = replace_initializing_runs(runs_api.list_runs(namespace=namespace, state_list=[status], name_filter=name,
-                                                            run_kinds_filter=listed_runs_kinds))
+        runs = replace_initializing_runs(
+            Run.list(namespace=namespace, state_list=[status], name_filter=name, run_kinds_filter=listed_runs_kinds))
         runs_representations = [run.cli_representation for run in runs]
         if brief:
             runs_table_data = [
@@ -143,7 +142,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
             ]
         click.echo(tabulate(runs_table_data if not count else runs_table_data[-count:],
                             headers=runs_list_headers, tablefmt="orgtbl"))
-    except runs_api.InvalidRegularExpressionError:
+    except InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)
         exit(1)
@@ -165,7 +164,7 @@ def replace_initializing_runs(run_list: List[Run]):
     for run in run_list:
         exp_name = run.experiment_name
         if (run.state is None or run.state == '') and exp_name not in initializing_experiments:
-            experiment = experiments_api.get_experiment(exp_name, run.submitter)
+            experiment = Experiment.get(name=exp_name, namespace=run.namespace)
             ret_list.append(create_fake_run(experiment))
             initializing_experiments.add(exp_name)
         elif exp_name not in initializing_experiments:
@@ -177,6 +176,6 @@ def replace_initializing_runs(run_list: List[Run]):
 def create_fake_run(experiment: Experiment) -> Run:
     return Run(name=experiment.name, experiment_name=experiment.name, metrics={},
                parameters=experiment.parameters_spec, pod_count=0,
-               pod_selector={}, state=RunStatus.CREATING, submitter=experiment.submitter,
+               pod_selector={}, state=RunStatus.CREATING, namespace=experiment.namespace,
                creation_timestamp=experiment.creation_timestamp,
                template_name=experiment.template_name)

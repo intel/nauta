@@ -26,10 +26,10 @@ import click
 
 from util.logger import initialize_logger
 from cli_state import common_options, pass_state, State
-from util.k8s.kubectl import check_users_presence, UserState
+from util.k8s.kubectl import UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
-from platform_resources.users import purge_user
+from platform_resources.user_utils import purge_user, check_users_presence
 from util.k8s.k8s_info import is_current_user_administrator, get_config_map_data, patch_config_map_data
 from util.aliascmd import AliasCmd
 from util.spinner import spinner

@@ -31,7 +31,7 @@ from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
-from platform_resources.experiments import generate_name
+from platform_resources.experiment_utils import generate_name
 from util.system import handle_error
 from cli_text_consts import PredictBatchCmdTexts as Texts
 

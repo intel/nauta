@@ -22,8 +22,6 @@
 from enum import Enum
 from typing import Pattern, List
 
-from platform_resources.run_model import RunStatus
-
 
 def filter_by_name_regex(resource_object_dict: dict, name_regex: Pattern = None, spec_location: bool = True):
     if spec_location:
@@ -38,38 +36,11 @@ def filter_by_state(resource_object_dict: dict, state: Enum = None):
     return resource_object_dict['spec']['state'] == state.value if state else True
 
 
-def filter_run_by_state(resource_object_dict: dict, state_list: List[Enum] = None):
-    if not state_list or not all(state_list):
-        return True
-
-    current_state = resource_object_dict['spec'].get('state')
-    if current_state:
-        if [item for item in state_list if item.value == current_state]:
-            return True
-        else:
-            return False
-    else:
-        if state_list and state_list[0] == RunStatus.CREATING:
-            return True
-        else:
-            return False
-
-
 def filter_by_excl_state(resource_object_dict: dict, state: Enum = None):
     return resource_object_dict['spec']['state'] != state.value if state else True
-
-
-def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
-    if not state:
-        return True
-
-    return not filter_run_by_state(resource_object_dict, [state])
 
 
 def filter_by_experiment_name(resource_object_dict: dict, exp_name: List[str] = None):
     return resource_object_dict['spec']['experiment-name'] in exp_name if exp_name else True
 
 
-def filter_by_run_kinds(resource_object_dict: dict, run_kinds: List[Enum] = None):
-    return any([resource_object_dict['metadata']['labels'].get('runKind') == run_kind.value for run_kind in run_kinds]) \
-        if run_kinds else True

@@ -22,12 +22,16 @@
 from collections import namedtuple
 import dateutil
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
-from platform_resources.platform_resource_model import PlatformResource
-from platform_resources.run_model import Run, RunStatus
+from kubernetes.client import CustomObjectsApi
+
+from platform_resources.platform_resource import PlatformResource, PlatformResourceApiClient
+from platform_resources.run import Run, RunStatus
+from util.logger import initialize_logger
 from util.system import format_timestamp_for_cli
 
+logger = initialize_logger(__name__)
 
 class UserStatus(Enum):
     DEFINED = 'DEFINED'
@@ -36,12 +40,16 @@ class UserStatus(Enum):
 
 
 class User(PlatformResource):
+    api_group_name = 'aipg.intel.com'
+    crd_plural_name = 'users'
+    crd_version = 'v1'
 
     UserCliModel = namedtuple('UserCliModel', ['name', 'created', 'date_of_last_submitted_job',
                                                'running_jobs', 'queued_jobs'])
 
     def __init__(self, name: str, uid: int, state: UserStatus = UserStatus.DEFINED,
                  creation_timestamp: str = None, experiment_runs: List[Run] = None):
+        super().__init__()
         self.name = name
         self.uid = uid
         self.state = state
@@ -72,6 +80,34 @@ class User(PlatformResource):
                    state=state,
                    creation_timestamp=creation_timestamp)
 
+    @classmethod
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None):
+        """
+        Return list of users.
+        :namespace:
+        :return: List of User objects
+        """
+        logger.debug('Listing users.')
+        k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
+
+        raw_users = k8s_custom_object_api.list_cluster_custom_object(group=cls.api_group_name,
+                                                                     plural=cls.crd_plural_name,
+                                                                     version=cls.crd_version)
+
+        users = [User.from_k8s_response_dict(user_dict) for user_dict in raw_users['items']]
+
+        # Get experiment runs for each user
+        # TODO: CHANGE IMPLEMENTATION TO USE AGGREGATED USER DATA AFTER CAN-366
+        runs = Run.list(custom_objects_api=k8s_custom_object_api)
+        user_map = {user.name: user for user in users}
+
+        for run in runs:
+            if user_map.get(run.namespace):
+                user_map[run.namespace].experiment_runs.append(run)
+            else:
+                logger.error(f"Run exists for nonexisting user {run.namespace}")
+
+        return users
 
     @property
     def cli_representation(self):
@@ -81,7 +117,7 @@ class User(PlatformResource):
                                                             if self.date_of_last_submitted_job is not None else None)
 
     @property
-    def date_of_last_submitted_job(self) -> str or None:
+    def date_of_last_submitted_job(self) -> Optional[str]:
         if self.experiment_runs:
             return sorted((run for run in self.experiment_runs),
                           key=lambda run: dateutil.parser.parse(run.creation_timestamp))[-1].creation_timestamp

@@ -19,21 +19,20 @@
 # and approved by Intel in writing.
 #
 
-import dateutil.parser
 from functools import partial
+import time
 from typing import List, Callable, Generator
 
 import elasticsearch
 import elasticsearch.helpers
 import elasticsearch.client
-import time
 
 from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity, \
     filter_log_by_pod_status, filter_log_by_pod_ids
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
-from platform_resources.run_model import Run
+from platform_resources.run import Run
 
 logger = initialize_logger(__name__)
 
