@@ -103,7 +103,7 @@ def test_missing_file(mocker, launch_mocks):
 
     runner = CliRunner()
     result = runner.invoke(batch.batch, ['--data', data_location,
-                                         '--local_model_location', local_model_location])
+                                         '--local-model-location', local_model_location])
 
     assert batch.validate_local_model_location.call_count == 1
     assert result.exit_code == 2

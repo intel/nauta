@@ -176,7 +176,7 @@ def test_submit_invalid_script_folder_location(prepare_mocks: SubmitMocks):
     script_folder_location = '/wrong-directory'
 
     runner = CliRunner()
-    parameters = [SCRIPT_LOCATION, '--script_folder_location', script_folder_location]
+    parameters = [SCRIPT_LOCATION, '--script-folder-location', script_folder_location]
 
     result = runner.invoke(submit, parameters, input="y")
     assert result.exit_code == 2

@@ -118,7 +118,7 @@ def test_missing_file(mocker, launch_mocks):
     mocker.patch.object(launch, 'validate_local_model_location').side_effect = SystemExit(2)
 
     runner = CliRunner()
-    result = runner.invoke(launch.launch, ['--local_model_location', local_model_location])
+    result = runner.invoke(launch.launch, ['--local-model-location', local_model_location])
 
     assert launch_mocks.generate_name_mock.call_count == 0
     assert launch_mocks.start_inference_instance_mock.call_count == 0

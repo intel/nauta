@@ -50,10 +50,10 @@ FORWARDED_URL = 'http://localhost:{}'
 @common_options()
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
-def webui(state: State, no_launch: bool, port: int):
+@click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
+def webui(state: State, no_launch: bool, port_number: int):
     """ Subcommand for launching webUI with credentials """
-    launch_app_with_proxy(DLS4EAppNames.INGRESS, no_launch, port)
+    launch_app_with_proxy(DLS4EAppNames.INGRESS, no_launch, port_number)
 
 
 # noinspection PyUnusedLocal
@@ -64,10 +64,10 @@ def webui(state: State, no_launch: bool, port: int):
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
 @click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),
               help=Texts.TB_HELP_TSCP)
-@click.option('-p', '--port', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
-@click.argument("experiment_name", type=str, required=True, nargs=-1)
-def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int], port: Optional[int],
-                experiment_name: List[str]):
+@click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
+@click.argument("experiment-name", type=str, required=True, nargs=-1)
+def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int],
+                port_number: Optional[int], experiment_name: List[str]):
     """ Subcommand for launching tensorboard with credentials """
     current_namespace = get_kubectl_current_context_namespace()
 
@@ -97,7 +97,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
                 launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
-                                      namespace=current_namespace, port=port,
+                                      namespace=current_namespace, port=port_number,
                                       app_name=f"tensorboard-{tb.id}")
                 return
             logger.warning(Texts.TB_WAITING_FOR_TB_MSG.format(tb_id=tb.id, tb_status_value=tb.status.value))

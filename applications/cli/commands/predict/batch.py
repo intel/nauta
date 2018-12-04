@@ -54,7 +54,7 @@ def validate_local_model_location(local_model_location: str):
 @click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b', options_metavar='[options]')
 @click.option('-n', '--name', help=Texts.HELP_NAME, callback=validate_experiment_name)
 @click.option('-m', '--model-location', help=Texts.HELP_MODEL_LOCATION)
-@click.option("-l", "--local_model_location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
+@click.option("-l", "--local-model-location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
 @click.option('-d', '--data', required=True, help=Texts.HELP_DATA)
 @click.option('-o', '--output', help=Texts.HELP_OUTPUT)
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
