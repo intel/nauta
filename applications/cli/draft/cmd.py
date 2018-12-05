@@ -70,24 +70,27 @@ def create(working_directory: str = None,
     return output, exit_code, log_output
 
 
-def up(working_directory: str = None,
-       namespace: str = None) -> (str, int, str):
-    output, exit_code, log_output = call_draft(
-        args=['up'], cwd=working_directory, namespace=namespace)
+def _log_draft_logs_from_draft_execution(draft_output: str = '', working_directory: str = ''):
     # displaying logs from draft - only in debug mode
     pattern = "Inspect the logs with `draft logs (.*)`"
 
     p = re.compile(pattern)
 
-    search_result = p.search(output)
+    search_result = p.search(draft_output)
 
     try:
         if search_result:
             draft_logs_filename = search_result.group(1)
 
             config_path = Config().config_path
-            filename = os.path.join(config_path, DRAFT_HOME_FOLDER,
-                                    DRAFT_LOGS_FOLDER, draft_logs_filename)
+
+            draft_app_name = os.path.basename(os.path.normpath(working_directory))
+
+            filename = os.path.join(config_path,
+                                    DRAFT_HOME_FOLDER,
+                                    DRAFT_LOGS_FOLDER,
+                                    draft_app_name,
+                                    draft_logs_filename)
 
             with open(filename, "r") as file:
                 logger.debug("Draft logs:")
@@ -97,9 +100,14 @@ def up(working_directory: str = None,
             logger.debug("Lack of logs from draft.")
     except Exception as exe:
         # exception here shouldn't block finishing of the operation
-        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(
-            exception=str(exe))
+        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(exception=str(exe))
         logger.error(error_message)
+
+
+def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
+    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
+
+    _log_draft_logs_from_draft_execution(output, working_directory)
 
     if not exit_code:
         output, exit_code = check_up_status(output)

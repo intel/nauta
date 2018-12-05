@@ -196,7 +196,7 @@ def convert_to_number(s: str) -> int or float:
         return float(s)
 
 
-def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TRAINING,
+def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunKinds.TRAINING,
                       script_location: str = None, script_parameters: Tuple[str, ...] = None,
                       pack_params: List[Tuple[str, str]] = None, parameter_range: List[Tuple[str, str]] = None,
                       parameter_set: Tuple[str, ...] = None,
@@ -343,7 +343,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                                    annotations={pack_param_name: pack_param_value
                                                 for pack_param_name, pack_param_value in pack_params})
                         submitted_runs.append(run)
-                        submit_draft_pack(run_folder, namespace)
+                        submit_draft_pack(run_folder, namespace=namespace)
                 except Exception as exe:
                     delete_environment(run_folder)
                     try:
@@ -523,6 +523,7 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
     :param run_folder: location of a folder with a description of an environment
+    :param run_name: run's name
     :param namespace: namespace where tiller used during deployment is located
     In case of any problems it throws an exception with a description of a problem
     """
@@ -547,7 +548,7 @@ def values_range(param_value: str) -> List[str]:
     """
     Returns a list containing values from start to stop with a step prepared based on
     a string representation of the "pr" parameter.
-    :param param value: content of the "pr" parameter
+    :param param_value: content of the "pr" parameter
     :return: list of values between start and stop with a given step
     """
     ret_range = []
@@ -719,7 +720,7 @@ def wrap_text(text: str, width: int, spaces: int = 2) -> str:
 
 
 def get_list_of_packs():
-    path = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER, "packs")
+    path = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER, "packs", "https-github.com-Azure-draft", "packs")
 
     list_of_packs = []
     for (dirpath, dirnames, filenames) in os.walk(path):
@@ -730,6 +731,8 @@ def get_list_of_packs():
     return list_of_packs
 
 
+# noinspection PyUnusedLocal
+# 'ctx' and 'param' required for Click's option callback
 def validate_template_name(ctx, param, value):
     if value not in get_list_of_packs():
         raise click.BadParameter(Texts.INCORRECT_TEMPLATE_NAME)
@@ -739,7 +742,7 @@ def validate_template_name(ctx, param, value):
 def validate_pack(name: str):
     # check corectenss of the Chart.yaml file
     chart_location = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER,
-                                  "packs", name, "charts", CHART_YAML_FILENAME)
+                                  "packs", "https-github.com-Azure-draft", "packs", name, "charts", CHART_YAML_FILENAME)
 
     if not os.path.isfile(chart_location):
         handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))

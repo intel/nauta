@@ -27,41 +27,69 @@ ifeq (Darwin,$(OS))
 endif
 
 build: $(ACTIVATE) set-version metrics-lib
-	. $(ACTIVATE); pip install pyinstaller;
+	. $(ACTIVATE); pip install pyinstaller
 	rm -rf dist/
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-dls-windows-amd64.7z -o draft.7z
-	mkdir dist/config/
-	7z x draft.7z -odist/config/
-	rm -f draft.7z
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
-	cp -Rf draft/packs/* dist/config/.draft/packs/
 
-	curl -o helm-v2.9.1-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-windows-amd64.tar.gz
+	git config --system core.longpaths true
+	# build dlsctl
+	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n dlsctl
+
+
+	# download and prepare Draft
+	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-windows-amd64.zip -o draft.zip
+	mkdir dist/config/
+	7z x draft.zip -odist/config/
+	rm -f draft.zip
+	mv dist/config/windows-amd64/* dist/config
+	rm -rf dist/config/windows-amd64
+
+	dist\config\draft init --home dist/config/.draft
+	rm -rf dist/config/.draft/packs/*
+	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
+	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
+	cp -r dist/config/.draft/packs/https-github.com-Azure-draft/packs dist/config/packs
+
+
+	# download and prepare Helm
+	curl -o helm-v2.9.1-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-windows-amd64.zip
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
-	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-windows-amd64.tar.gz -C helm_tmp/
+
+	7z x helm-v2.9.1-windows-amd64.zip -ohelm_tmp
+	mv helm_tmp/windows-amd64/* helm_tmp
+	rm -rf helm_tmp/windows-amd64
+
 	mv helm_tmp/helm.exe dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-windows-amd64.tar.gz
+	rm -f helm-v2.9.1-windows-amd64.zip
 	rm -rf helm_tmp
+
+
+	# download and prepare Socat
+	docker pull alpine/socat:1.0.3
+	docker tag alpine/socat:1.0.3 socat-container-image:1.0.3
+	docker save socat-container-image:1.0.3 > dist/config/socat-container-image.tar
+	gzip dist/config/socat-container-image.tar
+	docker rmi alpine/socat:1.0.3
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-dls-linux-amd64.tar.gz -o draft.tar.gz
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl
+	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-linux-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 	mkdir -vp dist/config/
 	tar -zxf draft.tar.gz -C dist/config/
 	rm -f draft.tar.gz
-	mkdir dist/config/packs/
-	cp -Rf draft/packs/* dist/config/packs/
-	rm -rf dist/config/.draft/packs
-	cd dist/config/.draft && ln -s ../packs packs
+	mv dist/config/linux-amd64/* dist/config
+	rm -rf dist/config/linux-amd64
+	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
+	rm -rf dist/config/.draft/packs/*
+	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
+	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
+	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
 
-	curl -o helm-v2.9.1-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-linux-amd64.tar.gz
+	curl -o helm-v2.9.1-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
@@ -72,20 +100,22 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-dls-darwin-amd64.tar.gz -o draft.tar.gz
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl
+	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-darwin-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 	mkdir -vp dist/config/
 	tar -zxf draft.tar.gz -C dist/config/
 	rm -f draft.tar.gz
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
-	mkdir dist/config/packs/
-	cp -Rf draft/packs/* dist/config/packs/
-	rm -rf dist/config/.draft/packs
-	cd dist/config/.draft && ln -s ../packs packs
+	mv dist/config/darwin-amd64/* dist/config
+	rm -rf dist/config/darwin-amd64
+	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
+	rm -rf dist/config/.draft/packs/*
+	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
+	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
+	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
 
-	curl -o helm-v2.9.1-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-darwin-amd64.tar.gz
+	curl -o helm-v2.9.1-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-darwin-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
@@ -94,6 +124,14 @@ ifeq (Darwin,$(OS))
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.9.1-darwin-amd64.tar.gz
 	rm -rf helm_tmp
+
+	# download and prepare Socat
+	docker pull alpine/socat:1.0.3
+	docker tag alpine/socat:1.0.3 socat-container-image:1.0.3
+	docker save socat-container-image:1.0.3 > dist/config/socat-container-image.tar
+	gzip dist/config/socat-container-image.tar
+	docker rmi alpine/socat:1.0.3
+
 endif
 
 

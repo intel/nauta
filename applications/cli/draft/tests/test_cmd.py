@@ -59,7 +59,9 @@ def test_create(draft_mock):
     draft_mock.create()
 
     assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'create'], env=ANY, cwd=None,
+    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'create'],
+                                                             env=ANY,
+                                                             cwd=None,
                                                              logs_size=0)])
 
 
@@ -70,7 +72,9 @@ def test_up(draft_mock, mocker):
     draft_mock.up()
 
     assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'], env=ANY, cwd=None,
+    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'],
+                                                             env=ANY,
+                                                             cwd=None,
                                                              logs_size=0)])
 
 

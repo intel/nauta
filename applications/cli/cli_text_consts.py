@@ -574,7 +574,6 @@ class ExperimentCommonTexts:
                                           "Specify pack params in format 'key value' not as 'key=value'."
     EXPERIMENT_NAME_TOO_LONG_ERROR_MSG = "Name given by a user cannot be longer than 30 characters."
     ERROR_DURING_PATCHING_RUN = "Error during patching a run occured {}."
-    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error during getting draft logs : {exception}"
     THE_SAME_EXP_IS_SUBMITTED = "There is another experiment with the same name submitted at this moment."
     PREPARING_RESOURCE_DEFINITIONS_MSG = "Preparing resources' definitions..."
     CLUSTER_CONNECTION_MSG = "Connecting to the cluster..."
@@ -592,6 +591,7 @@ class DraftCmdTexts:
     APP_NOT_RELEASED = "Application hasn't been released."
     DEPLOYMENT_NOT_CREATED = "Deployment hasn't been created."
     PACK_NOT_EXISTS = "Chosen pack doesn't exist."
+    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error during getting draft logs : {exception}"
 
 
 class PacksTfTrainingTexts:

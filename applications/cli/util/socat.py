@@ -40,7 +40,7 @@ socat_container_name = 'socat-'
 
 SOCAT_IMAGE_FILE_NAME = 'socat-container-image.tar.gz'
 
-SOCAT_IMAGE_NAME = 'socat-container-image:latest'
+SOCAT_IMAGE_NAME = 'socat-container-image:1.0.3'
 
 
 def get() -> Optional[Container]:
@@ -94,7 +94,8 @@ def start(docker_registry_port: str):
                            f'{docker_registry_port}'
     load_socat_image()
     client.containers.run(detach=True, remove=True, network_mode='host', name=socat_container_name,
-                          image=SOCAT_IMAGE_NAME, command=f'{docker_registry_port}')
+                          image=SOCAT_IMAGE_NAME, command=f'TCP-LISTEN:{docker_registry_port},fork,reuseaddr '
+                                                          f'TCP:host.docker.internal:{docker_registry_port}')
 
     _ensure_socat_running()
 
