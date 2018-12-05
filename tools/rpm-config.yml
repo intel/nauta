@@ -71,7 +71,7 @@ local_images:
       - src: /out/*
         dest: rpms
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/python/python2-pip-8.1.2-6.el7.noarch.rpm
+      - src: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/p/python2-pip-8.1.2-6.el7.noarch.rpm
         dest: python2-pip-8.1.2-6.el7.noarch.rpm
         checksum: d99bbd6fd197597da392019f62cb982113cfa6d359e916abc3844a138d807377
   rpm/docker:
@@ -86,12 +86,12 @@ local_images:
       - src: /out/*
         dest: rpms
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/pigz-2.3.3-1.el7.centos.x86_64.rpm
-        dest: pigz-2.3.3-1.el7.centos.x86_64.rpm
-        checksum: b95f8ffa8beae245197eda2b019cfbe05480ae6bc9c0e860bc54d58522f6b522
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/container-selinux-2.55-1.el7.noarch.rpm
-        dest: container-selinux-2.55-1.el7.noarch.rpm
-        checksum: 9a047c389a1401168171bf7c5f4eef3da40f0d9b9edc3ea075a9fb447c043630
+      - src: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/p/pigz-2.3.4-1.el7.x86_64.rpm
+        dest: pigz-2.3.4-1.el7.centos.x86_64.rpm
+        checksum: 107362ff688868473eeb86c8c62d362e0ed576e123b44d135cf96f2af11a05c0
+      - src: http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.68-1.el7.noarch.rpm
+        dest: container-selinux-2.68-1.el7.noarch.rpm
+        checksum: d2a6e716e12da75bca38a5c5d79cdb3863beb500389827121b6bca6df057aee9
   rpm/docker-distribution:
     version: "2.6.2"
     required:
@@ -103,7 +103,7 @@ local_images:
       - src: /out/*
         dest: rpms
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker-distribution/docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
+      - src: http://mirror.centos.org/centos/7/extras/x86_64/Packages/docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
         dest: docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
         checksum: 52b2c48b9bb4d0d5357057127799e4d71129fe8997dd0f770a9fe68ee7f3eff0
   rpm/cni:
