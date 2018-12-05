@@ -24,7 +24,8 @@ from sys import exit
 import click
 
 from cli_state import common_options, pass_state, State
-from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
+from util.dependencies_checker import check_dependency, get_dependency_map, save_dependency_versions
+from util.os_checker import check_os, UnsupportedOSError, OSCheckError
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
@@ -33,7 +34,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_
 from util.spinner import spinner
 from util.system import handle_error
 from cli_text_consts import VerifyCmdTexts as Texts
-from util.exceptions import KubectlConnectionError, InvalidOsError
+from util.exceptions import KubectlConnectionError
 
 
 logger = initialize_logger(__name__)
@@ -47,9 +48,10 @@ def verify(state: State):
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
-    except InvalidOsError as exception:
-        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
-        exit(1)
+    except UnsupportedOSError:
+        handle_error(logger, Texts.OS_UNSUPPORTED_MSG, Texts.OS_UNSUPPORTED_MSG, add_verbosity_msg=True)
+    except OSCheckError:
+        handle_error(logger, Texts.OS_CHECK_ERROR_MSG, Texts.OS_CHECK_ERROR_MSG, add_verbosity_msg=True)
 
     try:
         with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):

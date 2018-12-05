@@ -28,19 +28,14 @@ from typing import Optional, Dict
 import yaml
 
 from draft.cmd import call_draft
-from util.system import execute_system_command, get_os_version
+from util.system import execute_system_command
 from util.logger import initialize_logger
-from util.exceptions import InvalidDependencyError, InvalidOsError
+from util.exceptions import InvalidDependencyError
 from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 from version import VERSION
 from util.config import Config
 
 log = initialize_logger(__name__)
-
-UBUNTU_MIN_VERSION = LooseVersion('16')
-WINDOWS_MIN_VERSION = LooseVersion('10')
-MACOS_MIN_VERSION = LooseVersion('10.13')
-REDHAT_MIN_VERSION = LooseVersion('7.5')
 
 DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
@@ -134,15 +129,6 @@ def get_dependency_map():
     }
 
 
-SUPPORTED_OS_MAP = {
-    'ubuntu': UBUNTU_MIN_VERSION,
-    'rhel': REDHAT_MIN_VERSION,
-    'macos': MACOS_MIN_VERSION,
-    'windows_pro': WINDOWS_MIN_VERSION,
-    'windows_enterprise': WINDOWS_MIN_VERSION
-}
-
-
 def _is_version_valid(installed_version: LooseVersion,
                       expected_version: LooseVersion,
                       match_exact_version=False) -> bool:
@@ -163,27 +149,6 @@ def _parse_installed_version(version_output: str,
     installed_version = LooseVersion(matches[0][0] or matches[0][1])
 
     return installed_version
-
-
-def check_os():
-    """ Check if user's OS is supported by dlsctl. """
-    try:
-        os_name, os_version = get_os_version()
-        if os_name == "":
-            raise InvalidOsError(Texts.UNKNOWN_OS_ERROR_MSG)
-    except InvalidOsError:
-        raise
-    except Exception as exe:
-        raise InvalidOsError(Texts.GET_OS_VERSION_ERROR_MSG) from exe
-    log.info(f"Detected OS: {os_name} {os_version}")
-    if os_name not in SUPPORTED_OS_MAP:
-        raise InvalidOsError(
-            Texts.UNSUPPORTED_OS_ERROR_MSG.format(
-                os_name=os_name, os_version=os_version))
-    if not _is_version_valid(os_version, SUPPORTED_OS_MAP[os_name]):
-        raise InvalidOsError(
-            Texts.INVALID_OS_VERSION_ERROR_MSG.format(
-                os_name=os_name, os_version=os_version))
 
 
 def check_dependency(dependency_name: str,
