@@ -115,16 +115,16 @@ def format_run_message(run_message: Optional[str]) -> str:
 
 @click.command(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.argument("script_location", type=click.Path(), required=True)
-@click.option("-sfl", "--script_folder_location", type=click.Path(), help=Texts.HELP_SFL)
+@click.option("-sfl", "--script-folder-location", type=click.Path(), help=Texts.HELP_SFL)
 @click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob", callback=validate_template_name)
 @click.option("-n", "--name", help=Texts.HELP_N, callback=validate_experiment_name)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
+@click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
-@click.option("-pr", "--parameter_range", nargs=2, multiple=True, help=Texts.HELP_PR)
-@click.option("-ps", "--parameter_set", multiple=True, help=Texts.HELP_PS)
+@click.option("-pr", "--parameter-range", nargs=2, multiple=True, help=Texts.HELP_PR)
+@click.option("-ps", "--parameter-set", multiple=True, help=Texts.HELP_PS)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
-@click.argument("script_parameters", nargs=-1, metavar='[-- script_parameters]', callback=clean_script_parameters)
+@click.argument("script-parameters", nargs=-1, metavar='[-- script-parameters]', callback=clean_script_parameters)
 @common_options()
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,

@@ -52,10 +52,10 @@ logger = initialize_logger(__name__)
 @click.command(short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='i', options_metavar='[options]')
 @click.option('-n', '--name', default=None, help=Texts.HELP_N)
 @click.option('-f', '--filename', default=None, help=Texts.HELP_F)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
+@click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=Texts.HELP_NO_LAUNCH)
-@click.option('-pn', '--port_number', type=click.IntRange(1024, 65535), help=Texts.HELP_PN)
+@click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_PN)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.option("-t", "--template", help=Texts.HELP_T, default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
               type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
