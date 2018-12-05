@@ -80,3 +80,8 @@ class InvalidDependencyError(Exception):
     requirements.
     """
     pass
+
+
+class InvalidOsError(Exception):
+    """Error raised when dlsctl fails to read user's OS version, or this version does not meet the requirements."""
+    pass

@@ -93,8 +93,6 @@ class VerifyCmdTexts:
     CHECKING_OS_MSG = "Checking operating system..."
     VERIFYING_DEPENDENCY_MSG = "Verifying {dependency_name} ..."
     CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG = "Checking port forwarding from cluster..."
-    OS_UNSUPPORTED_MSG = "This OS is unsupported."
-    OS_CHECK_ERROR_MSG = "An error occurred during OS info gathering."
 
 
 class UserCmdTexts:
@@ -652,6 +650,12 @@ class UtilDependenciesCheckerTexts:
     VERSION_GET_FAIL_MSG = "Failed to get {dependency_name} version."
     INVALID_DEPENDENCY_ERROR_MSG = "{dependency_name} installed version: {installed_version}, does not match " \
                                    "expected version: {expected_version}"
+    UNKNOWN_OS_ERROR_MSG = "Unknown OS version."
+    GET_OS_VERSION_ERROR_MSG = "Could not determine OS version"
+    UNSUPPORTED_OS_ERROR_MSG = "This OS ({os_name} {os_version}) is not supported. Please check the list of " \
+                               "supported OS."
+    INVALID_OS_VERSION_ERROR_MSG = "This version ({os_name} {os_version}) of the OS is not supported. Please check " \
+                                   "the list of supported OS."
 
 
 class UtilConfigTexts:
@@ -692,7 +696,6 @@ class PlatformResourcesUsersTexts:
     INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
     USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
     USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
-
 
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
@@ -736,8 +739,6 @@ class CliStateTexts:
                                   "sure that the k8s cluster is online."
     DLSCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for dlsctl is not set."
     DLSCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
-    OS_UNSUPPORTED_MSG = "This OS is unsupported."
-    OS_CHECK_ERROR_MSG = "An error occurred during OS info gathering."
 
 
 class LicenseAcceptanceTexts:

@@ -26,12 +26,11 @@ import click
 
 from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
-from util.dependencies_checker import check_all_binary_dependencies
-from util.os_checker import check_os, UnsupportedOSError, OSCheckError
+from util.dependencies_checker import check_all_binary_dependencies, check_os
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
+from util.exceptions import InvalidDependencyError, InvalidOsError
 from util.system import handle_error
 from cli_text_consts import CliStateTexts as Texts
-from util.exceptions import InvalidDependencyError
 
 logger = initialize_logger(__name__)
 
@@ -69,13 +68,9 @@ def verify_cli_dependencies():
     try:
         check_os()
         check_all_binary_dependencies(namespace=namespace)
-    except InvalidDependencyError:
+    except (InvalidDependencyError, InvalidOsError):
         error_msg = Texts.INVALID_DEPENDENCY_ERROR_MSG
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=True)
-    except UnsupportedOSError:
-        handle_error(logger, Texts.OS_UNSUPPORTED_MSG, Texts.OS_UNSUPPORTED_MSG, add_verbosity_msg=True)
-    except OSCheckError:
-        handle_error(logger, Texts.OS_CHECK_ERROR_MSG, Texts.OS_CHECK_ERROR_MSG, add_verbosity_msg=True)
 
 
 def verify_cli_config_path():

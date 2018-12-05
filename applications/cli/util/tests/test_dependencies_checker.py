@@ -27,9 +27,11 @@ import yaml
 from util.dependencies_checker import _is_version_valid, LooseVersion, \
     _parse_installed_version, check_dependency, \
     DependencySpec, check_all_binary_dependencies, get_dependency_map, \
-    NAMESPACE_PLACEHOLDER, get_dependency_versions_file_path, save_dependency_versions, \
+    NAMESPACE_PLACEHOLDER, check_os, SUPPORTED_OS_MAP, \
+    get_dependency_versions_file_path, save_dependency_versions, \
     load_dependency_versions, DEPENDENCY_VERSIONS_FILE_SUFFIX
-from util.exceptions import InvalidDependencyError
+from util.exceptions import InvalidDependencyError, InvalidOsError
+from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 
 
 TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
@@ -272,6 +274,66 @@ def test_check_all_binary_dependencies_version_check_error(mocker):
 
     with pytest.raises(InvalidDependencyError):
         check_all_binary_dependencies(namespace='fake')
+
+
+def test_check_os_unknown(mocker):
+    get_os_version_mock = mocker.patch(
+        'util.dependencies_checker.get_os_version')
+    get_os_version_mock.return_value = ("", LooseVersion("0"))
+
+    with pytest.raises(InvalidOsError) as os_error:
+        check_os()
+
+    assert Texts.UNKNOWN_OS_ERROR_MSG == str(os_error.value)
+
+
+def test_check_os_get_os_version_fail(mocker):
+    get_os_version_mock = mocker.patch(
+        'util.dependencies_checker.get_os_version')
+    get_os_version_mock.side_effect = FileNotFoundError()
+
+    with pytest.raises(InvalidOsError) as os_error:
+        check_os()
+
+    assert Texts.GET_OS_VERSION_ERROR_MSG == str(os_error.value)
+
+
+def test_check_os_not_supported(mocker):
+    get_os_version_mock = mocker.patch(
+        'util.dependencies_checker.get_os_version')
+    get_os_version_mock.return_value = ("not_supported_system",
+                                        LooseVersion("9.3"))
+
+    with pytest.raises(InvalidOsError) as os_error:
+        check_os()
+
+    assert Texts.UNSUPPORTED_OS_ERROR_MSG.format(os_name="not_supported_system", os_version="9.3") \
+        == str(os_error.value)
+
+
+def test_check_os_version_not_supported(mocker):
+    get_os_version_mock = mocker.patch(
+        'util.dependencies_checker.get_os_version')
+    get_os_version_mock.return_value = ("ubuntu", LooseVersion("14.04"))
+
+    with pytest.raises(InvalidOsError) as os_error:
+        check_os()
+
+    assert Texts.INVALID_OS_VERSION_ERROR_MSG.format(
+        os_name="ubuntu", os_version="14.04") == str(os_error.value)
+
+
+def test_check_os_version_supported(mocker):
+    get_os_version_mock = mocker.patch(
+        'util.dependencies_checker.get_os_version')
+    get_os_version_mock.return_value = (list(SUPPORTED_OS_MAP.keys())[0],
+                                        SUPPORTED_OS_MAP[list(
+                                            SUPPORTED_OS_MAP.keys())[0]])
+
+    try:
+        check_os()
+    except InvalidOsError:
+        pytest.fail("check_os failed with supported OS.")
 
 
 def test_get_dependency_version_file_path(mocker):
