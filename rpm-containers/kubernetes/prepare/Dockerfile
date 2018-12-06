@@ -6,5 +6,5 @@ FROM ${BASE_IMAGE}
 
 COPY --from=data /build-output/kubernetes.tar.gz ./SOURCES/kubernetes.tar.gz
 
-ENV RPM_VERSION=1.10.6
+ENV RPM_VERSION=1.10.11
 ENV RPM_RELEASE=0

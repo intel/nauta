@@ -100,16 +100,16 @@ shared_images:
         dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
   shared/build/kubernetes:
-    version: "v1.10.6"
+    version: "v1.10.11"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.6.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.11.tar.gz
         dest: kubernetes.tar.gz
-        checksum: d91a77a65199f835ad68372fabd99a1f764ec59d9bde222c74224c1bf976ab20
+        checksum: 13c4554e945f4f7af42479c8a3ee656381a3e4272fd88d0b6db766aff21478f3
   shared/build/heapster:
     version: "v1.4.3"
     required:
@@ -155,7 +155,7 @@ shared_images:
         dest: kubernetes-dashboard-v1.8.3.tar.gz
         checksum: 9096f86d4107a6d23f2cff5edd1acae2faf25719a343c319860fd6a7408f761d
   shared/build/kubernetes-addons:
-    version: "v1.10.6"
+    version: "v1.10.11"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
