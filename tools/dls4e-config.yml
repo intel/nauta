@@ -38,7 +38,7 @@ local_images:
       BASE_IMAGE: "shared/centos"
     push: True
   dls4e/kubectl:
-    version: "1.10.6"
+    version: "1.10.11"
     required:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       BASE_IMAGE: "shared/centos"

@@ -109,7 +109,7 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
       - name: kubectl
-        image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/kubectl:1.10.6"
+        image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/kubectl:1.10.11"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: STS_NAME

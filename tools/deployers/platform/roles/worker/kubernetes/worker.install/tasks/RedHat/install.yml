@@ -4,4 +4,4 @@
   include_tasks: yum_dls4e_install.yml
   vars:
     packages:
-      - dls4e-kubernetes-worker-1.10.6
+      - dls4e-kubernetes-worker-1.10.11

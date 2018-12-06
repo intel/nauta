@@ -9,7 +9,7 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/flannel"
   core/kube-proxy:
-    version: "v1.10.6"
+    version: "v1.10.11"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/kubernetes"
