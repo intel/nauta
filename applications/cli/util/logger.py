@@ -23,7 +23,7 @@ import sys
 import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
-
+from typing import List
 
 STREAM_HANDLER = logging.StreamHandler(stream=sys.stdout)
 
@@ -32,10 +32,7 @@ def initialize_logger(package_name) -> logging.Logger:
     STREAM_HANDLER.setLevel(logging.CRITICAL)
     logger = logging.getLogger(package_name)
     logging.basicConfig(level=logging.DEBUG, handlers=[STREAM_HANDLER])
-    # CAN-1237 - by setting level of logs for k8s rest client to INFO I'm removing displaying content of
-    # every rest request sent by k8s client
-    k8s_rest_logger = logging.getLogger('kubernetes.client.rest')
-    k8s_rest_logger.setLevel(logging.INFO)
+
     return logger
 
 
@@ -73,6 +70,8 @@ def setup_log_file(log_file_directory: str, log_level=logging.DEBUG, log_backup_
     file_handler.setLevel(log_level)
     root_logger.addHandler(file_handler)
 
+    return file_handler
+
 
 def dlse_log_rotator(source, dest):
     if os.path.exists(source):
@@ -80,3 +79,17 @@ def dlse_log_rotator(source, dest):
             os.rename(source, dest)
         except PermissionError:
             pass  # When DLSe doesn't have permissions to log file, just skip this log rotation iteration.
+
+
+def configure_logger_for_external_packages(pack_name: str, initial_log_level: int,
+                                           handlers: List[logging.Handler] = None):
+    loggers_keys_list = [key for key in logging.Logger.manager.loggerDict if key.startswith(pack_name)]
+    for key in loggers_keys_list:
+        logger = logging.getLogger(key)
+        logger.propagate = False
+        if handlers:
+            for handler in handlers:
+                logger.addHandler(handler)
+        # default system logger's handler - should be present in all loggers
+        STREAM_HANDLER.setLevel(initial_log_level)
+        logger.addHandler(STREAM_HANDLER)
