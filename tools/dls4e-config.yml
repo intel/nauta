@@ -95,7 +95,7 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/etcd"
   dls4e/tiller:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/helm"

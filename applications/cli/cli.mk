@@ -52,17 +52,17 @@ ifeq (Windows,$(OS))
 
 
 	# download and prepare Helm
-	curl -o helm-v2.9.1-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-windows-amd64.zip
+	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 
-	7z x helm-v2.9.1-windows-amd64.zip -ohelm_tmp
+	7z x helm-v2.11.0-windows-amd64.zip -ohelm_tmp
 	mv helm_tmp/windows-amd64/* helm_tmp
 	rm -rf helm_tmp/windows-amd64
 
 	mv helm_tmp/helm.exe dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-windows-amd64.zip
+	rm -f helm-v2.11.0-windows-amd64.zip
 	rm -rf helm_tmp
 
 
@@ -89,14 +89,14 @@ ifeq (Linux,$(OS))
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
 	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
 
-	curl -o helm-v2.9.1-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
+	curl -o helm-v2.11.0-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-linux-amd64.tar.gz -C helm_tmp/
+	tar --strip-components=1 -xvf helm-v2.11.0-linux-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-linux-amd64.tar.gz
+	rm -f helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
@@ -115,14 +115,14 @@ ifeq (Darwin,$(OS))
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
 	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
 
-	curl -o helm-v2.9.1-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-darwin-amd64.tar.gz
+	curl -o helm-v2.11.0-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-darwin-amd64.tar.gz -C helm_tmp/
+	tar --strip-components=1 -xvf helm-v2.11.0-darwin-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-darwin-amd64.tar.gz
+	rm -f helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
 
 	# download and prepare Socat

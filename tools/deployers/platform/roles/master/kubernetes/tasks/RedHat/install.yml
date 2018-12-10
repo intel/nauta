@@ -6,7 +6,7 @@
     packages:
       - dls4e-kubernetes-server-1.10.11
       - dls4e-kubernetes-client-1.10.11
-      - dls4e-helm-2.9.1
+      - dls4e-helm-2.11.0
     handlers:
       - Reload Systemd
       - Restart Kubernetes Apiserver

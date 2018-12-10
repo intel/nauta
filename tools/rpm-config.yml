@@ -125,7 +125,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/helm:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       HELM_DATA_IMAGE: "shared/build/helm"
       BASE_IMAGE: "shared/centos/rpm-packer"
@@ -133,7 +133,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../rpm-containers/helm/prepare"
     push: False
   rpm/helm/rpm/client:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "rpm/helm"
     method: build

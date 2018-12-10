@@ -30,7 +30,7 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/addon-resizer"
   core/tiller:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "shared/build/tiller"
     method: build
