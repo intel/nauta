@@ -23,13 +23,16 @@ from collections import namedtuple
 from distutils.dir_util import copy_tree
 import itertools
 import os
+import psutil
 import re
 import shutil
+import signal
 from sys import exit
 import textwrap
 import yaml
 
 import click
+
 from typing import Tuple, List, Dict
 from pathlib import Path
 from tabulate import tabulate
@@ -41,6 +44,7 @@ from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiment as experiments_model
 from platform_resources.run import Run, RunStatus, RunKinds
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
+from util.helm import delete_helm_release
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.spinner import spinner
@@ -84,6 +88,33 @@ log = initialize_logger('commands.common')
 
 
 PrepareExperimentResult = namedtuple('PrepareExperimentResult', ['folder_name', 'script_name', 'pod_count'])
+
+submitted_runs = []
+submitted_experiment = ""
+submitted_namespace = ""
+
+
+def ctrl_c_handler_for_submit(sig, frame):
+    log.debug("ctrl-c pressed while submitting")
+    try:
+        with spinner(text=Texts.CTRL_C_PURGING_PROGRESS_MSG):
+            if submitted_runs:
+                for run in submitted_runs:
+                    try:
+                        # delete run
+                        delete_k8s_object("run", run.name)
+                        # purge helm release
+                        delete_helm_release(run.name, namespace=submitted_namespace, purge=True)
+                    except Exception:
+                        log.exception(Texts.ERROR_WHILE_REMOVING_RUNS)
+            delete_k8s_object("experiment", submitted_experiment)
+    except Exception:
+        log.exception(Texts.ERROR_WHILE_REMOVING_EXPERIMENT)
+
+    for proc in psutil.Process(os.getpid()).children(recursive=True):
+        proc.send_signal(signal.SIGTERM)
+
+    exit(1)
 
 
 def get_run_environment_path(run_name: str) -> str:
@@ -203,6 +234,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                       script_folder_location: str = None,
                       env_variables: List[str] = None,
                       requirements_file: str = None) -> (List[Run], Dict[str, str], str):
+
     script_parameters = script_parameters if script_parameters else ()
     parameter_set = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []
@@ -210,6 +242,8 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()
+        global submitted_namespace
+        submitted_namespace = namespace
     except Exception:
         message = Texts.GET_NAMESPACE_ERROR_MSG
         log.exception(message)
@@ -229,6 +263,13 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
         message = Texts.SUBMIT_PREPARATION_ERROR_MSG
         log.exception(message)
         raise SubmitExperimentError(message)
+
+    global submitted_experiment
+    submitted_experiment = experiment_name
+
+    # Ctrl-C handling
+    signal.signal(signal.SIGINT, ctrl_c_handler_for_submit)
+    signal.signal(signal.SIGTERM, ctrl_c_handler_for_submit)
 
     try:
         config = Config()
@@ -332,7 +373,6 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
             experiment.create(namespace=namespace, labels=labels)
 
             # submit runs
-            submitted_runs = []
             run_errors = {}
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
@@ -362,7 +402,6 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
             # Change experiment status to submitted
             experiment.state = experiments_model.ExperimentStatus.SUBMITTED
             experiment.update()
-
     except LocalPortOccupiedError as exe:
         click.echo(exe.message)
         raise SubmitExperimentError(exe.message)
