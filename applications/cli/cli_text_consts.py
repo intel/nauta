@@ -583,6 +583,9 @@ class ExperimentCommonTexts:
     INCORRECT_TEMPLATE_NAME = "Incorrect template name."
     INCORRECT_ENV_PARAMETER = "-e/--env option must be in <KEY>=<VALUE> format."
     INCORRECT_PACK_DEFINITION = "Definition of the {pack_name} pack is incorrect."
+    ERROR_WHILE_REMOVING_EXPERIMENT = "Error occured during removal of unsubmitted experiment."
+    ERROR_WHILE_REMOVING_RUNS = "Error occured during removal of unsubmitted runs."
+    CTRL_C_PURGING_PROGRESS_MSG = "System removes already submitted experiments as a result of pressing Ctrl-C."
 
 
 class DraftCmdTexts:

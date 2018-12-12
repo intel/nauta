@@ -23,14 +23,16 @@ from collections import namedtuple
 from distutils.dir_util import copy_tree
 import itertools
 import os
+import psutil
 import re
 import shutil
+import signal
 from sys import exit
 import textwrap
 import yaml
 
 import click
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
@@ -42,6 +44,7 @@ import platform_resources.experiment_model as experiments_model
 from platform_resources.run_model import Run, RunStatus, RunKinds
 import platform_resources.runs as runs_api
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
+from util.helm import delete_helm_release
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.spinner import spinner
@@ -82,6 +85,32 @@ CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
 
 log = initialize_logger('commands.common')
+
+
+submitted_runs = []
+submitted_experiment = ""
+submitted_namespace = ""
+
+
+def ctrl_c_handler_for_submit(sig, frame):
+    log.debug("ctrl-c pressed while submitting")
+    try:
+        with spinner(text=Texts.CTRL_C_PURGING_PROGRESS_MSG):
+            if submitted_runs:
+                for run in submitted_runs:
+                    try:
+                        # delete run
+                        delete_k8s_object("run", run.name)
+                        # purge helm release
+                        delete_helm_release(run.name, namespace=submitted_namespace, purge=True)
+                    except Exception:
+                        log.exception(Texts.ERROR_WHILE_REMOVING_RUNS)
+            delete_k8s_object("experiment", submitted_experiment)
+    except Exception:
+        log.exception(Texts.ERROR_WHILE_REMOVING_EXPERIMENT)
+    for proc in psutil.Process(os.getpid()).children(recursive=True):
+        proc.send_signal(signal.SIGTERM)
+    exit(1)
 
 
 class RunSubmission(Run):
@@ -209,7 +238,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                       parameter_set: Tuple[str, ...] = None,
                       script_folder_location: str = None,
                       env_variables: List[str] = None,
-                      requirements_file: str = None) -> (List[RunSubmission], str):
+                      requirements_file: str = None) -> (List[Run], Dict[str, str], str):
     script_parameters = script_parameters if script_parameters else ()
     parameter_set = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []
@@ -217,6 +246,8 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
     log.debug("Submit experiment - start")
     try:
         namespace = get_kubectl_current_context_namespace()
+        global submitted_namespace
+        submitted_namespace = namespace
     except Exception:
         message = Texts.GET_NAMESPACE_ERROR_MSG
         log.exception(message)
@@ -236,6 +267,12 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
         message = Texts.SUBMIT_PREPARATION_ERROR_MSG
         log.exception(message)
         raise SubmitExperimentError(message)
+
+    global submitted_experiment
+    submitted_experiment = experiment_name
+    # Ctrl-C handling
+    signal.signal(signal.SIGINT, ctrl_c_handler_for_submit)
+    signal.signal(signal.SIGTERM, ctrl_c_handler_for_submit)
 
     try:
         config = Config()
