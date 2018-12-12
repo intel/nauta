@@ -61,25 +61,19 @@ export BUILD_OPTIONS := $(BUILD_OPTIONS)
 export GLOBAL_WORKSPACE := $(GLOBAL_WORKSPACE)
 export GLOBAL_VIRTUALENV_DIR := $(GLOBAL_VIRTUALENV_DIR)
 
-release-package: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY
-release-package: export ENV_S3_URL := $(ENV_S3_URL)
-release-package: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
-release-package: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
 release-package: $(RELEASE_PACKAGE)
 release-package: export ENV_SRC := $(RELEASE_PACKAGE)
 release-package: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
 release-package: export BUILD_LOGS := $(BUILD_LOGS)
+release-package: export ENV_OUTPUT_ARTIFACT_DIRECTORY := $(ENV_OUTPUT_ARTIFACT_DIRECTORY)
 release-package:
 	@$(PUSH_MAKE)
 
-release-checksum: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY
-release-checksum: export ENV_S3_URL := $(ENV_S3_URL)
-release-checksum: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
-release-checksum: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
 release-checksum: $(RELEASE_PACKAGE)
 release-checksum: export ENV_SRC := $(RELEASE_PACKAGE_CHECKSUM)
 release-checksum: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE_CHECKSUM)
 release-checksum: export BUILD_LOGS := $(BUILD_LOGS)
+release-checksum: export ENV_OUTPUT_ARTIFACT_DIRECTORY := $(ENV_OUTPUT_ARTIFACT_DIRECTORY)
 release-checksum:
 ifeq (True,$(ENV_CALCULATESUM))
 	sha256sum "$(RELEASE_PACKAGE)" > "$(RELEASE_PACKAGE).sha256sum"
@@ -88,13 +82,11 @@ endif
 
 release: release-package release-checksum
 
-push: ENV_S3_URL ENV_ACCESS_KEY ENV_SECRET_KEY ENV_SRC ENV_DEST
-push: export ENV_S3_URL := $(ENV_S3_URL)
-push: export ENV_ACCESS_KEY := $(ENV_ACCESS_KEY)
-push: export ENV_SECRET_KEY := $(ENV_SECRET_KEY)
+push: ENV_SRC ENV_DEST
 push: export ENV_SRC := $(ENV_SRC)
 push: export ENV_DEST := $(ENV_DEST)
 push: export BUILD_LOGS := $(BUILD_LOGS)
+push: export ENV_OUTPUT_ARTIFACT_DIRECTORY := $(ENV_OUTPUT_ARTIFACT_DIRECTORY)
 push:
 	@$(PUSH_MAKE)
 

@@ -183,17 +183,6 @@ export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
 export CLI_ARTIFACT_PLATFORM:=darwin
 endif
 
-pack-ipplan:
-ifeq (Windows,$(OS))
-	@cd $(CURDIR)/../.. && 7z a -tzip ipplan-$(CLI_ARTIFACT_NAME) ./applications/cli/*
-endif
-ifeq (Linux,$(OS))
-	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C applications/cli .
-endif
-ifeq (Darwin,$(OS))
-	@cd $(CURDIR)/../.. && tar -zcf ipplan-$(CLI_ARTIFACT_NAME) -C applications/cli .
-endif
-
 pack: build
 ifeq (Windows,$(OS))
 	@7z a -tzip $(CLI_ARTIFACT_NAME) ./dist/*
@@ -206,42 +195,21 @@ ifeq (Darwin,$(OS))
 endif
 
 push: pack
-ifeq (True,$(ENV_IPPLAN))
-	@make pack-ipplan
-endif
-	@echo Upload artifacts to the releases directory
-ifneq (Windows,$(OS))
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)
-else
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
-endif
-
-ifeq (True,$(ENV_IPPLAN))
-	@echo Upload artifacts to the ipplan directory
-ifneq (Windows,$(OS))
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME) ENV_DEST=releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)
-else
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CURDIR)/../../ipplan-$(CLI_ARTIFACT_NAME)" "s3://repository/releases/ipplan/$(CLI_ARTIFACT_PLATFORM)/ipplan-$(CLI_ARTIFACT_NAME)"
-endif
-endif
+	mkdir -p $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl
+	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl
 
 ifeq (True,$(ENV_CALCULATESUM))
 	@echo Calculate file control sum and upload to the releases directory
 ifeq (Linux,$(OS))
 	sha256sum "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Darwin,$(OS))
 	shasum -a 256 "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Windows,$(OS))
 	powershell -Command "& { Get-FileHash -Algorithm SHA256 -Path $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) > $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum }"
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
 endif
+	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 
 
