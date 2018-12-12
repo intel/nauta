@@ -38,6 +38,13 @@ def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_locatio
     args = [script_location]
 
     if script_parameters:
-        args.extend(list(script_parameters))
+        for param in script_parameters:
+            if "&" in param or "|" in param:
+                param = f'"{param}"'
+            if "\\" in param:
+                # Each backslash has to be quadrupled because it has to be escaped and it goes through 2 template
+                # systems.
+                param = param.replace("\\", "\\\\\\\\")
+            args.append(param)
 
     return args
