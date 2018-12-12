@@ -101,13 +101,7 @@ local_images:
       BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/registry"
-  core/kube-batch:
-    version: "1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      BUILD_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/kube-batch"
+
 
 chart_values:
   features: {}
@@ -151,8 +145,3 @@ subcharts:
       chart_values:
         ingress_image: "{{ image_local_url['core/ingress'] }}"
         defaultbackend_image: "{{ image_local_url['core/defaultbackend'] }}"
-    kube-batch:
-      version: 1.0.0
-      path: "{{ playbook_dir }}/../../platform-charts/kube-batch"
-      chart_values:
-        image: "{{ image_local_url['core/kube-batch'] }}"

@@ -34,10 +34,10 @@ from util.exceptions import InvalidDependencyError, InvalidOsError
 from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 
 
-TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.9.1",' \
-                  ' GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}'
-TEST_SHORT_VERSION_OUTPUT = 'Client Version: v2.9.0\nServer Version: v2.9.1\n'
-TEST_VERSION = LooseVersion('v2.9.1')
+TEST_VERSION_OUTPUT = 'Client: &version.Version{SemVer:"v2.11.0",' \
+                      ' GitCommit:"", GitTreeState:"clean"}'
+TEST_SHORT_VERSION_OUTPUT = 'Client Version: v2.11.0\nServer Version: v2.11.0\n'
+TEST_VERSION = LooseVersion('v2.11.0')
 
 
 @pytest.mark.parametrize(
