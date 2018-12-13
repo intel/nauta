@@ -94,7 +94,7 @@ def test_missing_folder(prepare_mocks: SubmitMocks):
 def test_invalid_pack_param_arguments(prepare_mocks: SubmitMocks):
     prepare_mocks.validate_pack_params.side_effect = SystemExit(2)
 
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "--pack_param", "arg1", "val1", "--pack_param", "arg1",
+    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "--pack-param", "arg1", "val1", "--pack-param", "arg1",
                                          "val2", "-sfl", SCRIPT_FOLDER])
     assert result.exit_code == 2
 

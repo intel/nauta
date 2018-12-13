@@ -57,7 +57,7 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-m', '--model-location', help=Texts.HELP_M)
 @click.option("-l", "--local-model-location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
-@click.option("-p", "--pack_param", type=(str, str), multiple=True, help=Texts.HELP_P,
+@click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
 @common_options()
