@@ -2,12 +2,12 @@
 
 - name: "{{ message_label }} Pull docker image"
   docker_image:
-    name: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.9"
+    name: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.10"
 
 - name: "{{ message_label }} Create etcd server"
   docker_container:
     name: etcd
-    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.9"
+    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/etcd:3.3.10"
     restart_policy: no
     state: present
     published_ports:

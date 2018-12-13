@@ -1,28 +1,17 @@
-ARG KUBERNETES_DATA_IMAGE
-ARG DUMBINIT_DATA_IMAGE
-ARG JQ_DATA_IMAGE
 ARG BASE_IMAGE=dls4e/python36
-FROM ${JQ_DATA_IMAGE} as jqdata
-FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
-FROM ${KUBERNETES_DATA_IMAGE} as kubectldata
 FROM ${BASE_IMAGE}
 
-
-
-
 RUN yum clean all
+
+ADD kubernetes.repo .
+RUN cat kubernetes.repo >> /etc/yum.repos.d/kubernetes.repo
+
 RUN yum update -y
 RUN yum install -y samba
 RUN pip install pysmb
-
-COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
-RUN chmod +x /bin/dumb-init
-
-COPY --from=jqdata /build-output/jq /bin/jq
-RUN chmod +x /bin/jq
-
-COPY --from=kubectldata /build-output/kubernetes/kubectl /bin/kubectl
-RUN chmod +x /bin/kubectl
+RUN yum install -y kubectl
+RUN yum install -y jq
+RUN pip install dumb-init
 
 COPY samba-init.sh /bin
 COPY samba-loop.sh /bin
@@ -38,5 +27,5 @@ RUN chmod +x /bin/samba-*
 
 EXPOSE 137/udp 138/udp 139 445
 
-ENTRYPOINT ["/bin/dumb-init", "--"]
+ENTRYPOINT ["/opt/rh/rh-python36/root/usr/bin/dumb-init", "--"]
 CMD ["/bin/samba-init.sh"]

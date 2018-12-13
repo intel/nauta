@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=centos:7.4.1708
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 RUN yum clean all

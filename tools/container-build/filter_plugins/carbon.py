@@ -40,7 +40,7 @@ def organize_images(images):
             if len(image_reqs[image]) == 0:
                 layer.append(image)
         if len(layer) == 0:
-            raise Exception("Loop error")
+            raise Exception("Loop error: {}".format(image_names))
         layers.append(layer)
         for image in layer:
             image_names.remove(image)

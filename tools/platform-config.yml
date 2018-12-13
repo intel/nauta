@@ -3,105 +3,60 @@
 local_images:
   core/flannel:
     version: "v0.9.1"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/flannel"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/flannel"
+    image: "quay.io/coreos/flannel:v0.9.1-amd64"
+    method: pull
   core/kube-proxy:
     version: "v1.10.11"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/kube-proxy"
+    image: "gcr.io/google-containers/kube-proxy-amd64:v1.10.11"
+    method: pull
   core/pause:
     version: "3.1"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-addons"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/pause"
+    image: "gcr.io/google-containers/pause-amd64:3.1"
+    method: pull
   core/addon-resizer:
     version: "1.7"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-addons"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/addon-resizer"
+    image: "k8s.gcr.io/addon-resizer:1.7"
+    method: pull
   core/tiller:
     version: "v2.11.0"
-    required:
-      BASE_IMAGE: "shared/build/tiller"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/tiller"
+    image: "gcr.io/kubernetes-helm/tiller:v2.11.0"
+    method: pull
   core/heapster:
     version: "v1.4.3"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/heapster"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/heapster"
+    image: "k8s.gcr.io/heapster-amd64:v1.4.3"
+    method: pull
   core/defaultbackend:
     version: "1.4"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/defaultbackend"
+    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
+    method: pull
   core/ingress:
     version: "0.14.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-      NGINX_DATA_IMAGE: "shared/build/nginx"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/ingress-nginx"
+    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
+    method: pull
   core/kube-dns:
     version: "1.14.8"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-addons"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/kube-dns"
+    image: "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.8"
+    method: pull
   core/dnsmasq-nanny:
     version: "1.14.8"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-addons"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/dnsmasq-nanny"
+    image: "gcr.io/google-containers/k8s-dns-dnsmasq-nanny-amd64:1.14.8"
+    method: pull
   core/dns-sidecar:
     version: "1.14.8"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-addons"
-    directory: "{{ playbook_dir }}/../../platform-containers/dns-sidecar"
-    method: build
+    image: "gcr.io/google-containers/k8s-dns-sidecar-amd64:1.14.8"
+    method: pull
   core/etcd:
-    version: "3.3.9"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/etcd"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/etcd"
+    version: "3.3.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.3.10"
+    method: pull
   core/dashboard:
     version: "v1.8.3"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-dashboard"
-    directory: "{{ playbook_dir }}/../../platform-containers/kubernetes-dashboard"
-    method: build
+    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
+    method: pull
   core/registry:
     version: "v2"
-    #image: "registry:2"
-    required:
-      BUILD_IMAGE: "shared/centos/build-go"
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/registry"
-
+    image: "registry:2"
+    method: pull
 
 chart_values:
   features: {}

@@ -32,10 +32,8 @@ export_images:
 local_images:
   dls4e/centos:
     version: "7.5.1804"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/centos"
-    required:
-      BASE_IMAGE: "shared/centos"
+    method: pull
+    image: "centos:7.5.1804"
     push: True
   dls4e/kubectl:
     version: "1.10.11"
@@ -52,55 +50,34 @@ local_images:
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
     version: "v6.4.0"
-    required:
-      BASE_IMAGE: "shared/centos/java8"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-      BUILD_IMAGE: "shared/build/elasticsearch"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/elasticsearch"
+    image: "quay.io/pires/docker-elasticsearch-kubernetes:6.4.0"
+    method: pull
   dls4e/fluentd:
-    version: "v0.12"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/fluentd"
+    version: "v1.3.0"
+    image: "fluent/fluentd-kubernetes-daemonset:v1.3-debian-elasticsearch"
+    method: pull
   dls4e/registry:
     version: "2.6.2"
-    required:
-      BUILD_IMAGE: "shared/centos/build-go"
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/registry"
+    image: "registry:2"
+    method: pull
   dls4e/samba:
     version: "1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
-      JQ_DATA_IMAGE: "shared/build/jq"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/samba"
   dls4e/elasticsearch/curator:
-    version: "1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/elasticsearch-curator"
+    version: "v5.5.4"
+    image: "quay.io/pires/docker-elasticsearch-curator:5.5.4"
+    method: pull
   dls4e/etcd:
-    version: "3.3.9"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/etcd"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/etcd"
+    version: "3.3.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.3.10"
+    method: pull
   dls4e/tiller:
     version: "v2.11.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/helm"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/tiller"
+    image: "gcr.io/kubernetes-helm/tiller:v2.11.0"
+    method: pull
   dls4e/redsocks:
     version: "1.0.0"
     required:
@@ -211,27 +188,17 @@ local_images:
     directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
   dls4e/ingress:
     version: "0.14.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-      NGINX_DATA_IMAGE: "shared/build/nginx"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/ingress-nginx"
+    image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"
+    BASE_IMAGE: "shared/centos"
+    method: pull
   dls4e/defaultbackend:
     version: "1.4"
-    required:
-      BASE_IMAGE: "shared/centos"
-      INGRESS_DATA_IMAGE: "shared/build/ingress"
-    method: build
-    directory: "{{ playbook_dir }}/../../platform-containers/defaultbackend"
+    image: "gcr.io/google-containers/defaultbackend-amd64:1.4"
+    method: pull
   dls4e/dashboard:
     version: "v1.8.3"
-    required:
-      BASE_IMAGE: "shared/centos"
-      DATA_IMAGE: "shared/build/kubernetes-dashboard"
-    directory: "{{ playbook_dir }}/../../platform-containers/kubernetes-dashboard"
-    method: build
+    image: "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.3"
+    method: pull
   dls4e/tensorboard-service:
     version: "v1.0.0"
     required:
