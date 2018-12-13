@@ -46,6 +46,7 @@ ifeq (Windows,$(OS))
 
 	dist\config\draft init --home dist/config/.draft
 	rm -rf dist/config/.draft/packs/*
+	rm -rf dist/config/.draft/plugins/
 	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
 	cp -r dist/config/.draft/packs/https-github.com-Azure-draft/packs dist/config/packs
@@ -85,6 +86,7 @@ ifeq (Linux,$(OS))
 	rm -rf dist/config/linux-amd64
 	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
 	rm -rf dist/config/.draft/packs/*
+	rm -rf dist/config/.draft/plugins/
 	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
 	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
@@ -111,6 +113,7 @@ ifeq (Darwin,$(OS))
 	rm -rf dist/config/darwin-amd64
 	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
 	rm -rf dist/config/.draft/packs/*
+	rm -rf dist/config/.draft/plugins/
 	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
 	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
