@@ -142,9 +142,7 @@ endif
 	mkdir -p dist/lib/
 	mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	cp -f license.txt dist/
-	mkdir -p dist/docs/
-	cp -f ../dls-gui/src/assets/*.pdf dist/docs/
-	cp -f ../../docs/end-user-docs/Beta_Release_Docs/DL_Studio_User_Guide_Files/release/*.pdf dist/docs/
+	cp -Rf docs dist/docs
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
 

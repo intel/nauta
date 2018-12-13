@@ -1,0 +1,406 @@
+/*<meta />*/
+
+@media only screen and (max-width: 767px)
+{
+	nav.title-bar
+	{
+		background: transparent url('Images/DLS_Help_Title_8_1.png') no-repeat center top;
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(top, #ffffff 0%,transparent 100%);
+		-pie-background: url('Skins/Fluid/Stylesheets/Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(#ffffff, transparent);
+	}
+
+	.title-bar-layout a.logo
+	{
+		width: 132px;
+		height: 101px;
+		background: transparent url('Images/Intel_Logo_Small.png') no-repeat center center;
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(top, #ffffff 0%,transparent 100%);
+		-pie-background: url('Skins/Fluid/Stylesheets/Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(#ffffff, transparent);
+	}
+
+	.search-bar .search-submit
+	{
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+
+	.search-bar .search-filter
+	{
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-color: #ffffff;
+	}
+
+	.search-input
+	{
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+
+	.off-canvas.position-right
+	{
+		background-position: top center;
+	}
+
+	.off-canvas.position-right ul ul
+	{
+		background-position: top center;
+	}
+
+	.off-canvas.position-left
+	{
+		background-position: top center;
+	}
+
+	.off-canvas.position-left ul ul
+	{
+		background-position: top center;
+	}
+
+	.title-bar-section.middle > div
+	{
+		
+	}
+
+	.off-canvas-wrapper-inner nav.title-bar .outer-row
+	{
+		
+	}
+
+	.title-bar-layout .logo-wrapper
+	{
+		min-height: 101px;
+	}
+
+	.menu-icon-container
+	{
+		min-height: 101px;
+	}
+
+	.off-canvas-wrapper-inner .outer-row
+	{
+		
+	}
+
+	.main-section > .outer-row
+	{
+		
+	}
+
+	.off-canvas
+	{
+		background-color: #003377;
+	}
+
+	.off-canvas ul ul
+	{
+		background-color: #003377;
+	}
+
+	ul.off-canvas-list li a
+	{
+		
+	}
+
+	ul.off-canvas-list ul > li > a
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul > li > a
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul ul > li > a
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul ul ul > li > a
+	{
+		
+	}
+
+	ul.off-canvas-list li.js-drilldown-back > a
+	{
+		
+	}
+
+	ul.off-canvas-list li a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list li.js-drilldown-back > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list li a.selected
+	{
+		
+	}
+
+	ul.off-canvas-list ul > li > a.selected
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul > li > a.selected
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul ul > li > a.selected
+	{
+		
+	}
+
+	ul.off-canvas-list ul ul ul ul > li > a.selected
+	{
+		
+	}
+
+	.title-bar .menu-icon span
+	{
+		background: transparent url('Images/Menu.png') no-repeat center center;
+		-pie-background: transparent url('Skins/Fluid/Stylesheets/Images/Menu.png') no-repeat center center;
+	}
+
+	nav.title-bar .menu-icon
+	{
+		left: -13px;
+		right: auto;
+	}
+
+	.search-auto-complete ul
+	{
+		background-color: #ffffff;
+	}
+
+	.search-auto-complete li.auto-result-item a
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-item
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-content
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-history
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-item.auto-result-selected a
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-item.auto-result-selected
+	{
+		background-color: #ececec;
+	}
+
+	.search-auto-complete li.auto-result-content.auto-result-selected
+	{
+		background-color: #ececec;
+	}
+
+	.search-auto-complete li.auto-result-history.auto-result-selected
+	{
+		background-color: #ececec;
+	}
+
+	.search-auto-complete li.auto-result-item .auto-result-description
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-content .auto-result-description
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-history .auto-result-description
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-item .auto-result-icon
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-content .auto-result-icon
+	{
+		background: transparent url('Images/icon-topic.png') no-repeat center center;
+		-pie-background: transparent url('Skins/Fluid/Stylesheets/Images/icon-topic.png') no-repeat center center;
+		background-size: contain;
+	}
+
+	.search-auto-complete li.auto-result-history .auto-result-icon
+	{
+		background: transparent url('Images/icon-search.png') no-repeat center center;
+		-pie-background: transparent url('Skins/Fluid/Stylesheets/Images/icon-search.png') no-repeat center center;
+		background-size: contain;
+	}
+
+	.search-auto-complete li.auto-result-item .auto-result-phrase
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-content .auto-result-phrase
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-history .auto-result-phrase
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-item .auto-result-phrase .search-result-highlight
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-content .auto-result-phrase .search-result-highlight
+	{
+		
+	}
+
+	.search-auto-complete li.auto-result-history .auto-result-phrase .search-result-highlight
+	{
+		
+	}
+
+	.search-auto-complete li .auto-result-remove
+	{
+		width: 17px;
+		height: 27px;
+		background: transparent url('Images/icon-remove.png') no-repeat center center;
+		-pie-background: transparent url('Skins/Fluid/Stylesheets/Images/icon-remove.png') no-repeat center center;
+		background-size: contain;
+	}
+
+	.search-auto-complete li.auto-result-item .auto-result-separator
+	{
+		
+	}
+
+	.nav-search-wrapper
+	{
+		
+	}
+
+	.nav-search
+	{
+		
+	}
+
+	.search-bar .search-field
+	{
+		background-color: #ffffff;
+		padding-right: 50px;
+	}
+
+	.search-filter-content
+	{
+		top: 2em;
+		background-color: #ffffff;
+	}
+
+	.search-bar .search-filter.open
+	{
+		background-color: #ffffff;
+	}
+
+	.search-bar .search-filter:hover
+	{
+		background-repeat: no-repeat;
+		background-color: #ffffff;
+	}
+
+	.search-bar .search-filter.selected
+	{
+		background-repeat: no-repeat;
+		background: transparent url('Images/icon-filter-selected.png') no-repeat center center;
+	}
+
+	.search-filter-content ul li:hover
+	{
+		background-color: #ffffff;
+	}
+
+	.search-bar .search-field::-webkit-input-placeholder
+	{
+		
+	}
+
+	.search-bar .search-field::-moz-placeholder
+	{
+		
+	}
+
+	.search-bar .search-field:-moz-placeholder
+	{
+		
+	}
+
+	.search-bar .search-field:-ms-input-placeholder
+	{
+		
+	}
+
+	.search-bar.search-bar-container .search-submit
+	{
+		background-repeat: no-repeat;
+		background: transparent url('Images/icon-search.png') no-repeat center center;
+	}
+
+	.search-bar.search-bar-container .search-submit:hover
+	{
+		background-repeat: no-repeat;
+		background-color: transparent;
+	}
+}
+

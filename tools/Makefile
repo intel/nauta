@@ -46,7 +46,7 @@ RELEASE_PACKAGE_CHECKSUM:=$(WORKSPACE)/dls4e-$(VERSION).tar.gz.sha256sum
 REMOTE_RELEASE_PACKAGE:=releases/dls4e/dls4e-$(VERSION).tar.gz
 REMOTE_RELEASE_PACKAGE_CHECKSUM:=releases/dls4e/dls4e-$(VERSION).tar.gz.sha256sum
 
-DOCS:=$(CURDIR)/../docs/end-user-docs/Beta_Release_Docs/Installation_Guide_Files/release
+DOCS:=$(CURDIR)/docs
 
 PLATFORM_DEPLOYER:=$(CURDIR)/deployers/platform
 DLS4E_DEPLOYER:=$(CURDIR)/deployers/dls4e

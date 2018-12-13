@@ -1,0 +1,165 @@
+@namespace MadCap url(http://www.madcapsoftware.com/Schemas/MadCap.xsd);
+/*<meta />*/
+
+body
+{
+	font-family: 'Intel Clear';
+}
+
+h1
+{
+	font-weight: bold;
+	font-family: 'Intel Clear';
+	font-size: 18pt;
+	color: #004280;
+	bottom: 6pt;
+	margin-top: 0.67pt;
+	margin-bottom: 12pt;
+}
+
+h2
+{
+	font-weight: bold;
+	color: #004280;
+	bottom: 12pt;
+	top: 24pt;
+	margin-top: 18pt;
+	font-family: 'Intel Clear';
+	font-size: 15 pt;
+}
+
+h3
+{
+	font-weight: bold;
+	font: inherit;
+	font-family: 'Intel Clear';
+	color: #004280;
+	font-size: 13pt;
+	margin: 0px;
+}
+
+h4
+{
+	font-weight: bold;
+	font-size: 12.0pt;
+	font-family: 'Intel Clear';
+	margin: 0px;
+}
+
+h5
+{
+	font-weight: bold;
+	font-size: 10.0pt;
+}
+
+h6
+{
+	font-weight: bold;
+	font-size: 8.0pt;
+}
+
+p
+{
+	margin-top: 0pt;
+	margin-bottom: 0pt;
+	color: #000000;
+	padding-bottom: 11pt;
+	font-family: 'Intel Clear';
+	font-size: 11pt;
+}
+
+ol,
+ul
+{
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+img
+{
+	border: none;
+}
+
+a.Popup
+{
+	
+}
+
+MadCap|expandingHead
+{
+	font-style: italic;
+	font-weight: normal;
+	cursor: hand;
+	text-decoration: none;
+	color: #006600;
+}
+
+MadCap|expandingBody
+{
+	color: #777777;
+	font-style: italic;
+}
+
+MadCap|dropDownHotspot
+{
+	cursor: hand;
+	font-style: italic;
+	text-decoration: none;
+	color: #006600;
+}
+
+li
+{
+	padding-top: 2pt;
+	padding-bottom: 2pt;
+	font-size: 11pt;
+}
+
+h1#Product_Name
+{
+	font-weight: bold;
+	font-family: 'Intel Clear';
+	font-size: 18pt;
+	color: #004280;
+	margin-top: 0.67pt;
+	margin-bottom: 0;
+	page-break-before: avoid;
+	page-break-after: avoid;
+}
+
+h1#Document_Type
+{
+	font-weight: bold;
+	font-family: 'Intel Clear';
+	font-size: 18pt;
+	color: #004280;
+	margin-top: 0.67pt;
+	margin-bottom: 12pt;
+	bottom: 0px;
+}
+
+th
+{
+	font-size: 10pt;
+}
+
+td
+{
+	font-size: 10pt;
+}
+
+nav.title-bar
+{
+	border-bottom: solid 4px #004280;
+}
+
+ol
+{
+	font-family: 'Intel Clear';
+	font-size: 11pt;
+}
+
+ul
+{
+	font-family: 'Intel Clear';
+}

@@ -34,6 +34,7 @@
                     <exclude>**/applications/experiment-service/vendor/</exclude>
                     <exclude>**/tmp-go/</exclude>
                     <exclude>**/applications/cli/build/</exclude>
+                    <exclude>**/docs/</exclude>
                 </excludes>
                 <mapping>
                     <js>JAVADOC_STYLE</js>
