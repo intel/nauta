@@ -1,16 +1,16 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM centos:7.5.1804
 
-RUN yum -y install rh-nodejs8 bzip2 gcc
+RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+RUN yum -y install nodejs bzip2 gcc
 
 ENV NODE_TLS_REJECT_UNAUTHORIZED 0
 
 ADD package.json /app/
 WORKDIR /app
 
-RUN source /opt/rh/rh-nodejs8/enable && npm install
+RUN npm install
 ADD . /app
-RUN source /opt/rh/rh-nodejs8/enable && npm run build
+RUN npm run build
 
 # remove blacklisted components
 RUN rm -rf ./node_modules/commander
@@ -18,6 +18,4 @@ RUN rm -rf ./node_modules/commander
 EXPOSE 9000
 
 WORKDIR /app
-
-ENTRYPOINT [ "bash", "-c", "source /opt/rh/rh-nodejs8/enable && node ./api/server.js" ]
-
+ENTRYPOINT ["node", "./api/server.js"]

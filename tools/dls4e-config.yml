@@ -44,8 +44,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
   dls4e/gui:
     version: "1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/dls-gui"
   dls4e/elasticsearch:
