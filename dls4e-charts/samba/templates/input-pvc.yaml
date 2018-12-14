@@ -20,7 +20,7 @@ spec:
   storageClassName: ""
   selector:
     matchLabels:
-      kind: internal
+#      kind: internal
       type: input
       app: samba
 {{- else if .Values.global.input_nfs }}
