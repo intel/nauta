@@ -160,12 +160,15 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/2.7"
   dls4e/nginx:
-    version: "1.14.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      NGINX_BUILD_IMAGE: "shared/build/nginx"
+    version: "1.13.9"
+    method: pull
+    image: "nginx:1.13.9"
+  dls4e/docs:
+    version: "v0.0.1"
+    required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/utils/nginx"
+    directory: "{{ playbook_dir }}/../../docs/end-user-docs/user-guide/HTML Files Source and Output/HTML-Output"
+    dockerfile: "{{ playbook_dir }}/../../dls4e-containers/docs-nginx/Dockerfile"
   dls4e/tf/operator:
     version: "v2"
     required:
@@ -223,13 +226,6 @@ local_images:
       BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/tf-serving-sidecar"
-  dls4e/docs:
-    version: "v0.0.1"
-    required:
-      BASE_IMAGE: "shared/utils/nginx"
-      DOCS_IMAGE: "shared/centos/docs"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/docs-nginx"
   dls4e/kube-batch:
     version: "1.0.0"
     required:

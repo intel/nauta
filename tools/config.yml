@@ -25,14 +25,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
     push: False
-  shared/centos/docs:
-    version: "7.5.1804"
-    required:
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../docs/user-guide-html"
-    dockerfile: "{{ playbook_dir }}/../../shared-containers/docs/Dockerfile"
-    push: False
   shared/centos/build:
     version: "7.5.1804"
     required:
@@ -340,12 +332,4 @@ shared_images:
       BASE_IMAGE: "shared/centos/python36"
     method: build
     directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
-    push: False
-  shared/utils/nginx:
-    version: "v1.13.9"
-    required:
-      BASE_IMAGE: "shared/centos"
-      NGINX_BUILD_IMAGE: "shared/build/nginx"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/utils/nginx"
     push: False
