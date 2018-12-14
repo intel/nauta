@@ -167,7 +167,7 @@ local_images:
     version: "v0.0.1"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../docs/end-user-docs/user-guide/HTML Files Source and Output/HTML-Output"
+    directory: "{{ playbook_dir }}/../../docs/user-guide-html"
     dockerfile: "{{ playbook_dir }}/../../dls4e-containers/docs-nginx/Dockerfile"
   dls4e/tf/operator:
     version: "v2"
