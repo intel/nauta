@@ -214,6 +214,7 @@ def modify_draft_toml(experiment_folder: str, registry: str):
     log.debug(draft_toml_yaml["environments"])
     draft_toml_yaml["environments"]["development"]["namespace"] = namespace
     draft_toml_yaml["environments"]["development"]["registry"] = registry
+    draft_toml_yaml["environments"]["development"]["wait"] = False
 
 
     with open(draft_toml_temp_filename, "w") as draft_toml_file:
