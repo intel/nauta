@@ -71,6 +71,9 @@ resources:
     cpu: 76 # Maximal number of logical processors requested
     memory: 240Gi
 
+cpu: null
+memory: null
+
 # Number of physical processors that will be used by Horovod
 cpus: 20
 

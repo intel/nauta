@@ -26,6 +26,9 @@ worker_resources:
     cpu: 76
     memory: 240Gi
 
+worker_cpu: null
+worker_memory: null
+
 ps_resources:
   requests:
     cpu: 76
@@ -34,11 +37,16 @@ ps_resources:
     cpu: 76
     memory: 240Gi
 
+ps_cpu: null
+ps_memory: null
+
 sidecar_resources:
   requests:
     cpu: 0.01
     memory: 1Gi
 
+sidecar_cpu: null
+sidecar_memory: null
 
 experimentName: {{ DLS4e.ExperimentName }} 
 registryPort: {{ DLS4e.RegistryPort }}

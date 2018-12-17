@@ -19,5 +19,8 @@ resources:
     cpu: 38
     memory: 120Gi
 
+cpu: null
+memory: null
+
 experimentName:  {{ DLS4e.ExperimentName }} 
 podCount: 1

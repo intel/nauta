@@ -99,4 +99,9 @@ spec:
           periodSeconds: 2
 {{- end }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+          requests:
+            cpu: {{ default .Values.resources.requests.cpu .Values.cpu}}
+            memory: {{ default .Values.resources.requests.memory .Values.memory }}
+          limits:
+            cpu: {{ default .Values.resources.limits.cpu .Values.cpu }}
+            memory: {{ default .Values.resources.limits.memory .Values.memory }}
