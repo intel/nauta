@@ -178,8 +178,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/tf-operator"
   dls4e/docker:
     version: "18.03"
-    required:
-      BASE_IMAGE: "dls4e/kubectl"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/docker"
   dls4e/ps-sidecar:
