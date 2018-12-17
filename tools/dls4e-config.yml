@@ -183,8 +183,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../dls4e-containers/docker"
   dls4e/ps-sidecar:
     version: "1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
   dls4e/ingress:
