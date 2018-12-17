@@ -1,5 +1,4 @@
-ARG BASE_IMAGE=python:3.6.5
-FROM ${BASE_IMAGE}
+FROM python:3.6.7-stretch
 
 WORKDIR /app
 
