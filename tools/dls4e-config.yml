@@ -36,12 +36,9 @@ local_images:
     image: "centos:7.5.1804"
     push: True
   dls4e/kubectl:
-    version: "1.10.11"
-    required:
-      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
+    version: "v1.10.11"
+    image: "lachlanevenson/k8s-kubectl:v1.10.11"
+    method: pull
   dls4e/gui:
     version: "1.0.0"
     required: {}
