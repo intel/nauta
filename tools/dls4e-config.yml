@@ -216,8 +216,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../applications/batch-inference"
   dls4e/tf-serving-sidecar:
     version: "v1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/tf-serving-sidecar"
   dls4e/kube-batch:
