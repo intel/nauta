@@ -49,8 +49,7 @@ ifeq (Windows,$(OS))
 	rm -rf dist/config/.draft/plugins/
 	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
-	cp -r dist/config/.draft/packs/https-github.com-Azure-draft/packs dist/config/packs
-
+	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
 
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
@@ -62,6 +61,7 @@ ifeq (Windows,$(OS))
 	rm -rf helm_tmp/windows-amd64
 
 	mv helm_tmp/helm.exe dist/config
+
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.11.0-windows-amd64.zip
 	rm -rf helm_tmp
