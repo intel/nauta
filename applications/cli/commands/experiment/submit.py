@@ -148,7 +148,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         validate_script_folder_location(script_folder_location)
 
     click.echo(Texts.SUBMIT_START_USER_MSG)
-
+    runs_list = None
     # noinspection PyBroadException
     try:
         runs_list, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
@@ -160,6 +160,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     except K8sProxyCloseError as exe:
         handle_error(user_msg=exe.message)
         click.echo(exe.message)
+        if not runs_list:
+            exit(1)
     except SubmitExperimentError as exe:
         handle_error(user_msg=Texts.SUBMIT_ERROR_MSG.format(exception_message=exe.message))
         exit(1)
