@@ -1,7 +1,7 @@
 all: build
 
 build:
-	docker build --build-arg http_proxy=http://proxy-chain.intel.com:911 --build-arg https_proxy=http://proxy-chain.intel.com:911 -t dls-samba .
+	docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t dls-samba .
 	
 push:
 	docker tag dls-samba my-little-registry.pl/dls-samba

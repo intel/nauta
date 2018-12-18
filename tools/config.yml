@@ -1,9 +1,9 @@
 ---
 
 proxy:
-  http_proxy: http://proxy-mu.intel.com:911
-  https_proxy: http://proxy-mu.intel.com:912
-  no_proxy: os.mirror,.intel.com,127.0.0.1,localhost
+  http_proxy: "{{ lookup('env','http_proxy') }}"
+  https_proxy: "{{ lookup('env','https_proxy') }}"
+  no_proxy: "{{ lookup('env','no_proxy') }}"
 
 images: "{{ shared_images | combine(local_images | default({})) }}"
 
