@@ -1,11 +1,10 @@
-ARG KUBERNETES_DATA_IMAGE
-ARG BASE_IMAGE
-FROM ${KUBERNETES_DATA_IMAGE} as data
+FROM centos:7.5.1804
 
-FROM ${BASE_IMAGE}
+ADD kubernetes.repo /etc/yum.repos.d/kubernetes.repo
+
+RUN yum clean all
+RUN yum install -y kubectl
 
 RUN mkdir -p /out
 
-COPY --from=data /build-output/kubernetes/kubectl /out/kubectl
-
-RUN chmod +x /out/kubectl
+RUN cp /usr/bin/kubectl /out/kubectl

@@ -3,9 +3,7 @@
 local_images:
   bin/kubectl:
     version: "1.10.11"
-    required:
-      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
-      BASE_IMAGE: "shared/centos"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../bin-containers/kubectl"
     artifacts:
