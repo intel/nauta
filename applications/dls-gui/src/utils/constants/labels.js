@@ -38,7 +38,7 @@ export default {
   FILTER_BY_VAL: 'Filter by values',
   LAUNCH_TB: 'Launch Tensorboard',
   LICENSE: 'License',
-  LICENSE_PDF: 'dls-evaluation-license.pdf',
+  LICENSE_PDF: 'license.pdf',
   LAST: 'Last',
   LOAD_MORE: 'Load more',
   LOADING: 'Loading',

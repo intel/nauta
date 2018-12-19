@@ -74,7 +74,7 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex';
-import LicenseDoc from '../assets/dls-evaluation-license.pdf';
+import LicenseDoc from '../assets/license.pdf';
 import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {
