@@ -44,5 +44,5 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E dashboard image is required" .Values.image }}
-        args: ["--logtostderr", "--v", "3", "--enable-namespace-as-queue=false", "--default-queue=main", "--scheduler-conf=kube-system/{{ .Release.Name }}-{{ .Chart.Name }}-conf"]
+        args: ["--logtostderr", "--v", "3", "--enable-namespace-as-queue=false", "--default-queue=main", "--scheduler-conf=dls4e/{{ .Release.Name }}-{{ .Chart.Name }}-conf"]
         imagePullPolicy: IfNotPresent
