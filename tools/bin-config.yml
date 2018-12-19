@@ -21,17 +21,6 @@ local_images:
       - src: /loader
         dest: Linux/amd64
     push: False
-  bin/helm:
-    version: "2.11.0"
-    required:
-      HELM_DATA_IMAGE: "shared/build/helm"
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../bin-containers/helm"
-    artifacts:
-      - src: /out/*
-        dest: Linux/amd64
-    push: False
   bin/centos/ansible:
     version: "3.6"
     required:
@@ -43,4 +32,13 @@ local_images:
         dest: Linux/amd64/CENTOS/7
       - src: /out/*
         dest: Linux/amd64/REDHAT/7.5
+    push: False
+  bin/helm:
+    version: "2.11.0"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/helm"
+    artifacts:
+      - src: /out/*
+        dest: Linux/amd64
     push: False

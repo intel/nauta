@@ -96,14 +96,6 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/heapster/heapster-v1.4.3.tar.gz
         dest: heapster-v1.4.3.tar.gz
         checksum: 5a0e6fa74c8602d466338eb881af3bf4260940291e3eeb130e0ef9136c821f6c
-  shared/build/tiller:
-    version: "v2.11.0"
-    required:
-      BASE_IMAGE: "shared/centos"
-      HELM_DATA_IMAGE: "shared/build/helm"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tiller"
-    push: False
   shared/build/ingress:
     version: "0.14.0"
     required:
@@ -282,17 +274,6 @@ shared_images:
     push: False
     args:
       PYTHON_VERSION: 3.6
-  shared/build/helm:
-    version: "v2.11.0"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/helm"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/v2.11.0.tar.gz
-        dest: helm.tar.gz
-        checksum: eee403cc1e05ab2eb1c6802eb7ecc4a5c544cb5971b7ee828c0b8d60fe061eb0
   shared/build/cni:
     version: "v0.7.1"
     required:
