@@ -36,6 +36,12 @@ spec:
                   name: "tensorboard"
                 - containerPort: {{ .Values.TensorIPythonPort }}
                   name: "ipython"
+              env:
+                - name: "RUN_NAME"
+                  value: {{ .Release.Name }}
+{{ if .Values.env }}
+{{ toYaml .Values.env | indent 16 }}
+{{ end }}
               volumeMounts:
                 - name: input-home
                   mountPath: /mnt/input/home

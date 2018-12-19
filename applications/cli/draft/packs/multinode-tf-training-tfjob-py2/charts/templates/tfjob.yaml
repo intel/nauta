@@ -32,14 +32,17 @@ spec:
               image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["/bin/bash", "-c", "python {{ $command_args }}"]
+              env:
+              - name: RUN_NAME
+                value: {{ .Release.Name }}
+{{ if .Values.env }}
+{{ toYaml .Values.env | indent 16 }}
+{{ end }}
               ports:
                 - containerPort: {{ .Values.TensorBoardPort }}
                   name: "tensorboard"
                 - containerPort: {{ .Values.TensorIPythonPort }}
                   name: "ipython"
-              env:
-              - name: RUN_NAME
-                value: {{ .Release.Name }}
               volumeMounts:
                 - name: input-home
                   mountPath: /mnt/input/home
