@@ -21,18 +21,6 @@ local_images:
       - src: /loader
         dest: Linux/amd64
     push: False
-  bin/centos/ansible:
-    version: "3.6"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
-    method: build
-    directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
-    artifacts:
-      - src: /out/*
-        dest: Linux/amd64/CENTOS/7
-      - src: /out/*
-        dest: Linux/amd64/REDHAT/7.5
-    push: False
   bin/helm:
     version: "2.11.0"
     required: {}
@@ -41,4 +29,27 @@ local_images:
     artifacts:
       - src: /out/*
         dest: Linux/amd64
+    push: False
+  bin/pip:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/pip"
+    artifacts:
+      - src: /out/*
+        dest: pip
+    push: False
+  bin/centos/ansible:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      PIP_IMAGE: "bin/pip"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
+    artifacts:
+      - src: /out/*
+        dest: Linux/amd64/CENTOS/7
+      - src: /out/*
+        dest: Linux/amd64/REDHAT/7.5
     push: False

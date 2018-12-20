@@ -1,9 +1,11 @@
+ARG PIP_IMAGE
 ARG BASE_IMAGE
+FROM ${PIP_IMAGE} as pip
 FROM ${BASE_IMAGE}
 
 RUN yum install -y devtoolset-7-gcc*
 
-ADD requirements.txt /
+COPY --from=pip /out/requirements.txt /requirements.txt
 
 RUN source /opt/rh/devtoolset-7/enable && pip3.6 install -U virtualenv
 
