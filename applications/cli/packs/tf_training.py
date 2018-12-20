@@ -36,6 +36,7 @@ from util.k8s import k8s_info
 from util.logger import initialize_logger
 from util.config import FOLDER_DIR_NAME
 from util.config import DLS4EConfigMap
+from util.spinner import spinner
 
 import packs.common as common
 import dpath.util as dutil
@@ -79,8 +80,9 @@ def update_configuration(run_folder: str, script_location: str,
                            experiment_name=experiment_name, run_name=run_name,
                            pack_type=pack_type, cluster_registry_port=cluster_registry_port,
                            env_variables=env_variables)
-        modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
-                          script_folder_location=script_folder_location)
+        with spinner(text=Texts.PREPARING_IMAGES_MSG.format(run_name=experiment_name)):
+            modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
+                              script_folder_location=script_folder_location)
         modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
