@@ -37,6 +37,7 @@ ifeq (Windows,$(OS))
 	rm -f draft.7z
 	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 	cp -Rf draft/packs/* dist/config/.draft/packs/
+	rm -rf dist/config/.draft/plugins/
 
 	curl -o helm-v2.9.1-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-windows-amd64.tar.gz
 	rm -rf helm_tmp
@@ -59,6 +60,7 @@ ifeq (Linux,$(OS))
 	mkdir dist/config/packs/
 	cp -Rf draft/packs/* dist/config/packs/
 	rm -rf dist/config/.draft/packs
+	rm -rf dist/config/.draft/plugins/
 	cd dist/config/.draft && ln -s ../packs packs
 
 	curl -o helm-v2.9.1-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-linux-amd64.tar.gz
@@ -83,6 +85,7 @@ ifeq (Darwin,$(OS))
 	mkdir dist/config/packs/
 	cp -Rf draft/packs/* dist/config/packs/
 	rm -rf dist/config/.draft/packs
+	rm -rf dist/config/.draft/plugins/
 	cd dist/config/.draft && ln -s ../packs packs
 
 	curl -o helm-v2.9.1-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-darwin-amd64.tar.gz
