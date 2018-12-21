@@ -574,9 +574,9 @@ def submit_draft_pack(run_folder: str, namespace: str = None):
     if exit_code:
         error_message = Texts.JOB_NOT_DEPLOYED_ERROR_MSG
 
-        log_filename = get_log_filename(log_output)
+        log_filename = get_log_filename(str(log_output))
         if log_filename:
-            error_message = error_message + Texts.JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE.format(log_filename)
+            error_message = error_message + Texts.JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE.format(log_filename=log_filename)
         log.error(log_output)
         delete_environment(run_folder)
         raise SubmitExperimentError(error_message)
