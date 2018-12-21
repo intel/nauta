@@ -564,7 +564,7 @@ class ExperimentCommonTexts:
     DOCKER_TUNNEL_CLOSE_ERROR_MSG = "Local Docker-host tunnel hasn't been closed properly. Check whether it still " \
                                     "exists, if yes - close it manually."
     DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Draft templates haven't been generated. Reason - {reason}"
-    JOB_NOT_DEPLOYED_ERROR_MSG = "Job hasn't been deployed."
+    JOB_NOT_DEPLOYED_ERROR_MSG = "Job hasn't been deployed. "
     JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE = "For more details run: draft logs {log_filename}"
     INCORRECT_PARAM_FORMAT_ERROR_MSG = "Parameter {param_name} has incorrect format."
     PARAM_AMBIGUOUSLY_DEFINED = "Parameter {param_name} ambiguously defined."
