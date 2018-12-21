@@ -599,6 +599,7 @@ class DraftCmdTexts:
 class PacksTfTrainingTexts:
     CONFIG_NOT_UPDATED = "Configuration hasn't been updated."
     CANT_PARSE_VALUE = "Can not parse value: \"{value}\" to list/dict. Error: {error}"
+    PREPARING_IMAGES_MSG = "Preparing {run_name} images..."
 
 
 class UtilSystemTexts:
