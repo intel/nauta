@@ -134,8 +134,8 @@ class DLS4EConfigMap:
     IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
     REGISTRY_FIELD = 'registry'
     PLATFORM_VERSION = 'platform.version'
-    PY2_IMAGE_NAME = 'image.tensorflow_1.9_py2'
-    PY3_IMAGE_NAME = 'image.tensorflow_1.9_py3'
+    PY2_IMAGE_NAME = 'image.tensorflow_1.12_py2'
+    PY3_IMAGE_NAME = 'image.tensorflow_1.12_py3'
     PY2_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod_py2'
     PY3_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
 

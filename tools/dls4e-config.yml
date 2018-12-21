@@ -7,19 +7,17 @@ export_images:
     value: "{{ image_local_url['dls4e/tensorboard-service'] }}"
 # tensorflow part
   - name: tensorflow
-    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+    value: "{{ image_local_url['dls4e/tensorflow/1.12.0py3/base'] }}"
   - name: horovod
     value: "{{ image_local_url['dls4e/horovod/py3'] }}"
   - name: horovod_py2
     value: "{{ image_local_url['dls4e/horovod/py2'] }}"
-  - name: tensorflow_1.9
-    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
-  - name: tensorflow_1.9_py3
-    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
-  - name: tensorflow_1.9_py2
-    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py2/haswell/base'] }}"
-  - name: tensorflow_1.9_py3_skylake
-    value: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/skylake/base'] }}"
+  - name: tensorflow_1.12
+    value: "{{ image_local_url['dls4e/tensorflow/1.12.0py3/base'] }}"
+  - name: tensorflow_1.12_py3
+    value: "{{ image_local_url['dls4e/tensorflow/1.12.0py3/base'] }}"
+  - name: tensorflow_1.12_py2
+    value: "{{ image_local_url['dls4e/tensorflow/1.12.0py2/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['dls4e/activity-proxy'] }}"
   - name: batch-inference
@@ -36,9 +34,10 @@ local_images:
     image: "centos:7.5.1804"
     push: True
   dls4e/kubectl:
-    version: "v1.10.11"
-    image: "lachlanevenson/k8s-kubectl:v1.10.11"
-    method: pull
+    version: "1.10.11"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../dls4e-containers/kubectl"
   dls4e/gui:
     version: "1.0.0"
     required: {}
@@ -86,68 +85,39 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  dls4e/tensorflow/1.9.0py2/haswell/base:
-    version: "1.9.0-py2"
+  dls4e/tensorflow/1.12.0py2/base:
+    version: "1.12.0-py2"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0/haswell"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
-  dls4e/tensorflow/1.9.0py3/haswell/base:
-    version: "1.9.0-py3"
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow/py27"
+  dls4e/tensorflow/1.12.0py3/base:
+    version: "1.12.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
-  dls4e/tensorflow/1.9.0py3/skylake/base:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/skylake"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/skylake"
-      METRICS_IMAGE: "shared/build/metrics"
-    method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow/py36"
   dls4e/tensorflow:
-    version: "1.9.0-py3"
+    version: "1.12.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
-    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow"
+    directory: "{{ playbook_dir }}/../../dls4e-containers/tensorflow/py36"
   dls4e/horovod/py3:
     version: "1.9.0-py3"
-    fetch_files:
-      - src: https://files.pythonhosted.org/packages/d2/5e/4221d3e54ab79670bb654f2b139d0d4c46af7efd8ce953d3adaa73c12122/horovod-0.15.1.tar.gz
-        dest: horovod-v0.15.1.tar.gz
-        checksum: bcf6c43e2ad66f480cdba9cb915e6c4b9f0a930c81fe2f9c74f823250a423b6a
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
-      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/3.6"
   dls4e/horovod/py2:
     version: "1.9.0-py2"
-    fetch_files:
-      - src: https://files.pythonhosted.org/packages/d2/5e/4221d3e54ab79670bb654f2b139d0d4c46af7efd8ce953d3adaa73c12122/horovod-0.15.1.tar.gz
-        dest: horovod-v0.15.1.tar.gz
-        checksum: bcf6c43e2ad66f480cdba9cb915e6c4b9f0a930c81fe2f9c74f823250a423b6a
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
       METRICS_IMAGE: "shared/build/metrics"
-      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
-      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/horovod/2.7"
   dls4e/nginx:
@@ -305,7 +275,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../dls4e-charts/tf"
       chart_values:
         image: "{{ image_local_url['dls4e/tf/operator'] }}"
-        tfimage: "{{ image_local_url['dls4e/tensorflow/1.9.0py3/haswell/base'] }}"
+        tfimage: "{{ image_local_url['dls4e/tensorflow/1.12.0py3/base'] }}"
     ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../dls4e-charts/ingress"

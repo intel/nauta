@@ -102,7 +102,7 @@ spec:
             {{- range .Values.master.env }} -x {{ .name }} {{- end }}
             --mca orte_keep_fqdn_hostnames t --allow-run-as-root --display-map --tag-output --timestamp-output
             {{- if .Values.useHostNetwork }} --mca btl_tcp_if_include p3p1 {{- end }}
-            sh -c '/usr/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}'
+            sh -c '/usr/local/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}'
 {{- if .Values.master.args }}
 {{ toYaml .Values.master.args | indent 10 }}
 {{- end }}

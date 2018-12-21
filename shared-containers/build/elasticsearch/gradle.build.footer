@@ -1,7 +1,0 @@
-
-apply plugin: 'eclipse'
-eclipse {                                                                                                                                                                                    
-    classpath {                                                                                                                                                                              
-       downloadSources=true                                                                                                                                                                  
-    }                                                                                                                                                                                        
-} 

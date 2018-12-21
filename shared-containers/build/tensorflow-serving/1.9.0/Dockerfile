@@ -1,6 +1,0 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
-ENV TENSORFLOW_VERSION=1.9.0
-
-ADD tensorflow-serving-v${TENSORFLOW_VERSION}.tar.gz /tensorflow
-WORKDIR /tensorflow/serving-${TENSORFLOW_VERSION}/
