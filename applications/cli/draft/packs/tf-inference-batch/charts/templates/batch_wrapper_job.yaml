@@ -54,7 +54,9 @@ spec:
           securityContext:
             privileged: true
           resources:
-{{ toYaml .Values.batch_wrapper_resources | indent 12 }}
+            requests:
+              cpu: {{ default .Values.batch_wrapper_resources.requests.cpu .Values.wrapper_cpu}}
+              memory: {{ default .Values.batch_wrapper_resources.requests.memory .Values.wrapper_memory }}
       restartPolicy: Never
       volumes:
         - name: input-home

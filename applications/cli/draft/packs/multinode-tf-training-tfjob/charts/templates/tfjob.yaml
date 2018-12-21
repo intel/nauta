@@ -60,7 +60,12 @@ spec:
               securityContext:
                 privileged: true
               resources:
-{{ toYaml .Values.worker_resources | indent 16 }}
+                requests:
+                  cpu: {{ default .Values.worker_resources.requests.cpu .Values.worker_cpu}}
+                  memory: {{ default .Values.worker_resources.requests.memory .Values.worker_memory }}
+                limits:
+                  cpu: {{ default .Values.worker_resources.limits.cpu .Values.worker_cpu }}
+                  memory: {{ default .Values.worker_resources.limits.memory .Values.worker_memory }}
           volumes:
             - name: input-home
               persistentVolumeClaim:
@@ -128,7 +133,12 @@ spec:
               securityContext:
                 privileged: true
               resources:
-{{ toYaml .Values.ps_resources | indent 16 }}
+                requests:
+                  cpu: {{ default .Values.ps_resources.requests.cpu .Values.ps_cpu}}
+                  memory: {{ default .Values.ps_resources.requests.memory .Values.ps_memory }}
+                limits:
+                  cpu: {{ default .Values.ps_resources.limits.cpu .Values.ps_cpu }}
+                  memory: {{ default .Values.ps_resources.limits.memory .Values.ps_memory }}
             - name: sidecar
               image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/ps-sidecar:1.0.0"
               imagePullPolicy: Always
@@ -145,7 +155,9 @@ spec:
               securityContext:
                 privileged: true
               resources:
-{{ toYaml .Values.sidecar_resources | indent 16 }}
+                requests:
+                  cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu}}
+                  memory: {{ default .Values.sidecar_resources.requests.memory .Values.sidecar_memory }}
           volumes:
             - name: input-home
               persistentVolumeClaim:

@@ -24,10 +24,16 @@ resources:
     cpu: 38
     memory: 120Gi
 
+cpu: null
+memory: null
+
 batch_wrapper_resources:
   requests:
     cpu: 2
     memory: 1Gi
+
+wrapper_cpu: null
+wrapper_memory: null
 
 experimentName: {{ DLS4e.ExperimentName }} 
 podCount: 2
