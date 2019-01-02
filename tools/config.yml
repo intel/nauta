@@ -12,12 +12,8 @@ shared_images:
     version: "7.5.1804"
     method: build
     push: False
-    directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
     required: {}
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/centos/centos-docker-0008.tar.xz
-        dest: centos-docker.tar.xz
-        checksum: d5759d1da5f8a1e70f29b7dacfe5458fb2edf86fc2679115e5a71eca463bfa42
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
   shared/centos/rpm-packer:
     version: "7.5.1804"
     required:
