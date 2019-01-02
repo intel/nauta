@@ -132,9 +132,7 @@ local_images:
     dockerfile: "{{ playbook_dir }}/../../dls4e-containers/docs-nginx/Dockerfile"
   dls4e/tf/operator:
     version: "v2"
-    required:
-      BASE_IMAGE: "shared/centos"
-      BUILD_IMAGE: "shared/centos/build-go"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../dls4e-containers/tf-operator"
   dls4e/docker:

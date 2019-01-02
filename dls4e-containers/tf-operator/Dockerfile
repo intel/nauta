@@ -1,6 +1,4 @@
-ARG BUILD_IMAGE=golang:1.11.2
-ARG BASE_IMAGE=centos:7.4.1708
-FROM ${BUILD_IMAGE} as build
+FROM golang:1.11.2 as build
 
 RUN mkdir -p ${GOPATH}/src/github.com/kubeflow
 WORKDIR ${GOPATH}/src/github.com/kubeflow
@@ -20,7 +18,7 @@ RUN dep ensure -v
 
 RUN go build -o /tf-operator.v2 github.com/kubeflow/tf-operator/cmd/tf-operator.v2
 
-FROM ${BASE_IMAGE}
+FROM centos:7.4.1708
 
 RUN mkdir -p /opt/kubeflow
 
