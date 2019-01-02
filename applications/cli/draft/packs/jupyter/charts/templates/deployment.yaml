@@ -38,6 +38,11 @@ spec:
           env:
             - name: EXP_NAME
               value: "{{ .Values.experimentName }}"
+            - name: RUN_NAME
+              value: {{ .Release.Name }}
+{{ if .Values.env }}
+{{ toYaml .Values.env | indent 12 }}
+{{ end }}
           command: ["init_jupyter"]
           volumeMounts:
             - name: input-home
