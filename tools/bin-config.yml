@@ -30,21 +30,10 @@ local_images:
       - src: /out/*
         dest: Linux/amd64
     push: False
-  bin/pip:
-    version: "3.6"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
-    method: build
-    directory: "{{ playbook_dir }}/../../bin-containers/pip"
-    artifacts:
-      - src: /out/*
-        dest: pip
-    push: False
   bin/centos/ansible:
     version: "3.6"
     required:
       BASE_IMAGE: "shared/centos/python36"
-      PIP_IMAGE: "bin/pip"
     method: build
     directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
     artifacts:
@@ -52,4 +41,6 @@ local_images:
         dest: Linux/amd64/CENTOS/7
       - src: /out/*
         dest: Linux/amd64/REDHAT/7.5
+      - src: /requirements.txt
+        dest: pip
     push: False

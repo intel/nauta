@@ -1,11 +1,9 @@
-ARG PIP_IMAGE
 ARG BASE_IMAGE
-FROM ${PIP_IMAGE} as pip
 FROM ${BASE_IMAGE}
 
-RUN yum install -y devtoolset-7-gcc*
+RUN yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python35
 
-COPY --from=pip /out/requirements.txt /requirements.txt
+ADD requirements.txt /
 
 RUN source /opt/rh/devtoolset-7/enable && pip3.6 install -U virtualenv
 

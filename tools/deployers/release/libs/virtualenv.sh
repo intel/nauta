@@ -75,9 +75,9 @@ if [ ! -f "${DLS_VIRTUALENV}/.done" ]; then
     mkdir -p "${DLS_VIRTUALENV}"
 
     if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
-        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --isolated --ignore-installed --no-cache-dir
+        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --isolated --ignore-installed --no-cache-dir
     else
-        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --user --isolated --ignore-installed --no-cache-dir
+        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --user --isolated --ignore-installed --no-cache-dir
     fi
 
     touch "${DLS_VIRTUALENV}/.done"

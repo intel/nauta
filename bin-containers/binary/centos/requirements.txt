@@ -2,3 +2,7 @@ ansible==2.5.2.0
 docker==3.3.0
 jmespath==0.9.3
 netaddr==0.7.19
+pip==10.0.1
+virtualenv==16.0.0
+setuptools==39.2.0
+wheel==0.31.1
