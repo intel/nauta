@@ -288,9 +288,9 @@ def test_tensorboard_command_too_many_retries(mocker, launch_tensorboard_command
     result = runner.invoke(launch.launch, ['tensorboard', 'some-exp'])
 
     assert launch.K8sProxy.call_count == 1
-    assert launch.TensorboardServiceClient.get_tensorboard.call_count == 10
+    assert launch.TensorboardServiceClient.get_tensorboard.call_count == launch.TENSORBOARD_TRIES_COUNT
     assert commands.launch.launch.launch_app_with_proxy.call_count == 0
-    assert launch.sleep.call_count == 10
+    assert launch.sleep.call_count == launch.TENSORBOARD_TRIES_COUNT
     assert result.exit_code == 2
 
 
