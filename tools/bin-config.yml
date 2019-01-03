@@ -12,9 +12,7 @@ local_images:
     push: False
   bin/loader:
     version: "1.0.0"
-    required:
-      BUILD_IMAGE: "shared/centos/build-go"
-      BASE_IMAGE: "shared/centos"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/loader"
     artifacts:
