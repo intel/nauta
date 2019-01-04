@@ -10,7 +10,7 @@
             <artifactId>license-maven-plugin</artifactId>
             <version>3.0</version>
             <configuration>
-                <header>${project.basedir}/license_header_2018.txt</header>
+                <header>${project.basedir}/license_header_2019.txt</header>
                 <basedir>../..</basedir>
                 <includes>
                     <include>**/*.js</include>
