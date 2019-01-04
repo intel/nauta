@@ -28,12 +28,11 @@ local_images:
       - src: /out/*
         dest: Linux/amd64
     push: False
-  bin/centos/ansible:
+  bin/ansible:
     version: "3.6"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
+    required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../bin-containers/binary/centos"
+    directory: "{{ playbook_dir }}/../../bin-containers/ansible"
     artifacts:
       - src: /out/*
         dest: Linux/amd64/CENTOS/7

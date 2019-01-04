@@ -1,9 +1,20 @@
-ARG BASE_IMAGE
+# This dockerfile builds an Ansible binary for offline installer
+ARG BASE_IMAGE=centos:7.5.1804
 FROM ${BASE_IMAGE}
 
-RUN yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python35
+RUN yum install -y centos-release-scl
+RUN yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python36
 
-ADD requirements.txt /
+ADD requirements.txt /requirements.txt
+
+ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/rh/rh-python36/root/usr/lib64:$LD_LIBRARY_PATH
+ENV MANPATH=/opt/rh/rh-python36/root/usr/share/man:$MANPATH
+ENV PKG_CONFIG_PATH=/opt/rh/rh-python36/root/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
+ENV XDG_DATA_DIRS=/opt/rh/rh-python36/root/usr/share:$XDG_DATA_DIRS
+
+RUN source /opt/rh/devtoolset-7/enable && \
+            python3.6 -m pip install pip==10.0.1 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
 
 RUN source /opt/rh/devtoolset-7/enable && pip3.6 install -U virtualenv
 
