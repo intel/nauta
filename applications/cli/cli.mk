@@ -49,7 +49,7 @@ ifeq (Windows,$(OS))
 	rm -rf dist/config/.draft/plugins/
 	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
 	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
-	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
+	cd dist/config && cmd /C "cmd /C mklink /D packs .draft\packs\https-github.com-Azure-draft\packs"
 
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
