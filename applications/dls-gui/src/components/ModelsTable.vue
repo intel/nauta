@@ -458,6 +458,9 @@ export default {
           return arg1 ? toLocaleFormat(arg1) : '---';
         case 'trainingDurationTime':
         case 'trainingTimeInQueue':
+          if (arg1 === 0) {
+            return '---';
+          }
           const duration = new Date(arg1);
           const pData = TimedateExtractor(duration);
           return `${pData.days} days, ${pData.hours} hrs, ${pData.minutes} mins, ${pData.seconds} s`;
