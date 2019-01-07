@@ -43,6 +43,9 @@ logger = initialize_logger('commands.launch')
 
 FORWARDED_URL = 'http://localhost:{}'
 
+TENSORBOARD_TRIES_COUNT = 20
+TENSORBOARD_CHECK_BACKOFF_SECONDS = 5
+
 
 # noinspection PyUnusedLocal
 @click.command(cls=AliasCmd, alias='ui', short_help=Texts.WEBUI_HELP, help=Texts.WEBUI_HELP,
@@ -93,7 +96,9 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             sys.exit(1)
 
         click.echo(Texts.TB_WAITING_MSG)
-        for i in range(10):
+        for i in range(TENSORBOARD_TRIES_COUNT):
+            # noinspection PyTypeChecker
+            # tb.id is str
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
                 launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
@@ -101,7 +106,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
                                       app_name=f"tensorboard-{tb.id}")
                 return
             logger.warning(Texts.TB_WAITING_FOR_TB_MSG.format(tb_id=tb.id, tb_status_value=tb.status.value))
-            sleep(5)
+            sleep(TENSORBOARD_CHECK_BACKOFF_SECONDS)
 
         click.echo(Texts.TB_TIMEOUT_ERROR_MSG)
         sys.exit(2)
