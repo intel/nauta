@@ -89,6 +89,36 @@ def get_secret(secret_name: str, namespace: str) -> V1Secret:
     return api.read_namespaced_secret(name=secret_name, namespace=namespace)
 
 
+def get_certificate(namespace: str) -> str:
+    """
+    Gets a certificate of a user from a given namespace
+    :param namespace: namespace of a user
+    :return: certificate - if it doesn't exist or errors occurred during gathering
+    the certificate - function returns an empty string
+    """
+    ret_cert = ""
+    try:
+        api = get_k8s_api()
+        secrets_list = api.list_namespaced_secret(namespace)
+
+        if secrets_list:
+            for secret in secrets_list.items:
+                if "default-token" in secret.metadata.name:
+                    ret_cert = str(base64.b64decode(secret.data.get("ca.crt")), encoding="utf-8")
+                    break
+            else:
+                raise ValueError(Texts.LACK_OF_DEFAULT_TOKEN_ERROR_MSG)
+        else:
+            raise ValueError(Texts.EMPTY_LIST_OF_TOKENS_ERROR_MSG)
+
+    except Exception as exe:
+        error_message = Texts.GATHERING_USER_CERTIFICATE_ERROR_MSG
+        logger.exception(error_message)
+        raise KubernetesError(error_message) from exe
+
+    return ret_cert
+
+
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:
     api = get_k8s_api()
     return PodStatus(api.read_namespaced_pod(name=pod_name, namespace=namespace).status.phase.upper())

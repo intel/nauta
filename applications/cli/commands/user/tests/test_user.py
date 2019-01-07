@@ -43,9 +43,7 @@ clusters:
 - cluster:
     api-version: v1
     server: https://{test_address}
-    # certificate-authority-data: {test_cacert_encoded}
-    # BUG/TASK: CAN-261
-    insecure-skip-tls-verify: true
+    certificate-authority-data: {test_cacert_encoded}
   name: dls-cluster
 contexts:
 - context:

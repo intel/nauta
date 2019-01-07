@@ -25,7 +25,7 @@ from util.config import Config
 from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import execute_system_command, handle_error
-from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
+from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host, get_certificate
 from util.config import DLS4EConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -45,9 +45,7 @@ clusters:
 - cluster:
     api-version: v1
     server: https://{address}
-    # certificate-authority-data: {cert_data}
-    # BUG/TASK: CAN-261
-    insecure-skip-tls-verify: true
+    certificate-authority-data: {cert_data}
   name: dls-cluster
 contexts:
 - context:
@@ -145,6 +143,13 @@ def create(state: State, username: str, list_only: bool, filename: str):
                          add_verbosity_msg=state.verbosity == 0)
             users_password = ""
 
+        try:
+            cert = get_certificate(username)
+        except Exception:
+            handle_error(logger, Texts.CERT_GATHER_ERROR_MSG, Texts.CERT_GATHER_ERROR_MSG,
+                         add_verbosity_msg=state.verbosity == 0)
+            cert = ""
+
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
                      Texts.USER_ADD_ERROR_MSG.format(username=username),
@@ -163,7 +168,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
     try:
         kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(),
-                                         users_password, "")
+                                         users_password, cert)
     except Exception:
         handle_error(logger, Texts.CONFIG_CREATION_ERROR_MSG, Texts.CONFIG_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)
