@@ -49,9 +49,9 @@ def is_gui_browser_available() -> bool:
 def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port: int = None, app_name: str = None,
                number_of_retries: int = 0, url_end: str = "", namespace: str = None):
     try:
-        with K8sProxy(dls4e_app_name=k8s_app_name, port=port, app_name=app_name,
-                      number_of_retries=number_of_retries, namespace=namespace) as proxy,\
-                spinner(text=Texts.LAUNCHING_APP_MSG) as proxy_spinner:
+        with spinner(text=Texts.LAUNCHING_APP_MSG) as proxy_spinner, \
+             K8sProxy(dls4e_app_name=k8s_app_name, port=port, app_name=app_name,
+                      number_of_retries=number_of_retries, namespace=namespace) as proxy:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
 
             # run socat if on Windows or Mac OS
@@ -85,8 +85,8 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                     random_port=proxy.tunnel_port
                 ))
 
+            proxy_spinner.hide()
             click.echo(Texts.GO_TO_MSG.format(url=url))
-
             click.echo(Texts.PROXY_CREATED_MSG)
             wait_for_ctrl_c()
     except K8sProxyCloseError:
