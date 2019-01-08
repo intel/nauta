@@ -28,6 +28,7 @@ import click
 
 from cli_state import common_options, pass_state, State
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, build_tensorboard_run_list
+from util.spinner import spinner
 from util.aliascmd import AliasCmd, AliasGroup
 from util.app_names import DLS4EAppNames
 from util.exceptions import LaunchError, ProxyClosingError
@@ -74,8 +75,9 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
     """ Subcommand for launching tensorboard with credentials """
     current_namespace = get_kubectl_current_context_namespace()
 
-    with K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
-                  namespace=current_namespace, port=tensorboard_service_client_port) as proxy:
+    with spinner(Texts.TB_WAITING_MSG) as proxy_spinner, \
+            K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
+                     namespace=current_namespace, port=tensorboard_service_client_port) as proxy:
 
         tensorboard_service_client = TensorboardServiceClient(address=f'http://127.0.0.1:{proxy.tunnel_port}')
 
@@ -95,12 +97,12 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
 
-        click.echo(Texts.TB_WAITING_MSG)
         for i in range(TENSORBOARD_TRIES_COUNT):
             # noinspection PyTypeChecker
             # tb.id is str
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
+                proxy_spinner.hide()
                 launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
                                       namespace=current_namespace, port=port_number,
                                       app_name=f"tensorboard-{tb.id}")
