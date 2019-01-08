@@ -42,7 +42,7 @@ ifeq (Windows,$(OS))
     
 	cp -Rf draft/packs/* dist/config/packs/
 	rm -rf dist/config/.draft/packs
-	cd dist/config/.draft && ln -s ../packs packs
+	cd dist/config/.draft && cmd /C "cmd /C mklink /D packs ..\packs"
 
 	curl -o helm-v2.9.1-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-windows-amd64.tar.gz
 	rm -rf helm_tmp
