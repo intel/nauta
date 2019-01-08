@@ -217,6 +217,7 @@ def wait_for_ctrl_c():
         continue_loop = False
 
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     while continue_loop:
         time.sleep(0.1)
 
