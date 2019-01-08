@@ -382,8 +382,7 @@ def is_current_user_administrator(request_timeout: int = None) -> bool:
     try:
         get_cluster_roles(request_timeout=request_timeout)
     except ApiException as exe:
-        # 403 - forbidden
-        if exe.status == HTTPStatus.FORBIDDEN:
+        if exe.status in (HTTPStatus.FORBIDDEN, HTTPStatus.UNAUTHORIZED):
             return False
         else:
             raise exe

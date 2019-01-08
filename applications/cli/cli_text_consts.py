@@ -72,6 +72,8 @@ class VerifyCmdTexts:
     HELP = "Command verifies whether all external components required by dlsctl are installed in proper versions. " \
            "If something is missing, the application displays detailed information about it."
     KUBECTL_NOT_INSTALLED_ERROR_MSG = "kubectl is not installed."
+    KUBECTL_INVALID_VERSION_ERROR_MSG = "the installed version of kubectl ({installed_version}) is not " \
+                                        "supported, supported version {supported_versions_sign} {expected_version}"
     GET_K8S_NAMESPACE_ERROR_MSG = "Failed to get current Kubernetes namespace."
     VERSION_CHECKING_MSG = "Checking version of {dependency_name}. Installed version: ({installed_version}). " \
                            "Supported version {supported_versions_sign} {expected_version}."
