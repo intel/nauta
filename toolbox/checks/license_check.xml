@@ -18,6 +18,7 @@
                     <include>**/*.html</include>
                     <include>**/*.vue</include>
                     <include>**/*.py</include>
+                    <include>**/*.sh</include>
                 </includes>
                 <excludes>
                     <exclude>**/.venv/**/*.*</exclude>
@@ -42,6 +43,7 @@
                     <css>JAVADOC_STYLE</css>
                     <html>XML_STYLE</html>
                     <py>SCRIPT_STYLE</py>
+                    <sh>SCRIPT_STYLE</sh>
                 </mapping>
             </configuration>
             <executions>
