@@ -14,8 +14,8 @@ local_images:
     image: "gcr.io/google-containers/pause-amd64:3.1"
     method: pull
   core/addon-resizer:
-    version: "1.7"
-    image: "k8s.gcr.io/addon-resizer:1.7"
+    version: "1.8.1"
+    image: "k8s.gcr.io/addon-resizer:1.8.1"
     method: pull
   core/tiller:
     version: "v2.11.0"
