@@ -66,7 +66,7 @@ DependencySpec = namedtuple('DependencySpec', [
 ])
 
 
-def get_dependency_map():
+def get_dependency_map() -> Dict[str, DependencySpec]:
     return {
         'draft':
         DependencySpec(
@@ -214,8 +214,7 @@ def check_dependency(dependency_name: str,
                 dependency_name]
 
     try:
-        output, exit_code, log_output = dependency_spec.version_command(
-            dependency_spec.version_command_args)
+        output, exit_code, log_output = dependency_spec.version_command(dependency_spec.version_command_args)
         if exit_code != 0:
             raise RuntimeError
     except RuntimeError as e:

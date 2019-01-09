@@ -50,6 +50,37 @@ def verify(state: State):
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
 
+    dependencies = get_dependency_map()
+    kubectl_dependency_name = 'kubectl'
+    kubectl_dependency_spec = dependencies[kubectl_dependency_name]
+
+    with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=kubectl_dependency_name)):
+        valid, installed_version = check_dependency(dependency_name=kubectl_dependency_name,
+                                                    dependency_spec=kubectl_dependency_spec)
+
+    supported_versions_sign = '>='
+    logger.info(
+        Texts.VERSION_CHECKING_MSG.format(
+            dependency_name=kubectl_dependency_name, installed_version=installed_version,
+            supported_versions_sign=supported_versions_sign,
+            expected_version=kubectl_dependency_spec.expected_version
+        )
+    )
+
+    if valid:
+        click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name=kubectl_dependency_name))
+    else:
+        handle_error(logger,
+                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG.format(installed_version=installed_version,
+                                                                    supported_versions_sign=supported_versions_sign,
+                                                                    expected_version=  # noqa
+                                                                    kubectl_dependency_spec.expected_version),
+                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG,
+                     add_verbosity_msg=state.verbosity == 0)
+        exit(1)
+
+    del dependencies[kubectl_dependency_name]
+
     try:
         with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):
             check_connection_to_cluster()
@@ -71,7 +102,7 @@ def verify(state: State):
         exit(1)
 
     dependency_versions = {}
-    for dependency_name, dependency_spec in get_dependency_map().items():
+    for dependency_name, dependency_spec in dependencies.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=dependency_name)):
