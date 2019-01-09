@@ -65,8 +65,8 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                        -i $(LIBS_DIRECTORY)/inventory --force-handlers -e default_ansible_python_interpreter=$(PYTHON) \
                        -e VERSION_NO=$(DEFAULT_VERSION_NO) -e VERSION_MINOR=$(DEFAULT_VERSION_MINOR) \
                        -e VERSION_MAJOR=$(DEFAULT_VERSION_MAJOR) -e VERSION_ID=$(DEFAULT_VERSION_ID) \
-                       -e version=$(VERSION) -e user=$(USER) -e user_id=$(USER_ID) -e build_dir=$(BUILD_DIR) \
-                       -e group=$(GROUP) -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
+                       -e version=$(VERSION) -e user="$(USER)" -e user_id=$(USER_ID) -e build_dir=$(BUILD_DIR) \
+                       -e group="$(GROUP)" -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml
 
 $(REQUIREMENTS_LOCK): $(WORKSPACE)
