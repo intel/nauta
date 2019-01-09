@@ -14,7 +14,16 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 %{summary}
 
 %prep
-%setup -q -n cni-plugins
+cd /root/rpmbuild/BUILD
+rm -rf cni-plugins
+mkdir cni-plugins
+gzip -dc /root/rpmbuild/SOURCES/cni-plugins.tar.gz | tar -xvvf - -C cni-plugins
+if [ $? -ne 0 ]; then
+  exit $?
+fi
+cd cni-plugins
+chown -R root.root .
+chmod -R a+rX,g-w,o-w .
 
 %build
 # Empty section.
@@ -24,8 +33,7 @@ rm -rf %{buildroot}
 mkdir -p  %{buildroot}
 
 mkdir -p %{buildroot}/opt/dls4e/cni-plugins
-cp -a * %{buildroot}/opt/dls4e/cni-plugins/
-
+cp -a cni-plugins/* %{buildroot}/opt/dls4e/cni-plugins/
 
 %clean
 rm -rf %{buildroot}

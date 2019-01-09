@@ -1,10 +1,10 @@
-ARG KUBERNETES_DATA_IMAGE
 ARG BASE_IMAGE
-FROM ${KUBERNETES_DATA_IMAGE} as data
-
 FROM ${BASE_IMAGE}
 
-COPY --from=data /build-output/kubernetes.tar.gz ./SOURCES/kubernetes.tar.gz
+RUN curl -L https://github.com/kubernetes/kubernetes/releases/download/v1.10.11/kubernetes.tar.gz -o kubernetes.tar.gz
+RUN tar -xvf kubernetes.tar.gz && rm kubernetes.tar.gz
+
+RUN yes | ./kubernetes/cluster/get-kube-binaries.sh
 
 ENV RPM_VERSION=1.10.11
 ENV RPM_RELEASE=0

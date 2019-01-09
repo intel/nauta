@@ -52,45 +52,6 @@ shared_images:
       - src: https://github.com/kubernetes-incubator/apiserver-builder/releases/download/v1.9-alpha.4/apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
-  shared/build/kubernetes:
-    version: "v1.10.11"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.11.tar.gz
-        dest: kubernetes.tar.gz
-        checksum: 13c4554e945f4f7af42479c8a3ee656381a3e4272fd88d0b6db766aff21478f3
-  shared/build/docker:
-    version: "v18.06.0"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/docker"
-    push: False
-    fetch_files:
-      - src: http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.68-1.el7.noarch.rpm
-        dest: container-selinux-2.68-1.el7.noarch.rpm
-        checksum: d2a6e716e12da75bca38a5c5d79cdb3863beb500389827121b6bca6df057aee9
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
-        dest: docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
-        checksum: 994c76793afde01ae467ead3aef7ad30369dbd9447b2752f62bb251e6f0a24ba
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
-        dest: docker-ce-18.06.0.ce-3.el7.centos.src.rpm
-        checksum: 2926f66a94f5b3bcd1e3feb0d7107f2fd2713cf3f412f84dcc8fe89120c43392
-  shared/build/nginx:
-    version: "v1.13.9"
-    required:
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/nginx"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.src.rpm
-        dest: nginx-1.13.9-1.el7_4.ngx.src.rpm
-        checksum: 98d4329318dc9a681fa5e13cba5bc809bd2f7a97e38b36a1d07cb15a53b855ee
   shared/run/tensorflow/py2.7:
     version: "py2"
     required: {}
@@ -107,17 +68,6 @@ shared_images:
     push: False
     args:
       PYTHON_VERSION: 3.6
-  shared/build/cni:
-    version: "v0.7.1"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/cni"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/cni-plugins/v0.7.1.tar.gz
-        dest: cni-plugins.tar.gz
-        checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
   shared/build/consul:
     version: "v1.1.0"
     required:
@@ -126,9 +76,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/v1.1.0.tar.gz
-        dest: consul-1.1.0.tar.gz
-        checksum: 8e2539561eb07b2623d9828587e68f5ef46cee882227c7331ff26dddcdc0e9df
+      - src: https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip
+        dest: consul-1.1.0_linux_amd64.zip
+        checksum: 09c40c8b5be868003810064916d8460bff334ccfb59a5046390224b27e052c45
   shared/build/metrics:
     version: "0.0.1"
     required: {}

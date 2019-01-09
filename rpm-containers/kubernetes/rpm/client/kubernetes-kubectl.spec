@@ -4,7 +4,7 @@ Version: %{_dls4e_version}
 Release: %{_dls4e_release}
 License: Apache-2.0
 Group: Tools
-SOURCE0 : kubernetes.tar.gz
+SOURCE0 : kubernetes-client-linux-amd64.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -14,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 %{summary}
 
 %prep
-%setup -q -n kubernetes
+# Empty section.
 
 %build
 # Empty section.
@@ -24,8 +24,7 @@ rm -rf %{buildroot}
 mkdir -p  %{buildroot}
 
 mkdir -p %{buildroot}%{_bindir}/kubernetes
-cp -a kubectl %{buildroot}%{_bindir}/kubectl
-
+cp -a ../kubernetes/platforms/linux/amd64/kubectl %{buildroot}%{_bindir}
 
 %clean
 rm -rf %{buildroot}

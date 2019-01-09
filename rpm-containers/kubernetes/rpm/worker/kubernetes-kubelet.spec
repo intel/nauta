@@ -4,7 +4,7 @@ Version: %{_dls4e_version}
 Release: %{_dls4e_release}
 License: Apache-2.0
 Group: Tools
-SOURCE0 : kubernetes.tar.gz
+SOURCE0 : kubernetes-server-linux-amd64.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -34,7 +34,7 @@ rm -rf %{buildroot}
 mkdir -p  %{buildroot}
 
 mkdir -p %{buildroot}/opt/dls4e/kubernetes
-cp -a kubelet %{buildroot}/opt/dls4e/kubernetes/kubelet
+cp -a server/bin/kubelet %{buildroot}/opt/dls4e/kubernetes/kubelet
 
 
 %clean
