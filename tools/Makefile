@@ -67,7 +67,9 @@ release-package: export ENV_DEST := $(REMOTE_RELEASE_PACKAGE)
 release-package: export BUILD_LOGS := $(BUILD_LOGS)
 release-package: export ENV_OUTPUT_ARTIFACT_DIRECTORY := $(ENV_OUTPUT_ARTIFACT_DIRECTORY)
 release-package:
+ifneq ($(ENV_OUTPUT_ARTIFACT_DIRECTORY),)
 	@$(PUSH_MAKE)
+endif
 
 release-checksum: $(RELEASE_PACKAGE)
 release-checksum: export ENV_SRC := $(RELEASE_PACKAGE_CHECKSUM)
@@ -88,7 +90,9 @@ push: export ENV_DEST := $(ENV_DEST)
 push: export BUILD_LOGS := $(BUILD_LOGS)
 push: export ENV_OUTPUT_ARTIFACT_DIRECTORY := $(ENV_OUTPUT_ARTIFACT_DIRECTORY)
 push:
+ifneq ($(ENV_OUTPUT_ARTIFACT_DIRECTORY),)
 	@$(PUSH_MAKE)
+endif
 
 
 build: $(RELEASE_PACKAGE)
