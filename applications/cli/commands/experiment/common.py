@@ -109,7 +109,7 @@ def ctrl_c_handler_for_submit(sig, frame):
     except Exception:
         log.exception(Texts.ERROR_WHILE_REMOVING_EXPERIMENT)
     for proc in psutil.Process(os.getpid()).children(recursive=True):
-        proc.send_signal(signal.SIGTERM)
+        proc.send_signal(signal.SIGKILL)
     exit(1)
 
 
