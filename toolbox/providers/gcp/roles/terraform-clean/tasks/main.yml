@@ -1,0 +1,104 @@
+---
+
+- name: Check if state is stored in S3 bucket
+  set_fact:
+    persistent_terraform: "{{ ((s3_access_key | default ('')) != '' ) | bool }}"
+
+- name: Set default pool size
+  set_fact:
+    effective_tf_pool_size: "{{ gcp.pool_size }}"
+    effective_tf_pool_type: "{{ gcp.pool_type }}"
+  when: gcp is defined
+
+- name: Override default pool size with command parameters (1)
+  set_fact:
+    effective_tf_pool_size: "{{ tf_pool_size }}"
+  when: tf_pool_size is defined
+
+- name: Override default pool size with command parameters (2)
+  set_fact:
+    effective_tf_pool_type: "{{ tf_pool_type }}"
+  when: tf_pool_type is defined
+
+- name: "Create terraform files directory {{ workspace }}/terraform"
+  file:
+    state: directory
+    path: "{{ workspace }}/terraform"
+    mode: 0755
+
+- name: Execute terraform block
+  block:
+    - name: Check if state will be maintained by s3 bucket
+      debug:
+        msg: "Use terraform context from s3 bucket: {{ persistent_terraform }}"
+
+    - name: Check if state file is present
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: list
+        rgw: True
+      register: s3_files
+      when: persistent_terraform
+    - name: Download file if present
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: get
+        rgw: True
+        object: "{{ terraform_file }}"
+        dest: "{{ local_terraform_file }}"
+      when: persistent_terraform and terraform_file in s3_files.s3_keys
+    - name: Create empty tfstate file
+      file:
+        path: "{{ local_terraform_file }}"
+        state: touch
+      when: not persistent_terraform or (terraform_file not in s3_files.s3_keys)
+    - name: Generate private key
+      openssl_privatekey:
+        path: "{{ workspace }}/private"
+        mode: 0600
+    - name: Generate public key
+      openssl_publickey:
+        path: "{{ workspace }}/public"
+        privatekey_path: "{{ workspace }}/private"
+        format: OpenSSH
+    - name: Install terraform plugins
+      environment: "{{ proxy_env }}"
+      shell: "{{ terraform }} init"
+      args:
+        chdir: "{{ workspace }}/terraform"
+      changed_when: False
+    - name: Destroy terraform
+      environment:
+        TF_VAR_prefix: "{{ prefix }}"
+        TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
+        TF_VAR_external_public_key_file: "{{ external_public_key }}"
+        TF_VAR_internal_public_key_file: "{{ workspace }}/public"
+        TF_VAR_internal_key_file: "{{ workspace }}/private"
+        #            TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
+        #            TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
+        TF_VAR_pool_size: "1"
+        TF_VAR_pool_type: "n1-standard-4"
+      terraform:
+        binary_path: "{{ terraform }}"
+        project_path: "{{ workspace }}/terraform"
+        state_file: "{{ local_terraform_file }}"
+        state: absent
+  always:
+    - name: Upload tfstate file
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: put
+        rgw: True
+        object: "{{ terraform_file }}"
+        src: "{{ local_terraform_file }}"
+        permission: []
+      when: persistent_terraform

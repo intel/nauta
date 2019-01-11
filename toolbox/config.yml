@@ -1,0 +1,11 @@
+---
+
+proxy_env:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  ssh_args_for_proxy: ""
+  ssh_args_for_cmd_line: ""
+  ssh_args_prefix_for_proxy: "nc"
+
+proxy: "{{ proxy_env }}"

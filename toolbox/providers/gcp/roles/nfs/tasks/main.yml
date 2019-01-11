@@ -1,0 +1,41 @@
+---
+
+- name: Create exports directory
+  file:
+    path: /export
+    state: directory
+
+- name: Install nfs server
+  apt:
+    name: nfs-server
+    state: present
+    update_cache: True
+
+- name: Create filesystem
+  filesystem:
+    dev: "/dev/sdb"
+    fstype: xfs
+    resizefs: True
+
+- name: Mount xfs for nfs
+  mount:
+    fstype: xfs
+    path: /export
+    state: mounted
+    src: "/dev/sdb"
+
+- name: Create exports directory
+  file:
+    path: "/export/{{ item }}"
+    state: directory
+    mode: 0777
+  with_items:
+    - input
+    - output
+
+- name: Render exports
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify:
+    - Reload exportfs

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+
+svc_exists() {
+    kubectl -n dls4e get svc dls4enterprise-samba || return
+    if ip; then
+        if [ X"$(ip)" = X"" ]; then
+            return 1
+        fi
+    fi
+    if port; then
+        if [ X"$(port)" = X"" ]; then
+            return 1
+        fi
+    fi
+}
+
+ip() {
+    kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' || return
+}
+
+port() {
+    kubectl -n dls4e get svc dls4enterprise-samba -o jsonpath='{.spec.ports[?(@.name=="dls4e")].nodePort}' || return
+}
+
+while ! svc_exists; do
+    echo "Service is still down"
+    sleep 2
+done
+
+
+iptables -t nat -A OUTPUT -d ${MASTER_IP} -p tcp --dport 445 -j DNAT --to-destination $(ip):$(port)

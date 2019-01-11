@@ -4,7 +4,9 @@ ACTIVATE := $(VIRTUALENV_BIN)/activate
 REQUIREMENTS:=$(CURDIR)/requirements.txt
 
 PIP := $(VIRTUALENV_BIN)/pip
-PYTHON := $(VIRTUALENV_BIN)/PYTHON
+PYTHON := $(VIRTUALENV_BIN)/python3
+
+ANSIBLE_PLAYBOOK := $(VIRTUALENV_BIN)/ansible-playbook
 
 TOOLBOX_HOME=$(CURDIR)/toolbox
 
@@ -19,6 +21,12 @@ venv-clean:
 K8S_%:
 	@ if [ "${K8S_${*}}" = "" ]; then \
 		echo "Environment variable K8S_$* is not set, please set one before run"; \
+		exit 1; \
+	fi
+
+ENV_%:
+	@ if [ "${ENV_${*}}" = "" ]; then \
+		echo "Environment variable ENV_$* is not set, please set one before run"; \
 		exit 1; \
 	fi
 
@@ -61,3 +69,5 @@ gui-unit-tests:
 exp-service-tests:
 	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make test)
 	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make test_coverage)
+
+include toolbox/providers/providers.mk

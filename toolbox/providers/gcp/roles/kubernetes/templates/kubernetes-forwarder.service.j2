@@ -1,0 +1,17 @@
+[Unit]
+Description=Forwarder
+After=network.target network-online.target
+
+
+[Service]
+Type=simple
+
+Environment=KUBECONFIG=/root/.kube/config
+Environment=MASTER_IP={{ k8s.k8s_cluster_endpoint.value.replace('https://', '').replace('http://', '').split(':')[0] }}
+Restart=always
+RestartSec=5
+ExecStart=/usr/sbin/iptables-k8s-forwarder.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
