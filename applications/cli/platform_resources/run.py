@@ -201,6 +201,7 @@ class RunSchema(Schema):
     pod_selector = fields.Dict(fields.String, required=False, missing=None, allow_none=True, dump_to='pod-selector',
                                load_from='pod-selector')
     state = EnumField(RunStatus, required=True, allow_none=False, by_value=True)
+    end_timestamp = fields.String(required=False, dump_to='end-time', load_from='end-time', missing=None, allow_none=True)
 
     @post_load
     def make_run(self, data):
