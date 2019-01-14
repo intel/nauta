@@ -21,13 +21,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
     push: False
-  shared/centos/build:
-    version: "7.5.1804"
-    required:
-      BASE_IMAGE: "shared/centos"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/centos/build"
-    push: False
   shared/centos/python36:
     version: "3.6"
     required:
@@ -41,17 +34,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"
     push: False
-  shared/centos/go-apiserver-builder:
-    version: "v1.9-alpha.4"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/centos/go-apiserver-builder"
-    push: False
-    fetch_files:
-      - src: https://github.com/kubernetes-incubator/apiserver-builder/releases/download/v1.9-alpha.4/apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
-        dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
-        checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
   shared/run/tensorflow/py2.7:
     version: "py2"
     required: {}
