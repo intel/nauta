@@ -74,6 +74,11 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     if name:
         try:
             jupyter_experiment = get_experiment(namespace=current_namespace, name=name)
+
+            if jupyter_experiment:
+                metadata = jupyter_experiment.metadata
+                if metadata and metadata.get("labels") and metadata.get("labels").get("script_name"):
+                    filename = metadata.get("labels").get("script_name")
         except Exception:
             handle_error(logger, Texts.EXPERIMENT_GET_ERROR_MSG, Texts.EXPERIMENT_GET_ERROR_MSG)
             sys.exit(1)
@@ -144,14 +149,12 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     url_end = ""
     if filename:
         # only Jupyter notebooks are opened directly, other files are opened in edit mode
-        if not jupyter_experiment:
-            if ".ipynb" in filename:
-                url_end = f"/notebooks/output/experiment/"
-            else:
-                url_end = "/edit/"
-            url_end = url_end + Path(filename).name
-        else:
-            click.echo(Texts.ATTACHING_SCRIPT_NOT_SUPPORTED_MSG)
+        url_end = f"/notebooks/output/experiment/"
+        if jupyter_experiment and filename.endswith(".py"):
+            filename = filename[:filename.index(".py", -3)] + ".ipynb"
+        if not filename.endswith(".ipynb"):
+            url_end = "/edit/"
+        url_end = url_end + Path(filename).name
 
     # wait until all jupyter pods are ready
     for i in range(JUPYTER_CHECK_POD_READY_TRIES):
