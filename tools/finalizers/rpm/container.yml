@@ -6,7 +6,7 @@
   handlers:
   - name: Remove finalizer container
     docker_container:
-      name: "finalizer-{{ build_name }}-{{ user }}-{{ version }}"
+      name: "finalizer-{{ build_name }}-{{ user | regex_findall('[A-Za-z]') | join('') }}-{{ version }}"
       state: absent
       stop_timeout: 0
       force_kill: True

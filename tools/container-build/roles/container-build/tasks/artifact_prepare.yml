@@ -2,7 +2,7 @@
 
 - name: Generate artifact container name
   set_fact:
-    artifact_container: "artifact-{{ build_name }}-{{ user }}-{{ version }}-{{ name.replace('/', '-') }}"
+    artifact_container: "artifact-{{ build_name }}-{{ user | regex_findall('[A-Za-z]') | join('') }}-{{ version }}-{{ name.replace('/', '-') }}"
 
 - block:
     - name: Start artifact container

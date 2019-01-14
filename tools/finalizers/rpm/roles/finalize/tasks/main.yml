@@ -38,7 +38,7 @@
 
 - set_fact:
     centor_rpm_packer_image: "{{ build_facts.package_attached_images['shared/centos/rpm-packer'].remote_url }}"
-    container_name: "finalizer-{{ build_name }}-{{ user }}-{{ version }}"
+    container_name: "finalizer-{{ build_name }}-{{ user | regex_findall('[A-Za-z]') | join('') }}-{{ version }}"
 
 - name: Start artifact container
   docker_container:
