@@ -1,0 +1,11 @@
+---
+
+- name: Register {{ binary }} installation status
+  command: which {{ binary }}
+  register: binary_installed
+  ignore_errors: True
+
+- name: Check {{ binary }} installation status
+  fail:
+    msg: "{{ binary }} appears to be not installed. Aborting build process."
+  when: binary_installed is failed
