@@ -96,7 +96,7 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 	@touch $(ACTIVATE)
 else
 $(VIRTUALENV_DIR): $(VENV_LOCK)
-	@flock $(VENV_LOCK) bash -c "if [ ! -d $(VIRTUALENV_DIR) ]; then virtualenv -p python3.6 $(VIRTUALENV_DIR); fi"
+	@flock $(VENV_LOCK) bash -c "if [ ! -d $(VIRTUALENV_DIR) ]; then virtualenv -p python3 $(VIRTUALENV_DIR); fi"
 
 $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 	@flock $(VENV_LOCK) bash -c "if [ ! -f $(VIRTUALENV_DIR)/.act-$(VERSION) ]; then $(PIP) install --upgrade-strategy only-if-needed -r $(REQUIREMENTS) && touch $(VIRTUALENV_DIR)/.act-$(VERSION); fi"

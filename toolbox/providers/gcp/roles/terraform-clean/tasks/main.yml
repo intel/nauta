@@ -20,10 +20,10 @@
     effective_tf_pool_type: "{{ tf_pool_type }}"
   when: tf_pool_type is defined
 
-- name: "Create terraform files directory {{ workspace }}/terraform"
+- name: "Create terraform files directory {{ local_terraform_dir }}"
   file:
     state: directory
-    path: "{{ workspace }}/terraform"
+    path: "{{ local_terraform_dir }}"
     mode: 0755
 
 - name: Execute terraform block
@@ -53,40 +53,40 @@
         object: "{{ terraform_file }}"
         dest: "{{ local_terraform_file }}"
       when: persistent_terraform and terraform_file in s3_files.s3_keys
-    - name: Create empty tfstate file
+    - name: "Create empty tfstate file {{ local_terraform_file }}"
       file:
         path: "{{ local_terraform_file }}"
         state: touch
       when: not persistent_terraform or (terraform_file not in s3_files.s3_keys)
     - name: Generate private key
       openssl_privatekey:
-        path: "{{ workspace }}/private"
+        path: "{{ local_terraform_dir }}/private"
         mode: 0600
     - name: Generate public key
       openssl_publickey:
-        path: "{{ workspace }}/public"
-        privatekey_path: "{{ workspace }}/private"
+        path: "{{ local_terraform_dir }}/public"
+        privatekey_path: "{{ local_terraform_dir }}/private"
         format: OpenSSH
     - name: Install terraform plugins
       environment: "{{ proxy_env }}"
       shell: "{{ terraform }} init"
       args:
-        chdir: "{{ workspace }}/terraform"
+        chdir: "{{ local_terraform_dir }}"
       changed_when: False
     - name: Destroy terraform
       environment:
         TF_VAR_prefix: "{{ prefix }}"
         TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
         TF_VAR_external_public_key_file: "{{ external_public_key }}"
-        TF_VAR_internal_public_key_file: "{{ workspace }}/public"
-        TF_VAR_internal_key_file: "{{ workspace }}/private"
+        TF_VAR_internal_public_key_file: "{{ local_terraform_dir }}/public"
+        TF_VAR_internal_key_file: "{{ local_terraform_dir }}/private"
         #            TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
         #            TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
         TF_VAR_pool_size: "1"
         TF_VAR_pool_type: "n1-standard-4"
       terraform:
         binary_path: "{{ terraform }}"
-        project_path: "{{ workspace }}/terraform"
+        project_path: "{{ local_terraform_dir }}"
         state_file: "{{ local_terraform_file }}"
         state: absent
   always:

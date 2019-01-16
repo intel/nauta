@@ -6,16 +6,16 @@
   set_fact:
     persistent_terraform: "{{ ((s3_access_key | default ('')) != '' ) | bool }}"
 
-- name: "Create terraform files directory {{ workspace }}/terraform"
+- name: "Create terraform files directory {{ local_terraform_dir }}"
   file:
     state: directory
-    path: "{{ workspace }}/terraform"
+    path: "{{ local_terraform_dir }}"
     mode: 0755
 
-- name: Generate terraform files in {{ workspace }}/terraform
+- name: Generate terraform files in {{ local_terraform_dir }}
   template:
     src: "{{ template_item }}.j2"
-    dest: "{{ workspace }}/terraform/{{ template_item }}"
+    dest: "{{ local_terraform_dir }}/{{ template_item }}"
   loop_control:
     loop_var: template_item
   with_items:
@@ -67,7 +67,7 @@
         dest: "{{ local_terraform_file }}"
       when: persistent_terraform and terraform_file in s3_files.s3_keys
 
-    - name: Create empty tfstate file
+    - name: "Create empty tfstate file {{ local_terraform_file }}"
       copy:
         dest: "{{ local_terraform_file }}"
         content: ""
@@ -75,20 +75,20 @@
 
     - name: Generate private key
       openssl_privatekey:
-        path: "{{ workspace }}/private"
+        path: "{{ local_terraform_dir }}/private"
         mode: 0600
 
     - name: Generate public key
       openssl_publickey:
-        path: "{{ workspace }}/public"
-        privatekey_path: "{{ workspace }}/private"
+        path: "{{ local_terraform_dir }}/public"
+        privatekey_path: "{{ local_terraform_dir }}/private"
         format: OpenSSH
 
     - name: Install terraform plugins
       environment: "{{ proxy_env }}"
       shell: "{{ terraform }} init"
       args:
-        chdir: "{{ workspace }}/terraform"
+        chdir: "{{ local_terraform_dir }}"
       changed_when: False
 
     - name: Terraform definition file
@@ -100,13 +100,13 @@
         TF_VAR_prefix: "{{ prefix }}"
         TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
         TF_VAR_external_public_key_file: "{{ external_public_key }}"
-        TF_VAR_internal_public_key_file: "{{ workspace }}/public"
-        TF_VAR_internal_key_file: "{{ workspace }}/private"
+        TF_VAR_internal_public_key_file: "{{ local_terraform_dir }}/public"
+        TF_VAR_internal_key_file: "{{ local_terraform_dir }}/private"
         TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
         TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
       shell: "{{ terraform }} refresh -state {{ local_terraform_file }}"
       args:
-        chdir: "{{ workspace }}/terraform"
+        chdir: "{{ local_terraform_dir }}"
       changed_when: False
 
     - name: Apply terraform
@@ -114,13 +114,13 @@
         TF_VAR_prefix: "{{ prefix }}"
         TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
         TF_VAR_external_public_key_file: "{{ external_public_key }}"
-        TF_VAR_internal_public_key_file: "{{ workspace }}/public"
-        TF_VAR_internal_key_file: "{{ workspace }}/private"
+        TF_VAR_internal_public_key_file: "{{ local_terraform_dir }}/public"
+        TF_VAR_internal_key_file: "{{ local_terraform_dir }}/private"
         TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
         TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
       terraform:
         binary_path: "{{ terraform }}"
-        project_path: "{{ workspace }}/terraform"
+        project_path: "{{ local_terraform_dir }}"
         state_file: "{{ local_terraform_file }}"
         state: present
       register: terraform_infra
@@ -160,7 +160,7 @@
         group: nfs
         ansible_ssh_host: "{{ terraform_infra.outputs.nfs_internal_ip.value }}"
         ansible_ssh_user: "{{ gcp.internal_username }}"
-        ansible_ssh_private_key_file: "{{ workspace }}/private"
+        ansible_ssh_private_key_file: "{{ local_terraform_dir }}/private"
         ansible_ssh_common_args: >
           -o ProxyCommand="ssh -W %h:%p
           -o GSSAPIAuthentication=no -o ControlMaster=auto -o ControlPersist=60s

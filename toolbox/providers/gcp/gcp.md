@@ -116,9 +116,10 @@ Options:
 - `external-public-key` `[~/.ssh/id_rsa.pub]` - Path to file with public key accepted by cluster gateway to connect.
 - `external-key` `[~/.ssh/id_rsa]` -Path to file with private key used to connect to cluster gateway.
 - `s3-url` Url to s3 bucket to store terraform cluster state. By default local file will be used.
-- `s3-secret-key` Secret key to s3 bucket
-- `s3-access-key` Secret key to s3 bucket
-- `network-settings` `config.yml` - File name with network settings in provider directory
+- `s3-secret-key` Secret key to s3 bucket.
+- `s3-access-key` Secret key to s3 bucket.
+- `network-settings` `config.yml` - File name with network settings in provider directory.
+- `compile-platform-on-cloud` [`false|true]` - If true plagform packages will be create on bastion/gatway node.
 
 ### Use cases
 - #### Destroy cluster
@@ -140,6 +141,7 @@ Options:
 ```
 
 ### Installer output
+#### Access data
 Ip addresses for bastion nodes are visible in `<cluster_name>.info` file.
 User can access to bastion/gateway node using:
 
@@ -152,3 +154,5 @@ or without proxy:
 ```$xslt
 ssh -i /pathtoprivatekey <external-user>@<ip-gateway>
 ```
+#### Definition data
+During cluster creation all data related with terraform definition and state is stored in `.workspace/terraform/<cluster-name>` directory.

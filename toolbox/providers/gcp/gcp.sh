@@ -21,7 +21,7 @@ print_log () {
     if [ "$1" = "ERROR" ] ; then
         COLOR='\033[0;31m' #red
     fi
-    if [ "$1" = "INFO" ] ; then
+    if [ "$1" = "DEBUG" ] ; then
         COLOR='\033[0;32m' #green
     fi
     if [ "$1" = "WARNING" ] ; then
@@ -35,26 +35,31 @@ check_file_presence() {
     if [ -f $1 ]; then
         print_log "INFO" "File $1 exists"
     else
-        print_log "ERROR" "File $1 does not exists"
+        print_log "WARNING" "File $1 does not exists"
         exit 1
     fi
 }
 
 function validate_prerequisities {
-    print_log  "INFO" "Validate prerequisities"
+    print_log "INFO" "Validate prerequisities"
 }
 
 function validate_arguments {
-    print_log  "WARNING" "Validate arguments"
+    print_log "DEBUG" "Validate arguments"
     check_file_presence "${GcpConfig}"
     check_file_presence "${SCRIPTDIR}/gcp-service-account.yml"
     if [ "${InstallFile}" != "" ]; then
         check_file_presence "${InstallFile}"
     fi
+
+    if [ "${InstallFile}" != "" ] && [ "${CompilePlatformOnCloud}" = "true" ] ; then
+        print_log "WARNING" "Both: compile platform on gateway and local install file are set. Compilation on gateway is overriden strategy."
+        InstallFile=""
+    fi
 }
 
 function set_defaults {
-    print_log  "WARNING" "Set defaults"
+    print_log "DEBUG" "Set defaults"
 #    if [ "${Operation}" = "" ] ; then Operation="create" ; fi
     if [ "${GcpConfig}" = "" ] ; then GcpConfig="`pwd`/gcp-config.yml" ; fi
     if [ "${K8sCluster}" = "" ] ; then K8sCluster="nauta" ; fi
@@ -63,13 +68,20 @@ function set_defaults {
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
     if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="config.yml" ; fi
 
+    if [ "${CompilePlatformOnCloud}" = "" ] ; then CompilePlatformOnCloud="false" ; fi
+
     if [ "${InstallFile}" != "" ]; then
         INSTALL_FILE_NAME=$(basename -- "${InstallFile}")
+    fi
+
+    CurrentBranch=`git status | grep "On branch" | awk '{print $3}'`
+    if [ "${CurrentBranch}" = "" ] ; then
+        CurrentBranch="develop"
     fi
 }
 
 show_parameters() {
-    print_log  "WARNING" "Build parameters:"
+    print_log "DEBUG" "Build parameters:"
     echo -e "\t\tOperation=${Operation}"
     echo -e "\t\tK8sCluster=${K8sCluster}"
     echo -e "\t\tGcpConfig=${GcpConfig}"
@@ -79,6 +91,8 @@ show_parameters() {
     echo -e "\t\tNetworkSettings=${NetworkSettings}"
     echo -e ""
     echo -e "\t\tInstallFile=${InstallFile}"
+    echo -e "\t\tCompilePlatformOnCloud=${CompilePlatformOnCloud}"
+    echo -e "\t\tCurrentBranch=${CurrentBranch}"
 
     echo -e ""
     echo -e "\t\tS3Url=${S3Url}"
@@ -89,7 +103,7 @@ show_parameters() {
 }
 
 create_cluster() {
-    print_log  "WARNING" "\
+    print_log "DEBUG" "\
     cd ../../.. && \
         ENV_S3_URL="${S3Url}" \
         ENV_SECRET_KEY="${S3SecretKey}" \
@@ -118,7 +132,7 @@ create_cluster() {
 
 
 destroy_cluster() {
-   print_log  "WARNING" "\
+   print_log "DEBUG" "\
     cd ../../.. && \
         ENV_S3_URL="${S3Url}" \
         ENV_SECRET_KEY="${S3SecretKey}" \
@@ -146,110 +160,121 @@ destroy_cluster() {
 }
 
 set_connectivity_params() {
-    print_log  "WARNING" "Set connectivity parameters to access gateway node"
+    print_log "DEBUG" "Set connectivity parameters to access gateway node"
     GATEWAY_IP=`cat ${K8sOutputFile} | grep "gateway_ip" | awk -F '"' '{print $2}'`
     GATEWAY_USER=`cat ${GcpConfig} | grep "external_username" | awk -F '"' '{print $2}'`
     PROXY_TO_GATEWAY=`cat ${SCRIPTDIR}/../../${NetworkSettings} | grep "ssh_args_for_cmd_line" | awk -F '"' '{print $2}'`
 }
 
 show_connectivity_parameters() {
-    print_log  "WARNING" "Conectivity parameters:"
+    print_log "DEBUG" "Conectivity parameters:"
     echo -e "\t\tGATEWAY_IP=${GATEWAY_IP}"
     echo -e "\t\tGATEWAY_USER=${GATEWAY_USER}"
     echo -e "\t\tPROXY_TO_GATEWAY=${PROXY_TO_GATEWAY}"
 }
 
-transfer_install_file() {
-    print_log  "WARNING" "Transfer install file ${InstallFile} to gateway node ${GATEWAY_IP}"
+run_scp_command() {
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" scp -i "${ExternalKey}" $1 $2
+        scp -r -i "${ExternalKey}"  $1 $2
+    else
+        print_log "DEBUG" scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" $1 $2
+        scp -r -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" $1 $2
+    fi
+}
 
-    print_log  "WARNING" "shasum -a 256 ${InstallFile} > ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256"
+run_ssh_command() {
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" "$1"
+        ssh -i "${ExternalKey}" "$1"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" "$1"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" "$1"
+    fi
+}
+
+transfer_install_file() {
+    print_log "DEBUG" "Transfer install file ${InstallFile} to gateway node ${GATEWAY_IP}"
+
+    print_log "DEBUG" "shasum -a 256 ${InstallFile} > ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256"
     shasum -a 256 -p ${InstallFile} > ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256
     rm -rf ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
 
-    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
-        set +e
-        print_log  "WARNING" scp -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
-        scp -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
-        set -e
-    else
-        set +e
-        print_log  "WARNING" scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
-        scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
-        set -e
-    fi
+    set +e
+    run_scp_command ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
+    set -e
 
     set +e
-    print_log  "WARNING" diff ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
+    print_log "DEBUG" diff ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
     diff ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
     ret_val=$?
     set -e
 
-    print_log  "WARNING" "sha256 comparision result:${ret_val}"
+    print_log "DEBUG" "sha256 comparision result:${ret_val}"
 
     if [ "${ret_val}" != "0" ]; then
-        if [ "${PROXY_TO_GATEWAY}" = "" ]; then
-            print_log  "WARNING" scp -i "${ExternalKey}" "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
-            scp -i "${ExternalKey}" "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
+        run_scp_command "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
+        run_scp_command ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
+    fi
+}
 
-            print_log  "WARNING" scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${INSTALL_FILE_NAME}.sha256.remote ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
-            scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
-        else
-            print_log  "WARNING" scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
-            scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
+transfer_scripts() {
+    print_log "DEBUG" "Transfer install scripts"
+    run_scp_command ${SCRIPTDIR}/files/remote_scripts ${GATEWAY_USER}@${GATEWAY_IP}:
+}
 
-            print_log  "WARNING" scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${INSTALL_FILE_NAME}.sha256.remote ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
-            scp -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
-        fi
+install_platform_prerequisities() {
+    print_log "DEBUG" "Install platform prerequisities on gateway"
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_prerequisities.sh"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_prerequisities.sh"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_prerequisities.sh"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_prerequisities.sh"
     fi
 }
 
 install_platform() {
-    print_log  "WARNING" "Install platform from file ${InstallFile} on gateway"
+    print_log "DEBUG" "Install platform from file ${InstallFile} on gateway"
+
+    print_log "DEBUG" "Install platform prerequisities on gateway"
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_platform.sh ${INSTALL_FILE_NAME}"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_platform.sh ${INSTALL_FILE_NAME}"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_platform.sh ${INSTALL_FILE_NAME}"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/install_platform.sh ${INSTALL_FILE_NAME}"
+    fi
+}
+
+install_compiler_prerequisities() {
+    print_log "DEBUG" "Install compile prerequisities on gateway"
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_prerequisities.sh"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_prerequisities.sh"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_prerequisities.sh"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_prerequisities.sh"
+    fi
+}
+
+compile_platform() {
+    print_log "DEBUG" "Compile platform"
+
+    # till repo won't be public
+    run_scp_command /opt/home/k8sworker/cloud/carbon.tar ${GATEWAY_USER}@${GATEWAY_IP}:carbon.tar
 
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} rm -rf install
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} rm -rf install
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} tar xvf ${INSTALL_FILE_NAME} -C install
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} tar xvf ${INSTALL_FILE_NAME} -C install
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get update
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get update
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get install python python-pip python-dev virtualenv python3-pip python3-dev python3-venv gcc openssl libssl-dev libffi-dev -y
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get install python python-pip python-dev virtualenv python3-pip python3-dev python3-venv gcc openssl libssl-dev libffi-dev -y
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
     else
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} tar xvf ${INSTALL_FILE_NAME} -C install
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} tar xvf ${INSTALL_FILE_NAME} -C install
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get update
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get update
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get install python python-pip python-dev virtualenv python3-pip python3-dev python3-venv gcc openssl libssl-dev libffi-dev -y
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} sudo apt-get install python python-pip python-dev virtualenv python3-pip python3-dev python3-venv gcc openssl libssl-dev libffi-dev -y
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
-
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
     fi
 }
 
 clean() {
-   print_log  "WARNING" "\
+   print_log "DEBUG" "\
     cd ../../.. && \
         make gcp-clean \
     "
@@ -259,7 +284,7 @@ clean() {
 }
 
 show_help() {
-   print_log  "WARNING" "Help"
+   print_log "DEBUG" "Help"
    echo -e `cat ${SCRIPTDIR}/gcp.sh.help | sed 's/\[RED\]/\\\033\[0;31m/g' | sed 's/\[GREEN\]/\\\033\[0;32m/g' | sed 's/\[YELLOW\]/\\\033\[0;33m/g' | sed 's/\[NOCOLOR\]/\\\033\[0m/g' | sed 's/\[BR\]/\\\n/g'`
 }
 
@@ -279,6 +304,7 @@ LONG_OPTIONS+="s3-secret-key:,"
 LONG_OPTIONS+="s3-access-key:,"
 LONG_OPTIONS+="install-file:,"
 LONG_OPTIONS+="network-settings:,"
+LONG_OPTIONS+="compile-platform-on-cloud:,"
 LONG_OPTIONS+="help"
 
 SHORT_OPTIONS="c:"
@@ -297,6 +323,7 @@ while true; do
         --s3-access-key) S3AccessKey="$2"; shift 2 ;;
         --install-file) InstallFile="$2"; shift 2 ;;
         --network-settings) NetworkSettings="$2"; shift 2 ;;
+        --compile-platform-on-cloud) CompilePlatformOnCloud="$2"; shift 2 ;;
         --) break;;
         *) echo "Internal error! |$1|$2|" ; exit 1 ;;
    esac
@@ -314,10 +341,29 @@ if [ "${Operation}" = "create" ]; then
     create_cluster
 fi
 
+if [ "${CompilePlatformOnCloud}" = "true" ]; then
+    set_connectivity_params
+    show_connectivity_parameters
+    transfer_scripts
+
+    VERSION_MAJOR=1
+    VERSION_MINOR=0
+    VERSION_NO=0
+    VERSION_ID=`date +"%Y%m%d%H%M%S"`
+    INSTALL_FILE_NAME="nauta-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}.tar.gz"
+    INSTALL_CLIENT_FILE_NAME="nctl-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}.tar.gz"
+    install_compiler_prerequisities
+    compile_platform
+    install_platform_prerequisities
+    install_platform
+fi
+
 if [ "${InstallFile}" != "" ]; then
     set_connectivity_params
     show_connectivity_parameters
+    transfer_scripts
     transfer_install_file
+    install_platform_prerequisities
     install_platform
 fi
 
@@ -325,4 +371,4 @@ if [ "${Operation}" = "destroy" ]; then
     destroy_cluster
 fi
 
-print_log "WARNING" "Script finish"
+print_log "DEBUG" "Script finish"
