@@ -53,9 +53,9 @@ kubectl port-forward --namespace=$NAMESPACE $DOCKER_REGISTRY_POD $DOCKER_REGISTR
 UNAME="$(uname -s)"
 if [[ $UNAME = "Darwin" ]]; then
   echo "Running on Darwin OS, starting docker host port-forwarding"
-  if ! docker top dlsctl-registry &>/dev/null; then
-    echo "Starting dlsctl-registry container"
-    docker run -d --rm --net=host --name=dlsctl-registry alpine/socat TCP-LISTEN:$DOCKER_REGISTRY_PORT,fork,reuseaddr TCP:host.docker.internal:$DOCKER_REGISTRY_PORT
+  if ! docker top nctl-registry &>/dev/null; then
+    echo "Starting nctl-registry container"
+    docker run -d --rm --net=host --name=nctl-registry alpine/socat TCP-LISTEN:$DOCKER_REGISTRY_PORT,fork,reuseaddr TCP:host.docker.internal:$DOCKER_REGISTRY_PORT
   fi
 fi
 

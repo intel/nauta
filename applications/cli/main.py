@@ -73,13 +73,13 @@ def signal_handler(sig, frame):
 
 
 def configure_cli_logs():
-    if os.environ.get('DLS_CTL_LOG_DISABLE'):
+    if os.environ.get('NAUTA_CTL_LOG_DISABLE'):
         return
 
-    log_level = os.environ.get('DLS_CTL_FILE_LOG_LEVEL', default=logging.DEBUG)
-    log_retention = os.environ.get('DLS_CTL_LOG_RETENTION', default=30)
+    log_level = os.environ.get('NAUTA_CTL_FILE_LOG_LEVEL', default=logging.DEBUG)
+    log_retention = os.environ.get('NAUTA_CTL_LOG_RETENTION', default=30)
 
-    log_file_directory = os.environ.get('DLS_CTL_LOG_DIRECTORY')
+    log_file_directory = os.environ.get('NAUTA_CTL_LOG_DIRECTORY')
     if not log_file_directory:
         verify_cli_config_path()
         log_file_directory = '{}/logs'.format(Config().config_path)

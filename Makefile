@@ -42,7 +42,7 @@ include toolbox/checks/checks.mk
 k8s-installer-build:
 	@make tools-release
 
-dlsctl-build:
+nctl-build:
 	@(cd $(CURDIR)/applications/cli && make full_clean && make push)
 
 tools-%:
@@ -64,7 +64,7 @@ unit-tests-with-code-cov:
 	@(cd $(CURDIR)/applications/cli && make test-with-code-cov)
 
 gui-unit-tests:
-	@(cd $(CURDIR)/applications/dls-gui && make test)
+	@(cd $(CURDIR)/applications/nauta-gui && make test)
 
 exp-service-tests:
 	@(cd $(GOPATH)/src/github.com/nervanasystems/carbon/applications/experiment-service && make test)

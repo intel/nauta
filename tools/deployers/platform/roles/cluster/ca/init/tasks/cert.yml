@@ -1,7 +1,7 @@
 ---
 
 - set_fact:
-    node_kind_path: "/etc/dls-cluster/master/{{ kind }}"
+    node_kind_path: "/etc/nauta-cluster/master/{{ kind }}"
 
 - name: "{{ message_label }} Generate privatekey for type {{ name }}"
   openssl_privatekey:

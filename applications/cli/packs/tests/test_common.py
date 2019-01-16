@@ -18,30 +18,30 @@ import unittest.mock as mock
 
 import packs.common as common
 
-PREP_LIST_OUTPUT = '''RUN mkdir .dlsctl/tmp/t20180416164710727 
-COPY .dlsctl/tmp/t20180416164710727/* .dlsctl/tmp/t20180416164710727/ 
-RUN mkdir .dlsctl/tmp/t20180416164710727/charts 
-COPY .dlsctl/tmp/t20180416164710727/charts/* .dlsctl/tmp/t20180416164710727/charts/ 
-RUN mkdir .dlsctl/tmp/t20180416164710727/charts/tf-training 
-COPY .dlsctl/tmp/t20180416164710727/charts/tf-training/* .dlsctl/tmp/t20180416164710727/charts/tf-training/ 
-RUN mkdir .dlsctl/tmp/t20180416164710727/charts/tf-training/templates 
-COPY .dlsctl/tmp/t20180416164710727/charts/tf-training/templates/* .dlsctl/tmp/t20180416164710727/charts/tf-training/templates/ 
-RUN mkdir .dlsctl/tmp/t20180416164710727/charts/tf-training/charts 
-COPY .dlsctl/tmp/t20180416164710727/charts/tf-training/charts/* .dlsctl/tmp/t20180416164710727/charts/tf-training/charts/'''
+PREP_LIST_OUTPUT = '''RUN mkdir .nctl/tmp/t20180416164710727 
+COPY .nctl/tmp/t20180416164710727/* .nctl/tmp/t20180416164710727/ 
+RUN mkdir .nctl/tmp/t20180416164710727/charts 
+COPY .nctl/tmp/t20180416164710727/charts/* .nctl/tmp/t20180416164710727/charts/ 
+RUN mkdir .nctl/tmp/t20180416164710727/charts/tf-training 
+COPY .nctl/tmp/t20180416164710727/charts/tf-training/* .nctl/tmp/t20180416164710727/charts/tf-training/ 
+RUN mkdir .nctl/tmp/t20180416164710727/charts/tf-training/templates 
+COPY .nctl/tmp/t20180416164710727/charts/tf-training/templates/* .nctl/tmp/t20180416164710727/charts/tf-training/templates/ 
+RUN mkdir .nctl/tmp/t20180416164710727/charts/tf-training/charts 
+COPY .nctl/tmp/t20180416164710727/charts/tf-training/charts/* .nctl/tmp/t20180416164710727/charts/tf-training/charts/'''
 
-PREP_LIST_INPUT = [('/.dlsctl/tmp/t20180416164609672/charts/tf-training/charts', [], []),
-     ('/.dlsctl/tmp/t20180416164609672', ['charts'], ['app.py', '.draftignore', 'Dockerfile', 'draft.toml']),
-     ('/.dlsctl/tmp/t20180416164609672/charts', ['tf-training'], []),
-     ('/.dlsctl/tmp/t20180416164609672/charts/tf-training', ['templates', 'charts'],
+PREP_LIST_INPUT = [('/.nctl/tmp/t20180416164609672/charts/tf-training/charts', [], []),
+     ('/.nctl/tmp/t20180416164609672', ['charts'], ['app.py', '.draftignore', 'Dockerfile', 'draft.toml']),
+     ('/.nctl/tmp/t20180416164609672/charts', ['tf-training'], []),
+     ('/.nctl/tmp/t20180416164609672/charts/tf-training', ['templates', 'charts'],
       ['values.yaml', '.helmignore', 'Chart.yaml']),
-     ('/.dlsctl/tmp/t20180416164609672/charts/tf-training/templates', [], ['job.yaml', '_helpers.tpl']),
-     ('/.dlsctl/tmp/t20180416164609672/charts/tf-training/charts', [], []),
-     ('/.dlsctl/tmp/t20180416164710727', ['charts'], ['app.py', '.draftignore', 'Dockerfile', 'draft.toml']),
-     ('/.dlsctl/tmp/t20180416164710727/charts', ['tf-training'], []),
-     ('/.dlsctl/tmp/t20180416164710727/charts/tf-training', ['templates', 'charts'],
+     ('/.nctl/tmp/t20180416164609672/charts/tf-training/templates', [], ['job.yaml', '_helpers.tpl']),
+     ('/.nctl/tmp/t20180416164609672/charts/tf-training/charts', [], []),
+     ('/.nctl/tmp/t20180416164710727', ['charts'], ['app.py', '.draftignore', 'Dockerfile', 'draft.toml']),
+     ('/.nctl/tmp/t20180416164710727/charts', ['tf-training'], []),
+     ('/.nctl/tmp/t20180416164710727/charts/tf-training', ['templates', 'charts'],
       ['values.yaml', '.helmignore', 'Chart.yaml']),
-     ('/.dlsctl/tmp/t20180416164710727/charts/tf-training/templates', [], ['job.yaml', '_helpers.tpl']),
-     ('/.dlsctl/tmp/t20180416164710727/charts/tf-training/charts', [], [])]
+     ('/.nctl/tmp/t20180416164710727/charts/tf-training/templates', [], ['job.yaml', '_helpers.tpl']),
+     ('/.nctl/tmp/t20180416164710727/charts/tf-training/charts', [], [])]
 
 PARAMETERS = ("--param1=value1", "-param2=value2", "param3=value3")
 SCRIPT_LOCATION = "training_script.py"

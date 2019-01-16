@@ -98,7 +98,7 @@ def main(_):
 
         summary_writer.add_summary(summary_out, global_step=i)
 
-        # Example of dls4e metrics usage. Simply construct dict of keys and string values that you want to bind with
+        # Example of nauta metrics usage. Simply construct dict of keys and string values that you want to bind with
         # them and call publish. Old values of the same key will be overwritten.
         publish({"global_step": str(i), "loss": str(loss_val), "accuracy": str(accuracy_val)})
 

@@ -1,0 +1,33 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-output
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 32Gi
+{{- if .Values.global.features.nfs }}
+  storageClassName: ""
+  selector:
+    matchLabels:
+#      kind: internal
+      type: output
+      app: samba
+{{- else if .Values.global.output_nfs }}
+  storageClassName: ""
+  selector:
+    matchLabels:
+      app_name: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+      type: output
+      app: samba
+      namespace: {{ .Release.Namespace }}
+{{- end }}

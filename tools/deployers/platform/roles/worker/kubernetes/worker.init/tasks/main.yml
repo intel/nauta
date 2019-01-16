@@ -9,7 +9,7 @@
 - name: "{{ message_label }} Install cgroup file"
   template:
     src: kubelet.cgroup.conf.j2
-    dest: /etc/cgconfig.d/50-DLS4E.conf
+    dest: /etc/cgconfig.d/50-NAUTA.conf
   notify:
     - Restart CG
 

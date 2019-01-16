@@ -10,7 +10,7 @@
 
 - name: "{{ message_label }} Ensure that home dir exists"
   file:
-    path: /opt/dls4e/home
+    path: /opt/nauta/home
     state: directory
     mode: 0755
     owner: root
@@ -23,7 +23,7 @@
     generate_ssh_key: True
     groups: cluster-facts
     uid: "{{ item.uid }}"
-    home: "/opt/dls4e/home/{{ item.name }}"
+    home: "/opt/nauta/home/{{ item.name }}"
   with_items:
     - name: cluster-facts
       uid: 3510
@@ -34,7 +34,7 @@
 
 - name: "{{ message_label }} Fetch public keys from hosts"
   slurp:
-    src: "/opt/dls4e/home/cluster-facts/.ssh/id_rsa.pub"
+    src: "/opt/nauta/home/cluster-facts/.ssh/id_rsa.pub"
   register: cluster_facts_key
 
 - name: "{{ message_label }} Add authorized master keys to facts users"
@@ -46,7 +46,7 @@
 - name: "{{ message_label }} Render facts key config"
   template:
     src: config.j2
-    dest: /opt/dls4e/home/cluster-facts/.ssh/config
+    dest: /opt/nauta/home/cluster-facts/.ssh/config
     mode: 0600
     owner: cluster-facts
     group: cluster-facts
@@ -54,7 +54,7 @@
 
 - name: "{{ message_label }} Create cluster directory"
   file:
-    path: /etc/dls-facts
+    path: /etc/nauta-facts
     state: directory
     owner: cluster-facts
     group: cluster-facts

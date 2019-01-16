@@ -140,7 +140,7 @@ spec:
                   cpu: {{ default .Values.ps_resources.limits.cpu .Values.ps_cpu }}
                   memory: {{ default .Values.ps_resources.limits.memory .Values.ps_memory }}
             - name: sidecar
-              image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/ps-sidecar:1.0.0"
+              image: "127.0.0.1:{{ .Values.registryPort }}/nauta/ps-sidecar:1.0.0"
               imagePullPolicy: Always
               env:
                 - name: MY_POD_NAME

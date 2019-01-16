@@ -25,7 +25,7 @@ from cli_text_consts import PredictStreamCmdTexts as Texts
 
 TEST_DATA = '{"instances": [1.0, 2.0, 5.0]}'
 TEST_RESPONSE = '{"predictions": [3.5, 4.0, 5.5]}'
-TEST_URL = 'https://dls.com:8443/api/v1/namespaces/test/services/inf/proxy/v1/models/saved_model_half_plus_three'
+TEST_URL = 'https://nauta.com:8443/api/v1/namespaces/test/services/inf/proxy/v1/models/saved_model_half_plus_three'
 TEST_API_KEY = 'Bearer blablebla'
 
 

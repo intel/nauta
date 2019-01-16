@@ -1,0 +1,30 @@
+---
+
+- import_playbook: prepare.yml
+
+- name: Load storage
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: "storage/{{ storage_type | default('auto') }}"
+
+- name: Run provisioners preperation
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: workspace
+
+- name: Run provisioner pods
+  hosts: provisioner-pods
+  gather_facts: False
+  roles:
+    - role: workspace-prepare
+
+- name: Run provisioner registry
+  hosts: provisioners
+  gather_facts: False
+  roles:
+    - role: registry-install
+    - role: nauta-install
+
+- import_playbook: finalize.yml

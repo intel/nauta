@@ -1,0 +1,27 @@
+---
+
+- name: "{{ message_label }} Get current version of release"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get cm nauta -o 'jsonpath={.metadata.labels.nauta_release_version}'"
+  changed_when: False
+  register: nauta_version_remote
+
+- name: "{{ message_label }} Register fact if version is matching"
+  set_fact:
+    nauta_version_match: "{{ nauta_version == nauta_version_remote.stdout }}"
+
+- name: "{{ message_label }} Upgrade helm chart if required"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} upgrade nauta {{ runtime_nauta_chart }} --timeout {{ helm_timeout }} --wait -f {{ workspace }}/nauta-{{ nauta_version }}.values.yaml --recreate-pods"
+  when:
+    - not chart is changed
+    - upgrade | default(False) | bool
+    - not nauta_version_match
+
+- name: "{{ message_label }} Fail if upgrade is not possible"
+  fail:
+    msg: NAUTA is already installed and upgrade option is not selected
+  when:
+    - chart is not changed
+    - not (upgrade | default(False) | bool)
+    - not nauta_version_match

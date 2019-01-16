@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+    nauta_app_name: tensorboard-service
+  name: tensorboard-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 80
+    targetPort: http
+  selector:
+    app: {{ .Chart.Name }}
+    type: tensorboard-service
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}

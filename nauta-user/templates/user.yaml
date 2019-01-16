@@ -1,0 +1,10 @@
+apiVersion: {{ .Values.api_group_name }}/v1
+kind: User
+metadata:
+  name: "{{ required "NAUTA Username is required as parameter user" .Values.username }}"
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+spec:

@@ -136,7 +136,7 @@ Options:
 ```$xslt
 ./gcp.sh --k8s-cluster cicd-carbon-b --operation create \
                                      --gcp-config `pwd`/gcp-config.yml \
-                                     --install-file /opt/project-data/repository/releases/dls4e/dls4e-1.0.0-latest.tar.gz
+                                     --install-file /opt/project-data/repository/releases/nauta/nauta-1.0.0-latest.tar.gz
 ```
 
 ### Installer output

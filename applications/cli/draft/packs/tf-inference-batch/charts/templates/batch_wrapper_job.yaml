@@ -26,7 +26,7 @@ spec:
       schedulerName: kube-batch
       containers:
         - name: {{ .Chart.Name }}
-          image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/batch-inference:v1.0.0"
+          image: "127.0.0.1:{{ .Values.registryPort }}/nauta/batch-inference:v1.0.0"
           command: ["python3.6", "main.py"]
           args: ["--input_dir_path", "{{ .Values.dataPath }}", "--output_dir_path", "{{ .Values.outputPath }}", "--input_format", "{{ .Values.inputFormat }}" ]
           imagePullPolicy: {{ .Values.image.pullPolicy }}

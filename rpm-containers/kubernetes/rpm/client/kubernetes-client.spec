@@ -1,13 +1,13 @@
-Summary: DLS4E Kubernetes client metadata v%{_dls4e_version} package
-Name: dls4e-kubernetes-client
-Version: %{_dls4e_version}
-Release: %{_dls4e_release}
+Summary: NAUTA Kubernetes client metadata v%{_nauta_version} package
+Name: nauta-kubernetes-client
+Version: %{_nauta_version}
+Release: %{_nauta_release}
 License: Apache-2.0
 Group: Tools
 
-Requires: dls4e-commons
+Requires: nauta-commons
 
-Requires: dls4e-kubernetes-kubectl = %{version}
+Requires: nauta-kubernetes-kubectl = %{version}
 
 %define  debug_package %{nil}
 

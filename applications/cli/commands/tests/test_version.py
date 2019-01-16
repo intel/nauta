@@ -22,7 +22,7 @@ from click.testing import CliRunner
 
 from commands import version
 from version import VERSION
-from util.config import DLS4EConfigMap
+from util.config import NAUTAConfigMap
 from util.exceptions import KubernetesError
 from cli_text_consts import VersionCmdTexts as Texts, VERBOSE_RERUN_MSG
 
@@ -57,11 +57,11 @@ def mocked_k8s_CoreV1Api(mocker):
     mocker.patch('kubernetes.client.ApiClient')
     coreV1API_instance = mocked_coreV1Api_class.return_value
 
-    v1_config_map = V1ConfigMap(data={DLS4EConfigMap.PLATFORM_VERSION: PLATFORM_VERSION,
-                                      DLS4EConfigMap.IMAGE_TILLER_FIELD: "",
-                                      DLS4EConfigMap.EXTERNAL_IP_FIELD: "",
-                                      DLS4EConfigMap.IMAGE_TENSORBOARD_SERVICE_FIELD: "",
-                                      DLS4EConfigMap.REGISTRY_FIELD: ""})
+    v1_config_map = V1ConfigMap(data={NAUTAConfigMap.PLATFORM_VERSION: PLATFORM_VERSION,
+                                      NAUTAConfigMap.IMAGE_TILLER_FIELD: "",
+                                      NAUTAConfigMap.EXTERNAL_IP_FIELD: "",
+                                      NAUTAConfigMap.IMAGE_TENSORBOARD_SERVICE_FIELD: "",
+                                      NAUTAConfigMap.REGISTRY_FIELD: ""})
 
     coreV1API_instance.read_namespaced_config_map.return_value = v1_config_map
 
@@ -84,7 +84,7 @@ def test_version(mocked_k8s_config, mocked_k8s_CoreV1Api):
 
 
 def test_version_with_kubernetes_exception(mocker):
-    config_map_mock = mocker.patch('util.config.DLS4EConfigMap.__init__')
+    config_map_mock = mocker.patch('util.config.NAUTAConfigMap.__init__')
     config_map_mock.side_effect = KubernetesError("")
     runner = CliRunner()
     result = runner.invoke(version.version, [])
@@ -95,7 +95,7 @@ def test_version_with_kubernetes_exception(mocker):
 
 
 def test_version_with_unknown_exception(mocker):
-    config_map_mock = mocker.patch('util.config.DLS4EConfigMap.__init__')
+    config_map_mock = mocker.patch('util.config.NAUTAConfigMap.__init__')
     config_map_mock.side_effect = Exception("")
     runner = CliRunner()
     result = runner.invoke(version.version, [])

@@ -136,7 +136,7 @@ def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
     check_command_asserts(prepare_command_mocks, cne_count=0)
     assert f"Lack of {experiment_name_plural} fulfilling given criteria." \
            f" Name or match string parameters do not match any existing {experiment_name} in an appropriate " \
-           f"state for the command. Run 'dlsctl exp list' to find out what are the names and states of " \
+           f"state for the command. Run 'nctl exp list' to find out what are the names and states of " \
            f"existing {experiment_name_plural}." in result.output
 
 

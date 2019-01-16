@@ -1,0 +1,13 @@
+---
+
+- name: "{{ message_label }} Install nauta packages {{ packages | join(', ') }}"
+  yum:
+    disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
+    enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"
+    update_cache: "True"
+    disablerepo: "*"
+    enablerepo: "NAUTARepository"
+    name: "{{ item }}"
+    state: "{{ state | default('present') }}"
+  with_items: "{{ packages }}"
+  notify: "{{ task_handlers | default([]) }}"

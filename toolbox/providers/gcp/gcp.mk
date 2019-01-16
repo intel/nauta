@@ -38,7 +38,7 @@ gcp-destroy: $(ACTIVATE) $(WORKSPACE) $(TERRAFORM) ENV_NAME ENV_NETWORK_SETTINGS
 
 gcp-recreate: gcp-destroy gcp-create
 
-gcp-dls-install: $(ACTIVATE) ENV_NAME ENV_S3_URL ENV_SECRET_KEY ENV_ACCESS_KEY
+gcp-nauta-install: $(ACTIVATE) ENV_NAME ENV_S3_URL ENV_SECRET_KEY ENV_ACCESS_KEY
 	@$(K8S_BM_DEPLOYMENT_HOME)/files/gcp_install.sh \
 	    --k8s-clustername $(ENV_NAME) \
 	    --k8s-use-latest-if-install-not-found true \

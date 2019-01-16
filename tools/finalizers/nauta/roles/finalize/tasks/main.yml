@@ -1,0 +1,102 @@
+---
+
+- name: Create build dir directories
+  file:
+    path: "{{ build_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - docker
+    - repository
+    - tmp
+
+- name: Create ansible files
+  file:
+    path: "{{ build_dir }}/repository/{{ item }}"
+    state: directory
+  with_items:
+    - files
+    - group_vars/all
+
+- name: Get charts
+  shell: "tar -zvxf {{ chart }} -C {{ build_dir }}/repository/files"
+
+- name: Unarchive input package
+  shell: "tar -I pigz -xf {{ package }}"
+  args:
+    chdir: "{{ build_dir }}/tmp"
+  notify:
+    - Remove build dir
+
+- name: Load variables
+  include_vars:
+    dir: "{{ build_dir }}/tmp/facts"
+    extensions:
+      - yaml
+      - yml
+    name: build_facts
+
+- name: Set local url paths
+  vars:
+    name: "{{ item.key }}"
+    url: "{{ item.value.local_url }}"
+  set_fact:
+    image_local_url: "{{ image_local_url | default({}) | combine({name: url}) }}"
+  with_dict: "{{ build_facts.package_attached_images | default({}) }}"
+
+- name: Copy all deployer files
+  synchronize:
+    src: "{{ deployer }}/"
+    dest: "{{ build_dir }}/repository/"
+  notify:
+    - Remove build dir
+
+- name: Create deployer bin
+  shell: "tar -cf {{ build_dir }}/docker/docker.tar.gz -I pigz ./"
+  args:
+    chdir: "{{ build_dir }}/tmp/registry/"
+
+- name: Copy templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ build_dir }}/docker/{{ item }}"
+  with_items:
+    - Dockerfile
+    - registry.yml
+
+- name: Build image
+  docker_image:
+    buildargs:
+      BASE_IMAGE: "{{ build_facts.package_attached_images['nauta/registry'].remote_url }}"
+    path: "{{ build_dir }}/docker"
+    name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+    pull: False
+    push: False
+  notify:
+    - Remove docker image
+
+- name: Save image
+  vars:
+    image: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+    dest: "{{ build_dir }}/repository/files/nauta-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.img"
+  shell: docker save {{ image }} -o {{ dest }}
+
+- name: Generate file with configuration
+  vars:
+    configuration:
+      nauta_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+  copy:
+    dest: "{{ build_dir }}/repository/group_vars/all/version.yml"
+    content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+
+- name: Generate file with images
+  vars:
+    configuration:
+      registry_images: "{{ export_images }}"
+  copy:
+    dest: "{{ build_dir }}/repository/group_vars/all/images.yml"
+    content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+
+- name: Create package
+  shell: tar -cf {{ output }} -I pigz ./
+  args:
+    chdir: "{{ build_dir }}/repository"

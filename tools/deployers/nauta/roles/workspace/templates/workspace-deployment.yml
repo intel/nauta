@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nauta-workspace-pod
+  namespace: nauta
+spec:
+  selector:
+    matchLabels:
+      app: workspace
+      release: nauta
+      kind: bootstrap-nauta-workspace
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: workspace
+        release: nauta
+        kind: bootstrap-nauta-workspace
+    spec:
+      tolerations:
+        - key: "master"
+          operator: "Exists"
+          effect: "NoSchedule"
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      volumes:
+        - name: bin
+          hostPath:
+            path: /bin
+            type: Directory
+        - name: usrbin
+          hostPath:
+            path: /usr/bin
+            type: Directory
+        - name: sbin
+          hostPath:
+            path: /sbin
+            type: Directory
+        - name: lib
+          hostPath:
+            path: /lib
+            type: Directory
+        - name: lib64
+          hostPath:
+            path: /lib64
+            type: Directory
+        - name: docker
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: kind
+                      operator: In
+                      values:
+                        - bootstrap-nauta-workspace
+                topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: master
+                    operator: In
+                    values:
+                      - "True"
+      containers:
+        - name: bootstrap
+          image: {{ pause_image }}
+          env:
+            - name: PATH
+              value: /bin:/usr/bin:/usr/sbin
+          volumeMounts:
+            - name: bin
+              mountPath: /bin
+              readOnly: true
+            - name: usrbin
+              mountPath: /usr/bin
+              readOnly: true
+            - name: sbin
+              mountPath: /sbin
+              readOnly: true
+            - name: lib
+              mountPath: /lib
+              readOnly: true
+            - name: lib64
+              mountPath: /lib64
+              readOnly: true
+            - name: docker
+              mountPath: /var/run/docker.sock

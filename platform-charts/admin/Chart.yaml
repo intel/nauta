@@ -1,4 +1,4 @@
 apiVersion: v1
 name: admin
-description: A DLS Admin User creation
+description: A NAUTA Admin User creation
 version: 1.0.0

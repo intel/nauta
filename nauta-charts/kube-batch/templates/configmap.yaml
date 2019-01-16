@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+data:
+  actions:                   "reclaim, allocate, backfill, preempt"
+  plugins:                   "gang, priority, predicates"
+  plugin.gang.jobready:      "true"
+  plugin.gang.joborder:      "true"
+  plugin.gang.preemptable:   "true"
+  plugin.priority.joborder:  "true"
+  plugin.priority.taskorder: "true"

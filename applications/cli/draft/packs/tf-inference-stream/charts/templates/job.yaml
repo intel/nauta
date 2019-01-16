@@ -38,7 +38,7 @@ spec:
               value: "/models"
             - name: MODEL_PATH
               value: "{{ .Values.modelPath }}"
-          command: ["tf_serving_dls4e"]
+          command: ["tf_serving_nauta"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.grpcContainerPort }}

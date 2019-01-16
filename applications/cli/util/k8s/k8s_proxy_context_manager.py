@@ -24,7 +24,7 @@ import psutil
 
 from util.config import Config
 from util.k8s import kubectl
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.logger import initialize_logger
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, KubectlConnectionError
 from cli_text_consts import UtilK8sProxyTexts as Texts
@@ -37,9 +37,9 @@ class TunnelSetupError(RuntimeError):
 
 
 class K8sProxy:
-    def __init__(self, dls4e_app_name: DLS4EAppNames, port: int = None,
+    def __init__(self, nauta_app_name: NAUTAAppNames, port: int = None,
                  app_name: str = None, number_of_retries: int = 0, namespace: str = None):
-        self.dls4e_app_name = dls4e_app_name
+        self.nauta_app_name = nauta_app_name
         self.external_port = port
         self.app_name = app_name
         self.number_of_retries = number_of_retries
@@ -49,7 +49,7 @@ class K8sProxy:
         logger.debug("k8s_proxy - entering")
         try:
             self.process, self.tunnel_port, self.container_port \
-                = kubectl.start_port_forwarding(k8s_app_name=self.dls4e_app_name,
+                = kubectl.start_port_forwarding(k8s_app_name=self.nauta_app_name,
                                                 port=self.external_port,
                                                 app_name=self.app_name,
                                                 number_of_retries=self.number_of_retries,
@@ -103,7 +103,7 @@ class K8sProxy:
 
 def check_port_forwarding():
     config = Config()
-    with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+    with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         address = "127.0.0.1", proxy.tunnel_port
         if sock.connect_ex(address) != 0:

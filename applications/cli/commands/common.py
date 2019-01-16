@@ -116,7 +116,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
         status = RunStatus[status] if status else None
 
         # List experiments command is actually listing Run resources instead of Experiment resources with one
-        # exception - if run is initialized - dlsctl displays data of an experiment instead of data of a run
+        # exception - if run is initialized - nctl displays data of an experiment instead of data of a run
         runs = replace_initializing_runs(
             Run.list(namespace=namespace, state_list=[status], name_filter=name, run_kinds_filter=listed_runs_kinds))
         runs_representations = [run.cli_representation for run in runs]

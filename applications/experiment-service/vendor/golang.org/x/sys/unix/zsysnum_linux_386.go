@@ -90,7 +90,7 @@ const (
 	SYS_SETGROUPS              = 81
 	SYS_SELECT                 = 82
 	SYS_SYMLINK                = 83
-	SYS_OLDLSTAT               = 84
+	SYS_OLNAUTATAT               = 84
 	SYS_READLINK               = 85
 	SYS_USELIB                 = 86
 	SYS_SWAPON                 = 87

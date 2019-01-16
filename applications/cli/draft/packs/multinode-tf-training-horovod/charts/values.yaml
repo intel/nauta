@@ -7,7 +7,7 @@ useHostPID: false
 
 commandline:
   args:
-    {% for arg in DLS4e.CommandLine %}
+    {% for arg in NAUTA.CommandLine %}
     - {{ arg }}
     {% endfor %}
 
@@ -16,7 +16,7 @@ ssh:
   useSecrets: True
 
 image:
-  clusterRepository: {{ DLS4e.ExperimentImage }}
+  clusterRepository: {{ NAUTA.ExperimentImage }}
   pullPolicy: IfNotPresent
 
 workersCount: 3
@@ -58,8 +58,8 @@ master:
       value: "20"
 runKind: "training"
 
-experimentName: {{ DLS4e.ExperimentName }}
-registryPort: {{ DLS4e.RegistryPort }}
+experimentName: {{ NAUTA.ExperimentName }}
+registryPort: {{ NAUTA.RegistryPort }}
 
 podCount: 1
 

@@ -47,7 +47,7 @@ from util.system import get_current_os, OS
 from util import socat
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
     SubmitExperimentError
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s.k8s_info import get_app_service_node_port, get_kubectl_current_context_namespace
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
@@ -271,7 +271,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
 
         # start port forwarding
         # noinspection PyBroadException
-        with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+        with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
             # Save port that was actually used in configuration
             if proxy.tunnel_port != config.local_registry_port:
                 config.local_registry_port = proxy.tunnel_port
@@ -289,7 +289,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                         log.exception(error_msg)
                         raise SubmitExperimentError(error_msg)
 
-                cluster_registry_port = get_app_service_node_port(dls4e_app_name=DLS4EAppNames.DOCKER_REGISTRY)
+                cluster_registry_port = get_app_service_node_port(nauta_app_name=NAUTAAppNames.DOCKER_REGISTRY)
 
                 # prepare environments for all experiment's runs
                 for experiment_run in runs_list:
@@ -401,7 +401,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
         click.echo(exe.message)
         raise SubmitExperimentError(exe.message)
     except K8sProxyCloseError:
-        log.exception('Error during closing of a proxy for a {}'.format(DLS4EAppNames.DOCKER_REGISTRY))
+        log.exception('Error during closing of a proxy for a {}'.format(NAUTAAppNames.DOCKER_REGISTRY))
         raise K8sProxyCloseError(Texts.PROXY_CLOSE_ERROR_MSG)
     except K8sProxyOpenError:
         error_msg = Texts.PROXY_OPEN_ERROR_MSG
@@ -485,7 +485,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
     :param local_registry_port: port on which docker registry is accessible locally
-    :param cluster_registry_port: port on which docker registry is accessible within dls4e cluster
+    :param cluster_registry_port: port on which docker registry is accessible within nauta cluster
     :param pack_params: additional pack params
     :param env_variables: environmental variables to be passed to training
     :param requirements_file: path to a file with experiment requirements

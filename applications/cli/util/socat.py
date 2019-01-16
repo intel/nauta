@@ -29,7 +29,7 @@ from util.config import Config
 
 client = docker.from_env()
 
-SOCAT_CONTAINER_NAME_PREFIX = 'dlsctl-registry-bridge'
+SOCAT_CONTAINER_NAME_PREFIX = 'nctl-registry-bridge'
 
 socat_container_name = 'socat-'
 

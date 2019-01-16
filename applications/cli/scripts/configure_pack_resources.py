@@ -115,9 +115,9 @@ def get_horovod_resources(k8s_worker_resources: dict, physical_cpus=1):
     return horovod_resources
 
 
-def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_resources: dict, horovod_cpus=1):
+def override_default_resources_in_packs(nctl_config_dir_path: str, k8s_worker_resources: dict, horovod_cpus=1):
     yaml_parser = YAML(typ="jinja2")
-    values_yaml_paths = f'{dlsctl_config_dir_path}/packs/*/charts/values.yaml'
+    values_yaml_paths = f'{nctl_config_dir_path}/packs/*/charts/values.yaml'
     for values_yaml_path in glob.glob(values_yaml_paths):
         logger.info(f'Changing resources for pack: {values_yaml_path}')
         pack_resources = k8s_worker_resources.copy()
@@ -147,9 +147,9 @@ def override_default_resources_in_packs(dlsctl_config_dir_path: str, k8s_worker_
 def argument_parser():
     parser = argparse.ArgumentParser(description='Override default pack resources according to resources '
                                                  'actually available on the cluster, or values provided as parameters.')
-    parser.add_argument('-c', '--config-dir-path', default=os.environ.get('DLS_CTL_CONFIG'),
-                        type=str, help='Path to dlsctl config directory.'
-                                       ' May be set by DLS_CTL_CONFIG environment variable.')
+    parser.add_argument('-c', '--config-dir-path', default=os.environ.get('NCTL_CONFIG'),
+                        type=str, help='Path to nctl config directory.'
+                                       ' May be set by NCTL_CONFIG environment variable.')
     parser.add_argument('--cpu-percentage',
                         help='Define how many percent of allocatable CPUs may be used by packs (e.g. 0.2 or 0.5)',
                         type=float, required=False)
@@ -180,6 +180,6 @@ if __name__ == '__main__':
         resources_to_set = get_k8s_worker_allocatable_resources(cpu_threshold=args.cpu_percentage,
                                                                 mem_threshold=args.mem_percentage)
 
-    override_default_resources_in_packs(dlsctl_config_dir_path=args.config_dir_path,
+    override_default_resources_in_packs(nctl_config_dir_path=args.config_dir_path,
                                         k8s_worker_resources=resources_to_set,
                                         horovod_cpus=args.cpu_horovod)

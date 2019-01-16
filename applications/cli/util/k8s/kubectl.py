@@ -25,7 +25,7 @@ from util import system
 from util.logger import initialize_logger
 from util.exceptions import KubernetesError, KubectlConnectionError, LocalPortOccupiedError
 from util.k8s.k8s_info import get_app_services
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.system import check_port_availability
 from cli_text_consts import UtilKubectlTexts as Texts
 
@@ -55,7 +55,7 @@ def find_random_available_port() -> int:
     return tunnel_port
 
 
-def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_name: str = None,
+def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_name: str = None,
                           number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen, Optional[int], int):
     """
     Creates a proxy responsible for forwarding requests to and from a
@@ -67,7 +67,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
     function.
 
     :param k8s_app_name: name of kubernetes application for tunnel creation
-                         value taken from DLS4EAppNames enum
+                         value taken from NAUTAAppNames enum
     :param port: if given - the system will try to use it as a local port. Random port will be used
      if that port is not available
     :return:
@@ -79,7 +79,7 @@ def start_port_forwarding(k8s_app_name: DLS4EAppNames, port: int = None, app_nam
         service_node_port = None
         service_container_port = None
 
-        app_services = get_app_services(dls4e_app_name=k8s_app_name, namespace=namespace, app_name=app_name)
+        app_services = get_app_services(nauta_app_name=k8s_app_name, namespace=namespace, app_name=app_name)
 
         if app_services:
             service_node_port = app_services[0].spec.ports[0].node_port

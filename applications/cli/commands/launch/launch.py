@@ -25,7 +25,7 @@ from cli_state import common_options, pass_state, State
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, build_tensorboard_run_list
 from util.spinner import spinner
 from util.aliascmd import AliasCmd, AliasGroup
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.exceptions import LaunchError, ProxyClosingError
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.k8s.k8s_proxy_context_manager import K8sProxy
@@ -52,7 +52,7 @@ TENSORBOARD_CHECK_BACKOFF_SECONDS = 5
 @click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
 def webui(state: State, no_launch: bool, port_number: int):
     """ Subcommand for launching webUI with credentials """
-    launch_app_with_proxy(DLS4EAppNames.INGRESS, no_launch, port_number)
+    launch_app_with_proxy(NAUTAAppNames.INGRESS, no_launch, port_number)
 
 
 # noinspection PyUnusedLocal
@@ -71,7 +71,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
     current_namespace = get_kubectl_current_context_namespace()
 
     with spinner(Texts.TB_WAITING_MSG) as proxy_spinner, \
-            K8sProxy(dls4e_app_name=DLS4EAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
+            K8sProxy(nauta_app_name=NAUTAAppNames.TENSORBOARD_SERVICE, app_name='tensorboard-service',
                      namespace=current_namespace, port=tensorboard_service_client_port) as proxy:
 
         tensorboard_service_client = TensorboardServiceClient(address=f'http://127.0.0.1:{proxy.tunnel_port}')
@@ -98,7 +98,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if tb.status == TensorboardStatus.RUNNING:
                 proxy_spinner.hide()
-                launch_app_with_proxy(k8s_app_name=DLS4EAppNames.TENSORBOARD, no_launch=no_launch,
+                launch_app_with_proxy(k8s_app_name=NAUTAAppNames.TENSORBOARD, no_launch=no_launch,
                                       namespace=current_namespace, port=port_number,
                                       app_name=f"tensorboard-{tb.id}")
                 return
@@ -115,7 +115,7 @@ def launch():
     pass
 
 
-def launch_app_with_proxy(k8s_app_name: DLS4EAppNames, no_launch: bool, port: int = None, namespace: str = None,
+def launch_app_with_proxy(k8s_app_name: NAUTAAppNames, no_launch: bool, port: int = None, namespace: str = None,
                           app_name: str = None):
     # noinspection PyBroadException
     try:

@@ -225,8 +225,8 @@ install_platform() {
         print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
         ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
 
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/dls4e/config.yml install/installer.sh dls4e-install
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/dls4e/config.yml install/installer.sh dls4e-install
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
     else
         print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
         ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} mkdir -p install
@@ -243,8 +243,8 @@ install_platform() {
         print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
         ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} chmod +x install/installer.sh
 
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/dls4e/config.yml install/installer.sh dls4e-install
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/dls4e/config.yml install/installer.sh dls4e-install
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
     fi
 }
 

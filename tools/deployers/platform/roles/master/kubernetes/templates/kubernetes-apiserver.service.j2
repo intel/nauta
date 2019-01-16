@@ -7,34 +7,34 @@ Requires=docker.service
 TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
-ExecStart=/opt/dls4e/kubernetes/kube-apiserver \
-            --advertise-address {{ dls_configuration.internal_interface.ipv4_address }} \
+ExecStart=/opt/nauta/kubernetes/kube-apiserver \
+            --advertise-address {{ nauta_configuration.internal_interface.ipv4_address }} \
             --apiserver-count 1 \
             --secure-port {{ kubernetes_network.internal_port }} \
-            --bind-address {{ dls_configuration.internal_interface.ipv4_address }} \
+            --bind-address {{ nauta_configuration.internal_interface.ipv4_address }} \
             --allow-privileged \
             --etcd-servers "{{ etcd }}" \
-            --etcd-cafile /etc/dls-cluster/client/etcd/ca.pem \
-            --etcd-certfile /etc/dls-cluster/client/etcd/node.crt \
-            --etcd-keyfile /etc/dls-cluster/client/etcd/node.key \
-            --kubelet-certificate-authority /etc/dls-cluster/master/kubernetes/ca/CA.crt \
-            --kubelet-client-certificate /etc/dls-cluster/master/kubernetes/crt/apiservice.crt \
-            --kubelet-client-key /etc/dls-cluster/master/kubernetes/key/apiservice.key \
+            --etcd-cafile /etc/nauta-cluster/client/etcd/ca.pem \
+            --etcd-certfile /etc/nauta-cluster/client/etcd/node.crt \
+            --etcd-keyfile /etc/nauta-cluster/client/etcd/node.key \
+            --kubelet-certificate-authority /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
+            --kubelet-client-certificate /etc/nauta-cluster/master/kubernetes/crt/apiservice.crt \
+            --kubelet-client-key /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
             --service-cluster-ip-range {{ kubernetes_network.svc }} \
-            --client-ca-file /etc/dls-cluster/master/kubernetes/ca/CA.crt \
-            --tls-ca-file /etc/dls-cluster/master/kubernetes/ca/CA.crt \
-            --tls-cert-file /etc/dls-cluster/master/kubernetes/crt/apiservice.crt \
-            --tls-private-key-file /etc/dls-cluster/master/kubernetes/key/apiservice.key \
-            --requestheader-client-ca-file /etc/dls-cluster/master/kubernetes/ca/CA.crt \
+            --client-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
+            --tls-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
+            --tls-cert-file /etc/nauta-cluster/master/kubernetes/crt/apiservice.crt \
+            --tls-private-key-file /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
+            --requestheader-client-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
             --requestheader-extra-headers-prefix=X-Remote-Extra- \
             --requestheader-group-headers=X-Remote-Group \
             --requestheader-username-headers=X-Remote-User \
-            --proxy-client-cert-file /etc/dls-cluster/master/kubernetes/crt/apiservice-fullchain.crt \
-            --proxy-client-key-file /etc/dls-cluster/master/kubernetes/key/apiservice.key \
+            --proxy-client-cert-file /etc/nauta-cluster/master/kubernetes/crt/apiservice-fullchain.crt \
+            --proxy-client-key-file /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
             --admission-control "{{ kubernetes_calculated_admission_control | join(',') }}" \
             {{ feature_gates }} \
             {{ runtime_config }} \
-            --service-account-key-file /etc/dls-cluster/master/kubernetes/key/service.key \
+            --service-account-key-file /etc/nauta-cluster/master/kubernetes/key/service.key \
             --authorization-mode=RBAC \
             --anonymous-auth={{ 'true' if kubernetes_anonymous_access else 'False' }}
 

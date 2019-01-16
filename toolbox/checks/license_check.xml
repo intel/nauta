@@ -23,15 +23,15 @@
                 <excludes>
                     <exclude>**/.venv/**/*.*</exclude>
                     <exclude>**/node_modules/**/*.*</exclude>
-                    <exclude>**/dls-gui/build/**/*.*</exclude>
-                    <exclude>**/dls-gui/config/**/*.*</exclude>
+                    <exclude>**/nauta-gui/build/**/*.*</exclude>
+                    <exclude>**/nauta-gui/config/**/*.*</exclude>
                     <exclude>**/package_examples/mnist_checker.py</exclude>
                     <exclude>**/package_examples/mnist_converter_pb.py</exclude>
                     <exclude>**/package_examples/mnist_horovod.py</exclude>
                     <exclude>**/package_examples/mnist_multinode.py</exclude>
                     <exclude>**/package_examples/mnist_single_node.py</exclude>
-                    <exclude>**/dls-gui/.eslintrc.js</exclude>
-                    <exclude>**/dls-gui/.postcssrc.js</exclude>
+                    <exclude>**/nauta-gui/.eslintrc.js</exclude>
+                    <exclude>**/nauta-gui/.postcssrc.js</exclude>
                     <exclude>**/applications/experiment-service/vendor/</exclude>
                     <exclude>**/tmp-go/</exclude>
                     <exclude>**/applications/cli/build/</exclude>

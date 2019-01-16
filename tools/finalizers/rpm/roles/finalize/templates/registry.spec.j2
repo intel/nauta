@@ -1,5 +1,5 @@
-Summary: DLS4E Registry Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
-Name: dls4e-registry
+Summary: NAUTA Registry Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
+Name: nauta-registry
 Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
 Release: {{ VERSION_ID }}
 License: Apache-2.0
@@ -9,7 +9,7 @@ AutoReqProv: no
 
 %define  debug_package %{nil}
 
-Requires: dls4e-commons
+Requires: nauta-commons
 
 %description
 %{summary}
@@ -24,8 +24,8 @@ Requires: dls4e-commons
 rm -rf %{buildroot}
 mkdir -p  %{buildroot}
 
-mkdir -p %{buildroot}/opt/dls4e/registry
-cp -ar ./* %{buildroot}/opt/dls4e/registry/
+mkdir -p %{buildroot}/opt/nauta/registry
+cp -ar ./* %{buildroot}/opt/nauta/registry/
 
 exit 0
 %clean
@@ -33,4 +33,4 @@ rm -rf %{buildroot}
 
 %files
 %defattr(0755,root,root,-)
-/opt/dls4e/registry/*
+/opt/nauta/registry/*

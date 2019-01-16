@@ -9,5 +9,5 @@ docker_repository_cache:
 
 docker_repository_cache_registry: "{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
 docker_repository_cache_url: "{{ docker_repository_cache.schema }}://{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
-docker_version_prefix: dls4e
+docker_version_prefix: nauta
 docker_timeout: 1200

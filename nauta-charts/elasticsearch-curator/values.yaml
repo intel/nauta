@@ -1,0 +1,29 @@
+# Indices older than these will be deleted, in days
+indicesAge: 60
+
+# Mount path for the configmap
+mountPath: /etc/config
+
+# Schedule to run jobs. Must be in cron time format
+schedule: "0 1 * * *"
+
+# How many jobs to keep in history
+history:
+  successfulJobs: 1
+  failedJobs: 3
+
+# ElasticSearch connection details
+elasticsearch:
+  host: nauta-elasticsearch
+  port: 9200
+
+# Sane defaults for resources, tweak for your needs
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 200m
+
+nodeSelector: {}

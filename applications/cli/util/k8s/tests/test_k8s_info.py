@@ -28,8 +28,8 @@ from util.k8s.k8s_info import get_kubectl_host, get_app_services, \
                               get_cluster_roles, is_current_user_administrator, check_pods_status, \
                               PodStatus, get_app_service_node_port, get_pods, NamespaceStatus, get_pod_events, \
                               get_namespaced_pods, add_bytes_to_unit
-from util.config import DLS4EConfigMap
-from util.app_names import DLS4EAppNames
+from util.config import NAUTAConfigMap
+from util.app_names import NAUTAAppNames
 from util.exceptions import KubernetesError
 
 test_namespace = "test_namespace"
@@ -87,8 +87,8 @@ def mocked_k8s_config(mocker):
 
 
 def test_config_map_data():
-    return {DLS4EConfigMap.EXTERNAL_IP_FIELD: TEST_EXTERNAL_IP,
-            DLS4EConfigMap.IMAGE_TILLER_FIELD: TEST_IMAGE_TILLER}
+    return {NAUTAConfigMap.EXTERNAL_IP_FIELD: TEST_EXTERNAL_IP,
+            NAUTAConfigMap.IMAGE_TILLER_FIELD: TEST_IMAGE_TILLER}
 
 
 @pytest.fixture()
@@ -173,7 +173,7 @@ def test_get_k8s_host_wo_port(mocked_k8s_config):
 
 
 def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
-    services = get_app_services(dls4e_app_name=DLS4EAppNames.DOCKER_REGISTRY)
+    services = get_app_services(nauta_app_name=NAUTAAppNames.DOCKER_REGISTRY)
 
     assert services
 
@@ -220,8 +220,8 @@ def test_delete_namespace_failure(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfi
 def test_get_config_map_data(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
     data = get_config_map_data("config_map_name", test_namespace)
 
-    assert data.get(DLS4EConfigMap.EXTERNAL_IP_FIELD) == TEST_EXTERNAL_IP
-    assert data.get(DLS4EConfigMap.IMAGE_TILLER_FIELD) == TEST_IMAGE_TILLER
+    assert data.get(NAUTAConfigMap.EXTERNAL_IP_FIELD) == TEST_EXTERNAL_IP
+    assert data.get(NAUTAConfigMap.IMAGE_TILLER_FIELD) == TEST_IMAGE_TILLER
 
 
 def test_get_users_token(mocker, mocked_k8s_CoreV1Api, mocked_kubeconfig):
@@ -321,7 +321,7 @@ def test_get_app_service_node_port(mocker):
             ]
         ))
     ]
-    assert get_app_service_node_port(DLS4EAppNames.DOCKER_REGISTRY) == test_node_port
+    assert get_app_service_node_port(NAUTAAppNames.DOCKER_REGISTRY) == test_node_port
 
 
 def test_add_bytes_to_unit():

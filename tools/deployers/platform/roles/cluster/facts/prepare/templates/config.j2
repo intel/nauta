@@ -1,6 +1,6 @@
 {% for item in groups['master'] %}
 Host facts-{{ item }}
-  Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
+  Hostname {{ hostvars[item].nauta_configuration.internal_interface.ipv4_address }}
   User cluster-facts
   PreferredAuthentications publickey
   IdentityFile ~/.ssh/id_rsa

@@ -12,7 +12,7 @@ containerPort: 8500
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: {{ DLS4e.ExperimentImage }}
+  clusterRepository: {{ NAUTA.ExperimentImage }}
 
 workersCount: 1
 
@@ -35,8 +35,8 @@ batch_wrapper_resources:
 wrapper_cpu: null
 wrapper_memory: null
 
-experimentName: {{ DLS4e.ExperimentName }} 
+experimentName: {{ NAUTA.ExperimentName }} 
 podCount: 2
-registryPort: {{ DLS4e.RegistryPort }}
+registryPort: {{ NAUTA.RegistryPort }}
 
 logLevel: 'INFO'

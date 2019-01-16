@@ -14,7 +14,7 @@
 
 - name: "{{ message_label }} Ensure that home dir exists"
   file:
-    path: /opt/dls4e/home
+    path: /opt/nauta/home
     state: directory
     mode: 0755
     owner: root
@@ -28,7 +28,7 @@
     group: "{{ item.name }}"
     groups: cluster
     uid: "{{ item.uid }}"
-    home: "/opt/dls4e/home/{{ item.name }}"
+    home: "/opt/nauta/home/{{ item.name }}"
   with_items:
     - name: cluster-master
       uid: 3500
@@ -41,7 +41,7 @@
 
 - name: "{{ message_label }} Fetch public keys from hosts"
   slurp:
-    src: "/opt/dls4e/home/cluster-master/.ssh/id_rsa.pub"
+    src: "/opt/nauta/home/cluster-master/.ssh/id_rsa.pub"
   register: cluster_master_key
 
 - name: "{{ message_label }} Add authorized master keys to client users"
@@ -60,7 +60,7 @@
 - name: "{{ message_label }} Render master key config"
   template:
     src: config.j2
-    dest: /opt/dls4e/home/cluster-master/.ssh/config
+    dest: /opt/nauta/home/cluster-master/.ssh/config
     mode: 0600
     owner: cluster-master
     group: cluster-master
@@ -68,7 +68,7 @@
 
 - name: "{{ message_label }} Create cluster directory"
   file:
-    path: /etc/dls-cluster
+    path: /etc/nauta-cluster
     state: directory
     owner: root
     group: cluster
@@ -76,7 +76,7 @@
 
 - name: "{{ message_label }} Create cluster directory"
   file:
-    path: /etc/dls-cluster/master
+    path: /etc/nauta-cluster/master
     state: directory
     owner: cluster-master
     group: cluster-master
@@ -84,7 +84,7 @@
 
 - name: "{{ message_label }} Create cluster directory"
   file:
-    path: /etc/dls-cluster/client
+    path: /etc/nauta-cluster/client
     state: directory
     owner: cluster-client
     group: cluster

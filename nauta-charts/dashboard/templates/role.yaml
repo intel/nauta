@@ -1,0 +1,62 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  resourceNames:
+  - "kubernetes-dashboard-key-holder"
+  - "kubernetes-dashboard-certs"
+  verbs:
+  - "get"
+  - "update"
+  - "delete"
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  verbs:
+  - "create"
+- apiGroups:
+  - ""
+  resources:
+  - "configmaps"
+  resourceNames:
+  - "kubernetes-dashboard-settings"
+  verbs:
+  - "get"
+  - "update"
+- apiGroups:
+  - ""
+  resources:
+  - "services"
+  resourceNames:
+  - "heapster"
+  - "{{ .Release.Name }}-heapster"
+  verbs:
+  - "proxy"
+- apiGroups:
+  - ""
+  resources:
+  - "services/proxy"
+  resourceNames:
+  - "heapster"
+  - "http:heapster:"
+  - "https:heapster:"
+  - "heapster"
+  - "http:{{ .Release.Name }}-heapster:"
+  - "https:{{ .Release.Name }}-heapster:"
+  - "{{ .Release.Name }}-{{ .Chart.Name }}:web"
+  verbs:
+  - "get"
+  - "create"

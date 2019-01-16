@@ -7,11 +7,11 @@
 - name: "{{ message_label }} Render pip.ini file"
   template:
     src: pip.ini.j2
-    dest: /opt/dls4e/pip.ini
+    dest: /opt/nauta/pip.ini
 
 - name: "{{ message_label }} Install pip core"
   environment:
-    PIP_CONFIG_FILE: /opt/dls4e/pip.ini
+    PIP_CONFIG_FILE: /opt/nauta/pip.ini
   pip:
     name: "{{ item }}"
     state: latest
@@ -23,11 +23,11 @@
 
 - name: "{{ message_label }} Install pip apps"
   environment:
-    PIP_CONFIG_FILE: /opt/dls4e/pip.ini
+    PIP_CONFIG_FILE: /opt/nauta/pip.ini
   pip:
     name: "{{ item }}"
     state: latest
-    virtualenv: /opt/dls4e/python
+    virtualenv: /opt/nauta/python
     virtualenv_site_packages: True
     virtualenv_python: "{{ ansible_python_interpreter }}"
   with_items:
@@ -37,8 +37,8 @@
 
 - name: "{{ message_label }} Ensure that python exists"
   file:
-    path: "/opt/dls4e/python/bin/python2"
+    path: "/opt/nauta/python/bin/python2"
 
 - name: "{{ message_label }} Override python variable"
   set_fact:
-    ansible_python_interpreter: "/opt/dls4e/python/bin/python2"
+    ansible_python_interpreter: "/opt/nauta/python/bin/python2"

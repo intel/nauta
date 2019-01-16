@@ -8,10 +8,10 @@ ignore: |
   /platform-deploy/charts/
   /*/charts
   /**/charts
-  /tools/finalizers/dls4e/dls4e-registry
-  /dls4e-charts
-  /dls4e-user
-  /dls4e-registry-charts
+  /tools/finalizers/nauta/nauta-registry
+  /nauta-charts
+  /nauta-user
+  /nauta-registry-charts
   /platform-charts
   /tmp-go
 

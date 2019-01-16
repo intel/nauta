@@ -10,7 +10,7 @@ grpcContainerPort: 8500
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: {{ DLS4e.ExperimentImage }}
+  clusterRepository: {{ NAUTA.ExperimentImage }}
 
 workersCount: 1
 
@@ -25,5 +25,5 @@ resources:
 cpu: null
 memory: null
 
-experimentName: {{ DLS4e.ExperimentName }} 
+experimentName: {{ NAUTA.ExperimentName }} 
 podCount: 1

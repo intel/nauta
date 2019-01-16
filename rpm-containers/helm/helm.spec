@@ -1,7 +1,7 @@
-Summary: DLS4E Kubernetes Helm v%{_dls4e_version} package
-Name: dls4e-helm
-Version: %{_dls4e_version}
-Release: %{_dls4e_release}
+Summary: NAUTA Kubernetes Helm v%{_nauta_version} package
+Name: nauta-helm
+Version: %{_nauta_version}
+Release: %{_nauta_release}
 License: Apache-2.0
 Group: Tools
 SOURCE0 : helm.tar.gz

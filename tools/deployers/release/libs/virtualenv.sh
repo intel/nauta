@@ -60,20 +60,20 @@ if [ X"${VIRTUAL_ENV}" = X"" ]; then
     export PYTHONUSERBASE=${CURDIR}/.venv/
 
     export VIRTUALENV_ENABLED=0
-    export DLS_VIRTUALENV="${CURDIR}/.venv"
+    export NAUTA_VIRTUALENV="${CURDIR}/.venv"
 else
     echo "Running inside virtualenv space"
     if find_file "${VIRTUAL_ENV}/bin" python3.5 python3.6 > /dev/null 2>&1; then
         PYTHON=$(find_file "${VIRTUAL_ENV}/bin" python3.5 python3.6)
 
         export VIRTUALENV_ENABLED=1
-        export DLS_VIRTUALENV="${VIRTUAL_ENV}"
+        export NAUTA_VIRTUALENV="${VIRTUAL_ENV}"
     else
         echo "Unable to find proper python in virtualenv. Retrying with system one"
         PYTHON=$(find_bin python3.5 python3.6)
 
         export VIRTUALENV_ENABLED=0
-        export DLS_VIRTUALENV="${CURDIR}/.venv"
+        export NAUTA_VIRTUALENV="${CURDIR}/.venv"
     fi
 
     if ! ${PYTHON} -m pip > /dev/null 2>&1; then
@@ -81,14 +81,14 @@ else
         PIP=$(find_bin pip3.5 pip3.6)
 
         export VIRTUALENV_ENABLED=0
-        export DLS_VIRTUALENV="${CURDIR}/.venv"
+        export NAUTA_VIRTUALENV="${CURDIR}/.venv"
     else
         PIP="${PYTHON} -m pip"
     fi
 fi
 
-if [ ! -f "${DLS_VIRTUALENV}/.done" ]; then
-    mkdir -p "${DLS_VIRTUALENV}"
+if [ ! -f "${NAUTA_VIRTUALENV}/.done" ]; then
+    mkdir -p "${NAUTA_VIRTUALENV}"
 
     if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
         ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --isolated --ignore-installed --no-cache-dir
@@ -96,9 +96,9 @@ if [ ! -f "${DLS_VIRTUALENV}/.done" ]; then
         ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --user --isolated --ignore-installed --no-cache-dir
     fi
 
-    touch "${DLS_VIRTUALENV}/.done"
+    touch "${NAUTA_VIRTUALENV}/.done"
 
     echo "Local python packages ready"
 fi
-ANSIBLE_PATH="${DLS_VIRTUALENV}/bin/ansible-playbook"
-PATH=${DLS_VIRTUALENV}/bin:${PATH}
+ANSIBLE_PATH="${NAUTA_VIRTUALENV}/bin/ansible-playbook"
+PATH=${NAUTA_VIRTUALENV}/bin:${PATH}

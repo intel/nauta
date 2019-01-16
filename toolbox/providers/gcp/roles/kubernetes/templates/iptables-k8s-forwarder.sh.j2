@@ -3,7 +3,7 @@
 set -e
 
 svc_exists() {
-    kubectl -n dls4e get svc dls4enterprise-samba || return
+    kubectl -n nauta get svc nauta-samba || return
     if ip; then
         if [ X"$(ip)" = X"" ]; then
             return 1
@@ -21,7 +21,7 @@ ip() {
 }
 
 port() {
-    kubectl -n dls4e get svc dls4enterprise-samba -o jsonpath='{.spec.ports[?(@.name=="dls4e")].nodePort}' || return
+    kubectl -n nauta get svc nauta-samba -o jsonpath='{.spec.ports[?(@.name=="nauta")].nodePort}' || return
 }
 
 while ! svc_exists; do

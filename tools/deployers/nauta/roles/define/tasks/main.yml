@@ -1,0 +1,49 @@
+---
+
+- name: "{{ message_label }} Set paths fact"
+  set_fact:
+    nauta_img: "nauta-{{ nauta_version }}.img"
+    registry_chart: "nauta-registry-{{ nauta_version }}.tgz"
+    nauta_chart: "nauta-{{ nauta_version }}.tgz"
+
+- set_fact:
+    ansible_python_interpreter: "{{ default_ansible_python_interpreter }}"
+  when: default_ansible_python_interpreter | default('') != ''
+
+- name: "{{ message_label }} Set local paths fact"
+  set_fact:
+    workspace: ".workspace"
+    runtime_kubectl: "{{ kubectl }}"
+    runtime_helm: "{{ helm }}"
+    runtime_loader: "{{ loader }}"
+    runtime_img: "{{ playbook_dir }}/files/nauta-{{ nauta_version }}.img"
+    runtime_nauta_img: "{{ playbook_dir }}/files/{{ nauta_img }}"
+    runtime_registry_chart: "{{ playbook_dir }}/files/{{ registry_chart }}"
+    runtime_nauta_chart: "{{ playbook_dir }}/files/{{ nauta_chart }}"
+    runtime_kubeconfig: "{{ kubeconfig }}"
+
+- name: "{{ message_label }} Fail if external ip is not defined"
+  fail:
+    msg: External IP is not defined
+  when: runtime_kubernetes_external_name is not defined
+
+- name: "{{ message_label }} Add host"
+  add_host:
+    name: provisioner
+    group: provisioners
+    ansible_connection: local
+    workspace: "{{ workspace }}"
+    runtime_kubectl: "{{ runtime_kubectl }}"
+    runtime_helm: "{{ runtime_helm }}"
+    runtime_loader: "{{ runtime_loader }}"
+    runtime_img: "{{ runtime_img }}"
+    runtime_nauta_img: "{{ runtime_nauta_img }}"
+    runtime_registry_chart: "{{ runtime_registry_chart }}"
+    runtime_nauta_chart: "{{ runtime_nauta_chart }}"
+    runtime_kubernetes_external_name: "{{ runtime_kubernetes_external_name }}"
+    runtime_kubeconfig: "{{ runtime_kubeconfig }}"
+
+- name: "{{ message_label }} Create directory"
+  file:
+    path: "{{ workspace }}"
+    state: directory

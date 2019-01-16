@@ -1,0 +1,24 @@
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: input-public
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 32Gi
+  selector:
+    matchLabels:
+      app_name: "{{ required "NAUTA Release name is required" .Values.global.nauta }}"
+      share: public
+      type: input
+      user: "{{ required "NAUTA Username is required as parameter user" .Values.username }}"
+  storageClassName: ""

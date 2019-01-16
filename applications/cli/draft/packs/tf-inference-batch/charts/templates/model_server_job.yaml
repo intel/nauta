@@ -36,7 +36,7 @@ spec:
               value: "/models"
             - name: MODEL_PATH
               value: "{{ .Values.modelPath }}"
-          command: ["tf_serving_dls4e"]
+          command: ["tf_serving_nauta"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
@@ -66,7 +66,7 @@ spec:
               cpu: {{ default .Values.resources.limits.cpu .Values.cpu }}
               memory: {{ default .Values.resources.limits.memory .Values.memory }}
         - name: sidecar
-          image: "127.0.0.1:{{ .Values.registryPort }}/dls4e/tf-serving-sidecar:v1.0.0"
+          image: "127.0.0.1:{{ .Values.registryPort }}/nauta/tf-serving-sidecar:v1.0.0"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: BATCH_WRAPPER_JOB_NAME

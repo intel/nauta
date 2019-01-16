@@ -26,7 +26,7 @@ from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from commands.experiment.common import submit_experiment, RUN_MESSAGE, RUN_NAME, RUN_PARAMETERS, RUN_STATUS, \
     JUPYTER_NOTEBOOK_TEMPLATES_NAMES, RunKinds, validate_env_paramater
 from util.exceptions import SubmitExperimentError, LaunchError, ProxyClosingError
@@ -164,7 +164,7 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         sys.exit(1)
 
     try:
-        launch_app(k8s_app_name=DLS4EAppNames.JUPYTER, app_name=name, no_launch=no_launch,
+        launch_app(k8s_app_name=NAUTAAppNames.JUPYTER, app_name=name, no_launch=no_launch,
                    number_of_retries=number_of_retries, url_end=url_end, port=port_number)
     except LaunchError as exe:
         handle_error(logger, exe.message, exe.message)

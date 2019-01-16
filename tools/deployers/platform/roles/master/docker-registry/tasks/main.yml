@@ -6,7 +6,7 @@
 
 - name: "{{ message_label }} Ensure registry directory exists"
   file:
-    path: /opt/dls4e/registry
+    path: /opt/nauta/registry
 
 - name: "{{ message_label }} Replace configuration"
   template:

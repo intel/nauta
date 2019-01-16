@@ -1,0 +1,55 @@
+apiVersion: batch/v1beta1 #for API server versions < 1.8.0 use batch/v2alpha1 and enable it in the API server
+kind: CronJob
+metadata:
+  name: {{ template "curator.fullname" . }}
+  labels:
+    app: {{ template "curator.name" . }}
+    chart: {{ template "curator.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.history.successfulJobs }}
+  failedJobsHistoryLimit: {{ .Values.history.failedJobs }}
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ template "curator.name" . }}
+            image: "{{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA elasticsearch init image is required" .Values.image }}"
+            args: 
+            - --config 
+            - {{ .Values.mountPath }}/config.yml
+            - {{ .Values.mountPath }}/action_file.yml
+            volumeMounts:
+            - name: config
+              mountPath: {{ .Values.mountPath }}
+          {{- with .Values.resources }}
+            resources:
+{{ toYaml . | indent 14}}
+          {{- end }}
+          volumes:
+          - name: config
+            configMap:
+              name: {{ template "curator.fullname" . }}-config
+          restartPolicy: OnFailure
+      {{- with .Values.nodeSelector }}
+        nodeSelector:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+        tolerations:
+        - key: "master"
+          operator: "Exists"
+          effect: "NoSchedule"
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: master
+                  operator: In
+                  values:
+                  - "True"

@@ -19,7 +19,7 @@ import os
 from typing import List
 
 from kubernetes import client as k8s
-from dls4e.config import Dls4ePlatformConfig
+from nauta.config import NautaPlatformConfig
 from tensorboard.models import Run
 
 
@@ -63,8 +63,8 @@ class K8STensorboardInstance:
 
         deployment_labels = {
             'name': k8s_name,
-            'type': 'dls4e-tensorboard',
-            'dls4e_app_name': 'tensorboard',
+            'type': 'nauta-tensorboard',
+            'nauta_app_name': 'tensorboard',
             'id': id,
             'runs-hash': run_names_hash
         }
@@ -76,10 +76,10 @@ class K8STensorboardInstance:
             "--host", "127.0.0.1"
         ]
 
-        dls4e_config = Dls4ePlatformConfig.incluster_init()
+        nauta_config = NautaPlatformConfig.incluster_init()
 
-        tensorboard_image = dls4e_config.get_tensorboard_image()
-        tensorboard_proxy_image = dls4e_config.get_activity_proxy_image()
+        tensorboard_image = nauta_config.get_tensorboard_image()
+        tensorboard_proxy_image = nauta_config.get_activity_proxy_image()
 
         deployment = k8s.V1Deployment(api_version='apps/v1',
                                       kind='Deployment',
@@ -159,8 +159,8 @@ class K8STensorboardInstance:
                                     name=k8s_name,
                                     labels={
                                         'name': k8s_name,
-                                        'type': 'dls4e-tensorboard',
-                                        'dls4e_app_name': 'tensorboard',
+                                        'type': 'nauta-tensorboard',
+                                        'nauta_app_name': 'tensorboard',
                                         'id': id
                                     }
                                 ),
@@ -175,8 +175,8 @@ class K8STensorboardInstance:
                                     ],
                                     selector={
                                         'name': k8s_name,
-                                        'type': 'dls4e-tensorboard',
-                                        'dls4e_app_name': 'tensorboard',
+                                        'type': 'nauta-tensorboard',
+                                        'nauta_app_name': 'tensorboard',
                                         'id': id
                                     }
                                 ))
@@ -187,13 +187,13 @@ class K8STensorboardInstance:
                                          name=k8s_name,
                                          labels={
                                              'name': k8s_name,
-                                             'type': 'dls4e-tensorboard',
-                                             'dls4e_app_name': 'tensorboard',
+                                             'type': 'nauta-tensorboard',
+                                             'nauta_app_name': 'tensorboard',
                                              'id': id
                                          },
                                          annotations={
-                                             'dls.ingress.kubernetes.io/rewrite-target': '/',
-                                             'kubernetes.io/ingress.class': 'dls-ingress'
+                                             'nauta.ingress.kubernetes.io/rewrite-target': '/',
+                                             'kubernetes.io/ingress.class': 'nauta-ingress'
                                          }
                                      ),
                                      spec=k8s.V1beta1IngressSpec(

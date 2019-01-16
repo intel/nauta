@@ -72,9 +72,9 @@ def verify_cli_config_path():
     try:
         config = Config()
         if not config.config_path:
-            raise ConfigInitError(Texts.DLSCTL_CONFIG_NOT_SET_ERROR_MSG)
+            raise ConfigInitError(Texts.NCTL_CONFIG_NOT_SET_ERROR_MSG)
     except ConfigInitError as e:
-        error_msg = Texts.DLSCTL_CONFIG_INIT_ERROR_MSG.format(exception_msg=str(e))
+        error_msg = Texts.NCTL_CONFIG_INIT_ERROR_MSG.format(exception_msg=str(e))
         handle_error(logger, error_msg, error_msg)
         sys.exit(1)
 

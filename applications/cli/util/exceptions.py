@@ -71,12 +71,12 @@ class ScriptConversionError(Exception):
 
 class InvalidDependencyError(Exception):
     """
-    Error raised when dlsctl fails to obtain some dependency version, or when this version does not meet the
+    Error raised when nctl fails to obtain some dependency version, or when this version does not meet the
     requirements.
     """
     pass
 
 
 class InvalidOsError(Exception):
-    """Error raised when dlsctl fails to read user's OS version, or this version does not meet the requirements."""
+    """Error raised when nctl fails to read user's OS version, or this version does not meet the requirements."""
     pass

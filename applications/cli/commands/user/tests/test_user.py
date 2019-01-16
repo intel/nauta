@@ -44,10 +44,10 @@ clusters:
     api-version: v1
     server: https://{test_address}
     certificate-authority-data: {test_cacert_encoded}
-  name: dls-cluster
+  name: nauta-cluster
 contexts:
 - context:
-    cluster: dls-cluster
+    cluster: nauta-cluster
     namespace: "{test_namespace}"
     user: "{test_username}"
   name: user-context
@@ -104,7 +104,7 @@ def test_delete_helm_release_success(mocker):
                             (f"release: \"{test_username}\" not found", 0,
                              f"release: \"{test_username}\" not found")]
 
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.helm.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -115,7 +115,7 @@ def test_delete_helm_release_success(mocker):
 
 def test_delete_helm_release_failure(mocker):
     mocker.patch("util.helm.execute_system_command", return_value=("", 1, ""))
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.helm.Config')
     fake_config.return_value.config_path = fake_config_path
     with pytest.raises(RuntimeError):
@@ -126,7 +126,7 @@ def test_delete_user_success(mocker):
     dns_mock = mocker.patch("util.helm.delete_namespace")
     dhr_mock = mocker.patch("util.helm.delete_helm_release")
 
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.helm.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -269,7 +269,7 @@ def prepare_mocks(mocker) -> CreateUserMock:
     config_class_mock = mocker.patch('commands.user.create.Config')
     config_instance_mock = config_class_mock.return_value
     config_instance_mock.config_path = "test"
-    config_map_class_mock = mocker.patch("commands.user.create.DLS4EConfigMap")
+    config_map_class_mock = mocker.patch("commands.user.create.NAUTAConfigMap")
     config_map_instance = config_map_class_mock.return_value
     config_map_instance.tiller_location = "image_tiller"
 

@@ -62,7 +62,7 @@ chart_values:
   features: {}
 
 subcharts:
-  dls4e-platform:
+  nauta-platform:
     dashboard:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../platform-charts/dashboard"

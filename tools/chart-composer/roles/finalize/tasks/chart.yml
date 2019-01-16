@@ -51,20 +51,20 @@
     dest: "{{ build_dir }}/charts/{{ package_name }}/requirements.yaml"
 
 - set_fact:
-    dls4e_values:
+    nauta_values:
       features: "{{ chart_features }}"
       global:
-        dls4e: "{{ package_name }}"
-        dls4e_release: "{{ version }}"
-        dls4e_release_standarized: "{{ version.replace('.', '-') }}"
+        nauta: "{{ package_name }}"
+        nauta_release: "{{ version }}"
+        nauta_release_standarized: "{{ version.replace('.', '-') }}"
 
 - name: Mix values
   set_fact:
-    dls4e_values: "{{ dls4e_values | combine(chart_values | default({})) }}"
+    nauta_values: "{{ nauta_values | combine(chart_values | default({})) }}"
 
 - name: Render values
   set_fact:
-    dls4e_values: "{{ dls4e_values | combine({name: spec.chart_values | default({})}) }}"
+    nauta_values: "{{ nauta_values | combine({name: spec.chart_values | default({})}) }}"
   with_dict: "{{ subcharts_list }}"
   vars:
     name: "{{ item.key }}"
@@ -72,7 +72,7 @@
 
 - name: Create {{ package_name }} values.yaml file
   copy:
-    content: "{{ dls4e_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    content: "{{ nauta_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
     dest: "{{ build_dir }}/charts/{{ package_name }}/values.yaml"
 
 - name: Create chart {{ package_name }}

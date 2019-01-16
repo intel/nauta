@@ -7,8 +7,8 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
-    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
 spec:
   replicas: 1
   selector:
@@ -42,7 +42,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
       - name: heapster
-        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E heapster image is required" .Values.image }}
+        image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA heapster image is required" .Values.image }}
         imagePullPolicy: IfNotPresent
         command:
         - /heapster

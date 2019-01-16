@@ -32,8 +32,8 @@ build: $(ACTIVATE) set-version metrics-lib
 ifeq (Windows,$(OS))
 
 	git config --system core.longpaths true
-	# build dlsctl
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n dlsctl
+	# build nctl
+	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
 
 
 	# download and prepare Draft
@@ -75,7 +75,7 @@ ifeq (Windows,$(OS))
 	docker rmi alpine/socat:1.0.3
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
 	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-linux-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -102,7 +102,7 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
 	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-darwin-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -138,7 +138,7 @@ ifeq (Darwin,$(OS))
 endif
 
 
-	cp -Rf ../../dls4e-user dist/config/
+	cp -Rf ../../nauta-user dist/config/
 	mkdir -p dist/lib/
 	mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	cp -f license.txt dist/
@@ -175,15 +175,15 @@ export CLI_ARTIFACT_DIRECTORY:=$(CURDIR)
 export CLI_ARTIFACT_VERSION_STRING:=$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(BUILD_ID)
 
 ifeq (Windows,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-windows.zip
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-windows.zip
 export CLI_ARTIFACT_PLATFORM:=windows
 endif
 ifeq (Linux,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-linux.tar.gz
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-linux.tar.gz
 export CLI_ARTIFACT_PLATFORM:=linux
 endif
 ifeq (Darwin,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
 export CLI_ARTIFACT_PLATFORM:=darwin
 endif
 
@@ -200,8 +200,8 @@ endif
 
 push: pack
 ifneq ($(ENV_OUTPUT_ARTIFACT_DIRECTORY),)
-	mkdir -p $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl
-	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl
+	mkdir -p $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/nctl
+	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/nctl
 
 ifeq (True,$(ENV_CALCULATESUM))
 	@echo Calculate file control sum and upload to the releases directory
@@ -214,7 +214,7 @@ endif
 ifeq (Windows,$(OS))
 	powershell -Command "& { Get-FileHash -Algorithm SHA256 -Path $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) > $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum }"
 endif
-	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/dlsctl/$(CLI_ARTIFACT_NAME).sha256sum
+	cp -r $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum $(ENV_OUTPUT_ARTIFACT_DIRECTORY)/nctl/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 endif
 

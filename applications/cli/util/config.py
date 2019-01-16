@@ -26,9 +26,9 @@ from util import system
 from cli_text_consts import UtilConfigTexts as Texts
 
 
-# environmental variable with a dlsctl HOME folder
-DLS_CTL_CONFIG_ENV_NAME = 'DLS_CTL_CONFIG'
-DLS_CTL_CONFIG_DIR_NAME = 'config'
+# environmental variable with a nctl HOME folder
+NCTL_CONFIG_ENV_NAME = 'NCTL_CONFIG'
+NCTL_CONFIG_DIR_NAME = 'config'
 
 # name of a directory with EXPERIMENT's data
 EXPERIMENTS_DIR_NAME = 'experiments'
@@ -38,8 +38,8 @@ FOLDER_DIR_NAME = 'folder'
 # registry config file
 DOCKER_REGISTRY_CONFIG_FILE = 'docker_registry.yaml'
 
-DLS4E_NAMESPACE = "dls4e"
-DLS4E_CONFIGURATION_CM = "dls4enterprise"
+NAUTA_NAMESPACE = "nauta"
+NAUTA_CONFIGURATION_CM = "nauta"
 
 
 log = initialize_logger(__name__)
@@ -69,28 +69,28 @@ class Config:
 
     @staticmethod
     def get_config_path() -> str:
-        binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), DLS_CTL_CONFIG_DIR_NAME)
-        user_local_config_dir_path = os.path.join(os.path.expanduser('~'), DLS_CTL_CONFIG_DIR_NAME)
+        binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), NCTL_CONFIG_DIR_NAME)
+        user_local_config_dir_path = os.path.join(os.path.expanduser('~'), NCTL_CONFIG_DIR_NAME)
 
-        log.debug(f"{DLS_CTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
-        log.debug(f'{DLS_CTL_CONFIG_DIR_NAME} user home path:  {binary_config_dir_path}')
+        log.debug(f"{NCTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
+        log.debug(f'{NCTL_CONFIG_DIR_NAME} user home path:  {binary_config_dir_path}')
 
-        if DLS_CTL_CONFIG_ENV_NAME in os.environ and os.environ.get(DLS_CTL_CONFIG_ENV_NAME):
-            user_path = os.environ.get(DLS_CTL_CONFIG_ENV_NAME)
+        if NCTL_CONFIG_ENV_NAME in os.environ and os.environ.get(NCTL_CONFIG_ENV_NAME):
+            user_path = os.environ.get(NCTL_CONFIG_ENV_NAME)
             if os.path.exists(user_path):
                 return user_path
             else:
                 message = Texts.USER_DIR_NOT_FOUND_ERROR_MSG.format(user_path=user_path,
-                                                                    config_env_name=DLS_CTL_CONFIG_ENV_NAME)
+                                                                    config_env_name=NCTL_CONFIG_ENV_NAME)
                 raise ConfigInitError(message)
         elif user_local_config_dir_path and os.path.exists(user_local_config_dir_path):
             return user_local_config_dir_path
         elif binary_config_dir_path and os.path.exists(binary_config_dir_path):
             return binary_config_dir_path
         else:
-            message = Texts.DLS_CTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG.format(
-                config_dir_name=DLS_CTL_CONFIG_DIR_NAME, binary_config_dir_path=binary_config_dir_path,
-                config_env_name=DLS_CTL_CONFIG_ENV_NAME, user_local_config_dir_path=user_local_config_dir_path
+            message = Texts.NCTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG.format(
+                config_dir_name=NCTL_CONFIG_DIR_NAME, binary_config_dir_path=binary_config_dir_path,
+                config_env_name=NCTL_CONFIG_ENV_NAME, user_local_config_dir_path=user_local_config_dir_path
             )
             raise ConfigInitError(message)
 
@@ -117,13 +117,13 @@ class Config:
             yaml.dump(docker_registry_config, docker_registry_config_file, default_flow_style=False)
 
 
-class DLS4EConfigMap:
+class NAUTAConfigMap:
     """
-    Class for accessing values stored in DLS4E config map on Kubernetes cluster.
+    Class for accessing values stored in NAUTA config map on Kubernetes cluster.
     It is implemented using borg pattern (http://code.activestate.com/recipes/66531/),
     so each instance of this class will have shared state, ensuring configuration consistency.
     """
-    # images keys' names must be compliant with 'export_images' in tools/dls4e-config.yml
+    # images keys' names must be compliant with 'export_images' in tools/nauta-config.yml
     IMAGE_TILLER_FIELD = 'image.tiller'
     EXTERNAL_IP_FIELD = 'external_ip'
     IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
@@ -139,7 +139,7 @@ class DLS4EConfigMap:
     def __init__(self, config_map_request_timeout: int = None):
         self.__dict__ = self.__shared_state
         if not self.__dict__:
-            config_map_data = get_config_map_data(name=DLS4E_CONFIGURATION_CM, namespace=DLS4E_NAMESPACE,
+            config_map_data = get_config_map_data(name=NAUTA_CONFIGURATION_CM, namespace=NAUTA_NAMESPACE,
                                                   request_timeout=config_map_request_timeout)
             self.image_tiller = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
                                                config_map_data[self.IMAGE_TILLER_FIELD])
@@ -149,5 +149,5 @@ class DLS4EConfigMap:
             self.platform_version = config_map_data.get(self.PLATFORM_VERSION)
             self.py2_image_name = config_map_data.get(self.PY2_IMAGE_NAME)
             self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)
-            self.py2_horovod_image_name = config_map_data.get(DLS4EConfigMap.PY2_HOROVOD_IMAGE_CONFIG_KEY)
-            self.py3_horovod_image_name = config_map_data.get(DLS4EConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)
+            self.py2_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY2_HOROVOD_IMAGE_CONFIG_KEY)
+            self.py3_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)

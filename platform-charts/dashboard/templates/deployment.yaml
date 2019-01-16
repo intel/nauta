@@ -8,8 +8,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     kubernetes.io/cluster-service: "true"
-    dls4e_release: {{ required "DLS4E Release name is required" .Values.global.dls4e }}
-    dls4e_release_version: {{ required "DLS4E Release version is required" .Values.global.dls4e_release }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
 spec:
   replicas: 1
   strategy:
@@ -48,7 +48,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
       containers:
       - name: dashboard
-        image: {{ required "DLS4E Registry is required" .Values.global.dls4e_registry }}/{{ required "DLS4E dashboard image is required" .Values.image }}
+        image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA dashboard image is required" .Values.image }}
         imagePullPolicy: IfNotPresent
         args:
           - --enable-insecure-login

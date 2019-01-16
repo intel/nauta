@@ -1,0 +1,19 @@
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ required "NAUTA Release name is required" .Values.global.nauta }}-{{ required "NAUTA Username is required as parameter user" .Values.username }}-user-common"
+  labels:
+    app: "{{ .Chart.Name }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ required "NAUTA Release name is required" .Values.global.nauta }}-common"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: "{{ .Release.Namespace }}"

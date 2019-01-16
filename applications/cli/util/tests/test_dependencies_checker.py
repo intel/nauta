@@ -159,7 +159,7 @@ def test_check_all_binary_dependencies(mocker):
     check_dependency_mock = mocker.patch(
         'util.dependencies_checker.check_dependency')
     check_dependency_mock.return_value = True, LooseVersion('0.0.0')
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -184,7 +184,7 @@ def test_check_all_binary_dependencies_saved_versions(mocker):
     check_dependency_mock = mocker.patch(
         'util.dependencies_checker.check_dependency')
     check_dependency_mock.return_value = True, fake_version
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -228,7 +228,7 @@ def test_check_all_binary_dependencies_invalid_version(mocker):
     mocker.patch(
         'util.dependencies_checker.save_dependency_versions',
         return_value=None)
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -246,7 +246,7 @@ def test_check_all_binary_dependencies_parsing_error(mocker):
     mocker.patch(
         'util.dependencies_checker.save_dependency_versions',
         return_value=None)
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
     with pytest.raises(InvalidDependencyError):
@@ -263,7 +263,7 @@ def test_check_all_binary_dependencies_version_check_error(mocker):
     mocker.patch(
         'util.dependencies_checker.save_dependency_versions',
         return_value=None)
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 
@@ -332,21 +332,21 @@ def test_check_os_version_supported(mocker):
 
 
 def test_get_dependency_version_file_path(mocker):
-    fake_dlsctl_version = '1.0.0-alpha'
-    fake_config_path = '/usr/ogorek/dlsctl_config'
-    mocker.patch('util.dependencies_checker.VERSION', fake_dlsctl_version)
+    fake_nctl_version = '1.0.0-alpha'
+    fake_config_path = '/usr/ogorek/nctl_config'
+    mocker.patch('util.dependencies_checker.VERSION', fake_nctl_version)
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 
     path = get_dependency_versions_file_path()
     assert path in {
-        f'{fake_config_path}/{fake_dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}',
-        f'{fake_config_path}\\{fake_dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}'
+        f'{fake_config_path}/{fake_nctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}',
+        f'{fake_config_path}\\{fake_nctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}'
     }  # Windows
 
 
 def test_save_dependency_versions(mocker, tmpdir):
-    fake_config_dir = tmpdir.mkdir("/dlsctl_config")
+    fake_config_dir = tmpdir.mkdir("/nctl_config")
     fake_dependency_versions_file_path = f'{fake_config_dir}1.0.0.saved-versions.yaml'
     mocker.patch(
         'util.dependencies_checker.get_dependency_versions_file_path',
@@ -368,7 +368,7 @@ def test_load_dependency_versions(mocker, tmpdir):
         'bla': LooseVersion('1.0.0'),
         'ble': LooseVersion('0.0.1-alpha')
     }
-    fake_dependency_versions_file = tmpdir.mkdir("/dlsctl_config").join(
+    fake_dependency_versions_file = tmpdir.mkdir("/nctl_config").join(
         "1.0.0.saved-versions.yaml")
     fake_dependency_versions_file.write(yaml.dump(fake_dependency_versions))
 

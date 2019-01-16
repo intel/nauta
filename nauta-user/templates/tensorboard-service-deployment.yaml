@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorboard-service
+  labels:
+    app: "{{ .Chart.Name }}"
+    type: tensorboard-service
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Chart.Name }}"
+      type: tensorboard-service
+      release: "{{ .Release.Name }}"
+      chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+      heritage: "{{ .Release.Service }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Chart.Name }}"
+        type: tensorboard-service
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        heritage: "{{ .Release.Service }}"
+        nauta_app_name: tensorboard-service
+    spec:
+      containers:
+      - image: {{ required "NAUTA user tensorboard-service image is required" .Values.TensorboardServiceImage }}
+        name: api
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /mnt/output
+          name: output-public
+      - image: {{ required "NAUTA user tensorboard-service image is required" .Values.TensorboardServiceImage }}
+        name: garbage-collector
+        command: ["python3.6", "daemon.py"]
+      restartPolicy: Always
+      volumes:
+      - name: output-public
+        persistentVolumeClaim:
+          claimName: output-public
+          readOnly: true

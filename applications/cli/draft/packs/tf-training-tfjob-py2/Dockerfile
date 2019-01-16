@@ -1,4 +1,4 @@
-FROM dls4e/tensorflow:1.9.0-py2
+FROM nauta/tensorflow:1.9.0-py2
 
 
 WORKDIR /app

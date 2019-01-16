@@ -21,9 +21,9 @@
       DNS.3: "kubernetes.default"
       DNS.4: "kubernetes.default.svc"
       DNS.5: "kubernetes.default.svc.{{ k8s_domain }}.{{ domain }}"
-      DNS.6: "{{ kubernetes_api_address | default('kubernetes.dls4e') }}"
+      DNS.6: "{{ kubernetes_api_address | default('kubernetes.nauta') }}"
       IP.1: "{{ kubernetes_network.svc_list.apiservice.ip }}"
-      IP.2: "{{ dls_configuration.external_interface.ipv4_address }}"
+      IP.2: "{{ nauta_configuration.external_interface.ipv4_address }}"
     key_usage:
       - digitalSignature
       - keyEncipherment

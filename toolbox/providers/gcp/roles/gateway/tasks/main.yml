@@ -23,5 +23,5 @@
     k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
   template:
     src: config.yml.j2
-    dest: /home/dls4e/config.yml
+    dest: /home/nauta/config.yml
     mode: 0444
