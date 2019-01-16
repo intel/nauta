@@ -2,8 +2,11 @@
 
 proxy:
   http_proxy: "{{ lookup('env','http_proxy') }}"
+  HTTP_PROXY: "{{ lookup('env','http_proxy') }}"
   https_proxy: "{{ lookup('env','https_proxy') }}"
+  HTTPS_PROXY: "{{ lookup('env','https_proxy') }}"
   no_proxy: "{{ lookup('env','no_proxy') }}"
+  NO_PROXY: "{{ lookup('env','no_proxy') }}"
 
 images: "{{ shared_images | combine(local_images | default({})) }}"
 
