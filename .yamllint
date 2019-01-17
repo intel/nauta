@@ -4,16 +4,17 @@ ignore: |
   /.venv
   /applications/old_experiment-service/
   /applications/cli/draft/packs/*/charts/
-  /k8s-features/charts
+  /applications/nauta-gui/node_modules/
+  /k8s-features/charts/
   /platform-deploy/charts/
-  /*/charts
-  /**/charts
-  /tools/finalizers/nauta/nauta-registry
-  /nauta-charts
-  /nauta-user
-  /nauta-registry-charts
-  /platform-charts
-  /tmp-go
+  /*/charts/
+  /**/charts/
+  /tools/finalizers/nauta/nauta-registry/
+  /nauta-charts/
+  /nauta-user/
+  /nauta-registry-charts/
+  /platform-charts/
+  /tmp-go/
 
 rules:
   braces:
