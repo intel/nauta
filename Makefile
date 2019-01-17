@@ -40,6 +40,7 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 include toolbox/checks/checks.mk
 
 k8s-installer-build:
+	@(cd $(CURDIR)/tools/initializers && make check-platform-dependencies)
 	@make tools-release
 
 nctl-build:

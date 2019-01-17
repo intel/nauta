@@ -1,20 +1,4 @@
 ---
-- name: Check all build dependencies are installed
-  hosts: localhost
-  become: False
-  roles:
-    - role: check-dependency
-      binary: python3
-    - role: check-dependency
-      binary: pip
-    - role: check-dependency
-      binary: virtualenv
-    - role: check-dependency
-      binary: tar
-    - role: check-dependency
-      binary: pigz
-    - role: check-dependency
-      binary: docker
 
 - name: Run local tasks
   hosts: localhost
