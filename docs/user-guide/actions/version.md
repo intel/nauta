@@ -7,9 +7,9 @@
 
 ## Synopsis
 
-Returns the version of Intel Deep Learning Studio.  
+Returns the version of Nauta software.  
 
-`dlsctl version`
+`nctl version`
 
 ## Options
 
@@ -21,9 +21,9 @@ Returns the version of Intel Deep Learning Studio.
 
 ## Returns
 
-The version command returns the currently installed `dlsctl` application version of both client platform and server.  
+The version command returns the currently installed `nctl` application version of both client platform and server.  
 
 ## Example
 
-`dlsctl version`
+`$ nctl version`
 

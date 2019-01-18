@@ -1,6 +1,6 @@
 # experiment Command
 
-This overall purpose of this command/subcommands is to submit and manage experiments. Following are the subcommands for the dlsctl experiment command.
+This overall purpose of this command/subcommands is to submit and manage experiments. Following are the subcommands for the nctl experiment command.
 
  - [submit Subcommand](#submit-subcommand)
  - [list Subcommand](#list-subcommand)  
@@ -22,11 +22,11 @@ This overall purpose of this command/subcommands is to submit and manage experim
   
  ### Synopsis
  
-Submits training jobs. We can use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
+Submits training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
  
  ### Syntax
  
- `dlsctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
+ `nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
  
  
  ### Arguments
@@ -41,12 +41,12 @@ Submits training jobs. We can use this command to submit single and multi-node t
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-sfl, --script_folder_location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used                                   by a script, e.g., other .py files, data, etc. If not given, then its content won't be copied into a the docker image created by the `dlsctl submit` command. `dlsctl` copies all content, preserving its structure, including subfolder(s). |
- |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `dlsctl` to create a description of a job to be submitted. If not given - a default template for single node tensorflow training is used (tf-training). List of available templates can be obtained by issuing `dlsctl experiment template_list command`. |
+ |`-sfl, --script_folder_location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used                                   by a script, e.g., other .py files, data, etc. If not given, then its content won't be copied into a the docker image created by the `nctl submit` command. `nclt` copies all content, preserving its structure, including subfolder(s). |
+ |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given - a default template for single node tensorflow training is used (tf-training). List of available templates can be obtained by issuing `nctl experiment template_list command`. |
  |`-n, --name TEXT`| No | Name for this experiment.|
  |`-p, --pack_param` <br> `<TEXT TEXT>…`| No |Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use: 'key "{'a': 'b'}"'|
- |`-pr, --parameter_range` <br> `[param_name] [definition]` | No | If the parameter is given, `dlsctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. Optional. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> Contains values of this paramater that are passed to different instance of experiments. `[definition]` can have two forms: <br> - range - `{x...y:step}` - this form says that `dlsctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> - set of values - `{x, y, z}` - this form says that `dlsctl` will launch number of experiments equal to a number of values given in this definition.|
- |`-ps, --parameter_set` <br>`[definition]` | No | If this parameter is given, `dlsctl` will launch an experiment with a set of parameters defined in `[definition]` argument. Optional. Format of the `[definition]` argument is as follows : `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br> All parameters given in `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once - `dlsctl` will start as many experiments as there is occurences of this parameter in a call. |
+ |`-pr, --parameter_range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> Contains values of this paramater that are passed to different instance of experiments. `[definition]` can have two forms: <br> - range - `{x...y:step}` - this form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> - set of values - `{x, y, z}` - this form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
+ |`-ps, --parameter_set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` will launch an experiment with a set of parameters defined in `[definition]` argument. Optional. Format of the `[definition]` argument is as follows : `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br> All parameters given in `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once - `nctl` will start as many experiments as there is occurences of this parameter in a call. |
  |`-e, --env TEXT` | No | Set of values of one or several parameters.Environment variables passed to training. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
@@ -56,12 +56,12 @@ Submits training jobs. We can use this command to submit single and multi-node t
  #### Additional remarks
  
  For both types of parameters - `-ps` and `-pr` - if parameter stated in their definitions
- is also given in a `[script_parameters]` argument of the `dlsctl` command, then values taken from `-ps`
+ is also given in a `[script_parameters]` argument of the `nctl` command, then values taken from `-ps`
  and `-pr` are passed to a script.   
  
- If a combination of both paramaters is given, then `dlsctl` launches a number of experiments
+ If a combination of both paramaters is given, then `nctl` launches a number of experiments
  equal to combination of values passed in those paramater. For example, if the following
- combination of parameters is passed to `dlsctl` command:
+ combination of parameters is passed to `nctl` command:
  
  `-pr param1 "{0.1, 0.2, 0.3}" -ps "{param2: 3, param4: 5}" -ps "{param6: 7}"` 
  
@@ -76,23 +76,17 @@ Submits training jobs. We can use this command to submit single and multi-node t
  
  ### Returns
  
-This commmand returns a list of submitted experiments with their names and statuses. In case of problems during submission, the command displays message/messages describing the causes. Errors may cause some experiments to not be created and will be empty. If any error appears, then messages describing it are displayed with experiment's names/statuses. 
+This command returns a list of submitted experiments with their names and statuses. In case of problems during submission, the command displays message/messages describing the causes. Errors may cause some experiments to not be created and will be empty. If any error appears, then messages describing it are displayed with experiment's names/statuses. 
   
-If one or more of experiment has not been submitted successfully, then the command returns an exit code > 0. The exact  value of the code depends on the cause of error(s) that prevented submitting the experiment(s). Here is a sample output  of `submit` command.
- 
- <!-- language: lang-none -->
- 
-     | Experiment          | Status   |
-     +---------------------+----------+
-     | t20180423121021851  | Received |
+If one or more of experiment has not been submitted successfully, then the command returns an exit code > 0. The exact  value of the code depends on the cause of error(s) that prevented submitting the experiment(s).
      
- ### Examples
+ ### Example
  
- `dlsctl experiment submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0`  
+ `$ nctl experiment submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0`  
  
- Starts a single node training job using mnist_cnn.py script located in a folder from which `dlsctl` command was issued. Content of
+ Starts a single node training job using mnist_cnn.py script located in a folder from which `nctl` command was issued. Content of
  the /data folder is copied into docker image (into /app folder - which is a work directory of docker images created using
- tf-training pack). Arguments `--data-dir` and `--num_gpus` are passed to a script.
+ tf-training pack). Arguments `--data_dir` and `--num_gpus` are passed to a script.
 
 
 ## list Subcommand
@@ -105,22 +99,22 @@ If one or more of experiment has not been submitted successfully, then the comma
 
 ### <a name="synopsis_list"></a>Synopsis
 
-Displays a list of all experiments with some basic information for each. Results are
+Displays a list of all experiments with some basic information for each, regardless of the owner. Results are
 sorted using the date-of-creation of the experiment, starting with the most recent experiment.  
 
 ### <a name="syntax_list"></a>Syntax
 
-`dlsctl experiment list [options]`  
+`nctl experiment list [options]`  
 
 ### <a name="options_list"> </a>Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-a, --all_users`| No | List contains experiments submitted by of all users.|
-|`-n, --name` | No | A regular expression to filter list to experiments that match this expression.|
+|`-a, --all_users`| No | List contains experiments submitted by all users.|
+|`-n, --name TEXT` | No | A regular expression to filter list to experiments that match this expression.|
 |`-s, --status` | No | QUEUED,  RUNNING,  COMPLETE, CANCELLED, FAILED, CREATING - Lists experiments based on indicated status.|
 |`-u, --uninitialized` | No | List uninitialized experiments, that is, experiments without resources submitted for creation.|
-|`-c, --count (INT)` | No | An integer, command displays c last rows.|
+|`-c, --count` <br> `INTEGER RANGE` | No | An integer, command displays c last rows.|
 |`-b, --brief` | No | Print short version of the result table. Only 'name', 'submission date', 'owner' and 'state' columns will be printed.|
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
@@ -141,15 +135,15 @@ List of experiments matching criteria given in command's options. Each row conta
     | exp1-20181122:0830-3 | learningrate: 0.001 |               |  20181122:0830 | jdoe     | Queued   |
         
 
-###  <a name="example_list"> </a> Example
+###  <a name="example_list"> </a> Examples
 
-`dlsctl experiment list`
+The following command displays all experiments submitted by a current user
 
-Displays all experiments submitted by a current user
+`$ nctl experiment list`
 
-`dlsctl experiment list -n train`
+The following command displays all experiments submitted by a current user and with name starting with `train` word.
 
-Displays all experiments submitted by a current user and with name starting with `train` word.
+`$ nctl experiment list -n train`
 
 ## cancel Subcommand
 
@@ -166,13 +160,13 @@ Cancels training chosen based on provided parameters.
 
 ### <a name="syntax_cancel"> </a> Syntax
 
-`dlsctl experiment cancel [options] NAME`
+`nctl experiment cancel [options] NAME`
 
 ### <a name="arguments_cancel"> </a> Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`NAME` | Yes | The name of an experiment/pod/status of a pod to be cancelled. If any such object has been found - the command displays for each of such objects a question whether this object should be cancelled. Value of this argument should be created using rules described [here](interpret_experiment_parameters.md). |
+|`NAME` | Yes | The name of an experiment/pod/status of a pod to be cancelled. If any such object is found, the command displays a question whether this object should be cancelled. |
 
 ### <a name="options_cancel"></a> Options
 
@@ -192,7 +186,7 @@ Description of a problem - if any occurs. Otherwise information that training jo
 
 ### <a name="example_cancel"></a>  Example
 
-`dlsctl experiment cancel t20180423121021851`
+`$ nctl experiment cancel t20180423121021851`
 
 Cancels experiment with `t20180423121021851` name.
 
@@ -211,7 +205,7 @@ Displays basic details of an experiment, such as the name of an experiment, para
 
 ### <a name="syntax_view"></a> Syntax
 
-`dlsctl experiment view [options] EXPERIMENT_NAME`
+`nctl experiment view [options] EXPERIMENT_NAME`
 
 ### <a name="arguments_view"></a> Arguments
 
@@ -223,20 +217,20 @@ Displays basic details of an experiment, such as the name of an experiment, para
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-t, --tensorboard` | No | If given, command exposes a tensorboard's instance with experiment's data. |
-|`-u, --username` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
+|`-tb, --tensorboard` | No | If given, command exposes a TensorBoard's instance with experiment's data. |
+|`-u, --username`<br> `TEXT` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
 
 
 ### <a name="returns_view"></a> Returns
 
-Displays details of an experiment. If `-t/--tensorboard` option is given - the command returns also a link to tensorboard's instance with data from an experiment.
+Displays details of an experiment. If `-tb/--tensorboard` option is given then the command returns a link to TensorBoard's instance with data from an experiment.
 
 
 ### <a name="example_view"></a>  Example
 
-`dlsctl experiment view experiment_name_2 -t`
+`$ nctl experiment view experiment_name_2 -tb`
 
 Displays details of an `experiment_name_2` experiment and exposes `tensorboard` instance with experiment's data to a user.
 
@@ -252,11 +246,11 @@ Displays details of an `experiment_name_2` experiment and exposes `tensorboard` 
 
 ### <a name="synopsis_logs"></a> Synopsis
 
-Displays logs from experiments. Logs to be displayed are chosen based on parameters given.
+Displays logs from experiments. Logs to be displayed are chosen based on parameters given in the command's call.
 
 ### <a name="syntax_logs"></a>  Syntax
 
-`dlsctl experiment logs [options] EXPERIMENT_NAME`
+`nctl experiment logs [options] EXPERIMENT_NAME`
 
 ### <a name="arguments_logs"></a> Arguments
 
@@ -275,7 +269,7 @@ Displays logs from experiments. Logs to be displayed are chosen based on paramet
 |`- p, --pod_status TEXT` | No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN' - command returns logs with matching status from an experiment and matching EXPERIMENT_NAME.|
 |`-m, --match TEXT` | No |  If given, command searches for logs from experiments matching the value of this option. This option cannot be used along with the NAME argument.|
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
-|`--pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
+|`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
 |`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
@@ -287,9 +281,9 @@ In case of any problems, a message(s) with description of their cause(s). Otherw
 
 ### <a name="example_logs"></a> Example
 
-`dlsctl experiment logs experiment_name_2 --min_severity DEBUG`
+`$ nctl experiment logs experiment_name_2 --min_severity DEBUG`
 
-Displays logs from `experiment_name_2` experiment with severity DEBUG.
+Displays logs from `experiment_name_2` experiment with severity DEBUG and higher (INFO, WARNING, and so on).
 
 
 ## interact Subcommand
@@ -307,14 +301,14 @@ is displayed in a notebook.
 
 ### <a name="syntax_interact"></a> Syntax
 
-`dlsctl experiment interact [options]`
+`nctl experiment interact [options]`
 
 ### <a name="options_interact"></a> Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-n, --name` | No | Name of a Jupyter notebook's session. If session with a given name already exists, then a user is connected to this session. |
-|`-f, --filename` | No | File with a notebook that should be opened in Jupyter notebook. Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use:'key "{'a': 'b'}"'|
+|`-n, --name TEXT` | No | Name of a Jupyter notebook's session. If session with a given name already exists, then a user is connected to this session. |
+|`-f, --filename TEXT` | No | File with a notebook that should be opened in Jupyter notebook. |
 |`-p, --pack_param <TEXT TEXT>...`| No | Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br>For maps use: 'key "{'a': 'b'}"' |
 |`--no-launch`| No | Run command without a web browser starting, only proxy tunnel is created.|
 |`-pn, --port_number INTEGER RANGE` | No | Port on which service will be exposed locally.|
@@ -329,7 +323,7 @@ In case of any problems, a message provides a description of possible causes. Ot
 
 ### <a name="example_interact"></a> Example
 
-`dlsctl experiment interact training_script.py`
+`$ nctl experiment interact --filename training_script.py`
 
 Launches in a default browser a Jupyter notebook with `training_script.py` script.
 
@@ -348,7 +342,7 @@ to properly deploy a training job on a cluster.
 
 ### <a name="syntax_templist"></a> Syntax
 
-`dlsctl experiment template_list [options]`
+`nctl experiment template_list [options]`
 
 ### <a name="options_templist"></a>  Options
 
@@ -365,6 +359,6 @@ List of existing templates, or a "Lack of installed packs." message if there are
 
 ### <a name="example_templist"></a> Example
 
-`dlsctl experiment template_list`
+`$ nctl experiment template_list`
 
 

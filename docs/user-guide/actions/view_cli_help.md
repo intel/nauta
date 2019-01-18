@@ -1,16 +1,16 @@
 # Viewing CLI Commands Help
 
-The –help command provides man-page style help for each dlsctl command. You can view help for any command and subcommand, and all related parameters.
+The `–help` command provides man-page style help for each nctl command. You can view help for any command and subcommand, and all related parameters.
 
-Entering `dlsctl –help` provides a listing of all dlsctl commands (without subcommands), as shown next.
+Entering `nctl –help` provides a listing of all nctl commands (without subcommands), as shown next.
 
-    $ dlsctl -h
+    $ nctl -h
 
-    Usage: dlsctl COMMAND [OPTIONS] [ARGS]...
+    Usage: nctl COMMAND [OPTIONS] [ARGS]...
 
-      Intel® Deep Learning Studio (Intel® DL Studio) Client
-
-      To get further help on commands use COMMAND with -h or --help option.
+     Nauta Client
+     
+     To get further help on commands use COMMAND with -h or --help option.
 
     Options:
       -h, --help  Show this message and exit.
@@ -29,14 +29,14 @@ Entering `dlsctl –help` provides a listing of all dlsctl commands (without sub
       user, u          Command for creating/deleting/listing users of the
                        platform. Can only be run by a platform administrator.
       verify, ver      Command verifies whether all external components required
-                       by dlsctl are installed in proper versions. If something is
+                       by nctl are installed in proper versions. If something is
                        missing, the application displays detailed information
                        about it.
-      version, v       Displays the version of the installed dlsctl application.
+      version, v       Displays the version of the installed nctl application.
 
 
 You can view help for any command and available subcommand(s). The following example shows generic syntax; brackets are optional parameters, but [subcommand] requires [command].
 
-`dlsctl [command_name] [subcommand] –help`
+`nctl [command_name] [subcommand] –help`
 
  

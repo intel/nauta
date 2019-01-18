@@ -1,9 +1,9 @@
 
 # Viewing Experiment Results from the Web UI
 
-The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, use the following command at the command prompt:
+The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, enter the following command at the command prompt:
 
-**Execute:** `dlsctl launch webui`
+`$ nctl launch webui`
 
 The following screen displays (this is an example only).
 
@@ -12,13 +12,13 @@ The following screen displays (this is an example only).
 
 
 * **Name**: The left-most column lists the experiments by name.
-* **Status**: This column reveals experiment’s current status, one of: QUEUED, RUNNING, COMPLETE, CANCELED, FAILED, CREATING.
+* **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELED, FAILED, CREATING`.
 * **Submission Date**: This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM.  The Start Date (or time) will always be after the Submission Date (or time).
 * **Duration**: This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
 * **Type**: Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (inference) with this model.
 
-You can perform the tasks discussed below at the Intel DL Studio web UI.
+You can perform the tasks discussed below at the Nauta web UI.
 
 ## Expand Experiment Details
 
@@ -54,7 +54,7 @@ experiment name or other parameters (such as user), and list only those matching
 
 ## Adding/Deleting Columns
 
-Click **ADD/DELETE COLUMNS** to open a scrollable dialogue. Here, the columns currently in use are listed first with 
+Click **ADD/DELETE COLUMNS** to open a dialogue. Here, the columns currently in use are listed first with 
 their check box checked. Scroll down to see more, available columns listed next, unchecked. Click to check and 
 uncheck and select the column headings you prefer. Optional column headings include parameters such as Pods, 
 End Date, Owner, Template, Time in Queue, etc.
@@ -68,5 +68,4 @@ Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png).
 
 ## Launching Kubernetes Dashboard
 
-Click the “hamburger menu” ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to 
-open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
+Click the hamburger menu ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).

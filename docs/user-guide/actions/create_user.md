@@ -13,16 +13,20 @@ Creating a new user account creates a user account configuration file compliant 
 
 To create a user, perform these steps:
 
-1. The `dlsctl user create <username>`  command sets up a namespace and associated roles for the named user on the cluster. It sets up "home" directories, named after the username, on the "input" and "output" network shares with file-system level access privileges.
-  * **Execute** `dlsctl user create <username>`
+1. The `nctl user create <username>`  command sets up a namespace and associated roles for the named user on the cluster. It sets up "home" directories, named after the username, on the "input" and "output" network shares with file-system level access privileges. Create the user:
+ 
+    `$ nctl user create <username>`
 
-2. The above command also creates a configuration file named `<username>.config` and places this file in the user's home directory. As Admin, copy that file into the folder named .kube in the user's home directory:
-  * **Execute**: `cp <username>.config ~/.kube/.`
+2. The above command also creates a configuration file named `<username>.config` that the Admin provides to the user. The user then copies that file into a local folder. Use the following commmand:
+ 
+    `$ cp <username>.config ~/<local_user_folder>/.`
 
 3. Use the export command to set this variable for the user:
-  * **Execute**: `export KUBECONFIG=~/.kube/<username>.config`
+ 
+    `$ export KUBECONFIG=~/<local_user_folder>/<username>.config`
 
-4. To verify that your new user has been created:
- * **Execute**: `dlsctl user list`
+4. Verify that the new user has been created with the following command:
+
+   `$ nctl user list`
 
 The above command lists all users, including the new user just added.

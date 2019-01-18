@@ -8,11 +8,11 @@
 
 ## Synopsis
 
-Checks whether all prerequisites required by `dlsctl` are installed and have proper versions.  
+Checks whether all prerequisites required by `nctl` are installed and have proper versions.  
 
 ## Syntax
 
-`dlsctl verify`
+`nctl verify`
 
 ## Options
 
@@ -29,7 +29,7 @@ In the case of any installation issues, the command returns information about th
 
 ## Example
 
-`dlsctl verify`
+`nctl verify`
 
 
 ```

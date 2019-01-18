@@ -22,7 +22,7 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 
 ### Syntax
 
-`dlsctl predict batch [options]`
+`nctl predict batch [options]`
  
 ### Options
 
@@ -34,14 +34,14 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 |`-d, --data TEXT`| Yes | Location of a folder with data that will be used to perform the batch inference. Value should point out the location from one of the system's shares.|
 |`-o, --output TEXT`| No | Location of a folder where outputs from inferences will be stored. Value should point out the location from one of the system's shares.|
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of the directory in model's location.|
-|`-tr, --tf-record`| No |If given, the batch prediction accepts files in TFRecord formats. Otherwise files should be delivered in protobuf format.|
+|`-tr, --tf-record`| No |If given, the batch prediction accepts files in `TFRecord` formats. Otherwise files should be delivered in `protobuf` format.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Show help message and exit. |
 
 
 ### Returns
 
-Description of a problem - if any occurs. Otherwise information that predict job was submitted. 
+Description of a problem, if any occurs. Otherwise information that the predict job was submitted. 
 
 **Note**: Refer to [Batch Inference Example](batch_inf_example.md) for a detailed example of this command.
 
@@ -56,17 +56,17 @@ Description of a problem - if any occurs. Otherwise information that predict job
   
 ### <a name="synopsis_cancel"></a> Synopsis
 
-This command cancels prediction instance/s chosen based on criteria given as a parameter.
+This command cancels prediction instance(s) chosen based on criteria given as a parameter.
 
 ### <a name="syntax_cancel"></a>  Syntax
 
-`dlsctl predict cancel [options] [name]`
+`nctl predict cancel [options] [name]`
 
 ### <a name="arguments_cancel"></a> Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`NAME` | No | Name of predict instance to be cancelled.  [name] argument value can be empty when 'match' option is used.|
+|`NAME` | No | Name of predict instance to be cancelled. The [name] argument value can be empty when 'match' option is used.|
 
 ### <a name="options_cancel"></a> Options
 
@@ -93,11 +93,11 @@ Description of a problem - if any occurs. Otherwise information that training jo
  
 ### <a name="synopsis_launch"></a>  Synopsis
 
-Starts a new prediction instance that can be used for performing prediction, classification and regression tasks on a trained model.
+Starts a new prediction instance that can be used for performing prediction, classification and regression tasks on a trained model. The created prediction instance is for streaming prediction only.
 
 ### <a name="syntax_launch"></a>   Syntax
 
-`dlsctl predict launch [options]`
+`nctl predict launch [options]`
 
 ### <a name="options_launch"></a>   Options
 
@@ -114,13 +114,13 @@ Starts a new prediction instance that can be used for performing prediction, cla
 
 ### <a name="returns_launch"></a> Returns
 
-Prediction instance URL and authorization token.
+Prediction instance URL and authorization token, as well as information about the experiment  (name, model location, state).
 
 ### <a name="example_launch"></a> Example
 
 <!-- language: lang-none -->
 
-    dlsctl predict l -n test -m /mnt/input/home/experiment1
+    $ nctl predict l -n test -m /mnt/input/home/experiment1
     
     | Prediction instance   | Model Location               | Status   |
     |-----------------------+------------------------------+----------|
@@ -157,7 +157,7 @@ sorted using a date of creation starting with the most recent, and filtered by o
 
 ### <a name="syntax_list"></a> Syntax
 
-`dlsctl predict list [options]`  
+`nctl predict list [options]`  
 
 ###  <a name="options_list"></a>Options
 
@@ -190,7 +190,7 @@ Perform stream inference task on launched prediction instance.
 
 ###  <a name="Syntax_stream"></a> Syntax
 
-`dlsctl predict stream [options]`  
+`nctl predict stream [options]`  
 
 ### <a name="Options_stream"></a> Options
 

@@ -5,11 +5,13 @@
 ### Viewing all Experiments
 To list all experiments you have submitted, run the next command.  The possible returned statuses are QUEUED, RUNNING, COMPLETE, CANCELED, FAILED, and CREATING.
 
-**Syntax:** `dlsctl experiment list [options]`
+**Syntax:** `nctl experiment list [options]`
 
-**Execute:** `dlsctl experiment list`
+Here is an example:  
 
-Following are _example results_ (not all columns are shown)
+`$ nctl experiment list`
+
+Following are _example results_ (not all columns are shown).
 
 ![](images/experiment_list.png)
 
@@ -18,11 +20,13 @@ The primary purpose of the next command is to provide Kubernetes pod-level infor
 
 Use the following command to view a single experiment’s details (this is an example only):
 
-**Syntax:** `dlsctl experiment view [options] EXPERIMENT_NAME`
+**Syntax:** `nctl experiment view [options] EXPERIMENT_NAME`
 
-**Execute:** `dlsctl experiment view mnist-tb-2-1`
+Here is an example:  
 
-Following are _example results_ and not all information is shown.
+`$ nctl experiment view mnist-tb-2-1`
+
+Following are _example results_ (not all information is show).
 
 ![](images/experiment_view.png)
 

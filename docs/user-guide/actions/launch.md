@@ -15,11 +15,11 @@ This command launches a browser for Web UI or Tensorboard.
 
 ### Synopsis
 
-Launches the Intel DL Studio web user interface with credentials.
+Launches the Nauta web user interface with credentials.
 
 ### Syntax
 
-`dlsctl launch webui [options]`
+`nctl launch webui [options]`
 
 ### Arguments
 
@@ -40,7 +40,7 @@ Link to an exposed application.
 
 ### Examples
 
-`dlsctl launch webui`
+`nctl launch webui`
 
 This command returns a Go-to URL. The following is an example only:
 <!-- language: lang-none -->
@@ -69,7 +69,7 @@ Launches the TensorBoard* web user interface front end with credentials, with th
 
 Format of the command is as follows:
 
-`dlsctl launch tensorboard [options] EXPERIMENT NAME`
+`nctl launch tensorboard [options] EXPERIMENT NAME`
 
 ### <a name="arguments_tb"> </a> Arguments
 
@@ -99,7 +99,7 @@ Link to an exposed application.
 
 ### <a name="example_tb"> </a> Example
 
-`dlsctl launch tensorboard experiment75`
+`nctl launch tensorboard experiment75`
 
 An example might look like the following:
 <!-- language: lang-none -->
