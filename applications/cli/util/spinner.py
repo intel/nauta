@@ -30,8 +30,20 @@ from util.system import get_current_os, OS
 SPINNER_COLOR = "green"
 IS_TERMINAL_INTERACTIVE = sys.stdout.isatty()
 
-NctlSpinner = yaspin.Spinner(frames='\\|/-', interval=80) if get_current_os() == OS.WINDOWS \
-    else yaspin.Spinner('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏', interval=80)
+
+def set_frames_string():
+    fallback_frames = "\\|/-"
+    if get_current_os() == OS.WINDOWS:
+        return fallback_frames
+    try:
+        utf_frames = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+        utf_frames.encode(sys.stdout.encoding)
+        return utf_frames
+    except UnicodeEncodeError:
+        return fallback_frames
+
+
+NctlSpinner = yaspin.Spinner(frames=set_frames_string(), interval=80)
 
 
 class DummySpinner(yaspin.core.Yaspin):
