@@ -125,12 +125,12 @@
                             </div>
                             <div class="body-container" data-mc-content-body="True">
                                 <h1>Launching TensorBoard to View Experiments</h1>
-                                <p>You can launch TensorBoard from the Intel DL Studio Web UI or the CLI. These methods are described below.</p>
+                                <p>You can launch TensorBoard from the Nauta Web UI or the CLI. These methods are described below.</p>
                                 <h2>Launching TensorBoard from the Web UI</h2>
                                 <p><b>Note</b>: To view the experiment’s results in TensorBoard, TensorBoard data must be written to a folder in the directory <span style="font-family: 'Courier New';">/mnt/output/experiment</span>.</p>
                                 <p>To launch TensorBoard from the web UI and view results for individual experiments, perform these steps:</p>
                                 <ol>
-                                    <li value="1">Open the web ui. <b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl launch webui</span></li>
+                                    <li value="1">Open the web ui. Enter this command:&#160;<br /> <span style="font-family: 'Courier New';">$ nctl launch webui</span></li>
                                     <li value="2">At the web UI, identify the experiment that you want to see displayed in TensorBoard.  Click on the check box to the left of the experiment name.</li>
                                     <li value="3">With an experiment selected (checked), the <b>LAUNCH TENSORBOARD</b> button becomes active.  Click <b>LAUNCH TENSORBOARD</b>.  TensorBoard is launched on a separate browser tab/window with graphs showing the experiment’s results. <br /><br />The following screen displays (this is an example only).</li>
                                 </ol>
@@ -140,15 +140,16 @@
                                     </img>
                                 </p>
                                 <h2><a name="Launchin"></a>Launching TensorBoard from the CLI</h2>
-                                <p> To launch TensorBoard from the CLI, do the following.</p>
-                                <p>1.	<b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl launch -tb &lt;experiment name&gt;</span></p>
+                                <p> To launch TensorBoard from the CLI, use this command:</p>
+                                <p><span style="font-family: 'Courier New';">$ nctl launch -tb &lt;experiment name&gt;</span>
+                                </p>
                                 <p>The following result displays.</p>
                                 <p style="text-align: center;">
                                     <img src="../images/tensorboard_from_cli.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;" />
                                 </p>
                                 <p>This command will launch a local browser. If the command was run with the <span style="font-family: 'Courier New';">--no-launch</span> option, then you need to copy the returned URL into a web browser. TensorBoard is launched with graphs showing the experiment’s results (as shown above).</p>
-                                <p>You can also launch TensorBoard and with the <span style="font-family: 'Courier New';">dlsctl experiment view</span>  command:</p>
-                                <p><span style="font-family: 'Courier New';">dlsctl experiment view -tensorboard EXPERIMENT_NAME</span>
+                                <p>You can also launch TensorBoard and with the <span style="font-family: 'Courier New';">nctl experiment view</span>  command:</p>
+                                <p><span style="font-family: 'Courier New';">nctl experiment view -tensorboard &lt;experiment name&gt;</span>
                                 </p>
                                 <p>This command exposes a TensorBoard instance with data from the named experiment as above.</p>
                             </div>

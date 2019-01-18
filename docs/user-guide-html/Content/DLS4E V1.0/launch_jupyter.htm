@@ -125,14 +125,16 @@
                             </div>
                             <div class="body-container" data-mc-content-body="True">
                                 <h1>Launching Jupyter* Interactive Notebook</h1>
-                                <p>You can use Jupyter* Notebook to run and display the results of you experiments. This release of Intel® DL Studio supports Python 3 an 2.7 for scripts. Launch Jupyter Notebook using the following command:</p>
-                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment interact [options]</span></p>
-                                <p><b>Execute</b>:&#160;<span style="font-family: 'Courier New';">dlsctl experiment interact</span></p>
+                                <p>You can use Jupyter* Notebook to run and display the results of you experiments. This release of Nauta supports Python 3 an 2.7 for scripts. Launch Jupyter Notebook using the following command:</p>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment interact [options]</span></p>
                                 <p>Other available options to this command are:</p>
                                 <ul>
                                     <li value="1"><span style="font-family: 'Courier New';">name</span> - The name of this Jupyter Notebook session. </li>
                                     <li value="2"><span style="font-family: 'Courier New';">filename</span> - File with a notebook that should be opened in Jupyter Notebook.</li>
                                 </ul>
+                                <p>Enter this command to launch Jupyter:&#160;</p>
+                                <p><span style="font-family: 'Courier New';">nctl experiment interact</span>
+                                </p>
                                 <p><b>Note</b>:&#160;Files located in the input storage are accessible through Jupyter Notebooks. Only files that are written to /output/home/ are persistently stored. Therefore, changes made to other files, including model scripts, during the session will not be saved after the session is closed. It is recommended to save session data to the output/&lt;experiment&gt; folder for future use.</p>
                                 <p style="text-align: left;">Files that are accessible through the Jupyter Notebook are the same folders that is accessible to the user for experiments.</p>
                                 <p>The following result displays.</p>

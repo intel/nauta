@@ -14,7 +14,7 @@
         <link href="../../Skins/Fluid/Stylesheets/foundation.6.2.3.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Styles.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Tablet.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
-        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>Mounting Experiment Input to Intel DL&#160;Studio Storage</title>
+        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>Mounting Experiment Input to Nauta Storage</title>
         <link href="../Resources/Stylesheets/Styles.css" rel="stylesheet" type="text/css" />
         <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
         </script>
@@ -124,13 +124,13 @@
                                 </div>
                             </div>
                             <div class="body-container" data-mc-content-body="True">
-                                <h1>Mounting Experiment Input to Intel DL&#160;Studio Storage</h1>
-                                <p> Perform these steps to mount a local folder/machine to Intel DL Studio storage and use those files when performing training.</p>
+                                <h1>Mounting Experiment Input to Nauta Storage</h1>
+                                <p> Perform these steps to mount a local folder/machine to Nauta storage and use those files when performing training.</p>
                                 <p><b>Note</b>:&#160;Names below are examples only.</p>
                                 <ol>
-                                    <li value="1">Linux/macOS: Create a folder for mounting named <span style="font-family: 'Courier New';">my_input</span>.<br /><b>Execute</b>: <span style="font-family: 'Courier New';">mkdir my_input</span></li>
-                                    <li value="2">Use the mount command to display the command that should be used to mount your local folder/machine to your Intel DL Studio input folder. <br /><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl mount</span></li>
-                                    <li value="3"><b>Execute</b>: <span style="font-family: 'Courier New';">mount_smbfs</span> or <span style="font-family: 'Courier New';">net use</span> or <span style="font-family: 'Courier New';">mount.cfis</span> as appropriate. The command is dependent on the operating system. For Linux/macOS users, the MOUNTPOINT is the <span style="font-family: 'Courier New';">my_input</span> folder. For Windows users, choose a drive letter as mount point.</li>
+                                    <li value="1">Linux/macOS: Create a folder for mounting named <span style="font-family: 'Courier New';">my_input:</span><br /><span style="font-family: 'Courier New';">$ mkdir my_input</span></li>
+                                    <li value="2">Use the mount command to display the command that should be used to mount your local folder/machine to your Nauta input folder. <br /><span style="font-family: 'Courier New';">$ nctl mount</span></li>
+                                    <li value="3">Enter <span style="font-family: 'Courier New';">mount_smbfs</span> or <span style="font-family: 'Courier New';">net use</span> or <span style="font-family: 'Courier New';">mount.cfis</span> as appropriate. The command is dependent on the operating system. For Linux/macOS users, the MOUNTPOINT is the <span style="font-family: 'Courier New';">my_input</span> folder. For Windows users, choose a drive letter as mount point.</li>
                                     <li value="4">Linux/macOS: 4.	Linux/macOS: Navigate to <span style="font-family: 'Courier New';">my_input</span><br />Windows: Open Explorer Window and navigate to the input/home folder.</li>
                                     <li value="5">
                                         <p>Copy input data or files to this folder for use when submitting experiments. </p>

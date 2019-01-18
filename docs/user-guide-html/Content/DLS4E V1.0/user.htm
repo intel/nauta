@@ -137,9 +137,9 @@
                                 </ul>
                                 <h2><a name="create"></a>create Subcommand</h2>
                                 <h3>Synopsis</h3>
-                                <p>Creates and initializes a new DLS4E user. This command must be executed when kubectl is used by a dlsctl command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of kubectl configuration files.</p>
+                                <p>Creates and initializes a new Nauta user. This command must be executed when kubectl is used by a nctl command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of kubectl configuration files.</p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl user create [options] USERNAME</span>
+                                <p><span style="font-family: 'Courier New';">nctl user create [options] USERNAME</span>
                                 </p>
                                 <h3>Arguments</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -177,7 +177,7 @@
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">If given, content of the generated user's config file is displayed on the screen only. <br />If not given, the file with configuration is saved on disk.</td>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
-                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-f, --filename &lt;filename&gt;</td>
+                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-f, --filename &lt;filename&gt; TEXT</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">No</td>
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Name of file where user's configuration will be stored. If not given configuration is stored in the <span style="font-family: 'Courier New';">config.&lt;username&gt;</span> file.</td>
                                         </tr>
@@ -195,10 +195,10 @@
                                 </table>
                                 <p>&#160;</p>
                                 <h3>Additional remarks</h3>
-                                <p>In case of any errors during saving of a file with a configuration - the command displays a content of the configuration file on the screen - even if -l option wasn't chosen.</p>
-                                <p>If an admin tries to create a user with a name that was used previously by a deleted user - it may happen, that the create command displays information that the previous user is still being deleted - even if the previous user is not listed on a list of existing users. In this case the operation of a creation of a new user should be postponed for a while - until all user's objects are removed.</p>
+                                <p>In case of any errors during saving of a file with a configuration, the command displays a content of the configuration file on the screen, even if -l option wasn't used.</p>
+                                <p>If an admin tries to create a user with a name that was used previously by a deleted user, it may happen, that the create command displays information that the previous user is still being deleted, even if the previous user is not listed on a list of existing users. In this case the operation of a creation of a new user should be postponed for a while until all user's objects are removed.</p>
                                 <h3>Returns</h3>
-                                <p>In case of any problems, a message is displayed describing their cause/causes. Otherwise message is returned indicating success. If <span style="font-family: 'Courier New';">-list_only</span> option was given, then the command displays also a content of a configuration file.</p>
+                                <p>In case of any problems, a message is displayed describing their cause/causes. Otherwise message is returned indicating success. If <span style="font-family: 'Courier New';">--list_only</span> option was given, then the command displays also a content of a configuration file.</p>
                                 <h3>Notes</h3>
                                 <p>The user name must fulfill the following rules:</p>
                                 <ol>
@@ -208,14 +208,14 @@
                                 </ol>
                                 <p>&#160;</p>
                                 <h3>Examples</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl user create jdoe</span>
+                                <p><span style="font-family: 'Courier New';">nctl user create jdoe</span>
                                 </p>
                                 <p>Creates a jdoe user.</p>
                                 <h2><a name="delete"></a>delete Subcommand</h2>
                                 <h3>Synopsis</h3>
-                                <p>Command deletes a user with a given name. If option -p/--purge was added - it removes also all artifacts related to a removed user, such as the content of the user's folders and data of experiments and runs.</p>
+                                <p>Command deletes a user with a given name. If option -p/--purge was added, it removes also all artifacts related to a removed user, such as the content of the user's folders and data of experiments and runs.</p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl user delete USERNAME</span>
+                                <p><span style="font-family: 'Courier New';">nctl user delete USERNAME</span>
                                 </p>
                                 <h3>Arguments</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -250,7 +250,7 @@
                                         <tr class="TableStyle-TableStyle-Body-Body1">
                                             <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-p, --purge</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">No	</td>
-                                            <td class="TableStyle-TableStyle-BodyD-Column1-Body1">If set the system also removes all logs generated by the user's experiments<br /></td>
+                                            <td class="TableStyle-TableStyle-BodyD-Column1-Body1">If set the system also removes all logs generated by the user's experiments.<br /></td>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
                                             <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-v, --verbose</td>
@@ -267,18 +267,18 @@
                                 <p>&#160;</p>
                                 <h3>Additional remarks</h3>
                                 <p>Before removing a user, the commands asks for a final confirmation. If user chooses Yes, the user is deleted.</p>
-                                <p>Deletion of a user may take a while to be fully completed. The command takes up to 30 seconds for complete removal of the user. If after this time user hasn't been deleted completely - the command displays information that a user is still being deleted. In this case the user won't be listed on a list of existing users but there is no possibility to create a user with the same name until the command completes and the user is deleted.</p>
+                                <p>Deletion of a user may take a while to be fully completed. The command takes up to 30 seconds for complete removal of the user. If after this time user hasn't been deleted completely, the command displays information that a user is still being deleted. In this case the user won't be listed on a list of existing users but there is no possibility to create a user with the same name until the command completes and the user is deleted.</p>
                                 <h3>	Returns</h3>
                                 <p>A message about a result of the operation. In case of any problems, a short description of their causes.</p>
                                 <h3>Examples</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl user delete jdoe -p</span>
+                                <p><span style="font-family: 'Courier New';">nctl user delete jdoe -p</span>
                                 </p>
                                 <p>Removes jdoe user with all his/her artifacts.</p>
                                 <h2><a name="list"></a>list Subcommand</h2>
                                 <h3>Synopsis</h3>
                                 <p>Lists all currently configured users.</p>
                                 <h2>Syntax</h2>
-                                <p style="font-family: 'Courier New';">dlsctl user list [options]</p>
+                                <p style="font-family: 'Courier New';">nctl user list [options]</p>
                                 <h3>Options</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
                                     <col style="width: 210px;" class="TableStyle-TableStyle-Column-Column1" />

@@ -131,20 +131,17 @@
                                     </li>
                                     <li value="2"><a href="view_exp_logs.htm" class="MCXref xref">Viewing Experiment Logs and Results Data</a>
                                     </li>
-                                    <li value="3"><a href="view_exp_webui.htm" class="MCXref xref">Viewing Experiment Results at the Web UI</a>
-                                    </li>
+                                    <li value="3">&#160;</li>
                                     <li value="4"><a href="view_exp_tensorbd.htm" class="MCXref xref">Launching TensorBoard to View Experiments</a>
                                     </li>
                                 </ul>
                                 <h2><a name="Viewing"></a>Viewing Experiments Using the CLI</h2>
                                 <h3><a name="Viewing2"></a>Viewing all Experiments</h3>
                                 <p>To list <i>all</i> experiments you have submitted, run the next command. &#160;The possible returned statuses are QUEUED,  RUNNING, COMPLETE, CANCELED, FAILED, and CREATING. </p>
-                                <ul>
-                                    <li value="1">
-                                        <p><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment list [options]</span></p>
-                                    </li>
-                                    <li value="2"> <b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl experiment list</span></li>
-                                </ul>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment list [options]</span></p>
+                                <p>Here is an example:</p>
+                                <p><span style="font-family: 'Courier New';">$ nctl experiment list</span>
+                                </p>
                                 <p>Following are example results (not all columns are shown).</p>
                                 <p style="text-align: center;">
                                     <img src="../images/experiment_list_736x401.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 736;height: 401;" />
@@ -152,15 +149,13 @@
                                 <h3><a name="Viewing3"></a>Viewing a Single Experiment's Details</h3>
                                 <p>The primary purpose of the next command is to provide Kubernetes pod-level information and container information for this experiment. This includes the pod ID, the POD status, information about input and output volumes used in this experiment, and CPU and memory resources requested to perform this experiment.</p>
                                 <p>Use the following command to view a single experiment’s details (this is an example only):</p>
-                                <ul>
-                                    <li value="1"><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment view [options] EXPERIMENT_NAME</span></li>
-                                    <li value="2">
-                                        <p><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl experiment view mnist-tb-2-1</span></p>
-                                    </li>
-                                </ul>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment view [options] EXPERIMENT_NAME</span></p>
+                                <p>Here is an example:</p>
+                                <p><span style="font-family: 'Courier New';">$ nctl experiment view mnist-tb-2-1</span>
+                                </p>
                                 <p>Following are example results and not all information is shown.</p>
                                 <p style="text-align: center;">
-                                    <img src="../images/experiment_view_751x460.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 751;height: 460;" />
+                                    <img src="../images/experiment_view_799x489.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 799;height: 489;" />
                                 </p>
                                 <p>&#160;</p>
                             </div>

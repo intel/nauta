@@ -130,19 +130,16 @@
                                 <p><b>Note 2</b>: User names are limited to 32 characters maximum, must be lowercase,  no underscores, periods, or special characters, and must start with a letter not a number. You can use a hyphen to join user names, for example: john-doe.</p>
                                 <p>To create a user, perform these steps:</p>
                                 <ol>
-                                    <li value="1">The <span style="font-family: 'Courier New';">dlsctl user create &lt;username&gt;</span> command sets up a namespace and associated roles for the named user on the cluster. It sets up "home" directories, named after the username, on the "input" and "output" network shares with file-system level access privileges.<ul><li value="1"><b>Execute</b> <span style="font-family: 'Courier New';">dlsctl user create &lt;username&gt;</span><br /><br /></li></ul></li>
-                                    <li value="2">The above command also creates a configuration file named <span style="font-family: 'Courier New';">&lt;username&gt;.config</span> that the Admin provides to the user.  The user then copies that file into a local folder:<br /><ul><li value="1"><b>Execute</b>:&#160;<span style="font-family: 'Courier New';">cp &lt;username&gt;.config ~/&lt;local_user_folder&gt;/.</span></li><br /></ul></li>
-                                    <li value="3">Use the export command to set this variable for the user:<ul><li value="1"><b>Execute</b>:&#160;<span style="font-family: 'Courier New';">export KUBECONFIG=~/&lt;local_user_folder&gt;/&lt;username&gt;.config</span></li></ul></li>
+                                    <li value="1">The <span style="font-family: 'Courier New';">nctl user create &lt;username&gt;</span> command sets up a namespace and associated roles for the named user on the cluster. It sets up "home" directories, named after the username, on the "input" and "output" network shares with file-system level access privileges.<br /><p><span style="font-family: 'Courier New';">$ nctl user create &lt;username&gt;</span><br /></p></li>
+                                    <li value="2">The above command also creates a configuration file named <span style="font-family: 'Courier New';">&lt;username&gt;.config</span> that the Admin provides to the user.  The user then copies that file into a local folder:<br /><span style="font-family: 'Courier New';">$ cp &lt;username&gt;.config ~/&lt;local_user_folder&gt;/.</span><br /><ul><br /></ul></li>
+                                    <li value="3">Use the export command to set this variable for the user:<br /><span style="font-family: 'Courier New';">$ export KUBECONFIG=~/&lt;local_user_folder&gt;/&lt;username&gt;.config</span><br /></li>
                                 </ol>
                                 <ul>
                                     <br />
                                 </ul>
                                 <ol start="4">
-                                    <li value="4">To verify that your new user has been created:</li>
+                                    <li value="4">Verify that the new user has been created with the following command:<br /><span style="font-family: 'Courier New';">$ nctl user list</span><br /></li>
                                 </ol>
-                                <ul>
-                                    <li value="1"><b>Execute</b>:&#160;<span style="font-family: 'Courier New';">dlsctl user list</span></li>
-                                </ul>
                                 <p>
                                     <br />The above command lists all users, including the new user just added. </p>
                             </div>

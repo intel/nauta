@@ -336,14 +336,14 @@ nav.title-bar
 	display: block;
 	padding-top: 3px;
 	padding-bottom: 2px;
-	background: #303335 url('Images/DLS_Help_Title_8_1.png') no-repeat center top;
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
-	background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(top, #ffffff 0%,transparent 100%);
-	-pie-background: url('Skins/Fluid/Stylesheets/Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(#ffffff, transparent);
+	background: #303335 url('Images/Nauta User Guide Title_2.png') no-repeat center top;
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+	background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, linear-gradient(top, #ffffff 0%,transparent 100%);
+	-pie-background: url('Skins/Fluid/Stylesheets/Images/Nauta User Guide Title_2.png') no-repeat center top, linear-gradient(#ffffff, transparent);
 }
 
 nav.title-bar .menu-icon
@@ -379,7 +379,6 @@ nav.title-bar .menu-icon
 	display: flex;
 	flex: 0 1 auto;
 	order: 1;
-	min-height: 101px;
 	align-self: center;
 	justify-content: flex-start;
 }
@@ -389,19 +388,21 @@ nav.title-bar .menu-icon
 	border: none;
 	padding: 0;
 	margin: 0;
+	width: 182px;
+	height: 42px;
 	z-index: 1;
-	display: block;
-	width: 132px;
-	height: 101px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	display: none;
 	align-self: center;
-	background: transparent url('Images/Intel_Logo_Small.png') no-repeat center center;
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
-	background: url('Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(top, #ffffff 0%,transparent 100%);
-	-pie-background: url('Skins/Fluid/Stylesheets/Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(#ffffff, transparent);
+	background: none;
+	background: -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+	background: -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+	background: -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+	background: linear-gradient(top, #ffffff 0%,transparent 100%);
+	-pie-background: linear-gradient(#ffffff, transparent);
 }
 
 .title-bar-container
@@ -652,14 +653,9 @@ html.pulseTopic .main-section .row.outer-row
 
 .off-canvas-wrapper-inner nav.title-bar .outer-row
 {
-	padding-left: 7px;
+	padding-left: 0px;
 	padding-right: 0px;
 	max-width: 100%;
-}
-
-.menu-icon-container
-{
-	min-height: 101px;
 }
 
 .off-canvas-wrapper-inner .outer-row

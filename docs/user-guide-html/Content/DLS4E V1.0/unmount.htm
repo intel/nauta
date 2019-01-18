@@ -14,7 +14,7 @@
         <link href="../../Skins/Fluid/Stylesheets/foundation.6.2.3.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Styles.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Tablet.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
-        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>Evaluating Experiments with Inference Testing</title>
+        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>Unmounting Experiment Input to Storage</title>
         <link href="../Resources/Stylesheets/Styles.css" rel="stylesheet" type="text/css" />
         <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
         </script>
@@ -124,14 +124,12 @@
                                 </div>
                             </div>
                             <div class="body-container" data-mc-content-body="True">
-                                <h1>Evaluating Experiments with Inference Testing</h1>
-                                <p>For guidance on using inference testing to evaluate an experiment, refer to the topics shown below:</p>
-                                <ul>
-                                    <li value="1">For a discussion of the <span style="font-family: 'Courier New';">nctl predict</span> command and its subcommands and parameters, refer to <a href="predict.htm" class="MCXref xref" xrefformat="{paratext}">predict Command</a></li>
-                                    <li value="2">For a demonstration of how to run batch inference, refer to: <a href="batch_inf_example.htm" class="MCXref xref" xrefformat="{paratext}">Batch Inference Example </a>.</li>
-                                    <li value="3"> For a demonstration of how to run streaming inference, refer to: <a href="stream_inf_example.htm">Streaming Inference Example</a>.</li>
-                                </ul>
-                                <p>&#160;</p>
+                                <h1>Unmounting Experiment Input to Storage</h1>
+                                <p>Perform these steps to unmount previously mounted Nauta storage from a local folder/machine.</p>
+                                <p>Use the mount command to display the command that should be used to unmount your local folder/machine from your Nauta input folder:</p>
+                                <p><span style="font-family: 'Courier New';">$&#160;nctl mount</span>
+                                </p>
+                                <p>Execute the unmount using <span style="font-family: 'Courier New';">umount</span> or <span style="font-family: 'Courier New';">net use</span> as appropriate. The command is dependent on the operating system.</p>
                             </div>
                         </div>
                     </section><a data-close="true"></a>

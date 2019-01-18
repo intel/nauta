@@ -126,14 +126,11 @@
                             <div class="body-container" data-mc-content-body="True">
                                 <h1>Viewing Experiment Logs and Results Data</h1>
                                 <p>Each experiment generates logs. This is the information generated during the run of the experiment and saved. If an experiment did not print out data during execution, the logs will be blank.</p>
-                                <p>Separate from logs, the results or output of an experiment can be found by mounting the user’s output folder or output-shared folder.  A model file should write to the Intel DL Studio output folder to save any output files.</p>
+                                <p>Separate from logs, the results or output of an experiment can be found by mounting the user’s output folder or output-shared folder.  A model file should write to the Nauta output folder to save any output files.</p>
                                 <p>Use the following command to view logs from a given experiment.</p>
-                                <ul>
-                                    <li value="1">
-                                        <p><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment logs [options] EXPERIMENT_NAME</span></p>
-                                    </li>
-                                    <li value="2"><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl experiment logs mnist-tb</span></li>
-                                </ul>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment logs [options] EXPERIMENT_NAME</span></p>
+                                <p>Here is an example:</p>
+                                <p style="font-family: 'Courier New';">nctl experiment logs multiexp-1</p>
                                 <p>The following result displays an example log.</p>
                                 <p style="text-align: center;">
                                     <img src="../images/logs and results_575x182.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 575;height: 182;" />

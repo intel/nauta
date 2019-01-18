@@ -4,28 +4,28 @@
 {
 	nav.title-bar
 	{
-		background: transparent url('Images/DLS_Help_Title_8_1.png') no-repeat center top;
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
-		background: url('Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(top, #ffffff 0%,transparent 100%);
-		-pie-background: url('Skins/Fluid/Stylesheets/Images/DLS_Help_Title_8_1.png') no-repeat center top, linear-gradient(#ffffff, transparent);
+		background: transparent url('Images/Nauta User Guide Title_2.png') no-repeat center top;
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: url('Images/Nauta User Guide Title_2.png') no-repeat center top, linear-gradient(top, #ffffff 0%,transparent 100%);
+		-pie-background: url('Skins/Fluid/Stylesheets/Images/Nauta User Guide Title_2.png') no-repeat center top, linear-gradient(#ffffff, transparent);
 	}
 
 	.title-bar-layout a.logo
 	{
-		width: 132px;
-		height: 101px;
-		background: transparent url('Images/Intel_Logo_Small.png') no-repeat center center;
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -o-linear-gradient(top, #ffffff 0%,transparent 100%);
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
-		background: url('Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(top, #ffffff 0%,transparent 100%);
-		-pie-background: url('Skins/Fluid/Stylesheets/Images/Intel_Logo_Small.png') no-repeat center center, linear-gradient(#ffffff, transparent);
+		background-position: center center;
+		background-repeat: no-repeat;
+		background: none;
+		background: -moz-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,transparent));
+		background: -webkit-linear-gradient(top, #ffffff 0%, transparent 100%);
+		background: -o-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: -ms-linear-gradient(top, #ffffff 0%,transparent 100%);
+		background: linear-gradient(top, #ffffff 0%,transparent 100%);
+		-pie-background: linear-gradient(#ffffff, transparent);
 	}
 
 	.search-bar .search-submit
@@ -79,12 +79,12 @@
 
 	.title-bar-layout .logo-wrapper
 	{
-		min-height: 101px;
+		min-height: 40px;
 	}
 
 	.menu-icon-container
 	{
-		min-height: 101px;
+		min-height: 40px;
 	}
 
 	.off-canvas-wrapper-inner .outer-row

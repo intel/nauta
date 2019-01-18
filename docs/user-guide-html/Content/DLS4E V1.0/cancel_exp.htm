@@ -126,15 +126,16 @@
                             <div class="body-container" data-mc-content-body="True">
                                 <h1>Canceling Experiments</h1>
                                 <p>To cancel one or more experiments, use the following command:</p>
-                                <p><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl experiment cancel [options]EXPERIMENT_NAME</span></p>
+                                <p> <span style="font-family: 'Courier New';">$ nctl experiment cancel [options]EXPERIMENT_NAME</span></p>
                                 <p>This command stops and cancels any experiment queued or in progress. Completed experiments cannot be cancelled.  Cancels any experiment based on the name of an experiment/pod/status of a pod. If any such object is found the command queries if these objects (one or more) should be cancelled.</p>
                                 <p>The value of this argument should be created using rules described here. Use this command to cancel one or more experiments with matching or partially-matching names, a matching pod ID, matching pod status, or combinations of these criteria.</p>
-                                <p>For example, the following command will cancel all experiments with a matching or partially matching name::</p>
-                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment cancel -match EXPERIMENT_NAME</span></p>
+                                <p>For example, the following command will cancel all experiments with a matching or partially matching name:</p>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment cancel -match EXPERIMENT_NAME</span></p>
                                 <p>The following command will cancel all experiments with a matching pod-ID, using one or more comma-separated IDs:</p>
-                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">dlsctl experiment cancel –-pod-ids [pod_ID] EXPERIMENT_NAME]</span></p>
+                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment cancel –-pod-ids [pod_ID] EXPERIMENT_NAME]</span></p>
                                 <p>The following command will cancel all experiments with a matching pod-status, using one of the following statuses: <span style="font-family: 'Courier New';">[PENDING, RUNNING, SUCCEEDED, FAILED, UNKNOWN]</span>:</p>
-                                <p><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl experiment cancel --pod-status [PENDING, RUNNING, SUCCEEDED, FAILED, UNKNOWN] EXPERIMENT_NAME</span></p>
+                                <p><span style="font-family: 'Courier New';">$ nctl experiment cancel --pod-status [PENDING, RUNNING, SUCCEEDED, FAILED, UNKNOWN] EXPERIMENT_NAME</span>
+                                </p>
                                 <p>Any of the above criteria can be combined.</p>
                                 <p>You can also purge all information concerning any experiment using the <span style="font-family: 'Courier New';">-p</span> or <span style="font-family: 'Courier New';">--purge</span> option.</p>
                             </div>

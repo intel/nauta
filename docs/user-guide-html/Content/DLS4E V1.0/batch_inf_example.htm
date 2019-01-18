@@ -130,36 +130,36 @@
                                 <ol>
                                     <li value="1">The user has acquired the dataset and the trained model.</li>
                                     <li value="2">The user converts dataset into serialized protocol buffers (PBs). Refer to <a href="getting_started.htm">https://developers.google.com/protocol-buffers/</a> as one information source.</li>
-                                    <li value="3">The user invokes <span style="font-family: 'Courier New';">dlsctl mount</span>.</li>
-                                    <li value="4">The user mounts the Samba input folder by invoking the command displayed in the previous step.</li>
+                                    <li value="3">The user invokes <span style="font-family: 'Courier New';">nctl mount</span>.</li>
+                                    <li value="4">The user mounts the Samba shared folder by invoking the command displayed in the previous step.</li>
                                     <li value="5">The user copies the serialized PBs and the trained model to the just-mounted share.</li>
-                                    <li value="6">The user runs <span style="font-family: 'Courier New';">dlsctl predict batch</span> command.</li>
+                                    <li value="6">The user runs <span style="font-family: 'Courier New';">nctl predict batch</span> command.</li>
                                 </ol>
                                 <h2>MNIST Example</h2>
                                 <p>You need to have preprocessed MNIST data for feeding the batch inference. You can use already-preprocessed data located in 'parsed' directory, or generate data on your own (refer to <a href="#MNIST" class="MCXref xref" xrefformat="{paratext}">MNIST Data Preprocessing</a>).</p>
                                 <ol>
-                                    <li value="1">Mount Samba input share to your directory, assumed /mnt/input . Use the command printed by <span style="font-family: 'Courier New';">dlsctl mount</span>.</li>
-                                    <li value="2">Copy 'parsed' and 'trained_mnist_model' to <span style="font-family: 'Courier New';">/mnt/input</span>.</li>
-                                    <li value="3"><b>Execute</b>:&#160;<span style="font-family: 'Courier New';">dlsctl predict batch --model-location /mnt/input/home/trained_mnist_model --data /mnt/input/home/parsed --model-name mnist</span></li>
+                                    <li value="1">Mount Samba input share to your directory, assumed /mnt/input . Use the command printed by <span style="font-family: 'Courier New';">nctl mount</span>.</li>
+                                    <li value="2">Copy 'parsed' and 'trained_mnist_model' to <span style="font-family: 'Courier New';">/mnt/input</span>.<br /></li>
+                                    <li value="3">Enter the following command:&#160;<br /><span style="font-family: 'Courier New';">$ nctl predict batch --model-location /mnt/input/home/trained_mnist_model --data /mnt/input/home/parsed --model-name mnist</span><br /></li>
                                 </ol>
-                                <p><b>Important notes</b>:</p>
+                                <p><b>Notes</b>:</p>
                                 <ul>
-                                    <li value="1">Paths provided in locations such as <span style="font-family: 'Courier New';">--model-location</span> and <span style="font-family: 'Courier New';">--data</span> need to point for files/directory from the container's context, not from user's filesystem or mounts. These paths can be mapped using instructions from <span style="font-family: 'Courier New';">dlsctl mount</span>. For example, if you've mounted Samba <span style="font-family: 'Courier New';">/input</span> and copied files there, you should pass <span style="font-family: 'Courier New';">/mnt/input/home/&lt;file&gt;</span> .</li>
+                                    <li value="1">Paths provided in locations such as <span style="font-family: 'Courier New';">--model-location</span> and <span style="font-family: 'Courier New';">--data</span> need to point for files/directory from the container's context, not from user's filesystem or mounts. These paths can be mapped using instructions from <span style="font-family: 'Courier New';">nctl mount</span>. For example, if you've mounted Samba <span style="font-family: 'Courier New';">/input</span> and copied files there, you should pass <span style="font-family: 'Courier New';">/mnt/input/home/&lt;file&gt;</span> .</li>
                                     <li value="2"><span style="font-family: 'Courier New';">--model-name</span> is optional, but it must match the model name provided during data preprocessing, since generated requests must provide which servable they target. In the <span style="font-family: 'Courier New';">mnist_converter_pb.py</span> script you can find <span style="font-family: 'Courier New';">request.model_spec.name = 'mnist'</span>, which saves model name in requests, and that name must match value passed as <span style="font-family: 'Courier New';">--model-name</span>. If not provided it assumes that model name is equal to last directory in model location: <span style="font-family: 'Courier New';">/mnt/input/home/trained_mnist_model -&gt; trained_mnist_model</span></li>
                                 </ul>
                                 <h2><a name="MNIST"></a>MNIST Data Preprocessing</h2>
                                 <p>Perform the following steps:&#160;</p>
                                 <ol>
-                                    <li value="1">Create venv. <b>Execute</b>:&#160;<span style="font-family: 'Courier New';">make venv</span></li>
-                                    <li value="2">Run the mnist_converter_pb.py script using just generated venv:<br /></li>
+                                    <li value="1">Create venv. Enter the following command:<br /><span style="font-family: 'Courier New';">$ make venv</span></li>
+                                    <li value="2">Run the <span style="font-family: 'Courier New';">mnist_converter_pb.py</span> script using just generated venv:<br /></li>
                                 </ol>
                                 <blockquote>
-                                    <p style="font-family: 'Courier New';">source .venv/bin/activate<br />python mnist_converter_pb.py</p>
+                                    <p style="font-family: 'Courier New';">$ source .venv/bin/activate<br />$ python mnist_converter_pb.py</p>
                                 </blockquote>
                                 <h2>Description of Files</h2>
                                 <ul>
-                                    <li value="1">output - example PBs responses from batch inference downloaded after dlsctl predict batch process.</li>
-                                    <li value="2">parsed - example PBs parsed MNIST dataset generated by mnist_converter_pb.py script ready as an input for dlsctl predict batch.</li>
+                                    <li value="1">output - example PBs responses from batch inference downloaded after nctl predict batch process.</li>
+                                    <li value="2">parsed - example PBs parsed MNIST dataset generated by mnist_converter_pb.py script ready as an input for nctl predict batch.</li>
                                     <li value="3">trained_mnist_model - example MNIST trained model used for inference.</li>
                                     <li value="4">batch_client.py - prototype of batch inference wrapper client.</li>
                                     <li value="5">checker.py - script checking MNIST inference error rate from PBs responses.</li>

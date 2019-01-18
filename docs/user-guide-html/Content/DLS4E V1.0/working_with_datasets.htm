@@ -129,7 +129,7 @@
                                 <ul>
                                     <li value="1"><a href="#Uploadin" class="MCXref xref">Uploading Datasets</a>
                                     </li>
-                                    <li value="2"><a href="#dlsctl" class="MCXref xref">dlsctl mount Command</a>
+                                    <li value="2"><a href="#dlsctl" class="MCXref xref">nctl mount Command</a>
                                     </li>
                                     <li value="3"><a href="#Mount" class="MCXref xref">Mount and Access Folders</a>
                                     </li>
@@ -137,27 +137,27 @@
                                     </li>
                                 </ul>
                                 <h2><a name="Uploadin"></a>Uploading Datasets</h2>
-                                <p>Intel DL Studio offers two ways for users to upload and use datasets for experiments:</p>
+                                <p>Nauta offers two ways for users to upload and use datasets for experiments:</p>
                                 <h4>Uploading During Experiment Submission</h4>
                                 <p>Uploading additional datasets or files is an option available for the ‘submit’ command, using the following option:</p>
                                 <p style="text-indent: 0.5in;">-<span style="font-family: 'Courier New';">sfl, --script_folder_location</span></p>
                                 <p>Where <span style="font-family: 'Courier New';">script_folder_location</span> is the name of a folder with additional files used by a script, e.g., other .py files, datasets, etc. If the option is not included, the files will not be included in the experiment.</p>
                                 <p><b>Syntax</b>:</p>
-                                <p><span style="font-family: 'Courier New';">dlsctl experiment submit --script_folder_location DATASET-PATH SCRIPT_LOCATION</span>
+                                <p><span style="font-family: 'Courier New';">nctl experiment submit --script_folder_location DATASET-PATH SCRIPT_LOCATION</span>
                                 </p>
                                 <p>This option is recommended for small datasets or datasets that are NOT reused often. In using this option, the dataset will be uploaded each time the submit command is executed which may add to the overall submission time.</p>
                                 <p><b>Note</b>: <span style="font-family: 'Courier New';">script_folder_location</span> is also used for script files, not only for datasets.</p>
-                                <h4>Upload to DL Studio storage and Reference Location</h4>
-                                <p>Depending on the Intel DL Studio configuration, the application uses NFS to connect to a storage location where each user has folders that have been setup to store experiment input and output data. This option allows the user to upload files and datasets for private use and for sharing. Once uploaded, the files are referenced by the path. All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the instructions in this chapter for information how to access and use Intel DL Studio storage.</p>
+                                <h4>Upload to Nauta storage and Reference Location</h4>
+                                <p>Depending on the Nauta configuration, the application uses NFS to connect to a storage location where each user has folders that have been setup to store experiment input and output data. This option allows the user to upload files and datasets for private use and for sharing. Once uploaded, the files are referenced by the path. All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the instructions in this chapter for information how to access and use Nauta storage.</p>
                                 <p>This option is recommended for large datasets, data that will be reused often, and data that will be shared among users.</p>
-                                <h2><a name="dlsctl"></a>dlsctl mount Command</h2>
-                                <p>The ‘mount’ command displays another command that can be used to mount Intel DL Studio folders to a user’s local machine. When a user executes the command, information similar the following is displayed (this example is for macOS).  Use the following command to mount those folders (all of the following is displayed, although this is an example only).</p>
-                                <p><b>Note</b>: The <span style="font-family: 'Courier New';">dlsctl mount</span> command also returns a command to <i>unmount</i> a folder.</p>
+                                <h2><a name="dlsctl"></a>nctl mount Command</h2>
+                                <p>The ‘mount’ command displays another command that can be used to mount Nauta folders to a user’s local machine. When a user executes the command, information similar the following is displayed (this example is for macOS).  Use the following command to mount those folders (all of the following is displayed, although this is an example only).</p>
                                 <p style="text-align: center;">
                                     <img src="../images/dlsctl_mount_command_558x451.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 558;height: 451;" />
                                 </p>
-                                <p><b>IMPORTANT</b>: Intel DL Studio uses the mount command that is native to each operating system, so the command printed out may not appear as in the example.</p>
-                                <p><b>Note</b>: All variables are shown in upper-case letters.</p>
+                                <p><b>Note 1</b>: The <span style="font-family: 'Courier New';">nctl mount</span> command also returns a command to <i>unmount</i> a folder.</p>
+                                <p><b>Note 2</b>: Nauta uses the mount command that is native to each operating system, so the command printed out may not appear as in the example.</p>
+                                <p><b>Note 3</b>: All variables are shown in upper-case letters.</p>
                                 <h2><a name="Mount"></a>Mount and Access Folders</h2>
                                 <p>The following table displays the access permissions for each mounting folder.</p>
                                 <table style="width: 100%;border-collapse: collapse;border-top-left-radius: 1px;border-top-right-radius: 1px;border-bottom-right-radius: 1px;border-bottom-left-radius: 1px;border-left-style: solid;border-left-width: 2px;border-right-style: solid;border-right-width: 2px;border-top-style: solid;border-top-width: 2px;border-bottom-style: solid;border-bottom-width: 2px;">
@@ -169,7 +169,7 @@
                                     <thead>
                                         <tr>
                                             <th style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;">
-                                                <p>DLS4E Folder</p>
+                                                <p>NAUTA Folder</p>
                                             </th>
                                             <th style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;">
                                                 <p>Reference Path</p>
@@ -246,14 +246,32 @@
                                     </tbody>
                                 </table>
                                 <h2><a name="Uploadin2"></a>Uploading and Using Shared Dataset Example</h2>
-                                <p>The default configuration is to mount my-input and my-output folders to Intel DL Studio storage. Perform these steps below to mount an input-shared folder to Intel DL Studio storage so that you and other users can use shared input data when performing training.</p>
+                                <p>The default configuration is to mount my-input and my-output folders to Nauta storage. Perform these steps below to mount an input-shared folder to Nauta storage so that you and other users can use shared input data when performing training.</p>
                                 <ol>
-                                    <li value="1">Linux/macOS only: Create a folder for mounting named my-input.<br /><b>Execute</b>: <span style="font-family: 'Courier New';">mkdir my-input</span><br /></li>
-                                    <li value="2">Use the mount command to display the command that should be used to mount your local folder/machine to your Intel DL Studio input folder.<br /><b>Execute</b>: <span style="font-family: 'Courier New';">dlsctl mount</span><br /></li>
-                                    <li value="3">Use the mounting command that was displayed to mount your local machine to Intel DL Studio storage.  Examples of mounting the local folder to the Intel DL Studio output folder for each OS:<ul><li value="1">MacOS:&#160;m<span style="font-family: 'Courier New';">ount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/input- my-input</span></li><li value="2">Ubuntu:&#160;<span style="font-family: 'Courier New';">sudo mount.cifs  -o username=USERNAME,password=PASSWORD,rw,uid=1000 //CLUSTER-URL/input my-input</span></li><li value="3">Windows: Use Y: drive as mount point<br /><span style="font-family: 'Courier New';">net case Y: \\CLUSTER-URL\input /user:USERNAME PASSWORD</span><br /></li></ul></li>
-                                    <li value="4">Copy input data or files to this folder for use when submitting experiments.  After copying, the files will be located in Intel DL Studio storage and can be used by any user for their experiments.<ol style="list-style-type: lower-alpha;"><li value="1">Using the mnist example in <a href="getting_started.htm" class="MCXref xref">Getting Started</a>, you can download the mnist dataset from this link:<br />Mnist Dataset: <a href="experiment.htm">http://yann.lecun.com/exdb/mnist</a></li><li value="2">Create a <span style="font-family: 'Courier New';">mnist</span> folder in the DL Studio input folder. </li><li value="3">Copy the downloaded files to the folder.</li><li value="4">Submit an experiment referencing the new shared dataset. From the examples folder,<br /><b>Execute</b>:<span style="font-family: 'Courier New';">dlsctl experiment submit --name mnist-shared-input  mnist_with_summaries.py -- --data_dir==/mnt/input/home/mnist</span></li></ol></li>
+                                    <li value="1">Linux/macOS only: Create a folder for mounting named my-input.: <br /><span style="font-family: 'Courier New';">$ mkdir my-input</span><br /></li>
+                                    <li value="2">Use the mount command to display the command that should be used to mount your local folder/machine to your Nauta input folder.<br /><span style="font-family: 'Courier New';">$ nctl mount</span><br /></li>
+                                    <li value="3">
+                                        <p>Use the mounting command that was provided to mount your local machine to Nauta storage. Enter the mount command that is provided by <span style="font-family: 'Courier New';">nctl mount</span> using the input-shared as the NAUTA_FOLDER and my-shared-input folder or ‘Y:’ as the MOUNTPOINT. Here are examples of mounting the local folder to the Nauta output folder for each OS:</p>
+                                        <ul>
+                                            <li value="1">MacOS:&#160;m<span style="font-family: 'Courier New';">ount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/input- my-input</span></li>
+                                            <li value="2">Ubuntu:&#160;<span style="font-family: 'Courier New';">sudo mount.cifs  -o username=USERNAME,password=PASSWORD,rw,uid=1000 //CLUSTER-URL/input my-input</span></li>
+                                            <li value="3">Windows: Use Y: drive as mount point<br /><span style="font-family: 'Courier New';">net case Y: \\CLUSTER-URL\input /user:USERNAME PASSWORD</span><br /></li>
+                                        </ul>
+                                    </li>
+                                    <li value="4">
+                                        <p>Navigate to the mounted location:</p>
+                                        <ul>
+                                            <li value="1">MacOS/Ubuntu only: Navigate to my-shared-input folder.</li>
+                                            <li value="2"> Windows: Open Explorer Window and navigate to Y: drive</li>
+                                        </ul>
+                                    </li>
+                                    <li value="5">Copy input data or files to this folder for use when submitting experiments.  After copying, the files will be located in Nauta storage and can be used by any user for their experiments. </li>
+                                    <li value="6">Using the mnist example in <a href="getting_started.htm" class="MCXref xref">Getting Started</a>, you can download the mnist dataset from this link:<br />Mnist Dataset: <a href="experiment.htm">http://yann.lecun.com/exdb/mnist</a></li>
+                                    <li value="7">Create a <span style="font-family: 'Courier New';">mnist</span> folder in the Nauta input folder. </li>
+                                    <li value="8">Copy the downloaded files to the folder.</li>
+                                    <li value="9">Submit an experiment referencing the new shared dataset. From the examples folder:<br />:<span style="font-family: 'Courier New';">$ nctl experiment submit --name mnist-shared-input  mnist_with_summaries.py -- --data_dir==/mnt/input/home/mnist</span></li>
+                                    <li value="10">If you want to to copy your data to shared folder use input-shared instead of input in step 2. Doing so lets any Nauta user can use the same path to reference the mnist dataset on your shared Nauta&#160;storage<p>&#160;</p></li>
                                 </ol>
-                                <p>If you want to to copy your data to shared folder use input-shared instead of input in step 2. Doing so lets any Intel DL Studio user can use the same path to reference the mnist dataset on your shared DL Storage.</p>
                                 <p>&#160;</p>
                             </div>
                         </div>

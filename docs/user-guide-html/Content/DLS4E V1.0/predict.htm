@@ -144,7 +144,7 @@
                                 <h3>Synopsis</h3>
                                 <p>Starts a new batch instance that will perform prediction on provided data. Uses a specified dataset to perform inference. Results are stored in an output file.</p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict batch [options]</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict batch [options]</span>
                                 </p>
                                 <h3>Options</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -158,7 +158,7 @@
                                             <th class="TableStyle-TableStyle-BodyD-Column1-Body1">Description</th>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
-                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-n, --name</td>
+                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-n, --name TEXT</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">No</td>
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Name of predict session.</td>
                                         </tr>
@@ -166,6 +166,11 @@
                                             <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-m, --model-location TEXT</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">Yes</td>
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/saved_model).</td>
+                                        </tr>
+                                        <tr class="TableStyle-TableStyle-Body-Body1">
+                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-l, --local_model_location</td>
+                                            <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">Yes</td>
+                                            <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Local path to saved model that will be used for inference. Model content will be copied into an image.</td>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
                                             <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-d,--data TEXT</td>
@@ -178,7 +183,7 @@
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Location of a folder where outputs from inferences will be stored. Value should points out the location from one of the system's shares.</td>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
-                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-mn, --mode-name</td>
+                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-mn, --mode-name TEXT</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">No</td>
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">Name of a model passed as a servable name. By default it is the name of directory in model's location.</td>
                                         </tr>
@@ -202,13 +207,13 @@
                                     </tbody>
                                 </table>
                                 <h3>Returns</h3>
-                                <p>Description of a problem if any occurs. Otherwise information that predict job was submitted.</p>
+                                <p>Description of a problem if any occurs. Otherwise information that the predict job was submitted.</p>
                                 <p><b>Note</b>:&#160;Refer to <a href="batch_inf_example.htm" class="MCXref xref">Batch Inference Example </a> for a detailed example of this command. </p>
                                 <h2><a name="cancel"></a>cancel Subcommand</h2>
                                 <h3>Synopsis</h3>
                                 <p>This command cancels prediction instance(s) chosen based on criteria given as a parameter. </p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict cancel [options] [name]</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict cancel [options] [name]</span>
                                 </p>
                                 <h3>Arguments</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -224,7 +229,7 @@
                                         <tr class="TableStyle-TableStyle-Body-Body1">
                                             <td class="TableStyle-TableStyle-BodyB-Column1-Body1" style="font-family: 'Courier New';">NAME</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyB-Column1-Body1">No</td>
-                                            <td class="TableStyle-TableStyle-BodyA-Column1-Body1">Name of predict instance to be cancelled.  [name] argument value can be empty when 'match' option is used.</td>
+                                            <td class="TableStyle-TableStyle-BodyA-Column1-Body1">Name of predict instance to be cancelled. The [name] argument value can be empty when 'match' option is used.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -241,7 +246,7 @@
                                             <th class="TableStyle-TableStyle-BodyD-Column1-Body1">Description</th>
                                         </tr>
                                         <tr class="TableStyle-TableStyle-Body-Body1">
-                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-m, --match </td>
+                                            <td class="TableStyle-TableStyle-BodyE-Column1-Body1" style="font-family: 'Courier New';">-m, --match TEXT</td>
                                             <td style="text-align: center;" class="TableStyle-TableStyle-BodyE-Column1-Body1">No</td>
                                             <td class="TableStyle-TableStyle-BodyD-Column1-Body1">If given, command searches for prediction instances matching the value of this option.</td>
                                         </tr>
@@ -268,9 +273,9 @@
                                 <p>Description of a problem if any occurs. Otherwise, information that training job/jobs was/were cancelled successfully.</p>
                                 <h2><a name="launch"></a>launch Subcommand</h2>
                                 <h3>Synopsis</h3>
-                                <p>Starts a new prediction instance that can be used for performing prediction, classification and regression tasks on trained model. </p>
+                                <p>Starts a new prediction instance that can be used for performing prediction, classification and regression tasks on a trained model. The created prediction instance is for streaming prediction only.</p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict launch [options]</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict launch [options]</span>
                                 </p>
                                 <h3>Options</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -319,9 +324,9 @@
                                 </table>
                                 <p>&#160;</p>
                                 <h3> Returns</h3>
-                                <p>Prediction instance URL and authorization token.</p>
+                                <p>Prediction instance URL and authorization token, as well as information about the experiment  (name, model location, state).</p>
                                 <h3>Example</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict l -n test -m /mnt/input/home/experiment1</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict l -n test -m /mnt/input/home/experiment1</span>
                                 </p>
                                 <p style="font-family: 'Courier New';font-size: 10pt;">| Prediction instance   | Model Location               | Status   |</p>
                                 <p style="font-family: 'Courier New';font-size: 10pt;">|-----------------------+------------------------------+----------|</p>
@@ -335,7 +340,7 @@
                                 <h3>Synopsis</h3>
                                 <p>Displays a list of inference instances with some basic information regarding each of them. Results are sorted using a date of creation of an inference instance - starting from the latest one. </p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict list [options]</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict list [options]</span>
                                 </p>
                                 <h3>Options</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
@@ -394,12 +399,12 @@
                                 </table>
                                 <p>&#160;</p>
                                 <h3> Returns</h3>
-                                <p>List of inference instances matching criteria given in command's options.</p>
+                                <p>List of inference instances.</p>
                                 <h2><a name="stream"></a>stream Subcommand</h2>
                                 <h3>Synopsis</h3>
                                 <p>Perform stream inference task on launched prediction instance.</p>
                                 <h3>Syntax</h3>
-                                <p><span style="font-family: 'Courier New';">dlsctl predict stream [options]</span>
+                                <p><span style="font-family: 'Courier New';">nctl predict stream [options]</span>
                                 </p>
                                 <h3>Options</h3>
                                 <table style="width: 100%;mc-table-style: url('../Resources/TableStyles/TableStyle.css');" class="TableStyle-TableStyle" cellspacing="3">
