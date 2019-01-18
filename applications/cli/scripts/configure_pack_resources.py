@@ -174,11 +174,11 @@ if __name__ == '__main__':
     if not args.config_dir_path:
         exit(parser.print_help())
 
-    if args.cpu_fixed and args.mem_fixed:
-        resources_to_set = get_fixed_resources(fixed_cpu=args.cpu_fixed, fixed_memory=args.mem_fixed)
-    else:
+    if args.cpu_percentage and args.mem_percentage:
         resources_to_set = get_k8s_worker_allocatable_resources(cpu_threshold=args.cpu_percentage,
                                                                 mem_threshold=args.mem_percentage)
+    else:
+        resources_to_set = get_fixed_resources(fixed_cpu=args.cpu_fixed, fixed_memory=args.mem_fixed)
 
     override_default_resources_in_packs(nctl_config_dir_path=args.config_dir_path,
                                         k8s_worker_resources=resources_to_set,
