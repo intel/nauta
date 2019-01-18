@@ -1,5 +1,5 @@
-# Intel® Deep Learning Studio Installation and Configuration  
-# Installation Guide, Alpha Release
+# Nauta Installation and Configuration  
+# Administration Guide
 <br>
 <br>
 <br>
@@ -13,8 +13,8 @@
 
 
 
-**Revision 2.0, September 2018** 
-**Intel Confidential—Do Not Reproduce**
+**Revision 1.0, January 2019** 
+
 <br>
 <br>
 <br>
@@ -32,8 +32,10 @@
 
 
 
-**Terms and Conditions**
-Copyright © 2018 Intel Corporation. All rights reserved.
+**Terms and Conditions** **<-- WAITING ON LEGAL TO PROVIDE UPDATED INFO**
+
+
+Copyright © 2019 Intel Corporation. All rights reserved.
 
 Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and other countries.
 

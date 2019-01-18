@@ -1,9 +1,9 @@
 # Nauta System Software Components Requisites
-Nauta requires certian components, as shown in Table 1 before beginning your installation. 
+Nauta requires certian components (as shown in the table below) before beginning your installation. 
 
 ## List of External Software Components
 
-Table 1 shows the software package that includes the external software components for Nauta. 
+The table shows the software package that includes the external software components for Nauta. 
 
 Name | Version | Project link
 --- | --- | --- 
