@@ -20,14 +20,14 @@
 #
 
 from collections import defaultdict
+from datetime import datetime
+from enum import Enum
 import re
 import sys
 from sys import exit
-from enum import Enum
-
+from typing import List, Tuple
 
 import click
-from typing import List, Tuple
 
 from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
@@ -417,6 +417,7 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
                         delete_helm_release(release_name=run.name, namespace=namespace, purge=False)
                         # change a run state to CANCELLED
                         run.state = RunStatus.CANCELLED
+                        run.end_timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
                         update_run(run, namespace)
                 deleted_runs.append(run)
             except Exception:
