@@ -7,7 +7,7 @@ RUN yum install -y git gcc clang openssl-devel libpcap-devel libevent libevent-d
         libmpc-devel mpfr-devel gmp-devel zlib-devel* \
         device-mapper device-mapper-devel btrfs-progs btrfs-progs-devel \
         libnl3 libnl3-devel libseccomp libseccomp-devel systemd-devel \
-        libgudev1 libgudev1-devel pigz
+        libgudev1 libgudev1-devel pigz mercurial
 
 RUN mkdir /build-process /build-output
 WORKDIR /build-process
