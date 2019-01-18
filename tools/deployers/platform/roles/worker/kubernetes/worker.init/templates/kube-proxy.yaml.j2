@@ -41,7 +41,7 @@ spec:
       mountPath: /etc/kubelet
       readOnly: True
     - name: certs
-      mountPath: /etc/dls-cluster/client
+      mountPath: /etc/nauta-cluster/client
       readOnly: True
   volumes:
   - name: xtables-lock
@@ -57,5 +57,5 @@ spec:
       type: Directory
   - name: certs
     hostPath:
-      path: /etc/dls-cluster/client
+      path: /etc/nauta-cluster/client
       type: Directory

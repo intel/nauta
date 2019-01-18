@@ -1,12 +1,12 @@
 ---
 
 - name: "{{ message_label }} Install package"
-  include_tasks: yum_dls4e_install.yml
+  include_tasks: yum_nauta_install.yml
   vars:
     packages:
-      - dls4e-kubernetes-server-1.10.11
-      - dls4e-kubernetes-client-1.10.11
-      - dls4e-helm-2.9.1
+      - nauta-kubernetes-server-1.10.11
+      - nauta-kubernetes-client-1.10.11
+      - nauta-helm-2.9.1
     handlers:
       - Reload Systemd
       - Restart Kubernetes Apiserver

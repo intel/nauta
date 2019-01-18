@@ -1,4 +1,4 @@
-FROM dls4e/horovod:1.9.0-py3
+FROM nauta/horovod:1.9.0-py3
 
 WORKDIR /app
 

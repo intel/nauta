@@ -1,0 +1,31 @@
+---
+
+- name: "{{ message_label }} Load informations about admin user"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get serviceaccounts nauta-admin-account -o jsonpath='{.secrets[0].name}'"
+  register: nauta_admin_account
+
+- name: "{{ message_label }} Load informations about admin token"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.token}'"
+  register: nauta_admin_token
+
+- name: "{{ message_label }} Load informations about admin namespace"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
+  register: nauta_admin_namespace
+
+- name: "{{ message_label }} Load informations about admin crt"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
+  register: nauta_admin_crt
+
+- name: "{{ message_label }} Create kube directory"
+  file:
+    path: "~/.kube"
+    state: directory
+
+- name: "{{ message_label }} Render nauta admin config"
+  template:
+    src: kubeconfig.yml.j2
+    dest: "{{ root }}/nauta-admin.config"

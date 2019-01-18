@@ -31,7 +31,7 @@ from util import socat
 from util.network import wait_for_connection
 from util.logger import initialize_logger
 from util.system import wait_for_ctrl_c
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, LaunchError, \
     ProxyClosingError
@@ -51,11 +51,11 @@ def is_gui_browser_available() -> bool:
         return False
 
 
-def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port: int = None, app_name: str = None,
+def launch_app(k8s_app_name: NAUTAAppNames = None, no_launch: bool = False, port: int = None, app_name: str = None,
                number_of_retries: int = 0, url_end: str = "", namespace: str = None):
     try:
         with spinner(text=Texts.LAUNCHING_APP_MSG) as proxy_spinner, \
-             K8sProxy(dls4e_app_name=k8s_app_name, port=port, app_name=app_name,
+             K8sProxy(nauta_app_name=k8s_app_name, port=port, app_name=app_name,
                       number_of_retries=number_of_retries, namespace=namespace) as proxy:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
 
@@ -69,7 +69,7 @@ def launch_app(k8s_app_name: DLS4EAppNames = None, no_launch: bool = False, port
                     logger.exception(err_message)
                     raise LaunchError(err_message)
 
-            if k8s_app_name == DLS4EAppNames.INGRESS:
+            if k8s_app_name == NAUTAAppNames.INGRESS:
                 config.load_kube_config()
                 user_token = configuration.Configuration().api_key.get('authorization')
                 prepared_user_token = user_token.replace('Bearer ', '')

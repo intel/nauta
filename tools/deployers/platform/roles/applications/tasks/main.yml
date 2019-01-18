@@ -1,10 +1,10 @@
 ---
 
-- name: "{{ message_label }} Create a k8s dls4e namespace"
+- name: "{{ message_label }} Create a k8s nauta namespace"
   changed_when: False
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl get namespace dls4e || kubectl create namespace dls4e"
+  shell: "kubectl get namespace nauta || kubectl create namespace nauta"
 
 - name: "{{ message_label }} Create kubernetes configuration directory"
   file:
@@ -49,8 +49,8 @@
 
 - name: "{{ message_label }} Copy chart"
   copy:
-    src: dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
-    dest: /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz
+    src: nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz
+    dest: /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz
 
 - name: "{{ message_label }} Fetch all interfaces names"
   set_fact:
@@ -59,17 +59,17 @@
 
 - name: "{{ message_label }} Render values"
   vars:
-    dls_release_values:
+    nauta_release_values:
       global:
         MasterHost: "{{ hostvars[groups['master'][0]].ansible_nodename }}"
-        dls4e_registry: "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
+        nauta_registry: "registry.service.{{ nodes_domain }}.{{ domain }}:5000"
       flannel:
         interfaces: "{{ all_cluster_interfaces | sort | unique }}"
         pod_network: "{{ kubernetes_network.pod }}"
       samba-forward:
         ClusterIP: "{{ kubernetes_network.svc_list.samba.ip }}"
       nfs:
-        ip: "{{ hostvars[groups['master'][0]].dls_configuration.internal_interface.ipv4_address }}"
+        ip: "{{ hostvars[groups['master'][0]].nauta_configuration.internal_interface.ipv4_address }}"
         input: "{{ local_data_path }}/local/nfs/input"
         output: "{{ local_data_path }}/local/nfs/output"
       skydns:
@@ -79,8 +79,8 @@
         ClusterIP: "{{ kubernetes_network.svc_list.ingress.ip }}"
       features: "{{ features | default({}) }}"
   copy:
-    content: "{{ dls_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
-    dest: "/tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml"
+    content: "{{ nauta_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "/tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.values.yaml"
 
 - name: "{{ message_label }} Mark node taint"
   changed_when: False
@@ -93,34 +93,34 @@
   environment:
     KUBECONFIG: /dev/null
   shell: >
-    helm upgrade dls4enterprise-k8s-platform
+    helm upgrade nauta-k8s-platform
     --namespace kube-system -i
-    /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.tgz --wait
-    -f /tmp/dls4e-platform-{{ dls4e_release_package_version }}-{{ dls4e_release_package_release }}.values.yaml
+    /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz --wait
+    -f /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.values.yaml
 
 - name: "{{ message_label }} Load informations about admin user"
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl -n kube-system get serviceaccounts dls4enterprise-k8s-platform-admin -o jsonpath='{.secrets[0].name}'"
-  register: dlsenterprise_admin_account
+  shell: "kubectl -n kube-system get serviceaccounts nauta-k8s-platform-admin -o jsonpath='{.secrets[0].name}'"
+  register: nauta_admin_account
 
 - name: "{{ message_label }} Load informations about admin token"
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.token}'"
-  register: dlsenterprise_admin_token
+  shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.token}'"
+  register: nauta_admin_token
 
 - name: "{{ message_label }} Load informations about admin namespace"
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
-  register: dlsenterprise_admin_namespace
+  shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
+  register: nauta_admin_namespace
 
 - name: "{{ message_label }} Load informations about admin crt"
   environment:
     KUBECONFIG: /dev/null
-  shell: "kubectl -n kube-system get secrets {{ dlsenterprise_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
-  register: dlsenterprise_admin_crt
+  shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
+  register: nauta_admin_crt
 
 - name: "{{ message_label }} Create kubeconfig directory"
   file:
@@ -132,7 +132,7 @@
     src: kubeconfig.j2
     dest: /root/.kube/config
 
-- name: "{{ message_label }} Create a k8s dls4e namespace"
+- name: "{{ message_label }} Create a k8s nauta namespace"
   changed_when: False
   shell: "kubectl get pods"
 

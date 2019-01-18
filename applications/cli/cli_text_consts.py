@@ -24,14 +24,14 @@ SPINNER_COLOR = "green"
 
 
 class VersionCmdTexts:
-    HELP = "Displays the version of the installed dlsctl application."
+    HELP = "Displays the version of the installed nctl application."
     INITIAL_PLATFORM_VERSION = "Failed to get platform version."
     KUBECTL_INT_ERROR_MSG = "Falied to check platform version. This may occur for example due to invalid path to " \
                             "kubectl config, invalid k8s credentials or k8s cluster being unavailable. Check your " \
                             "KUBECONFIG environment variable and make sure that the k8s cluster is online."
     OTHER_ERROR_MSG = "Unexpected error occurred during platform version check."
-    TABLE_APP_ROW_NAME = "dlsctl application"
-    TABLE_PLATFORM_ROW_NAME = "dls4e platform"
+    TABLE_APP_ROW_NAME = "nctl application"
+    TABLE_PLATFORM_ROW_NAME = "nauta platform"
     TABLE_HEADERS = ["Component", "Version"]
 
 
@@ -39,7 +39,7 @@ class MountCmdTexts:
     HELP = "Displays a command that can be used to mount client's folders on his/her local machine."
     MAIN_MSG = """Use the following command to mount those folders:
  - replace <MOUNTPOINT> with a proper location on your local machine)
- - replace <DLS4E_FOLDER> with one of the following:
+ - replace <NAUTA_FOLDER> with one of the following:
         - input - User's private input folder (read/write)
           (can be accessed as /mnt/input/home from training script).
         - output - User's private output folder (read/write)
@@ -54,9 +54,9 @@ as /mnt/output/experiment from training script. This folder is shared by Samba
 as output/<EXPERIMENT_NAME>.
 --------------------------------------------------------------------"""
 
-    HELP_L = "Displays a list of dls4e folders mounted on a local machine. If run using admin credentials, displays " \
+    HELP_L = "Displays a list of nauta folders mounted on a local machine. If run using admin credentials, displays " \
              "mounts of all users."
-    USER_IS_ADMIN_ERROR_MSG = "DLS4E doesn't create shares for administrators. Please execute this command as a " \
+    USER_IS_ADMIN_ERROR_MSG = "NAUTA doesn't create shares for administrators. Please execute this command as a " \
                               "regular user."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
@@ -74,7 +74,7 @@ class CmdsCommonTexts:
 
 
 class VerifyCmdTexts:
-    HELP = "Command verifies whether all external components required by dlsctl are installed in proper versions. " \
+    HELP = "Command verifies whether all external components required by nctl are installed in proper versions. " \
            "If something is missing, the application displays detailed information about it."
     KUBECTL_NOT_INSTALLED_ERROR_MSG = "kubectl is not installed."
     KUBECTL_INVALID_VERSION_ERROR_MSG = "the installed version of kubectl ({installed_version}) is not " \
@@ -378,15 +378,15 @@ class ExperimentSubmitCmdTexts:
                "given - its content won't be copied into an image."
     HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
              " Template is chosen. List of available templates might be obtained by" \
-             " Issuing dlsctl experiment template_list command."
+             " Issuing nctl experiment template_list command."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
     HELP_PR = "Values (set or range) of a single parameter."
     HELP_PS = "Set of values of one or several parameters."
-    USER_IS_ADMIN_LOG_MSG = "Current user is dls4e administrator. Submit cannot be performed."
-    USER_IS_ADMIN_USR_MSG = "You cannot submit experiments as dls4e administrator. Switch your KUBECONFIG " \
-                            "environment variable to point to a valid dls4e user config. If you don't have one you " \
-                            "can create it with command 'dlsctl user create'."
+    USER_IS_ADMIN_LOG_MSG = "Current user is nauta administrator. Submit cannot be performed."
+    USER_IS_ADMIN_USR_MSG = "You cannot submit experiments as nauta administrator. Switch your KUBECONFIG " \
+                            "environment variable to point to a valid nauta user config. If you don't have one you " \
+                            "can create it with command 'nctl user create'."
     HELP_E = "Environment variables passed to training. User can pass as many environmental variables as it is " \
              "needed - each variable should be in such case passed as a separate -e parameter."
     HELP_R = "Path to file with experiment's pip requirements." \
@@ -423,7 +423,7 @@ class ExperimentInteractCmdTexts:
     SUBMITTING_EXPERIMENT_USER_MSG = "Submitting interactive experiment."
     SUBMIT_ERROR_MSG = "Error during starting jupyter notebook session: {exception_message}"
     SUBMIT_OTHER_ERROR_MSG = "Other error during starting jupyter notebook session."
-    SESSION_EXISTS_MSG = "Jupyter notebook's session exists. dlsctl connects to this session ..."
+    SESSION_EXISTS_MSG = "Jupyter notebook's session exists. nctl connects to this session ..."
     NOTEBOOK_STATE_CHECK_ERROR_MSG = "Error during checking state of Jupyter notebook."
     ATTACHING_SCRIPT_NOT_SUPPORTED_MSG = "Attaching script to existing Jupyter notebook's session is not supported. " \
                                          "Please create a new Jupyter notebook's session to attach script."
@@ -461,7 +461,7 @@ class ExperimentCancelCmdTexts:
     LIST_RUNS_ERROR_MSG = "Problems during loading a list of {experiment_name_plural}."
     LACK_OF_EXPERIMENTS_ERROR_MSG = "Lack of {experiment_name_plural} fulfilling given criteria. Name or match " \
                                     "string parameters do not match any existing {experiment_name} in an appropriate " \
-                                    "state for the command. Run 'dlsctl exp list' to find out what are the names and " \
+                                    "state for the command. Run 'nctl exp list' to find out what are the names and " \
                                     "states of existing {experiment_name_plural}."
     CANCEL_OPERATION = {
         "cancelled": "cancelled",
@@ -665,7 +665,7 @@ class UtilDependenciesCheckerTexts:
 
 class UtilConfigTexts:
     USER_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {user_path} directory from {config_env_name} env!"
-    DLS_CTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {config_dir_name} directory in {binary_config_dir_path} " \
+    NCTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {config_dir_name} directory in {binary_config_dir_path} " \
                                              "and {user_local_config_dir_path}. Use {config_env_name} env to point " \
                                              "{config_dir_name} directory location"
 
@@ -683,7 +683,7 @@ class PlatformResourcesExperimentsTexts:
     EXPERIMENT_INVALID_STATE_MSG = " experiment with name: {name} already exist, " \
                                    "but it doesn't have any resources submitted for creation. " \
                                    "In order to create experiment with desired name," \
-                                   " purge old experiment using following command: dlsctl experiment cancel --purge" \
+                                   " purge old experiment using following command: nctl experiment cancel --purge" \
                                    " {name}"
     EXPERIMENT_UPDATE_ERROR_MSG = "Error during patching an Experiment"
 
@@ -740,8 +740,8 @@ class CliStateTexts:
                                   "example due to invalid path to kubectl config, invalid k8s credentials or k8s " \
                                   "cluster being unavailable. Check your KUBECONFIG environment variable and make " \
                                   "sure that the k8s cluster is online."
-    DLSCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for dlsctl is not set."
-    DLSCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
+    NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set."
+    NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
 
 
 class LicenseAcceptanceTexts:
@@ -751,5 +751,5 @@ class LicenseAcceptanceTexts:
                                       "THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND " \
                                       "CONDITIONS OF THIS AGREEMENT. Agree?"
     CANNOT_ACCEPT_LICENSE_MSG = "Cannot save license agreement - \"config\" file or directory already exists in " \
-                                "{dlsctl_config_path} but this name is reserved for dlsctl app. Please remove it " \
+                                "{nctl_config_path} but this name is reserved for nctl app. Please remove it " \
                                 "and try again."

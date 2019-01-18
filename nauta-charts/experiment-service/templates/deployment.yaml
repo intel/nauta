@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+    apiserver: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
+      apiserver: "true"
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        heritage: {{ .Release.Service }}
+        apiserver: "true"
+    spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
+      serviceAccount: {{ .Release.Name }}-{{ .Chart.Name }}
+      containers:
+        - name: apiserver
+          image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA service image is required" .Values.service_image }}
+          imagePullPolicy: Always
+          command:
+          - "./apiserver"
+          args:
+          - "--etcd-servers=http://{{ .Release.Name }}-{{ .Chart.Name }}-etcd:2379"
+          - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+          - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
+          - "--v=3"
+          - "--audit-log-path=-"
+          - "--audit-log-maxage=0"
+          - "--audit-log-maxbackup=0"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          volumeMounts:
+          - name: apiserver-certs
+            mountPath: /apiserver.local.config/certificates
+            readOnly: true
+        - name: controller
+          image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA service image is required" .Values.service_image }}
+          imagePullPolicy: Always
+          command:
+          - "./controller-manager"
+          args:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+      volumes:
+      - name: apiserver-certs
+        secret:
+          secretName: {{ .Release.Name }}-{{ .Chart.Name }}

@@ -1,0 +1,22 @@
+{{- if .Values.global.output_nfs }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Release.Namespace }}-output
+  labels:
+    app_name: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    type: output
+    app: samba
+    namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  capacity:
+    storage: 32Gi
+  nfs:
+    path: {{ .Values.global.output_nfs.path }}
+    server: {{ .Values.global.output_nfs.server }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+{{- end }}

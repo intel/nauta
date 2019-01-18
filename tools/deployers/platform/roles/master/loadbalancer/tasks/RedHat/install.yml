@@ -1,7 +1,7 @@
 ---
 
 - name: "{{ message_label }} Install package"
-  include_tasks: yum_dls4e_install.yml
+  include_tasks: yum_nauta_install.yml
   vars:
     packages:
       - nginx-1.13.9

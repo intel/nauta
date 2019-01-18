@@ -44,8 +44,8 @@ config() {
 }
 
 kubeconfig() {
-    if [ X"${DLS_KUBECONFIG}" != X"" ]; then
-        echo "${DLS_KUBECONFIG}"
+    if [ X"${NAUTA_KUBECONFIG}" != X"" ]; then
+        echo "${NAUTA_KUBECONFIG}"
     elif [ -f "${CURDIR}/platform-admin.config" ]; then
         echo "${CURDIR}/platform-admin.config"
     else
@@ -78,27 +78,27 @@ platform_ansible_run() {
         exit 1
     fi
     set +e
-    ansible_run ${CURDIR}/platform/dls.yml
+    ansible_run ${CURDIR}/platform/nauta.yml
     ret_val=$?
     set -e
     show_error_message $ret_val
     return $ret_val
 }
 
-dls4e_ansible_run() {
-    export KIND=dls4e
+nauta_ansible_run() {
+    export KIND=nauta
     set +e
-    ansible_run ${CURDIR}/dls4e/install.yml
+    ansible_run ${CURDIR}/nauta/install.yml
     ret_val=$?
     set -e
     show_error_message $ret_val
     return $ret_val
 }
 
-dls4e_fetch_ansible_run() {
-    export KIND=dls4e
+nauta_fetch_ansible_run() {
+    export KIND=nauta
     set +e
-    ansible_run ${CURDIR}/dls4e/fetch.yml
+    ansible_run ${CURDIR}/nauta/fetch.yml
     ret_val=$?
     set -e
     show_error_message $ret_val
@@ -131,15 +131,15 @@ if [ X"${COMMAND}" = X"" ]; then
 fi
 
 case "${COMMAND}" in
-  install) platform_ansible_run && dls4e_ansible_run
+  install) platform_ansible_run && nauta_ansible_run
      ;;
   platform-install) platform_ansible_run
      ;;
-  dls4e-install) dls4e_ansible_run
+  nauta-install) nauta_ansible_run
      ;;
-  dls4e-upgrade) UPGRADE=True dls4e_ansible_run
+  nauta-upgrade) UPGRADE=True nauta_ansible_run
      ;;
-  dls4e-fetch) dls4e_fetch_ansible_run
+  nauta-fetch) nauta_fetch_ansible_run
      ;;
   platform-verify) platform_verify_ansible_run
      ;;

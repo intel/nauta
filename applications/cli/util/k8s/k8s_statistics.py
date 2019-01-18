@@ -61,7 +61,7 @@ def get_highest_usage() -> Tuple[List[str], List[str]]:
         name = item.metadata.name
         namespace = item.metadata.namespace
         # omit technical namespaces
-        if namespace not in ["dls4e", "kube-system"] and item.status.phase.upper() == PodStatus.RUNNING.value:
+        if namespace not in ["nauta", "kube-system"] and item.status.phase.upper() == PodStatus.RUNNING.value:
             try:
                 cpu, mem = get_top_for_pod(name=name, namespace=namespace)
                 if namespace in users_data:

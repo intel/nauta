@@ -166,7 +166,7 @@ def _parse_installed_version(version_output: str,
 
 
 def check_os():
-    """ Check if user's OS is supported by dlsctl. """
+    """ Check if user's OS is supported by nctl. """
     try:
         os_name, os_version = get_os_version()
         if os_name == "":
@@ -285,17 +285,17 @@ def check_all_binary_dependencies(namespace: str):
 
 
 def get_dependency_versions_file_path() -> str:
-    dlsctl_version = VERSION
-    dlsctl_config_directory = Config().config_path
+    nctl_version = VERSION
+    nctl_config_directory = Config().config_path
     dependency_versions_file_path = os.path.join(
-        dlsctl_config_directory,
-        f'{dlsctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}')
+        nctl_config_directory,
+        f'{nctl_version}{DEPENDENCY_VERSIONS_FILE_SUFFIX}')
     return dependency_versions_file_path
 
 
 def save_dependency_versions(dependency_versions: Dict[str, LooseVersion]):
     """
-    Saves a YAML file containing versions of dlsctl dependencies under $(DLS_CTL_CONFIG)/$(dlsctl_version) path.
+    Saves a YAML file containing versions of nctl dependencies under $(NCTL_CONFIG)/$(nctl_version) path.
     :param dependency_versions: a dictionary containing dependency names as keys and their versions as values
     """
     dependency_versions_file_path = get_dependency_versions_file_path()
@@ -308,7 +308,7 @@ def save_dependency_versions(dependency_versions: Dict[str, LooseVersion]):
 
 def load_dependency_versions() -> Optional[Dict[str, LooseVersion]]:
     """
-    Loads saved dependency version for current dlsctl version. Returns None if dependency version file is not present.
+    Loads saved dependency version for current nctl version. Returns None if dependency version file is not present.
     """
     dependency_versions_file_path = get_dependency_versions_file_path()
     log.info(

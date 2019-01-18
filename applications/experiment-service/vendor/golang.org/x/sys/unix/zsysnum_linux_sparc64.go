@@ -189,7 +189,7 @@ const (
 	SYS_SGETMASK               = 199
 	SYS_SSETMASK               = 200
 	SYS_SIGSUSPEND             = 201
-	SYS_OLDLSTAT               = 202
+	SYS_OLNAUTATAT               = 202
 	SYS_USELIB                 = 203
 	SYS_READDIR                = 204
 	SYS_READAHEAD              = 205

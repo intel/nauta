@@ -31,7 +31,7 @@ from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import execute_system_command, handle_error
 from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
-from util.config import DLS4EConfigMap
+from util.config import NAUTAConfigMap
 from cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
@@ -41,7 +41,7 @@ from cli_text_consts import UserCreateCmdTexts as Texts
 
 logger = initialize_logger(__name__)
 
-ADD_USER_CHART_NAME = "dls4e-user"
+ADD_USER_CHART_NAME = "nauta-user"
 
 KUBECONFIG_TEMPLATE = '''
 current-context: user-context
@@ -53,10 +53,10 @@ clusters:
     # certificate-authority-data: {cert_data}
     # BUG/TASK: CAN-261
     insecure-skip-tls-verify: true
-  name: dls-cluster
+  name: nauta-cluster
 contexts:
 - context:
-    cluster: dls-cluster
+    cluster: nauta-cluster
     namespace: "{context_namespace}"
     user: "{context_username}"
   name: user-context
@@ -123,13 +123,13 @@ def create(state: State, username: str, list_only: bool, filename: str):
         with spinner(text=Texts.CREATING_USER_PROGRESS_MSG.format(username=username)):
             chart_location = os.path.join(Config().config_path, ADD_USER_CHART_NAME)
 
-            dls4e_config_map = DLS4EConfigMap()
+            nauta_config_map = NAUTAConfigMap()
 
-            tiller_location = dls4e_config_map.image_tiller
-            tensorboard_service_location = dls4e_config_map.image_tensorboard_service
+            tiller_location = nauta_config_map.image_tiller
+            tensorboard_service_location = nauta_config_map.image_tensorboard_service
 
             add_user_command = ["helm", "install", "--wait", "--namespace", username, "--name", username,
-                                chart_location, "--set", "global.dls4e=dls4enterprise", "--set",
+                                chart_location, "--set", "global.nauta=nauta", "--set",
                                 f"username={username}", "--set", "TillerImage={}".format(tiller_location),
                                 "--set", f"TensorboardServiceImage={tensorboard_service_location}"]
             env = os.environ.copy()

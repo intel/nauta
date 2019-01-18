@@ -1,0 +1,20 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+data:
+  external_ip: {{ required "NAUTA Release version is required" .Values.global.nauta_configuration.external_ip }}
+  tensorboard.timeout: "1800"
+  registry: {{ required "NAUTA registry address is required" .Values.global.nauta_configuration.registry }}
+{{- $root := . -}}
+{{- range (required "List of images is required" .Values.global.images) }}
+  image.{{ required "Name not found" .name }}: {{ required "Value not found" .value }}
+{{- end }}
+  platform.version: "{{ .Values.global.nauta_release }}"

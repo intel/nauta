@@ -35,7 +35,7 @@ import platform_resources.user_model as model
 from util.logger import initialize_logger
 from util.k8s import k8s_proxy_context_manager
 from util.exceptions import K8sProxyCloseError
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from cli_text_consts import PlatformResourcesUsersTexts as Texts
@@ -97,7 +97,7 @@ def purge_user(username: str):
     """
     # remove data from elasticsearch
     try:
-        with k8s_proxy_context_manager.K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy,\
+        with k8s_proxy_context_manager.K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy,\
             spinner(text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS):
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
@@ -135,11 +135,11 @@ def get_user_data(username: str) -> model.User:
 def validate_user_name(username: str) -> bool:
     """
     Verifies whether a name given as a parameter is a value
-    accepted by the DLS4E system.
+    accepted by the NAUTA system.
 
     :param username: - name of a user
     :return: throws a ValueError in case when username cannot be accepted by
-    the DLS4E system. Message in error describes a detected problem
+    the NAUTA system. Message in error describes a detected problem
     """
     # name cannot be longer than 32 and shorter than 1 character - due to lmitations
     # of a mechanism responsible for creating user/public shares

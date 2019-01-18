@@ -10,8 +10,8 @@ metadata:
     chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}
     release: {{ $root.Release.Name }}
     heritage: {{ $root.Release.Service }}
-    dls4e_release: {{ required "DLS4E Release name is required" $root.Values.global.dls4e }}
-    dls4e_release_version: {{ required "DLS4E Release version is required" $root.Values.global.dls4e_release }}
+    nauta_release: {{ required "NAUTA Release name is required" $root.Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" $root.Values.global.nauta_release }}
     iface: "{{ . }}"
 spec:
   selector:
@@ -44,7 +44,7 @@ spec:
       serviceAccountName: {{ $root.Release.Name }}-{{ $root.Chart.Name }}
       initContainers:
       - name: install-cni
-        image: {{ required "DLS4E Registry is required" $root.Values.global.dls4e_registry }}/{{ required "DLS4E dashboard image is required" $root.Values.image }}
+        image: {{ required "NAUTA Registry is required" $root.Values.global.nauta_registry }}/{{ required "NAUTA dashboard image is required" $root.Values.image }}
         command:
         - cp
         resources:
@@ -62,7 +62,7 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        image: {{ required "DLS4E Registry is required" $root.Values.global.dls4e_registry }}/{{ required "DLS4E dashboard image is required" $root.Values.image }}
+        image: {{ required "NAUTA Registry is required" $root.Values.global.nauta_registry }}/{{ required "NAUTA dashboard image is required" $root.Values.image }}
         command:
         - /opt/bin/flanneld
         resources:

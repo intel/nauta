@@ -1,4 +1,4 @@
-# DLS4E Experiment Service
+# NAUTA Experiment Service
 
 
 ## Requirements
@@ -29,7 +29,7 @@ For more info about preoject structure check [Knowledge](#knowledge) section
 ## Deployment
 
 ### Deploy on cluster
-Current deployment configuration is handled by helm chart [here](../../dls4e-charts/experiment-service)
+Current deployment configuration is handled by helm chart [here](../../nauta-charts/experiment-service)
 
 ### Update running api-server in the cluster
 1. Make changes in your code e.g.: add new field. Build it: `make build`
@@ -38,7 +38,7 @@ Current deployment configuration is handled by helm chart [here](../../dls4e-cha
 1. Push to remote docker registry: `docker push 127.0.0.1:31655/experiment-service`
 1. Change image address in deployment to `image: 127.0.0.1:31655/experiment-service`: 
     ```
-    kubectl edit -n=dls4e deployment dls4enterprise-experiment-service
+    kubectl edit -n=nauta deployment nauta-experiment-service
     ```
 1. Test it!
 

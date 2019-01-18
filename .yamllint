@@ -4,14 +4,15 @@ ignore: |
   /.venv
   /applications/old_experiment-service/
   /applications/cli/draft/packs/*/charts/
+  /applications/nauta-gui/node_modules/
   /k8s-features/charts
   /platform-deploy/charts/
   /*/charts
   /**/charts
   /tools/finalizers/dls4e/dls4e-registry
-  /dls4e-charts
-  /dls4e-user
-  /dls4e-registry-charts
+  /nauta-charts
+  /nauta-user
+  /nauta-registry-charts
   /platform-charts
   /tmp-go
 

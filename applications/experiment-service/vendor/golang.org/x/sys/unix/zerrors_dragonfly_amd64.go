@@ -422,7 +422,7 @@ const (
 	IFT_DCN                           = 0x8d
 	IFT_DIGITALPOWERLINE              = 0x8a
 	IFT_DIGITALWRAPPEROVERHEADCHANNEL = 0xba
-	IFT_DLSW                          = 0x4a
+	IFT_NAUTAW                          = 0x4a
 	IFT_DOCSCABLEDOWNSTREAM           = 0x80
 	IFT_DOCSCABLEMACLAYER             = 0x7f
 	IFT_DOCSCABLEUPSTREAM             = 0x81

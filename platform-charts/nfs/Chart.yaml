@@ -1,4 +1,4 @@
 apiVersion: v1
 name: nfs
-description: A DLS-Lite PV internal definition
+description: A NAUTA-Lite PV internal definition
 version: 0.1.0

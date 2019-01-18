@@ -38,11 +38,11 @@ image:
   pullPolicy: IfNotPresent
 commandline:
   args:
-{% for arg in DLS4e.CommandLine %}
+{% for arg in NAUTA.CommandLine %}
     - {{ arg }}
 {% endfor %}
 
-experimentName: {{ DLS4e.ExperimentName }}
+experimentName: {{ NAUTA.ExperimentName }}
 resources:
   limits:
     cpu: 100m
@@ -61,7 +61,7 @@ image:
   pullPolicy: IfNotPresent
 commandline:
   args:
-{{% for arg in DLS4e.CommandLine %}}
+{{% for arg in NAUTA.CommandLine %}}
   - {{{{ arg }}}}
 {{% endfor %}}
 resources:

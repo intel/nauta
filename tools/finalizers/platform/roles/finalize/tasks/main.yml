@@ -61,9 +61,9 @@
 - name: Generate file with configuration
   vars:
     configuration:
-      dls4e_release_package_installation: file
-      dls4e_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
-      dls4e_release_package_release: "{{ VERSION_ID }}"
+      nauta_release_package_installation: file
+      nauta_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+      nauta_release_package_release: "{{ VERSION_ID }}"
   copy:
     dest: "{{ build_dir }}/repository/group_vars/all/repository.yml"
     content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"

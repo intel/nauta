@@ -28,7 +28,7 @@ from tensorboard.models import Run
 
 
 def test_generate_tensorboard_deployment(mocker):
-    mocker.patch('k8s.models.Dls4ePlatformConfig')
+    mocker.patch('k8s.models.NautaPlatformConfig')
     fake_runs = [
         Run(
             name="some-run-3",

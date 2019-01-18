@@ -83,7 +83,7 @@ def test_verify_with_kubectl_connection_success(mocker):
     mocker.patch.object(verify, "check_os")
     mocker.patch.object(verify, "save_dependency_versions")
 
-    fake_config_path = '/usr/ogorek/dlsctl_config'
+    fake_config_path = '/usr/ogorek/nctl_config'
     fake_config = mocker.patch('util.dependencies_checker.Config')
     fake_config.return_value.config_path = fake_config_path
 

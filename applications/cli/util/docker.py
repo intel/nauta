@@ -25,7 +25,7 @@ from typing import List
 
 from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.logger import initialize_logger
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from cli_text_consts import UtilDockerTexts as Texts
 
 
@@ -91,7 +91,7 @@ def delete_images_for_experiment(exp_name: str):
     :param exp_name: name of an experiment for which image should be removed
     In case of any problems it raises an error
     """
-    with K8sProxy(DLS4EAppNames.DOCKER_REGISTRY) as proxy:
+    with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY) as proxy:
         # Save port that was actually used in configuration
         server_address = f"127.0.0.1:{proxy.tunnel_port}"
         list_of_tags = get_tags_list(server_address=server_address, image_name=exp_name)

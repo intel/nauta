@@ -25,7 +25,7 @@ from tabulate import tabulate
 from util.aliascmd import AliasCmd
 from cli_state import common_options, pass_state, State
 from version import VERSION
-from util.config import DLS4EConfigMap
+from util.config import NAUTAConfigMap
 from util.exceptions import KubernetesError
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -42,12 +42,12 @@ PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 @common_options(verify_dependencies=False, verify_config_path=False)
 @pass_state
 def version(state: State):
-    """ Returns the version of the installed dlsctl application. """
+    """ Returns the version of the installed nctl application. """
     platform_version = Texts.INITIAL_PLATFORM_VERSION
     error_msg = ""
     platform_version_fail = False
     try:
-        platform_version = DLS4EConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
+        platform_version = NAUTAConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
     except KubernetesError:
         error_msg = Texts.KUBECTL_INT_ERROR_MSG
         platform_version_fail = True

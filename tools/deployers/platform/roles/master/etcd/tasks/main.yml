@@ -11,10 +11,10 @@
     restart_policy: no
     state: present
     published_ports:
-      - "{{ dls_configuration.internal_interface.ipv4_address }}:2379:2379"
-      - "{{ dls_configuration.internal_interface.ipv4_address }}:2380:2380"
-      - "{{ dls_configuration.internal_interface.ipv4_address }}:4001:4001"
-      - "{{ dls_configuration.internal_interface.ipv4_address }}:7001:7001"
+      - "{{ nauta_configuration.internal_interface.ipv4_address }}:2379:2379"
+      - "{{ nauta_configuration.internal_interface.ipv4_address }}:2380:2380"
+      - "{{ nauta_configuration.internal_interface.ipv4_address }}:4001:4001"
+      - "{{ nauta_configuration.internal_interface.ipv4_address }}:7001:7001"
     env:
       ETCD_NAME: "{{ ansible_hostname }}"
       ETCD_DATA_DIR: "/etcd-data"
@@ -38,9 +38,9 @@
       ETCD_PEER_KEY_FILE: /ca/node.key
     volumes:
       - "/data/local/etcd:/etcd-data"
-      - "/etc/dls-cluster/client/etcd/ca.pem:/ca/CA.pem:ro"
-      - "/etc/dls-cluster/client/etcd/node.crt:/ca/node.crt:ro"
-      - "/etc/dls-cluster/client/etcd/node.key:/ca/node.key:ro"
+      - "/etc/nauta-cluster/client/etcd/ca.pem:/ca/CA.pem:ro"
+      - "/etc/nauta-cluster/client/etcd/node.crt:/ca/node.crt:ro"
+      - "/etc/nauta-cluster/client/etcd/node.key:/ca/node.key:ro"
     command: /usr/local/bin/etcd
 
 - name: "{{ message_label }} Render etcd service script"

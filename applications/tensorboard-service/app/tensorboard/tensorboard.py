@@ -35,15 +35,15 @@ from k8s.client import K8SAPIClient, K8SPodPhase
 import k8s.models
 from tensorboard.models import Tensorboard, TensorboardStatus, Run
 from tensorboard.proxy_client import try_get_last_request_datetime
-from dls4e.config import Dls4ePlatformConfig
+from nauta.config import NautaPlatformConfig
 
 
 class TensorboardManager:
     OUTPUT_PUBLIC_MOUNT_PATH = '/mnt/output'
-    NGINX_INGRESS_ADDRESS = 'dls4enterprise-ingress.dls4e'
+    NGINX_INGRESS_ADDRESS = 'nauta-ingress.nauta'
 
     def __init__(self, namespace: str, api_client: K8SAPIClient,
-                 config: Dls4ePlatformConfig):
+                 config: NautaPlatformConfig):
         self.client = api_client
         self.namespace = namespace
         self._config = config
@@ -54,12 +54,12 @@ class TensorboardManager:
     def incluster_init(cls):
         config.load_incluster_config()
 
-        dls4e_config = Dls4ePlatformConfig.incluster_init()
+        nauta_config = NautaPlatformConfig.incluster_init()
 
         with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", mode='r') as file:
             my_current_namespace = file.read()
 
-        return cls(namespace=my_current_namespace, api_client=K8SAPIClient(), config=dls4e_config)
+        return cls(namespace=my_current_namespace, api_client=K8SAPIClient(), config=nauta_config)
 
     @staticmethod
     def _get_current_datetime() -> datetime:
@@ -79,7 +79,7 @@ class TensorboardManager:
         return new_tensorboard
 
     def list(self) -> List[V1Deployment]:
-        return self.client.list_deployments(namespace=self.namespace, label_selector='type=dls4e-tensorboard')
+        return self.client.list_deployments(namespace=self.namespace, label_selector='type=nauta-tensorboard')
 
     @staticmethod
     def _check_tensorboard_nginx_reachable(url) -> bool:
@@ -131,7 +131,7 @@ class TensorboardManager:
 
         ingress = self.client.get_ingress(name=name, namespace=self.namespace)
 
-        pod = self.client.get_pod(namespace=self.namespace, label_selector=f'name={name},type=dls4e-tensorboard')
+        pod = self.client.get_pod(namespace=self.namespace, label_selector=f'name={name},type=nauta-tensorboard')
 
         # there might be some time when Kubernetes deployment has been created in cluster,
         # but pod is not present yet in cluster
@@ -160,7 +160,7 @@ class TensorboardManager:
 
         ingress = ingresses[0]
 
-        pod = self.client.get_pod(namespace=self.namespace, label_selector=f'id={id},type=dls4e-tensorboard')
+        pod = self.client.get_pod(namespace=self.namespace, label_selector=f'id={id},type=nauta-tensorboard')
 
         if pod is None:
             return Tensorboard(id=id, status=TensorboardStatus.CREATING, url=ingress.spec.rules[0].http.paths[0].path)

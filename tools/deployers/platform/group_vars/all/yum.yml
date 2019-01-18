@@ -12,4 +12,4 @@ use_system_enabled_repos: True
 calculated_enabled_repos: "{{ enabled_repos }}"
 calculated_disabled_repos: "{% if use_system_enabled_repos %}{{ disabled_repos }}{% else %}*{% endif %}"
 
-dls4e_calculated_enabled_repos: "{{ calculated_enabled_repos + ['DLS4ERepository'] }}"
+nauta_calculated_enabled_repos: "{{ calculated_enabled_repos + ['NAUTARepository'] }}"

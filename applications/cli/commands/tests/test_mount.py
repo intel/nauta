@@ -35,13 +35,13 @@ TEST_PSW = "test_password"
 TEST_ADR = "test_address"
 
 CORRECT_LINUX_MOUNT = f"sudo mount.cifs -o username={TEST_USR},password=" \
-                      f"{TEST_PSW},rw,uid=10001 //{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
+                      f"{TEST_PSW},rw,uid=10001 //{TEST_ADR}/<NAUTA_FOLDER> <MOUNTPOINT>"
 CORRECT_LINUX_UNMOUNT = "sudo umount <MOUNTPOINT> [-fl]"
 
-CORRECT_WINDOWS_MOUNT = f"net use <MOUNTPOINT> \\\\{TEST_ADR}\\<DLS4E_FOLDER> /user:{TEST_USR} {TEST_PSW}"
+CORRECT_WINDOWS_MOUNT = f"net use <MOUNTPOINT> \\\\{TEST_ADR}\\<NAUTA_FOLDER> /user:{TEST_USR} {TEST_PSW}"
 CORRECT_WINDOWS_UNMOUNT = "net use <MOUNTPOINT> /d"
 
-CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<DLS4E_FOLDER> <MOUNTPOINT>"
+CORRECT_OSX_MOUNT = f"mount_smbfs //'{TEST_USR}:{TEST_PSW}'@{TEST_ADR}/<NAUTA_FOLDER> <MOUNTPOINT>"
 CORRECT_OSX_UNMOUNT = "umount <MOUNTPOINT> [-f]"
 
 MOUNT_IP = "1.2.3.4"
@@ -67,11 +67,11 @@ LINUX_MOUNT_OUTPUT = "freezer on /run/lxcfs/controllers/freezer type cgroup (rw,
                      "lxcfs on /var/lib/lxcfs type fuse.lxcfs (rw,nosuid,nodev,relatime,user_id=0," \
                      "group_id=0,allow_other)\n" \
                      f"//{MOUNT_IP}/input on /home/username/input type cifs " \
-                     "(rw,relatime,vers=1.0,cache=strict,username=username,domain=DLS4ENTERPRISE-SAMBA-6DBF869D46" \
+                     "(rw,relatime,vers=1.0,cache=strict,username=username,domain=NAUTA-SAMBA-6DBF869D46" \
                      "-7SNF6,uid=10001,forceuid,gid=0,noforcegid,addr=10.91.120.87,unix,posixpaths," \
                      "serverino,mapposix,acl,rsize=1048576,wsize=65536,actimeo=1)\n" \
                      f"//{MOUNT_IP}/input on /home/username/input type cifs " \
-                     "(rw,relatime,vers=1.0,cache=strict,username=username2,domain=DLS4ENTERPRISE-SAMBA-6DBF869D46" \
+                     "(rw,relatime,vers=1.0,cache=strict,username=username2,domain=NAUTA-SAMBA-6DBF869D46" \
                      "-7SNF6,uid=10001,forceuid,gid=0,noforcegid,addr=10.91.120.87,unix,posixpaths," \
                      "serverino,mapposix,acl,rsize=1048576,wsize=65536,actimeo=1)"
 

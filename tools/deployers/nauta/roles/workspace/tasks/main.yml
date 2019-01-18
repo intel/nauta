@@ -1,0 +1,83 @@
+---
+
+- name: "{{ message_label }} Verify helm access"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} init -c --skip-refresh"
+  changed_when: False
+
+- name: "{{ message_label }} Verify helm access"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} ls"
+  changed_when: False
+
+- name: "{{ message_label }} Verify kubernetes access"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} get pods"
+  changed_when: False
+
+- name: "{{ message_label }} Check if kubernetes namespace exists"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} get ns nauta"
+  register: namespace
+  changed_when: namespace.rc in [1]
+  failed_when: namespace.rc not in [0, 1]
+
+- name: "{{ message_label }} Create kubernetes namespace if not exists"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} create ns nauta"
+  changed_when: False
+  when: namespace is changed
+
+- name: "{{ message_label }} Fetch all pods"
+  shell: "{{ runtime_kubectl }} get nodes -o 'jsonpath={.items[*].status.images[*].names[*]}'"
+  environment: "{{ local_envs }}"
+  changed_when: False
+  register: images
+
+- set_fact:
+    pause_image: "{{ (images.stdout.split(' ') | map('regex_search', '.*pause.*') | select('string') | list | sort | unique)[0] }}"
+
+- name: "{{ message_label }} Render kubernetes workspace pod deployment template"
+  template:
+    src: workspace-deployment.yml
+    dest: "{{ workspace }}/workspace-deployment.yml"
+
+- name: "{{ message_label }} Apply kubernetes workspace pod deployment"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} apply -f {{ workspace }}/workspace-deployment.yml"
+  changed_when: False
+
+- name: "{{ message_label }} Wait for all workspaces to get ready"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} --namespace=nauta get deployment nauta-workspace-pod -o jsonpath='{.status.readyReplicas}'"
+  changed_when: False
+  register: workspace_ready
+  until: workspace_ready.stdout | int == 2
+  retries: 60
+  delay: 1
+
+- name: "{{ message_label }} Fetch all instance names"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} get pods -n nauta -l kind=bootstrap-nauta-workspace -o jsonpath={.items[*].metadata.name}"
+  until: workspaces.stdout.split(' ') | length == 2
+  retries: 60
+  delay: 1
+  changed_when: False
+  register: workspaces
+
+- name: "{{ message_label }} Register provisioner pods"
+  add_host:
+    name: "{{ item }}"
+    pod: "{{ item }}"
+    groups: provisioner-pods
+    ansible_connection: "local"
+    workspace: "{{ workspace }}"
+    runtime_kubectl: "{{ runtime_kubectl }}"
+    runtime_helm: "{{ runtime_helm }}"
+    runtime_loader: "{{ runtime_loader }}"
+    runtime_img: "{{ runtime_img }}"
+    runtime_nauta_img: "{{ runtime_nauta_img }}"
+    runtime_registry_chart: "{{ runtime_registry_chart }}"
+    runtime_nauta_chart: "{{ runtime_nauta_chart }}"
+    local_envs: "{{ local_envs }}"
+  with_items: "{{ workspaces.stdout.split(' ') }}"

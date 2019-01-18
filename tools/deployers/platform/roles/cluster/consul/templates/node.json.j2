@@ -1,11 +1,11 @@
 {
   "node_name": "{{ inventory_hostname }}",
-  "advertise_addr": "{{ dls_configuration.internal_interface.ipv4_address }}",
-  "bind_addr": "{{ dls_configuration.internal_interface.ipv4_address }}",
-  "client_addr": "{{ dls_configuration.internal_interface.ipv4_address }}",
+  "advertise_addr": "{{ nauta_configuration.internal_interface.ipv4_address }}",
+  "bind_addr": "{{ nauta_configuration.internal_interface.ipv4_address }}",
+  "client_addr": "{{ nauta_configuration.internal_interface.ipv4_address }}",
   "addresses": {
     "http": "127.0.0.1",
-    "https": "{{ dls_configuration.internal_interface.ipv4_address }}"
+    "https": "{{ nauta_configuration.internal_interface.ipv4_address }}"
   },
   "ports": {
     "http": 8500,

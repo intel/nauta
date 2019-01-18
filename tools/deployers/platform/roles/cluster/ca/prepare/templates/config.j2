@@ -1,6 +1,6 @@
 {% for item in groups['all'] %}
 Host cluster-{{ item }}
-  Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
+  Hostname {{ hostvars[item].nauta_configuration.internal_interface.ipv4_address }}
   User cluster-client
   PreferredAuthentications publickey
   IdentityFile ~/.ssh/id_rsa
@@ -12,7 +12,7 @@ Host cluster-{{ item }}
 {% if inventory_hostname in groups['master'] %}
 {% for item in groups['master'] %}
 Host master-cluster-{{ item }}
-  Hostname {{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}
+  Hostname {{ hostvars[item].nauta_configuration.internal_interface.ipv4_address }}
   User cluster-master
   PreferredAuthentications publickey
   IdentityFile ~/.ssh/id_rsa

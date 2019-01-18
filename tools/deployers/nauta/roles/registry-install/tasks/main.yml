@@ -1,0 +1,25 @@
+---
+
+- name: "{{ message_label }} Check if image exists"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} status nauta-registry-{{ nauta_version.replace('.', '-') }}"
+  register: chart
+  changed_when: chart.rc == 1
+  failed_when: chart.rc not in [0, 1]
+
+- name: "{{ message_label }} Ensure that nauta registry chart exists"
+  file:
+    path: "{{ runtime_registry_chart }}"
+
+- name: "{{ message_label }} Install helm chart"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} install -n nauta-registry-{{ nauta_version.replace('.', '-') }} --namespace nauta  {{ runtime_registry_chart }} --wait"
+  when: chart is changed
+
+- name: "{{ message_label }} Fetch kubectl nodeport"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get svc nauta-registry-{{ nauta_version.replace('.', '-') }} -o 'jsonpath={.spec.ports[?(@.targetPort=='5000')].nodePort}'"
+  register: nodeport
+
+- set_fact:
+    registry_nodeport: "{{ nodeport.stdout | int }}"

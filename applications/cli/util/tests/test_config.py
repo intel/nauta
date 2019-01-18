@@ -25,7 +25,7 @@ from unittest.mock import patch, mock_open, ANY
 import pytest
 
 from util import system
-from util.config import DLS_CTL_CONFIG_DIR_NAME, DLS_CTL_CONFIG_ENV_NAME, Config, ConfigInitError
+from util.config import NCTL_CONFIG_DIR_NAME, NCTL_CONFIG_ENV_NAME, Config, ConfigInitError
 
 APP_DIR_PATH = '/my/App'
 APP_BINARY_PATH = os.path.join(APP_DIR_PATH, 'binary')
@@ -47,7 +47,7 @@ def test_validate_config_path_for_existing_config_dir_with_invalid_data(mocker):
     os_path_mock = mocker.patch('os.path.isdir')
     os_path_mock.return_value = True
     os_listdir_mock = mocker.patch('os.listdir')
-    os_listdir_mock.return_value = ['not_dlsctl_dir', 'not_dlsctl_file']
+    os_listdir_mock.return_value = ['not_nctl_dir', 'not_nctl_file']
 
     result = Config.validate_config_path(FAKE_PATH)
 
@@ -77,7 +77,7 @@ def test_validate_config_path_success_with_app_dir(os_env_get, exists_mock, expa
 
     result = Config.get_config_path()
 
-    assert result == os.path.join(APP_DIR_PATH, DLS_CTL_CONFIG_DIR_NAME)
+    assert result == os.path.join(APP_DIR_PATH, NCTL_CONFIG_DIR_NAME)
     assert exists_mock.call_count == 2
 
 
@@ -92,11 +92,11 @@ def test_validate_config_path_success_with_user_local_dir(os_env_get, exists_moc
 
     result = Config.get_config_path()
 
-    assert result == os.path.join(USER_HOME_PATH, DLS_CTL_CONFIG_DIR_NAME)
+    assert result == os.path.join(USER_HOME_PATH, NCTL_CONFIG_DIR_NAME)
     assert exists_mock.call_count == 1
 
 
-@patch('os.environ', {DLS_CTL_CONFIG_ENV_NAME: USER_CUSTOM_PATH})
+@patch('os.environ', {NCTL_CONFIG_ENV_NAME: USER_CUSTOM_PATH})
 @patch('sys.executable', APP_BINARY_PATH)
 @patch('os.path.expanduser')
 @patch('os.path.exists')
@@ -110,7 +110,7 @@ def test_validate_config_path_success_with_env(exists_mock, expanduser_mock):
     assert exists_mock.call_count == 1
 
 
-@patch('os.environ', {DLS_CTL_CONFIG_ENV_NAME: USER_CUSTOM_PATH})
+@patch('os.environ', {NCTL_CONFIG_ENV_NAME: USER_CUSTOM_PATH})
 @patch('sys.executable', APP_BINARY_PATH)
 @patch('os.path.expanduser')
 @patch('os.path.exists')

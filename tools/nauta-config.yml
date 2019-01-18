@@ -1,0 +1,366 @@
+---
+
+export_images:
+  - name: tiller
+    value: "{{ image_local_url['nauta/tiller'] }}"
+  - name: tensorboard_service
+    value: "{{ image_local_url['nauta/tensorboard-service'] }}"
+# tensorflow part
+  - name: tensorflow
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: horovod
+    value: "{{ image_local_url['nauta/horovod/py3'] }}"
+  - name: horovod_py2
+    value: "{{ image_local_url['nauta/horovod/py2'] }}"
+  - name: tensorflow_1.9
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: tensorflow_1.9_py3
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+  - name: tensorflow_1.9_py2
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py2/haswell/base'] }}"
+  - name: tensorflow_1.9_py3_skylake
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/skylake/base'] }}"
+  - name: activity-proxy
+    value: "{{ image_local_url['nauta/activity-proxy'] }}"
+  - name: batch-inference
+    value: "{{ image_local_url['nauta/batch-inference'] }}"
+  - name: tf-serving-sidecar
+    value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
+  - name: ps-sidecar
+    value: "{{ image_local_url['nauta/ps-sidecar'] }}"
+
+local_images:
+  nauta/centos:
+    version: "7.5.1804"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/centos"
+    required:
+      BASE_IMAGE: "shared/centos"
+    push: True
+  nauta/kubectl:
+    version: "1.10.11"
+    required:
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/kubectl"
+  nauta/gui:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/nauta-gui"
+  nauta/elasticsearch:
+    version: "v6.4.0"
+    required:
+      BASE_IMAGE: "shared/centos/java8"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      BUILD_IMAGE: "shared/build/elasticsearch"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch"
+  nauta/fluentd:
+    version: "v0.12"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/fluentd"
+  nauta/registry:
+    version: "2.6.2"
+    required:
+      BUILD_IMAGE: "shared/centos/build-go"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/registry"
+  nauta/samba:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      JQ_DATA_IMAGE: "shared/build/jq"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/samba"
+  nauta/elasticsearch/curator:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch-curator"
+  nauta/etcd:
+    version: "3.3.9"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/etcd"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/etcd"
+  nauta/tiller:
+    version: "v2.9.1"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/helm"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tiller"
+  nauta/redsocks:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/build"
+    method: build
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/redsocks/release-0.5.tar.gz
+        dest: redsocks-0.5.tar.gz
+        checksum: bbeb531d7f1986d7102f1bd6733dacce41d3f3ba7d604f1aab61c63e0ba2ee62
+    directory: "{{ playbook_dir }}/../../nauta-containers/redsocks"
+  nauta/experiment-service:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/go-apiserver-builder"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/experiment-service"
+  nauta/tensorflow/1.9.0py2/haswell/base:
+    version: "1.9.0-py2"
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py2.7"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
+  nauta/tensorflow/1.9.0py3/haswell/base:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
+  nauta/tensorflow/1.9.0py3/skylake/base:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/skylake"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/skylake"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
+  nauta/tensorflow:
+    version: "1.9.0-py3"
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
+  nauta/horovod/py3:
+    version: "1.9.0-py3"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
+        dest: horovod-v0.15.1.tar.gz
+        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py3.6"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/horovod/3.6"
+  nauta/horovod/py2:
+    version: "1.9.0-py2"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
+        dest: horovod-v0.15.1.tar.gz
+        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+    required:
+      BASE_IMAGE: "shared/run/tensorflow/py2.7"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
+      METRICS_IMAGE: "shared/build/metrics"
+      KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/horovod/2.7"
+  nauta/nginx:
+    version: "1.14.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+      NGINX_BUILD_IMAGE: "shared/build/nginx"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/utils/nginx"
+  nauta/tf/operator:
+    version: "v2"
+    required:
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/tf-operator"
+  nauta/docker:
+    version: "18.03"
+    required:
+      BASE_IMAGE: "nauta/kubectl"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/docker"
+  nauta/ps-sidecar:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
+  nauta/ingress:
+    version: "0.14.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+      INGRESS_DATA_IMAGE: "shared/build/ingress"
+      NGINX_DATA_IMAGE: "shared/build/nginx"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/ingress-nginx"
+  nauta/defaultbackend:
+    version: "1.4"
+    required:
+      BASE_IMAGE: "shared/centos"
+      INGRESS_DATA_IMAGE: "shared/build/ingress"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/defaultbackend"
+  nauta/dashboard:
+    version: "v1.8.3"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DATA_IMAGE: "shared/build/kubernetes-dashboard"
+    directory: "{{ playbook_dir }}/../../platform-containers/kubernetes-dashboard"
+    method: build
+  nauta/tensorboard-service:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/tensorboard-service"
+  nauta/activity-proxy:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/activity-proxy"
+  nauta/batch-inference:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      METRICS_IMAGE: "shared/build/metrics"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/batch-inference"
+  nauta/tf-serving-sidecar:
+    version: "v1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../applications/tf-serving-sidecar"
+  nauta/docs:
+    version: "v0.0.1"
+    required:
+      BASE_IMAGE: "shared/utils/nginx"
+      DOCS_IMAGE: "shared/centos/docs"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/docs-nginx"
+
+subcharts:
+  nauta-registry:
+    registry:
+      version: 2.6.2
+      path: "{{ playbook_dir }}/../../nauta-registry-charts/registry"
+  nauta:
+    gui:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/gui"
+      chart_values:
+        image: "{{ image_local_url['nauta/gui'] }}"
+    admin-account:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/admin-account"
+    experiments:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/experiments"
+    configuration:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/configuration"
+    commons:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/commons"
+      chart_values:
+        docker_image: "{{ image_local_url['nauta/docker'] }}"
+    docker-registry:
+      version: 1.1.1
+      path: "{{ playbook_dir }}/../../nauta-charts/docker-registry"
+      chart_values:
+        image: "{{ image_local_url['nauta/registry'] }}"
+        gc_image: "{{ image_local_url['nauta/kubectl'] }}"
+    elasticsearch:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/elasticsearch"
+      chart_values:
+        image: "{{ image_local_url['nauta/elasticsearch'] }}"
+        init_image: "{{ image_local_url['nauta/centos'] }}"
+    elasticsearch-curator:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/elasticsearch-curator"
+      chart_values:
+        image: "{{ image_local_url['nauta/elasticsearch/curator'] }}"
+        init_image: "{{ image_local_url['nauta/centos'] }}"
+    fluentd:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/fluentd"
+      chart_values:
+        image: "{{ image_local_url['nauta/fluentd'] }}"
+        centos_image: "{{ image_local_url['nauta/centos'] }}"
+    samba:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/samba"
+      chart_values:
+        image: "{{ image_local_url['nauta/samba'] }}"
+    redsocks:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/redsocks"
+      conditions: features.redsocks
+      feature_enabled: False
+      chart_values:
+        image: "{{ image_local_url['nauta/redsocks'] }}"
+        Interfaces: cni0
+    registry-nginx:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/registry-nginx"
+      chart_values:
+        image: "{{ image_local_url['nauta/nginx'] }}"
+    experiment-service:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/experiment-service"
+      chart_values:
+        service_image: "{{ image_local_url['nauta/experiment-service'] }}"
+        etcd_image: "{{ image_local_url['nauta/etcd'] }}"
+        etcd_gc_image: "{{ image_local_url['nauta/kubectl'] }}"
+    tf:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../nauta-charts/tf"
+      chart_values:
+        image: "{{ image_local_url['nauta/tf/operator'] }}"
+        tfimage: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+    ingress:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/ingress"
+      chart_values:
+        image: "{{ image_local_url['nauta/ingress'] }}"
+        defaultbackend_image: "{{ image_local_url['nauta/defaultbackend'] }}"
+    dashboard:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../nauta-charts/dashboard"
+      chart_values:
+        image: "{{ image_local_url['nauta/dashboard'] }}"
+    documentation-service:
+      version: 0.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/documentation-service"
+      chart_values:
+        image: "{{ image_local_url['nauta/docs'] }}"
+    kube-batch-queue:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/kube-batch-queue"

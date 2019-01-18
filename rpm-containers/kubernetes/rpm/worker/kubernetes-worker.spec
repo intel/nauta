@@ -1,13 +1,13 @@
-Summary: DLS4E Kubernetes worker metadata v%{_dls4e_version} package
-Name: dls4e-kubernetes-worker
-Version: %{_dls4e_version}
-Release: %{_dls4e_release}
+Summary: NAUTA Kubernetes worker metadata v%{_nauta_version} package
+Name: nauta-kubernetes-worker
+Version: %{_nauta_version}
+Release: %{_nauta_release}
 License: Apache-2.0
 Group: Tools
 
-Requires: dls4e-commons
+Requires: nauta-commons
 
-Requires: dls4e-kubernetes-kubelet = %{version}
+Requires: nauta-kubernetes-kubelet = %{version}
 
 %define  debug_package %{nil}
 

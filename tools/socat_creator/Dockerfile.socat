@@ -1,4 +1,4 @@
-FROM 'registry.toolbox.nervana.sclab.intel.com:80/dls4e/shared/centos:3c416291150d6d7a5e6272cc3086916f049ce8bd'
+FROM 'registry.toolbox.nervana.sclab.intel.com:80/nauta/shared/centos:3c416291150d6d7a5e6272cc3086916f049ce8bd'
 #FROM centos:latest
 
 ARG no_proxy=os.mirror

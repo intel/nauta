@@ -33,7 +33,7 @@ def save_license_accepted():
     if Config.validate_config_path(config_dir_path):
         open(path.join(config_dir_path, "license_accepted"), mode='a').close()
     else:
-        click.echo(LicenseAcceptanceTexts.CANNOT_ACCEPT_LICENSE_MSG.format(dlsctl_config_path=config_dir_path))
+        click.echo(LicenseAcceptanceTexts.CANNOT_ACCEPT_LICENSE_MSG.format(nctl_config_path=config_dir_path))
         sys.exit(1)
 
 

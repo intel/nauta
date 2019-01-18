@@ -1,5 +1,5 @@
-Summary: DLS4E Consul v1.0.6 package
-Name: dls4e-consul
+Summary: NAUTA Consul v1.0.6 package
+Name: nauta-consul
 Version: 1.1.0
 Release: 0
 License: MPL-2.0

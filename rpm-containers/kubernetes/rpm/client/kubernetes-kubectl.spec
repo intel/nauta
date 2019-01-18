@@ -1,7 +1,7 @@
-Summary: DLS4E Kubernetes Kubectl v%{_dls4e_version} package
-Name: dls4e-kubernetes-kubectl
-Version: %{_dls4e_version}
-Release: %{_dls4e_release}
+Summary: NAUTA Kubernetes Kubectl v%{_nauta_version} package
+Name: nauta-kubernetes-kubectl
+Version: %{_nauta_version}
+Release: %{_nauta_release}
 License: Apache-2.0
 Group: Tools
 SOURCE0 : kubernetes.tar.gz

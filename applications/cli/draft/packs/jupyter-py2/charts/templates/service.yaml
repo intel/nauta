@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     draft: {{ .Values.draft }}
-    dls4e_app_name: jupyter
+    nauta_app_name: jupyter
 spec:
   selector:
     app: {{ template "name" . }}

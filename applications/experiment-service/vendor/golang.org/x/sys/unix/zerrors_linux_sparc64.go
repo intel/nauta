@@ -424,7 +424,7 @@ const (
 	ETH_P_SCA                        = 0x6007
 	ETH_P_SLOW                       = 0x8809
 	ETH_P_SNAP                       = 0x5
-	ETH_P_TDLS                       = 0x890d
+	ETH_P_TNAUTA                       = 0x890d
 	ETH_P_TEB                        = 0x6558
 	ETH_P_TIPC                       = 0x88ca
 	ETH_P_TRAILER                    = 0x1c

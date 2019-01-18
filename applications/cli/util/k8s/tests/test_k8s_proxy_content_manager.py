@@ -27,7 +27,7 @@ import requests
 from requests.exceptions import ConnectionError
 
 from util.k8s.k8s_proxy_context_manager import K8sProxy, TunnelSetupError
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.exceptions import K8sProxyCloseError, K8sProxyOpenError
 from util.k8s.k8s_proxy_context_manager import kubectl
 
@@ -39,7 +39,7 @@ def test_set_up_proxy(mocker):
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
     mocker.patch("psutil.Process")
 
-    with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
+    with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
         pass
 
     assert spf_mock.call_count == 1
@@ -53,7 +53,7 @@ def test_set_up_proxy_open_failure(mocker):
     spc_mock = mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError())
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
     with pytest.raises(K8sProxyOpenError):
-        with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
+        with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
             pass
 
     assert spf_mock.call_count == 1
@@ -74,7 +74,7 @@ def test_set_up_proxy_close_failure(mocker):
     mocker.patch("psutil.wait_procs")
 
     with pytest.raises(K8sProxyCloseError):
-        with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
+        with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
             pass
 
     # noinspection PyUnresolvedReferences
@@ -97,7 +97,7 @@ def test_set_up_proxy_open_readiness_failure(mocker):
     mocker.patch("psutil.wait_procs")
 
     with pytest.raises(K8sProxyOpenError):
-        with K8sProxy(DLS4EAppNames.ELASTICSEARCH):
+        with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
             pass
 
     # noinspection PyUnresolvedReferences

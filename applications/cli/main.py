@@ -44,7 +44,7 @@ from licensing.license_acceptance_manager import check_license_acceptance
 
 logger = initialize_logger(__name__)
 
-BANNER = """Intel® Deep Learning Studio (Intel® DL Studio) Client
+BANNER = """Nauta Client
 
             To get further help on commands use COMMAND with -h or --help option."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)
@@ -79,13 +79,13 @@ def signal_handler(sig, frame):
 
 
 def configure_cli_logs():
-    if os.environ.get('DLS_CTL_LOG_DISABLE'):
+    if os.environ.get('NCTL_LOG_DISABLE'):
         return
 
-    log_level = os.environ.get('DLS_CTL_FILE_LOG_LEVEL', default=logging.DEBUG)
-    log_retention = os.environ.get('DLS_CTL_LOG_RETENTION', default=30)
+    log_level = os.environ.get('NCTL_FILE_LOG_LEVEL', default=logging.DEBUG)
+    log_retention = os.environ.get('NCTL_LOG_RETENTION', default=30)
 
-    log_file_directory = os.environ.get('DLS_CTL_LOG_DIRECTORY')
+    log_file_directory = os.environ.get('NCTL_LOG_DIRECTORY')
     if not log_file_directory:
         verify_cli_config_path()
         log_file_directory = '{}/logs'.format(Config().config_path)

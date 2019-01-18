@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+    nauta_app_name: samba
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        heritage: {{ .Release.Service }}
+        nauta_app_name: samba
+    spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
+      volumes:
+        - name: input
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-{{ .Chart.Name }}-input
+        - name: output
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-{{ .Chart.Name }}-output
+      serviceAccountName: {{ .Release.Name }}-{{ .Chart.Name }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA samba image is required" .Values.image }}
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          requests:
+            memory: 512Mi
+#          limits:
+#            memory: 512Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/samba-health.sh
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
+        env:
+        - name: INPUT_PVC
+          value: {{ .Release.Name }}-{{ .Chart.Name }}-input
+        - name: OUTPUT_PVC
+          value: {{ .Release.Name }}-{{ .Chart.Name }}-output
+        - name: APP_RELEASE
+          value: {{ .Release.Name }}
+        - name: SAMBA_LOG_LEVEL
+          value: "3"
+        ports:
+        - containerPort: 137
+          protocol: UDP
+        - containerPort: 138
+          protocol: UDP
+        - containerPort: 139
+          protocol: TCP
+        - containerPort: 445
+          protocol: TCP
+        volumeMounts:
+          - name: input
+            mountPath: /smb/input
+          - name: output
+            mountPath: /smb/output

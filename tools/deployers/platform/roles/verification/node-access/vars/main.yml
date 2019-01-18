@@ -1,27 +1,27 @@
 ---
 
 verification_checks:
-  - message: "Param dls4e_configuration should be provided as a map with not empty items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
-    condition: "{{ dls4e_configuration is defined and not (dls4e_configuration | string).startswith('{') }}"
+  - message: "Param nauta_configuration should be provided as a map with not empty items: input_nfs.path, input_nfs.server, output_nfs.path and output_nfs.server"
+    condition: "{{ nauta_configuration is defined and not (nauta_configuration | string).startswith('{') }}"
 
-  - message: "Param dls4e_configuration.input_nfs should be provided as a map with items: input_nfs.path and input_nfs.server"
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is not defined }}"
+  - message: "Param nauta_configuration.input_nfs should be provided as a map with items: input_nfs.path and input_nfs.server"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.input_nfs is not defined }}"
 
-  - message: "Param dls4e_configuration.output_nfs should be provided as a map with items: output_nfs.path and output_nfs.server"
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is not defined }}"
+  - message: "Param nauta_configuration.output_nfs should be provided as a map with items: output_nfs.path and output_nfs.server"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.output_nfs is not defined }}"
 
-  - message: "Param dls4e_configuration.input_nfs.path should be provided"
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is defined and dls4e_configuration.input_nfs.path | default('') == '' }}"
+  - message: "Param nauta_configuration.input_nfs.path should be provided"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.input_nfs is defined and nauta_configuration.input_nfs.path | default('') == '' }}"
 
-  - message: "Param dls4e_configuration.input_nfs.server should be provided"
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.input_nfs is defined and dls4e_configuration.input_nfs.server | default('') == '' }}"
+  - message: "Param nauta_configuration.input_nfs.server should be provided"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.input_nfs is defined and nauta_configuration.input_nfs.server | default('') == '' }}"
 
-  - message: "Param dls4e_configuration.output_nfs.path should be provided"
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is defined and dls4e_configuration.output_nfs.path | default('') == '' }}"
+  - message: "Param nauta_configuration.output_nfs.path should be provided"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.output_nfs is defined and nauta_configuration.output_nfs.path | default('') == '' }}"
 
-  - message: "Param dls4e_configuration.output_nfs.server should be provided"
+  - message: "Param nauta_configuration.output_nfs.server should be provided"
     # yamllint disable-line rule:line-length
-    condition: "{{ dls4e_configuration is defined and dls4e_configuration.output_nfs is defined and dls4e_configuration.output_nfs.server | default('') == '' }}"
+    condition: "{{ nauta_configuration is defined and nauta_configuration.output_nfs is defined and nauta_configuration.output_nfs.server | default('') == '' }}"
 
   - message: "Param proxy should be provided as a map with items: http_proxy, https_proxy, no_proxy"
     condition: "{{ proxy is defined and not (proxy | string).startswith('{') }}"

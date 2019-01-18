@@ -10,6 +10,6 @@
     value: "{{ item.value }}"
     sysctl_set: yes
     reload: yes
-    sysctl_file: /etc/sysctl.d/99-dlsadmin.conf
+    sysctl_file: /etc/sysctl.d/99-nautaadmin.conf
   with_dict:
     net.ipv4.ip_local_port_range: '45000 65535'

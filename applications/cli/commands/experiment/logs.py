@@ -34,11 +34,11 @@ from platform_resources.runs import list_runs
 from cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.aliascmd import AliasCmd
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.k8s.k8s_proxy_context_manager import K8sProxy
-from util.spinner import spinner, DlsctlSpinner
+from util.spinner import spinner, NctlSpinner
 from util.system import handle_error
 from cli_text_consts import ExperimentLogsCmdTexts as Texts, SPINNER_COLOR
 
@@ -73,7 +73,7 @@ def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_
         exit(1)
 
     try:
-        with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
+        with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             namespace = get_kubectl_current_context_namespace()
@@ -162,7 +162,7 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
 
     if click.confirm(confirmation_message, default=True):
         try:
-            with open(filename, 'w') as file, spinner(spinner=DlsctlSpinner,
+            with open(filename, 'w') as file, spinner(spinner=NctlSpinner,
                                                       text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
                 for log_entry in run_logs_generator:
                     if not log_entry.content.isspace():

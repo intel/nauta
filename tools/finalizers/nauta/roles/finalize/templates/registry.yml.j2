@@ -1,0 +1,17 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+    cache:
+        layerinfo: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+    maintenance:
+        readonly:
+            enabled: true
+http:
+    addr: :5000
+    secret: NAUTAREGISTRY
+    debug:
+        addr: 127.0.0.1:5001

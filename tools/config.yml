@@ -25,7 +25,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
     required: {}
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/centos/centos-docker-0008.tar.xz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/centos-docker-0008.tar.xz
         dest: centos-docker.tar.xz
         checksum: d5759d1da5f8a1e70f29b7dacfe5458fb2edf86fc2679115e5a71eca463bfa42
   shared/centos/rpm-packer:
@@ -72,13 +72,13 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/go/go1.10.2.linux-amd64.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.10.2.linux-amd64.tar.gz
         dest: go1.10.2.linux-amd64.tar.gz
         checksum: 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/godep/dep-linux-amd64
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/godep/dep-linux-amd64
         dest: dep-linux-amd64
         checksum: 31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/glide/glide-v0.13.1-linux-amd64
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/glide/glide-v0.13.1-linux-amd64
         dest: glide-v0.13.1-linux-amd64
         checksum: b3e126a0034ab41005b51fc9542997b632f2802ee64ad0e3850c0353ba2867cf
   shared/centos/java8:
@@ -96,7 +96,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/go-apiserver-builder"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/apiserver-builder/apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/apiserver-builder/apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
   shared/build/kubernetes:
@@ -107,7 +107,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes/v1.10.11.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes/v1.10.11.tar.gz
         dest: kubernetes.tar.gz
         checksum: 13c4554e945f4f7af42479c8a3ee656381a3e4272fd88d0b6db766aff21478f3
   shared/build/heapster:
@@ -118,7 +118,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/heapster"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/heapster/heapster-v1.4.3.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/heapster/heapster-v1.4.3.tar.gz
         dest: heapster-v1.4.3.tar.gz
         checksum: 5a0e6fa74c8602d466338eb881af3bf4260940291e3eeb130e0ef9136c821f6c
   shared/build/tiller:
@@ -134,7 +134,7 @@ shared_images:
     required:
       BASE_IMAGE: "shared/centos/build-go"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/authbind/authbind_2.1.2.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/authbind/authbind_2.1.2.tar.gz
         dest: authbind_2.1.2.tar.gz
         checksum: 7dfb138b6ceeab34d58906be2598812d6dcc83885e650f93414d4851027c968c
     method: build
@@ -148,10 +148,10 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes-dashboard"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/go/go1.10.2.linux-amd64.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.10.2.linux-amd64.tar.gz
         dest: go1.10.2.linux-amd64.tar.gz
         checksum: 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3.tar.gz
         dest: kubernetes-dashboard-v1.8.3.tar.gz
         checksum: 9096f86d4107a6d23f2cff5edd1acae2faf25719a343c319860fd6a7408f761d
   shared/build/kubernetes-addons:
@@ -169,13 +169,13 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/docker"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/container-selinux-2.66-1.el7.noarch.rpm
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/container-selinux-2.66-1.el7.noarch.rpm
         dest: container-selinux-2.66-1.el7.noarch.rpm
         checksum: ae35c1cd94b6c54c3678526ac6527d69c80453a8574b223bd6a6cbf9c5cc9134
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
         dest: docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
         checksum: 994c76793afde01ae467ead3aef7ad30369dbd9447b2752f62bb251e6f0a24ba
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
         dest: docker-ce-18.06.0.ce-3.el7.centos.src.rpm
         checksum: 2926f66a94f5b3bcd1e3feb0d7107f2fd2713cf3f412f84dcc8fe89120c43392
   shared/build/nodejs:
@@ -186,7 +186,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/nodejs"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nodejs/node-v8.12.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/nodejs/node-v8.12.0.tar.gz
         dest: node-v8.12.0.tar.gz
         checksum: b4797843136edd9195c28221a1680ae52c29d867fc5fc1c99f7d6e2f2126a67b
   shared/build/nginx:
@@ -197,7 +197,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/nginx"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.src.rpm
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.src.rpm
         dest: nginx-1.13.9-1.el7_4.ngx.src.rpm
         checksum: 98d4329318dc9a681fa5e13cba5bc809bd2f7a97e38b36a1d07cb15a53b855ee
   shared/build/tensorflow/py2.7:
@@ -222,7 +222,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.9.0.tar.gz
         dest: tensorflow-v1.9.0.tar.gz
         checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
   shared/build/tensorflow/py3.6/1.9.0:
@@ -233,7 +233,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.9.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/v1.9.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.9.0.tar.gz
         dest: tensorflow-v1.9.0.tar.gz
         checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
   shared/build/tensorflow/py2.7/1.9.0/haswell:
@@ -265,7 +265,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.9.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/tf-serving/1.9.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/1.9.0.tar.gz
         dest: tensorflow-serving-v1.9.0.tar.gz
         checksum: 860fc67fe6d385f721bf98b533d6cabb09162f8b1469e69af3c7e9f30dde0b92
   shared/build/tensorflow-serving/py3.6/1.9.0:
@@ -276,7 +276,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.9.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/tf-serving/1.9.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/1.9.0.tar.gz
         dest: tensorflow-serving-v1.9.0.tar.gz
         checksum: 860fc67fe6d385f721bf98b533d6cabb09162f8b1469e69af3c7e9f30dde0b92
   shared/build/tensorflow-serving/py2.7/1.9.0/haswell:
@@ -326,7 +326,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/helm"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/v2.9.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/helm/v2.9.1.tar.gz
         dest: helm.tar.gz
         checksum: 2fee31764117024d1cc4f597d23791c60feef7c3ceedd143cfdbbafca7a7e126
   shared/build/cni:
@@ -337,7 +337,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/cni"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/cni-plugins/v0.7.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/cni-plugins/v0.7.1.tar.gz
         dest: cni-plugins.tar.gz
         checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
   shared/build/flannel:
@@ -348,7 +348,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/flannel"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/flannel/flannel-0.9.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/flannel/flannel-0.9.1.tar.gz
         dest: flannel-0.9.1.tar.gz
         checksum: 9e1ba3d52895f98b8fcc6157725735e4c446e3f3addf4971b0edb1d296f098e3
   shared/build/etcd:
@@ -359,7 +359,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/etcd"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/etcd/v3.3.9.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/etcd/v3.3.9.tar.gz
         dest: etcd-v3.3.9.tar.gz
         checksum: 96639d35772108004da53e568489ce7572171d39ee507245848cc42fbd3a3032
   shared/build/consul:
@@ -370,7 +370,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/consul/v1.1.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/consul/v1.1.0.tar.gz
         dest: consul-1.1.0.tar.gz
         checksum: 8e2539561eb07b2623d9828587e68f5ef46cee882227c7331ff26dddcdc0e9df
   shared/build/elasticsearch:
@@ -381,7 +381,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/elasticsearch"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/elasticsearch/elasticsearch-v6.4.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/elasticsearch-v6.4.0.tar.gz
         dest: elasticsearch-6.4.0.tar.gz
         checksum: 33dcd95315833f8b2c87ec2db302c021ab7f0a47fdbe4cddb322748871679387
   shared/build/jq:
@@ -392,7 +392,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/jq"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/jq/jq-1.5.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/jq/jq-1.5.tar.gz
         dest: jq-1.5.tar.gz
         checksum: c4d2bfec6436341113419debf479d833692cc5cdab7eb0326b5a4d4fbe9f493c
   shared/build/dumb-init:
@@ -403,7 +403,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/dumb-init"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/dumb-init/dumb-init-1.2.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/dumb-init/dumb-init-1.2.1.tar.gz
         dest: dumb-init-1.2.1.tar.gz
         checksum: 56858088d9d6c911c227d196fcbfca06aff31fbe83e1519f9cabe5cf6f11b242
   shared/build/draft:
@@ -414,7 +414,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/draft"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/draft/draft-0.13.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/draft/draft-0.13.0.tar.gz
         dest: draft-0.13.0.tar.gz
         checksum: f9b2d7fcb5259506b60eb212af3be82f6e05f585548de2b0a1f891042e1ceb4a
   shared/build/metrics:

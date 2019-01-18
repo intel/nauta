@@ -19,7 +19,7 @@ default_dns_search_domains:
 global_dns_search_domains: "{{ dns_search_domains + default_dns_search_domains }}"
 ### Network
 
-domain: dlse
+domain: nauta
 
 nodes_domain: infra
 k8s_domain: kubernetes
@@ -56,7 +56,7 @@ helm_applications:
   dashboard: dashboard
   storage: nfs
   samba-forward: samba-forward
-  dls-admin: dls-admin
+  nauta-admin: nauta-admin
 
 ### Docker
 

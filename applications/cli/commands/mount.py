@@ -38,7 +38,7 @@ from cli_text_consts import MountCmdTexts as Texts
 
 logger = initialize_logger(__name__)
 
-DLS4E_IDENTITY_STRING = "domain=DLS4ENTERPRISE"
+NAUTA_IDENTITY_STRING = "domain=NAUTA"
 
 
 class ShareData():
@@ -128,7 +128,7 @@ def get_mount_command() -> str:
 
 def get_mount_command_linux(usr: str, psw: str, adr: str) -> str:
     usr_id = str(os.getuid())
-    return f"sudo mount.cifs -o username={usr},password={psw},rw,uid={usr_id} //{adr}/<DLS4E_FOLDER> <MOUNTPOINT>"
+    return f"sudo mount.cifs -o username={usr},password={psw},rw,uid={usr_id} //{adr}/<NAUTA_FOLDER> <MOUNTPOINT>"
 
 
 def get_unmount_command_linux() -> str:
@@ -136,7 +136,7 @@ def get_unmount_command_linux() -> str:
 
 
 def get_mount_command_windows(usr: str, psw: str, adr: str) -> str:
-    return f"net use <MOUNTPOINT> \\\\{adr}\\<DLS4E_FOLDER> /user:{usr} {psw}"
+    return f"net use <MOUNTPOINT> \\\\{adr}\\<NAUTA_FOLDER> /user:{usr} {psw}"
 
 
 def get_unmount_command_windows() -> str:
@@ -144,7 +144,7 @@ def get_unmount_command_windows() -> str:
 
 
 def get_mount_command_osx(usr: str, psw: str, adr: str) -> str:
-    return f"mount_smbfs //'{usr}:{psw}'@{adr}/<DLS4E_FOLDER> <MOUNTPOINT>"
+    return f"mount_smbfs //'{usr}:{psw}'@{adr}/<NAUTA_FOLDER> <MOUNTPOINT>"
 
 
 def get_unmount_command_osx() -> str:
@@ -171,8 +171,8 @@ def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool =
     ret_list = []
 
     if output:
-        for item in [dls_item for dls_item in output.split("\n") if
-                     host in dls_item and (is_admin or username_string in dls_item)]:
+        for item in [nauta_item for nauta_item in output.split("\n") if
+                     host in nauta_item and (is_admin or username_string in nauta_item)]:
             try:
                 mount_data = re.search(mnt_regex, item)
                 if osx:

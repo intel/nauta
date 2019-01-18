@@ -38,8 +38,8 @@ from cli_text_consts import UserDeleteCmdTexts as Texts
 
 logger = initialize_logger(__name__)
 
-USER_DEL_CM = "dls4enterprise-user-del"
-DLS4E_NAMESPACE = "dls4e"
+USER_DEL_CM = "nauta-user-del"
+NAUTA_NAMESPACE = "nauta"
 
 
 @click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='d', options_metavar='[options]')
@@ -85,7 +85,7 @@ def delete(state: State, username: str, purge: bool):
         click.echo(Texts.DELETION_START_DELETING)
         delete_user(username)
 
-        patch_config_map_data(name=USER_DEL_CM, namespace=DLS4E_NAMESPACE, key=username, value="1")
+        patch_config_map_data(name=USER_DEL_CM, namespace=NAUTA_NAMESPACE, key=username, value="1")
 
         if purge:
             try:
@@ -100,7 +100,7 @@ def delete(state: State, username: str, purge: bool):
             for i in range(60):
                     user_state = check_users_presence(username)
 
-                    user_del_cm_content = get_config_map_data(name=USER_DEL_CM, namespace=DLS4E_NAMESPACE,
+                    user_del_cm_content = get_config_map_data(name=USER_DEL_CM, namespace=NAUTA_NAMESPACE,
                                                               request_timeout=1)
                     if (not user_state or user_state == UserState.NOT_EXISTS) and \
                             (not user_del_cm_content or not user_del_cm_content.get(username)):

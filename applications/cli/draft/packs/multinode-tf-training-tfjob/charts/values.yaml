@@ -7,13 +7,13 @@ TensorIPythonPort: 6006
 
 commandline:
   args:
-    {% for arg in DLS4e.CommandLine %}
+    {% for arg in NAUTA.CommandLine %}
     - {{ arg }}
     {% endfor %}
 
 image:
   pullPolicy: IfNotPresent
-  clusterRepository: {{ DLS4e.ExperimentImage }}
+  clusterRepository: {{ NAUTA.ExperimentImage }}
 
 service:
   type: ClusterIP
@@ -49,8 +49,8 @@ sidecar_cpu: null
 sidecar_memory: null
 
 
-experimentName: {{ DLS4e.ExperimentName }} 
-registryPort: {{ DLS4e.RegistryPort }}
+experimentName: {{ NAUTA.ExperimentName }} 
+registryPort: {{ NAUTA.RegistryPort }}
 
 workersCount: 3
 psSidecarLoggingLevel: "WARNING"

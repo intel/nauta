@@ -1,0 +1,29 @@
+{{ if ne (required "NAUTA Storage Type" .Values.global.nauta_storage.type) "pvc" }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  capacity:
+    storage: 128Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ required "Host definition is required" .Values.global.MasterHost }}
+  hostPath:
+    path: "{{ required "NAUTA Storage Path" .Values.global.nauta_storage.local_path }}/{{ .Release.Name }}/{{ .Chart.Name }}/main"
+    type: DirectoryOrCreate
+{{ end }}

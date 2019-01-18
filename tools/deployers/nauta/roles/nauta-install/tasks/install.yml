@@ -1,0 +1,6 @@
+---
+
+- name: "{{ message_label }} Install helm chart"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} install --timeout {{ helm_timeout }} -n nauta --namespace nauta {{ runtime_nauta_chart }} --wait -f {{ workspace }}/nauta-{{ nauta_version }}.values.yaml"
+  when: chart is changed

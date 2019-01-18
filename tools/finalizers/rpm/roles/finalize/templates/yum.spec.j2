@@ -1,5 +1,5 @@
-Summary: DLS4E Local Yum Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
-Name: dls4e-yum
+Summary: NAUTA Local Yum Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
+Name: nauta-yum
 Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
 Release: {{ VERSION_ID }}
 License: Apache-2.0
@@ -7,7 +7,7 @@ Group: Tools
 
 %define  debug_package %{nil}
 
-Requires: dls4e-yum-repository = {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}
+Requires: nauta-yum-repository = {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}
 
 %description
 %{summary}
@@ -22,15 +22,15 @@ Requires: dls4e-yum-repository = {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERS
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/etc/yum.repos.d
 
-echo "[DLS4ERepository]
-name=DLS4Enterprise repository
+echo "[NAUTARepository]
+name=NAUTAnterprise repository
 gpgcheck=0
 enabled=0
-baseurl=file:///opt/dls4e/repository" > %{buildroot}/etc/yum.repos.d/dls4e.repo
+baseurl=file:///opt/nauta/repository" > %{buildroot}/etc/yum.repos.d/nauta.repo
 
 %clean
 # Empty
 
 %files
 %defattr(0755,root,root,-)
-/etc/yum.repos.d/dls4e.repo
+/etc/yum.repos.d/nauta.repo

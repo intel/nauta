@@ -1,6 +1,6 @@
 # Batch prediction with files in TFRecords format
 
-By default batch prediction functionality provided by dls4e system uses files in the protocolbuffer format as a  
+By default batch prediction functionality provided by nauta system uses files in the protocolbuffer format as a  
 source of data used in prediction. The system however has also option allowing users to pass data in TFRecords
 format. To make the system accept this format, the following things have to be done:
 1) a user must prepare a file in TFRecords format according to the following rules:  

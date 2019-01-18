@@ -15,7 +15,7 @@ WORKDIR /build/gopath/src/k8s.io/heapster
 RUN ls -lah
 
 # Workaround: we're using release, not git checkout: #
-RUN sed -i '15s/.*/GIT_COMMIT:=DLS/' Makefile
+RUN sed -i '15s/.*/GIT_COMMIT:=NAUTA/' Makefile
 ######################################################
 
 RUN make build

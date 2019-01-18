@@ -1,5 +1,0 @@
-apiVersion: v1
-name: ingress
-description: A DLS-GUI ingress
-version: 1.0.0
-appVersion: 0.1.0

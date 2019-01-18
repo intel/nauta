@@ -30,8 +30,8 @@ build: $(ACTIVATE) set-version metrics-lib
 	. $(ACTIVATE); pip install pyinstaller;
 	rm -rf dist/
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-dls-windows-amd64.7z -o draft.7z
+	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl;
+	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-nauta-windows-amd64.7z -o draft.7z
 	mkdir dist/config/
 	7z x draft.7z -odist/config/
 	rm -f draft.7z
@@ -56,8 +56,8 @@ ifeq (Windows,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-dls-linux-amd64.tar.gz -o draft.tar.gz
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl;
+	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-nauta-linux-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 	mkdir -vp dist/config/
@@ -80,8 +80,8 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n dlsctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-dls-darwin-amd64.tar.gz -o draft.tar.gz
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl;
+	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-nauta-darwin-amd64.tar.gz -o draft.tar.gz
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 	mkdir -vp dist/config/
@@ -106,12 +106,12 @@ ifeq (Darwin,$(OS))
 endif
 
 
-	cp -Rf ../../dls4e-user dist/config/
+	cp -Rf ../../nauta-user dist/config/
 	mkdir -p dist/lib/
 	mv experiment_metrics/dist/experiment_metrics-0.0.1.tar.gz dist/lib/
 	cp -f license.txt dist/
 	mkdir -p dist/docs/
-	cp -f ../dls-gui/src/assets/*.pdf dist/docs/
+	cp -f ../nauta-gui/src/assets/*.pdf dist/docs/
 	cp -f ../../docs/end-user-docs/Beta_Release_Docs/DL_Studio_User_Guide_Files/release/*.pdf dist/docs/
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
@@ -142,15 +142,15 @@ export CLI_ARTIFACT_DIRECTORY:=$(CURDIR)
 export CLI_ARTIFACT_VERSION_STRING:=$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(BUILD_ID)
 
 ifeq (Windows,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-windows.zip
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-windows.zip
 export CLI_ARTIFACT_PLATFORM:=windows
 endif
 ifeq (Linux,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-linux.tar.gz
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-linux.tar.gz
 export CLI_ARTIFACT_PLATFORM:=linux
 endif
 ifeq (Darwin,$(OS))
-export CLI_ARTIFACT_NAME:=dlsctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
+export CLI_ARTIFACT_NAME:=nctl-$(CLI_ARTIFACT_VERSION_STRING)-darwin.tar.gz
 export CLI_ARTIFACT_PLATFORM:=darwin
 endif
 
@@ -182,10 +182,10 @@ ifeq (True,$(ENV_IPPLAN))
 endif
 	@echo Upload artifacts to the releases directory
 ifneq (Windows,$(OS))
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) ENV_DEST=releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)
 else
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
+	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
+	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" "s3://repository/releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME)"
 endif
 
 ifeq (True,$(ENV_IPPLAN))
@@ -202,16 +202,16 @@ ifeq (True,$(ENV_CALCULATESUM))
 	@echo Calculate file control sum and upload to the releases directory
 ifeq (Linux,$(OS))
 	sha256sum "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Darwin,$(OS))
 	shasum -a 256 "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME)" > "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
+	@cd $(CURDIR)/../.. && make tools-push ENV_SRC=$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum ENV_DEST=releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum
 endif
 ifeq (Windows,$(OS))
 	powershell -Command "& { Get-FileHash -Algorithm SHA256 -Path $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME) > $(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum }"
-	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
-	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/dlsctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
+	@echo aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
+	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
 endif
 endif
 

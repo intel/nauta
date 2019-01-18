@@ -89,7 +89,7 @@ install -d $RPM_BUILD_ROOT/%{_bindir}
 install -p -m 755 cli/build/docker $RPM_BUILD_ROOT/%{_bindir}/docker
 echo "$(readlink -f engine/bundles/dynbinary-daemon/dockerd)"
 
-# WARNING Workaround: DLS builds in /go (GOPATH), install adjusted below.
+# WARNING Workaround: NAUTA builds in /go (GOPATH), install adjusted below.
 # was:
 #install -p -m 755 $(readlink -f engine/bundles/dynbinary-daemon/dockerd) $RPM_BUILD_ROOT/%{_bindir}/dockerd
 # is:

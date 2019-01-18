@@ -20,7 +20,7 @@
 # and approved by Intel in writing.
 #
 
-# autocomplete for dlsctl application
+# autocomplete for nctl application
 
 LICENSE_ACCEPTANCE_TEXT='DO NOT ACCESS, COPY OR PERFORM ANY PORTION OF THE PRE-RELEASE SOFTWARE
 UNTIL YOU HAVE READ AND ACCEPTED THE TERMS AND CONDITIONS OF THIS
@@ -28,11 +28,11 @@ AGREEMENT LICENSE.TXT . BY COPYING, ACCESSING, OR PERFORMING
 THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND
 CONDITIONS OF THIS AGREEMENT. Agree? (y/n)'
 
-validate_dlsctl_home_config_directory() {
-    local dlsctl_home_config_directory="$1"
-    if [ -d "${dlsctl_home_config_directory}" ]; then
-        # check if it is actual config directory of dlsctl - it should contain draft and helm binaries
-        if [ -f "${dlsctl_home_config_directory}/draft" ] && [ -f "${dlsctl_home_config_directory}/helm" ]; then
+validate_nctl_home_config_directory() {
+    local nctl_home_config_directory="$1"
+    if [ -d "${nctl_home_config_directory}" ]; then
+        # check if it is actual config directory of nctl - it should contain draft and helm binaries
+        if [ -f "${nctl_home_config_directory}/draft" ] && [ -f "${nctl_home_config_directory}/helm" ]; then
             return 0
         else
             return 1
@@ -42,39 +42,39 @@ validate_dlsctl_home_config_directory() {
     fi
 }
 
-get_dlsctl_config_directory() {
-    if [ -z "${DLS_CTL_CONFIG}" ]; then
-        # DLS_CTL_CONFIG environment variable is not set
-        local dlsctl_home_config_directory="${HOME}/config"
-        if validate_dlsctl_home_config_directory "${dlsctl_home_config_directory}"; then
-            echo "${dlsctl_home_config_directory}"
+get_nctl_config_directory() {
+    if [ -z "${NCTL_CONFIG}" ]; then
+        # NCTL_CONFIG environment variable is not set
+        local nctl_home_config_directory="${HOME}/config"
+        if validate_nctl_home_config_directory "${nctl_home_config_directory}"; then
+            echo "${nctl_home_config_directory}"
         else
             # get config path relative to autocomplete script
-            local dlsctl_relative_config_directory="$(dirname "$0")/config"
-            if [ -d "$dlsctl_relative_config_directory" ]; then
-                echo "${dlsctl_relative_config_directory}"
+            local nctl_relative_config_directory="$(dirname "$0")/config"
+            if [ -d "$nctl_relative_config_directory" ]; then
+                echo "${nctl_relative_config_directory}"
             else
                 # Unable to determine config directory path
                 echo ''
             fi
         fi
     else
-        # DLS_CTL_CONFIG environment variable is set
-        echo "${DLS_CTL_CONFIG}"
+        # NCTL_CONFIG environment variable is set
+        echo "${NCTL_CONFIG}"
     fi
 }
 
 check_license() {
-    local dlsctl_config_directory
-    dlsctl_config_directory=$(get_dlsctl_config_directory)
+    local nctl_config_directory
+    nctl_config_directory=$(get_nctl_config_directory)
 
-    if [ -z "${dlsctl_config_directory}" ]; then
-        echo 'Unable to determine dlsctl config directory.'
-        echo 'Please set dlsctl config directory path as a value of DLS_CTL_CONFIG environment variable.'
+    if [ -z "${nctl_config_directory}" ]; then
+        echo 'Unable to determine nctl config directory.'
+        echo 'Please set nctl config directory path as a value of NCTL_CONFIG environment variable.'
         exit 1
     fi
 
-    local license_file="${dlsctl_config_directory}/license_accepted"
+    local license_file="${nctl_config_directory}/license_accepted"
     if [ -f "${license_file}" ]; then
         return 0
     fi
@@ -97,13 +97,13 @@ if [ ! -f ~/.bash_profile ]; then
     touch ~/.bash_profile
 fi
 
-if grep -q "_DLSCTL_COMPLETE" ~/.bash_profile; then
-    echo 'Autocompletion for dlsctl application has been already set up.'
+if grep -q "_NCTL_COMPLETE" ~/.bash_profile; then
+    echo 'Autocompletion for nctl application has been already set up.'
     exit 1
 fi
 
-FILE=$(cd $(dirname "$0"); pwd)/dlsctl;
+FILE=$(cd $(dirname "$0"); pwd)/nctl;
 
 echo -e '\n' >> ~/.bash_profile
-echo '# autocomplete for dlsctl application' >> ~/.bash_profile
-echo 'eval "$(_DLSCTL_COMPLETE=source '${FILE}')"' >> ~/.bash_profile
+echo '# autocomplete for nctl application' >> ~/.bash_profile
+echo 'eval "$(_NCTL_COMPLETE=source '${FILE}')"' >> ~/.bash_profile

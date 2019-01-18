@@ -1,7 +1,7 @@
 ---
 
 - set_fact:
-    kind_path: "/etc/dls-cluster/master/{{ kind }}"
+    kind_path: "/etc/nauta-cluster/master/{{ kind }}"
 
 - name: "{{ message_label }} Ensure that node dirs exis"
   file:
@@ -48,11 +48,11 @@
   include_tasks: cert.yml
   vars:
     name: "{{ item }}"
-    common_name: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+    common_name: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
     subject_alt_name:
-      DNS.1: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+      DNS.1: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
       DNS.2: "{{ item }}"
-      IP.1: "{{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}"
+      IP.1: "{{ hostvars[item].nauta_configuration.internal_interface.ipv4_address }}"
     key_usage:
       - digitalSignature
       - keyEncipherment
@@ -65,11 +65,11 @@
   include_tasks: cert.yml
   vars:
     name: "{{ item }}"
-    common_name: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+    common_name: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
     subject_alt_name:
-      DNS.1: "{{ hostvars[item].dls_configuration.network.instance_name }}"
+      DNS.1: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
       DNS.2: "{{ item }}"
-      IP.1: "{{ hostvars[item].dls_configuration.internal_interface.ipv4_address }}"
+      IP.1: "{{ hostvars[item].nauta_configuration.internal_interface.ipv4_address }}"
     key_usage:
       - digitalSignature
       - keyEncipherment

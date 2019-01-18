@@ -1,0 +1,61 @@
+---
+
+- name: "{{ message_label }} Check if image exists"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_helm }} status nauta"
+  register: chart
+  changed_when: chart.rc == 1
+  failed_when: chart.rc not in [0, 1]
+
+- set_fact:
+    calc_features: "{{ features | default({}) }}"
+
+- name: Append calc features with default values
+  set_fact:
+    calc_features: "{{ calc_features | combine({item.key: item.value}) }}"
+  with_dict:
+    nfs: True
+  when: item.key not in calc_features
+
+- name: "{{ message_label }} Set global values in configuration"
+  set_fact:
+    global_values:
+      nauta_registry: "127.0.0.1:{{ registry_nodeport }}"
+      nauta_configuration:
+        external_ip: "{{ runtime_kubernetes_external_name }}"
+        registry: "127.0.0.1:{{ registry_nodeport }}"
+      nauta_storage: "{{ calculated_storage }}"
+      MasterHost: "{{ (calculated_storage | default({})).local_selector | default('') }}"
+      images: "{{ registry_images }}"
+      features: "{{ calc_features | default({}) }}"
+
+- name: "{{ message_label }} Render configuration"
+  set_fact:
+    nauta_config_values:
+      global: "{{ nauta_configuration | default({}) | combine(global_values) }}"
+      features: "{{ calc_features | default({}) }}"
+
+- name: "{{ message_label }} Ensure that nauta registry chart exists"
+  file:
+    path: "{{ runtime_nauta_chart }}"
+
+- name: "{{ message_label }} Render values"
+  vars:
+    rendered_values: "{{ features_config | default({}) | combine(nauta_config_values) }}"
+  copy:
+    content: "{{ rendered_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
+    dest: "{{ workspace }}/nauta-{{ nauta_version }}.values.yaml"
+
+- name: "{{ message_label }} Install helm chart"
+  include_tasks: install.yml
+  when: chart is changed
+
+- name: "{{ message_label }} Upgrade helm chart if required"
+  include_tasks: upgrade.yml
+  when:
+    - not chart is changed
+
+- name: "{{ message_label }} Remove image values file"
+  file:
+    path: "{{ workspace }}/nauta-{{ nauta_version }}.values.yaml"
+    state: absent

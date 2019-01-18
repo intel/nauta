@@ -39,7 +39,7 @@ from platform_resources.runs import list_runs, update_run
 from platform_resources.experiment_model import ExperimentStatus, Experiment
 from platform_resources.experiments import update_experiment, get_experiment, delete_experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
-from util.app_names import DLS4EAppNames
+from util.app_names import NAUTAAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.helm import delete_helm_release
 from util.k8s.k8s_proxy_context_manager import K8sProxy
@@ -217,7 +217,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     if purge:
         # Connect to elasticsearch in order to purge run logs
         try:
-            with K8sProxy(DLS4EAppNames.ELASTICSEARCH) as proxy:
+            with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
                 es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                    verify_certs=False, use_ssl=False)
                 for exp_name, run_list in exp_with_runs.items():

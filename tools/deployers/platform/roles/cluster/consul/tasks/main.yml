@@ -32,7 +32,7 @@
 - name: "{{ message_label }} Copy ssl keys"
   copy:
     remote_src: True
-    src: "/etc/dls-cluster/client/consul/{{ item }}"
+    src: "/etc/nauta-cluster/client/consul/{{ item }}"
     dest: "/etc/consul/ssl/{{ item }}"
     owner: consul
     group: consul

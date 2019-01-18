@@ -17,9 +17,9 @@
 # of the Materials, either expressly, by implication, inducement, estoppel or
 # otherwise. Any license under such intellectual property rights must be express
 # and approved by Intel in writing.
-NAMESPACE="dls4e"
+NAMESPACE="nauta"
 echo "Getting registry svc name"
-DOCKER_REGISTRY_SVC=`kubectl get --namespace=$NAMESPACE --no-headers=true -l dls4e_app_name=docker-registry svc -o custom-columns=:metadata.name`
+DOCKER_REGISTRY_SVC=`kubectl get --namespace=$NAMESPACE --no-headers=true -l nauta_app_name=docker-registry svc -o custom-columns=:metadata.name`
 if [[ -z "$DOCKER_REGISTRY_SVC" ]]; then
   echo "Unable to get docker registry pod name";
   exit 1
@@ -27,7 +27,7 @@ fi
 echo "Docker registry svc = $DOCKER_REGISTRY_SVC"
 
 echo "Getting docker registry port"
-DOCKER_REGISTRY_PORT=`kubectl get --namespace=$NAMESPACE --no-headers=true -l dls4e_app_name=docker-registry svc -o go-template='{{range .items}}{{range.spec.ports}}{{.nodePort}}{{end}}{{end}}'`
+DOCKER_REGISTRY_PORT=`kubectl get --namespace=$NAMESPACE --no-headers=true -l nauta_app_name=docker-registry svc -o go-template='{{range .items}}{{range.spec.ports}}{{.nodePort}}{{end}}{{end}}'`
 if [[ -z "$DOCKER_REGISTRY_PORT" ]]; then
   echo "Unable to get docker registry port"
   exit 2
@@ -40,9 +40,9 @@ kubectl port-forward --namespace=$NAMESPACE service/$DOCKER_REGISTRY_SVC $DOCKER
 UNAME="$(uname -s)"
 if [[ $UNAME = "Darwin" ]]; then
   echo "Running on Darwin OS, starting docker host port-forwarding"
-  if ! docker top dlsctl-registry &>/dev/null; then
-    echo "Starting dlsctl-registry container"
-    docker run -d --rm --net=host --name=dlsctl-registry alpine/socat TCP-LISTEN:$DOCKER_REGISTRY_PORT,fork,reuseaddr TCP:host.docker.internal:$DOCKER_REGISTRY_PORT
+  if ! docker top nctl-registry &>/dev/null; then
+    echo "Starting nctl-registry container"
+    docker run -d --rm --net=host --name=nctl-registry alpine/socat TCP-LISTEN:$DOCKER_REGISTRY_PORT,fork,reuseaddr TCP:host.docker.internal:$DOCKER_REGISTRY_PORT
     echo " Docker run return code: $?"
   fi
 fi

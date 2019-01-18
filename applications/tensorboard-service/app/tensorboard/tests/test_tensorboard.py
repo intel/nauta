@@ -40,7 +40,7 @@ FAKE_NAMESPACE = "fake-namespace"
 
 @pytest.fixture
 def tensorboard_manager_mocked(mocker) -> TensorboardManager:
-    mocker.patch('k8s.models.Dls4ePlatformConfig')
+    mocker.patch('k8s.models.NautaPlatformConfig')
     # noinspection PyTypeChecker
     mgr = TensorboardManager(api_client=mock.MagicMock(), namespace=FAKE_NAMESPACE, config=mock.MagicMock())
 
@@ -50,7 +50,7 @@ def tensorboard_manager_mocked(mocker) -> TensorboardManager:
 def test_incluster_init(mocker: MockFixture):
     fake_namespace = 'some-namespace'
     mocker.patch.object(tensorboard.tensorboard, 'config')
-    mocker.patch('dls4e.config.Dls4ePlatformConfig.incluster_init')
+    mocker.patch('nauta.config.NautaPlatformConfig.incluster_init')
     mocker.patch('builtins.open', new=lambda *args, **kwargs: mock.MagicMock(
         __enter__=lambda *args, **kwargs: mock.MagicMock(
             read=lambda: fake_namespace
@@ -96,7 +96,7 @@ def test_list(tensorboard_manager_mocked: TensorboardManager):
     tensorboard_manager_mocked.list()
 
     tensorboard_manager_mocked.client.list_deployments.\
-        assert_called_once_with(namespace=FAKE_NAMESPACE, label_selector='type=dls4e-tensorboard')
+        assert_called_once_with(namespace=FAKE_NAMESPACE, label_selector='type=nauta-tensorboard')
 
 
 # noinspection PyShadowingNames

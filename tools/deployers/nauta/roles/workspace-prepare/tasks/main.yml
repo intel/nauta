@@ -1,0 +1,38 @@
+---
+
+- name: "{{ message_label }} Copy loader"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta cp {{ runtime_loader }} {{ pod }}:/loader"
+  changed_when: False
+
+- name: "{{ message_label }} Check if image is present"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta exec {{ pod }} /loader check nauta-repository:{{ nauta_version }}"
+  register: package
+  changed_when: package.rc != 0
+  failed_when: False
+
+- name: "{{ message_label }} Send image"
+  environment: "{{ local_envs }}"
+  shell: 'cat {{ runtime_img }} | "{{ runtime_kubectl }}" -n nauta exec -i "{{ pod }}" /loader load "nauta-repository:{{ nauta_version }}"'
+  when: package is changed
+
+- name: "{{ message_label }} Check if image is present"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta exec {{ pod }} /loader check nauta-repository:{{ nauta_version }}"
+  changed_when: False
+
+- name: "{{ message_label }} Fetch node name"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get pods {{ pod }} -o jsonpath={.spec.nodeName}"
+  register: node_name
+  changed_when: False
+
+- name: "{{ message_label }} Fail if node name is empty"
+  fail:
+    msg: Node name is empty
+  when: node_name.stdout == ''
+
+- name: "{{ message_label }} Label node"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} label node {{ node_name.stdout }} nauta-release-version-{{ nauta_version.replace('.', '-') }}=True --overwrite"

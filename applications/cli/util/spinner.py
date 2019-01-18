@@ -30,7 +30,7 @@ from util.system import get_current_os, OS
 SPINNER_COLOR = "green"
 IS_TERMINAL_INTERACTIVE = sys.stdout.isatty()
 
-DlsctlSpinner = yaspin.Spinner(frames='\\|/-', interval=80) if get_current_os() == OS.WINDOWS \
+NctlSpinner = yaspin.Spinner(frames='\\|/-', interval=80) if get_current_os() == OS.WINDOWS \
     else yaspin.Spinner('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏', interval=80)
 
 
@@ -56,7 +56,7 @@ class DummySpinner(yaspin.core.Yaspin):
         pass
 
 
-def spinner(text: str, color: str = SPINNER_COLOR, spinner: yaspin.Spinner = DlsctlSpinner,
+def spinner(text: str, color: str = SPINNER_COLOR, spinner: yaspin.Spinner = NctlSpinner,
             *args, **kwargs) -> yaspin.core.Yaspin:
     if IS_TERMINAL_INTERACTIVE:
         return yaspin.yaspin(spinner=spinner, text=text, color=color, *args, **kwargs)

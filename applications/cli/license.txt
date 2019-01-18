@@ -1,6 +1,6 @@
-Intel® Deep Learning Studio End User License Agreement
+Intel® Nauta End User License Agreement
 
-Do not access, copy or perform any portion of the Intel® Deep Learning Studio pre-release software (the “Pre-Release
+Do not access, copy or perform any portion of the Intel® Nauta pre-release software (the “Pre-Release
 Software”) until You have read and accepted the terms and conditions of this End User License Agreement (the
 “Agreement”). By copying, accessing, or performing the Pre-Release Software, You agree to be legally bound by the terms
 and conditions of this Agreement. If You do not agree to be bound by or the entity for whose benefit You act has not
@@ -167,4 +167,4 @@ such provision within legal limits.
 full right to require such performance at any time thereafter; nor will waiver by a Party of a breach of any provision
 hereof constitute a waiver of the provision itself.
 
-End-User License Agreement for pre-release version of the Intel® Deep Learning Studio Software Version: November 4, 2018
+End-User License Agreement for pre-release version of the Intel® Nauta Software Version: November 4, 2018

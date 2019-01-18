@@ -35,7 +35,7 @@ import toml
 from util.k8s import k8s_info
 from util.logger import initialize_logger
 from util.config import FOLDER_DIR_NAME
-from util.config import DLS4EConfigMap
+from util.config import NAUTAConfigMap
 from util.spinner import spinner
 
 import packs.common as common
@@ -103,23 +103,23 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
             if line.startswith("ADD training.py"):
                 if script_location or script_folder_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
-            elif line.startswith("FROM dls4e/tensorflow:1.9.0-py"):
-                dls4e_config_map = DLS4EConfigMap()
+            elif line.startswith("FROM nauta/tensorflow:1.9.0-py"):
+                nauta_config_map = NAUTAConfigMap()
                 if line.find('1.9.0-py2') != -1:
-                    tf_image_name = dls4e_config_map.py2_image_name
+                    tf_image_name = nauta_config_map.py2_image_name
                 else:
-                    tf_image_name = dls4e_config_map.py3_image_name
+                    tf_image_name = nauta_config_map.py3_image_name
                 tf_image_repository = f'127.0.0.1:{local_registry_port}/{tf_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {tf_image_repository}'
 
                 # pull image from platform's registry
                 pull_tf_image(tf_image_repository=tf_image_repository)
-            elif line.startswith("FROM dls4e/horovod"):
-                dls4e_config_map = DLS4EConfigMap()
+            elif line.startswith("FROM nauta/horovod"):
+                nauta_config_map = NAUTAConfigMap()
                 if line.find('1.9.0-py2') != -1:
-                    image_name = dls4e_config_map.py2_horovod_image_name
+                    image_name = nauta_config_map.py2_horovod_image_name
                 else:
-                    image_name = dls4e_config_map.py3_horovod_image_name
+                    image_name = nauta_config_map.py3_horovod_image_name
                 image_repository = f'127.0.0.1:{local_registry_port}/{image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
 
@@ -147,7 +147,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         
         template = jinja2.Template(values_yaml_file.read())
 
-        rendered_values = template.render(DLS4e = {
+        rendered_values = template.render(NAUTA = {
             'ExperimentName' : experiment_name,
             'CommandLine' : common.prepare_script_paramaters(script_parameters, script_location),
             'RegistryPort' : str(cluster_registry_port),
