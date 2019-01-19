@@ -10,8 +10,9 @@ To test your model, Nauta also supports both batch and streaming inference, all 
 The Nauta client software runs on the following operating systems:
 
 * Ubuntu* 16.04
-* macOS*
+* macOS* High Sierra
 * Windows* 10
+* RedHat* 7.5
  
 # Purpose of this Guide
 

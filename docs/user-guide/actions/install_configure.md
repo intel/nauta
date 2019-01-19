@@ -7,7 +7,7 @@ For instructions to install and configure Nauta to run on the host server, refer
 
 ## Supported Operating Systems
 
-This release of the Nauta client software has been validated on the operating systems and versions. Please visit [ai.intel.com/nauta](ai.intel.com/nauta) to acquire the installation package for your OS.
+This release of the Nauta client software has been validated on the following operating systems and versions:
 
 * Ubuntu 16.04
 * Red Hat 7.5 
@@ -22,8 +22,6 @@ The following software _must_ be installed on the client system before installin
 
 * docker version 18.03.0-ce or later: (https://docs.docker.com/install/)
 
-**Note**: Helm is shipped together with Nauta.
-
 
 ## Installation
 
@@ -31,7 +29,7 @@ To install the Nauta client software package, do the following:
 
 1.	Download and install the two required software packages listed above, preferably in the order given.
 
-2.	Download and extract the Nauta client software package for your operating system. There is no installation utility. You can unpack this package and place the unpacked files in any location you prefer. Take note of the path. 
+2.	Build the Nauta client software package for your operating system ([Nauta CLI build instructions](nctl.md)). There is no installation utility. You can unpack this package and place the unpacked files in any location you prefer. Take note of the path. 
 
 3.	Set KUBECONFIG environment variable to the Kubernetes configuration file provided by your Nauta administrator. Here, `<PATH>` is wherever your _config_ file is located.
  
