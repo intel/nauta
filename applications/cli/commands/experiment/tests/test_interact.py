@@ -17,11 +17,13 @@
 from click.testing import CliRunner
 import pytest
 
+from kubernetes import client
+
 from platform_resources.experiment import Experiment, ExperimentStatus
 from commands.experiment import interact
 from commands.experiment.common import RunStatus, SubmitExperimentError
 from cli_text_consts import ExperimentInteractCmdTexts as Texts
-from platform_resources.run import Run
+from platform_resources.run import Run, KubernetesObject
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -42,6 +44,8 @@ SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-trai
                       experiment_name=CORRECT_INTERACT_NAME,
                       state=RunStatus.QUEUED)]
 
+KO_EXPERIMENT = KubernetesObject(spec=JUPYTER_EXPERIMENT, metadata=client.V1ObjectMeta())
+
 
 class InteractMocks:
     def __init__(self, mocker):
@@ -54,6 +58,8 @@ class InteractMocks:
                                               return_value=(SUBMITTED_RUNS, {}, ""))
         self.launch_app = mocker.patch("commands.experiment.interact.launch_app")
         self.check_pods_status = mocker.patch("commands.experiment.interact.check_pods_status", return_value=True)
+        self.calc_number = mocker.patch("commands.experiment.interact.calculate_number_of_running_jupyters",
+                                        return_value=1)
 
 
 @pytest.fixture
@@ -62,11 +68,12 @@ def prepare_mocks(mocker) -> InteractMocks:
 
 
 def check_asserts(prepare_mocks: InteractMocks, get_namespace_count=1, get_experiment_count=1,
-                  submit_experiment_count=1, launch_app_count=1):
+                  submit_experiment_count=1, launch_app_count=1, calc_number_count=1):
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "Namespace wasn't gathered."
     assert prepare_mocks.get_experiment.call_count == get_experiment_count, "Experiment wasn't gathered."
     assert prepare_mocks.submit_experiment.call_count == submit_experiment_count, "Experiment wasn't submitted."
     assert prepare_mocks.launch_app.call_count == launch_app_count, "App wasn't launched."
+    assert prepare_mocks.calc_number.call_count == calc_number_count, "Experiments weren't counted."
 
 
 def test_interact_incorrect_name(prepare_mocks: InteractMocks):
@@ -80,7 +87,7 @@ def test_interact_incorrect_name(prepare_mocks: InteractMocks):
 
     assert "Name given by a user cannot be longer than 30 characters" in result.output
     check_asserts(prepare_mocks, get_namespace_count=2, get_experiment_count=2, submit_experiment_count=0,
-                  launch_app_count=0)
+                  launch_app_count=0, calc_number_count=2)
 
 
 def test_error_when_listing_experiments(prepare_mocks: InteractMocks):
@@ -158,3 +165,21 @@ def test_interact_other_error_when_submitting(prepare_mocks: InteractMocks):
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=1,
                   launch_app_count=0)
     assert Texts.SUBMIT_OTHER_ERROR_MSG in result.output
+
+
+def test_calculate_number_of_running_jupyters(mocker):
+    exp_list = mocker.patch("commands.experiment.interact.list_k8s_experiments_by_label", return_value=[KO_EXPERIMENT])
+
+    count = interact.calculate_number_of_running_jupyters()
+
+    assert count == 1
+    assert exp_list.call_count == 1
+
+
+def test_interact_too_much_notebooks(prepare_mocks: InteractMocks):
+    prepare_mocks.calc_number.return_value = 4
+    result = CliRunner().invoke(interact.interact, input="n")
+
+    assert Texts.INTERACT_ABORT_MSG in result.output
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=0,
+                  launch_app_count=0)

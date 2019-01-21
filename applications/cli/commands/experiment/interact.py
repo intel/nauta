@@ -36,9 +36,11 @@ from util.exceptions import K8sProxyCloseError
 from util.system import handle_error
 from cli_text_consts import ExperimentInteractCmdTexts as Texts
 from platform_resources.experiment import ExperimentStatus, Experiment
-from platform_resources.experiment_utils import generate_name
+from platform_resources.experiment_utils import generate_name, list_k8s_experiments_by_label
 
 JUPYTER_CHECK_POD_READY_TRIES = 60
+
+ACCEPTED_NUMBER_OF_NOTEBOOKS = 2
 
 logger = initialize_logger(__name__)
 
@@ -61,8 +63,14 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     Starts an interactive session with Jupyter Notebook.
     """
     current_namespace = get_kubectl_current_context_namespace()
-    create_new_notebook = True
 
+    jupyters_number = calculate_number_of_running_jupyters(current_namespace)
+    if jupyters_number > ACCEPTED_NUMBER_OF_NOTEBOOKS:
+        if not click.confirm(Texts.TOO_MANY_JUPYTERS.format(jupyter_number=str(jupyters_number))):
+            click.echo(Texts.INTERACT_ABORT_MSG)
+            sys.exit(0)
+
+    create_new_notebook = True
     jupyter_experiment = None
 
     if name:
@@ -175,3 +183,14 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
     except Exception:
         handle_error(logger, Texts.SESSION_LAUNCH_OTHER_ERROR_MSG, Texts.SESSION_LAUNCH_OTHER_ERROR_MSG)
         sys.exit(1)
+
+
+def calculate_number_of_running_jupyters(namespace: str=None):
+    present_jupyters = list_k8s_experiments_by_label(namespace=namespace, label_selector="runKind=jupyter")
+
+    count = 0
+    if present_jupyters:
+        for jupyter in present_jupyters:
+            if jupyter.spec.state in [ExperimentStatus.SUBMITTED, ExperimentStatus.CREATING]:
+                count = count + 1
+    return count
