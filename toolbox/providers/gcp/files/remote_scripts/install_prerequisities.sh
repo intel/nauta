@@ -16,4 +16,15 @@
 #
 
 sudo apt-get update
-sudo apt-get install python python-pip python-dev virtualenv python3-pip python3-dev python3-venv gcc openssl libssl-dev libffi-dev -y
+sudo apt-get install python \
+                     python-pip \
+                     python-dev \
+                     virtualenv \
+                     python3-pip \
+                     python3-dev \
+                     python3-venv \
+                     gcc \
+                     openssl \
+                     libssl-dev \
+                     libffi-dev \
+                     -y

@@ -43,6 +43,7 @@ sudo apt-get install make \
                      python3.6-venv \
                      binutils \
                      build-essential \
+                     cifs-utils \
                      -y
 
 pip3 install virtualenv

@@ -258,18 +258,57 @@ install_compiler_prerequisities() {
     fi
 }
 
+function retrieve_repo {
+    PROJECT_NAME=$1
+    BRANCH_NAME=$2
+
+    if [ -d "$PROJECT_NAME" ]; then
+      cd $PROJECT_NAME
+      git fetch --all
+
+      set +e
+      git reset --hard origin/$BRANCH_NAME
+      if [ $? -ne 0 ]; then
+        print_log "ERROR" "Error in hard reset. Probably sha sum or tag name is added instead of branch name. Trying to reset again."
+        git reset --hard $BRANCH_NAME
+      fi
+      set -e
+
+      git checkout $BRANCH_NAME
+
+      set +e
+      git reset --hard origin/$BRANCH_NAME
+      if [ $? -ne 0 ]; then
+        print_log "ERROR" "Error in hard reset. Probably sha sum or tag name is added instead of branch name. Trying to reset again."
+        git reset --hard $BRANCH_NAME
+      fi
+      set -e
+    else
+      git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+      cd $PROJECT_NAME
+    fi
+}
+
 compile_platform() {
     print_log "DEBUG" "Compile platform"
 
     # till repo won't be public
-    run_scp_command /opt/home/k8sworker/cloud/carbon.tar ${GATEWAY_USER}@${GATEWAY_IP}:carbon.tar
+
+    cd ${SCRIPTDIR}/../../../../cloud
+    retrieve_repo nauta ${CurrentBranch}
+    cd ${SCRIPTDIR}/../../../../cloud
+
+    rm nauta.tar
+    tar cf nauta.tar nauta
+    cd ${SCRIPTDIR}
+    run_scp_command /opt/home/k8sworker/cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar
 
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
         print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}"
     else
         print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}"
     fi
 }
 
@@ -351,7 +390,7 @@ if [ "${CompilePlatformOnCloud}" = "true" ]; then
     VERSION_NO=0
     VERSION_ID=`date +"%Y%m%d%H%M%S"`
     INSTALL_FILE_NAME="nauta-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}.tar.gz"
-    INSTALL_CLIENT_FILE_NAME="nctl-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}.tar.gz"
+    INSTALL_CLIENT_FILE_NAME="nctl-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}-linux.tar.gz"
     install_compiler_prerequisities
     compile_platform
     install_platform_prerequisities
@@ -363,6 +402,7 @@ if [ "${InstallFile}" != "" ]; then
     show_connectivity_parameters
     transfer_scripts
     transfer_install_file
+    install_compiler_prerequisities
     install_platform_prerequisities
     install_platform
 fi

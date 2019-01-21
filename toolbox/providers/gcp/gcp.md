@@ -1,4 +1,6 @@
-# Google Cloud Platform installation guide
+# Nauta Google Cloud Platform installation guide
+
+This tutorial shows how to prepare and install Nauta on Google Cloud Platform.
 
 ## Overall cluster architecture
 GCP Nauta Kubernetes instance consists of several parts:
@@ -7,17 +9,24 @@ GCP Nauta Kubernetes instance consists of several parts:
 - nfs server - internal server with nfs based resources
 - gke cluster - kubernetes cluster.
 
-Plase refer to [terraform definition files](terraform/tasks/templates/main) to see detailed configuration (networking,
+Please refer to terraform definition files (in directory terraform/templates) to see detailed configuration (networking,
 resources, etc.)
 
 ## Prerequisities
-Installer process uses [Terraform](https://www.terraform.io/) to create resources on Google Cloud Platform.
-Service account has to be created to operate on user's project.
 
-The following resources MUST be defined before installation
+### Workstation
+To install Nauta on GCP workstation (Linux or Mac based) with access to the internet is required. Installation repository (nauta)
+has to be downloaded or cloned from github repository.
 
-###GCP access config
-File `gcp-service-account.yml` present in `toolbox/providers/gcp` directory MUST be properly filled wih access data.
+***All operations described below should be made on workstation. All paths are connected with downloaded or cloned repository*** 
+
+### Google Cloud Platform
+Service account has to be created to operate on user's project (please refer to https://console.cloud.google.com/iam-admin/serviceaccounts?project=<project_name>).
+
+Service account should have `project-owner` priviliges and be ready to create gke cluster, vpc, virtual machines.
+
+#### GCP access config
+File `gcp-service-account.yml` MUST be created in `toolbox/providers/gcp` directory and filled wih access data.
 ```$xslt
 gcp_service_account:
   type: "service_account"
@@ -32,11 +41,13 @@ gcp_service_account:
   client_x509_cert_url: "<fill-with-proper-data>"
 ``` 
 
-###Connectivity configuration
-During installation several operations on cluster is done using ssh connectivity. Network configuration is stored
+Values are defined in config file generated during service account creation.
+
+### Connectivity configuration
+During installation several operations on cluster are done using ssh connectivity. Network configuration is stored
 in `toolbox/config.yml` file.
 
-####No proxy configuration
+#### No proxy configuration
 ```$xslt
 proxy_env:
   http_proxy: ""
@@ -49,7 +60,7 @@ proxy_env:
 proxy: "{{ proxy_env }}"
 ```
 
-####Configuration with proxy
+#### Configuration with proxy
 ```$xslt
 proxy_env:
   http_proxy: "{{ lookup('env', 'http_proxy') | default('') }}"
@@ -105,6 +116,8 @@ gcp:
 
 
 ## Installation process
+Installer process uses [Terraform](https://www.terraform.io/) to create resources on Google Cloud Platform.
+
 ### Installer options
 ```Usage:
 gcp.sh [options]
@@ -124,20 +137,33 @@ Options:
 ### Use cases
 - #### Destroy cluster
 ```$xslt
-./gcp.sh --k8s-cluster cicd-carbon-b --operation destroy
+./gcp.sh --k8s-cluster nauta-cluster --operation destroy
 ```
 
 - #### Create cluster
+This command creates gke cluster and resources related to the cluster (gateway, nfs).
+
 ```$xslt
-./gcp.sh --k8s-cluster cicd-carbon-b --operation create \
+./gcp.sh --k8s-cluster nauta-cluster --operation create \
                                      --gcp-config `pwd`/gcp-config.yml
 ```
 
 - #### Create cluster and install platform
+This command creates gke cluster, resources and installs nauta from local file.
+
 ```$xslt
-./gcp.sh --k8s-cluster cicd-carbon-b --operation create \
+./gcp.sh --k8s-cluster nauta-cluster --operation create \
                                      --gcp-config `pwd`/gcp-config.yml \
                                      --install-file /opt/project-data/repository/releases/nauta/nauta-1.0.0-latest.tar.gz
+```
+
+- #### Create cluster and install platform
+This command creates gke cluster, resources; compiles and create platform distribution artifacts on gateway node and installs nauta.
+
+```$xslt
+./gcp.sh --k8s-cluster nauta-cluster --operation create \
+                                     --gcp-config `pwd`/gcp-config.yml \
+                                     --compile-platform-on-cloud true
 ```
 
 ### Installer output
