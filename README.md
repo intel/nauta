@@ -1,13 +1,13 @@
-# Deep Learning Studio for Enterprise
+# Nauta Overview
 
-Deep Learning Studio (NAUTA) goal is to make the day-to-day life of a data scientist user simpler by
-                                                        
-* Provide state-of-the art configuration for doing Deep Learning on Intel hardware with the leading DL frameworks 
-* Making hard things simpler without impeding low-level access for advanced users
-* Reduce daily grind by automating mundane or repetitive tasks
-* Provide additional control and insights into large scale DL activities
+The Nauta software provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments, can be viewed and monitored using a command line interface, web UI and/or TensorBoard*. You can use existing 
+data sets, use your own data, or downloaded data from online sources, and create public or private folders to make collaboration 
+among teams easier. Nauta runs using the industry leading Kubernetes* and Docker* platform for scalability and ease of management. 
+Templates are available (and customizable) on the platform to take the complexities out of creating and running single and multi-node 
+deep learning training experiments without all the systems overhead and scripting needed with standard container environments.  
+To test your model, Nauta also supports both batch and streaming inference, all in a single platform.
 
- 
-NAUTA consists of the following tools:
-- [NAUTA Command Line Interface (nctl)](docs/user-guide/README.md)
-- [NAUTA Installation and configuration guide](docs/installation-and-configuration/)
+Please refer to the following documents for more in-depth information:
+
+- [Nauta Installation and configuration guide](docs/installation-and-configuration/) 
+- [Nauta User Guide](docs/user-guide/README.md)
