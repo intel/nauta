@@ -1,10 +1,6 @@
 # Installation Process
 
-Before proceeding with this step, you must create an inventory and configuration file LINKS PENDING TO EXAMPLES.
-
-## Nauta Installer: Two Modes
-Nauta Installer supports two modes: full installation or upgrade. Full installation requires that RedHat 7.5 operating system is installed and configured on the host account to the information included in this document. 
-
+Before proceeding with this step, you must create an _Inventory_ and _Configuration_ file. See:  [Inventory File Information](../Inventory_Tasks/IT.md) and [Configuration File Information](../Configuration_Tasks_Variables/CTV.md)
 
 ## Installation Procedure
 
@@ -35,12 +31,14 @@ Invoke `./installer.sh` with one of the following options:
     - **Note:** It is assumed that Kubernetes is already installed. In addition, this requires the same procedure for Nauta upgrades.
 * **nauta-upgrade:** Nauta installation upgrade
 
-## Additional Installer Parameter Information 
+## Installation Output 
 
-The default installation targets: /opt/nauta. In addition, there are some binary files that target: `/usr/bin` and settings located in: `/etc/nauta-cluster`. The path _cannot_ be changed and the version is included in the package name.
+Nauta will be installed on cluster nodes in the following folders: /opt/nauta`,`/usr/bin`, `/etc/nauta-cluster`
 
 
-## Installation Build Process Artifacts
+## Access Files
+
+On installer machine, the following files will be created in the Installation folder. These files are access files used to connect to the cluster using kubectl client.
 
 As an output of Kubernetes installation, files are created in the main installation directory:
 
@@ -61,3 +59,17 @@ Call the installer with nauta-upgrade option:
 `./installer.sh nauta-upgrade`
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
+
+This completes the Nauta Installtion Process.
+
+## User Management Tasks & Troublshooting
+
+* [User Management Tasks](../User_Management/UM.md)
+
+* [Troubleshooting Information](../Troubleshooting/T.md)
+
+
+
+
+
+

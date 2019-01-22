@@ -1,5 +1,4 @@
-# Nauta Installation and Configuration  
-# Administration Guide
+# Nauta Installation, Configuration, and Administration Guide, Open Source Beta Version
 <br>
 <br>
 <br>
@@ -13,7 +12,7 @@
 
 
 
-**Revision 1.0, January 2019** 
+**Document Revision 1.0, January 2019** 
 
 <br>
 <br>

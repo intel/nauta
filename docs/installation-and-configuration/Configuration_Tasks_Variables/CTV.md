@@ -1,5 +1,5 @@
 # Configuration Tasks
-Nauta configuration tasks include configuring the files, proxies, and DNS servers and other configuration tasks. 
+Nauta configuration tasks include configuring the proxies, and DNS servers and other configuration tasks. 
 
 **Note:** In the examples shown, Green indicates parameter name and Blue indicates exemplary parameter value.
 
@@ -228,9 +228,12 @@ nauta_configuration:
     server: "{{ nfs_server }}"
 ```
 
-### Features (Optional) 
+### Optional Features: Redsocks and NFS 
 
-**Description:** This is a map of enabled features and more information can be found under: [Features and Network File System](J1_Features_and_Network_File_System.md)
+Either Redsocks or NFS is installed and configured during the installation process. By default, Redsocks is not installed; however, NFS is installed by default.   
+
+This is a map of enabled features. Redsocks is not enabled during the installation, as the default is set to false (shown in the example below). Therefore, if you want to install Redsocks you need to set the feature switch to True. 
+Caution: After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It cannot be changed to False in your config file after the initial install.  Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
 
 ```yaml
 features:
@@ -238,13 +241,20 @@ features:
   redsocks: True
 ```
 
-### Features: Network File System (NFS) and Redsocks 
+## Features: Network File System (NFS) and Redsocks 
 
-Nauta features include NFS and Redsocks. To configure either NFS or Redsocks, you _must_ enable either feature and configure feature options.
+Nauta features include NFS and Redsocks*.  To configure either NFS or Redsocks, you must enable either feature and configure feature options. 
+
+## Network File System Overview
+The Network File System, or NFS allows a system to share directories and files with others over a network. The advantage of using NFS is that end-users as well as programs can access files on remote systems in the same way as local files. In addition, NFS uses less disk space, as it can store data on a single machine while remaining accessible to others over a network.
+
+## Redsocks Configuration 
+
+Redsocks configuration is an optional part of the installer; therefore, it might apply only to limited number of installations.
 
 ### Features List 
 
-**NFS:** default: enabled
+**NFS:** default: True
 **Redsocks:** default: disabled
 
 ### How to Enable Features 
@@ -267,10 +277,7 @@ features_config:
   redsocks:
     IP: 10.217.247.236
     Port: 1080
-```
-### Features: Network File System (NFS) and Redsocks  
-
-Nauta features include NFS and Redsocks*.  To configure either NFS or Redsocks, you must enable either feature and configure feature options. 
+``` 
 
 ### Network File System Overview
 
@@ -284,19 +291,36 @@ Redsocks configuration is an optional part of the installer; therefore, it might
 
 **Description:** This is the IP address of Socks5 proxy.
 
-**Required:** True
+```yaml
+Required: True
+```
 
 ### Port 
 
 **Description:** This is the port address of Socks5 proxy. 
 
-**Required:** True
+```yaml
+Required: True
+```
 
 ### Interfaces 
 
 **Description:** Comma-separated list of interfaces from which traffic should be managed by RedSocks.
 
-**Required:** False 
+```yaml
+Required: False
+Default: cni0
+```
 
-**Default:** cni0
+## Networking Configuration Example
+The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.5. All interfaces (both external and internal) are Ethernet interfaces. 
+
+![New Users Added](../Z_examples/NN.jpg)
+
+## Next Steps: Nauta Installation Requirements
+
+* [Installation Requirements: Package Requirements](../Installation_Package_Requirements/IPR.md)
+
+
+
 

@@ -1,12 +1,12 @@
 # Nauta Installer System Requirements 
 
-Nauta supported installer systems, include:
-  * Red Hat* Enterprise Linux* 7.5
+When installing Nauta it should be installed on a separate machine (your installer machine), as Nauta requires a separate machine to run installer.
+
+## Nauta Supported Operating Systems
+Nauta supports the following Operating Systems: 
+  * RedHat* Enterprise Linux* 7.5 or CentOS* 7.5
   * Ubuntu* 16.04
-  * CentOS* 7.5
-  
- **Note:** Select one operating system only for your installer machine. 
- 
+   
 ### Red Hat Enterprise Linux 7.5
 
 Required on system, software requirements:
@@ -27,3 +27,14 @@ Required on system, software requirements:
     - libffi-dev
     - libssl-dev
     - sshpass
+
+## Next Steps: Target Host Requirements
+
+* [Target Host Requirements](../Target_Host_Requirements/THR.md)
+
+
+
+
+
+
+

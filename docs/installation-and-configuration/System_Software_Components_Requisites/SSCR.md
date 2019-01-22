@@ -1,9 +1,9 @@
 # Nauta System Software Components Requisites
-Nauta requires certian components, as shown in Table 1 before beginning your installation. 
+As shown in the table below, these are the packages included in the install package. 
 
 ## List of External Software Components
 
-Table 1 shows the software package that includes the external software components for Nauta. 
+The table shows the software package that includes the external software components for Nauta. 
 
 Name | Version | Project link
 --- | --- | --- 
@@ -30,16 +30,14 @@ tensorflow | 1.9.0 | https://github.com/tensorflow/tensorflow
 tiller | 2.9.1 | https://github.com/helm/helm
 
 ## Key Components
-Key Compponents include: 
-* Nauta complete bundle (including installation scripts and reference configuration).
+
+The Nauta complete bundle (including installation scripts) contains the following:
+
   * Vanilla Kubernetes cluster on top of provisioned Hardware and Operating System-level Software.
   * Nauta components (containerized components, their configuration, integration method, and so on.)
-  * Used software components are optimized for AI containers with Nauta-optimized libraries
 
-## Inlcluded Documentation
-* Installation and Configuration Guide 
-  * Format = PDF
-* User Guide
-  * Format = HTML
-* Release Notes
-  * Format = HTML & PDF
+The Nauta software components are optimized for AI containers with Nauta-optimized libraries.
+
+## Next Steps: How to Build Nauta
+
+* [Building Nauta](../How_to_Build_Nauta/HBN.md)
