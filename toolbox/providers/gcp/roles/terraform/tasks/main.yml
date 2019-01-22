@@ -153,6 +153,7 @@
         ansible_ssh_user: "{{ gcp.external_username }}"
         ansible_ssh_private_key_file: "{{ external_key }}"
         ansible_ssh_common_args: "{{ proxy_env.ssh_args_for_proxy }}"
+      when: gcp.generate_test_node | bool
 
     - name: Register nfs host
       add_host:

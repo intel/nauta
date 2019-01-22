@@ -294,11 +294,12 @@ compile_platform() {
 
     # till repo won't be public
 
+    mkdir -p ${SCRIPTDIR}/../../../../cloud
     cd ${SCRIPTDIR}/../../../../cloud
     retrieve_repo nauta ${CurrentBranch}
     cd ${SCRIPTDIR}/../../../../cloud
 
-    rm nauta.tar
+    rm -f nauta.tar
     tar cf nauta.tar nauta
     cd ${SCRIPTDIR}
     run_scp_command /opt/home/k8sworker/cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar

@@ -8,13 +8,13 @@
 
 - name: Copy privatekey
   copy:
-    src: "{{ workspace }}/private"
+    src: "{{ local_terraform_dir }}/private"
     dest: .ssh/id_rsa
     mode: 0600
 
 - name: Copy publickey
   copy:
-    src: "{{ workspace }}/public"
+    src: "{{ local_terraform_dir }}/public"
     dest: .ssh/id_rsa.pub
     mode: 0600
 

@@ -12,6 +12,8 @@
     - role: terraform
 
 - hosts: gateway
+  vars:
+    local_terraform_dir: "{{ workspace }}/terraform/{{ prefix }}"
   roles:
     - role: gateway
 
