@@ -12,6 +12,11 @@ Please refer to the following documents for more in-depth information:
 - [Nauta Installation and configuration guide](docs/installation-and-configuration/) 
 - [Nauta User Guide](docs/user-guide/README.md)
 
+# License
+
+By contributing to the project software, you agree that your contributions will be licensed under the Apache 2.0 license that is included in the LICENSE file in the root directory of this source tree.
+The user materials are licensed under [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
+
 # Contact
 
 Submit Github issue to ask a question, submit a request or report a bug.
