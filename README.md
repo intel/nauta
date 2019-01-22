@@ -12,7 +12,7 @@ deep learning training experiments without all the systems overhead and scriptin
 
 To test your model, Nauta also supports both batch and streaming inference, all in a single platform.
 
-To build the Nauta installation package please follow our [How to Build](docs/installation-and-configuration/Nauta%20How%20to%20Build.md) guide.
+To build Nauta installation package and run it smoothly on Google Cloud Platform please follow our [Nauta on Google Cloud Platform - Getting Started](toolbox/providers/gcp/gcp.md). More details on building Nauta artifacts can be found in [How to Build](docs/installation-and-configuration/How_to_Build_Nauta/HBN.md) guide.
 
 To get things up and running quickly please take a look at our [Getting Started](docs/user-guide/actions/getting_started.md) guide.
 
