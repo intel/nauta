@@ -15,13 +15,13 @@ There are dependencies and requirements to building Nauta. Make sure all depende
 - pigz
 - Docker
 
-**Note:** During platform build process, TensorFlow* is checked by Horovod* installation inside Docker* container. 
+**Note:** During platform build process, Horovod* is checking if TensorFlow* is able to run on build machine, please see hardware requirements section below. 
 
 ## Your Build Machine
 
-You _must_ meet all TensorFlow requirements: in particular you must implement the set of instructions available on CPU. This may impact the building process on virtual machines without SSE capabilities. 
+You _must_ meet all TensorFlow* requirements: in particular your CPU must have support for SSE instructions.
 
-The build process hardware requirements require at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of final tar.gz file is ~5GB.
+The build process hardware should have at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of final tar.gz file is ~5GB.
 
 The build process requires access to docker command. Remember to add user to docker group by: `sudo usermod -aG docker
 [user]` if he/she hasn't been added there yet. See also [post-install docker guide](https://docs.docker.com/install/linux/linux-postinstall).
