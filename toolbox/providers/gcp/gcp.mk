@@ -10,7 +10,7 @@ gcp-create: $(ACTIVATE) $(TERRAFORM) ENV_NAME $(VAULT) $(WORKSPACE) ENV_EXTERNAL
 	-e workspace=$(WORKSPACE) \
 	-e terraform=$(TERRAFORM) \
 	-e @$(CURDIR)/toolbox/$(ENV_NETWORK_SETTINGS) \
-	-e @$(CURDIR)/toolbox/providers/gcp/gcp-service-account.yml \
+	-e service_account_config_file=$(CURDIR)/toolbox/providers/gcp/gcp-service-account.json \
 	-e external_key=$(ENV_EXTERNAL_KEY) \
 	-e external_public_key=$(ENV_EXTERNAL_PUBLIC_KEY) \
 	-e cluster_config_file=$(ENV_CLUSTER_CONFIG_FILE) \
@@ -31,7 +31,7 @@ gcp-destroy: $(ACTIVATE) $(WORKSPACE) $(TERRAFORM) ENV_NAME ENV_NETWORK_SETTINGS
 	$(if $(TF_VAR_POOL_SIZE), -e tf_pool_size=$(TF_VAR_POOL_SIZE),) \
 	$(if $(TF_VAR_POOL_TYPE), -e tf_pool_type=$(TF_VAR_POOL_TYPE),) \
 	-e @$(CURDIR)/toolbox/$(ENV_NETWORK_SETTINGS) \
-	-e @$(CURDIR)/toolbox/providers/gcp/gcp-service-account.yml \
+	-e service_account_config_file=$(CURDIR)/toolbox/providers/gcp/gcp-service-account.json \
 	--vault-password-file=$(VAULT) \
 	-e external_key=$(ENV_EXTERNAL_KEY) \
 	-e external_public_key=$(ENV_EXTERNAL_PUBLIC_KEY)

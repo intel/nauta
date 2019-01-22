@@ -47,7 +47,7 @@ function validate_prerequisities {
 function validate_arguments {
     print_log "DEBUG" "Validate arguments"
     check_file_presence "${GcpConfig}"
-    check_file_presence "${SCRIPTDIR}/gcp-service-account.yml"
+    check_file_presence "${SCRIPTDIR}/gcp-service-account.json"
     if [ "${InstallFile}" != "" ]; then
         check_file_presence "${InstallFile}"
     fi
