@@ -302,7 +302,7 @@ compile_platform() {
     rm -f nauta.tar
     tar cf nauta.tar nauta
     cd ${SCRIPTDIR}
-    run_scp_command /opt/home/k8sworker/cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar
+    run_scp_command ${SCRIPTDIR}/../../../../cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar
 
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
         print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
