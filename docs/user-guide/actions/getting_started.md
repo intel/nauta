@@ -91,7 +91,7 @@ training.
 
 **Note 3**: For more info about experiment submit command please refer to [experiment Command](experiment.md).
 
-This example will show how to submit a mnist experiment and write the TensorBoard data to a folder in your Nauta output folder. Enter the following command:
+This example will show how to submit a mnist experiment and write the TensorBoard data to a folder in your NAUTA output folder. Enter the following command:
 
 **Syntax**:
 Following is the basic syntax for experiment submit command:
@@ -118,11 +118,11 @@ The execution of the submit command may take a few minutes the first time. Durin
 
 Use the following command to view the status of all your experiments:
 
-**Syntax**: `nauta experiment list [options]`
+**Syntax**: `nctl experiment list [options]`
 
 Enter this commmand: 
 
-`$ nauta experiment list --brief`
+`$ nctl experiment list --brief`
 
 Experiment status displays as below.  This is an example only. The `--brief` option returns a short version of results as shown.
 
@@ -141,11 +141,11 @@ Experiment status displays as below.  This is an example only. The `--brief` opt
 
 Use the following command to view the experiment log.
 
-**Syntax**: `nauta experiment logs [options] EXPERIMENT_NAME`
+**Syntax**: `nctl experiment logs [options] EXPERIMENT_NAME`
 
 Enter this command:
 
-`$ nauta experiment logs mnist-tb`
+`$ nctl experiment logs mnist-tb`
 
 A log displays as follows. The result below is an example only.
 
@@ -155,7 +155,7 @@ A log displays as follows. The result below is an example only.
 
 Experiments launched in Nauta can output additional kinds of metrics using the publish function from the experiment metrics API. To see an example of metrics published with the single experiment executed in the above example, enter this command:
 
-`$ nauta experiment list`
+`$ nctl experiment list`
 
 Following are example results (only a fragment is shown):
 
@@ -178,7 +178,7 @@ To add metrics to an experiment file you have created, you need to edit the expe
       
 5.	The published metrics can now be viewed. 
 
-    `$ nauta <new_name> experiment list`
+    `$ nctl <new_name> experiment list`
 
 **Information about saving metrics for multinode experiments**
 
@@ -213,7 +213,7 @@ should choose one of such identificators and store logs only from a node having 
 
 The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, enter the following command at the command prompt:
 
-`$ nauta launch webui`
+`$ nctl launch webui`
 
 The following screen displays (this is an example only).
 
@@ -280,16 +280,16 @@ Click the hamburger menu ![](images/hamburger_menu.png) at the far left of the U
 
 ## Launching TensorBoard
 
-Generally, every file that the training script outputs to `/mnt/output/experiment` (accessed from the perspective of training script launched in Nauta) is accessible from the outside after mounting the output directory with command provided by `nauta mount`. 
+Generally, every file that the training script outputs to `/mnt/output/experiment` (accessed from the perspective of training script launched in Nauta) is accessible from the outside after mounting the output directory with command provided by `nctl mount`. 
 Use the following command to launch TensorBoard and to view graphs of this model's results. (Refer to [Working with Datasets](working_with_datasets.md) for more information.) 
 
 When training scripts output Tensorflow summaries to `/mnt/output/experiment`, they can be automatically picked up by Tensorboard instance launched with command:
 
-**Syntax**: nauta launch tensorboard [options] EXPERIMENT_NAME
+**Syntax**: nctl launch tensorboard [options] EXPERIMENT_NAME
 
 Enter this command:
 
-`$ nauta launch tensorboard single`
+`$ nctl launch tensorboard single`
 
 The following message displays.
 
@@ -322,14 +322,14 @@ will create `/tmp/mnist_test/conversion_out folder`, fill it with 100 `protobuf`
 
 ### Trained Model
 
-Servable models (as with other training artifacts) can be saved by a training script. As previously mentioned, to access these you have to use the command provided by the `nauta mount` command and mount output storage locally. Example scripts all save servable models in their models subdirectory. To use models like this for inference, you will have to mount input storage too, because models have to be accessible from inside of the cluster. 
+Servable models (as with other training artifacts) can be saved by a training script. As previously mentioned, to access these you have to use the command provided by the `nctl mount` command and mount output storage locally. Example scripts all save servable models in their models subdirectory. To use models like this for inference, you will have to mount input storage too, because models have to be accessible from inside of the cluster. 
 
 For the single experiment example, execute these commands:
 ```
 $ mkdir -p /mnt/input/single
 $ mkdir /mnt/output
-$ ... mount command provided with nauta mount used to mount output storage to /mnt/output
-$ ... mount command provided with nauta mount used to mount input storage to /mnt/input
+$ ... mount command provided with nctl mount used to mount output storage to /mnt/output
+$ ... mount command provided with nctl mount used to mount input storage to /mnt/input
 $ cp /mnt/output/single/models/* -Rf /mnt/input/single/
 ```
 After these steps /mnt/input/single should contain:
@@ -353,7 +353,7 @@ $ cp /tmp/mnist_test/conversion_out/* /mnt/input/data
 ```
 Enter the next command to create a prediction instance.
 
-`$ nauta predict batch -m /mnt/input/home/single -d /mnt/input/home/data --model-name mnist --name single-predict`
+`$ nctl predict batch -m /mnt/input/home/single -d /mnt/input/home/data --model-name mnist --name single-predict`
 
 Following are the example results of this command: 
 
@@ -380,7 +380,7 @@ You can use the following steps to mount the output folder and view TensorBoard 
 
 2.	To see the correct mount options and command:
 
-       `$ nauta mount`
+       `$ nctl mount`
 
 3.	Use the mounting command that was displayed to mount Nauta storage to your local machine. Following are examples of mounting the local folder to the Nauta output folder for each OS:
        * MacOS: `mount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/output my_output_folder`
@@ -405,9 +405,9 @@ For more information on mounting, refer to [Working with Datasets](working_with_
 ## Removing Experiments (Optional) 
 An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel` command and its `purge` option. The experiment will only be removed from the experiment list. The experiment’s artifacts will remain in the Nauta storage output folder. Logs will be removed.
 
-**Syntax**: `nauta experiment cancel [options] EXPERIMENT_NAME`
+**Syntax**: `nctl experiment cancel [options] EXPERIMENT_NAME`
 
- `$ nauta experiment cancel –-purge <your_experiment>`
+ `$ nctl experiment cancel –-purge <your_experiment>`
 
 
 
