@@ -129,7 +129,7 @@
                                 <ul>
                                     <li value="1"><a href="#Uploadin" class="MCXref xref">Uploading Datasets</a>
                                     </li>
-                                    <li value="2"><a href="#dlsctl" class="MCXref xref">nctl mount Command</a>
+                                    <li value="2"><a href="#nctl" class="MCXref xref">nctl mount Command</a>
                                     </li>
                                     <li value="3"><a href="#Mount" class="MCXref xref">Mount and Access Folders</a>
                                     </li>
@@ -150,10 +150,10 @@
                                 <h4>Upload to Nauta storage and Reference Location</h4>
                                 <p>Depending on the Nauta configuration, the application uses NFS to connect to a storage location where each user has folders that have been setup to store experiment input and output data. This option allows the user to upload files and datasets for private use and for sharing. Once uploaded, the files are referenced by the path. All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the instructions in this chapter for information how to access and use Nauta storage.</p>
                                 <p>This option is recommended for large datasets, data that will be reused often, and data that will be shared among users.</p>
-                                <h2><a name="dlsctl"></a>nctl mount Command</h2>
+                                <h2><a name="nctl"></a>nctl mount Command</h2>
                                 <p>The ‘mount’ command displays another command that can be used to mount Nauta folders to a user’s local machine. When a user executes the command, information similar the following is displayed (this example is for macOS).  Use the following command to mount those folders (all of the following is displayed, although this is an example only).</p>
                                 <p style="text-align: center;">
-                                    <img src="../images/dlsctl_mount_command_558x451.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 558;height: 451;" />
+                                    <img src="../images/nctl_mount_command_558x451.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 558;height: 451;" />
                                 </p>
                                 <p><b>Note 1</b>: The <span style="font-family: 'Courier New';">nctl mount</span> command also returns a command to <i>unmount</i> a folder.</p>
                                 <p><b>Note 2</b>: Nauta uses the mount command that is native to each operating system, so the command printed out may not appear as in the example.</p>

@@ -3,13 +3,13 @@
 proxy:
   http_proxy: http://proxy-chain.intel.com:911
   https_proxy: http://proxy-chain.intel.com:912
-  no_proxy: .intel.com,127.0.0.1,localhost,.dlse
+  no_proxy: .intel.com,127.0.0.1,localhost,.nauta
 
 dns_servers:
   - 10.102.60.20
   - 10.102.60.30
 
-dls4e_configuration:
+nauta_configuration:
   input_nfs:
     path: /exports/test/input
     server: 10.91.120.230

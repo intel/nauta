@@ -47,7 +47,7 @@ the following command to mount those folders (all of the following is displayed,
 
 
  
-![Image](images/dlsctl_mount_command.png)
+![Image](images/nctl_mount_command.png)
 
 **Note 1**: The `nctl` mount command also returns a command to unmount a folder.
 

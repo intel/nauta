@@ -64,7 +64,7 @@ The command may take up to 30 seconds to delete the user and you may receive the
 
 To permanently remove (purge) all artifacts associated with the user and all data related to past experiments submitted by that user: 
 
-`dlsctl user delete <user_name> -p/--purge`
+`nctl user delete <user_name> -p/--purge`
       
 ### Limitations	
 The nauta user delete command may take up to 30 seconds to delete the user. A new user with the same user name _cannot_ be created until after the delete command confirms that the first user with the same name has been deleted (see: [Troubleshooting](Z_examples/Troubleshooting) for more details).

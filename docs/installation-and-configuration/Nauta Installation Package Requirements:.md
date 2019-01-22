@@ -4,7 +4,7 @@
 
 Untar the package from a local resource by doing the following:
 
-`tar -zxf dls4e-1.0.0-beta.tar.gz -C <destination>`
+`tar -zxf nauta-1.0.0-beta.tar.gz -C <destination>`
 
 ### Nauta Structure
 

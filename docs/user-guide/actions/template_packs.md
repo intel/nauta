@@ -208,13 +208,13 @@ The name should be unique and not conflict with any other packs available in the
      * If the experiment script to be used with the pack accepts any
        command-line arguments, then a `commandline` parameter must be
        specified and assigned the value of
-       [`NAUTA.CommandLine`](#dls4e.commandline) placeholder. This
-       will allow the commandline parameters specified in the `dlstctl
+       [`NAUTA.CommandLine`](#nauta.commandline) placeholder. This
+       will allow the commandline parameters specified in the `nctl
        experiment submit` command to be propagated to the relevant
        *Helm* chart elements (by referencing the 'commandline'
        parameter specified in values.yaml)
      * An `image` parameter must be specified and assigned the
-       value of [`NAUTA.ExperimentImage`](#dls4e.image). The actual
+       value of [`NAUTA.ExperimentImage`](#nauta.image). The actual
        name of this parameter does not matter as long as it is properly
        referenced wherever a container image for the experiment is
        specified within the chart templates.
@@ -252,7 +252,7 @@ The name should be unique and not conflict with any other packs available in the
 # <a name="placeholders"></a> NAUTA values.yaml placeholders
 
 
-## <a name="dls4e.commandline"></a> `NAUTA.CommandLine`
+## <a name="nauta.commandline"></a> `NAUTA.CommandLine`
 
 
 The NAUTA.CommandLine placeholder, when placed within the `values.yaml` file, will be
@@ -275,7 +275,7 @@ initialize a parameter named `commandline`:
         - {{ arg }}
         {% endfor %}
 
-## <a name="dls4e.image"></a> `NAUTA.ExperimentImage`
+## <a name="nauta.image"></a> `NAUTA.ExperimentImage`
 The NAUTA.ExperimentImage placeholder carries the full reference to the docker image resulting
 from building the [`Dockerfile`](#dockerfile) specified within the
 pack. 

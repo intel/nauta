@@ -49,7 +49,7 @@ Access help for any command with the `-help` or `-h` parameter. The following co
 
 The results are shown below.
 
-![Image](images/dlsctl_help.png) 
+![Image](images/nctl_help.png) 
 
 
 ## Example Experiments
