@@ -12,7 +12,11 @@ deep learning training experiments without all the systems overhead and scriptin
 
 To test your model, Nauta also supports both batch and streaming inference, all in a single platform.
 
-Please refer to the following documents for more in-depth information:
+To build the Nauta installation package please follow our [How to Build](docs/installation-and-configuration/Nauta%20How%20to%20Build.md) guide.
+
+To get things up and running quickly please take a look at our [Getting Started](docs/user-guide/actions/getting_started.md) guide.
+
+For more in-depth information please refer to the following documents:
 
 - [Nauta Installation and configuration guide](docs/installation-and-configuration/) 
 - [Nauta User Guide](docs/user-guide/README.md)
