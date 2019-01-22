@@ -21,7 +21,10 @@ There are dependencies and requirements to building Nauta. Make sure all depende
 
 You _must_ meet all TensorFlow requirements: in particular you must implement the set of instructions available on CPU. This may impact the building process on virtual machines without SSE capabilities. 
 
-The build process hardware requirements require at least 12 GB of RAM and at least 50GB of space for temporary containers, registries, and so on. The size of final tar.gz file is ~5GB.
+The build process hardware requirements require at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of final tar.gz file is ~5GB.
+
+The build process requires access to docker command. Remember to add user to docker group by: `sudo usermod -aG docker
+[user]` if he/she hasn't been added there yet. See also [post-install docker guide](https://docs.docker.com/install/linux/linux-postinstall).
 
 ## Proxy Settings
 

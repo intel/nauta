@@ -11,3 +11,7 @@ Please refer to the following documents for more in-depth information:
 
 - [Nauta Installation and configuration guide](docs/installation-and-configuration/) 
 - [Nauta User Guide](docs/user-guide/README.md)
+
+# Contact
+
+Submit Github issue to ask a question, submit a request or report a bug.
