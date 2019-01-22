@@ -1,4 +1,4 @@
-# Nauta Overview
+# Nauta
 
 ![Nauta Diagram](docs/nauta.svg)
 
