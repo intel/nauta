@@ -1,9 +1,11 @@
-# How to build Nauta CLI 
+# How to build Nauta CLI (nctl)
 
-### Ubuntu 16.04 LTS
+## NCTL Development requirements
+
+### Ubuntu 16.04 LTS and Ubuntu 18.04 LTS
 
 * python 3.6
-* python3.6-dev 
+* python3.6-dev
 * python3.6-venv
 * build-essential
 * binutils
@@ -11,25 +13,10 @@
 
 ```
 sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get update
-sudo apt-get install python3.6 python3.6-dev python3.6-venv make binutils
+sudo apt update && sudo apt install python3.6 python3.6-dev python3.6-venv build-essential binutils curl
 ```
 
-### Ubuntu 18.04.1 LTS
-
-* python 3.6
-* python3-venv
-* python3-dev
-* binutils
-* build-essential
-* curl
-
-```
-sudo apt update
-sudo apt install python3-venv python3-dev binutils build-essential
-```
-
-### MacOS Sierra
+### MacOS High Sierra
 * python 3.6
 * python3-venv
 * python3-dev
@@ -75,4 +62,3 @@ dependencies like helm, draft etc. Also docs and examples directories will be av
 `make venv` - creates .venv with all modules required by nctl
 
 `make venv-dev` - internal target used by makefiles
-
