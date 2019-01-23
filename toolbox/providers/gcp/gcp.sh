@@ -284,7 +284,8 @@ function retrieve_repo {
       fi
       set -e
     else
-      git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+      #git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+      git clone -b $BRANCH_NAME https://github.com/IntelAI/$PROJECT_NAME.git --recursive
       cd $PROJECT_NAME
     fi
 }
