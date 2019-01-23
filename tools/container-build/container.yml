@@ -14,5 +14,3 @@
     - role: prepare
     - role: container-build
     - role: finalize
-    - role: cache-registry-final
-      when: not docker_repository_cache.external

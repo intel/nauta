@@ -47,7 +47,7 @@ function validate_prerequisities {
 function validate_arguments {
     print_log "DEBUG" "Validate arguments"
     check_file_presence "${GcpConfig}"
-    check_file_presence "${SCRIPTDIR}/gcp-service-account.yml"
+    check_file_presence "${SCRIPTDIR}/gcp-service-account.json"
     if [ "${InstallFile}" != "" ]; then
         check_file_presence "${InstallFile}"
     fi
@@ -294,14 +294,15 @@ compile_platform() {
 
     # till repo won't be public
 
+    mkdir -p ${SCRIPTDIR}/../../../../cloud
     cd ${SCRIPTDIR}/../../../../cloud
     retrieve_repo nauta ${CurrentBranch}
     cd ${SCRIPTDIR}/../../../../cloud
 
-    rm nauta.tar
+    rm -f nauta.tar
     tar cf nauta.tar nauta
     cd ${SCRIPTDIR}
-    run_scp_command /opt/home/k8sworker/cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar
+    run_scp_command ${SCRIPTDIR}/../../../../cloud/nauta.tar ${GATEWAY_USER}@${GATEWAY_IP}:nauta.tar
 
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
         print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"

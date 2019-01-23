@@ -2,5 +2,7 @@
 
 gcp_cluster_info:
     gateway_ip: "{{ k8s.gateway_ip.value }}"
-    testnode_ip: "{{ k8s.testnode_ip.value | default ('') }}"
+{% if gcp.generate_test_node %}
+    testnode_ip: "{{ k8s.testnode_ip.value }}"
+{% endif %}
     nfs_internal_ip: "{{ k8s.nfs_internal_ip.value }}"

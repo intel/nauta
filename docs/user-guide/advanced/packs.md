@@ -1,12 +1,12 @@
 # Controlling packs parameters
 
 ### Pack definition 
-The packs are located in the _dls_ctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
-The default pack used by _dlsctl_ client is _tf-training-tfjob_. The pack consist of the parts:
+The packs are located in the nctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
+The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist of the parts:
 * docker image specification _Dockerfile_ 
 * helm deployment _charts_ folder
 
-All the pack parameters that can be controlled by _dlsctl_ are defined in _charts/values.yml_ file.
+All the pack parameters that can be controlled by _nctl_ are defined in _charts/values.yml_ file.
 
 Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
     
@@ -58,9 +58,9 @@ Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
     
 ### Modifying values
 
-The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _dlsctl_ commands:
- * _dlsctl experiment submit_
- * _dlsctl experiment interact_
+The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
+ * _nctl experiment submit_
+ * _nctl experiment interact_
  
 The _-p_ parameter can be provided multiple times.
 Format specification:
@@ -70,11 +70,11 @@ Format specification:
  
 #### Example
 
-    dlsctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
+    nctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
 
 ### Experiment resources
 
-_dlsctl_ is using by default following resource limits and requests for each built-in template:
+_nctl_ is using by default following resource limits and requests for each built-in template:
 
 | Template      | CPU   request | CPU limit | Memory request | Memory limit | Physical CPU cores request
 | --- | --- | --- | --- | --- | --- |

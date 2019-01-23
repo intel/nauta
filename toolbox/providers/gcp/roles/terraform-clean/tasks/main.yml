@@ -1,5 +1,9 @@
 ---
 
+- name: Load service account credentials
+  set_fact:
+    gcp_service_account: "{{ lookup('file',service_account_config_file) | from_json }}"
+
 - name: Check if state is stored in S3 bucket
   set_fact:
     persistent_terraform: "{{ ((s3_access_key | default ('')) != '' ) | bool }}"

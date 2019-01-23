@@ -26,6 +26,25 @@ data:
   master.run: |
      #!/bin/bash
      set -x
+     function retry()
+     {
+         local n=0;local try=$1
+         local cmd="${@: 2}"
+         [[ $# -le 1 ]] && {
+             echo "Usage $0 <retry_number> <Command>";
+         }
+         set +e
+         until [[ $n -ge $try ]]
+         do
+           $cmd && break || {
+                   echo "Command Fail.."
+                   ((n++))
+                   echo "retry $n :: [$cmd]"
+                   sleep 1;
+                   }
+         done
+         set -e
+     }
      sleep 5
 
      # Check if requested number of cpus (physical cores) is available
@@ -46,6 +65,8 @@ data:
      fi
      echo "StrictHostKeyChecking no" >> /root/.ssh/config
      /usr/sbin/sshd
+    
+     retry 90 ssh -o ConnectTimeout=2 -q {{ $name }}-master exit
 
      if [ $# -eq 0 ]; then
           sleep infinity

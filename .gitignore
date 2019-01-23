@@ -27,6 +27,7 @@ files/*.tar.gz
 .bin
 *.tfstate
 gcp-service-account.yml
+gcp-service-account.json
 *config-intel.yml
 *.info
 

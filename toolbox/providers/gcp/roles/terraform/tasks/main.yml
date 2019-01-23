@@ -2,6 +2,10 @@
 
 - include_vars: "{{ cluster_config_file }}"
 
+- name: Load service account credentials
+  set_fact:
+    gcp_service_account: "{{ lookup('file',service_account_config_file) | from_json }}"
+
 - name: Check if state is stored in S3 bucket
   set_fact:
     persistent_terraform: "{{ ((s3_access_key | default ('')) != '' ) | bool }}"
@@ -153,6 +157,7 @@
         ansible_ssh_user: "{{ gcp.external_username }}"
         ansible_ssh_private_key_file: "{{ external_key }}"
         ansible_ssh_common_args: "{{ proxy_env.ssh_args_for_proxy }}"
+      when: gcp.generate_test_node | bool
 
     - name: Register nfs host
       add_host:

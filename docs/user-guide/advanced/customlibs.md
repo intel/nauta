@@ -1,13 +1,13 @@
 # Installing libraries and dependencies
-To install a library or dependency that is not included in standard DLS docker image it is required to modify draft pack definition.
+To install a library or dependency that is not included in standard NAUTA docker image it is required to modify draft pack definition.
 
 ## Modifying existing draft packs
-The draft packs are located in the _dls_ctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
-The default pack used by _dlsctl_ client is _tf-training-tfjob_. Edit the _Dockerfile_ located in selected pack to make necessary changes.
+The draft packs are located in the nctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
+The default pack used by _nctl_ client is _tf-training-tfjob_. Edit the _Dockerfile_ located in selected pack to make necessary changes.
 
 Example _Dockerfile_:
 
-    FROM dls4e/tensorflow:1.9.0-py3
+    FROM nauta/tensorflow:1.9.0-py3
     
     WORKDIR /app
 
@@ -17,7 +17,7 @@ Example _Dockerfile_:
     
 
 ### Installing OS packages
-The images in Deep Learning Studio are based on CentOS. To install system package add the following lines to _Dockerfile_:
+The images in Nauta are based on CentOS. To install system package add the following lines to _Dockerfile_:
 
     RUN yum update
     RUN yum install package1 package2
@@ -38,7 +38,7 @@ Depending on the network configuration it may be required to setup proxy servers
 Below is an example _Dockerfile_ showing installation of additional packages
 
   
-    FROM dls4e/tensorflow:1.9.0-py3
+    FROM nauta/tensorflow:1.9.0-py3
     
     WORKDIR /app
 
