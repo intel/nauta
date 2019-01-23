@@ -1,15 +1,15 @@
-# Nauta for Enterprise
+# Nauta Installation, Configuration and Administration Guide
 
-This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing and configuring Nauta. This guide also provides an overview of Nauta requirements, such as configuration management and operating system requirements.  
+This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing and configuring Nauta. This guide also provides an overview of Nauta requirements and configuration options.
 
 **Note:** For instructions on configuring the Nauta client, refer to the Nauta User Guide.
 
-The Nauta software provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments, can be viewed and monitored using a command line interface (CLI), web UI and/or TensorBoard*. You can use existing data sets, use your own data, or downloaded data from online sources, and create public or private folders to make collaboration among teams easier. 
+Nauta is a software suite that provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments can be viewed and monitored using a command line interface (CLI), web UI and/or TensorBoard*. You can use existing data sets, your own data, or downloaded data from online sources, and create public or private folders to make collaboration among teams easier. 
 
-Nauta runs using the industry leading Kubernetes* and Docker* platform for scalability and ease of management. Templates are available (and customizable) on the platform to take the complexities out of creating and running single and multi-node deep learning training experiments without all the systems overhead and scripting needed with standard container environments.
+Nauta runs on Kubernetes* and Docker* for scalability and ease of management. Nauta uses customizable templates  to take the complexities out of creating and running single and multi-node deep learning training experiments without all the systems complexity and scripting needed with standard container environments.
 
 # Document Flow
-This guide consists of the following main topics in order. These are:
+This guide consists of the following main topics, in order:
 
 * [System Software Components Requisites](System_Software_Components_Requisites/SSCR.md)
 
