@@ -1,9 +1,8 @@
-# Nauta System Software Components Requisites
-As shown in the table below, these are the packages included in the install package. 
+# Nauta System Software Components
+Nauta relies on several external software components, listed in the table below. These components are included in Nauta, and installed automatically as part of the Nauta installation process. 
 
 ## List of External Software Components
-
-The table shows the software package that includes the external software components for Nauta. 
+The following table lists Nauta's external software components and their versions. 
 
 Name | Version | Project link
 --- | --- | --- 
@@ -31,12 +30,12 @@ tiller | 2.9.1 | https://github.com/helm/helm
 
 ## Key Components
 
-The Nauta complete bundle (including installation scripts) contains the following:
+The Nauta installation package consists of two major components:
 
-  * Vanilla Kubernetes cluster on top of provisioned Hardware and Operating System-level Software.
-  * Nauta components (containerized components, their configuration, integration method, and so on.)
+  * A package that installs a vanilla Kubernetes cluster, including necessary OS-level software components, on provisioned Hardware.
+  * A package that installs Nauta components (including containers, configuration files, etc.) on the above-mentioned Kubernetes cluster.
 
-The Nauta software components are optimized for AI containers with Nauta-optimized libraries.
+Nauta software components are optimized for AI containers containing Nauta-optimized libraries.
 
 ## Next Steps: How to Build Nauta
 
