@@ -58,7 +58,7 @@ ifeq ($(OS), $(filter $(OS),Linux Darwin))
 	@python3.6 -m venv $(VIRTUALENV_DIR)
 	@chmod +x $(ACTIVATE)
 endif
-	@. $(ACTIVATE); python -m pip install -U pip
+	@. $(ACTIVATE); python -m pip install -U pip==18.0
 	@echo "downloading dependencies to ./vendor/ ..."
 	@. $(ACTIVATE); mkdir -p vendor
 	@. $(ACTIVATE); cd vendor && pip download -r ../requirements.txt;

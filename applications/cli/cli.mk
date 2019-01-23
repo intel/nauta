@@ -27,7 +27,7 @@ ifeq (Darwin,$(OS))
 endif
 
 build: $(ACTIVATE) set-version metrics-lib
-	. $(ACTIVATE); pip install pyinstaller
+	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 ifeq (Windows,$(OS))
 
