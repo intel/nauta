@@ -1,108 +1,48 @@
-# Inventory File Configuration Tasks
+# Inventory Configuration
 
-Configuration files are YAML* files used to define configuration settings so that will be used with Nauta. As part of the Inventory configuration tasks you need to create a YAML file and modify the file for the system inventory.
+Nauta uses Ansible for certain provisioning tasks during installation. You must create (or modify) an Ansible inventory file to match your hardware configuration. Nauta will look for your inventory file at the location defined the `ENV_INVENTORY` environment variable (explained in [Installation Process](Installation_Process/IP.md)).
 
+Your Nauta cluster will contain one Master node and one or more Worker nodes. Each of these nodes must be specified in the inventory file.
 ## Invetory File Example
-Below is an example of Inventory File and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. 
+Below is an example of Inventory File and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. Note that Ansible uses the YAML format.
 
-**`[master]`** 
+```yaml
+**[master]** 
+master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 data_interface=em2 external_interface=em3 local_data_device=/dev/sdb1
 
-`master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 data_interface=em2 external_interface=em3 local_data_device=/dev/sdb1`
-
-**`[worker]`** 
-
-`worker-0 ansible_ssh_host=192.168.100.61 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1` 
-
-`worker-1 ansible_ssh_host=192.168.100.55 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1` 
-
-`worker-3 ansible_ssh_host=192.168.100.106 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1` 
-
-`worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1` 
-
+**[worker]** 
+worker-0 ansible_ssh_host=192.168.100.61 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
+worker-1 ansible_ssh_host=192.168.100.55 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
+worker-3 ansible_ssh_host=192.168.100.106 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
+worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
+```
 
 ## Inventory File Structure
 
 The file contains two sections:
-* **Master:** Contains a description of a master node. This section must contain exactly one row.
-* **Worker:** Contains descriptions of workers. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
+* `**[master]**` Contains a description of a master node. This section must contain exactly one row.
+* `**[worker]**` Contains descriptions of workers. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
 
-Format of rows with node's descriptions is as follows (all parts of such row are separated with spaces):
+Each row describes a server (playing either the role of "master" or "worker" depending on which section the row is in). For each server, the inventory file must define a series of values that tells Nauta where to find the server, how to log into it, etc. The format for each row is as follows:
 
-`[NAME] [VARIABLES]`
+`[SERVER_NAME] [VAR_NAME1]=[VAR_VALUE1] [VAR_NAME2]=[VAR_VALUE2] [VAR_NAME3]=[VAR_VALUE3]...`
 
-* **NAME:** This is a name of a node. It should be a hostname of a real node. However, this _is not_ a requirement.
+## Per-node Inventory Variables
+The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory, some are only required for some, and some variables are entirely optional.
 
-* **VARIABLES:** Variables describing the node in the following format: 
-
-`[VARIABLE_NAME]=[VARIABLE_VALUE]`
-
-
-
-## Installation Inventory Variables
-
-The table below shows the basic SSH parameters for RedHat* Ansible* that must be used to determine how to gain root access on remote hosts.
-
-
-Name | Description 
---- | ---  
-ansible_ssh_user | The user name must be the same for master and worker nodes
-ansible_ssh_pass | The SSH password to use
-ansible_ssh_host | The name (DNS name) or IP Address of the host to connect to. 
-ansible_ssh_port | The SSH port number, if not defined 22 is used. However, if this variable is present it must have an assigned value. If you do not enter a value in this row for the file, the default value is 22
-ansible_ssh_private_key_file | This is a Private Key file used by SSH
-
-**Note:** If an Administrator decides to choose something other than root for Ansible SSH user, the user must be configured in sudoers file with NOPASSWD option. Refer to [Ansible Inventory documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information. 
-
-### internal_interface
-_Internal interface name:_ This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces.
-
-#### Specification
-* **Type:** string
-* **Default:** none
-* **Required:** true
-* **Used when:** always for both for master and worker nodes
-* **Acceptable values:** this is the interface name
-
-### local_data_device
-_Local data device:_ This device is used for Nauta internal data and NFS data in case of local NFS.
-
-#### Specification
-* **Type:** string
-* **Default:** none
-* **Required:** true
-* **Used when:** used with master nodes 
-* **Acceptable values:**  this is the path to block device
-
-### local_data_path
-_Local data path:_ This is used as the mountpoint for `local_data_device.`
-
-#### Specification
-* **Type:** string
-* **Default:** local_data_path is optional 
-* **Required:** false
-* **Used when:** used with master nodes
-* **Acceptable values:** this is the absolute path where data is located in file system.
-
-### data_interface
-_Data interface name:_ This is used for data transfer.  This is the same type of variable as internal_interface.
-
-#### Specification
-* **Type:** string
-* **Default:** none
-* **Required:** true
-* **Used when:** always for both for master and worker nodes
-* **Acceptable values:** interface name
-
-### external_interface
-**External interface name:** This is used for external network communication.
-
-#### Specification
-* **Type:** string
-* **Default:** none
-* **Required:** true
-* **Used when:** always for both for master and worker nodes
-* **Acceptable values:** interface name
+Variable Name | Description | Req? | Type | Default | Used When | Value |
+--- | ---  | --- | --- | --- | --- | --- 
+ansible_ssh_user | The user name must be the same for master and worker nodes. **Note:** If an Administrator decides to choose something other than root for Ansible SSH user, the user must be configured in sudoers file with NOPASSWD option. Refer to [Ansible Inventory documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information. | Yes | string | none | always | username
+ansible_ssh_pass | The SSH password to use | Yes | string | none | always | Password
+ansible_ssh_host | The name (DNS name) or IP Address of the host to connect to. | Yes | IPaddr | none | always | IP Address
+ansible_ssh_port | The SSH port number, if not defined 22 is used. | No | int | 22 | not using 22 | Port Address
+ansible_ssh_private_key_file | This is a Private Key file used by SSH | No | string | none | using a keyfile | filenae
+internal_interface | This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always for both for master and worker nodes |  Interface name
+local_data_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | this is the path to block device
+local_data_path | This is used as the mountpoint for `local_data_device.` | No | string | none | used with master nodes |  this is the absolute path where data is located in file system.
+data_interface | This is used for data transfer.  This is the same type of variable as internal_interface. | Yes | string | none | always for both for master and worker nodes | interface name
+external_interface | This is used for external network communication. | Yes | string | none | always for both for master and worker nodes | interface name
 
 ## Next Steps: Configuration Tasks
 
-* [Configuration Tasks: (Varibles: Proxy, DNS, File Examples)](../Configuration_Tasks_Variables/CTV.md)
+* [Configuring Nauta - Proxies, Filesystem and Network](../Configuration_Tasks_Variables/CTV.md)
