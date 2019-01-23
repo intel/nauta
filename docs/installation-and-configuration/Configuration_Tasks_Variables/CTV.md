@@ -1,17 +1,48 @@
 # Configuration Tasks
-Nauta configuration tasks include configuring the proxies, and DNS servers and other configuration tasks. 
+Nauta's configuration is specified by a YAML configuration file. Nauta will look for this file at the location defined the `ENV_CONFIG` environment variable (explained in [Installation Process](Installation_Process/IP.md)). This configration file specifies network proxies, DNS server locations, and other related values listed below.
 
-**Note:** In the examples shown, Green indicates parameter name and Blue indicates exemplary parameter value.
+**Note:** In the examples shown, Green indicates a parameter name, and Blue indicates an example parameter value. Some configuration variables are of type "dictionary" - for these, `{}` indicates an empty dictionary. Likewise, some variables are of type "list", and for these, `[]` indicates an empty list.
 
-## Example Configuration File and Options
+## Example Configuration File 
+Note that this is an *example* file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section below the table.
 
-### Proxy Configuration
+```yaml
+# Proxy Settings
+proxy:
+  http_proxy: http://<your proxy address and port>
+  ftp_proxy: http://<your proxy address and port>
+  https_proxy: http://<your proxy address and port>
+  no_proxy: <localhost, any other addresses>, 10.0.0.1,localhost,.nauta
 
-**Description:** This is the Proxy setting for internal applications and, this proxy configuration is a dictionary and DNS server is list.
+# This is a list of DNS servers used for resolution: a max of three entries.
+dns_servers:
+  - 10.102.60.20
+  - 10.102.60.30
 
-**Default value:** {}
+# This is a domain used as part of a domain search list.
+dns_search_domains:
+  - example.com
 
-- **Note:** Instances of curly brackets { } indicates that this is an empty dictionary.
+# This is the _Internal_ domain name.
+domain: nauta
+
+# Internal subdomain for infrastructure
+nodes_domain: lab007
+
+# This is the Internal subdomain for Kubernetes resources.
+k8s_domain: kubernetes
+
+# This is the Network Range for Kubernetes pods.
+kubernetes_pod_subnet: 10.3.0.0/16
+
+# This is the Network Range for Kubernetes services.
+kubernetes_svc_subnet: 10.4.0.0/16
+```
+## Configuration Variable Details
+
+### proxy
+- **Description:** These are the Proxy settings for internal applications. 
+- **Default value:** {}
 
 ```yaml
 proxy:
@@ -19,21 +50,15 @@ proxy:
   ftp_proxy: http://<your proxy address and port>
   https_proxy: http://<your proxy address and port>
   no_proxy: <localhost, any other addresses>, 10.0.0.1,localhost,.nauta
-  HTTP_PROXY: http://proxy-chain.intel.com:911
+  HTTP_PROXY: http://:<your proxy address and port>
   FTP_PROXY: http://<your proxy address and port>
   HTTPS_PROXY: http://<your proxy address and port>
   NO_PROXY: .<localhost, any other addresses>, 10.0.0.1,localhost,.nauta
 ```
-**Note:**  Proxy addresses should be replaced by a specific value by a client.
 
 ### dns_servers
-
-**Description:** This is a list of DNS servers used for resolution: a max of three entries.
-
-**Default value:** []
-
-- **Note:** Instances of squares brackets [ ] indicates that this is an empty list. 
-
+- **Description:** This is a list of DNS servers used for resolution: a max of three entries.
+- **Default value:** []
 ```yaml
 dns_servers:
   - 10.102.60.20
@@ -41,10 +66,8 @@ dns_servers:
 ```
 
 ### dns_search_domains
-
-**Description:** This is a domain used as part of a domain search list.
-
-**Default value:** []
+- **Description:** This is a domain used as part of a domain search list.
+- **Default value:** []
 
 ```yaml
 dns_search_domains:
@@ -52,31 +75,16 @@ dns_search_domains:
   ```
 
 ### domain
-
-**Description:** This is the _Internal_ domain name.
-
-**Default value:** nauta
+- **Description:** This is the _Internal_ domain name. Note that this variable and 'nodes_domain' (defined below) together form the "full domain" (`<nodes_domain>.<domain>`) for Nauta's internal domain. For example, if `domain` is "nauta" and `sub_domain` is "infra", the full domain is `infra.nauta`.
+- **Default value:** nauta
 
 ```yaml
 domain: nauta
 ```
 
 ### nodes_domain
-
-
-**Description:** Internal subdomain for infrastructure. Full domain for an infrastructure is:
-
-`<nodes_domain>.<domain>`
-
-**Default value:** infra
-
-**Note:**  The domain setting is for top domain. Together with nodes_domain it creates a full zone domain. For example: 
-
- **domain:** `nauta` 
-
- **nodes_domain:** `infra` 
-
-This results in full domain: `infra.nauta`
+- **Description:** Internal subdomain for infrastructure. Full domain for an infrastructure is:
+- **Default value:** infra
 
 ```yaml
 nodes_domain: lab007
@@ -85,53 +93,42 @@ nodes_domain: lab007
 **Note:** These IP addresses _should not_ conflict with Internal IP address ranges. 
 
 ### k8s_domain
-
-**Description:** This is the Internal subdomain for Kubernetes resources. Full domain for infrastructure is: `<k8s_domain>.<domain>`
-
-**Default value:** kubernetes
+- **Description:** This is the Internal subdomain for Kubernetes resources. Full domain for infrastructure is: `<k8s_domain>.<domain>`
+- **Default value:** kubernetes
 
 ```yaml
 k8s_domain: kubernetes
 ```
 
 ### kubernetes_pod_subnet
-
-**Description:** This is the Network Range for Kubernetes pods.
-
-**Default value:** 10.3.0.0/16
+- **Description:** This is the Network Range for Kubernetes pods.
+- **Default value:** 10.3.0.0/16
 
 ```yaml
 kubernetes_pod_subnet: 10.3.0.0/16
 ```
 
 ### kubernetes_svc_subnet
-
-**Description:** This is the Network Range for Kubernetes services.
-
-**Default value:** 10.4.0.0/16
+- **Description:** This is the Network Range for Kubernetes services.
+- **Default value:** 10.4.0.0/16
 
 ```yaml
 kubernetes_svc_subnet: 10.4.0.0/16
 ```
 
 ### insecure_registries 
-
-**Description:**  This is a list of insecure Docker registries added to configuration.
-
-**Default value:** []
-
-**Note:** This refers to Docker registries only. 
+- **Description:**  This is a list of insecure Docker registries added to configuration.
+- **Default value:** []
 
 ```yaml
 insecure_registries: 
 - my.company.registry:9876
 ```
+**Note:** This refers to Docker registries only. 
 
 ### enabled_plugins 
-
-**Description:** This is a list of enabled Yum* plugins.
-
-**Default value:** []
+- **Description:** This is a list of enabled Yum* plugins.
+- **Default value:** []
 
 ```yaml
 enabled_plugins:
@@ -139,10 +136,8 @@ enabled_plugins:
 ```
 
 ### disabled_plugins
-
-**Description:** This is a list of disabled Yum plugins.
-
-**Default value:** []
+- **Description:** This is a list of disabled Yum plugins.
+- **Default value:** []
 
 ```yaml
 disabled_plugins:
@@ -150,20 +145,16 @@ disabled_plugins:
 ```
 
 ### use_system_enabled_plugins
-
-**Description:** This defines if Yum should use system-enabled plugins.
-
-**Default value:** False
+- **Description:** This defines if Yum should use system-enabled plugins.
+- **Default value:** False
 
 ```yaml
 use_system_enabled_plugins: False
 ```
 
 ### enabled_repos 
-
-**Description:** This is a list of enabled repositories, and is used for external dependencies installation.
-
-**Default value:** []
+- **Description:** This is a list of enabled repositories, and is used for external dependencies installation.
+- **Default value:** []
 
 ```yaml
 enabled_repos:
@@ -171,10 +162,8 @@ enabled_repos:
 ```
 
 ### disabled_repos 
-
-**Description:** This is a list of disabled repositories, and is used for external dependencies installation.
-
-**Default value:** []
+- **Description:** This is a list of disabled repositories, and is used for external dependencies installation.
+- **Default value:** []
 
 ```yaml
 disabled_repos:
@@ -182,41 +171,27 @@ disabled_repos:
 ```
 
 ### use_system_enabled_repos 
-
-**Description:** This defines if the default system repositories should be enabled in external dependencies installation.
-
-Default value: True
+- **Description:** This defines if the default system repositories should be enabled in external dependencies installation.
+- **Default value:** True
 
 ```yaml
 use_system_enabled_repos: True
 ```
 
 ### input_nfs
-
-**Description:** Definition of input NFS mounts for Samba.
-
-By default, internal NFS provisioner is used.
-
-**Default value:** {}
-
-**Fields**
-- **path:** NFS path to mount
-
-- **server:** NFS server
+- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used.
+- **Default value:** {}
+- **Fields**
+    - **path:** NFS path to mount
+    - **server:** NFS server
 
 ### output_nfs
+- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used. By default, internal NFS provisioner is used.
+- **Default value:** {}
 
-
-**Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used.
-
-
- By default, internal NFS provisioner is used.
-
-**Default value:** {}
-
-**Fields**
-- **path:** NFS path to mount
-- **server:** NFS server
+- **Fields**
+    - **path:** NFS path to mount
+    - **server:** NFS server
 
 ```yaml
 nauta_configuration:
@@ -242,23 +217,19 @@ features:
 ```
 
 ## Features: Network File System (NFS) and Redsocks 
-
 Nauta features include NFS and Redsocks*.  To configure either NFS or Redsocks, you must enable either feature and configure feature options. 
 
 ## Network File System Overview
 The Network File System, or NFS allows a system to share directories and files with others over a network. The advantage of using NFS is that end-users as well as programs can access files on remote systems in the same way as local files. In addition, NFS uses less disk space, as it can store data on a single machine while remaining accessible to others over a network.
 
 ## Redsocks Configuration 
-
 Redsocks configuration is an optional part of the installer; therefore, it might apply only to limited number of installations.
 
 ### Features List 
-
-**NFS:** default: True
-**Redsocks:** default: disabled
+- **NFS:** default: True
+- **Redsocks:** default: disabled
 
 ### How to Enable Features 
-
 Additional features can be enabled using features object in configuration, as shown below.
 
 ```yaml
@@ -267,8 +238,7 @@ features:
 ```
 
 ### Feature Plugin Configuration 
-
-Configuration for features should be placed under `features_config'.
+Configuration for features should be placed under `features_config`.
 
 ```yaml
 features:
@@ -279,33 +249,24 @@ features_config:
     Port: 1080
 ``` 
 
-### Network File System Overview
-
-The Network File System, or NFS allows a system to share directories and files with others over a network. The advantage of using NFS is that end-users as well as programs can access files on remote systems in the same way as local files. In addition, NFS uses less disk space, as it can be store data on a single machine while remaining accessible to others over a network.
-Redsocks Configuration 
-Redsocks configuration is an optional part of the installer; therefore, it might apply only to limited number of installations.
-
 ### Redsocks Configuration Parameters 
 
-### IP 
-
-**Description:** This is the IP address of Socks5 proxy.
-
-```yaml
-Required: True
-```
-
-### Port 
-
-**Description:** This is the port address of Socks5 proxy. 
+#### IP 
+- **Description:** This is the IP address of Socks5 proxy.
 
 ```yaml
 Required: True
 ```
 
-### Interfaces 
+#### Port 
+- **Description:** This is the port address of Socks5 proxy. 
 
-**Description:** Comma-separated list of interfaces from which traffic should be managed by RedSocks.
+```yaml
+Required: True
+```
+
+#### Interfaces 
+- **Description:** Comma-separated list of interfaces from which traffic should be managed by RedSocks.
 
 ```yaml
 Required: False
