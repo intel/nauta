@@ -1,7 +1,7 @@
 # Controlling packs parameters
 
 ### Pack definition 
-The packs are located in the nctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
+The packs are located in the _nctl_config_ folder. Navigate to _.draft/packs/https-github.com-Azure-draft/packs_ folder to list existing packs.
 The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist of the parts:
 * docker image specification _Dockerfile_ 
 * helm deployment _charts_ folder
@@ -9,55 +9,68 @@ The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist 
 All the pack parameters that can be controlled by _nctl_ are defined in _charts/values.yml_ file.
 
 Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
-    
-	# Default values for charts.
+
+    	# Default values for charts.
 	# This is a YAML-formatted file.
 	# Declare variables to be passed into your templates.
-
+	
 	TensorBoardPort: 8888
 	TensorIPythonPort: 6006
-
+	
 	commandline:
 	  args:
-	    - "/app/training.py"
-	    - "--data_dir=/temp"
-
+	    {% for arg in NAUTA.CommandLine %}
+	    - {{ arg }}
+	    {% endfor %}
+	
 	image:
 	  pullPolicy: IfNotPresent
-	  clusterRepository: ''
-
+	  clusterRepository: {{ NAUTA.ExperimentImage }}
+	
 	service:
 	  type: ClusterIP
-
+	
 	worker_resources:
 	  requests:
-	    cpu: 0.01
-	    memory: 1Gi
-
+	    cpu: 76
+	    memory: 240Gi
+	  limits:
+	    cpu: 76
+	    memory: 240Gi
+	
+	worker_cpu: null
+	worker_memory: null
+	
 	ps_resources:
 	  requests:
-	    cpu: 0.01
-	    memory: 1Gi
-
+	    cpu: 76
+	    memory: 240Gi
+	  limits:
+	    cpu: 76
+	    memory: 240Gi
+	
+	ps_cpu: null
+	ps_memory: null
+	
 	sidecar_resources:
 	  requests:
 	    cpu: 0.01
 	    memory: 1Gi
-	  #limits:
-	  #  cpu: 2
-	  #  memory: 4Gi
-
-
-	experimentName: ''
-
+	
+	sidecar_cpu: null
+	sidecar_memory: null
+	
+	
+	experimentName: {{ NAUTA.ExperimentName }} 
+	registryPort: {{ NAUTA.RegistryPort }}
+	
 	workersCount: 3
 	psSidecarLoggingLevel: "WARNING"
 	pServersCount: 1
-	podCount: 4
+
 
     
 ### Modifying values
-
 The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
  * _nctl experiment submit_
  * _nctl experiment interact_
@@ -90,6 +103,12 @@ _nctl_ is using by default following resource limits and requests for each built
 | tf-training-tfjob-py2 | 38 | 38 | 120Gi | 120Gi | - |
 
 It is recommended to keep requests and limits on the same values. Also requested limits never should be bigger than resources available on node.
+
+Please note, that you can use `cpu` and `memory` pack parameters when you want to change both requests and limits, e.g. following command:
+```
+nctl experiment submit multinode.py-p cpu 2 -p memory 4Gi
+```
+will submit an experiment with CPU requests and limits set to 2, and memory requests and limits set to 4Gi.
 
 In order to change these defaults, following parameters should be adjusted (using methods described in Modifying values section):
 
