@@ -1,4 +1,4 @@
-FROM nauta/tensorflow:1.9.0-py3
+FROM nauta/tensorflow-py3
 
 WORKDIR /app
 
