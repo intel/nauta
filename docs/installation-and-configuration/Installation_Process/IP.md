@@ -28,12 +28,12 @@ To install Nauta, follow these steps:
 * **ENV_INVENTORY (mandatory):** Inventory file location, for example:
 
   
-`export ENV_INVENTORY=$(absolute path <inventory file>)`
+`export ENV_INVENTORY=$(realpath <inventory file>)`
   
 * **ENV_CONFIG (mandatory):** Configuration file location, for example:
 
   
-`export ENV_CONFIG=$(absolute path <config file>)`
+`export ENV_CONFIG=$(realpath <config file>)`
    
 2. Run the installation:
 
