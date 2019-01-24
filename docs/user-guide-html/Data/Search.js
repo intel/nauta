@@ -1,1 +1,1 @@
-define({r:0.5,st:'Stem',n:1,t:[0],u:['../Content/NAUTA V1.0/accessing_kubernetes.htm'],s:['$','optim'],p:[['$',4],['command',4],['folder',4],['located',21],['packaging',15],['started',4],['user',15]]});
+define({r:0.5,st:'Stem',n:1,t:[0],u:['../Content/NAUTA V1.0/accessing_kubernetes.htm'],s:['$','offici'],p:[['$',4],['cleans',4],['experiments',12],['largely',5],['only',35],['sends',24],['to',5]]});

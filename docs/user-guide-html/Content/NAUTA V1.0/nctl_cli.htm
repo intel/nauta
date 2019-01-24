@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" class="_Skins_HTML5___Top_Navigation" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="Default.xml" data-mc-path-to-help-system="../../" data-mc-has-content-body="True" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic;Default" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" class="_Skins_HTML5___Top_Navigation" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="Default.xml" data-mc-path-to-help-system="../../" data-mc-has-content-body="True" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic;Default" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta charset="utf-8" />
@@ -14,7 +14,7 @@
         <link href="../../Skins/Fluid/Stylesheets/foundation.6.2.3.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Styles.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Tablet.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
-        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>Evaluating Experiments</title>
+        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>How to Build Nauta CLI</title>
         <link href="../Resources/Stylesheets/Styles.css" rel="stylesheet" type="text/css" />
         <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
         </script>
@@ -124,41 +124,74 @@
                                 </div>
                             </div>
                             <div class="body-container" data-mc-content-body="True">
-                                <h1>Evaluating Experiments</h1>
-                                <p>This section discusses the following topics:</p>
+                                <h1>How to Build Nauta CLI</h1>
+                                <h2>Ubuntu 16.04 LTS</h2>
                                 <ul>
-                                    <li value="1"><a href="#Viewing" class="MCXref xref">Viewing Experiments Using the CLI</a>
-                                    </li>
-                                    <li value="2"><a href="view_exp_logs.htm" class="MCXref xref">Viewing Experiment Logs and Results Data</a>
-                                    </li>
-                                    <li value="3"><a href="view_exp_webui.htm">Viewing Experiments Results from the Web UI</a>
-                                    </li>
-                                    <li value="4"><a href="view_exp_tensorbd.htm" class="MCXref xref">Launching TensorBoard to View Experiments</a>
-                                    </li>
+                                    <li value="1">python 3.6</li>
+                                    <li value="2">python 3.6-dev</li>
+                                    <li value="3">python 3.6-venv</li>
+                                    <li value="4">build-essential</li>
+                                    <li value="5">binutils</li>
+                                    <li value="6">curl</li>
                                 </ul>
-                                <h2><a name="Viewing"></a>Viewing Experiments Using the CLI</h2>
-                                <h3><a name="Viewing2"></a>Viewing all Experiments</h3>
-                                <p>To list <i>all</i> experiments you have submitted, run the next command. &#160;The possible returned statuses are QUEUED,  RUNNING, COMPLETE, CANCELED, FAILED, and CREATING. </p>
-                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment list [options]</span></p>
-                                <p>Here is an example:</p>
-                                <p><span style="font-family: 'Courier New';">$ nctl experiment list</span>
-                                </p>
-                                <p>Following are example results (not all columns are shown).</p>
-                                <p style="text-align: center;">
-                                    <img src="../images/experiment_list_736x401.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 736;height: 401;" />
-                                </p>
-                                <h3><a name="Viewing3"></a>Viewing a Single Experiment's Details</h3>
-                                <p>The primary purpose of the next command is to provide Kubernetes pod-level information and container information for this experiment. This includes the pod ID, the POD status, information about input and output volumes used in this experiment, and CPU and memory resources requested to perform this experiment.</p>
-                                <p>Use the following command to view a single experiment’s details (this is an example only):</p>
-                                <p><b>Syntax</b>: <span style="font-family: 'Courier New';">nctl experiment view [options] EXPERIMENT_NAME</span></p>
-                                <p>Here is an example:</p>
-                                <p><span style="font-family: 'Courier New';">$ nctl experiment view mnist-tb-2-1</span>
-                                </p>
-                                <p>Following are example results and not all information is shown.</p>
-                                <p style="text-align: center;">
-                                    <img src="../images/experiment_view_799x489.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;width: 799;height: 489;" />
-                                </p>
-                                <p>&#160;</p>
+                                <p>Enter the commands listed below, in the order listed:</p>
+                                <ol>
+                                    <li value="1"><span style="font-family: 'Courier New';">$ sudo add-apt-repository ppa:deadsnakes/ppa</span>
+                                    </li>
+                                    <li value="2"><span style="font-family: 'Courier New';">$ sudo apt-get update</span>
+                                    </li>
+                                    <li value="3"><span style="font-family: 'Courier New';">$ sudo apt-get install python3.6 python3.6-dev python3.6-venv make binutils</span>
+                                    </li>
+                                </ol>
+                                <h2>Ubuntu 18.04.1 LTS</h2>
+                                <ul>
+                                    <li value="1">python 3.6</li>
+                                    <li value="2">python 3-venv</li>
+                                    <li value="3">python 3-dev</li>
+                                    <li value="4">binutils</li>
+                                    <li value="5">build-essential</li>
+                                    <li value="6">curl</li>
+                                </ul>
+                                <p>Enter the commands listed below in the order listed:</p>
+                                <ol>
+                                    <li value="1"><span style="font-family: 'Courier New';">$ sudo apt update</span>
+                                    </li>
+                                    <li value="2"><span style="font-family: 'Courier New';">$ sudo apt install python3-venv python3-dev binutils build-essential</span>
+                                    </li>
+                                </ol>
+                                <h2>MacOS High Sierra</h2>
+                                <ul>
+                                    <li value="1">python 3.6</li>
+                                    <li value="2">python 3-venv</li>
+                                    <li value="3">python 3-dev</li>
+                                    <li value="4">binutils</li>
+                                    <li value="5">make</li>
+                                    <li value="6">curl</li>
+                                    <li value="7">docker</li>
+                                </ul>
+                                <h2>Windows 10</h2>
+                                <ul>
+                                    <li value="1">python 3.6.5 64-bit (<a href="https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe">https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe</a>)</li>
+                                    <li value="2">make (<a href="http://gnuwin32.sourceforge.net/packages/make.htm">http://gnuwin32.sourceforge.net/packages/make.htm</a>)</li>
+                                    <li value="3">7-zip (<a href="https://www.7-zip.org/">https://www.7-zip.org/</a>)</li>
+                                    <li value="4">wget (h<a href="ttps://eternallybored.org/misc/wget/">ttps://eternallybored.org/misc/wget/</a>)</li>
+                                    <li value="5">MSYS2 (<a href="http://www.msys2.org/">http://www.msys2.org/</a>)</li>
+                                    <li value="6">git (<a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a>)</li>
+                                    <li value="7">docker (<a href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a>)</li>
+                                    <li value="8">Windows 10 SDK (<a href="https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk">https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk</a>)</li>
+                                </ul>
+                                <p>You should have these tools (except Windows SDK) available system-wide via command-line (add them to PATH).</p>
+                                <h3>Proxy settings</h3>
+                                <p>Also, remember about setting <span style="font-family: 'Courier New';">http_proxy</span>, <span style="font-family: 'Courier New';">https_proxy</span> and <span style="font-family: 'Courier New';">no_proxy</span> environment variables, if you're behind a proxy. The variable <span style="font-family: 'Courier New';">no_proxy</span> should include in particular 127.0.0.1 and localhost.</p>
+                                <h3>Build</h3>
+                                <p>Be sure that development requirements above are fulfilled and in <span style="font-family: 'Courier New';">applications/cli</span> directory run make build. Artifacts will be available in the dist directory, including nctl binary. If you wish to rebuild nctl after making changes, you can invoke make clean build (it cleans only dist and build directory). or trigger make full_clean build to also recreate the .venv directory.</p>
+                                <p>If you want to create a tar.gz package with nctl you should invoke <span style="font-family: 'Courier New';">make nctl-buil</span>d from the main directory in the repository. After a successful build, the tar.gz file can be found in <span style="font-family: 'Courier New';">applications/cli</span> directory. The package contains the nctl binary and all dependencies, such as helm, draft etc. Also, docs and examples directories will be available.</p>
+                                <h4>Available make Commands and Targets</h4>
+                                <p><span style="font-family: 'Courier New';">make clean</span> - removes build artifacts only</p>
+                                <p><span style="font-family: 'Courier New';">make full_clean</span> - removes build artifacts and virtual env</p>
+                                <p><span style="font-family: 'Courier New';">make buil</span>d - builds cli app</p>
+                                <p><span style="font-family: 'Courier New';">make venv</span> - creates .venv with all modules required by nctl</p>
+                                <p><span style="font-family: 'Courier New';">make venv-dev</span> - internal target used by makefiles</p>
                             </div>
                         </div>
                     </section><a data-close="true"></a>

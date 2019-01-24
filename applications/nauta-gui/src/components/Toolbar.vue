@@ -33,7 +33,7 @@
       <v-list>
         <v-list-tile class="list__tile--link">
           <v-list-tile-title>
-            <a href="/documentation/" target="_blank">
+            <a href="/documentation/Content/NAUTA%20V1.0/index.htm" target="_blank">
               {{ labels.USER_GUIDE }}
             </a>
           </v-list-tile-title>
