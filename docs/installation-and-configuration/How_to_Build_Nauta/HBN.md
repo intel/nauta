@@ -9,12 +9,18 @@ When building Nauta within these versions of Ubuntu (currently, the only validat
 
 - python3-venv
 - python3-dev
+- virtualenv
 - binutils
 - build-essential
-- pip3
-- tar
+- make
 - pigz
-- Docker
+- docker
+
+To install required packages invoke:
+
+`sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz`
+
+To install Docker CE just follow [official docker instruction](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
 **Note:**  During the Nauta build process, TensorFlow* will checked by the Horovod* installer inside its Docker* container. 
 
@@ -40,15 +46,11 @@ Unpack the downloaded tarball, then from the main directory of Nauta repository 
 
 During the build process, Docker* images related to Nauta are prepared. After a successful build, the resulting `tar.gz` file will be found in the `tools/.workspace` directory.
 
-## Connecting to the Internet
-
-Note that to build Nauta package you need internet connection so that you can untar the tarball, configure your proxy settings, DNS settings, and so on. 
-
 ## Tarball—Output of the Build
 A successful build produces a compressed tarball. The tarball's name will be in the following form: `nauta-{version}-{build-id}.tar.gz` (for example: `nauta-1.0.0-190110100005.tar.gz).`
 The tarball contains, among other things, docs, images, config files, and ansible playbooks. To complete the installation of Nauta, follow the rest of this installation guide with a prepared `tar.gz` artifact.
 
-Note that this guide explains how to create the Nauta application, but to interact with an installed Nauta platform, the `nctl` client is also required. For more information on installing the client, refer to the chapter _Client Installation and Configuration_ in section _How to Build Nauta CLI_ in the Nauta User Guide.
+Note that this guide explains how to build the Nauta application, but to interact with an installed Nauta platform, the `nctl` client is also required. For more information on installing the client, refer to the chapter _Client Installation and Configuration_ in section _How to Build Nauta CLI_ in the [Nauta User Guide](../../user-guide/actions/nctl.md).
 
 ## Next Steps: Nauta Installer System Requirements
 
