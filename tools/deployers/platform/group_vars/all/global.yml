@@ -3,10 +3,10 @@
 # Proxy settings required to download security updates and connect to external network
 # It is not required, but recommended for docker settings
 proxy: {}
-#  http_proxy: http://proxy-mu.intel.com:911
-#  ftp_proxy: http://proxy-mu.intel.com:911
-#  https_proxy: http://proxy-mu.intel.com:912
-#  no_proxy: .intel.com,localhost,127.0.0.1,.{{ nodes_domain }}.{{ domain }}
+#  http_proxy: proxy.example.com:1080
+#  ftp_proxy: proxy.example.com:1080
+#  https_proxy: proxy.example.com:1080
+#  no_proxy: .example.com,localhost,127.0.0.1,.{{ nodes_domain }}.{{ domain }}
 
 # List of dns servers used as upstream for dns resolution
 dns_servers: []
