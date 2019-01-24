@@ -1,6 +1,6 @@
 # Nauta
 
-![Nauta Diagram](docs/nauta.svg)
+![Nauta Diagram](docs/nauta.png)
 
 The Nauta software provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments, can be viewed and monitored using a command line interface, web UI and/or TensorBoard*. You can use existing 
 data sets, use your own data, or downloaded data from online sources, and create public or private folders to make collaboration 

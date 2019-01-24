@@ -116,7 +116,7 @@ Bastion node is accessible from the Internet. Please adjust authorized keys - ad
 
 ### Next Steps
 
-When connected via ssh to Nauta Cluster Bastion Node, you can use `nctl` command to manage cluster. TODO: link to nctl.
+When connected via ssh to Nauta Cluster Bastion Node, you can use `nctl` command to manage cluster.
 
 ### Platform Installation Node - Cluster Removal
 
