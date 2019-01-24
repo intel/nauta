@@ -4,11 +4,11 @@ Before proceeding with this step, you must create an _Inventory_ and _Configurat
 
 ## Kernel upgrade
 
-Running heavy training jobs on workers with the operating system kernel older than 4.* might lead to hanging the worker node. See https://bugzilla.redhat.com/show_bug.cgi?id=1507149 for more information.
+If you run Linux kernel prior to 4.* version we recommend to upgrade it on all nodes of a cluster before platform installation. 
 
-Additionally please remember, that update of a kernel should be made before installation of a platform. Otherwise some components of the platform - those which depends on libraries installed with a new kernel - will be removed.
+Running heavy training jobs on workers with the operating system kernel older than 4.* may lead to hanging the worker node. See https://bugzilla.redhat.com/show_bug.cgi?id=1507149 for more information.
 
-This may occur when a memory limit for 0 job is set to a value close to the maximum amount of memory installed on this node. These problems are caused by errors in handling memory limits in older versions of the kernel. To avoid this problem, it is recommended to install on all nodes of a cluster with a newer version of a system's kernel.
+This may occur when a memory limit for a training job is set to a value close to the maximum amount of memory installed on this node. These problems are caused by errors in handling memory limits in older versions of the kernel.
 
 The following kernel was verified as a viable fix for this issue (see link below).
 
