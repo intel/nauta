@@ -19,7 +19,7 @@ To install Nauta in a 'bare metal' (i.e. non-cloud) server environment, you'll n
 1. Configure Nauta's configuration file to tell it about proxies, network quirks and filesystem preferences
 1. Run the installation script
 
-This process will create a Kubernetes cluster, all the docker files you need to run Tensorflow, Jupyter, Tensorboard, Horovod, and more, install the Nauta server-side application on your new Kubernetes cluster, and start the whole thing running. This is a lot of stuff, so it takes some time (we know! we're working on making it faster and simpler, please bear with us).
+This process will create a Kubernetes cluster, all the docker files you need to run Tensorflow, Jupyter, Tensorboard, Horovod,  install the Nauta server-side application on your new Kubernetes cluster, and start the whole thing running. This is a lot of stuff, so it takes some time (we know! we're working on making it faster and simpler, please bear with us).
 
 # Document Flow
 This guide consists of the following main topics, in order:
