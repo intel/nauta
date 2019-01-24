@@ -15,19 +15,19 @@ Nauta offers two ways for users to upload and use datasets for experiments:
 
 Uploading additional datasets or files is an option available for the ‘submit’ command, using the following option:
 
-`-sfl, --script_folder_location`
+`-sfl, --script-folder-location`
 
-Where `script_folder_location` is the name of a folder with additional files used by a script, e.g., other .py files, 
+Where `script-folder-location` is the name of a folder with additional files used by a script, e.g., other .py files, 
 datasets, etc. If the option is not included, the files will not be included in the experiment.
 
 **Syntax:**
 
-`nctl experiment submit --script_folder_location DATASET-PATH SCRIPT_LOCATION`
+`nctl experiment submit --script-folder-location DATASET-PATH SCRIPT_LOCATION`
 
 This option is recommended for small datasets or datasets that are NOT reused often. In using this option, 
 the dataset will be uploaded each time the submit command is executed which may add to the overall submission time.
 
-**Note**: `script_folder_location` is also used for script files, not only for datasets.
+**Note**: `script-folder-location` is also used for script files, not only for datasets.
 
 ### Upload to Nauta Storage
 
@@ -49,7 +49,7 @@ the following command to mount those folders (all of the following is displayed,
  
 ![Image](images/nctl_mount_command.png)
 
-**Note 1**: The `nctl` mount command also returns a command to unmount a folder.
+**Note 1**: The `nctl mount` command also returns a command to unmount a folder.
 
 **Note 2:** Nauta uses the mount command that is native to each operating system, so the command printed 
 out may not appear as in this example.
