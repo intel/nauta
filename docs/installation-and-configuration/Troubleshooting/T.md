@@ -145,22 +145,6 @@ If during execution of a multinode, Horovod-based experiment one of pods fails, 
 This results in training jobs using Horovod _does not_ resurrect failed pods. The Nauta system also _does not_ restart these training jobs. If a user encounters this, they should rerun the experiment manually. The construction of a multinode TFJob-based experiment is different, as it uses Kubernetes features. Thus, training jobs based on TFJobs restart failing pods so an experiment can be continued after their failure without a need to be restarted manually by a user
 .
 
-## Nodes Hang When Running Heavy Training Jobs
-
-Running heavy training jobs on workers with the operating system kernel older than 4.* might lead to hanging the worker node. See https://bugzilla.redhat.com/show_bug.cgi?id=1507149 for more information. 
-
-This may occur when a memory limit for 0 job is set to a value close to the maximum amount of memory installed on this node. These problems are caused by errors in handling memory limits in older versions of the kernel. To avoid this problem, it is recommended to install on all nodes of a cluster with a newer version of a system's kernel.
-
-The following kernel was verified as a viable fix for this issue (see link below).
-
-* https://elrepo.org/linux/kernel/el7/x86_64/RPMS/kernel-ml-4.19.2-1.el7.elrepo.x86_64.rpm
-      
-To install the new kernel refer to: _Chapter 5, Manually Upgrading the Kernel_ in RedHat's Kernel Administration Guide (see link below).
-
-https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/kernel_administration_guide/ch-manually_upgrading_the_kernel
-
-**Note:** The above kernel _does not_ include RedHat's optimizations and hardware drivers.
-
 ## Platform Client for Microsoft Windows
 
 Using standard Microsoft* Windows* terminals (`cmd.exe`, `power shell`) is enough to interact with platform, but there is a sporadic issue with the output. Some lines can be surrounded with incomprehensible characters, for example:

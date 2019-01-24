@@ -2,6 +2,24 @@
 
 Before proceeding with this step, you must create an _Inventory_ and _Configuration_ file. See:  [Inventory File Information](../Inventory_Tasks/IT.md) and [Configuration File Information](../Configuration_Tasks_Variables/CTV.md)
 
+## Kernel upgrade
+
+Running heavy training jobs on workers with the operating system kernel older than 4.* might lead to hanging the worker node. See https://bugzilla.redhat.com/show_bug.cgi?id=1507149 for more information.
+
+Additionally please remember, that update of a kernel should be made before installation of a platform. Otherwise some components of the platform - those which depends on libraries installed with a new kernel - will be removed.
+
+This may occur when a memory limit for 0 job is set to a value close to the maximum amount of memory installed on this node. These problems are caused by errors in handling memory limits in older versions of the kernel. To avoid this problem, it is recommended to install on all nodes of a cluster with a newer version of a system's kernel.
+
+The following kernel was verified as a viable fix for this issue (see link below).
+
+* https://elrepo.org/linux/kernel/el7/x86_64/RPMS/
+
+To install the new kernel refer to: Chapter 5, Manually Upgrading the Kernel in RedHat's Kernel Administration Guide (see link below).
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/kernel_administration_guide/ch-manually_upgrading_the_kernel
+
+Note: The above kernel does not include RedHat's optimizations and hardware drivers.
+
 ## Installation Procedure
 
 To install Nauta, follow these steps:
