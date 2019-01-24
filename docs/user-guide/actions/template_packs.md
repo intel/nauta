@@ -75,11 +75,7 @@ that represent the types of experiments officially supported and validated.
 
 For each of the packs there are two versions provided: one that
 supports Python 2.7.x user scripts (packs with `-py2` suffix in the
-name) and one that supports Python 3.5.x user scripts.
-
-Packs with `multi-` prefix in the name support multi-node
-experiments, while those with a `single-` prefix are designed for
-single node experiments only.
+name) and one that supports Python 3.6.x user scripts.
 
 All packs are optimized for non-trivial deep learning tasks executed
 on Intel's two socket Xeon systems, and therefore the default compute configuration is
@@ -138,17 +134,17 @@ resource requirements either on per-experiemnt basis or permanently
 
 The template packs provided with Nauta are listed below:
 
-* **multi-tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
+* **multinode-tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
 
-* **multi-tf-training-horovod-py2** - A TensorFlow multi-node training job based on Horovod using Python 2.
+* **multinode-tf-training-horovod-py2** - A TensorFlow multi-node training job based on Horovod using Python 2.
 
-* **multi-tf-training-tfjob** - A TensorFlow multi-node training job based on TF-operator using Python 3.
+* **multinode-tf-training-tfjob** - A TensorFlow multi-node training job based on TfJob using Python 3.
 
-* **multi-tf-training-tfjob-py2** - A TensorFlow multi-node training job based on TF-operator using Python 2.
+* **multinode-tf-training-tfjob-py2** - A TensorFlow multi-node training job based on TfJob using Python 2.
 
-* **single-tf-training-tfjob** - A TensorFlow single-node training job based on TF-operator using Python 3.
+* **tf-training-tfjob** - A TensorFlow single-node training job based on TfJob using Python 3.
 
-* **single-tf-training-tfjob-py2** - A TensorFlow single-node training job based on TF-operator using Python 2.
+* **tf-training-tfjob-py2** - A TensorFlow single-node training job based on TfJob using Python 2.
 
 # <a name="customize"></a> Customizing the Provided Packs
 Any customizations to template packs revolve mostly around the `values.yaml` file included in the pack's underlying _Helm_ chart. As mentioned above, this file provides key definitions that are referenced throughout the rest of the _Helm_ chart, and therefore it plays a crucial role in the process of converting the chart's templates into actual
