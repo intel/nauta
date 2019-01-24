@@ -103,9 +103,9 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
             if line.startswith("ADD training.py"):
                 if script_location or script_folder_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
-            elif line.startswith("FROM nauta/tensorflow:1.9.0-py"):
+            elif line.startswith("FROM nauta/tensorflow-py"):
                 nauta_config_map = NAUTAConfigMap()
-                if line.find('1.9.0-py2') != -1:
+                if line.find('-py2') != -1:
                     tf_image_name = nauta_config_map.py2_image_name
                 else:
                     tf_image_name = nauta_config_map.py3_image_name
@@ -116,7 +116,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
                 pull_tf_image(tf_image_repository=tf_image_repository)
             elif line.startswith("FROM nauta/horovod"):
                 nauta_config_map = NAUTAConfigMap()
-                if line.find('1.9.0-py2') != -1:
+                if line.find('-py2') != -1:
                     image_name = nauta_config_map.py2_horovod_image_name
                 else:
                     image_name = nauta_config_map.py3_horovod_image_name
