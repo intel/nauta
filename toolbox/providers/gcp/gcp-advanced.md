@@ -71,7 +71,6 @@ For specific ssh connectivity please refer to `ssh`/`scp` manuals.
 Kubernetes cluster resources and connectivity servers can be defined in yaml file (i.e. `gcp-config.yml`)
 ```$xslt
 gcp:
-  gke_project: "myprojectname"
   region: "europe-west1"
   zone: "europe-west1-b"
 
@@ -90,7 +89,7 @@ gcp:
   testnode_image: ""
 ``` 
 
-- `gke-project`, `region` and `zone` - typical GCP parameters
+- `region` and `zone` - typical GCP parameters
 - `external-username` - username to connect to bastion (gateway) server
 - `gateway_type` - node type (see server types accessible in region and zone defined above) for bastion (gateway) server
 - `testnode_type` - node type (see server types accessible in region and zone defined above) for test server

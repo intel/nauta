@@ -75,7 +75,6 @@ Edit file `$NAUTA_DIR/toolbox/providers/gcp/gcp-config.yml` - the only field you
 
 ```$xslt
 gcp:
-  gke_project: "myprojectname"     # CHANGE to `project_id` from $NAUTA_DIR/toolbox/providers/gcp/gcp-service-account.json
   region: "us-west1"               # GCP target data center
   zone: "us-west1-a"               # GCP target data center zone
   external_username: "nauta"       # safe default

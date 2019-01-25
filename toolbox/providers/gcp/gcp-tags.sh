@@ -58,12 +58,15 @@ function set_defaults {
     if [ "${K8sCluster}" = "" ] ; then K8sCluster="nauta" ; fi
     if [ "${GcpConfig}" = "" ] ; then GcpConfig="`pwd`/gcp-config.yml" ; fi
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
+
+    if [ "${ClusterOwner}" = "" ] ; then ClusterOwner="`whoami`" ; fi
 }
 
 show_parameters() {
     print_log "DEBUG" "Build parameters:"
     echo -e "\t\tK8sCluster=${K8sCluster}"
     echo -e "\t\tK8sOutputFile=${K8sOutputFile}"
+    echo -e "\t\tClusterOwner=${ClusterOwner}"
 
     echo -e ""
     echo -e "\t\tSCRIPTDIR=${SCRIPTDIR}"
@@ -85,7 +88,7 @@ show_connectivity_parameters() {
 
 tag_cluster() {
     print_log "DEBUG" "Tag cluster"
-    tags_string="owner=`whoami`,provider=gketf,gateway_ip=${GATEWAY_IP},testnode_ip=${TESTNODE_IP}"
+    tags_string="owner=${ClusterOwner},provider=gketf,gateway_ip=${GATEWAY_IP},testnode_ip=${TESTNODE_IP}"
     tags_string=`echo ${tags_string} | sed 's/\./_/g'`
     print_log "DEBUG" gcloud beta container clusters update ${K8sCluster} --update-labels ${tags_string}
     gcloud beta container clusters update ${K8sCluster} --zone ${CLUSTER_ZONE} --update-labels ${tags_string}
@@ -98,6 +101,7 @@ WORKSPACEDIR="${SCRIPTDIR}/../../../.workspace"
 
 LONG_OPTIONS=""
 LONG_OPTIONS+="k8s-cluster:,"
+LONG_OPTIONS+="cluster-owner:,"
 LONG_OPTIONS+="gcp-config:,"
 
 SHORT_OPTIONS="c:"
@@ -107,6 +111,7 @@ while true; do
    case "$1" in
         --k8s-cluster) K8sCluster="$2"; shift 2 ;;
         --gcp-config) GcpConfig="$2"; shift 2 ;;
+        --cluster-owner) ClusterOwner="$2"; shift 2 ;;
         --) break;;
         *) echo "Internal error! |$1|$2|" ; exit 1 ;;
    esac

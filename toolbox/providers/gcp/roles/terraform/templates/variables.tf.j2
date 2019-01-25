@@ -3,7 +3,7 @@ variable "service_account" {
 }
 
 variable "gke_project" {
-  default = "{{ gcp.gke_project }}"
+  default = "{{ gcp_service_account.project_id }}"
 }
 
 variable "prefix" {
