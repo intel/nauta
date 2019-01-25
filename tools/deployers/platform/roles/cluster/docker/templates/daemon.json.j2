@@ -5,5 +5,10 @@
   ],
   "dns": [{% for host in groups["master"] %}"{{ hostvars[host].nauta_configuration.internal_interface.ipv4_address }}"{% if not loop.last %},{% endif %}{% endfor %}],
   "insecure-registries": ["registry.service.{{ nodes_domain }}.{{ domain }}:5000"{% for reg in insecure_registries %},"{{ reg }}"{% endfor %}],
-  "max-concurrent-downloads": 15
+  "max-concurrent-downloads": 15,
+  "log-driver": "json-file",
+  "log-opts": {
+      "max-size": "{{ docker_log_driver_settings.max_size }}",
+      "max-file": "{{ docker_log_driver_settings.max_file }}"
+      }
 }

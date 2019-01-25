@@ -203,6 +203,18 @@ nauta_configuration:
     server: "{{ nfs_server }}"
 ```
 
+### Docker log driver settings
+- **Description:** Docker log driver settings for controlling rotation of containers' logs on bare metal environments. In case of cloud deployments, like Google Cloud Platform, instead of changing this parameter, refer to your cloud provider instructions for log rotation configuration. For more infomation about Docker log driver settings, please see: https://docs.docker.com/config/containers/logging/json-file/
+- **Default value:**
+```yaml
+docker_log_driver_settings:
+  max_size: 5g
+  max_file: 1
+```
+- **Fields**
+    - **max_size:** Maximum size of log file
+    - **max_file:** Maximum count of present log files
+
 ### Optional Features: Redsocks and NFS 
 
 Either Redsocks or NFS is installed and configured during the installation process. By default, Redsocks is not installed; however, NFS is installed by default.   
