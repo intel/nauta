@@ -41,7 +41,7 @@ shared_images:
     version: "py2"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run/2.7"
     push: False
     args:
       PYTHON_VERSION: 2.7
@@ -49,7 +49,7 @@ shared_images:
     version: "py3"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run/3.6"
     push: False
     args:
       PYTHON_VERSION: 3.6
