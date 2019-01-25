@@ -12,7 +12,7 @@ The following screen displays (this is an example only).
 
 
 * **Name**: The left-most column lists the experiments by name.
-* **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELED, FAILED, CREATING`.
+* **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date**: This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM.  The Start Date (or time) will always be after the Submission Date (or time).
 * **Duration**: This column shows the duration of execution for this experiment in days, hours, minutes and seconds.

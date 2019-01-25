@@ -1,5 +1,6 @@
 # Installing libraries and dependencies
-To install a library or dependency that is not included in standard NAUTA docker image it is required to modify draft pack definition.
+To install an OS library or dependency that is not included in standard NAUTA docker image it is required to modify draft pack definition.
+In order to install a pip dependency (like numpy or pandas), refer to `experiment submit` command documentations.
 
 ## Modifying existing draft packs
 The draft packs are located in the nctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
@@ -21,12 +22,6 @@ The images in Nauta are based on CentOS. To install system package add the follo
 
     RUN yum update
     RUN yum install package1 package2
-    
-    
-### Installing PIP packages
-Simply add _pip install package_ to _Dockerfile
-
-    RUN pip install pip_package_name
 
 ### Proxy
 Depending on the network configuration it may be required to setup proxy servers
@@ -47,7 +42,6 @@ Below is an example _Dockerfile_ showing installation of additional packages
          
     RUN yum update
     RUN yum install libsndfile
-    RUN pip install PySoundFile python_speech_features
     
     ADD training.py .
     

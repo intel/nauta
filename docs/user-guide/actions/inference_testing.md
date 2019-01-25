@@ -5,4 +5,4 @@ For guidance on using inference testing to evaluate an experiment, refer to the 
 
 * For a demonstration of how to run batch inference, refer to: [Batch Inference Example](batch_inf_example.md).
 
-* For a demonstration of how to run streaming inference, refer to: [Stream Inference Example](stream_inf_example.md).
+* For a demonstration of how to run streaming inference, refer to: [Stream Inference Example](streaming_inference.md).

@@ -9,7 +9,7 @@ This command stops and cancels any experiment queued or in progress. Completed e
 The value of this argument should be created using rules described here. Use this command to cancel one or more experiments with matching or partially-matching names, a matching pod ID, matching pod status, or combinations of these criteria.
 For example, the following command will cancel all experiments with a matching or partially matching name:
 
-**Syntax**: `nctl experiment cancel -match EXPERIMENT_NAME`
+**Syntax**: `nctl experiment cancel --match EXPERIMENT_NAME`
 
 The following command will cancel all experiments with a matching pod-ID, using one or more comma-separated IDs:
 

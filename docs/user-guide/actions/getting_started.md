@@ -43,9 +43,9 @@ Each `nctl` command has at least two options:
   * `-vv` for DEBUG - Detailed logs on INFO/DEBUG/EXCEPTION/ERROR levels are displayed.
 * `-h, --help` - The application displays the usage and options available for a specific command or subcommand.
  
-Access help for any command with the `-help` or `-h` parameter. The following command provides a list and brief description of all nctl commands. 
+Access help for any command with the `--help` or `-h` parameter. The following command provides a list and brief description of all nctl commands. 
 
-`nctl -help`
+`nctl --help`
 
 The results are shown below.
 
@@ -85,26 +85,25 @@ training.
 
 ### Submitting an Experiment
   
-**Note 1**: The included example scripts do not require an external data source. They download the MNIST dataset and save it locally. Templates referenced here have set CPU and Memory requirements.
+**Note 1**: The included example scripts do not require an external data source. Scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements.
 
-**Note 2**: Please refer to template packs documentation for more info about changing those if you want to.
+**Note 2**: Please refer to template packs documentation for more info about changing those requirements if you want to.
 
 **Note 3**: For more info about experiment submit command please refer to [experiment Command](experiment.md).
 
-This example will show how to submit a mnist experiment and write the TensorBoard data to a folder in your NAUTA output folder. Enter the following command:
+This example will show how to submit a mnist experiment and write the TensorBoard data to a folder in your NAUTA output folder.
+Enter the following command to run this example:
+
+`$ nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
 
 **Syntax**:
 Following is the basic syntax for experiment submit command:
 
 `nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
 
-Enter the following command to run this example:
-
-`$ nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
-
 **Where**:
 * `-t`,  TEXT: Name of a template that will be used by Nauta to create a description of a job to be submitted. By default, this is a single-node tensorflow training. The template is chosen. The list of available templates can be obtained by issuing the `nctl experiment template_list` command.
-* `-- SCRIPT_LOCATION`: The path and name of the Python script use to perform this experiment.
+* `SCRIPT_LOCATION`: The path and name of the Python script use to perform this experiment.
 
 **Note**: In order to run TensorBoard, TensorBoard data must be written to a folder in the directory `/mnt/output/experiment`. This example script takes care of this requirement, but your scripts will need to do this well.
 
@@ -221,7 +220,7 @@ The following screen displays (this is an example only).
 
 
 * **Name**: The left-most column lists the experiments by name.
-* **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELED, FAILED, CREATING`.
+* **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date**: This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Duration**: This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
@@ -402,8 +401,8 @@ To unmount previously mounted Nauta input storage from a local folder/machine re
 
 For more information on mounting, refer to [Working with Datasets](working_with_datasets.md).
 
-## Removing Experiments (Optional) 
-An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel` command and its `purge` option. The experiment will only be removed from the experiment list. The experiment’s artifacts will remain in the Nauta storage output folder. Logs will be removed.
+## Removing Experiments
+An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel` command and its `--purge` option. If `--purge` option is not set in `cancel` command, the experiment will only change status to CANCELLED. If `--purge` option is set in `cancel` command, experiment objects and logs will be irreversibly removed (The experiment’s artifacts will remain in the Nauta storage output folder).
 
 **Syntax**: `nctl experiment cancel [options] EXPERIMENT_NAME`
 

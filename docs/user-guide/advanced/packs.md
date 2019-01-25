@@ -106,7 +106,7 @@ It is recommended to keep requests and limits on the same values. Also requested
 
 Please note, that you can use `cpu` and `memory` pack parameters when you want to change both requests and limits, e.g. following command:
 ```
-nctl experiment submit multinode.py-p cpu 2 -p memory 4Gi
+nctl experiment submit multinode.py -p cpu 2 -p memory 4Gi
 ```
 will submit an experiment with CPU requests and limits set to 2, and memory requests and limits set to 4Gi.
 

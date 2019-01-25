@@ -41,13 +41,13 @@ Submits training jobs. Use this command to submit single and multi-node training
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-sfl, --script_folder_location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used                                   by a script, e.g., other .py files, data, etc. If not given, then its content won't be copied into a the docker image created by the `nctl submit` command. `nclt` copies all content, preserving its structure, including subfolder(s). |
+ |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used                                   by a script, e.g., other .py files, data, etc. If not given, then its content won't be copied into a the docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
  |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given - a default template for single node tensorflow training is used (tf-training). List of available templates can be obtained by issuing `nctl experiment template_list command`. |
  |`-n, --name TEXT`| No | Name for this experiment.|
- |`-p, --pack_param` <br> `<TEXT TEXT>…`| No |Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use: 'key "{'a': 'b'}"'|
- |`-pr, --parameter_range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> Contains values of this paramater that are passed to different instance of experiments. `[definition]` can have two forms: <br> - range - `{x...y:step}` - this form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> - set of values - `{x, y, z}` - this form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
- |`-ps, --parameter_set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` will launch an experiment with a set of parameters defined in `[definition]` argument. Optional. Format of the `[definition]` argument is as follows : `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br> All parameters given in `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once - `nctl` will start as many experiments as there is occurences of this parameter in a call. |
- |`-e, --env TEXT` | No | Set of values of one or several parameters.Environment variables passed to training. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
+ |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use: 'key "{'a': 'b'}"'|
+ |`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> Contains values of this paramater that are passed to different instance of experiments. `[definition]` can have two forms: <br> - range - `{x...y:step}` - this form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> - set of values - `{x, y, z}` - this form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
+ |`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` will launch an experiment with a set of parameters defined in `[definition]` argument. Optional. Format of the `[definition]` argument is as follows : `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br> All parameters given in `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once - `nctl` will start as many experiments as there is occurences of this parameter in a call. |
+ |`-e, --env TEXT` | No | Environment variable passed to training. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
  |`-r, --requirements PATH` | No | Path to file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
@@ -263,11 +263,11 @@ Displays logs from experiments. Logs to be displayed are chosen based on paramet
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-s, --min_severity` | No | Minimal severity of logs. Available choices are:<br> - CRITICAL - displays only CRITICAL logs.<br> - ERROR - displays ERROR and CRITICAL logs.<br> - WARNING - displays ERROR, CRITICAL and WARNING logs. <br> - INFO - displays ERROR, CRITICAL, WARNING and INFO.<br> - DEBUG - displays ERROR, CRITICAL, WARNING, INFO and DEBUG. |
-|`-sd, --start_date` | No | Retrieve logs produced from this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
-|`-ed, --end_date` | No | retrieve logs produced until this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
+|`-s, --min-severity` | No | Minimal severity of logs. Available choices are:<br> - CRITICAL - displays only CRITICAL logs.<br> - ERROR - displays ERROR and CRITICAL logs.<br> - WARNING - displays ERROR, CRITICAL and WARNING logs. <br> - INFO - displays ERROR, CRITICAL, WARNING and INFO.<br> - DEBUG - displays ERROR, CRITICAL, WARNING, INFO and DEBUG. |
+|`-sd, --start-date` | No | Retrieve logs produced from this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
+|`-ed, --end-date` | No | retrieve logs produced until this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
 |`-i, --pod-ids TEXT` | No |Comma-separated pods IDs. If given, then matches pods by their IDs and only logs from these pods from an experiment with `EXPERIMENT_NAME` name will be returned.|
-|`- p, --pod_status TEXT` | No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN' - command returns logs with matching status from an experiment and matching EXPERIMENT_NAME.|
+|`- p, --pod-status TEXT` | No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN' - command returns logs with matching status from an experiment and matching EXPERIMENT_NAME.|
 |`-m, --match TEXT` | No |  If given, command searches for logs from experiments matching the value of this option. This option cannot be used along with the NAME argument.|
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
@@ -282,7 +282,7 @@ In case of any problems, a message(s) with description of their cause(s). Otherw
 
 ### <a name="example_logs"></a> Example
 
-`$ nctl experiment logs experiment_name_2 --min_severity DEBUG`
+`$ nctl experiment logs experiment_name_2 --min-severity DEBUG`
 
 Displays logs from `experiment_name_2` experiment with severity DEBUG and higher (INFO, WARNING, and so on).
 
@@ -310,10 +310,10 @@ is displayed in a notebook.
 |:--- |:--- |:--- |
 |`-n, --name TEXT` | No | Name of a Jupyter notebook's session. If session with a given name already exists, then a user is connected to this session. |
 |`-f, --filename TEXT` | No | File with a notebook that should be opened in Jupyter notebook. |
-|`-p, --pack_param <TEXT TEXT>...`| No | Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br>For maps use: 'key "{'a': 'b'}"' |
+|`-p, --pack-param <TEXT TEXT>...`| No | Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br>For maps use: 'key "{'a': 'b'}"' |
 |`--no-launch`| No | Run command without a web browser starting, only proxy tunnel is created.|
-|`-pn, --port_number INTEGER RANGE` | No | Port on which service will be exposed locally.|
-|` -e, --env TEXT` | No | Environment variables passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e paramater.|
+|`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
+|` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e paramater.|
 |` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |

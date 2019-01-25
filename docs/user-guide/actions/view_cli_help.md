@@ -1,8 +1,8 @@
 # Viewing CLI Commands Help
 
-The `–help` command provides man-page style help for each nctl command. You can view help for any command and subcommand, and all related parameters.
+The `–-help` command provides man-page style help for each nctl command. You can view help for any command and subcommand, and all related parameters.
 
-Entering `nctl –help` provides a listing of all nctl commands (without subcommands), as shown next.
+Entering `nctl –-help` or `nctl -h` provides a listing of all nctl commands (without subcommands), as shown next.
 
     $ nctl -h
 
@@ -37,6 +37,6 @@ Entering `nctl –help` provides a listing of all nctl commands (without subcomm
 
 You can view help for any command and available subcommand(s). The following example shows generic syntax; brackets are optional parameters, but [subcommand] requires [command].
 
-`nctl [command_name] [subcommand] –help`
+`nctl [command_name] [subcommand] –-help`
 
  
