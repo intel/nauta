@@ -163,7 +163,7 @@ resource "google_compute_disk" "nfs" {
   name = "${var.prefix}-nfs-disk"
   type = "pd-standard"
   zone = "${var.zone}"
-  size = "400"
+  size = "${var.nfs_disk_size}"
 }
 
 resource "google_compute_instance" "nfs" {

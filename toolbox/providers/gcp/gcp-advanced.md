@@ -94,6 +94,7 @@ gcp:
 - `gateway_type` - node type (see server types accessible in region and zone defined above) for bastion (gateway) server
 - `testnode_type` - node type (see server types accessible in region and zone defined above) for test server
 - `nfs_type` - node type (see server types accessible in region and zone defined above) for internal nfs server
+- `nfs_disk_size` - Size (in GB) of the disk attached to nfs server to store user data
 - `internal_username` - username for internal ssh connectivity
 - `pool_type` - node type (see server types accessible in region and zone defined above) for gke cluster resources
 - `pool_size` - gke cluster servers quantity

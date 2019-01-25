@@ -82,6 +82,7 @@ gcp:
   gateway_type: "n1-standard-4"    # safe default
   testnode_type: "n1-standard-4"   # (do not edit)
   nfs_type: "n1-standard-2"        # safe default
+  nfs_disk_size: "400"             # size in GB, safe default
   pool_type: "n1-standard-16"      # Worker GCP Node size, adjust as needed
   pool_size: "1"                   # Number of Worker GCP Nodes
   generate_test_node: False        # (do not edit)
