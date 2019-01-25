@@ -52,6 +52,9 @@ If you want to create tar.gz package with nctl you should invoke `make nctl-buil
 After successful build tar.gz file can be found in `applications/cli` directory. Package contains nctl binary and all
 dependencies like helm, draft etc. Also docs and examples directories will be available.
 
+**Note** On Windows please start build process in console delivered together with msys. If one starts process of build 
+from Windows cmd console - it fails.
+
 ##### Available make targets
 `make clean` - removes build artifacts only
 
