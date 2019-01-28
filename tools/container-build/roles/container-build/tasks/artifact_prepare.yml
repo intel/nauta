@@ -12,7 +12,7 @@
         stop_timeout: 0
         recreate: True
         restart_policy: no
-        user: "{{ user_id }}"
+        user: "{{ user_id }}:0"
         command: "bash -c 'while true; do sleep 1; done'"
     - name: Register node
       add_host:
