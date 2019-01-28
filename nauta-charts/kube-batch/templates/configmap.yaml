@@ -10,10 +10,11 @@ metadata:
     nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
     nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
 data:
-  actions:                   "reclaim, allocate, backfill, preempt"
-  plugins:                   "gang, priority, predicates"
-  plugin.gang.jobready:      "true"
-  plugin.gang.joborder:      "true"
-  plugin.gang.preemptable:   "true"
-  plugin.priority.joborder:  "true"
-  plugin.priority.taskorder: "true"
+  config.yml: |-
+    actions:                   "reclaim, allocate, backfill, preempt"
+    plugins:                   "gang, priority, predicates"
+    plugin.gang.jobready:      "true"
+    plugin.gang.joborder:      "true"
+    plugin.gang.preemptable:   "true"
+    plugin.priority.joborder:  "true"
+    plugin.priority.taskorder: "true"
