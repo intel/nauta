@@ -26,7 +26,7 @@ kubernetes_calculated_runtime_config: "{{ (kubernetes_default_runtime_config | c
 
 kubernetes_anonymous_access: True
 
-cpu_manager_policy: static
+cpu_manager_policy: none
 system_reserved: "cpu=500m"
 kube_reserved: "cpu=500m"
 cgroups_per_qos: true
