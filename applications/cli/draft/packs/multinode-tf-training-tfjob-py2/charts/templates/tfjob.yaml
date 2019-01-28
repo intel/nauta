@@ -15,7 +15,7 @@ spec:
   tfReplicaSpecs:
     Worker:
       replicas: {{ .Values.workersCount }}
-      restartPolicy: ExitCode
+      restartPolicy: Never
       template:
         metadata:
           annotations:
@@ -86,9 +86,10 @@ spec:
               volumeMounts:
                 - name: output-home
                   mountPath: /mnt/output/home
-      backoffLimit: 5
+      backoffLimit: 0
     PS:
-      restartPolicy: ExitCode
+      restartPolicy: Never
+      backoffLimit: 0
       replicas: {{ .Values.pServersCount }}
       template:
         metadata:

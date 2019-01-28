@@ -13,7 +13,8 @@ metadata:
 spec:
   tfReplicaSpecs:
     Master:
-      restartPolicy: ExitCode
+      restartPolicy: Never
+      backoffLimit: 0
       replicas: 1
       template:
         metadata:
