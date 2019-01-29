@@ -657,9 +657,9 @@ class UtilDependenciesCheckerTexts:
     UNKNOWN_OS_ERROR_MSG = "Unknown OS version."
     GET_OS_VERSION_ERROR_MSG = "Could not determine OS version"
     UNSUPPORTED_OS_ERROR_MSG = "This OS ({os_name} {os_version}) is not supported. Please check the list of " \
-                               "supported OS."
+                               "supported OS in the documentation."
     INVALID_OS_VERSION_ERROR_MSG = "This version ({os_name} {os_version}) of the OS is not supported. Please check " \
-                                   "the list of supported OS."
+                                   "the list of supported OS in the documentation."
 
 
 class UtilConfigTexts:
