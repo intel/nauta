@@ -239,7 +239,7 @@ resource "google_container_cluster" "primary" {
       machine_type = "${var.pool_type}"
 
       image_type = "ubuntu"
-      min_cpu_platform = "Intel Haswell"
+      min_cpu_platform = "${var.pool_min_cpu_platform}"
 
       oauth_scopes = [
         "compute-rw",

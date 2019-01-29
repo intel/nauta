@@ -61,3 +61,7 @@ variable "pool_type" {
 variable "pool_size" {
   type = "string"
 }
+
+variable "pool_min_cpu_platform" {
+  default = "{{ gcp.pool_min_cpu_platform }}"
+}

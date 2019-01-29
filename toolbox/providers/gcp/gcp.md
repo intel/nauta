@@ -85,6 +85,7 @@ gcp:
   nfs_disk_size: "400"             # size in GB, safe default
   pool_type: "n1-standard-16"      # Worker GCP Node size, adjust as needed
   pool_size: "1"                   # Number of Worker GCP Nodes
+  pool_min_cpu_platform: "Intel Skylake" # CPU Architecture, safe default
   generate_test_node: False        # (do not edit)
   testnode_image: ""               # (do not edit)
 ``` 

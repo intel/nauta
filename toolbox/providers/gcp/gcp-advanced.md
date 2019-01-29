@@ -98,6 +98,7 @@ gcp:
 - `internal_username` - username for internal ssh connectivity
 - `pool_type` - node type (see server types accessible in region and zone defined above) for gke cluster resources
 - `pool_size` - gke cluster servers quantity
+- `pool_min_cpu_platform` - cpu architecture
 - `generate_test_node` `[True|False]` - boolean flag to decide if test node will be created
 - `test_node_image` - name of the image accessible in the gcp project to create test node with pre-installed test software
 

@@ -1,7 +1,6 @@
 ---
 
 gcp:
-  gke_project: "myprojectname"
   region: "europe-west1"
   zone: "europe-west1-b"
 
@@ -16,6 +15,7 @@ gcp:
 
   pool_type: "n1-standard-16"
   pool_size: "1"
+  pool_min_cpu_platform: "Intel Skylake"
 
   generate_test_node: False
   testnode_image: ""
