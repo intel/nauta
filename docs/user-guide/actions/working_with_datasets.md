@@ -63,7 +63,7 @@ The following table displays the access permissions for each mounting folder.
 Table 1: Access Permissions for Mounting Folders
 
 
-| Nauta Folder | Reference Path | User Access | Public Access
+| Nauta Folder | Reference Path | User Access | Shared Access
 |:--- |:--- |:--- |:--- |
 | input |	/mnt/input/home |	read/write	| - |
 | output |	/mnt/output/home |	read/write |	- |
@@ -103,6 +103,6 @@ in Nauta storage and can be used by any user for their experiments.
 
 9.	Submit an experiment referencing the new shared dataset. From the examples folder enter this command:
 
-    `nctl experiment submit --name mnist-shared-input \ mnist_with_summaries.py -- --data_dir==/mnt/input/home/mnist`
+    `nctl experiment submit --name mnist-shared-input examples/mnist_single_node.py -- --data_dir==/mnt/input/home/mnist`
 
 10.	If you want to to copy your data to shared folder use `input-shared` instead of input in step 2. Doing so lets any Nauta user can use the same path to reference the mnist dataset on your shared Nauta Storage.

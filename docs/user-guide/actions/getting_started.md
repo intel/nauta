@@ -177,7 +177,7 @@ To add metrics to an experiment file you have created, you need to edit the expe
       
 5.	The published metrics can now be viewed. 
 
-    `$ nctl <new_name> experiment list`
+    `$ nctl experiment list`
 
 **Information about saving metrics for multinode experiments**
 
@@ -213,6 +213,8 @@ should choose one of such identificators and store logs only from a node having 
 The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, enter the following command at the command prompt:
 
 `$ nctl launch webui`
+
+**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling.  After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
 
 The following screen displays (this is an example only).
 
@@ -289,6 +291,8 @@ When training scripts output Tensorflow summaries to `/mnt/output/experiment`, t
 Enter this command:
 
 `$ nctl launch tensorboard single`
+
+**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling.  After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
 
 The following message displays.
 
