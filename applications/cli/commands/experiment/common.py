@@ -376,7 +376,6 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             experiments_api.add_experiment(experiment, namespace, labels=labels)
 
             # submit runs
-            submitted_runs = []
             for run, run_folder in zip(runs_list, experiment_run_folders):
                 try:
                     run.state = RunStatus.QUEUED
