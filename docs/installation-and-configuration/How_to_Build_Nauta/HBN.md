@@ -22,7 +22,7 @@ To install required packages invoke:
 
 To install Docker CE just follow [official docker instruction](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
-**Note:**  During the Nauta build process, TensorFlow* will checked by the Horovod* installer inside its Docker* container. 
+**Note:**  During the Nauta build process, Horovod* is checking if TensorFlow* is able to run on build machine - please see hardware requirements section below.
 
 ### Your Build Machine
 
