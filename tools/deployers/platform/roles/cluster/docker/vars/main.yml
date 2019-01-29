@@ -1,0 +1,5 @@
+---
+
+docker_log_driver_settings:
+  max_size: 5g
+  max_file: 1
