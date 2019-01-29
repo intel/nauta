@@ -15,21 +15,21 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python2.7
 ENV PIP=pip2.7
 
-RUN ${PIP} install --force-reinstall -U setuptools
-RUN ${PIP} install --force-reinstall -U pip
+RUN ${PIP} install --force-reinstall -U setuptools==40.6.*
+RUN ${PIP} install --force-reinstall -U pip==19.0.*
 
 RUN source /opt/rh/devtoolset-7/enable && ${PIP} install \
-        Pillow \
-        h5py \
-        ipykernel \
-        jupyter \
-        matplotlib \
-        mock \
-        numpy \
-        scipy \
-        sklearn \
-        pandas \
-        wheel
+        Pillow==5.4.* \
+        h5py==2.9.* \
+        ipykernel==4.10.* \
+        jupyter==1.0.* \
+        matplotlib==2.2.* \
+        mock==2.0.* \
+        numpy==1.16.* \
+        scipy==1.2.* \
+        scikit-learn==0.20.* \
+        pandas==0.23.* \
+        wheel==0.32.*
 
 RUN source /opt/rh/devtoolset-7/enable && ${PYTHON} -m ipykernel.kernelspec
 

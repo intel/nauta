@@ -15,20 +15,20 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python3.6
 ENV PIP=pip3.6
 
-RUN source /opt/rh/devtoolset-7/enable && ${PIP} install -U pip setuptools
+RUN source /opt/rh/devtoolset-7/enable && ${PIP} install -U pip==19.0.* setuptools==40.6.*
 
 RUN source /opt/rh/devtoolset-7/enable && ${PIP} install \
-        Pillow \
-        h5py \
-        ipykernel \
-        jupyter \
-        matplotlib \
-        mock \
-        numpy \
-        scipy \
-        sklearn \
-        pandas \
-        wheel
+        Pillow==5.4.* \
+        h5py==2.9.* \
+        ipykernel==5.1.* \
+        jupyter==1.0.* \
+        matplotlib==3.0.* \
+        mock==2.0.* \
+        numpy==1.16.* \
+        scipy==1.2.* \
+        scikit-learn==0.20.* \
+        pandas==0.23.* \
+        wheel==0.32.*
 
 RUN source /opt/rh/devtoolset-7/enable && ${PYTHON} -m ipykernel.kernelspec
 
