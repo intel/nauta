@@ -11,7 +11,7 @@ RUN git clone https://github.com/kubernetes-sigs/kube-batch.git
 
 WORKDIR ${GOPATH}/src/github.com/kubernetes-sigs/kube-batch
 
-RUN git checkout e84f2581a94f8290a1bea663fc7e21e69e379e32
+RUN git checkout 38ad28b006850df46812f41080fc4c6867d8dcf6
 
 RUN go build -o /kube-batch ./cmd/kube-batch
 
