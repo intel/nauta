@@ -24,8 +24,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
     push: False
-    args:
-      USER_UID: "{{ user_id }}"
   shared/centos/python36:
     version: "3.6"
     required:
