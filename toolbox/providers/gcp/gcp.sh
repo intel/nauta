@@ -201,7 +201,7 @@ transfer_install_file() {
     rm -rf ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
 
     set +e
-    run_scp_command ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
+    run_scp_command ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${INSTALL_FILE_NAME}.sha256 ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256.remote
     set -e
 
     set +e
@@ -212,9 +212,26 @@ transfer_install_file() {
 
     print_log "DEBUG" "sha256 comparision result:${ret_val}"
 
+
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "mkdir -p artifacts"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "mkdir -p artifacts"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "mkdir -p artifacts"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "mkdir -p artifacts"
+    fi
+
     if [ "${ret_val}" != "0" ]; then
-        run_scp_command "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}
-        run_scp_command ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:${INSTALL_FILE_NAME}.sha256
+        run_scp_command "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${INSTALL_FILE_NAME}
+        run_scp_command ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${INSTALL_FILE_NAME}.sha256
+
+        if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+            print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+            ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+        else
+            print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+            ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+        fi
     fi
 }
 

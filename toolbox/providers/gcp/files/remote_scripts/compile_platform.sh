@@ -18,6 +18,8 @@
 # Parameters (positional)
 # ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}
 
+mkdir -p artifacts
+
 sudo rm -rf compile
 mkdir -p compile
 
@@ -26,12 +28,14 @@ cd compile/nauta
 
 make nctl-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6
 
-find ~/compile/nauta/applications/cli -maxdepth 1 -name "nctl*.tar.gz" -exec cp {} ~/$2 \;
+find ~/compile/nauta/applications/cli -maxdepth 1 -name "nctl*.tar.gz" -exec cp {} ~/artifacts/$2 \;
+
+ln -fs ~/artifacts/$2 ~/artifacts/nctl.installer
 
 echo "Client file is present as ~/$2"
 
 sudo make k8s-installer-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6
 
-find ~/compile/nauta/tools/.workspace -maxdepth 1 -name "nauta*.tar.gz" -exec cp {} ~/$1 \;
+find ~/compile/nauta/tools/.workspace -maxdepth 1 -name "nauta*.tar.gz" -exec cp {} ~/artifacts/$1 \;
 
 echo "Image file is present as ~/$1"

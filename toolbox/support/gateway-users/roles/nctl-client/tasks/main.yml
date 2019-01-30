@@ -1,0 +1,51 @@
+---
+
+- name: "Load a variable file based on the OS type."
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Load gateway users definition
+  include_vars: "{{ gateway_users_config_file }}"
+
+- name: "Check nctl installation package presence"
+  stat:
+    path: "{{ nauta_admin_home }}/artifacts/nctl.installer"
+  register: sym
+
+- name: "Check if installer candidate is present"
+  fail:
+    msg: "Cannot find nctl installer file ({{ nauta_admin_home }}/artifacts/nctl.installer). Cannot overwrite version"
+  when: not sym.stat.exists
+
+# Always download: set status as failed
+- name: "Check nctl installation status"
+  stat:
+    path: "/usr/local/bin/nctl-fake"
+  register: sym
+
+- name: "Remove old install"
+  file:
+    path: "/tmp/nctl.install"
+    state: absent
+  when: not sym.stat.exists
+
+- name: "Remove old package"
+  become: True
+  file:
+    path: "/usr/local/bin/config"
+    state: absent
+  when: not sym.stat.exists
+
+- name: "Unpack and install nctl package"
+  become: True
+  shell: "tar -xvf nctl.installer -C /usr/local/bin"
+  args:
+    chdir: "{{ nauta_admin_home }}/artifacts"
+  when: not sym.stat.exists
+
+- name: "Copy fresh nctl configuration"
+  become: True
+  # yamllint disable-line rule:line-length
+  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/config && cp -R /usr/local/bin/config {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/config"
+  loop_control:
+    loop_var: developer_user
+  with_dict: "{{ gateway_users }}"
