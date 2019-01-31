@@ -1,7 +1,10 @@
 ARG BASE_IMAGE=centos:7.4.1708
 FROM ${BASE_IMAGE}
+ARG USER_UID
 
 RUN yum clean all && yum update -y && yum install -y make curl wget unzip vim rpm-build createrepo pigz
+
+RUN if ! [[ $(getent passwd $USER_UID) ]] ; then adduser -u ${USER_UID} builder; fi
 
 RUN mkdir /root/rpmbuild/BUILD \
           /root/rpmbuild/RPMS \
