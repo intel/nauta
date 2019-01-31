@@ -22,7 +22,7 @@ In order to use that model for streaming inference, perform following steps:
 
 3. Run the following command: 
     ```
-    $ nctl predict launch --local_model_location <directory where you have cloned Tensorflow
+    $ nctl predict launch --local-model-location <directory where you have cloned Tensorflow
     Serving>/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu 
     ```
 4. Alternatively to step 3, you may want to save a trained model on input share, so it can be reused by other experiments/prediction instances. In order to to this, run these commands:
