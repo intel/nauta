@@ -3,7 +3,7 @@ ARG BASE_IMAGE=centos:7.5.1804
 
 # GLIDE Section
 FROM ${BASE_IMAGE} as base
-RUN yum install -y wget
+RUN yum update -y && yum install -y wget
 RUN mkdir -p /build/glide
 ENV GLIDE_VERSION=v0.13.1
 ENV GLIDE_ARCH=amd64

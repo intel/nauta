@@ -1,7 +1,6 @@
 FROM centos:7.4.1708
 
-RUN yum clean all
-RUN yum install -y git gcc clang openssl-devel libpcap-devel libevent libevent-devel \
+RUN yum clean all && yum update -y && yum install -y git gcc clang openssl-devel libpcap-devel libevent libevent-devel \
         libffi-devel libcurl-devel gcc-c++ make \
         pkgconfig sox-devel unzip wget vi @development rpmbuild createrepo \
         libmpc-devel mpfr-devel gmp-devel zlib-devel* \

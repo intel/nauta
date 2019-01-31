@@ -2,8 +2,7 @@ FROM centos:7.5.1804
 
 ADD kubernetes.repo /etc/yum.repos.d/kubernetes.repo
 
-RUN yum clean all
-RUN yum install -y kubectl
+RUN yum clean all && yum update -y && yum install -y kubectl
 
 RUN mkdir -p /out
 

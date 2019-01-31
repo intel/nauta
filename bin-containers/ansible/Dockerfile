@@ -2,8 +2,7 @@
 ARG BASE_IMAGE=centos:7.5.1804
 FROM ${BASE_IMAGE}
 
-RUN yum install -y centos-release-scl
-RUN yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python36
+RUN yum update -y &&  yum install -y centos-release-scl && yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python36
 
 ADD requirements.txt /requirements.txt
 

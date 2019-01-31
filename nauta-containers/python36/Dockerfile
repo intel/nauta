@@ -1,8 +1,7 @@
 ARG BASE_IMAGE=centos:7.4.1708
 FROM ${BASE_IMAGE}
 
-RUN yum clean all
-RUN yum update -y
+RUN yum clean all && yum update -y
 #RUN yum install -y --skip-broken https://centos7.iuscommunity.org/ius-release.rpm
 
 RUN echo $'[ius] \n\ 

@@ -1,9 +1,9 @@
 FROM centos:7.4.1708
 
 WORKDIR /
-RUN yum -y update
-RUN yum group install -y "Development Tools"
-RUN yum install -y libevent libevent-devel iptables openssl pkgconfig
+RUN yum update -y && \ 
+    yum group install -y "Development Tools" && \
+    yum install -y libevent libevent-devel iptables openssl pkgconfig
 
 RUN git clone https://github.com/darkk/redsocks
 WORKDIR /redsocks

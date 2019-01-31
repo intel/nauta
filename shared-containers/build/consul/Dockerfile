@@ -9,7 +9,7 @@ RUN cd /build-output/consul && unzip consul-1.1.0_linux_amd64.zip
 
 RUN rm -rf /build-output/consul/consul-1.1.0_linux_amd64.zip
 
-RUN yum clean all && yum install -y which
+RUN yum clean all && yum update -y && yum install -y which
 
 RUN cd /build-output && \
     tar -I pigz -cf consul.tar.gz consul/
