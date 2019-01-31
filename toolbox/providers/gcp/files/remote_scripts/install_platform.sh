@@ -17,6 +17,6 @@
 
 sudo rm -rf install
 mkdir -p install
-tar xvf $1 -C install
+tar xvf artifacts/$1 -C install
 chmod +x install/installer.sh
 LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ENV_CONFIG=/home/nauta/config.yml install/installer.sh nauta-install
