@@ -25,12 +25,12 @@ import time
 import click
 
 from util.logger import initialize_logger
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.k8s.kubectl import check_users_presence, UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
 from platform_resources.users import purge_user
-from util.k8s.k8s_info import is_current_user_administrator, get_config_map_data, patch_config_map_data
+from util.k8s.k8s_info import get_config_map_data, patch_config_map_data
 from util.aliascmd import AliasCmd
 from util.spinner import spinner
 from util.system import handle_error
@@ -45,7 +45,7 @@ NAUTA_NAMESPACE = "nauta"
 @click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='d', options_metavar='[options]')
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=Texts.HELP_PR)
-@common_options()
+@common_options(admin_command=True)
 @pass_state
 def delete(state: State, username: str, purge: bool):
     """
@@ -55,9 +55,6 @@ def delete(state: State, username: str, purge: bool):
     :param purge: if set - command removes also all artifacts associated with a user
     """
     try:
-        if not is_current_user_administrator():
-            handle_error(user_msg=Texts.USER_NOT_ADMIN_ERROR_MSG)
-            exit(1)
         click.echo(Texts.DELETION_CHECK_PRESENCE)
         user_state = check_users_presence(username)
 

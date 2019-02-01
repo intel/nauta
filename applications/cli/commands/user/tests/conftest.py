@@ -24,5 +24,6 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def mock_cli_validation(mocker):
-    mocker.patch('cli_state.verify_cli_dependencies')
-    mocker.patch('cli_state.verify_cli_config_path')
+    mocker.patch('util.cli_state.verify_cli_dependencies')
+    mocker.patch('util.cli_state.verify_cli_config_path')
+    mocker.patch('util.cli_state.verify_user_privileges')

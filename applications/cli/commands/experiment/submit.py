@@ -29,14 +29,13 @@ from tabulate import tabulate
 
 from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds, \
     validate_env_paramater
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names, validate_template_name, \
     validate_pack
-from util.k8s.k8s_info import is_current_user_administrator
 from platform_resources.run_model import RunStatus
 from util.system import handle_error
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
@@ -125,15 +124,11 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
 @click.argument("script-parameters", nargs=-1, metavar='[-- script-parameters]', callback=clean_script_parameters)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            env: List[str], script_parameters: Tuple[str, ...], requirements: str):
-    if is_current_user_administrator():
-        handle_error(logger, Texts.USER_IS_ADMIN_LOG_MSG, Texts.USER_IS_ADMIN_USR_MSG)
-        exit(1)
-
     logger.debug(Texts.SUBMIT_START_LOG_MSG)
     validate_script_location(script_location)
     validate_pack_params(pack_param)

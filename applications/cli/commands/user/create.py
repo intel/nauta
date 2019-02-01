@@ -30,9 +30,9 @@ from util.config import Config
 from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import execute_system_command, handle_error
-from util.k8s.k8s_info import get_users_token, is_current_user_administrator, get_kubectl_host
+from util.k8s.k8s_info import get_users_token, get_kubectl_host
 from util.config import NAUTAConfigMap
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import check_users_presence, UserState
@@ -76,7 +76,7 @@ DEFAULT_FILENAME = "{}.config"
 @click.argument('username', required=True)
 @click.option("-l", "--list-only", is_flag=True, help=Texts.HELP_L)
 @click.option("-f", "--filename", help=Texts.HELP_F)
-@common_options()
+@common_options(admin_command=True)
 @pass_state
 def create(state: State, username: str, list_only: bool, filename: str):
     """
@@ -95,10 +95,6 @@ def create(state: State, username: str, list_only: bool, filename: str):
         except ValueError as exe:
             handle_error(logger, Texts.NAME_VALIDATION_ERROR_MSG.format(username=username), str(exe),
                          add_verbosity_msg=state.verbosity == 0)
-            exit(1)
-
-        if not is_current_user_administrator():
-            handle_error(logger, Texts.USER_NOT_ADMIN_ERROR_MSG, Texts.USER_NOT_ADMIN_ERROR_MSG)
             exit(1)
 
         user_state = check_users_presence(username)

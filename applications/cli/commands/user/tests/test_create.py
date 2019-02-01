@@ -162,145 +162,85 @@ def test_delete_user_failure(mocker):
     assert dhr_mock.call_count == 0
 
 
-def test_create_user_failure(mocker):  # noqa: F811
-    cup_mock = mocker.patch(
-        "commands.user.create.check_users_presence",
-        return_value=UserState.ACTIVE)
-    esc_mock = mocker.patch(
-        "commands.user.create.execute_system_command", return_value=("", 0))
-    gut_mock = mocker.patch(
-        "commands.user.create.get_users_token",
-        return_value=test_samba_password)
-    vun_mock = mocker.patch("commands.user.create.validate_user_name")
-    icu_mock = mocker.patch(
-        "commands.user.create.is_current_user_administrator",
-        return_value=True)
+class UserCreationMocks:
+    def __init__(self, mocker):
+        self.check_users_presence = mocker.patch(
+            "commands.user.create.check_users_presence",
+            return_value=UserState.ACTIVE)
+        self.execute_system_command = mocker.patch(
+            "commands.user.create.execute_system_command", return_value=("", 0))
+        self.get_users_token = mocker.patch(
+            "commands.user.create.get_users_token",
+            return_value=test_samba_password)
+        self.validate_user_name = mocker.patch("commands.user.create.validate_user_name")
 
+
+@pytest.fixture()
+def user_creation_mocks(mocker) -> UserCreationMocks:
+    return UserCreationMocks(mocker)
+
+
+def test_create_user_failure(user_creation_mocks: UserCreationMocks):  # noqa: F811
     runner = CliRunner()
     runner.invoke(create, [test_username])
 
-    assert cup_mock.call_count == 1, "users presence wasn't checked"
-    assert esc_mock.call_count == 0, "user was created"
-    assert gut_mock.call_count == 0, "users password was taken"
-    assert vun_mock.call_count == 1, "username wasn't validated"
-    assert icu_mock.call_count == 1, "admin wasn't checked"
+    assert user_creation_mocks.check_users_presence.call_count == 1, "users presence wasn't checked"
+    assert user_creation_mocks.execute_system_command.call_count == 0, "user was created"
+    assert user_creation_mocks.get_users_token.call_count == 0, "users password was taken"
+    assert user_creation_mocks.validate_user_name.call_count == 1, "username wasn't validated"
 
 
-def test_create_user_terminating(mocker):  # noqa: F811
-    cup_mock = mocker.patch(
-        "commands.user.create.check_users_presence",
-        return_value=UserState.TERMINATING)
-    esc_mock = mocker.patch(
-        "commands.user.create.execute_system_command", return_value=("", 0))
-    gut_mock = mocker.patch(
-        "commands.user.create.get_users_token",
-        return_value=test_samba_password)
-    vun_mock = mocker.patch("commands.user.create.validate_user_name")
-    icu_mock = mocker.patch(
-        "commands.user.create.is_current_user_administrator",
-        return_value=True)
-
+def test_create_user_terminating(user_creation_mocks: UserCreationMocks):  # noqa: F811
+    user_creation_mocks.check_users_presence.return_value = UserState.TERMINATING
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
     assert Texts.USER_BEING_REMOVED_ERROR_MSG.format(
         username=test_username) in result.output
 
-    assert cup_mock.call_count == 1, "users presence wasn't checked"
-    assert esc_mock.call_count == 0, "user was created"
-    assert gut_mock.call_count == 0, "users password was taken"
-    assert vun_mock.call_count == 1, "username wasn't validated"
-    assert icu_mock.call_count == 1, "admin wasn't checked"
+    assert user_creation_mocks.check_users_presence.call_count == 1, "users presence wasn't checked"
+    assert user_creation_mocks.execute_system_command.call_count == 0, "user was created"
+    assert user_creation_mocks.get_users_token.call_count == 0, "users password was taken"
+    assert user_creation_mocks.validate_user_name.call_count == 1, "username wasn't validated"
 
 
-def test_create_user_not_admin(mocker):  # noqa: F811
-    cup_mock = mocker.patch(
-        "commands.user.create.check_users_presence", return_value=False)
-    vun_mock = mocker.patch("commands.user.create.validate_user_name")
-    icu_mock = mocker.patch(
-        "commands.user.create.is_current_user_administrator",
-        return_value=False)
+def test_create_user_incorrect_name(user_creation_mocks: UserCreationMocks):  # noqa: F811
+    error_msg = 'error'
+    user_creation_mocks.validate_user_name.side_effect = ValueError(error_msg)
 
     runner = CliRunner()
     result = runner.invoke(create, [test_username])
 
-    assert Texts.USER_NOT_ADMIN_ERROR_MSG in result.output
-
-    assert cup_mock.call_count == 0, "users presence wasn't checked"
-    assert vun_mock.call_count == 1, "username wasn't validated"
-    assert icu_mock.call_count == 1, "admin wasn't checked"
-
-
-def test_create_user_incorrect_name(mocker):  # noqa: F811
-    vun_mock = mocker.patch(
-        "commands.user.create.validate_user_name",
-        side_effect=ValueError("error"))
-    icu_mock = mocker.patch(
-        "commands.user.create.is_current_user_administrator",
-        return_value=False)
-
-    runner = CliRunner()
-    result = runner.invoke(create, [test_username])
-
-    assert "error" in result.output
-
-    assert vun_mock.call_count == 1, "username wasn't validated"
-    assert icu_mock.call_count == 0, "admin wasn't checked"
+    assert error_msg in result.output
+    assert user_creation_mocks.validate_user_name.call_count == 1, "username wasn't validated"
 
 
 class CreateUserMock():
-    def __init__(self, cup: None, esc: None, gut: None, vun: None, icu: None,
-                 opj: None, ccl: None, cnm: None, gkh: None, iuc: None):
-        self.cup = cup
-        self.esc = esc
-        self.gut = gut
-        self.vun = vun
-        self.icu = icu
-        self.opj = opj
-        self.ccl = ccl
-        self.cnm = cnm
-        self.gkh = gkh
-        self.iuc = iuc
+    def __init__(self, mocker):
+        self.check_users_presence = mocker.patch("commands.user.create.check_users_presence", return_value=False)
+        self.execute_system_command = mocker.patch("commands.user.create.execute_system_command",
+                                                   return_value=("", 0, ""))
+        self.get_users_token = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
+        self.validate_user_name = mocker.patch("commands.user.create.validate_user_name")
+        self.path_join = mocker.patch("os.path.join", return_value="folder")
+
+        self.is_user_created = mocker.patch('commands.user.create.is_user_created', return_value=True)
+
+        config_class_mock = mocker.patch('commands.user.create.Config')
+        self.config_instance = config_class_mock.return_value
+        self.config_instance.config_path = "test"
+
+        config_map_class_mock = mocker.patch("commands.user.create.NAUTAConfigMap")
+        self.config_map = config_map_class_mock.return_value
+        self.config_map.tiller_location = "image_tiller"
+
+        self.get_kubectl_host = mocker.patch("commands.user.create.get_kubectl_host")
+        self.get_kubectl_host.return_value = "localhost"
 
 
 @pytest.fixture
 def prepare_mocks(mocker) -> CreateUserMock:
-    cup_mock = mocker.patch(
-        "commands.user.create.check_users_presence", return_value=False)
-    esc_mock = mocker.patch(
-        "commands.user.create.execute_system_command",
-        return_value=("", 0, ""))
-    gut_mock = mocker.patch(
-        "commands.user.create.get_users_token",
-        return_value=test_samba_password)
-    vun_mock = mocker.patch("commands.user.create.validate_user_name")
-    icu_mock = mocker.patch(
-        "commands.user.create.is_current_user_administrator",
-        return_value=True)
-    opj_mock = mocker.patch("os.path.join", return_value="folder")
-    iuc_mock = mocker.patch(
-        "commands.user.create.is_user_created", return_value=True)
-    config_class_mock = mocker.patch('commands.user.create.Config')
-    config_instance_mock = config_class_mock.return_value
-    config_instance_mock.config_path = "test"
-    config_map_class_mock = mocker.patch("commands.user.create.NAUTAConfigMap")
-    config_map_instance = config_map_class_mock.return_value
-    config_map_instance.tiller_location = "image_tiller"
-
-    gkh_mock = mocker.patch("commands.user.create.get_kubectl_host")
-    gkh_mock.return_value = "localhost"
-
-    return CreateUserMock(
-        cup=cup_mock,
-        esc=esc_mock,
-        gut=gut_mock,
-        vun=vun_mock,
-        icu=icu_mock,
-        opj=opj_mock,
-        ccl=config_instance_mock,
-        cnm=config_map_instance,
-        gkh=gkh_mock,
-        iuc=iuc_mock)
+    return CreateUserMock(mocker)
 
 
 def check_asserts(prepare_mocks: CreateUserMock,
@@ -308,26 +248,22 @@ def check_asserts(prepare_mocks: CreateUserMock,
                   esc_count=1,
                   gut_count=1,
                   vun_count=1,
-                  icu_count=1,
                   opj_count=1,
-                  gkh_count=1,
-                  iuc_count=1):
-    assert prepare_mocks.cup.call_count == cup_count, "User presence wasn't verified."
-    assert prepare_mocks.esc.call_count == esc_count, "User wasn't created."
-    assert prepare_mocks.gut.call_count == gut_count, "Token wasn't taken."
-    assert prepare_mocks.vun.call_count == vun_count, "User wasn't validated."
-    assert prepare_mocks.icu.call_count == icu_count, "Users wasn't checked as an admin."
-    assert prepare_mocks.opj.call_count == opj_count, "Folder wasn't generated."
-    assert prepare_mocks.gkh.call_count == gkh_count, "Kubectl host wasn't taken"
-    assert prepare_mocks.iuc.call_count == iuc_count, "User's state wasn't checked"
+                  gkh_count=1):
+    assert prepare_mocks.check_users_presence.call_count == cup_count, "User presence wasn't verified."
+    assert prepare_mocks.execute_system_command.call_count == esc_count, "User wasn't created."
+    assert prepare_mocks.get_users_token.call_count == gut_count, "Token wasn't taken."
+    assert prepare_mocks.validate_user_name.call_count == vun_count, "User wasn't validated."
+    assert prepare_mocks.path_join.call_count == opj_count, "Folder wasn't generated."
+    assert prepare_mocks.get_kubectl_host.call_count == gkh_count, "Kubectl host wasn't taken"
 
 
-def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
+def test_create_user_success(prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
     m = mock_open()
     with patch("builtins.open", m):
-        result = runner.invoke(create, [test_username])
+        result = runner.invoke(create, [test_username], catch_exceptions=False)
 
     assert Texts.CONFIG_SAVE_SUCCESS_MSG.format(
         filename=test_username + ".config") in result.output
@@ -335,27 +271,16 @@ def test_create_user_success(mocker, prepare_mocks):  # noqa: F811
     check_asserts(prepare_mocks)
 
 
-def test_create_user_with_empty_username(mocker, prepare_mocks):  # noqa: F811
+def test_create_user_with_empty_username(prepare_mocks: CreateUserMock):  # noqa: F811
     runner = CliRunner()
     m = mock_open()
     with patch("builtins.open", m):
-        result = runner.invoke(create, [])
+        result = runner.invoke(create, [], catch_exceptions=False)
 
     assert 'Missing argument "USERNAME"' in result.output
-    check_asserts(
-        prepare_mocks,
-        cup_count=0,
-        esc_count=0,
-        gut_count=0,
-        vun_count=0,
-        icu_count=0,
-        opj_count=0,
-        gkh_count=0,
-        iuc_count=0)
 
 
-def test_create_user_with_non_empty_username(mocker,
-                                             prepare_mocks):  # noqa: F811
+def test_create_user_with_non_empty_username(prepare_mocks: CreateUserMock):  # noqa: F811
     runner = CliRunner()
     m = mock_open()
     with patch("builtins.open", m):
@@ -366,8 +291,7 @@ def test_create_user_with_non_empty_username(mocker,
     check_asserts(prepare_mocks)
 
 
-def test_create_user_success_display_config(mocker,
-                                            prepare_mocks):  # noqa: F811
+def test_create_user_success_display_config(prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
     m = mock_open()
@@ -379,8 +303,7 @@ def test_create_user_success_display_config(mocker,
     check_asserts(prepare_mocks)
 
 
-def test_create_user_success_with_filename(mocker,
-                                           prepare_mocks):  # noqa: F811
+def test_create_user_success_with_filename(prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
     filename = "test-filename"
@@ -394,8 +317,7 @@ def test_create_user_success_with_filename(mocker,
     check_asserts(prepare_mocks)
 
 
-def test_create_user_success_with_error_saving_file(
-        mocker, prepare_mocks):  # noqa: F811
+def test_create_user_success_with_error_saving_file(prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
     filename = "test-filename"
@@ -409,8 +331,7 @@ def test_create_user_success_with_error_saving_file(
     check_asserts(prepare_mocks)
 
 
-def test_create_user_success_with_error_creating_file(
-        mocker, prepare_mocks):  # noqa: F811
+def test_create_user_success_with_error_creating_file(mocker, prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
 
@@ -425,11 +346,10 @@ def test_create_user_success_with_error_creating_file(
     check_asserts(prepare_mocks)
 
 
-def test_create_user_with_defined_status_only(mocker,
-                                              prepare_mocks):  # noqa: F811
+def test_create_user_with_defined_status_only(prepare_mocks: CreateUserMock):  # noqa: F811
+    prepare_mocks.is_user_created.return_value = False
     runner = CliRunner()
     m = mock_open()
-    prepare_mocks.iuc.return_value = False
     with patch("builtins.open", m):
         result = runner.invoke(create, [test_username])
 
@@ -441,7 +361,7 @@ def test_create_user_with_defined_status_only(mocker,
     check_asserts(prepare_mocks)
 
 
-def test_create_user_with_l_and_f(mocker, prepare_mocks):  # noqa: F811
+def test_create_user_with_l_and_f(prepare_mocks: CreateUserMock):  # noqa: F811
 
     runner = CliRunner()
 
@@ -458,7 +378,5 @@ def test_create_user_with_l_and_f(mocker, prepare_mocks):  # noqa: F811
         esc_count=0,
         gut_count=0,
         vun_count=0,
-        icu_count=0,
         opj_count=0,
-        gkh_count=0,
-        iuc_count=0)
+        gkh_count=0)

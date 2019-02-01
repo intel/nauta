@@ -181,16 +181,6 @@ def test_mount(mocker):
     assert cmp_mock.call_count == call_number
 
 
-def test_mount_is_admin(mocker):
-    icu_mock = mocker.patch("commands.mount.is_current_user_administrator", return_value=True)
-
-    runner = CliRunner()
-    result = runner.invoke(mount)
-
-    assert icu_mock.call_count == 1
-    assert Texts.USER_IS_ADMIN_ERROR_MSG in result.output
-
-
 def test_get_mounts_windows(mocker, capsys):
     esc_mock = mocker.patch("commands.mount.execute_system_command")
     esc_mock.return_value = WIN_NET_USE_OUTPUT, 0, WIN_NET_USE_OUTPUT

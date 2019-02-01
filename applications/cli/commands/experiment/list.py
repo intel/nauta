@@ -24,7 +24,7 @@ import click
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, RunKinds, RUN_NAME, RUN_STATUS, RUN_SUBMISSION_DATE,\
     RUN_SUBMITTER
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from platform_resources.run_model import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger

@@ -21,7 +21,7 @@
 
 import click
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 import commands.experiment.cancel
 from util.logger import initialize_logger
@@ -35,7 +35,7 @@ logger = initialize_logger(__name__)
 @click.argument("name", required=False, metavar='[name]')
 @click.option('-m', '--match', default=None, help=Texts.HELP_M)
 @click.option('-p', '--purge', default=None, help=Texts.HELP_P, is_flag=True)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 @click.pass_context
 def cancel(context, state: State, name: str, match: str, purge: bool):

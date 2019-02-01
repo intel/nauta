@@ -36,7 +36,6 @@ def mock_kubectl_calls(mocker):
 
 
 def test_verify_with_kubectl_connection_error(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = KubectlConnectionError("Cannot connect to K8S cluster")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
@@ -56,7 +55,6 @@ def test_verify_with_kubectl_connection_error(mocker):
 
 
 def test_verify_with_kubectl_not_found_error(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = FileNotFoundError
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
@@ -76,7 +74,6 @@ def test_verify_with_kubectl_not_found_error(mocker):
 
 
 def test_verify_with_kubectl_connection_success(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
@@ -98,7 +95,6 @@ def test_verify_with_kubectl_connection_success(mocker):
 
 
 def test_verify_with_kubectl_namespace_get_error(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
@@ -122,7 +118,6 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
 
 
 def test_verify_with_kubectl_admin_check_error(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
@@ -141,7 +136,6 @@ def test_verify_with_kubectl_admin_check_error(mocker):
 
 
 def test_verify_with_port_forwarding_error(mocker):
-    mocker.patch("cli_state.verify_cli_config_path")
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))

@@ -24,7 +24,7 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 import platform_resources.users as users_api
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
