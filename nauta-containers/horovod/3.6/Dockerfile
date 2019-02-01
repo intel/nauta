@@ -13,18 +13,32 @@ COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 RUN pip install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     pip install --ignore-installed /experiment_metrics-*.tar.gz
 
-RUN apt-get update && apt-get install -y libopenmpi-dev openmpi-bin libhdf5-openmpi-dev
+RUN apt-get update && apt-get install -y build-essential
+
+RUN mkdir /tmp/openmpi && \
+    cd /tmp/openmpi && \
+    wget https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.gz && \
+    tar zxf openmpi-3.1.2.tar.gz && \
+    cd openmpi-3.1.2 && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/openmpi
 
 RUN pip install horovod==${HOROVOD_VERSION}
 
-ENV MPIRUN_BIN /usr/bin/mpirun
-RUN mv ${MPIRUN_BIN} ${MPIRUN_BIN}.real && \
-    echo '#!/bin/bash' > ${MPIRUN_BIN} && \
-    echo '${MPIRUN_BIN}.real --allow-run-as-root "$@"' >> ${MPIRUN_BIN} && \
-    chmod a+x ${MPIRUN_BIN}
+# Create a wrapper for OpenMPI to allow running as root by default
+RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real && \
+    echo '#!/bin/bash' > /usr/local/bin/mpirun && \
+    echo 'mpirun.real --allow-run-as-root "$@"' >> /usr/local/bin/mpirun && \
+    chmod a+x /usr/local/bin/mpirun
 
-RUN echo "hwloc_base_binding_policy = none" >> /etc/openmpi/openmpi-mca-params.conf && \
-    echo "rmaps_base_mapping_policy = slot" >> /etc/openmpi/openmpi-mca-params.conf
+# Configure OpenMPI to run good defaults:
+#   --bind-to none --map-by slot --mca btl_tcp_if_exclude lo,docker0
+RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params.conf && \
+    echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf && \
+    echo "btl_tcp_if_exclude = lo,docker0" >> /usr/local/etc/openmpi-mca-params.conf
 
 RUN apt-get install -y openssh-client openssh-server && \
     mkdir -p /var/run/sshd /app /root/.ssh
@@ -45,4 +59,3 @@ RUN apt-get install -y apt-transport-https
 RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
 RUN apt-get update && apt-get install -y kubectl
-

@@ -116,6 +116,8 @@ spec:
         env:
           - name: STS_NAME
             value: {{ template "horovod.fullname" . }}
+          - name: RUN_NAME
+            value: {{ .Release.Name }}
         volumeMounts:
           - name: shared-data
             mountPath: /horovod/init

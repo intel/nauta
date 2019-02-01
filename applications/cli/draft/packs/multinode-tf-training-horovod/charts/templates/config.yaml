@@ -78,7 +78,7 @@ data:
      exit $RETURN_CODE
   master.kubectl: |
      #!/bin/bash
-     while [ ! -f /horovod/init/done ]; do
+     while [ ! -f /horovod/init/done ] && [ -z "$(kubectl get pods --selector=runName=$RUN_NAME,role=master -o jsonpath='{.items[*].status.containerStatuses[*].state}' | grep terminated)" ]; do
        sleep 5
      done
      kubectl delete sts $STS_NAME
