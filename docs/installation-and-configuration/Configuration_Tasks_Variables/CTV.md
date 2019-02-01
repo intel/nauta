@@ -16,8 +16,8 @@ proxy:
 
 # This is a list of DNS servers used for resolution: a max of three entries.
 dns_servers:
-  - 10.102.60.20
-  - 10.102.60.30
+  - 8.8.8.8
+  - 8.8.4.4
 
 # This is a domain used as part of a domain search list.
 dns_search_domains:
