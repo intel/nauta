@@ -232,7 +232,7 @@ resource "google_container_cluster" "primary" {
 
   node_pool {
     name       = "${var.prefix}-pool0"
-    node_count = "${var.pool_size}"
+    node_count = "1"
 
     node_config {
       preemptible  = false
@@ -259,6 +259,35 @@ resource "google_container_cluster" "primary" {
       }
     }
   }
+
+{% if (gcp.pool_size | int ) > 1 %}
+  node_pool {
+    name       = "${var.prefix}-pool1"
+    node_count = "{{ (gcp.pool_size | int ) - 1 }}"
+
+    node_config {
+      preemptible  = false
+      machine_type = "${var.pool_type}"
+
+      image_type = "ubuntu"
+      min_cpu_platform = "${var.pool_min_cpu_platform}"
+
+      oauth_scopes = [
+        "compute-rw",
+        "storage-ro",
+        "logging-write",
+        "monitoring",
+      ]
+      tags = ["nat"]
+
+      service_account = ""
+
+      metadata {
+        sshKeys = "${var.internal_username}:${file(var.internal_public_key_file)}"
+      }
+    }
+  }
+{% endif %}
 
   addons_config {
     http_load_balancing {
