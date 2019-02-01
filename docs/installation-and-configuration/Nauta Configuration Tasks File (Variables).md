@@ -19,7 +19,7 @@ proxy:
   ftp_proxy: http://<your proxy address and port>
   https_proxy: http://<your proxy address and port>
   no_proxy: <localhost, any other addresses>, 10.0.0.1,localhost,.nauta
-  HTTP_PROXY: http://proxy-chain.intel.com:911
+  HTTP_PROXY: http://<your proxy address and port>
   FTP_PROXY: http://<your proxy address and port>
   HTTPS_PROXY: http://<your proxy address and port>
   NO_PROXY: .<localhost, any other addresses>, 10.0.0.1,localhost,.nauta

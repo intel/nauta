@@ -77,7 +77,7 @@ OSX_MOUNT_OUTPUT = "/dev/disk1s1 on / (apfs, local, journaled)\n" \
                    "map -hosts on /net (autofs, nosuid, automounted, nobrowse)\n" \
                    "map auto_home on /home (autofs, automounted, nobrowse)\n" \
                    "map -static on /nfs/test_data (autofs, automounted, nobrowse)\n" \
-                   "ftp.nervana.sclab.intel.com:/home/nervana/fileshare/data on /nfs/test_data (nfs, nodev, noexec," \
+                   "ftp.nonexisting-nauta.com:/home/nauta/fileshare/data on /nfs/test_data (nfs, nodev, noexec," \
                    " nosuid, read-only, automounted, nobrowse)\n" \
                    f"//username@{MOUNT_IP}/input on /Users/tester/username/mounted_dir " \
                    "(smbfs, nodev, nosuid, mounted by tester)\n" \

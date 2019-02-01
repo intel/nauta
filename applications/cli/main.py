@@ -38,7 +38,7 @@ from cli_state import verify_cli_config_path
 
 logger = initialize_logger(__name__)
 
-BANNER = """Intel® Deep Learning Studio (Intel® DL Studio) Client
+BANNER = """Nauta Client
 
             To get further help on commands use COMMAND with -h or --help option."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)

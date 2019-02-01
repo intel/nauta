@@ -127,20 +127,10 @@ Prediction instance URL and authorization token, as well as information about th
     | test                  | /mnt/input/home/experiment1  | QUEUED   |
     
     Prediction instance URL (append method verb manually, e.g. :predict):
-    https://10.91.120.94.lab.nervana.sclab.intel.com:8443/api/v1/namespaces/mgumowsk/services/test/proxy/v1/models/home
+    https://192.168.0.1:8443/api/v1/namespaces/jdoe/services/test/proxy/v1/models/home
     
     Authorize with following header:
-    Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRl
-    cy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJtZ3Vtb3dzayIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJ
-    kZWZhdWx0LXRva2VuLWNrNXpkIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImRlZmF1bHQiLCJrdW
-    Jlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIzNDBlODEzNC1hZDE1LTExZTgtYTcwMS01MjU4MTYwNDA2MDAiL
-    CJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6bWd1bW93c2s6ZGVmYXVsdCJ9.kTLiLKpi1MzNMzXTmaSEbaCLYt4paZ_xFVT19aT6Fsf9ce-DTVu
-    RfAqd7Pf_CMktU9SJlZ_aN9WP35nysn-op8bFH5jLCJLSHBGBPkk7daU-7WQF4FfAD5gurLYZ2arNMd-FROEG9DjPOomaPeE5GLMhHwzKBRFzprr_jI
-    QG72QcCOA7lb4lRnVusiYtlsgqnDPbhRH8XBGWk429HakSrrjiSBfKivpNXYzlZ9YSMQrZn-ZbIpr_QSVfZlL_4IWmmvCvGOXTnqBKfOVbzf6ndsia5
-    hqTpgFV8mRkoblre2KiOvXPXy-xvysbAC3CMKAVoxCbzl7TmD6xow9vbWaMvKEnJk4FRM4g5tjqz4khJnPlAMvYWYH6qLgJx0yyVWOYNB5Iuf2m8UwF
-    mz7fEBvxDYAVAt1j-NOC-yorfnr-yQaxRbSKsvBRX-x_UqbpPL5yw_0R-XpTov4yj9t6ck4HC8h1-mgbkRdrIzNIKpv4EnC2WSHp2U5RpiKWXCmZpRk
-    y27xXkYZ2vzHdRLinWqDyaq42w0tlkOoAKonKfcHLNCWnlgcjoYT1kZ7pUKRI5ZNjQiX4Tbd_kqmbyNC6DWmMDBiufgpRLxyhxRJZ5BUCC_sTDX10PE
-    X5HcXfYIHtPqKK43ahStzpWKAspfqAVWX_gwBfhOeKd-kdbGTXP2QRQsQ
+    Authorization: Bearer abcdefghijklmnopqrst0123456789
 
  
 ## list Subcommand
