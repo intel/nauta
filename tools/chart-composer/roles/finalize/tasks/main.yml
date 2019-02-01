@@ -22,6 +22,7 @@
   unarchive:
     src: "{{ build_dir }}/helm.tar.gz"
     dest: "{{ build_dir }}"
+    remote_src: yes
 
 - name: Remove unecessary helm tar gz package
   file:
