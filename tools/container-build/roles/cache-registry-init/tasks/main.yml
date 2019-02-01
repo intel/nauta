@@ -33,6 +33,7 @@
       - 5000
     image: "registry:2"
     stop_timeout: 0
+    timeout: 120
     restart_policy: no
     user: "{{ user_id }}"
     state: started

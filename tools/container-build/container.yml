@@ -8,6 +8,7 @@
       docker_container:
         name: "{{ registry_name }}"
         state: absent
+        timeout: 120
   roles:
     - role: cache-registry-init
       when: not docker_repository_cache.external
