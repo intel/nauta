@@ -18,6 +18,7 @@ from functools import wraps
 import sys
 
 import click
+from typing import Optional
 
 from util.logger import set_verbosity_level, initialize_logger
 from util.config import Config, ConfigInitError
@@ -79,12 +80,38 @@ def verify_cli_config_path():
         sys.exit(1)
 
 
-def common_options(verify_dependencies=True, verify_config_path=True):
+def verify_user_privileges(admin_command: bool, command_name: str):
+    """
+    Verify user's privileges for given command.
+    :param admin_command: if set to True, a warning will be displayed and execution will be stopped for regular users,
+     if set to False, a warning will be displayed and execution will be stopped for admin users
+    :return:
+    """
+    try:
+        if admin_command and not is_current_user_administrator():
+            handle_error(logger=logger,
+                         log_msg=Texts.USER_NOT_ADMIN_MSG.format(command_name=command_name),
+                         user_msg=Texts.USER_NOT_ADMIN_MSG.format(command_name=command_name))
+            sys.exit(1)
+        if not admin_command and is_current_user_administrator():
+            handle_error(logger=logger,
+                         log_msg=Texts.USER_IS_ADMIN_MSG.format(command_name=command_name),
+                         user_msg=Texts.USER_IS_ADMIN_MSG.format(command_name=command_name))
+            sys.exit(1)
+    except Exception:
+        handle_error(logger, Texts.ADMIN_CHECK_ERROR_MSG, Texts.ADMIN_CHECK_ERROR_MSG,
+                     add_verbosity_msg=True)
+        sys.exit(1)
+
+
+def common_options(verify_dependencies=True, verify_config_path=True, admin_command: Optional[bool] = None):
     """
     Common options decorator for Click command functions. Adds verbosity option and optionally runs CLI dependencies
     verification before command run.
     :param verify_dependencies: if set to True, CLI dependencies will be verified before command run
     :param verify_config_path: if set to True, CLI config path will be verified before command run
+    :param admin_command: if set to True, only admin users will be able to run decorated command, if set to False, only
+    regular users will be able to run decorated command. If admin_command is set to None, check will not be performed
     :return: decorated command
     """
     def decorator(func):
@@ -95,6 +122,8 @@ def common_options(verify_dependencies=True, verify_config_path=True):
                 verify_cli_config_path()
             if verify_dependencies:
                 verify_cli_dependencies()
+            if admin_command is not None:
+                verify_user_privileges(admin_command, command_name=func.__name__)
 
             return func(*args, **kwargs)
         wrapper = verbosity_option(wrapper)

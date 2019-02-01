@@ -51,9 +51,6 @@ as output/<EXPERIMENT_NAME>.
 
     HELP_L = "Displays a list of nauta folders mounted on a local machine. If run using admin credentials, displays " \
              "mounts of all users."
-    USER_IS_ADMIN_ERROR_MSG = "NAUTA doesn't create shares for administrators. Please execute this command as a " \
-                              "regular user."
-    ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying that current user is an administrator."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
     UNMOUNT_COMMAND_MSG = "Use following command to unmount previously mounted folder:"
     UNMOUNT_OPTIONS_MSG = "In case of problems with unmounting (disconnected disk etc.) try out -f (force) or -l " \
@@ -121,7 +118,6 @@ class UserCreateCmdTexts:
     F_L_OPTIONS_EXCLUSION_ERROR_MSG = "Both -f/--filename and -l/--list_only options cannot be given. Please " \
                                       "choose one of them."
     NAME_VALIDATION_ERROR_MSG = "Error detected while validating user name: {username}."
-    USER_NOT_ADMIN_ERROR_MSG = "Only administrators can create new users."
     USER_ALREADY_EXISTS_ERROR_MSG = "User {username} already exists."
     USER_BEING_REMOVED_ERROR_MSG = "User {username} is still being removed."
     USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
@@ -148,7 +144,6 @@ class UserDeleteCmdTexts:
     USERNAME - is a name of user which should be deleted.
     """
     HELP_PR = "If this option is added, the command removes all of client's artifacts."
-    USER_NOT_ADMIN_ERROR_MSG = "Only administrators can delete users."
     USER_NOT_EXISTS_ERROR_MSG = "User {username} doesn't exists."
     USER_BEING_REMOVED_ERROR_MSG = "User is still being removed."
     USER_PRESENCE_VERIFICATION_ERROR_MSG = "Problems during verifying users presence."
@@ -380,10 +375,6 @@ class ExperimentSubmitCmdTexts:
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
     HELP_PR = "Values (set or range) of a single parameter."
     HELP_PS = "Set of values of one or several parameters."
-    USER_IS_ADMIN_LOG_MSG = "Current user is nauta administrator. Submit cannot be performed."
-    USER_IS_ADMIN_USR_MSG = "You cannot submit experiments as nauta administrator. Switch your KUBECONFIG " \
-                            "environment variable to point to a valid nauta user config. If you don't have one you " \
-                            "can create it with command 'nctl user create'."
     HELP_E = "Environment variables passed to training. User can pass as many environmental variables as it is " \
              "needed - each variable should be in such case passed as a separate -e parameter."
     HELP_R = "Path to file with experiment's pip requirements." \
@@ -744,6 +735,11 @@ class CliStateTexts:
                                   "sure that the k8s cluster is online."
     NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set."
     NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
+    USER_NOT_ADMIN_MSG = "Only nauta administrators can run '{command_name}' command."
+    USER_IS_ADMIN_MSG = "You cannot run command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \
+                            "environment variable to point to a valid nauta user config. If you don't have one you " \
+                            "can create it with command 'nctl user create'."
+    ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying current user privileges."
 
 
 class LicenseAcceptanceTexts:

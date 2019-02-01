@@ -47,8 +47,6 @@ FAILED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-trainin
 class SubmitMocks:
     def __init__(self, mocker):
         self.mocker = mocker
-        self.is_current_user_administrator = mocker.patch(
-            "commands.experiment.submit.is_current_user_administrator", return_value=False)
         self.submit_experiment = mocker.patch("commands.experiment.submit.submit_experiment",
                                               return_value=(SUBMITTED_RUNS, {}, ""))
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
@@ -92,14 +90,6 @@ def test_invalid_pack_param_arguments(prepare_mocks: SubmitMocks):
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "--pack-param", "arg1", "val1", "--pack-param", "arg1",
                                          "val2", "-sfl", SCRIPT_FOLDER])
     assert result.exit_code == 2
-
-
-def test_user_is_admin(prepare_mocks: SubmitMocks):
-    prepare_mocks.is_current_user_administrator.return_value = True
-
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-sfl", SCRIPT_FOLDER])
-    assert Texts.USER_IS_ADMIN_USR_MSG in result.output
-    assert result.exit_code == 1
 
 
 def test_submit_experiment_failure(prepare_mocks: SubmitMocks):

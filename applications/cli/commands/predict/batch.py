@@ -23,7 +23,7 @@ from tabulate import tabulate
 
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from platform_resources.experiment_utils import generate_name
@@ -58,7 +58,7 @@ def validate_local_model_location(local_model_location: str):
               callback=validate_pack_params_names)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False,
               help=Texts.HELP_REQUIREMENTS)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
           model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]], requirements: str):

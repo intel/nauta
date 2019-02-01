@@ -22,7 +22,7 @@ from typing import List, Tuple
 import click
 from tabulate import tabulate
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
@@ -55,7 +55,7 @@ logger = initialize_logger(__name__)
 @click.option("-e", "--env", multiple=True, help=Texts.HELP_E, callback=validate_env_paramater)
 @click.option("-t", "--template", help=Texts.HELP_T, default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
               type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
              port_number: int, env: List[str], template: str):

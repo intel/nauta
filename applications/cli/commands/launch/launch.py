@@ -21,7 +21,7 @@ from http import HTTPStatus
 
 import click
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, build_tensorboard_run_list
 from util.spinner import spinner
 from util.aliascmd import AliasCmd, AliasGroup
@@ -58,7 +58,7 @@ def webui(state: State, no_launch: bool, port_number: int):
 # noinspection PyUnusedLocal
 @click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.SHORT_TB_HELP,
                options_metavar='[options]')
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
 @click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),

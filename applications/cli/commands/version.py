@@ -18,7 +18,7 @@ import click
 from tabulate import tabulate
 
 from util.aliascmd import AliasCmd
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from version import VERSION
 from util.config import NAUTAConfigMap
 from util.exceptions import KubernetesError

@@ -25,7 +25,7 @@ from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
 from platform_resources.run import Run
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.app_names import NAUTAAppNames
@@ -51,7 +51,7 @@ logger = initialize_logger(__name__)
 @click.option('-o', '--output', help=Texts.HELP_O, is_flag=True)
 @click.option('-pa', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
 @click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool, pager: bool, follow: bool):

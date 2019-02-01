@@ -34,7 +34,7 @@ from commands.version import version
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
 from util.config import Config
-from cli_state import verify_cli_config_path
+from util.cli_state import verify_cli_config_path
 
 logger = initialize_logger(__name__)
 

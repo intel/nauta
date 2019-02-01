@@ -22,7 +22,7 @@ import click
 
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from platform_resources.run import Run
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\

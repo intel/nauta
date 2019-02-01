@@ -26,7 +26,7 @@ import click
 
 from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace
 from platform_resources.run import Run, RunStatus
@@ -56,7 +56,7 @@ experiment_name_plural = 'experiments'
 @click.option('-p', '--purge', help=Texts.HELP_P, is_flag=True)
 @click.option('-i', '--pod-ids', help=Texts.HELP_I)
 @click.option('-s', '--pod-status', help=Texts.HELP_S.format(available_statuses=PodStatus.all_members()))
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
            listed_runs_kinds: List[Enum] = None):

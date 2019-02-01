@@ -19,7 +19,7 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from platform_resources.user import User
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger

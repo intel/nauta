@@ -20,7 +20,7 @@ import click
 from tabulate import tabulate
 
 from commands.experiment.common import RUN_TEMPLATE_NAME, get_list_of_packs
-from cli_state import common_options
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error

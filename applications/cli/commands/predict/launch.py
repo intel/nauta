@@ -25,7 +25,7 @@ from tabulate import tabulate
 from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from platform_resources.experiment_utils import generate_name
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
@@ -55,7 +55,7 @@ def validate_local_model_location(local_model_location: str):
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str,
            pack_param: List[Tuple[str, str]], requirements: str):

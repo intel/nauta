@@ -20,7 +20,7 @@ from sys import exit
 import click
 import requests
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key
@@ -38,7 +38,7 @@ logger = initialize_logger(__name__)
 @click.option('-d', '--data', required=True, type=click.Path(exists=True), help=Texts.HELP_D)
 @click.option('-m', '--method-verb', default=InferenceVerb.PREDICT.value,
               type=click.Choice([verb.value for verb in InferenceVerb]), help=Texts.HELP_M)
-@common_options()
+@common_options(admin_command=False)
 @pass_state
 def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
     """

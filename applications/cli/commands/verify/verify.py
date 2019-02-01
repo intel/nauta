@@ -18,7 +18,7 @@ from sys import exit
 
 import click
 
-from cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State
 from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
