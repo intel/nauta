@@ -431,6 +431,8 @@ class ExperimentInteractCmdTexts:
              "it is needed - each variable should be in such case passed as a separate -e paramater."
     HELP_T = "Name of a jupyter notebook template used to create a deployment. " \
              "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
+    TOO_MANY_JUPYTERS = "You have {jupyter_number} opened Jupyter notebooks. Do you still want to open another one?"
+    INTERACT_ABORT_MSG = "Operation of starting a new Jupyter Notebook was aborted."
 
 
 class ExperimentCancelCmdTexts:
