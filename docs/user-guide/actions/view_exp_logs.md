@@ -14,5 +14,9 @@ Here is an example:
 
 The following result, displays an example log. 
  ![Image](images/experiment_log.png)
-
+ 
+ 
+ **Note:**  
+ Logs generated with sub-millisecond frequency may appear out of order when displayed. This is casued by the 1ms resolution of the underlying logging solution.
+ 
  
