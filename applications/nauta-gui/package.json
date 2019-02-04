@@ -95,6 +95,7 @@
     "shelljs": "^0.7.6",
     "sinon": "^4.5.0",
     "sinon-chai": "^2.8.0",
+    "terser": "~3.14.1",
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
     "vue-loader": "^14.2.2",
