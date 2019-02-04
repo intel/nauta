@@ -79,18 +79,6 @@ Before running the Docker Garbage Collector, the administrator should remove ima
 
 5) Restart system's Docker registry. It can be done by deleting the pod with label: `dls4e_app_name=docker-registry` 
 
-## Running Experiments are Evicted After Running Memory-consuming Horovod's Training
-
-When running memory-consuming multi-node, Horovod-based experiments evicts other experiments that work on the same nodes where Horovod-related tasks were scheduled. This is caused by Horovod-related tasks that consume all memory on one master node and worker nodes. This results in eviction of other tasks running on these nodes. However, this is the standard behavior of Kubernetes.
-
-To prevent this, schedule Horovod tasks to be only one on their nodes. To do this, set the requested number of CPUs when submitting an experiment near to maximum allocatable number of CPUs for cluster's nodes.
-
-If the cluster has nodes with different numbers, it should be set to the greatest available number of CPUs on nodes. In this case, review the number of nodes involved in this experiment.
-
-- Number of allocatable CPUs can be gathered by executing the `kubectl` describe node `<node_name>` command. 
-- Number of allocatable cpus is displayed in the `Allocatable->cpu` section. 
-- Number of CPUs gathered this way should be passed as a: `-p resources.requests.cpu <cpu_number>` parameter while issuing experiment submit.
-
 
 ## Command Connection Error
 
