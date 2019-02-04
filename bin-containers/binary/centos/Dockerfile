@@ -3,7 +3,7 @@ ARG BASE_IMAGE
 FROM ${PIP_IMAGE} as pip
 FROM ${BASE_IMAGE}
 
-RUN yum install -y devtoolset-7-gcc*
+RUN yum update -y && yum install -y devtoolset-7-gcc*
 
 COPY --from=pip /out/requirements.txt /requirements.txt
 

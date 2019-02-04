@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum -y install rh-nodejs8 bzip2 gcc
+RUN yum update -y && yum -y install rh-nodejs8 bzip2 gcc
 
 ENV NODE_TLS_REJECT_UNAUTHORIZED 0
 

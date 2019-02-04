@@ -10,9 +10,9 @@ FROM ${BASE_IMAGE}
 
 
 
-RUN yum clean all
-RUN yum update -y
-RUN yum install -y samba
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y samba
 RUN pip install pysmb
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init

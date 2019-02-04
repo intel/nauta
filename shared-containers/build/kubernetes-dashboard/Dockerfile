@@ -1,7 +1,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum -y install rh-nodejs8 bzip2 gcc mercurial which git \
+RUN yum clean all && \ 
+    yum update -y && \
+    yum -y install rh-nodejs8 bzip2 gcc mercurial which git \
                                     java-1.8.0-openjdk-devel java-1.8.0-openjdk \
                                     zip rsync curl pkg-config make libtool \
                                     libcurl patch automake patch gcc-c++

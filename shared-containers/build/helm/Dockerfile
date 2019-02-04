@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum install -y which git mercurial
+RUN yum clean all && yum update -y && yum install -y which git mercurial
 
 RUN mkdir -p /build-output/helm
 

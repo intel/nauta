@@ -1,7 +1,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum install -y which iproute2 net-tools iptables  make curl wget unzip vim rpm-build createrepo pigz libtool-ltdl-devel cmake glibc-static selinux-policy-devel
+RUN yum clean all && \
+    yum install -y which iproute2 net-tools iptables  make curl wget unzip vim \ 
+    rpm-build createrepo pigz libtool-ltdl-devel cmake glibc-static selinux-policy-devel
 
 RUN mkdir -vp /build-output/rpm/
 env GOPATH=/go

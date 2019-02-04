@@ -21,7 +21,10 @@ RUN chmod +x /bin/dumb-init /usr/bin/dumb-init /dumb-init
 
 RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
-RUN yum clean all && yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
+    python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 

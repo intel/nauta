@@ -3,9 +3,9 @@ ARG BASE_IMAGE
 FROM ${DATA_IMAGE} as dataimage
 FROM ${BASE_IMAGE}
 
-RUN yum clean all
-RUN yum update -y
-RUN yum install -y iptables dnsmasq dnsmasq-utils
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y iptables dnsmasq dnsmasq-utils
 
 COPY --from=dataimage /build-output/addons/dnsmasq-nanny /
 RUN chmod +x /dnsmasq-nanny

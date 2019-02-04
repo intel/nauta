@@ -8,9 +8,9 @@ FROM ${BASE_IMAGE}
 
 EXPOSE 9200 9300
 
-RUN yum clean all
-RUN yum update -y
-RUN yum install -y util-linux su-exec
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y util-linux su-exec
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
 RUN chmod +x /bin/dumb-init

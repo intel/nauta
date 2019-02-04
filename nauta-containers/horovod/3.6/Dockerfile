@@ -16,7 +16,10 @@ RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-r
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python
-RUN yum clean all && yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
+    python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 

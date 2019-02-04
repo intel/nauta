@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum install -y which
+RUN yum clean all && yum update -y && yum install -y which
 
 RUN mkdir /build-output/consul
 

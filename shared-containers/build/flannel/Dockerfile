@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum install -y which iproute2 net-tools
+RUN yum clean all && yum update -y && yum install -y which iproute2 net-tools
 
 RUN mkdir /build-output/flannel
 

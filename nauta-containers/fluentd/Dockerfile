@@ -25,7 +25,9 @@ COPY Gemfile* /fluentd/
 # Adjusted for CentOS, from:
 #     https://github.com/fluent/fluentd-kubernetes-daemonset/blob/master/docker-image/v0.12/debian-elasticsearch/Dockerfile
 
-RUN yum clean all && yum install -y rpm-build gcc gcc-c++ patch autoconf binutils libtool make libffi-devel openssl-devel rh-ruby23-ruby-devel
+RUN yum clean all && \
+    yum update -y && \
+    yum install -y rpm-build gcc gcc-c++ patch autoconf binutils libtool make libffi-devel openssl-devel rh-ruby23-ruby-devel
 
 RUN source /opt/rh/rh-ruby23/enable && gem install fluentd
 

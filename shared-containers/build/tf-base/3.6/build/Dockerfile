@@ -1,9 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum update -y
-RUN yum install -y which
-RUN yum install -y devtoolset-7-gcc*
+RUN yum install -y which devtoolset-7-gcc*
 RUN source /opt/rh/devtoolset-7/enable && gcc --version
 RUN yum install -y --nogpgcheck curl git rsync unzip zip which \
                                 java-1.8.0-openjdk-devel java-1.8.0-openjdk libpng12-devel \

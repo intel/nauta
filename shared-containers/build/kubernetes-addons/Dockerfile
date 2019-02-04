@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && yum install -y which mercurial git glibc-static
+RUN yum clean all && yum update -y && yum install -y which mercurial git glibc-static
 
 RUN mkdir -vp /build/gopath/
 RUN mkdir -vp /build-output/addons /build-output/resizer

@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 # Install development tools to install requirements. Only for redhat python
 
-RUN yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python35
+RUN yum update -y && yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python35
 
 RUN mkdir -p /out
 

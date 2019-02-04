@@ -18,7 +18,7 @@ RUN chmod +x /dumb-init
 
 COPY --from=nginxdataimage /build-output/nginx-1.13.9-1.ngx.x86_64.rpm /nginx-1.13.9-1.ngx.x86_64.rpm
 
-RUN yum install -y /nginx-1.13.9-1.ngx.x86_64.rpm
+RUN yum update -y && yum install -y /nginx-1.13.9-1.ngx.x86_64.rpm
 
 RUN mkdir -vp /etc/nginx/template /etc/nginx/geoip /ingress-controller
 ADD rootfs/etc/nginx/template/nginx.tmpl /etc/nginx/template/
