@@ -141,3 +141,10 @@ Using standard Microsoft* Windows* terminals (`cmd.exe`, `power shell`) is enoug
 [K[?25hCannot connect to K8S cluster: Unable to connect to the server: d...
 ```
 **Note:** The recommended shell environment for Windows operating system is bash. For bash-based terminals, this issue _does not_ occur. 
+
+## Experiments still in RUNNING state even if they finish with success
+
+Due to a known issue in kubernetes client library it may happen, especially when there is a lot of experiments running at the same time, that 
+some single-node experiments may still be in RUNNING status even if scripts run within such experiments were finished with success. Our analysis indicates that this problem may affect roughly 1% of experiments.   
+Till resolution of the problem on library's side - please monitor the statuses of experiments and check, whether they are not running too long 
+relative to predicted duration. If there are such cases, please cancel an experiment without purging it - results are in such cases still available on shares. 
