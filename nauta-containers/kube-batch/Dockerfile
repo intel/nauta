@@ -67,11 +67,11 @@ ENV PATH=${PATH}:/build/glide/
 RUN mkdir -p ${GOPATH}/src/github.com/kubernetes-sigs
 WORKDIR ${GOPATH}/src/github.com/kubernetes-sigs
 
-RUN git clone https://github.com/kubernetes-sigs/kube-batch.git
+RUN git clone https://github.com/IntelAI/kube-batch.git
 
 WORKDIR ${GOPATH}/src/github.com/kubernetes-sigs/kube-batch
 
-RUN git checkout 38ad28b006850df46812f41080fc4c6867d8dcf6
+RUN git checkout nauta
 
 RUN go build -o /kube-batch ./cmd/kube-batch
 
