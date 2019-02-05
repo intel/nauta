@@ -44,7 +44,7 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA dashboard image is required" .Values.image }}
-        args: ["--logtostderr", "--v", "3", "--enable-namespace-as-queue=false", "--default-queue=main", "--scheduler-conf=/etc/kube-batch/config.yml"]
+        args: ["--logtostderr", "--v", "3", "--enable-namespace-as-queue=false", "--default-queue=main", "--scheduler-conf=nauta/{{ .Release.Name }}-{{ .Chart.Name }}-conf"]
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - mountPath: /etc/kube-batch
