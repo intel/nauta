@@ -18,14 +18,36 @@ RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-r
 RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN yum clean all && \
     yum update -y && \
-    yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
-    python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
+    yum install -y gcc-c++ gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make \
+                   git mercurial wget hdf5-devel
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 
+
+RUN mkdir /tmp/openmpi && \
+    cd /tmp/openmpi && \
+    wget https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.gz && \
+    tar zxf openmpi-3.1.2.tar.gz && \
+    cd openmpi-3.1.2 && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/openmpi
+
+# Create a wrapper for OpenMPI to allow running as root by default
+RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real && \
+    echo '#!/bin/bash' > /usr/local/bin/mpirun && \
+    echo 'mpirun.real --allow-run-as-root "$@"' >> /usr/local/bin/mpirun && \
+    chmod a+x /usr/local/bin/mpirun
+
+# Configure OpenMPI to run good defaults:
+#   --bind-to none --map-by slot --mca btl_tcp_if_exclude lo,docker0
+RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params.conf && \
+    echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf && \
+    echo "btl_tcp_if_exclude = lo,docker0" >> /usr/local/etc/openmpi-mca-params.conf
+
 #RUN ln -sf /opt/rh/rh-python36/root/usr/bin/${PYTHON} /usr/bin/python
-ENV PATH=${PATH}:/usr/lib64/openmpi/bin
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64/openmpi/lib
 
 RUN mkdir /horovod
 COPY horovod-v0.15.1.tar.gz /horovod/
@@ -40,14 +62,6 @@ ADD requirements.txt /horovod/
 RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary :all: --ignore-installed scikit-build setuptools
 RUN source /opt/rh/rh-python36/enable && ${PIP} install -r /horovod/requirements.txt --no-binary :all: --no-clean --ignore-installed ipaddress
 
-ENV MPIRUN_BIN /usr/lib64/openmpi/bin/mpirun
-RUN mv ${MPIRUN_BIN} ${MPIRUN_BIN}.real && \
-    echo '#!/bin/bash' > ${MPIRUN_BIN} && \
-    echo '${MPIRUN_BIN}.real --allow-run-as-root "$@"' >> ${MPIRUN_BIN} && \
-    chmod a+x ${MPIRUN_BIN}
-
-RUN echo "hwloc_base_binding_policy = none" >> /etc/openmpi-x86_64/openmpi-mca-params.conf && \
-    echo "rmaps_base_mapping_policy = slot" >> /etc/openmpi-x86_64/openmpi-mca-params.conf
 RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN yum install -y openssh-clients openssh-server && \
     sshd-keygen && \
@@ -61,8 +75,6 @@ RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_confi
 
 RUN echo "AcceptEnv LD_LIBRARY_PATH MPIRUN_BIN" >> /etc/ssh/sshd_config
 
-RUN echo "export PATH=$PATH:/usr/lib64/openmpi/bin" >> /etc/bashrc
-
 RUN echo "y" | ssh-keygen -N "" -f /root/.ssh/id_rsa && \
     cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys && chmod og-rwx /root/.ssh/ -R
 
@@ -74,5 +86,3 @@ RUN ln -sf /opt/rh/rh-python36/root/usr/bin/${PYTHON} /usr/bin/python
 COPY --from=kubectl_data /build-output/kubernetes/kubectl /bin/kubectl
 
 RUN chmod +x /bin/kubectl
-
-
