@@ -10,7 +10,7 @@ This guide assumes that installation will proceed on a dedicated node, created o
 
 Most of the steps involved are being executed on this machine.
 
-Please note that the platform will be compiled from the source code during this procedure - it may take some time; typical installation time takes around 2 hours - please bee patient. Binary installation is described in advanced guide.
+Please note that the platform will be compiled from the source code during this procedure - it may take some time; typical installation time takes around 2 hours - please be patient. Binary installation is described in advanced guide.
 
 ### Google Cloud Platform Console: Create Platform Installation Node instance
 
@@ -47,7 +47,7 @@ Please note that the SSH keys generated during this step will be used for the in
 ```
 git clone https://github.com/IntelAI/nauta
 cd nauta
-echo 'export NAUTA_DIR=$HOME/nauta' > ~/.bashrc
+echo 'export NAUTA_DIR=$HOME/nauta' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -104,8 +104,9 @@ If you would like to create multiple Nauta deployments on a single account, pass
 Cluster creation step will create file containing details of your fresh Nauta cluster and save them in file:
 
 ```
-cat $NAUTA_DIR/toolbox/providers/gcp/nauta.info
+cat $NAUTA_DIR/toolbox/providers/gcp/<k8s-cluster>.info
 ```
+where `k8s-cluster` is the name of cluster provided to `--k8s-cluster` flag or `nauta` if the flag wasn't provided.
 
 Next steps is to connect via ssh to the Nauta Cluster Bastion Node using the following command:
 
@@ -115,7 +116,7 @@ ssh nauta@<ip-gateway-from-nauta.info>
 
 Bastion node is accessible from the Internet. Please adjust authorized keys - add your own to the bastion host to `~/.ssh/authorized_keys`.
 
-When on Nauta Cluster Bastion Node, find and untar `nctl-1.0.0-<timestamp>-linux.tar.gz` file which gives you a possibility to use `nctl` tool. Refer to [Nauta Getting Started document](../../../docs/user-guide/actions/getting_started.md) for further information on `nctl`. Your first step after veryfing that `nctl` works correctly should be a regular user creation and switching to it to perform other operations supported by Nauta.  
+When on Nauta Cluster Bastion Node, untar `~/artifacts/nctl-1.0.0-<timestamp>-linux.tar.gz` file which gives you a possibility to use `nctl` tool. Refer to [Nauta Getting Started document](../../../docs/user-guide/actions/getting_started.md) for further information on `nctl`. Your first step after veryfing that `nctl` works correctly should be a regular user creation and switching to it to perform other operations supported by Nauta.  
 
 ### Next Steps
 
