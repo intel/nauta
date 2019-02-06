@@ -42,7 +42,7 @@
 
 - name: Register fact
   set_fact:
-    registry_name: "yum-registry-{{ build_name }}-{{ 9999999999999999999999 | random | to_uuid }}"
+    registry_name: "yum-registry-{{ build_name }}-{{ version }}-{{ 9999999999999999999999 | random | to_uuid }}"
 
 - name: Start registry container
   docker_container:
