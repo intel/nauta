@@ -119,6 +119,8 @@ Options:
 - `s3-url` Url to s3 bucket to store terraform cluster state. By default local file will be used.
 - `s3-secret-key` Secret key to s3 bucket.
 - `s3-access-key` Secret key to s3 bucket.
+- `install-file` Path to nauta installer file.
+- `client-file` Path to nauta client installer file.
 - `network-settings` `config.yml` - File name with network settings in provider directory.
 - `compile-platform-on-cloud` [`false|true]` - If true plagform packages will be create on bastion/gatway node.
 

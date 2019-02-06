@@ -52,6 +52,10 @@ function validate_arguments {
         check_file_presence "${InstallFile}"
     fi
 
+    if [ "${ClientFile}" != "" ]; then
+        check_file_presence "${ClientFile}"
+    fi
+
     if [ "${InstallFile}" != "" ] && [ "${CompilePlatformOnCloud}" = "true" ] ; then
         print_log "WARNING" "Both: compile platform on gateway and local install file are set. Compilation on gateway is overriden strategy."
         InstallFile=""
@@ -74,6 +78,10 @@ function set_defaults {
         INSTALL_FILE_NAME=$(basename -- "${InstallFile}")
     fi
 
+    if [ "${ClientFile}" != "" ]; then
+        CLIENT_FILE_NAME=$(basename -- "${ClientFile}")
+    fi
+
     CurrentBranch=`git status | grep "On branch" | awk '{print $3}'`
     if [ "${CurrentBranch}" = "" ] ; then
         CurrentBranch="develop"
@@ -91,6 +99,7 @@ show_parameters() {
     echo -e "\t\tNetworkSettings=${NetworkSettings}"
     echo -e ""
     echo -e "\t\tInstallFile=${InstallFile}"
+    echo -e "\t\tClientFile=${ClientFile}"
     echo -e "\t\tCompilePlatformOnCloud=${CompilePlatformOnCloud}"
     echo -e "\t\tCurrentBranch=${CurrentBranch}"
 
@@ -224,13 +233,16 @@ transfer_install_file() {
     if [ "${ret_val}" != "0" ]; then
         run_scp_command "${InstallFile}" ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${INSTALL_FILE_NAME}
         run_scp_command ${WORKSPACEDIR}/${INSTALL_FILE_NAME}.sha256 ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${INSTALL_FILE_NAME}.sha256
+    fi
 
+    if [ "${ClientFile}" != "" ]; then
+        run_scp_command "${ClientFile}" ${GATEWAY_USER}@${GATEWAY_IP}:artifacts/${CLIENT_FILE_NAME}
         if [ "${PROXY_TO_GATEWAY}" = "" ]; then
-            print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
-            ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+            print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${CLIENT_FILE_NAME} artifacts/nctl.installer"
+            ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${CLIENT_FILE_NAME} artifacts/nctl.installer"
         else
-            print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
-            ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${INSTALL_FILE_NAME} artifacts/nctl.installer"
+            print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${CLIENT_FILE_NAME} artifacts/nctl.installer"
+            ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "ln -fs artifacts/${CLIENT_FILE_NAME} artifacts/nctl.installer"
         fi
     fi
 }
@@ -361,6 +373,7 @@ LONG_OPTIONS+="s3-url:,"
 LONG_OPTIONS+="s3-secret-key:,"
 LONG_OPTIONS+="s3-access-key:,"
 LONG_OPTIONS+="install-file:,"
+LONG_OPTIONS+="client-file:,"
 LONG_OPTIONS+="network-settings:,"
 LONG_OPTIONS+="compile-platform-on-cloud:,"
 LONG_OPTIONS+="help"
@@ -380,6 +393,7 @@ while true; do
         --s3-secret-key) S3SecretKey="$2"; shift 2 ;;
         --s3-access-key) S3AccessKey="$2"; shift 2 ;;
         --install-file) InstallFile="$2"; shift 2 ;;
+        --client-file) ClientFile="$2"; shift 2 ;;
         --network-settings) NetworkSettings="$2"; shift 2 ;;
         --compile-platform-on-cloud) CompilePlatformOnCloud="$2"; shift 2 ;;
         --) break;;

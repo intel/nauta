@@ -1,0 +1,19 @@
+---
+
+- name: "Set presence flag"
+  set_fact:
+    is_present: "{{ developer_user.value.state | default('present') == 'present' }}"
+
+- name: "Copy fresh nctl configuration"
+  become: True
+  # yamllint disable-line rule:line-length
+  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/config && cp -R /usr/local/bin/config {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/config"
+  warn: False
+  when: is_present
+
+- name: "Copy fresh nctl examples"
+  become: True
+  # yamllint disable-line rule:line-length
+  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/examples && cp -R /usr/local/bin/examples {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/examples"
+  warn: False
+  when: is_present

@@ -71,8 +71,6 @@ Copy previously downloaded JSON configuration file (for service account) as `gcp
 
 ## Platform Installation Node: Adjust cluster details
 
-Edit file `$NAUTA_DIR/toolbox/providers/gcp/gcp-config.yml` - the only field you need to adjust is `gke_project`, which is unique value. 
-
 ```$xslt
 gcp:
   region: "us-west1"               # GCP target data center

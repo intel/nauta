@@ -38,14 +38,12 @@
 - name: "Unpack and install nctl package"
   become: True
   shell: "tar -xvf nctl.installer -C /usr/local/bin"
+  warn: False
   args:
     chdir: "{{ nauta_admin_home }}/artifacts"
   when: not sym.stat.exists
 
-- name: "Copy fresh nctl configuration"
-  become: True
-  # yamllint disable-line rule:line-length
-  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/config && cp -R /usr/local/bin/config {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/config"
+- include_tasks: user.yml
   loop_control:
     loop_var: developer_user
   with_dict: "{{ gateway_users }}"

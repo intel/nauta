@@ -1,0 +1,1 @@
+../../../../providers/gcp/files/remote_scripts/compile_prerequisities.sh

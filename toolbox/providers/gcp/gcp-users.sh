@@ -155,6 +155,17 @@ function retrieve_repo {
     fi
 }
 
+create_users_prerequisities() {
+    print_log "DEBUG" "Install compile prerequisities on gateway"
+    if [ "${PROXY_TO_GATEWAY}" = "" ]; then
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users_prerequisities.sh"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users_prerequisities.sh"
+    else
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users_prerequisities.sh"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users_prerequisities.sh"
+    fi
+}
+
 create_users() {
     # till repo won't be public
 
@@ -228,6 +239,7 @@ show_connectivity_parameters
 transfer_scripts
 transfer_config
 
+create_users_prerequisities
 create_users
 
 print_log "DEBUG" "Script finish"
