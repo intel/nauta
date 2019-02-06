@@ -39,9 +39,19 @@ $(ACTIVATE): $(VIRTUALENV_DIR) $(REQUIREMENTS)
 
 include toolbox/checks/checks.mk
 
+k8s-installer-clean:
+	@ if [ -f $(CURDIR)/tools/.workspace/version ]; then \
+		export CONTAINER_LIST="$$(docker ps | grep $$(cat $(CURDIR)/tools/.workspace/version) | awk '{print $$1}')"; \
+		if [ "$$CONTAINER_LIST" != "" ]; then \
+                	docker rm -f $$CONTAINER_LIST ; \
+	        fi \
+	fi
+	@(cd $(CURDIR)/tools && find .workspace/ -mindepth 1 \( ! -iname "nauta-*.tar.gz" \) 2>/dev/null | xargs rm -rf)
+
 k8s-installer-build:
 	@(cd $(CURDIR)/tools/initializers && make check-platform-dependencies)
 	@make tools-release
+	$(MAKE)	k8s-installer-clean
 
 nctl-build:
 	@(cd $(CURDIR)/applications/cli && make full_clean && make push)

@@ -11,7 +11,7 @@
 
 - name: Register fact
   set_fact:
-    registry_cache_name: "yum-registry-cache"
+    registry_cache_name: "yum-registry-cache-{{ version }}"
 
 - name: Verify existence of registry cache
   command: "docker port {{ registry_cache_name }} 5000"
