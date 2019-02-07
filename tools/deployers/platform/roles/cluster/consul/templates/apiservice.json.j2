@@ -5,9 +5,10 @@
     "port": {{ kubernetes_network.internal_port }},
     "checks": [
       {
-        "http": "http://127.0.0.1:8080",
+        "http": "https://{{ nauta_configuration.internal_interface.ipv4_address }}:{{ kubernetes_network.internal_port }}/healthz",
         "interval": "1s",
-        "timeout": "1s"
+        "timeout": "1s",
+        "tls_skip_verify": true
       }
     ]
   }

@@ -15,6 +15,7 @@
   vars:
     name: "apiservice"
     common_name: "{{ kubernetes_network.svc_list.apiservice.consul_name }}"
+    organization_name: "kubernetes"
     subject_alt_name:
       DNS.1: "{{ kubernetes_network.svc_list.apiservice.consul_name }}"
       DNS.2: "kubernetes"
@@ -37,11 +38,72 @@
   loop_control:
     loop_var: kind
 
+- name: "{{ message_label }} Generate certs for kube-controller-manager"
+  include_tasks: cert.yml
+  vars:
+    name: "kube-controller-manager"
+    common_name: "system:kube-controller-manager"
+    organization_name: "system:kube-controller-manager"
+    subject_alt_name:
+      DNS.1: "kube-controller-manager"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - nonRepudiation
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+  with_items:
+    - kubernetes
+  loop_control:
+    loop_var: kind
+
+- name: "{{ message_label }} Generate certs for kube-scheduler"
+  include_tasks: cert.yml
+  vars:
+    name: "kube-scheduler"
+    common_name: "system:kube-scheduler"
+    organization_name: "system:kube-scheduler"
+    subject_alt_name:
+      DNS.1: "kube-scheduler"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - nonRepudiation
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+  with_items:
+    - kubernetes
+  loop_control:
+    loop_var: kind
+
+- name: "{{ message_label }} Generate certs for admin"
+  include_tasks: cert.yml
+  vars:
+    name: "admin"
+    common_name: "admin"
+    organization_name: "system:masters"
+    subject_alt_name:
+      DNS.1: "admin"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - nonRepudiation
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+  with_items:
+    - kubernetes
+  loop_control:
+    loop_var: kind
+
 - name: "{{ message_label }} Generate certs for service"
   include_tasks: cert.yml
   vars:
     name: "service"
     common_name: "service"
+    organization_name: "kubernetes"
     subject_alt_name:
       DNS.1: "service"
     key_usage:
@@ -60,6 +122,7 @@
   vars:
     name: "registry"
     common_name: "registry"
+    organization_name: "registry"
     subject_alt_name:
       DNS.1: "registry.service.{{ nodes_domain }}.{{ domain }}"
     key_usage:

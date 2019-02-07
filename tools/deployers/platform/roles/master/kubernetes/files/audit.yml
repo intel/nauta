@@ -1,0 +1,153 @@
+apiVersion: audit.k8s.io/v1beta1
+kind: Policy
+rules:
+
+  # Drop logs from apiserver and several controllers as they generate a lot of noncritical requests.
+  - level: None
+    users:
+      - system:apiserver
+      - system:serviceaccount:kube-system:namespace-controller
+      - system:serviceaccount:kube-system:generic-garbage-collector
+      - system:serviceaccount:kube-system:resourcequota-controller
+      - system:serviceaccount:kube-system:cronjob-controller
+      - system:serviceaccount:kube-system:disruption-controller
+
+  # Drop get/update endpoints requests from tf-operator as these are noncritical and they clutter the audit log.
+  - level: None
+    users: ["system:serviceaccount:nauta:nauta-tf"]
+    verbs: ["get", "update"]
+    resources:
+      - resources: ["endpoints"]
+
+  # Drop update tfjobs requests from tf-operator as these are noncritical and they clutter the audit log.
+  - level: None
+    users: ["system:serviceaccount:nauta:nauta-tf"]
+    verbs: ["update"]
+    resources:
+      - group: "kubeflow.org"
+        resources: ["tfjobs"]
+
+  # Drop get/update endpoints requests from tf-operator as these are noncritical and they clutter the audit log.
+  - level: None
+    users: ["system:serviceaccount:nauta:nauta-tf"]
+    verbs: ["get", "create", "delete"]
+    resources:
+      - group: "policy"
+        resources: ["poddisruptionbudgets"]
+
+  # Drop list deployments requests as these are noncritical and they clutter the audit log, because tensorboard-service
+  # autogenerates them.
+  - level: None
+    verbs: ["list"]
+    resources:
+      - group: "apps"
+        resources: ["deployments"]
+
+  # Taken from https://github.com/kubernetes/kubernetes/blob/master/cluster/gce/gci/configure-helper.sh#L735
+  # =====================================
+
+  # The following requests were manually identified as high-volume and low-risk, so drop them.
+  - level: None
+    users: ["system:kube-proxy"]
+    verbs: ["watch"]
+    resources:
+      - group: "" # core
+        resources: ["endpoints", "services", "services/status"]
+
+  - level: None
+    users: ["system:serviceaccount:kube-system:nauta-k8s-platform-ingress"]
+    namespaces: ["kube-system"]
+    verbs: ["get"]
+    resources:
+      - group: "" # core
+        resources: ["configmaps"]
+
+  - level: None
+    users: ["kubelet"] # legacy kubelet identity
+    verbs: ["get"]
+    resources:
+      - group: "" # core
+        resources: ["nodes", "nodes/status"]
+
+  - level: None
+    userGroups: ["system:nodes"]
+    verbs: ["get"]
+    resources:
+      - group: "" # core
+        resources: ["nodes", "nodes/status"]
+
+  - level: None
+    users:
+      - system:kube-controller-manager
+      - system:kube-scheduler
+      - system:serviceaccount:kube-system:endpoint-controller
+    verbs: ["get", "update"]
+    namespaces: ["kube-system"]
+    resources:
+      - group: "" # core
+        resources: ["endpoints"]
+
+  - level: None
+    users: ["cluster-autoscaler"]
+    verbs: ["get", "update"]
+    namespaces: ["kube-system"]
+    resources:
+      - group: "" # core
+        resources: ["configmaps", "endpoints"]
+
+  # Don't log HPA fetching metrics.
+  - level: None
+    users:
+      - system:kube-controller-manager
+    verbs: ["get", "list"]
+    resources:
+      - group: "metrics.k8s.io"
+
+  # Don't log these read-only URLs.
+  - level: None
+    nonResourceURLs:
+      - /healthz*
+      - /version
+      - /swagger*
+
+  # Don't log events requests.
+  - level: None
+    resources:
+      - group: "" # core
+        resources: ["events"]
+
+  - level: Request
+
+  # node and pod status calls from nodes are high-volume and can be large, don't log responses for expected updates from nodes
+  - level: Request
+    users: ["kubelet", "system:node-problem-detector", "system:serviceaccount:kube-system:node-problem-detector"]
+    verbs: ["update", "patch"]
+    resources:
+      - group: "" # core
+        resources: ["nodes/status", "pods/status"]
+    omitStages:
+      - "RequestReceived"
+
+  # Secrets, ConfigMaps, and TokenReviews can contain sensitive & binary data,
+  # so only log at the Metadata level.
+  - level: Metadata
+    resources:
+      - group: "" # core
+        resources: ["secrets", "configmaps"]
+      - group: authentication.k8s.io
+        resources: ["tokenreviews"]
+    omitStages:
+      - "RequestReceived"
+
+  # Get responses can be large; skip them.
+  - level: Request
+    verbs: ["get", "list", "watch"]
+    omitStages:
+      - "RequestReceived"
+
+  # =====================================
+
+  # Default level for everything else not specified above.
+  - level: Request
+    omitStages:
+      - "RequestReceived"

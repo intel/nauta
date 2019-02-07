@@ -3,7 +3,7 @@
 - name: "{{ message_label }} Create a k8s nauta namespace"
   changed_when: False
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl get namespace nauta || kubectl create namespace nauta"
 
 - name: "{{ message_label }} Create kubernetes configuration directory"
@@ -19,12 +19,12 @@
 - name: "{{ message_label }} Apply tiller release"
   changed_when: False
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: kubectl apply -f /root/kubernetes/apps/tiller.yml
 
 - name: "{{ message_label }} Wait for at least one tiller instances to get ready"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl --namespace=kube-system get ds tiller -o jsonpath='{.status.numberReady}'"
   changed_when: False
   register: tiller_ready
@@ -39,7 +39,7 @@
 
 - name: "{{ message_label }} Verify helm access"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: helm ls
   changed_when: False
   register: helm_access
@@ -85,13 +85,13 @@
 - name: "{{ message_label }} Mark node taint"
   changed_when: False
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl taint nodes {{ hostvars[groups['master'][0]].ansible_nodename }} master=true:NoSchedule --overwrite=True"
   when: "'worker' in groups and groups['worker'] | length > 0"
 
 - name: "{{ message_label }} Install helm chart"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: >
     helm upgrade nauta-k8s-platform
     --namespace kube-system -i
@@ -100,25 +100,25 @@
 
 - name: "{{ message_label }} Load informations about admin user"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl -n kube-system get serviceaccounts nauta-k8s-platform-admin -o jsonpath='{.secrets[0].name}'"
   register: nauta_admin_account
 
 - name: "{{ message_label }} Load informations about admin token"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.token}'"
   register: nauta_admin_token
 
 - name: "{{ message_label }} Load informations about admin namespace"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.namespace}'"
   register: nauta_admin_namespace
 
 - name: "{{ message_label }} Load informations about admin crt"
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: "kubectl -n kube-system get secrets {{ nauta_admin_account.stdout }} -o jsonpath='{.data.ca\\.crt}'"
   register: nauta_admin_crt
 

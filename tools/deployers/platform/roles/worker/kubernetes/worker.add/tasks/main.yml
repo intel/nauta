@@ -16,7 +16,7 @@
 - name: "{{ message_label }} Apply all node privileges directories"
   changed_when: False
   environment:
-    KUBECONFIG: /dev/null
+    KUBECONFIG: /etc/nauta-cluster/master/kubernetes/kubeconfigs/admin.kubeconfig
   shell: kubectl apply -f /root/kubernetes/nodes/{{ host }}.yml
   with_items: "{{ groups['all'] }}"
   loop_control:

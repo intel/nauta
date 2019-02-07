@@ -36,7 +36,13 @@ ExecStart=/opt/nauta/kubernetes/kube-apiserver \
             {{ runtime_config }} \
             --service-account-key-file /etc/nauta-cluster/master/kubernetes/key/service.key \
             --authorization-mode=RBAC \
-            --anonymous-auth={{ 'true' if kubernetes_anonymous_access else 'False' }}
+            --anonymous-auth={{ 'true' if kubernetes_anonymous_access else 'False' }} \
+            --audit-policy-file=/etc/nauta-cluster/master/kubernetes/audit.yml \
+            --audit-log-path=/var/log/kubernetes-apiserver-audit/log \
+            --audit-log-maxage={{ apiserver_audit_log_maxage }} \
+            --audit-log-maxbackup={{ apiserver_audit_log_maxbackup }} \
+            --audit-log-maxsize={{ apiserver_audit_log_maxsize }} \
+            --insecure-port=0
 
 [Install]
 WantedBy=multi-user.target

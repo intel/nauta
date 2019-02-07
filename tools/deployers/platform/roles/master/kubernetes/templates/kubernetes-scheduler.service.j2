@@ -8,7 +8,7 @@ TimeoutStartSec=0
 Restart=always
 LimitNOFILE=65536
 ExecStart=/opt/nauta/kubernetes/kube-scheduler \
-              --master=127.0.0.1:8080 \
+              --kubeconfig=/etc/nauta-cluster/master/kubernetes/kubeconfigs/kube-scheduler.kubeconfig \
               --v=0 \
               --leader-elect=true \
               {{ feature_gates }}

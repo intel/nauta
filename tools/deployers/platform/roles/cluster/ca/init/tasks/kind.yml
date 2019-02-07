@@ -49,6 +49,7 @@
   vars:
     name: "{{ item }}"
     common_name: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
+    organization_name: "hosts"
     subject_alt_name:
       DNS.1: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
       DNS.2: "{{ item }}"
@@ -66,6 +67,7 @@
   vars:
     name: "{{ item }}"
     common_name: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
+    organization_name: "hosts"
     subject_alt_name:
       DNS.1: "{{ hostvars[item].nauta_configuration.network.instance_name }}"
       DNS.2: "{{ item }}"
