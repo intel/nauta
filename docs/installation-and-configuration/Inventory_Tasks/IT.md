@@ -27,6 +27,11 @@ Each row describes a server (playing either the role of "master" or "worker" dep
 
 `[SERVER_NAME] [VAR_NAME1]=[VAR_VALUE1] [VAR_NAME2]=[VAR_VALUE2] [VAR_NAME3]=[VAR_VALUE3]...`
 
+**NOTE**: `SERVER_NAME` must conform to standard host naming rules - each element of the hostname must be from 1 to
+63 characters long and the entire hostname, including the dots, can be at most 253 characters long. Valid characters
+for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and the hyphen. A hostname may not start with
+a hyphen.
+
 ## Per-node Inventory Variables
 The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory, some are only required for some, and some variables are entirely optional.
 
