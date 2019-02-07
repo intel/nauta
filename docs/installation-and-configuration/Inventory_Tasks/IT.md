@@ -8,13 +8,13 @@ Below is an example of Inventory File and shows one Master Node and five Worker 
 
 ```yaml
 **[master]** 
-master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 data_interface=em2 external_interface=em3 local_data_device=/dev/sdb1
+master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 external_interface=em3 local_data_device=/dev/sdb1
 
 **[worker]** 
-worker-0 ansible_ssh_host=192.168.100.61 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
-worker-1 ansible_ssh_host=192.168.100.55 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
-worker-3 ansible_ssh_host=192.168.100.106 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
-worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 data_interface=p3p1 external_interface=em1
+worker-0 ansible_ssh_host=192.168.100.61 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 external_interface=em1
+worker-1 ansible_ssh_host=192.168.100.55 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 external_interface=em1
+worker-3 ansible_ssh_host=192.168.100.106 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 external_interface=em1
+worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 external_interface=em1
 ```
 
 ## Inventory File Structure
@@ -44,8 +44,8 @@ ansible_ssh_port | The SSH port number, if not defined 22 is used. | No | int | 
 ansible_ssh_private_key_file | This is a Private Key file used by SSH | No | string | none | using a keyfile | filenae
 internal_interface | This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always for both for master and worker nodes |  Interface name
 local_data_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | this is the path to block device
+local_device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | this is the path to block device
 local_data_path | This is used as the mountpoint for `local_data_device.` | No | string | none | used with master nodes |  this is the absolute path where data is located in file system.
-data_interface | This is used for data transfer.  This is the same type of variable as internal_interface. | Yes | string | none | always for both for master and worker nodes | interface name
 external_interface | This is used for external network communication. | Yes | string | none | always for both for master and worker nodes | interface name
 
 ## Next Steps: Configuration Tasks
