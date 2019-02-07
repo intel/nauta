@@ -7,7 +7,7 @@ Requires=kubernetes-apiserver.service
 TimeoutStartSec=0
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/opt/nauta/kubernetes/check.sh http://127.0.0.1:8080/healthz
+ExecStart=/opt/nauta/kubernetes/check.sh http://{{ nauta_configuration.internal_interface.ipv4_address }}:{{ kubernetes_network.internal_port }}/healthz
 
 [Install]
 WantedBy=multi-user.target

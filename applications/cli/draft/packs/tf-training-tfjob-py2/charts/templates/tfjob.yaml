@@ -11,6 +11,7 @@ metadata:
     draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
+  ttlSecondsAfterFinishing: 60
   tfReplicaSpecs:
     Master:
       replicas: 1

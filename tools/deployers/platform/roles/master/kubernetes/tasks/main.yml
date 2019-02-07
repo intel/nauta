@@ -20,6 +20,24 @@
 
 ### Apiserver
 
+- name: "{{ message_label }} Create apiserver audit directory"
+  file:
+    path: /var/log/kubernetes-apiserver-audit
+    state: directory
+    owner: root
+    group: cluster
+    mode: 0750
+
+- name: "{{ message_label }} Create kubeconfigs directory"
+  file:
+    path: /etc/nauta-cluster/master/kubernetes/kubeconfigs
+    state: directory
+
+- name: "{{ message_label }} Copy audit config"
+  copy:
+    src: audit.yml
+    dest: /etc/nauta-cluster/master/kubernetes/audit.yml
+
 - name: "{{ message_label }} Copy service templates"
   template:
     src: "{{ item }}.service.j2"
@@ -49,6 +67,13 @@
   notify:
     - Reload Systemd
     - Restart Kubernetes Apiserver Target
+
+- name: "{{ message_label }} Generate kubeconfigs for controller, scheduler and admin"
+  script: "create_kubeconfig.sh {{ nauta_configuration.internal_interface.ipv4_address }} {{ kubernetes_network.internal_port }} {{ item.filename }} {{ item.username }}"
+  with_items:
+    - { filename: "kube-controller-manager", username: "system:kube-controller-manager" }
+    - { filename: "kube-scheduler", username: "system:kube-scheduler" }
+    - { filename: "admin", username: "admin" }
 
 # Controller
 

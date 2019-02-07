@@ -13,6 +13,7 @@
     path: "{{ node_kind_path }}/csr/{{ name }}.csr"
     privatekey_path: "{{ node_kind_path }}/key/{{ name }}.key"
     common_name: "{{ common_name }}"
+    organization_name: "{{ organization_name }}"
     subject_alt_name: "{% for key, value in subject_alt_name.items() %}{{ key }}:{{ value }}{% if not loop.last %},{% endif %}{% endfor %}"
     key_usage: "{{ key_usage }}"
     extended_key_usage: "{{ extended_key_usage | default([]) }}"
