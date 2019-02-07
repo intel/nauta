@@ -13,7 +13,7 @@ ADD . /app
 RUN source /opt/rh/rh-nodejs8/enable && npm run build
 
 # remove blacklisted components
-RUN rm -rf ./node_modules/commander
+RUN rm -rf /tmp/* ./node_modules/commander ./node_modules/phantomjs-prebuilt
 
 EXPOSE 9000
 
