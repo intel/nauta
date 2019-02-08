@@ -90,7 +90,7 @@ domain: nauta
 nodes_domain: lab007
 ```
 
-**Note:** These IP addresses _should not_ conflict with Internal IP address ranges. 
+**Note:** These IP addresses _should not_ conflict with Internal IP address ranges.
 
 ### k8s_domain
 - **Description:** This is the Internal subdomain for Kubernetes resources. Full domain for infrastructure is: `<k8s_domain>.<domain>`
@@ -114,6 +114,30 @@ kubernetes_pod_subnet: 10.3.0.0/16
 
 ```yaml
 kubernetes_svc_subnet: 10.4.0.0/16
+```
+
+### apiserver_audit_log_maxage
+- **Description:** Max age in days for kubernetes apiserver audit logs
+- **Default value:** 7
+
+```yaml
+apiserver_audit_log_maxage: 7
+```
+
+### apiserver_audit_log_maxbackup
+- **Description:** Max number of log files kept for kubernetes apiserver audit
+- **Default value:** 10
+
+```yaml
+apiserver_audit_log_maxbackup: 10
+```
+
+### apiserver_audit_log_maxsize
+- **Description:** Max audit log file size in MB
+- **Default value:** 1024
+
+```yaml
+apiserver_audit_log_maxsize: 1024
 ```
 
 ### insecure_registries 
