@@ -1,6 +1,6 @@
 ---
 
-- name: "Set presence flag"
+- name: "Set {{ developer_user.key }} presence flag"
   set_fact:
     is_present: "{{ developer_user.value.state | default('present') == 'present' }}"
 
@@ -20,23 +20,23 @@
   register: result
   when: not is_present
 
-- name: "nctl output"
+- name: "nctl {{ developer_user.key }} output"
   debug:
     msg: "{{ result.stdout }}"
   when: result.stdout is defined
 
-- name: "Check if nctl produced k8s configuration file"
+- name: "Check if nctl {{ developer_user.key }} produced k8s configuration file"
   stat:
     path: "{{ nauta_admin_home }}/{{ developer_user.key }}.config"
   register: sym
   when: is_present
 
-- name: "Debug"
+- name: "Debug {{ developer_user.key }}"
   debug:
     msg: "File {{ nauta_admin_home }}/{{ developer_user.key }}.config doesn't exists"
   when: is_present and not sym.stat.exists
 
-- name: "Copy k8s config file into user's location"
+- name: "Copy k8s config file into {{ developer_user.key }} user's location"
   copy:
     src: "{{ nauta_admin_home }}/{{ developer_user.key }}.config"
     dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/.kube/config"

@@ -1,0 +1,4 @@
+name: tf-inference-batch
+apiVersion: v1
+description: tensorflow-serving batch inference chart
+version: 0.1.0

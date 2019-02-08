@@ -1,19 +1,42 @@
 ---
 
-- name: "Set presence flag"
+- name: "Set {{ developer_user.key }} presence flag"
   set_fact:
     is_present: "{{ developer_user.value.state | default('present') == 'present' }}"
 
-- name: "Copy fresh nctl configuration"
+- name: "Copy {{ developer_user.key }} nctl configuration"
   become: True
-  # yamllint disable-line rule:line-length
-  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/config && cp -R /usr/local/bin/config {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/config"
-  warn: False
+  synchronize:
+    src: "/usr/local/bin/config"
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}"
   when: is_present
 
-- name: "Copy fresh nctl examples"
+- name: "Copy default packs to {{ developer_user.key }} user directory according to infrastructure"
   become: True
-  # yamllint disable-line rule:line-length
-  shell: "rm -rf {{ worker_home_prefix }}/{{ developer_user.key }}/examples && cp -R /usr/local/bin/examples {{ worker_home_prefix }}/{{ developer_user.key }} && chown -R {{ developer_user.key }}:{{ worker_groupname }} {{ worker_home_prefix }}/{{ developer_user.key }}/examples"
-  warn: False
+  synchronize:
+    src: "{{ nauta_admin_home }}/packs/gcp/{{ pool_type }}/packs"
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/config"
+  when: is_present and (pool_type | default('')) != ""
+
+- name: "Fix {{ developer_user.key }} fresh nctl configuration ownership"
+  become: True
+  file:
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/config"
+    owner: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+    recurse: True
+
+- name: "Copy {{ developer_user.key }} nctl examples"
+  become: True
+  synchronize:
+    src: "/usr/local/bin/examples"
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}"
   when: is_present
+
+- name: "Fix {{ developer_user.key }} fresh nctl examples ownership"
+  become: True
+  file:
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/examples"
+    owner: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+    recurse: True

@@ -1,0 +1,162 @@
+{{- $workerNum := .Values.workersCount -}}
+{{- $name := include "horovod.fullname" . }}
+{{- $slots := 1 }}
+{{- if index .Values.resources "nvidia.com/gpu" }}
+{{- $slots := index .Values.resources "nvidia.com/gpu" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "horovod.fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ template "horovod.chart" . }}
+    app: {{ template "horovod.fullname" . }}
+data:
+  hostfile.config: |
+    {{ $name }}-master slots={{ $slots }}
+    {{- range $i, $none := until (int $workerNum) }}
+    {{ $name }}-{{ $i }}.{{ $name }} slots={{ $slots }}
+    {{- end }}
+  ssh.readiness: |
+    #!/bin/bash
+    set -xev
+    ssh localhost ls
+  master.run: |
+     #!/bin/bash
+     set -x
+     function retry()
+     {
+         local n=0;local try=$1
+         local cmd="${@: 2}"
+         [[ $# -le 1 ]] && {
+             echo "Usage $0 <retry_number> <Command>";
+         }
+         set +e
+         until [[ $n -ge $try ]]
+         do
+           $cmd && break || {
+                   echo "Command Fail.."
+                   ((n++))
+                   echo "retry $n :: [$cmd]"
+                   sleep 1;
+                   }
+         done
+         set -e
+     }
+     sleep 5
+
+     # Check if requested number of cpus (physical cores) is available
+     available_cpus=$(grep '^core id' /proc/cpuinfo |sort -u|wc -l)
+     if [ $REQUESTED_CPUS -gt $available_cpus ]; then
+        echo "Requested number CPUs: $REQUESTED_CPUS is greater than available number of CPUs: $available_cpus"
+        touch /horovod/init/done # Mark workers for deletion
+        exit 1
+     fi
+
+     mkdir -p /root/.ssh
+     rm -f /root/.ssh/config
+     touch /root/.ssh/config
+
+     if [ -n "$SSHPORT" ]; then
+        echo "Port $SSHPORT" > /root/.ssh/config
+        sed -i "s/^#Port.*/Port $SSHPORT /g" /etc/ssh/sshd_config
+     fi
+     echo "StrictHostKeyChecking no" >> /root/.ssh/config
+     /usr/sbin/sshd
+
+     retry 90 ssh -o ConnectTimeout=2 -q {{ $name }}-master exit
+
+     if [ $# -eq 0 ]; then
+          sleep infinity
+        else
+          bash -c "$*"
+          RETURN_CODE=$?
+     fi
+     touch /horovod/init/done
+     exit $RETURN_CODE
+  master.kubectl: |
+     #!/bin/bash
+     while [ ! -f /horovod/init/done ] && [ -z "$(kubectl get pods --selector=runName=$RUN_NAME,role=master -o jsonpath='{.items[*].status.containerStatuses[*].state}' | grep terminated)" ]; do
+       sleep 5
+     done
+     kubectl delete sts $STS_NAME
+  master.waitWorkerReady: |
+    #!/bin/bash
+    set -xev
+    function updateSSHPort() {
+      mkdir -p /root/.ssh
+      rm -f /root/.ssh/config
+      touch /root/.ssh/config
+
+      if [ -n "$SSHPORT" ]; then
+        echo "Port $SSHPORT" > /root/.ssh/config
+        echo "StrictHostKeyChecking no" >> /root/.ssh/config
+      fi
+    }
+
+    function runCheckSSH() {
+      {{- if .Values.useHostNetwork }}
+      echo `hostname` slots={{ $slots }} >> /horovod/init/hostfile
+      {{- end }}
+
+
+      for i in `cat $1 | awk '{print $(1)}'`;do
+        if [[ "$i" != *"master" ]];then
+          retry 90 ssh -o ConnectTimeout=2 -q $i exit
+          {{- if .Values.useHostNetwork }}
+          real=`ssh -q $i hostname`
+          if [ $? -eq 0 ]; then
+            echo $real slots={{ $slots }} >> /horovod/init/hostfile
+          fi
+          {{- end }}
+        fi
+      done
+    }
+
+    function retry()
+    {
+        local n=0;local try=$1
+        local cmd="${@: 2}"
+        [[ $# -le 1 ]] && {
+            echo "Usage $0 <retry_number> <Command>";
+        }
+        set +e
+        until [[ $n -ge $try ]]
+        do
+          $cmd && break || {
+                  echo "Command Fail.."
+                  ((n++))
+                  echo "retry $n :: [$cmd]"
+                  sleep 1;
+                  }
+        done
+        $cmd
+        if [ $? -ne 0 ]; then
+          # Delete horovod stateful set
+          kubectl delete sts $STS_NAME
+          exit 1
+        fi
+        set -e
+    }
+    updateSSHPort
+    runCheckSSH $1
+  worker.run_old: |
+     #!/bin/bash
+     exit 0
+  worker.run: |
+     #!/bin/bash
+     set -x
+
+     mkdir -p /root/.ssh
+     rm -f /root/.ssh/config
+     touch /root/.ssh/config
+
+     if [ -n "$SSHPORT" ]; then
+        echo "Port $SSHPORT" > /root/.ssh/config
+        sed -i "s/^#Port.*/Port $SSHPORT /g" /etc/ssh/sshd_config
+     fi
+     echo "StrictHostKeyChecking no" >> /root/.ssh/config
+
+     /usr/sbin/sshd -D

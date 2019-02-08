@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 #
 # Copyright (c) 2019 Intel Corporation
 #
@@ -15,24 +15,11 @@
 # limitations under the License.
 #
 
-# $1 PoolType for packs
+shopt -s extglob
+set +H
 
-PWD=`pwd`
+mkdir -p /mnt/output/home/${EXP_NAME}
 
-pwd
+mv -t /mnt/output/experiment !(input|output)
 
-sudo apt-get install make -y
-
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-echo ${SCRIPTDIR}
-
-sudo rm -rf users
-mkdir -p users
-
-tar xfz nauta.tar.gz -C users
-cd users/nauta
-
-make create-gateway-users ENV_GATEWAY_USERS=~/gateway-users.yml ENV_POOL_TYPE=$1
-
-cd ${PWD}
+jupyter notebook --allow-root

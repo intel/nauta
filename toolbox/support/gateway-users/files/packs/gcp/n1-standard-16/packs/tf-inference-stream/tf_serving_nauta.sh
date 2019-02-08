@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 #
 # Copyright (c) 2019 Intel Corporation
 #
@@ -15,24 +15,21 @@
 # limitations under the License.
 #
 
-# $1 PoolType for packs
 
-PWD=`pwd`
+cp -rf ${MODEL_PATH}/. ${MODEL_BASE_PATH}
 
-pwd
+if [ -z \"$(ls -A /models)\" ]; then
+    echo 'Error: the provided path to model {{ .Values.modelPath }} is invalid or contains no files.'
+    exit 1
+fi
 
-sudo apt-get install make -y
+tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH} &
 
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-echo ${SCRIPTDIR}
-
-sudo rm -rf users
-mkdir -p users
-
-tar xfz nauta.tar.gz -C users
-cd users/nauta
-
-make create-gateway-users ENV_GATEWAY_USERS=~/gateway-users.yml ENV_POOL_TYPE=$1
-
-cd ${PWD}
+while true;
+do
+if [[ -e /pod-data/END ]]; then
+    exit 0
+else
+    sleep 10
+fi
+done

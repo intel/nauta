@@ -1,0 +1,42 @@
+# Default values for charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+dataPath: '/mnt/input/home/data'
+modelPath: '/mnt/input/home/models'
+modelName: 'mnist'
+outputPath: '/mnt/output/experiment'
+inputFormat: 'pb'
+
+containerPort: 8500
+
+image:
+  pullPolicy: IfNotPresent
+  clusterRepository: {{ NAUTA.ExperimentImage }}
+
+workersCount: 1
+
+resources:
+  requests:
+    cpu: 7
+    memory: 20Gi
+  limits:
+    cpu: 7
+    memory: 20Gi
+
+cpu: null
+memory: null
+
+batch_wrapper_resources:
+  requests:
+    cpu: 1
+    memory: 1Gi
+
+wrapper_cpu: null
+wrapper_memory: null
+
+experimentName: {{ NAUTA.ExperimentName }} 
+podCount: 2
+registryPort: {{ NAUTA.RegistryPort }}
+
+logLevel: 'INFO'

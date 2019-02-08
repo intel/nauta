@@ -62,11 +62,12 @@ function set_defaults {
 
     if [ "${GatewayUsers}" = "" ] ; then GatewayUsers="`pwd`/../../support/gateway-users/gateway-users.yml" ; fi
 
-
     CurrentBranch=`git status | grep "On branch" | awk '{print $3}'`
     if [ "${CurrentBranch}" = "" ] ; then
         CurrentBranch="develop"
     fi
+
+    PoolType=`cat "${GcpConfig}" | grep "pool_type" | awk -F '"' '{print $2}'`
 }
 
 show_parameters() {
@@ -79,6 +80,7 @@ show_parameters() {
     echo -e "\t\tExternalKey=${ExternalKey}"
     echo -e ""
     echo -e "\t\tCurrentBranch=${CurrentBranch}"
+    echo -e "\t\tPoolType=${PoolType}"
 
     echo -e ""
     echo -e "\t\tSCRIPTDIR=${SCRIPTDIR}"
@@ -182,17 +184,18 @@ create_users() {
 
     print_log "DEBUG" "Install platform prerequisities on gateway"
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
-        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh"
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh"
+        print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh ${PoolType}"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh ${PoolType}"
     else
-        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh"
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh"
+        print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh ${PoolType}"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/create_users.sh ${PoolType}"
     fi
 }
 
 transfer_scripts() {
-    print_log "DEBUG" "Transfer scripts"
+    print_log "DEBUG" "Transfer scripts and packs"
     run_scp_command ${SCRIPTDIR}/../../support/gateway-users/files/remote_scripts ${GATEWAY_USER}@${GATEWAY_IP}:
+    run_scp_command ${SCRIPTDIR}/../../support/gateway-users/files/packs ${GATEWAY_USER}@${GATEWAY_IP}:
 }
 
 show_help() {
