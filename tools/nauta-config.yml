@@ -126,7 +126,7 @@ local_images:
     version: "v0.0.1"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../docs/user-guide-html"
+    directory: "{{ playbook_dir }}/../../docs"
     dockerfile: "{{ playbook_dir }}/../../nauta-containers/docs-nginx/Dockerfile"
   nauta/tf/operator:
     version: "v2"

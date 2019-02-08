@@ -1,10 +1,5 @@
 # version Command
 
-- [Synopsis](#synopsis) 
-- [Options](#options)
-- [Returns](#returns)  
-- [Example](#example)  
-
 ## Synopsis
 
 Returns the version of Nauta software.  

@@ -8,14 +8,6 @@ Use this command to create, delete, and manage users.
 
 ## create Subcommand
 
-- [Synopsis](#synopsis)  
-- [Syntax](#syntax)
-- [Arguments](#arguments)  
-- [Options](#options)
-- [Returns](#returns)
-- [Notes](#notes)
-- [Examples](#examples)  
-
 ### Synopsis
 
 Creates and initializes a new Nauta user. This command must be executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files.
@@ -69,14 +61,7 @@ Creates user `jdoe`.
 
 ## delete Subcommand
 
-- [Synopsis](#synopsis_delete)
-- [Syntax](#syntax_delete)
-- [Arguments](#arguments_delete)  
-- [Options](#options_delete)
-- [Returns](#returns_delete)
-- [Examples](#examples_delete)  
-
-### <a name="synopsis_delete"></a>Synopsis
+### Synopsis
 
 This command deletes a user with a given name. If option `-p`, `--purge` was used, it also removes all artifacts related to that removed user, such as the content of user's folders and data of experiments and runs.
 
@@ -86,17 +71,17 @@ removal of user. If after this time user hasn't been deleted completely, the com
 user is still being deleted. In this case the user won't be listed on a list of existing users, but there is no
 possibility to create a user with the same name until the command completes and the user is deleted.
 
-### <a name="syntax_delete"></a> Syntax
+### Syntax
 
 `nctl user delete [options] USERNAME`
 
-### <a name="arguments_delete"></a>Arguments
+### Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
 |`USERNAME` | Yes | Name of a user who to be removed from the Nauta user accounts. |
 
-### <a name="options_delete"></a>Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -105,12 +90,12 @@ possibility to create a user with the same name until the command completes and 
 |`-h, --help` | No | Show help message and exit. |
 
 
-### <a name="returns_delete"></a>Returns
+### Returns
 
 A message regarding the command's completion. In case of any problems, a short description of their causes.
 
 
-### <a name="examples_delete"></a> Example
+### Example
 
 `$ nctl user delete jdoe -p`
 
@@ -118,25 +103,20 @@ Removes `jdoe` user with all his/her artifacts.
 
 ## list Subcommand
 
-- [Synopsis](#synopsis_list)
-- [Syntax](#syntax_list)
-- [Arguments](#arguments_list)  
-- [Options](#options_list)
-
-### <a name="synopsis_list"></a>Synopsis
+### Synopsis
 
 Lists all currently configured users.
 
 
-### <a name="syntax_list"></a>Syntax
+### Syntax
 
 `nctl user list [options]`
 
-### <a name="arguments_list"></a>Arguments
+### Arguments
 
 None.
 
-### <a name="options_list"></a>Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |

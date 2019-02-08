@@ -2,11 +2,6 @@
 
 The `nctl mount` command displays another command that can be used to either mount or unmount a client's folders on/from his/her local machine. See also, [list Subcommand](#list-subcommand).
 
-- [Synopsis](#synopsis)  
-- [Syntax](#syntax)
-- [Options](#options)
-- [Returns](#returns)
-
 ## Synopsis
 
 The mount command by itself displays another command that can be used to mount/unmount a client's folders on or from his/her local machine. 

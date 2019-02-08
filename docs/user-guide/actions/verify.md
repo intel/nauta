@@ -1,11 +1,5 @@
 # verify Command
 
-- [Synopsis](#synopsis)
-- [Syntax](#synopsis)
-- [Options](#options)
-- [Returns](#returns)
-- [Example](#example)  
-
 ## Synopsis
 
 Checks whether all prerequisites required by `nctl` are installed and have proper versions.  

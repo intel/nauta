@@ -6,13 +6,13 @@ Storage locations for your input and output folders are determined by the mount 
 
 To submit multiple individual experiments that use the same script, use the following command syntax (line wrap is not intended).
 
-**Syntax:** `nctl exp submit –parameter_range SCRIPT_NAME [-- SCRIPT_PARAMETERS]`
+**Syntax:** `nctl exp submit --parameter_range SCRIPT_NAME [-- SCRIPT_PARAMETERS]`
 
 **Note:** `SCRIPT_NAME` above refers to values (set or of a range) of a single parameter.
 
 Here is an example command:  
 
-`$ nctl experiment submit –parameter_range lr "{0.1, 0.2, 0.3}" <script.py> -- --data_dir=/mnt/input/root/public/<data_folder>`
+`$ nctl experiment submit --parameter_range lr "{0.1, 0.2, 0.3}" <script.py> -- --data_dir=/mnt/input/root/public/<data_folder>`
 
 Refer to [Working with Datasets](working_with_datasets.md) for instructions on uploading the dataset to the `input_shared` folder.
 Parameters can include either:

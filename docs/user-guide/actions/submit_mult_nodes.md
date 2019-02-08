@@ -17,7 +17,7 @@ The following result displays showing the queued job.
 ![](images/multinodes.png)
 
 In the above command, to optionally set the number of workers and servers, set these as parameters below. The default values are 3 worker nodes and 1 (one) parameter server. The following parameters are set to 2 worker nodes and 1 parameter server.
-
-    -p workersCount 2
-
-    -p pServersCount 1
+```
+-p workersCount 2
+-p pServersCount 1
+```

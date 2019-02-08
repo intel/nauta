@@ -10,26 +10,18 @@ This overall purpose of this command/subcommands is to submit and manage experim
  - [interact Subcommand](#interact-subcommand)
  - [template_list Subcommand](#template_list-subcommand)
 
- 
 ## submit Subcommand
- 
- - [Synopsis](#synopsis)
- - [Syntax](#syntax)
- - [Arguments](#arguments)  
- - [Options](#options)
- - [Returns](#returns)
- - [Examples](#examples)  
-  
- ### Synopsis
+
+### Synopsis
  
 Submits training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
  
- ### Syntax
+### Syntax
  
  `nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
  
  
- ### Arguments
+### Arguments
  
  | Name | Required | Description |
  |:--- |:--- |:--- |
@@ -37,7 +29,7 @@ Submits training jobs. Use this command to submit single and multi-node training
  |`script_parameters` | No | String with a list of parameters that are passed to a training script. All such parameters should be added at the end of command after "--" string |
  
  
- ### Options
+### Options
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
@@ -54,7 +46,7 @@ Submits training jobs. Use this command to submit single and multi-node training
 
  
  
- #### Additional remarks
+#### Additional remarks
  
  For both types of parameters - `-ps` and `-pr` - if parameter stated in their definitions
  is also given in a `[script_parameters]` argument of the `nctl` command, then values taken from `-ps`
@@ -75,13 +67,13 @@ Submits training jobs. Use this command to submit single and multi-node training
  - `param1 = 0.3, param2 = not set, param4 = not set, param6 - 7`
  
  
- ### Returns
+### Returns
  
 This command returns a list of submitted experiments with their names and statuses. In case of problems during submission, the command displays message/messages describing the causes. Errors may cause some experiments to not be created and will be empty. If any error appears, then messages describing it are displayed with experiment's names/statuses. 
   
 If one or more of experiment has not been submitted successfully, then the command returns an exit code > 0. The exact  value of the code depends on the cause of error(s) that prevented submitting the experiment(s).
      
- ### Example
+### Example
  
  `$ nctl experiment submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0`  
  
@@ -92,22 +84,16 @@ If one or more of experiment has not been submitted successfully, then the comma
 
 ## list Subcommand
 
-- [Synopsis](#synopsis_list)
-- [Syntax](#syntax_list)
-- [Options](#options_list)
-- [Returns](#returns_list)
-- [Example](#example_list)  
-
-### <a name="synopsis_list"></a>Synopsis
+### Synopsis
 
 Displays a list of all experiments with some basic information for each, regardless of the owner. Results are
 sorted using the date-of-creation of the experiment, starting with the most recent experiment.  
 
-### <a name="syntax_list"></a>Syntax
+### Syntax
 
 `nctl experiment list [options]`  
 
-### <a name="options_list"> </a>Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -120,11 +106,11 @@ sorted using the date-of-creation of the experiment, starting with the most rece
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
 
-###  <a name="returns_list"> </a> Returns
+### Returns
 
 List of experiments matching criteria given in command's options. Each row contains the experiment name and additional data of each experiment, such parameters used for this certain training, time and date when ot was submitted, name of a user which submitted this training and current status of an experiment. Below is an example table returned by this command. 
 
-<!-- language: lang-none -->
+```
 
     
     | Experiment           | Parameters used     | Metrics       | Time submitted | Username | Status   |
@@ -134,9 +120,9 @@ List of experiments matching criteria given in command's options. Each row conta
     |                      | layers: 10          |               |                |          |          |
     | exp1-20181122:0830-2 | learningrate: 0.01  |               |  20181122:0830 | jdoe     | Running` |
     | exp1-20181122:0830-3 | learningrate: 0.001 |               |  20181122:0830 | jdoe     | Queued   |
-        
+```
 
-###  <a name="example_list"> </a> Examples
+### Examples
 
 The following command displays all experiments submitted by a current user
 
@@ -148,28 +134,21 @@ The following command displays all experiments submitted by a current user and w
 
 ## cancel Subcommand
 
-- [Synopsis](#synopsis_cancel)  
-- [Syntax](#syntax_cancel)
-- [Arguments](#arguments_cancel)  
-- [Options](#options_cancel)
-- [Returns](#returns_cancel)
-- [Example](#example_cancel)  
-
-### <a name="synopsis_cancel"></a> Synopsis
+### Synopsis
 
 Cancels training chosen based on provided parameters. 
 
-### <a name="syntax_cancel"> </a> Syntax
+### Syntax
 
 `nctl experiment cancel [options] NAME`
 
-### <a name="arguments_cancel"> </a> Arguments
+### Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
 |`NAME` | Yes | The name of an experiment/pod/status of a pod to be cancelled. If any such object is found, the command displays a question whether this object should be cancelled. |
 
-### <a name="options_cancel"></a> Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -180,12 +159,11 @@ Cancels training chosen based on provided parameters.
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Show help message and exit. |
 
-
-### <a name="returns_cancel"></a>  Returns
+### Returns
 
 Description of a problem - if any occurs. Otherwise information that training job/jobs was/were cancelled successfully. 
 
-### <a name="example_cancel"></a>  Example
+### Example
 
 `$ nctl experiment cancel t20180423121021851`
 
@@ -193,43 +171,35 @@ Cancels experiment with `t20180423121021851` name.
 
 ## view Subcommand
 
-- [Synopsis](#synopsis_view)
-- [Syntax](#syntax_view)
-- [Arguments](#arguments_view)  
-- [Options](#options_view)
-- [Returns](#returns_view)
-- [Examples](#example_view)  
-
-### <a name="synopsis_view"></a> Synopsis
+### Synopsis
 
 Displays basic details of an experiment, such as the name of an experiment, parameters, submission date etc. 
 
-### <a name="syntax_view"></a> Syntax
+### Syntax
 
 `nctl experiment view [options] EXPERIMENT_NAME`
 
-### <a name="arguments_view"></a> Arguments
+### Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
 |`EXPERIMENT_NAME` | Yes | Name of an experiment to be displayed. |
 
-### <a name="options_view"></a> Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-tb, --tensorboard` | No | If given, command exposes a TensorBoard's instance with experiment's data. |
 |`-u, --username`<br> `TEXT` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
- |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Show help message and exit. |
 
 
-### <a name="returns_view"></a> Returns
+### Returns
 
 Displays details of an experiment. If `-tb/--tensorboard` option is given then the command returns a link to TensorBoard's instance with data from an experiment.
 
-
-### <a name="example_view"></a>  Example
+### Example
 
 `$ nctl experiment view experiment_name_2 -tb`
 
@@ -238,28 +208,21 @@ Displays details of an `experiment_name_2` experiment and exposes `tensorboard` 
 
 ## logs Subcommand
 
-- [Synopsis](#synopsis_logs)
-- [Syntax](#syntax_logs)
-- [Arguments](#arguments_logs)  
-- [Options](#options_logs)
-- [Returns](#returns_logs)
-- [Example](#example_logs)  
-
-### <a name="synopsis_logs"></a> Synopsis
+### Synopsis
 
 Displays logs from experiments. Logs to be displayed are chosen based on parameters given in the command's call.
 
-### <a name="syntax_logs"></a>  Syntax
+### Syntax
 
 `nctl experiment logs [options] EXPERIMENT_NAME`
 
-### <a name="arguments_logs"></a> Arguments
+### Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
 |`EXPERIMENT_NAME` | Yes | Name of an experiment logs from which will be displayed. Value of this argument should be created using rules described [here](interpret_experiment_parameters.md).  |
 
-### <a name="options_logs"></a> Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -272,15 +235,15 @@ Displays logs from experiments. Logs to be displayed are chosen based on paramet
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
 |`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
- |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Show help message and exit. |
 
 
-### <a name="returns_logs"></a> Returns
+### Returns
 
 In case of any problems, a message(s) with description of their cause(s). Otherwise, logs are filtered based on command's parameters.
 
-### <a name="example_logs"></a> Example
+### Example
 
 `$ nctl experiment logs experiment_name_2 --min-severity DEBUG`
 
@@ -289,22 +252,16 @@ Displays logs from `experiment_name_2` experiment with severity DEBUG and higher
 
 ## interact Subcommand
 
-- [Synopsis](#synopsis_interact)
-- [Syntax](#syntax_interact)
-- [Options](#options_interact)
-- [Returns](#returns_interact)
-- [Example](#example_interact)  
-
-### <a name="synopsis_interact"></a> Synopsis
+### Synopsis
 
 Launches a local browser with Jupyter notebook. If script's name is given as a parameter of a command, then this script
 is displayed in a notebook. 
 
-### <a name="syntax_interact"></a> Syntax
+### Syntax
 
 `nctl experiment interact [options]`
 
-### <a name="options_interact"></a> Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -315,14 +272,14 @@ is displayed in a notebook.
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
 |` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e paramater.|
 |` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
- |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Show help message and exit. |
 
-### <a name="returns_interact"></a> Returns
+### Returns
 
 In case of any problems, a message provides a description of possible causes. Otherwise the command launches a default web browser with Jupyter notebook, and displays the address under which this session is provided.
 
-### <a name="example_interact"></a> Example
+### Example
 
 `$ nctl experiment interact --filename training_script.py`
 
@@ -331,21 +288,16 @@ Launches in a default browser a Jupyter notebook with `training_script.py` scrip
 
 ## template_list Subcommand
 
-- [Synopsis](#synopsis_templist)
-- [Syntax](#syntax_templist)
-- [Returns](#returns_templist)
-- [Examples](#examples_templist)  
-
-### <a name="synopsis_templist"></a>  Synopsis
+### Synopsis
 
 The command returns a list of templates installed on a client machine. Template contains all details needed 
 to properly deploy a training job on a cluster.
 
-### <a name="syntax_templist"></a> Syntax
+### Syntax
 
 `nctl experiment template_list [options]`
 
-### <a name="options_templist"></a>  Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
@@ -353,13 +305,11 @@ to properly deploy a training job on a cluster.
 |`-h, --help` | No | Show help message and exit. |
 
 
-### <a name="returns_templist"></a> Returns
+### Returns
 
 List of existing templates, or a "Lack of installed packs." message if there are no templates installed.
 
 
-### <a name="example_templist"></a> Example
+### Example
 
 `$ nctl experiment template_list`
-
-

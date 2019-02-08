@@ -10,7 +10,7 @@ All the pack parameters that can be controlled by _nctl_ are defined in _charts/
 
 Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
 
-    	# Default values for charts.
+	# Default values for charts.
 	# This is a YAML-formatted file.
 	# Declare variables to be passed into your templates.
 	
