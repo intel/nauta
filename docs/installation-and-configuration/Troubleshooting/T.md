@@ -148,3 +148,12 @@ Due to a known issue in kubernetes client library it may happen, especially when
 some single-node experiments may still be in RUNNING status even if scripts run within such experiments were finished with success. Our analysis indicates that this problem may affect roughly 1% of experiments.   
 Till resolution of the problem on library's side - please monitor the statuses of experiments and check, whether they are not running too long 
 relative to predicted duration. If there are such cases, please cancel an experiment without purging it - results are in such cases still available on shares. 
+
+## DNS server has changed or missed in installation step
+
+If you would like to change DNS settings in the installation please do on the master node:
+* stop consul service `systemctl stop consul`
+* change file with your favorite text editor i.e. vim `vim /etc/consul/dns.json`
+* in recursor provide proper DNS server i.e. `"recursors" : ["8.8.8.8","8.8.4.4"]`
+* start consul service: `systemctl start consul`
+
