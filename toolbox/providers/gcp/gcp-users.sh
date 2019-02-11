@@ -193,9 +193,8 @@ create_users() {
 }
 
 transfer_scripts() {
-    print_log "DEBUG" "Transfer scripts and packs"
+    print_log "DEBUG" "Transfer scripts"
     run_scp_command ${SCRIPTDIR}/../../support/gateway-users/files/remote_scripts ${GATEWAY_USER}@${GATEWAY_IP}:
-    run_scp_command ${SCRIPTDIR}/../../support/gateway-users/files/packs ${GATEWAY_USER}@${GATEWAY_IP}:
 }
 
 show_help() {

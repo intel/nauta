@@ -11,13 +11,6 @@
     dest: "{{ worker_home_prefix }}/{{ developer_user.key }}"
   when: is_present
 
-- name: "Copy default packs to {{ developer_user.key }} user directory according to infrastructure"
-  become: True
-  synchronize:
-    src: "{{ nauta_admin_home }}/packs/gcp/{{ pool_type }}/packs"
-    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/config"
-  when: is_present and (pool_type | default('')) != ""
-
 - name: "Fix {{ developer_user.key }} fresh nctl configuration ownership"
   become: True
   file:
@@ -40,3 +33,28 @@
     owner: "{{ developer_user.key }}"
     group: "{{ worker_groupname }}"
     recurse: True
+
+- name: "Find packs to upgrade with new resource values"
+  find:
+    paths: "{{ worker_home_prefix }}/{{ developer_user.key }}/config"
+    patterns: "values.yaml"
+    recurse: True
+  register: result
+  when: is_present
+
+- name: "Get pool type resources roles"
+  set_fact:
+    pool_resource_roles: "{{ pack_transition[pool_type | replace ('-', '_')] }}"
+  when: is_present and (pool_type | default('')) != ""
+
+- name: "Show resource roles"
+  debug:
+    msg: "{{ pool_resource_roles }}"
+  when: is_present and (pool_type | default('')) != ""
+
+- include_tasks: pack-parametrization.yml
+  loop_control:
+    loop_var: pack_value_file
+  with_items: "{{ result.files }}"
+  when: is_present and (pool_type | default('')) != ""
+

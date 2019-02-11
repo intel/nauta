@@ -1,0 +1,10 @@
+---
+
+- name: "Pool resource roles for {{ pool_type }} and {{ pack_value_file.path }}"
+  replace:
+    path: "{{ pack_value_file.path }}"
+    regexp: "{{ pack_item.old }}$"
+    replace: "{{ pack_item.new }}"
+  loop_control:
+    loop_var: pack_item
+  with_items: "{{ pool_resource_roles }}"
