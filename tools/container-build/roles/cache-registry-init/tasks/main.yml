@@ -33,7 +33,7 @@
       - 5000
     image: "registry:2"
     stop_timeout: 0
-    timeout: 120
+    timeout: "{{ docker_timeout }}"
     restart_policy: no
     user: "{{ user_id }}"
     state: started

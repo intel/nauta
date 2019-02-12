@@ -4,4 +4,4 @@
   docker_container:
     name: "{{ registry_cache_name }}"
     state: absent
-    timeout: 120
+    timeout: "{{ docker_timeout }}"
