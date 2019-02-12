@@ -8,4 +8,4 @@ docker_repository:
 docker_repository_registry: "{{ docker_repository.url }}:{{ docker_repository.port }}"
 docker_repository_url: "{{ docker_repository.schema }}://{{ docker_repository.url }}:{{ docker_repository.port }}"
 docker_version_prefix: nauta
-docker_timeout: 600
+docker_timeout: 3600

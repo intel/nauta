@@ -57,7 +57,7 @@
     recreate: True
     restart_policy: no
     user: "{{ user_id }}"
-    timeout: 120
+    timeout: "{{ docker_timeout }}"
   register: registry
   notify:
     - Cleanup registry container

@@ -14,7 +14,7 @@
         restart_policy: no
         user: "{{ user_id }}"
         command: "bash -c 'while true; do sleep 1; done'"
-        timeout: 120
+        timeout: "{{ docker_timeout }}"
     - name: Register node
       add_host:
         name: "{{ artifact_container }}"
@@ -35,4 +35,4 @@
         name: "{{ artifact_container }}"
         state: absent
         force_kill: True
-        timeout: 120
+        timeout: "{{ docker_timeout }}"
