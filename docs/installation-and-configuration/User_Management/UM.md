@@ -72,7 +72,8 @@ To permanently remove (purge) all artifacts associated with the user and all dat
 `$ nctl user delete <user_name> -p/--purge`
       
 ### Limitations	
-The nauta user delete command may take up to 30 seconds to delete the user. A new user with the same username _cannot_ be created until after the delete command confirms that the first user with the same name has been deleted (see: [Troubleshooting](../Troubleshooting/T.md) for more details).
+
+The Nauta `user delete` command may take up to 30 seconds to delete the user. A new user with the same username _cannot_ be created until after the delete command confirms that the first user with the same name has been deleted (see: [Troubleshooting](../Troubleshooting/T.md) for more details).
 
 ## Launching the Web UI 
 
@@ -84,11 +85,11 @@ Do the following to launch the Web UI:
 
 `$ nctl launch webui` 
     
-2. Your default web browser opens and displays the Web UI. For Administrators, the Web UI displays a list experiments and shows the following message:
+2. Your default Web browser opens and displays the Web UI. For Administrators, the Web UI displays a list experiments and shows the following message:
 
 `No data for currently signed user. Click here to load all users data.`
 
-The images shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates.
+The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates.
 
 ![New Users Added](../Z_examples/WEB.PNG)
 

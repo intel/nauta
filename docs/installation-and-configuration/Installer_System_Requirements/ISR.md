@@ -1,6 +1,6 @@
 # Nauta Installer System Requirements 
 
-When installing Nauta it should be installed on a separate machine (your installer machine), as Nauta requires a separate machine to run installer.
+When installing Nauta, it should be installed on a separate machine (your installer machine), as Nauta requires a separate machine to run the installer.
 
 ## Nauta Supported Operating Systems
 Nauta supports the following Operating Systems: 

@@ -1,10 +1,20 @@
 # Configuration Tasks
-Nauta's configuration is specified by a YAML configuration file. Nauta will look for this file at the location defined the `ENV_CONFIG` environment variable (explained in [Installation Process](Installation_Process/IP.md)). This configration file specifies network proxies, DNS server locations, and other related values listed below.
 
-**Note:** In the examples shown, Green indicates a parameter name, and Blue indicates an example parameter value. Some configuration variables are of type "dictionary" - for these, `{}` indicates an empty dictionary. Likewise, some variables are of type "list", and for these, `[]` indicates an empty list.
+Nauta's configuration is specified by a YAML* configuration file. Nauta will look for this file at the location defined the `ENV_CONFIG` environment variable (explained in [Installation Process](../Installation_Process/IP.md)). This configuration file specifies network proxies, DNS server locations, and other Nauta related parameters listed below.
+
+**Note 1:** In the examples shown, Green indicates a parameter name, and Blue indicates an example parameter value. Some configuration variables are of type _dictionary_ , and for these: `{}` indicates an empty dictionary. Likewise, some variables are of type _list_, and for these: `[]` indicates an empty list.
+
+**Note 2:** All parameters present in the config file must have values. For example: `proxy:`. Setting the config file with no value causes errors.
 
 ## Example Configuration File 
-Note that this is an *example* file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section below the table.
+
+**Note:** This is an _example_ file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section after the YAML file example below.
+
+1. In the YAML file, the _list of items_ is a sequence of elements starting in new line with a dash at the beginning. For example, an empty list: []. In an abbreviated form, elements can also be enclosed in one line.
+
+1.  In the YAML file, a dictionary is a sequence of pairs for the element's _key: value_. It can also be presented with each pair in new line or abbreviated in one line. 
+
+### YAML File Example
 
 ```yaml
 # Proxy Settings
@@ -38,6 +48,21 @@ kubernetes_pod_subnet: 10.3.0.0/16
 # This is the Network Range for Kubernetes services.
 kubernetes_svc_subnet: 10.4.0.0/16
 ```
+
+### Default Value of an Empty Dictionary
+
+For empty dictionaries, there are 3 defaults:
+
+1. A parameter _is not_ included in config file. In this case, the default value will be utilized. 
+
+2. A parameter is present in config file with a defualt value included, as shown below. 
+
+* `proxy: {}` 
+
+### Deciding to Leave the Proxy Parameter Empty
+
+Should you decide to leave the proxy parameter with empty dictionary, for example when you _do not_ need a proxy because you _do not_ have one in your network, or when you intentionally _do not_ want to use a proxy to connect your cluster as an external network, then you keep it isolated from the Internet.
+
 ## Configuration Variable Details
 
 ### proxy
@@ -210,12 +235,13 @@ use_system_enabled_repos: True
     - **server:** NFS server
 
 ### output_nfs
-- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used. By default, internal NFS provisioner is used.
+- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used. By default, internal NFS provisioner is used. 
 - **Default value:** {}
 
 - **Fields**
     - **path:** NFS path to mount
     - **server:** NFS server
+* **Note** For NFS information, see below. 
 
 ```yaml
 nauta_configuration:
@@ -239,42 +265,49 @@ docker_log_driver_settings:
     - **max_size:** Maximum size of log file
     - **max_file:** Maximum count of present log files
 
-### Optional Features: Redsocks and NFS 
+# Network File System (NFS) Overview
 
-Either Redsocks or NFS is installed and configured during the installation process. By default, Redsocks is not installed; however, NFS is installed by default.   
+The Network File System* (NFS*) allows a system to share directories and files with others over a network. The advantage of using NFS is that end-users, as well as programs can access files on remote systems in the same way as local files. In addition, NFS uses less disk space, as it can store data on a single machine while remaining accessible to others over a network.
 
-This is a map of enabled features. Redsocks is not enabled during the installation, as the default is set to false (shown in the example below). Therefore, if you want to install Redsocks you need to set the feature switch to True. 
-Caution: After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It cannot be changed to False in your config file after the initial install.  Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
+## Optional Features: Redsocks and NFS Installation 
+
+Either NFS or Redsocks* is installed and configured during the installation process. By default, Redsocks _is not_ installed; however, NFS is installed by default. 
+
+### Example NFS File
 
 ```yaml
 features:
   nfs: True
   redsocks: True
 ```
+### Features List (NFS Default Settings)
 
-## Features: Network File System (NFS) and Redsocks 
-Nauta features include NFS and Redsocks*.  To configure either NFS or Redsocks, you must enable either feature and configure feature options. 
-
-## Network File System Overview
-The Network File System, or NFS allows a system to share directories and files with others over a network. The advantage of using NFS is that end-users as well as programs can access files on remote systems in the same way as local files. In addition, NFS uses less disk space, as it can store data on a single machine while remaining accessible to others over a network.
-
-## Redsocks Configuration 
-Redsocks configuration is an optional part of the installer; therefore, it might apply only to limited number of installations.
-
-### Features List 
 - **NFS:** default: True
 - **Redsocks:** default: disabled
 
-### How to Enable Features 
-Additional features can be enabled using features object in configuration, as shown below.
+# Redsocks Overview
+
+Redsocks is the tool that allows you to redirect network traffic through a Socket (for example: SOCKS4, SOCKS5 or HTTPs proxy server). Redsocks operates through a proxy server, and as a result it is refered to as a transparent proxy redirector.
+
+## Redsocks Configuration 
+
+Redsocks configuration is an optional part of the installer; however, if you choose this option configure Redsocks if you decide it is needed in your environment/organizationn.
+
+Redsocks _is not_ enabled during the installation, as the default is set to _False_ (shown in the example below). Therefore, if you want to install Redsocks you _must_ set the feature switch to **True**. 
+
+**Caution:** After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It _cannot_ be changed to False in your config file after the initial install. Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
+
+
+### How to Enable Features
+
+Additional features can be enabled using features in the configuration, as shown below.
 
 ```yaml
 features:
     redsocks: False
 ```
 
-### Feature Plugin Configuration 
-Configuration for features should be placed under `features_config`.
+### Feature Plugin Configuration
 
 ```yaml
 features:
@@ -309,7 +342,8 @@ Required: False
 Default: cni0
 ```
 
-## Networking Configuration Example
+# Networking Configuration Example
+
 The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.5. All interfaces (both external and internal) are Ethernet interfaces. 
 
 ![New Users Added](../Z_examples/NN.jpg)
@@ -317,7 +351,5 @@ The Figure below shows an example Nauta Networking Diagram. While you can build 
 ## Next Steps: Nauta Installation Requirements
 
 * [Installation Requirements: Package Requirements](../Installation_Package_Requirements/IPR.md)
-
-
 
 

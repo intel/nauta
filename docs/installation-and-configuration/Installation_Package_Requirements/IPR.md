@@ -11,14 +11,14 @@ Copy the package to the installer machine, then untar it using the following com
 In extracted archive, the following appears:
 - **Files**
   - **installer.sh:** sh script
-  - **ansible.cfg:**  configuration file for ansible
+  - **ansible.cfg:**  configuration file for Ansible*
 
 - **Folders**
- - **bin:** binary directory
- - **docs:** documentation 
- - **libs:** contains various scripts that are used by the installer
- - **nauta:** Nauta Enterprise applications deployer
- - **platform:** Kubernetes platform deployer
+   - **bin:** binary directory
+   - **docs:** documentation 
+   - **libs:** contains various scripts that are used by the installer
+   - **nauta:** Nauta Enterprise applications deployer
+   - **platform:** Kubernetes platform deployer
 
 
 ### Components Version
