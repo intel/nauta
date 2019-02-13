@@ -305,19 +305,15 @@ shared_images:
     required:
       BASE_IMAGE: "shared/centos/python27"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/2.7/run"
     push: False
-    args:
-      PYTHON_VERSION: 2.7
   shared/run/tensorflow/py3.6:
     version: "py3"
     required:
       BASE_IMAGE: "shared/centos/python36"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run"
+    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/3.6/run"
     push: False
-    args:
-      PYTHON_VERSION: 3.6
   shared/build/helm:
     version: "v2.9.1"
     required:

@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ARG PYTHON_VERSION
+ARG PYTHON_VERSION=2.7
 ENV PYTHON=python${PYTHON_VERSION} PIP=pip${PYTHON_VERSION}
 
 COPY jupyter_notebook_config.py /root/.jupyter/
@@ -29,16 +29,16 @@ RUN ln -s -f /usr/bin/pip3.6 /usr/bin/pip3 || true
 RUN ${PIP} install -U pip setuptools
 
 RUN ${PIP} install \
-        Pillow \
-        h5py \
-        ipykernel \
-        jupyter \
-        matplotlib \
-        mock \
-        numpy \
-        scipy \
-        sklearn \
-        pandas \
-        wheel
+        Pillow==5.4.* \
+        h5py==2.9.* \
+        ipykernel==4.10.* \
+        jupyter==1.0.* \
+        matplotlib==2.2.* \
+        mock==2.0.* \
+        numpy==1.16.* \
+        scipy==1.2.* \
+        scikit-learn==0.20.* \
+        pandas==0.23.* \
+        wheel==0.32.*
 
 RUN ${PYTHON} -m ipykernel.kernelspec
