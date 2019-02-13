@@ -1,4 +1,0 @@
-[submodule "docs"]
-	path = docs
-	url = git@github.com:NervanaSystems/carbon-docs
-	branch = master

@@ -46,7 +46,7 @@ RELEASE_PACKAGE_CHECKSUM:=$(WORKSPACE)/nauta-$(VERSION).tar.gz.sha256sum
 REMOTE_RELEASE_PACKAGE:=releases/nauta/nauta-$(VERSION).tar.gz
 REMOTE_RELEASE_PACKAGE_CHECKSUM:=releases/nauta/nauta-$(VERSION).tar.gz.sha256sum
 
-DOCS:=$(CURDIR)/../docs/end-user-docs/Beta_Release_Docs/Installation_Guide_Files/release
+DOCS:=$(CURDIR)/../docs/user-guide
 
 PLATFORM_DEPLOYER:=$(CURDIR)/deployers/platform
 NAUTA_DEPLOYER:=$(CURDIR)/deployers/nauta
