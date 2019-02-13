@@ -63,6 +63,25 @@ as output/<EXPERIMENT_NAME>.
 class CmdsCommonTexts:
     INVALID_REGEX_ERROR_MSG = "Regular expression provided for name filtering is invalid: {name}"
     OTHER_ERROR_MSG = "Failed to get experiments list."
+    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    LOGS_GET_OTHER_ERROR_MSG = "Failed to get {instance_type} logs."
+    EXPERIMENT_NOT_EXISTS_ERROR_MSG = "{instance_type} with name {experiment_name} does not exist."
+    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
+    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
+                                 "yes - close it manually."
+    NAME_M_BOTH_GIVEN_ERROR_MSG = "Both {instance_type} name and -m option cannot be given. Please choose one of them."
+    NAME_M_NONE_GIVEN_ERROR_MSG = "Error: {instance_type} name or -m option must be given. Please pass one of them."
+    LOGS_STORING_CONFIRMATION = "Logs from the {experiment_name} {instance_type} will be stored in " \
+                                "the {filename} file. Should the app proceed?"
+    LOGS_STORING_CONFIRMATION_FILE_EXISTS = "Logs from the {experiment_name} {instance_type} will be stored in the " \
+                                            "{filename} file. The file with this name already exists. Should the app " \
+                                            "proceed?"
+    LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
+    LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
+    LOGS_STORING_CANCEL_MESSAGE = "Logs have not been written to the file mentioned above - cancelled by user."
+    MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
+    SAVING_LOGS_TO_FILE_PROGRESS_MSG = "Saving logs to a file..."
 
 
 class VerifyCmdTexts:
@@ -334,25 +353,26 @@ class ExperimentLogsCmdTexts:
     HELP_O = "If given - logs are stored in a file with a name derived from a name of an experiment."
     HELP_F = "Specify if logs should be streamed. Only logs from a single experiment can be streamed."
     HELP_PAGER = "Display logs in interactive pager."
-    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
-    LOGS_GET_OTHER_ERROR_MSG = "Failed to get experiment logs."
-    EXPERIMENT_NOT_EXISTS_ERROR_MSG = "Experiment with name {experiment_name} does not exist."
-    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
-    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
-    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
-                                 "yes - close it manually."
-    NAME_M_BOTH_GIVEN_ERROR_MSG = "Both experiment name and -m option cannot be given. Please choose one of them."
-    NAME_M_NONE_GIVEN_ERROR_MSG = "Error: Experiment name or -m option must be given. Please pass one of them."
-    LOGS_STORING_CONFIRMATION = "Logs from the {experiment_name} experiment will be stored in " \
-                                "the {filename} file. Should the app proceed?"
-    LOGS_STORING_CONFIRMATION_FILE_EXISTS = "Logs from the {experiment_name} experiment will be stored in the " \
-                                            "{filename} file. The file with this name already exists. Should the app " \
-                                            "proceed?"
-    LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
-    LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
-    LOGS_STORING_CANCEL_MESSAGE = "Logs have not been written to the file mentioned above - cancelled by user."
-    MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
-    SAVING_LOGS_TO_FILE_PROGRESS_MSG = "Saving logs to a file..."
+
+
+class PredictLogsCmdTexts:
+    SHORT_HELP = "Show logs for a given prediction instance."
+    HELP = """
+    Show logs for a given prediction instance.
+
+    name - is a name of a prediction instance whose logs should be displayed, name argument 
+    value can be empty when 'match' option is used.
+    """
+    HELP_S = "Show all events with this specified minimal and greater severity."
+    HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
+    HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
+    HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
+    HELP_P = "Get logs only for pods with given status."
+    HELP_M = "If given, command searches for logs from prediction instances matching the value of this option. " \
+             "This option cannot be used along with the NAME argument."
+    HELP_O = "If given - logs are stored in a file with a name derived from a name of a prediction instance."
+    HELP_F = "Specify if logs should be streamed. Only logs from a single prediction instance can be streamed."
+    HELP_PAGER = "Display logs in interactive pager."
 
 
 class ExperimentSubmitCmdTexts:

@@ -18,11 +18,12 @@ from click.testing import CliRunner
 from unittest.mock import patch, mock_open
 import pytest
 
+from commands import common
 from commands.experiment import logs
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError
 from platform_resources.run import Run
-from cli_text_consts import ExperimentLogsCmdTexts as Texts
+from cli_text_consts import CmdsCommonTexts as CmdsCommonTexts
 
 TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
                              content='Warning: Unable to load '
@@ -36,15 +37,15 @@ TEST_LOG_ENTRIES = [LogEntry(date='2018-04-17T09:28:39+00:00',
 
 
 def test_show_logs_success(mocker):
-    es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
+    es_client_mock = mocker.patch('commands.common.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
 
-    get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
+    get_current_namespace_mock = mocker.patch('commands.common.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -57,15 +58,15 @@ def test_show_logs_success(mocker):
 
 
 def test_show_logs_failure(mocker):
-    es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
+    es_client_mock = mocker.patch('commands.common.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.side_effect = RuntimeError
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
 
-    get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
+    get_current_namespace_mock = mocker.patch('commands.common.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -81,15 +82,15 @@ def test_show_logs_failure(mocker):
 
 @pytest.mark.parametrize("exception", [K8sProxyCloseError(), K8sProxyOpenError()])
 def test_show_logs_failure_proxy_problem(mocker, exception):
-    es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
+    es_client_mock = mocker.patch('commands.common.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.side_effect = RuntimeError
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
     proxy_mock.side_effect = exception
-    get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
+    get_current_namespace_mock = mocker.patch('commands.common.get_kubectl_current_context_namespace')
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -108,7 +109,7 @@ def test_show_logs_too_many_params(mocker):
 
     result = runner.invoke(logs.logs, ['fake_experiment', '-m', 'match_name'])
 
-    assert Texts.NAME_M_BOTH_GIVEN_ERROR_MSG in result.output
+    assert CmdsCommonTexts.NAME_M_BOTH_GIVEN_ERROR_MSG.format(instance_type="experiment") in result.output
 
 
 def test_show_logs_lack_of_params(mocker):
@@ -116,20 +117,20 @@ def test_show_logs_lack_of_params(mocker):
 
     result = runner.invoke(logs.logs)
 
-    assert Texts.NAME_M_NONE_GIVEN_ERROR_MSG in result.output
+    assert CmdsCommonTexts.NAME_M_NONE_GIVEN_ERROR_MSG.format(instance_type="experiment") in result.output
 
 
 def test_show_logs_from_two_experiments(mocker):
-    es_client_mock = mocker.patch('commands.experiment.logs.K8sElasticSearchClient')
+    es_client_mock = mocker.patch('commands.common.K8sElasticSearchClient')
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
 
-    get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
+    get_current_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -140,7 +141,7 @@ def test_show_logs_from_two_experiments(mocker):
         open_mock.return_value.__enter__.side_effect = exception
         result = runner.invoke(logs.logs, ['fake-experiment', '-o'], input='y')
 
-    assert Texts.LOGS_STORING_ERROR.format(exception_message=exception.message) in result.output
+    assert CmdsCommonTexts.LOGS_STORING_ERROR.format(exception_message=exception.message) in result.output
     assert proxy_mock.call_count == 1, "port forwarding was not initiated"
     assert get_current_namespace_mock.call_count == 1, "namespace was not retrieved"
     assert list_runs_mock.call_count == 1, "run was not retrieved"
@@ -148,15 +149,15 @@ def test_show_logs_from_two_experiments(mocker):
 
 
 def test_show_logs_to_file_success(mocker):
-    es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
+    es_client_mock = mocker.patch("commands.common.K8sElasticSearchClient")
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
 
-    get_current_namespace_mock = mocker.patch("commands.experiment.logs.get_kubectl_current_context_namespace")
+    get_current_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
     fake_experiment_name = 'fake-experiment'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_name, experiment_name=fake_experiment_name)]
 
     runner = CliRunner()
@@ -172,17 +173,17 @@ def test_show_logs_to_file_success(mocker):
 
 
 def test_show_logs_match(mocker):
-    es_client_mock = mocker.patch("commands.experiment.logs.K8sElasticSearchClient")
+    es_client_mock = mocker.patch("commands.common.K8sElasticSearchClient")
 
     es_client_instance = es_client_mock.return_value
     es_client_instance.get_experiment_logs_generator.return_value = TEST_LOG_ENTRIES
 
-    proxy_mock = mocker.patch.object(logs, 'K8sProxy')
+    proxy_mock = mocker.patch.object(common, 'K8sProxy')
 
-    get_current_namespace_mock = mocker.patch('commands.experiment.logs.get_kubectl_current_context_namespace')
+    get_current_namespace_mock = mocker.patch('commands.common.get_kubectl_current_context_namespace')
     fake_experiment_1_name = 'fake-experiment-1'
     fake_experiment_2_name = 'fake-experiment-2'
-    list_runs_mock = mocker.patch('commands.experiment.logs.Run.list')
+    list_runs_mock = mocker.patch('commands.common.Run.list')
     list_runs_mock.return_value = [Run(name=fake_experiment_1_name, experiment_name=fake_experiment_1_name),
                                    Run(name=fake_experiment_2_name, experiment_name=fake_experiment_2_name)]
 
