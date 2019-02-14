@@ -771,3 +771,23 @@ class LicenseAcceptanceTexts:
     CANNOT_ACCEPT_LICENSE_MSG = "Cannot save license agreement - \"config\" file or directory already exists in " \
                                 "{nctl_config_path} but this name is reserved for nctl app. Please remove it " \
                                 "and try again."
+
+class ConfigCmdTexts:
+    HELP = "Sets values of limits and requests for resources in templates used by the system."
+    HELP_C = "Number of cpu available for training on one node. K8s format expected. Obligatory"
+    HELP_M = "Amount of memory available for training on one node. K8s format expected. Obligatory"
+    HELP_PN = "Name of a pack which resources' settings should be changed. If not given - command changes resources " \
+              "for all packs."
+    MISSING_ARGUMENTS = """Usage: nctl config [options]
+Try \"nctl config -h\" for help. 
+                        
+Both cpu number and memory amount have to be given."""
+    MISSING_CONFIG_FILE = "File with a description of a configuration is missing."
+    CONFIG_FILE_INCORRECT = "File with a description of a configuration is corrupt."
+    CONFIG_UPDATE = "Updating templates file with a new configuration ..."
+    CPU_WRONG_FORMAT = "Cpu number should be given in k8s format."
+    MEMORY_WRONG_FORMAT = "Memory amount should be given in k8s format."
+    ERROR_DURING_UPDATE = "Problems during updating resources."
+    SUCCESS_MESSAGE = "Resources' settings have been updated with a success."
+    MEMORY_SETTINGS_TOO_LOW = "Memory amount passed to the command shouldn't be lower than {memory_value}."
+    CPU_SETTINGS_TOO_LOW = "CPU number passed to the command shouldn't be lower than {cpu_value}."

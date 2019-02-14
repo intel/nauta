@@ -33,7 +33,7 @@ ifeq (Windows,$(OS))
 
 	git config --system core.longpaths true
 	# build nctl
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
+	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	mkdir dist/config/
 	cp -Rf draft/packs dist/config
@@ -62,7 +62,7 @@ ifeq (Windows,$(OS))
 	docker rmi alpine/socat:1.0.3
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -82,7 +82,7 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -118,6 +118,7 @@ endif
 	cp -Rf docs dist/docs
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
+	cp node_config dist/config/
 
 ifneq (,$(SCM_REPOSITORY_STATE))
 	mkdir dist/config/scm/

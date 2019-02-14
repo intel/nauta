@@ -133,6 +133,8 @@ class NAUTAConfigMap:
     PY3_IMAGE_NAME = 'image.tensorflow_1.12_py3'
     PY2_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod_py2'
     PY3_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
+    MINIMAL_NODE_MEMORY_AMOUNT = 'minimal.node.memory.amount'
+    MINIMAL_NODE_CPU_NUMBER = 'minimal.node.cpu.number'
 
     __shared_state = {}
 
@@ -151,3 +153,5 @@ class NAUTAConfigMap:
             self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)
             self.py2_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY2_HOROVOD_IMAGE_CONFIG_KEY)
             self.py3_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)
+            self.minimal_node_memory_amount = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_MEMORY_AMOUNT)
+            self.minimal_node_cpu_number = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_CPU_NUMBER)
