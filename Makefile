@@ -13,6 +13,8 @@ TOOLBOX_HOME=$(CURDIR)/toolbox
 USER := $(shell id -un)
 USER_ID := $(shell id -u)
 
+K8S_INSTALLER_BUILD_LOG_PATH ?= k8s_installer_build.log
+
 venv: $(ACTIVATE)
 
 venv-clean:
@@ -48,10 +50,14 @@ k8s-installer-clean:
 	fi
 	@(cd $(CURDIR)/tools && find .workspace/ -mindepth 1 \( ! -iname "nauta-*.tar.gz" \) 2>/dev/null | xargs rm -rf)
 
-k8s-installer-build:
+k8s-installer-build-wrapped:
 	@(cd $(CURDIR)/tools/initializers && make check-platform-dependencies)
 	@make tools-release
 	$(MAKE)	k8s-installer-clean
+
+k8s-installer-build:
+	@echo "K8s installer build logs will be saved to $(K8S_INSTALLER_BUILD_LOG_PATH)"
+	@make k8s-installer-build-wrapped 2>&1 | tee $(K8S_INSTALLER_BUILD_LOG_PATH)
 
 nctl-build:
 	@(cd $(CURDIR)/applications/cli && make full_clean && make push)
