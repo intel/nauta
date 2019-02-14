@@ -29,8 +29,16 @@ This guide describes how to use Nauta, and discusses the following topics:
 * [Evaluating Experiments](actions/view_exp.md)
 * [Evaluating Experiments with Inference Testing](actions/inference_testing.md)
 * [Managing Users and Resources](actions/managing_users_resources.md)
-* [CLI Commands](actions/view_cli_help.md)
 * [Building Nauta CTL (nctl)](actions/nctl.md)
+* [CLI Commands](actions/view_cli_help.md)
+    * [config](actions/config.md) - adjusts packs' configuration to resources available on a cluster
+    * [experiment](actions/experiment.md) - training and managing training jobs 
+    * [launch](actions/launch.md) - launching browser for Web UI and Tensorboard
+    * [mount](actions/mount.md) - displaying details concerning how to mount user's folders
+    * [predict](actions/predict.md) - deploy and manage inference on trained model
+    * [user](actions/user.md) - adding/deleting/listing users of the system 
+    * [verify](actions/verify.md) - verifies installation of _dlsctl_ application
+    * [version](actions/version.md) - displays version of _dlsctl_ application
 
 ## Advanced section
 

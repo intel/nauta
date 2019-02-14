@@ -16,6 +16,8 @@ Entering `nctl --help` or `nctl -h` provides a listing of all nctl commands (wit
       -h, --help  Show this message and exit.
 
     Commands:
+      config, cfg      Sets values of limits and requests for resources in templates 
+                       used by the system.
       experiment, exp  Command for starting, stopping, and managing training jobs.
       launch, l        Command for launching web user-interface or tensorboard. It
                        works as process in the system console until user does not
