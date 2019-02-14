@@ -15,15 +15,20 @@
 
 
 import os
+import argparse
 
 import tensorflow as tf
 import horovod.tensorflow as hvd
 
 from experiment_metrics.api import publish
 
+layers = tf.contrib.layers
+learn = tf.contrib.learn
 
 # Output produced by the experiment (summaries, checkpoints etc.) has to be placed in this folder.
 EXPERIMENT_OUTPUT_PATH = "/mnt/output/experiment"
+FILENAMES = ('train-images-idx3-ubyte.gz', 'train-labels-idx1-ubyte.gz',
+             't10k-images-idx3-ubyte.gz', 't10k-labels-idx1-ubyte.gz')
 
 # Const names for input placeholder and main output node. They are needed for reference in graph restoration. More info
 # is in the in-code comments.
@@ -35,7 +40,6 @@ tf.logging.set_verbosity(tf.logging.INFO)
 # Set of constant names related to served model.
 # Look into example mnist conversion and checker scripts to see how these constants are used in TF Serving request
 # creation.
-# MODEL_NAME = "mnist" - Model name is not specified at this stage. It is given in "predict" commands as an argument.
 MODEL_SIGNATURE_NAME = "predict_images"
 MODEL_INPUT_NAME = "images"
 MODEL_OUTPUT_NAME = "scores"
@@ -67,10 +71,36 @@ def build_net(images_placeholder, dense_dropout_placeholder):
 
 
 def main(_):
+
+    # Horovod: initialize Horovod.
     hvd.init()
+    hvd_size = hvd.size()
+    print("hvd size: {}".format(hvd_size))
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--data_dir',
+        type=str,
+        default='/tensorflow/mnist/',
+        help='Directory which contains dataset')
+    parser.add_argument(
+        '--steps',
+        type=int,
+        default=100,
+        help='steps')
+
+    FLAGS, _ = parser.parse_known_args()
+
+    # Ensure data directory passed to the script contains proper dataset
+    dir_content = os.listdir(FLAGS.data_dir)
+    for file in FILENAMES:
+        if file not in dir_content:
+            print("Directory provided by user does not contains proper dataset")
+            FLAGS.data_dir = os.path.join(FLAGS.data_dir, "input_data_{}".format(hvd.rank()))
+            break
 
     # Read/download local dataset. Different copy for each process.
-    mnist = tf.contrib.learn.datasets.mnist.read_data_sets("mnist_data_{}".format(hvd.rank()))
+    mnist = learn.datasets.mnist.read_data_sets(FLAGS.data_dir)
 
     # Name images placeholder to be able to retrieve it from saved meta graph.
     images_placeholder = tf.placeholder(tf.float32, [None, 784], name=INPUT_NAME)
@@ -107,7 +137,7 @@ def main(_):
         hvd.BroadcastGlobalVariablesHook(0),
 
         # Horovod: adjust number of steps based on number of workers.
-        tf.train.StopAtStepHook(last_step=2000 // hvd.size()),
+        tf.train.StopAtStepHook(FLAGS.steps // hvd_size),
 
         tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
                                    every_n_iter=10),
@@ -158,7 +188,7 @@ def main(_):
 
                 # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
                 builder = tf.saved_model.builder.SavedModelBuilder(
-                    os.path.join(EXPERIMENT_OUTPUT_PATH, "models", "00001"))
+                    os.path.join(EXPERIMENT_OUTPUT_PATH, "1"))
 
                 prediction_signature = (
                     tf.saved_model.signature_def_utils.build_signature_def(
