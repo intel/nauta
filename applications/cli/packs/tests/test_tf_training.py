@@ -215,11 +215,9 @@ def test_modify_dockerfile_if_script_path_provided(mocker):
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
 
 
-
 def test_update_configuration_success(mocker):
     modify_values_yaml_mock = mocker.patch("packs.tf_training.modify_values_yaml")
     modify_dockerfile_mock = mocker.patch("packs.tf_training.modify_dockerfile")
-    modify_draft_toml_mock = mocker.patch("packs.tf_training.modify_draft_toml")
 
     output = tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                               script_parameters=SCRIPT_PARAMETERS,
@@ -230,7 +228,6 @@ def test_update_configuration_success(mocker):
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
     assert modify_values_yaml_mock.call_count == 1, "values yaml wasn't modified"
-    assert modify_draft_toml_mock.call_count == 1, "draft toml wasn't modified"
 
 
 def test_update_configuration_failure(mocker):

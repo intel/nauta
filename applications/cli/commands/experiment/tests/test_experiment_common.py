@@ -158,7 +158,7 @@ class SubmitExperimentMocks:
         self.update_experiment = mocker.patch("platform_resources.experiment.Experiment.update")
         self.add_run = mocker.patch("platform_resources.experiment.Run.create")
         self.update_run = mocker.patch("platform_resources.experiment.Run.update")
-        self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0, "")])
+        self.cmd_create = mocker.patch("draft.cmd.create", side_effect=[("", 0)])
         self.submit_one = mocker.patch("commands.experiment.common.submit_draft_pack")
         self.update_conf = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
         self.create_env = mocker.patch("commands.experiment.common.create_environment",
@@ -287,7 +287,7 @@ def test_submit_two_experiment_success(prepare_mocks: SubmitExperimentMocks, cap
     caplog.set_level(logging.CRITICAL)
     prepare_mocks.mocker.patch("click.confirm", return_value=True)
     prepare_mocks.create_env.side_effect = [(EXPERIMENT_FOLDER), (EXPERIMENT_FOLDER)]
-    prepare_mocks.cmd_create.side_effect = [("", 0, ""), ("", 0, "")]
+    prepare_mocks.cmd_create.side_effect = [("", 0), ("", 0)]
     prepare_mocks.update_conf.side_effect = [0, 0]
     prepare_mocks.check_run_env.side_effect = [None, None]
 
@@ -610,7 +610,7 @@ class ExpEnvMocks:
     def __init__(self, mocker):
         self.create_env_mock = mocker.patch('commands.experiment.common.create_environment')
         self.create_draft_env_mock = mocker.patch('commands.experiment.common.cmd.create',
-                                                  return_value=('env created', 0, ''))
+                                                  return_value=('env created', 0))
         self.get_pod_count_mock = mocker.patch('commands.experiment.common.get_pod_count', return_value=1)
         self.copy_requirements_file_mock = mocker.patch('commands.experiment.common.shutil.copyfile')
         self.create_requirements_file_mock = mocker.patch('commands.experiment.common.Path.touch')

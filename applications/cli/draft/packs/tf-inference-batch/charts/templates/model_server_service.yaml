@@ -7,7 +7,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
 spec:
   ports:
   - port: {{ .Values.containerPort }}
@@ -15,7 +14,6 @@ spec:
     protocol: TCP
   selector:
     app: {{ template "name" . }}
-    draft: {{ .Values.draft }}
     release: {{ .Release.Name }}
     runName: {{ .Release.Name }}
     batchType: server

@@ -14,143 +14,97 @@
 # limitations under the License.
 #
 
-import logging
 import os
-from typing import List
-import re
+from typing import Tuple
 
-from util.config import Config
-from util.system import execute_system_command
-from util.logger import initialize_logger, get_verbosity_level
+import docker
+from retry.api import retry_call
+from requests.exceptions import ConnectionError
+
 from cli_text_consts import DraftCmdTexts as Texts
+from util import helm
+from util.config import Config
+from util.filesystem import copytree_content
+from util.logger import initialize_logger
 
 logger = initialize_logger('draft.cmd')
 
-DRAFT_BIN = 'draft'
-DRAFT_HOME_FOLDER = ".draft"
-DRAFT_LOGS_FOLDER = "logs"
-
-DOCKER_IP_ADDRESS = "127.0.0.1"
+DOCKER_CONNECTION_MAX_TRIES = 100
+DOCKER_CONNECTION_DELAY_SECONDS = 5
 
 
-def call_draft(args: List[str], cwd: str = None, namespace: str = None, logs_size: int = 0) \
-        -> (str, int, str):
-    config_path = Config().config_path
-    full_command = [os.path.join(config_path, DRAFT_BIN)]
-    full_command.extend(args)
-    if get_verbosity_level() == logging.DEBUG:
-        full_command.append('--debug')
-    env = os.environ.copy()
-    env['PATH'] = config_path + os.pathsep + env['PATH']
-    env['DRAFT_HOME'] = os.path.join(config_path, DRAFT_HOME_FOLDER)
-    if namespace:
-        env['TILLER_NAMESPACE'] = namespace
-    return execute_system_command(
-        full_command, env=env, cwd=cwd, logs_size=logs_size)
+class NoPackError(Exception):
+    pass
 
 
-def create(working_directory: str = None,
-           pack_type: str = None) -> (str, int, str):
-    command = ['create']
-    if pack_type:
-        command.append('--pack={}'.format(pack_type))
-    output, exit_code, log_output = call_draft(
-        args=command, cwd=working_directory)
+def create(working_directory: str = None, pack_type: str = None) -> Tuple[str, int]:
+    try:
+        config_dirpath = Config().get_config_path()
 
-    if not exit_code:
-        output, exit_code = check_create_status(output)
-    else:
-        output = translate_create_status_description(output)
+        packs_dirpath = os.path.join(config_dirpath, 'packs')
 
-    return output, exit_code, log_output
+        requested_pack_path = os.path.join(packs_dirpath, pack_type)
+
+        if not os.path.isdir(requested_pack_path):
+            raise NoPackError(f'no pack found with name: {requested_pack_path}')
+
+        helm_chart_destination_dirpath = f"{working_directory}/charts/{pack_type}"
+        os.makedirs(helm_chart_destination_dirpath)
+
+        copytree_content(f"{requested_pack_path}", f"{working_directory}", ignored_objects=['charts'])
+        copytree_content(f"{requested_pack_path}/charts", helm_chart_destination_dirpath)
+    except NoPackError as ex:
+        # TODO: these exceptions should be reraised instead caught here
+        logger.exception(ex)
+        return Texts.PACK_NOT_EXISTS, 1
+    except Exception as ex:
+        logger.exception(ex)
+        return Texts.DEPLOYMENT_NOT_CREATED, 100
+
+    return "", 0
 
 
-def _log_draft_logs_from_draft_execution(draft_output: str = '', working_directory: str = ''):
-    # displaying logs from draft - only in debug mode
-    pattern = "Inspect the logs with `draft logs (.*)`"
-
-    p = re.compile(pattern)
-
-    search_result = p.search(draft_output)
+def up(run_name: str, local_registry_port: int, working_directory: str = None, namespace: str = None) -> \
+        Tuple[str, int]:
+    try:
+        docker_client = docker.from_env()
+        # we've seen often a problems with connection to local Docker's daemon via socket.
+        # here we retry a call to Docker in case of such problems
+        # original call without retry_call:
+        # docker_client.images.build(path=working_directory, tag=f"127.0.0.1:{local_registry_port}/{run_name}")
+        retry_call(f=docker_client.images.build,
+                   fkwargs={"path": working_directory, "tag": f"127.0.0.1:{local_registry_port}/{run_name}"},
+                   exceptions=ConnectionError,
+                   tries=DOCKER_CONNECTION_MAX_TRIES,
+                   delay=DOCKER_CONNECTION_DELAY_SECONDS
+                   )
+    except Exception as ex:
+        # TODO: these exceptions should be reraised instead caught here
+        logger.exception(ex)
+        return Texts.DOCKER_IMAGE_NOT_BUILT, 100
 
     try:
-        if search_result:
-            draft_logs_filename = search_result.group(1)
-
-            config_path = Config().config_path
-
-            draft_app_name = os.path.basename(os.path.normpath(working_directory))
-
-            filename = os.path.join(config_path,
-                                    DRAFT_HOME_FOLDER,
-                                    DRAFT_LOGS_FOLDER,
-                                    draft_app_name,
-                                    draft_logs_filename)
-
-            with open(filename, "r") as file:
-                logger.debug("Draft logs:")
-                logger.debug(file.read())
-                logger.debug(20 * "-")
-        else:
-            logger.debug("Lack of logs from draft.")
-    except Exception as exe:
-        # exception here shouldn't block finishing of the operation
-        error_message = Texts.PROBLEMS_DURING_GETTING_DRAFT_LOGS.format(exception=str(exe))
-        logger.error(error_message)
-
-
-def up(working_directory: str = None, namespace: str = None) -> (str, int, str):
-    output, exit_code, log_output = call_draft(args=['up'], cwd=working_directory, namespace=namespace)
-
-    _log_draft_logs_from_draft_execution(output, working_directory)
-
-    if not exit_code:
-        output, exit_code = check_up_status(output)
-
-    return output, exit_code, log_output
-
-
-def check_up_status(output: str) -> (str, int):
-    """
-    Checks whether up command was finished with success.
-    :param output: output of the 'up' command
-    :return: (message, exit_code):
-    - exit_code - 0 if operation was a success
-    - message - message with a description of a problem
-    """
-    if "Building Docker Image: SUCCESS" not in output:
-        return Texts.DOCKER_IMAGE_NOT_BUILT, 100
-    elif "Pushing Docker Image: SUCCESS" not in output:
+        # we've seen often a problems with connection to local Docker's daemon via socket.
+        # here we retry a call to Docker in case of such problems
+        # original call without retry_call:
+        # docker_client.images.push(repository=f"127.0.0.1:{local_registry_port}/{run_name}")
+        retry_call(f=docker_client.images.push,
+                   fkwargs={"repository": f"127.0.0.1:{local_registry_port}/{run_name}"},
+                   exceptions=ConnectionError,
+                   tries=DOCKER_CONNECTION_MAX_TRIES,
+                   delay=DOCKER_CONNECTION_DELAY_SECONDS
+                   )
+    except Exception as ex:
+        logger.exception(ex)
         return Texts.DOCKER_IMAGE_NOT_SENT, 101
-    elif "Releasing Application: SUCCESS" not in output:
+
+    try:
+        dirs = os.listdir(f"{working_directory}/charts")
+        helm.install_helm_chart(f"{working_directory}/charts/{dirs[0]}",
+                                release_name=run_name,
+                                tiller_namespace=namespace)
+    except Exception as ex:
+        logger.exception(ex)
         return Texts.APP_NOT_RELEASED, 102
+
     return "", 0
-
-
-def check_create_status(output: str) -> (str, int):
-    """
-    Checks whether create command was finished with success.
-    :param output: output of the 'create' command
-    :return: (message, exit_code):
-    - exit_code - 0 if operation was a success
-    - message - message with a description of a problem
-    """
-    if "--> Ready to sail" not in output:
-        return Texts.DEPLOYMENT_NOT_CREATED, 100
-    return "", 0
-
-
-def translate_create_status_description(output: str) -> str:
-    """
-    Converts a description of a known error to human readable
-    form
-
-    :param output: - message to be converted
-    :return: converted message - if the message given as input param
-    is recognized by the system, if is not recognized - original
-    output
-    """
-    if "Error: could not load pack:" in output:
-        return Texts.PACK_NOT_EXISTS
-    else:
-        return output

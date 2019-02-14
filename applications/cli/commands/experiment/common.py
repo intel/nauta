@@ -378,7 +378,10 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                                    annotations={pack_param_name: pack_param_value
                                                 for pack_param_name, pack_param_value in pack_params})
                         submitted_runs.append(run)
-                        submit_draft_pack(run_folder, namespace=namespace)
+                        submit_draft_pack(run_name=run.name,
+                                          run_folder=run_folder,
+                                          namespace=namespace,
+                                          local_registry_port=proxy.tunnel_port)
                 except Exception as exe:
                     delete_environment(run_folder)
                     try:
@@ -435,9 +438,7 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
     if not parameter_range and not parameter_set:
         run_list = [Run(name=experiment_name, experiment_name=experiment_name,
-                        pod_selector={'matchLabels': {'app': template_name,
-                                                      'draft': experiment_name,
-                                                      'release': experiment_name}})]
+                        pod_selector={'matchLabels': {'app': template_name, 'release': experiment_name}})]
     else:
         list_of_range_parameters = [("", )]
         list_of_set_parameters = [("", )]
@@ -463,7 +464,6 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
                 run_list.append(Run(name=current_run_name, experiment_name=experiment_name,
                                     parameters=current_params,
                                     pod_selector={'matchLabels': {'app': template_name,
-                                                                  'draft': current_run_name,
                                                                   'release': current_run_name}}))
                 run_index = run_index + 1
     return run_list
@@ -502,8 +502,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
             # create an environment
             create_environment(run_name, local_script_location, script_folder_location)
             # generate draft's data
-            output, exit_code, log_output = cmd.create(working_directory=run_folder, pack_type=pack_type)
-
+            output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
             # copy requirements file if it was provided, create empty requirements file otherwise
             dest_requirements_file = os.path.join(run_folder, 'requirements.txt')
             if requirements_file:
@@ -512,7 +511,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
                 Path(dest_requirements_file).touch()
 
         if exit_code:
-            raise SubmitExperimentError(Texts.DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=log_output))
+            raise SubmitExperimentError(Texts.DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=output))
 
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
@@ -553,28 +552,26 @@ def get_log_filename(log_output: str):
     return None
 
 
-def submit_draft_pack(run_folder: str, namespace: str = None):
+def submit_draft_pack(run_folder: str, run_name: str, local_registry_port: int, namespace: str = None):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
     :param run_folder: location of a folder with a description of an environment
     :param run_name: run's name
+    :param local_registry_port: port of destination local registry where pack should be submitted
     :param namespace: namespace where tiller used during deployment is located
     In case of any problems it throws an exception with a description of a problem
     """
     log.debug(f'Submit one run: {run_folder} - start')
 
     # run training
-    output, exit_code, log_output = cmd.up(working_directory=run_folder, namespace=namespace)
+    output, exit_code = cmd.up(run_name=run_name,
+                               local_registry_port=local_registry_port,
+                               working_directory=run_folder,
+                               namespace=namespace)
 
     if exit_code:
-        error_message = Texts.JOB_NOT_DEPLOYED_ERROR_MSG
-
-        log_filename = get_log_filename(str(log_output))
-        if log_filename:
-            error_message = error_message + Texts.JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE.format(log_filename=log_filename)
-        log.error(log_output)
         delete_environment(run_folder)
-        raise SubmitExperimentError(error_message)
+        raise SubmitExperimentError(Texts.JOB_NOT_DEPLOYED_ERROR_MSG)
     log.debug(f'Submit one run {run_folder} - finish')
 
 
@@ -754,7 +751,7 @@ def wrap_text(text: str, width: int, spaces: int = 2) -> str:
 
 
 def get_list_of_packs():
-    path = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER, "packs", "https-github.com-Azure-draft", "packs")
+    path = os.path.join(Config().config_path, "packs")
 
     list_of_packs = []
     for (dirpath, dirnames, filenames) in os.walk(path):
@@ -775,8 +772,7 @@ def validate_template_name(ctx, param, value):
 
 def validate_pack(name: str):
     # check corectenss of the Chart.yaml file
-    chart_location = os.path.join(Config().config_path, cmd.DRAFT_HOME_FOLDER,
-                                  "packs", "https-github.com-Azure-draft", "packs", name, "charts", CHART_YAML_FILENAME)
+    chart_location = os.path.join(Config().config_path, "packs", name, "charts", CHART_YAML_FILENAME)
 
     if not os.path.isfile(chart_location):
         handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))

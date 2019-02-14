@@ -216,7 +216,8 @@ def test_clean_script_parameters_with_backslash(prepare_mocks: SubmitMocks):
     assert ("aaa", "bbb", "ccc") == clean_script_parameters(None, None, ("\\aaa", "bbb", "ccc"))
 
 
-def test_submit_experiment_wrong_template(prepare_mocks: SubmitMocks):
+def test_submit_experiment_wrong_template():
+    """Checks the operation of 'validate_template_name' Click's callback to template option """
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-t", "wrong_template"])
 
     assert CommonTexts.INCORRECT_TEMPLATE_NAME in result.output

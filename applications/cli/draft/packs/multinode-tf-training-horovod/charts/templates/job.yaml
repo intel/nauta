@@ -9,7 +9,6 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     role: master
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
   backoffLimit: 0
@@ -19,7 +18,6 @@ spec:
         app: {{ template "horovod.name" . }}
         release: {{ .Release.Name }}
         role: master
-        draft: {{ .Values.draft }}
         runName: {{ .Release.Name }}
       annotations:
         scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
@@ -57,7 +55,7 @@ spec:
 {{- end }}
       containers:
       - name: horovod-master
-        image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.clusterRepository }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: SSHPORT
@@ -128,7 +126,7 @@ spec:
 {{- if .Values.ssh.useSecrets }}
       initContainers:
       - name: wait-workers
-        image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.clusterRepository }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: STS_NAME

@@ -6,7 +6,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
   name: {{ .Release.Name }}
 roleRef:

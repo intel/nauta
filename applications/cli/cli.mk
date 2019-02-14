@@ -35,21 +35,8 @@ ifeq (Windows,$(OS))
 	# build nctl
 	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
 
-
-	# download and prepare Draft
-	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-windows-amd64.zip -o draft.zip
 	mkdir dist/config/
-	7z x draft.zip -odist/config/
-	rm -f draft.zip
-	mv dist/config/windows-amd64/* dist/config
-	rm -rf dist/config/windows-amd64
-
-	dist\config\draft init --home dist/config/.draft
-	rm -rf dist/config/.draft/packs/*
-	rm -rf dist/config/.draft/plugins/
-	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
-	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
-	cd dist/config && cmd /C "cmd /C mklink /D packs .draft\packs\https-github.com-Azure-draft\packs"
+	cp -Rf draft/packs dist/config
 
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
@@ -76,20 +63,13 @@ ifeq (Windows,$(OS))
 endif
 ifeq (Linux,$(OS))
 	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
-	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-linux-amd64.tar.gz -o draft.tar.gz
+
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
+
 	mkdir -vp dist/config/
-	tar -zxf draft.tar.gz -C dist/config/
-	rm -f draft.tar.gz
-	mv dist/config/linux-amd64/* dist/config
-	rm -rf dist/config/linux-amd64
-	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
-	rm -rf dist/config/.draft/packs/*
-	rm -rf dist/config/.draft/plugins/
-	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
-	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
-	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
+
+	cp -Rf draft/packs dist/config
 
 	curl -o helm-v2.11.0-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -103,20 +83,13 @@ ifeq (Linux,$(OS))
 endif
 ifeq (Darwin,$(OS))
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
-	curl https://azuredraft.blob.core.windows.net/draft/draft-v0.14.1-darwin-amd64.tar.gz -o draft.tar.gz
+
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
+
 	mkdir -vp dist/config/
-	tar -zxf draft.tar.gz -C dist/config/
-	rm -f draft.tar.gz
-	mv dist/config/darwin-amd64/* dist/config
-	rm -rf dist/config/darwin-amd64
-	PATH=$$PATH:`pwd`/dist/config draft init --home dist/config/.draft
-	rm -rf dist/config/.draft/packs/*
-	rm -rf dist/config/.draft/plugins/
-	mkdir -p dist/config/.draft/packs/https-github.com-Azure-draft/packs
-	cp -Rf draft/packs/* dist/config/.draft/packs/https-github.com-Azure-draft/packs/
-	cd dist/config && ln -s .draft/packs/https-github.com-Azure-draft/packs packs
+
+	cp -Rf draft/packs dist/config
 
 	curl -o helm-v2.11.0-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp

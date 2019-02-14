@@ -7,7 +7,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
     batchType: wrapper
 spec:
@@ -18,7 +17,6 @@ spec:
         scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
       labels:
         app: {{ template "name" . }}
-        draft: {{ .Values.draft }}
         release: {{ .Release.Name }}
         runName: {{ .Release.Name }}
         batchType: wrapper
@@ -73,7 +71,7 @@ spec:
             claimName: output-public
       initContainers:
         - name: init-inference-pod
-          image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.clusterRepository }}"
           command: ['mkdir', '-p', "/mnt/output/home/{{ .Values.experimentName }}"]
           volumeMounts:
             - name: output-home

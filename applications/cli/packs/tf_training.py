@@ -78,7 +78,6 @@ def update_configuration(run_folder: str, script_location: str,
         with spinner(text=Texts.PREPARING_IMAGES_MSG.format(run_name=experiment_name)):
             modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
                               script_folder_location=script_folder_location)
-        modify_draft_toml(run_folder, registry=f'127.0.0.1:{local_registry_port}')
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
         raise RuntimeError(Texts.CONFIG_NOT_UPDATED) from exe
@@ -199,33 +198,11 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
     log.debug("Modify values.yaml - end")
 
 
-def modify_draft_toml(experiment_folder: str, registry: str):
-    log.debug("Modify draft.toml - start")
-    draft_toml_filename = os.path.join(experiment_folder, "draft.toml")
-    draft_toml_temp_filename = os.path.join(experiment_folder, "draft_temp.toml")
-    namespace = k8s_info.get_kubectl_current_context_namespace()
-
-    with open(draft_toml_filename, "r") as draft_toml_file:
-        draft_toml_yaml = toml.load(draft_toml_file)
-
-    log.debug(draft_toml_yaml["environments"])
-    draft_toml_yaml["environments"]["development"]["namespace"] = namespace
-    draft_toml_yaml["environments"]["development"]["registry"] = registry
-    draft_toml_yaml["environments"]["development"]["wait"] = False
-
-
-    with open(draft_toml_temp_filename, "w") as draft_toml_file:
-        toml.dump(draft_toml_yaml, draft_toml_file)
-
-    shutil.move(draft_toml_temp_filename, draft_toml_filename)
-    log.debug("Modify draft.toml - end")
-
-
 def pull_tf_image(tf_image_repository: str):
     try:
         log.debug(f'Pulling TF image: {tf_image_repository}')
         docker_client = docker.from_env()
-        docker_client.images.pull(repository=tf_image_repository)
+        docker_client.images.pull(tf_image_repository)
     except docker.errors.APIError:
         log.exception(f'Failed to pull TF image: {tf_image_repository}')
 
