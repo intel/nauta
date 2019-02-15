@@ -1,6 +1,6 @@
 # Nauta Installation, Configuration, and Administration Guide
 
-This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing and configuring Nauta. This guide also provides an overview of Nauta requirements and configuration options.
+This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing and configuring Nauta. This guide also provides an overview of Nauta requirements, configuration options, and administration tasks.
 
 **Note:** For instructions on configuring the Nauta client, refer to the [Nauta User Guide](../user-guide/).
 
@@ -22,7 +22,7 @@ To install Nauta in a 'bare metal' (for example, non-cloud) server environment, 
  
  - `cd nauta`
 
-2. Build the base package (a makefile will automate the bulk of the process, but there are some minimum packages needed to get going).
+2. Build the base package (a makefile will automate the bulk of the process, but there are some minimum packages needed for Nauta).
 
 3. Populate Nauta's inventory file to tell it where your master and worker nodes are, and how to access them.
 

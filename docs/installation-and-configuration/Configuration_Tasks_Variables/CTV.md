@@ -51,7 +51,7 @@ kubernetes_svc_subnet: 10.4.0.0/16
 
 ### Default Value of an Empty Dictionary
 
-For empty dictionaries, there are 3 defaults:
+For empty dictionaries, there are 2 defaults:
 
 1. A parameter _is not_ included in config file. In this case, the default value will be utilized. 
 
