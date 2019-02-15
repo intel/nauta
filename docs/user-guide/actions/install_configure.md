@@ -5,16 +5,6 @@ This section provides instructions for installing and configuring Nauta to run o
 For instructions to install and configure Nauta to run on the host server, refer to the _Nauta Installation and Configuration Guide_.
 
 
-## Supported Operating Systems
-
-This release of the Nauta client software has been validated on the following operating systems and versions:
-
-* Ubuntu 16.04
-* Red Hat 7.5 
-* macOS High Sierra
-* Windows 10
-
-
 ## Required Software Packages
 The following software _must_ be installed on the client system before installing Nauta:
 

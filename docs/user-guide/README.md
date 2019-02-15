@@ -9,11 +9,11 @@ Nauta software provides a multi-user, distributed computing environment for runn
  overhead and scripting needed with standard container environments. To test your model, Nauta also supports both batch
  and streaming inference, all in a single platform.
 
-The Nauta client software runs on the following operating systems:
+The Nauta client software has been validated on the following operating systems and versions:
 
 * Ubuntu* (16.04, 18.04)
 * RedHat* 7.5
-* macOS* High Sierra
+* macOS* High Sierra (10.13)
 * Windows* 10
 
 # Nauta User Guide
