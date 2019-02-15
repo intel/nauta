@@ -24,6 +24,7 @@ from experiment_metrics.api import publish
 
 # Output produced by the experiment (summaries, checkpoints etc.) has to be placed in this folder.
 EXPERIMENT_OUTPUT_PATH = "/mnt/output/experiment"
+MODEL_VERSION = 1
 
 FLAGS = None
 
@@ -117,7 +118,7 @@ def main(_):
     publish({"validation_accuracy": str(validation_accuracy_val)})
 
     # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
-    builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(EXPERIMENT_OUTPUT_PATH, "models", "00001"))
+    builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(EXPERIMENT_OUTPUT_PATH, str(MODEL_VERSION)))
 
     prediction_signature = (
         tf.saved_model.signature_def_utils.build_signature_def(
@@ -141,6 +142,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", type=str,
                         default="/tmp/mnist-data",
-                        help="Directory for storing input data")
+                        help="Directory which contains dataset")
     FLAGS, _ = parser.parse_known_args()
     tf.app.run()
