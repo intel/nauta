@@ -68,7 +68,7 @@
     buildargs:
       BASE_IMAGE: "{{ build_facts.package_attached_images['nauta/registry'].remote_url }}"
     path: "{{ build_dir }}/docker"
-    name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+    name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX }}-{{ VERSION_ID }}"
     pull: False
     push: False
   notify:
@@ -76,14 +76,14 @@
 
 - name: Save image
   vars:
-    image: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
-    dest: "{{ build_dir }}/repository/files/nauta-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.img"
+    image: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX }}-{{ VERSION_ID }}"
+    dest: "{{ build_dir }}/repository/files/nauta-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX }}-{{ VERSION_ID }}.img"
   shell: docker save {{ image }} -o {{ dest }}
 
 - name: Generate file with configuration
   vars:
     configuration:
-      nauta_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+      nauta_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX }}-{{ VERSION_ID }}"
   copy:
     dest: "{{ build_dir }}/repository/group_vars/all/version.yml"
     content: "{{ configuration | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
@@ -100,3 +100,4 @@
   shell: tar -cf {{ output }} -I pigz ./
   args:
     chdir: "{{ build_dir }}/repository"
+

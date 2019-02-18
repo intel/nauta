@@ -9,6 +9,7 @@
       name: "finalizer-{{ build_name }}-{{ user }}-{{ version }}"
       state: absent
       stop_timeout: 0
+      timeout: 120
       force_kill: True
   - name: Remove build dir
     file:

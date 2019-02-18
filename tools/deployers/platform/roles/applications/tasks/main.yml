@@ -49,8 +49,8 @@
 
 - name: "{{ message_label }} Copy chart"
   copy:
-    src: nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz
-    dest: /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz
+    src: "nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_version_suffix }}-{{ nauta_release_package_release }}.tgz"
+    dest: "/tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_version_suffix }}-{{ nauta_release_package_release }}.tgz"
 
 - name: "{{ message_label }} Fetch all interfaces names"
   set_fact:
@@ -80,7 +80,7 @@
       features: "{{ features | default({}) }}"
   copy:
     content: "{{ nauta_release_values | to_nice_yaml(width=50, explicit_start=True, explicit_end=True) }}"
-    dest: "/tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.values.yaml"
+    dest: "/tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_version_suffix }}-{{ nauta_release_package_release }}.values.yaml"
 
 - name: "{{ message_label }} Mark node taint"
   changed_when: False
@@ -95,8 +95,8 @@
   shell: >
     helm upgrade nauta-k8s-platform
     --namespace kube-system -i
-    /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.tgz --wait
-    -f /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_release }}.values.yaml
+    /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_version_suffix }}-{{ nauta_release_package_release }}.tgz --wait
+    -f /tmp/nauta-platform-{{ nauta_release_package_version }}-{{ nauta_release_package_version_suffix }}-{{ nauta_release_package_release }}.values.yaml
 
 - name: "{{ message_label }} Load informations about admin user"
   environment:

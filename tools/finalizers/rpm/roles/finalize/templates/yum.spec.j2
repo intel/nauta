@@ -1,13 +1,13 @@
-Summary: NAUTA Local Yum Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }} package
+Summary: NAUTA Local Yum Repository {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}.{{ VERSION_SUFFIX }}-{{ VERSION_ID }} package
 Name: nauta-yum
-Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}
+Version: {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}.{{ VERSION_SUFFIX }}
 Release: {{ VERSION_ID }}
 License: Apache-2.0
 Group: Tools
 
 %define  debug_package %{nil}
 
-Requires: nauta-yum-repository = {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}
+Requires: nauta-yum-repository = {{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}.{{ VERSION_SUFFIX }}-{{ VERSION_ID }}
 
 %description
 %{summary}

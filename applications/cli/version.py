@@ -19,4 +19,4 @@
 # and approved by Intel in writing.
 #
 
-VERSION = '1.0.0-dev'
+VERSION = '1.0.0-ent-dev'
