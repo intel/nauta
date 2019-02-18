@@ -158,8 +158,7 @@ local_images:
     method: pull
   nauta/tensorboard-service:
     version: "v1.0.0"
-    required:
-      BASE_IMAGE: "shared/centos/python36"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/tensorboard-service"
   nauta/activity-proxy:

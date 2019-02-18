@@ -1,5 +1,5 @@
 ARG METRICS_IMAGE=metrics-image
-ARG BASE_IMAGE=python:3.6.6
+ARG BASE_IMAGE=python:3.6.8
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
