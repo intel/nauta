@@ -16,7 +16,7 @@
 #
 
 # Parameters (positional)
-# ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}
+# ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID} ${VERSION_SUFFIX}
 
 mkdir -p artifacts
 
@@ -26,7 +26,7 @@ mkdir -p compile
 tar xvf nauta.tar -C compile
 cd compile/nauta
 
-make nctl-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6
+make nctl-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6 VERSION_SUFFIX=$7
 
 find ~/compile/nauta/applications/cli -maxdepth 1 -name "nctl*.tar.gz" -exec cp {} ~/artifacts/$2 \;
 
@@ -34,7 +34,7 @@ ln -fs ~/artifacts/$2 ~/artifacts/nctl.installer
 
 echo "Client file is present as ~/$2"
 
-sudo make k8s-installer-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6
+sudo make k8s-installer-build VERSION_MAJOR=$3 VERSION_MINOR=$4 VERSION_NO=$5 VERSION_ID=$6 VERSION_SUFFIX=$7
 
 find ~/compile/nauta/tools/.workspace -maxdepth 1 -name "nauta*.tar.gz" -exec cp {} ~/artifacts/$1 \;
 

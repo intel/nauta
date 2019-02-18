@@ -57,6 +57,7 @@ DEFAULT_NAME:=$(if $(NAME),$(NAME),$(if $(WORKSPACE_NAME),$(WORKSPACE_NAME),defa
 DEFAULT_VERSION_MAJOR:=$(if $(VERSION_MAJOR),$(VERSION_MAJOR),1)
 DEFAULT_VERSION_MINOR:=$(if $(VERSION_MINOR),$(VERSION_MINOR),0)
 DEFAULT_VERSION_NO:=$(if $(VERSION_NO),$(VERSION_NO),0)
+DEFAULT_VERSION_SUFFIX:=$(if $(VERSION_SUFFIX),$(VERSION_SUFFIX),oss)
 
 ifeq ("$(VERSION_ID)", "")
 ifneq ("$(wildcard $(VERSION_FILE))","")
@@ -72,7 +73,7 @@ endif
 
 DEFAULT_VERSION_ID:=$(VERSION_ID)
 
-VERSION:=$(DEFAULT_VERSION_MAJOR).$(DEFAULT_VERSION_MINOR).$(DEFAULT_VERSION_NO)-$(DEFAULT_VERSION_ID)
+VERSION:=$(DEFAULT_VERSION_MAJOR).$(DEFAULT_VERSION_MINOR).$(DEFAULT_VERSION_NO)-$(DEFAULT_VERSION_SUFFIX)-$(DEFAULT_VERSION_ID)
 
 BUILD_DIR:=$(WORKSPACE_BUILD)/$(VERSION)/$(DEFAULT_NAME)
 
@@ -80,6 +81,7 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                        -i $(LIBS_DIRECTORY)/inventory --force-handlers -e default_ansible_python_interpreter=$(PYTHON) \
                        -e VERSION_NO=$(DEFAULT_VERSION_NO) -e VERSION_MINOR=$(DEFAULT_VERSION_MINOR) \
                        -e VERSION_MAJOR=$(DEFAULT_VERSION_MAJOR) -e VERSION_ID=$(DEFAULT_VERSION_ID) \
+                       -e VERSION_SUFFIX=$(DEFAULT_VERSION_SUFFIX) \
                        -e version=$(VERSION) -e user="$(USER)" -e user_id=$(USER_ID) -e build_dir=$(BUILD_DIR) \
                        -e group="$(GROUP)" -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml

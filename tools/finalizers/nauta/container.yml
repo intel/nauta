@@ -10,7 +10,7 @@
       state: absent
   - name: Remove docker image
     docker_image:
-      name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}"
+      name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX  }}-{{ VERSION_ID }}"
       state: absent
   roles:
     - role: finalize

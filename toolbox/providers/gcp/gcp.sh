@@ -336,10 +336,10 @@ compile_platform() {
 
     if [ "${PROXY_TO_GATEWAY}" = "" ]; then
         print_log "DEBUG" ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
-        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}"
+        ssh -i "${ExternalKey}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID} ${VERSION_SUFFIX}"
     else
         print_log "DEBUG" ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME}"
-        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID}"
+        ssh -i "${ExternalKey}" -o ProxyCommand="${PROXY_TO_GATEWAY}" ${GATEWAY_USER}@${GATEWAY_IP} "./remote_scripts/compile_platform.sh ${INSTALL_FILE_NAME} ${INSTALL_CLIENT_FILE_NAME} ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_NO} ${VERSION_ID} ${VERSION_SUFFIX}"
     fi
 }
 
@@ -422,8 +422,9 @@ if [ "${CompilePlatformOnCloud}" = "true" ]; then
     VERSION_MINOR=0
     VERSION_NO=0
     VERSION_ID=`date +"%Y%m%d%H%M%S"`
-    INSTALL_FILE_NAME="nauta-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}.tar.gz"
-    INSTALL_CLIENT_FILE_NAME="nctl-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_ID}-linux.tar.gz"
+    VERSION_SUFFIX=oss
+    INSTALL_FILE_NAME="nauta-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_SUFFIX}-${VERSION_ID}.tar.gz"
+    INSTALL_CLIENT_FILE_NAME="nctl-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_NO}-${VERSION_SUFFIX}-${VERSION_ID}-linux.tar.gz"
     install_compiler_prerequisities
     compile_platform
     install_platform_prerequisities

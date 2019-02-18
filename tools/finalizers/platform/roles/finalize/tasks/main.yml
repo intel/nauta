@@ -63,6 +63,7 @@
     configuration:
       nauta_release_package_installation: file
       nauta_release_package_version: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}"
+      nauta_release_package_version_suffix: "{{ VERSION_SUFFIX }}"
       nauta_release_package_release: "{{ VERSION_ID }}"
   copy:
     dest: "{{ build_dir }}/repository/group_vars/all/repository.yml"

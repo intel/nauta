@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-VERSION = '1.0.0-dev'
+VERSION = '1.0.0-oss-dev'

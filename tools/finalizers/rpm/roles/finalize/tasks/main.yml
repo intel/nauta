@@ -147,8 +147,8 @@
 
 - name: Copy rpm
   copy:
-    src: "/data/rpmbuild/RPMS/x86_64/nauta-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.x86_64.rpm"
-    dest: "/out/final/nauta-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_ID }}.x86_64.rpm"
+    src: "/data/rpmbuild/RPMS/x86_64/nauta-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}.{{ VERSION_SUFFIX }}-{{ VERSION_ID }}.x86_64.rpm"
+    dest: "/out/final/nauta-{{ item }}-{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}.{{ VERSION_SUFFIX }}-{{ VERSION_ID }}.x86_64.rpm"
     remote_src: True
   delegate_to: "{{ container_name }}"
   with_items:
