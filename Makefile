@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 VIRTUALENV_DIR := $(CURDIR)/.venv
 VIRTUALENV_BIN := $(VIRTUALENV_DIR)/bin
 ACTIVATE := $(VIRTUALENV_BIN)/activate
@@ -11,7 +12,7 @@ TOOLBOX_HOME=$(CURDIR)/toolbox
 USER := $(shell id -un)
 USER_ID := $(shell id -u)
 
-K8S_INSTALLER_BUILD_LOG_PATH ?= k8s_installer_build.log
+K8S_INSTALLER_BUILD_LOG_PATH ?= $(CURDIR)/tools/.workspace/k8s_installer_build.log
 
 venv: $(ACTIVATE)
 
@@ -47,8 +48,9 @@ k8s-installer-build-wrapped:
 	@make k8s-installer-clean
 
 k8s-installer-build:
-	@echo "K8s installer build logs will be saved to $(K8S_INSTALLER_BUILD_LOG_PATH)"
-	@make k8s-installer-build-wrapped 2>&1 | tee $(K8S_INSTALLER_BUILD_LOG_PATH)
+	@echo "k8s installer build logs will be saved to $(K8S_INSTALLER_BUILD_LOG_PATH)"
+	@mkdir -p "$(CURDIR)/tools/.workspace"
+	@set -o pipefail && make k8s-installer-build-wrapped 2>&1 | tee $(K8S_INSTALLER_BUILD_LOG_PATH)
 
 nctl-build:
 	@(cd $(CURDIR)/applications/cli && make full_clean && make push)
