@@ -19,24 +19,24 @@ shared_images:
     push: False
     image: "ubuntu:bionic-20180821"
   shared/centos:
-    version: "7.5.1804"
+    version: "7.6.1810"
     method: "build"
     push: False
     directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
     required: {}
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/centos-docker-0008.tar.xz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/centos-docker-1550491978.tar.xz
         dest: centos-docker.tar.xz
-        checksum: d5759d1da5f8a1e70f29b7dacfe5458fb2edf86fc2679115e5a71eca463bfa42
+        checksum: 0f128307080f48debdce388bf796837cc05158e7d8337e171d76ee5b31274d39
   shared/centos/rpm-packer:
-    version: "7.5.1804"
+    version: "7.6.1810"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
     push: False
   shared/centos/docs:
-    version: "7.5.1804"
+    version: "7.6.1810"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
@@ -44,7 +44,7 @@ shared_images:
     dockerfile: "{{ playbook_dir }}/../../shared-containers/docs/Dockerfile"
     push: False
   shared/centos/build:
-    version: "7.5.1804"
+    version: "7.6.1810"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
@@ -107,9 +107,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes/v1.10.11.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes/v1.10.13.tar.gz
         dest: kubernetes.tar.gz
-        checksum: 13c4554e945f4f7af42479c8a3ee656381a3e4272fd88d0b6db766aff21478f3
+        checksum: 6087f16208d3242f82bb81419afcd0060f2279621b95b2a105e5790b6e775fb4
   shared/build/heapster:
     version: "v1.4.3"
     required:

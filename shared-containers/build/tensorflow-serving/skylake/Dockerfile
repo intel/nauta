@@ -1,6 +1,6 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
-
+ 
 RUN source /opt/rh/devtoolset-7/enable && bazel build \
         --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 \
         --copt=-march=broadwell \

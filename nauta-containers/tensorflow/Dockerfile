@@ -6,7 +6,7 @@ FROM ${TENSORFLOW_BUILD_IMAGE} as data
 FROM ${TENSORFLOW_SERVING_BUILD_IMAGE} as serving
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
-
+ 
 ENV TENSORFLOW_VERSION=1.9.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /

@@ -17,5 +17,5 @@ RUN source /opt/rh/devtoolset-7/enable && bazel build \
         --config=mkl \
         --jobs=64 \
         -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
-
+ 
 RUN source /opt/rh/devtoolset-7/enable && bazel-bin/tensorflow/tools/pip_package/build_pip_package /build-output/

@@ -8,7 +8,7 @@ FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
-
+ 
 ENV TENSORFLOW_VERSION=1.9.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
