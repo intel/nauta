@@ -1,4 +1,8 @@
-FROM centos:7.4.1708
+ARG NGINX_RPM_IMAGE=shared/build/rpm/nginx
 
-RUN mkdir -vp /out/
-ADD nginx-1.13.9-1.el7_4.ngx.x86_64.rpm /out/nginx-1.13.9-1.el7_4.ngx.x86_64.rpm
+FROM ${NGINX_RPM_IMAGE} as nginx_rpm_image
+FROM centos:7.5.1804
+
+WORKDIR /out
+
+COPY --from=nginx_rpm_image /out/* .

@@ -1,3 +1,8 @@
-FROM centos:7.4.1708
+ARG DOCKER_DISTRIBUTION_RPM_IMAGE=shared/build/rpm/docker-distribution
 
-ADD docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm /out/docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
+FROM ${DOCKER_DISTRIBUTION_RPM_IMAGE} as docker_distribution_rpm_image
+FROM centos:7.5.1804
+
+WORKDIR /out
+
+COPY --from=docker_distribution_rpm_image /out/* .

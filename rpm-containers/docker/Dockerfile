@@ -1,7 +1,14 @@
-FROM centos:7.4.1708
+ARG DOCKER_CE_RPM_IMAGE=shared/build/rpm/docker-ce
+ARG DOCKER_CE_DEBUG_INFO_RPM_IMAGE=shared/build/rpm/docker-ce-debuginfo
+ARG CONTAINER_SELINUX_RPM_IMAGE=shared/build/rpm/container-selinux
+
+FROM ${DOCKER_CE_RPM_IMAGE} as docker_ce_rpm_image
+FROM ${DOCKER_CE_DEBUG_INFO_RPM_IMAGE} as docker_ce_debuginfo_rpm_image
+FROM ${CONTAINER_SELINUX_RPM_IMAGE} as container_selinux_rpm_image
+FROM centos:7.5.1804
 
 WORKDIR /out
 
-RUN curl https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-18.06.0.ce-3.el7.x86_64.rpm -o docker-ce-18.06.0.ce-3.el7.x86_64.rpm
-RUN curl https://download.docker.com/linux/centos/7/debug-x86_64/edge/Packages/docker-ce-debuginfo-18.06.0.ce-3.el7.x86_64.rpm -o docker-ce-debuginfo-18.06.0.ce-3.el7.x86_64.rpm
-RUN yumdownloader container-selinux-2.68-1.el7
+COPY --from=docker_ce_rpm_image /out/* .
+COPY --from=docker_ce_debuginfo_rpm_image /out/* .
+COPY --from=container_selinux_rpm_image /out/* .

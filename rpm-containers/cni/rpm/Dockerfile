@@ -1,4 +1,5 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=shared/centos/rpm-packer
+
 FROM ${BASE_IMAGE}
 
 RUN curl -L https://github.com/containernetworking/plugins/releases/download/v0.7.1/cni-plugins-amd64-v0.7.1.tgz -o ./cni-plugins.tar.gz

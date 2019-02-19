@@ -57,18 +57,67 @@ shared_images:
       PYTHON_VERSION: 3.6
   shared/build/consul:
     version: "v1.1.0"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
+    required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
-    fetch_files:
-      - src: https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip
-        dest: consul-1.1.0_linux_amd64.zip
-        checksum: 09c40c8b5be868003810064916d8460bff334ccfb59a5046390224b27e052c45
   shared/build/metrics:
     version: "0.0.1"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
     push: False
+  shared/build/rpm/docker-ce:
+    version: "18.06"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "docker-ce"
+      PACKAGE_VERSION: "18.06"
+  shared/build/rpm/docker-ce-debuginfo:
+    version: "18.06"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "docker-ce-debuginfo"
+      PACKAGE_VERSION: "18.06"
+  shared/build/rpm/container-selinux:
+    version: "2.68"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "container-selinux"
+      PACKAGE_VERSION: "2.68"
+  shared/build/rpm/docker-distribution:
+    version: "2.6.2"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "docker-distribution"
+      PACKAGE_VERSION: "2.6.2"
+  shared/build/rpm/nginx:
+    version: "1.13.9"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "nginx"
+      PACKAGE_VERSION: "1.13.9"
+  shared/build/rpm/python2-pip:
+    version: "8.1.2"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "python2-pip"
+      PACKAGE_VERSION: "8.1.2"

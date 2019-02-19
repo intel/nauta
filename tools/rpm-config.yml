@@ -64,19 +64,19 @@ local_images:
     version: "2.7"
     required:
       BASE_IMAGE: "shared/centos/rpm-packer"
+      PYTHON2_PIP_RPM_IMAGE: "shared/build/rpm/python2-pip"
     method: build
     directory: "{{ playbook_dir }}/../../rpm-containers/python"
     push: False
     artifacts:
       - src: /out/*
         dest: rpms
-    fetch_files:
-      - src: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/p/python2-pip-8.1.2-7.el7.noarch.rpm
-        dest: python2-pip-8.1.2-7.el7.noarch.rpm
-        checksum: 48a1e429a39599c8be0a5a7e8e31393dd43c0e97f53e3824a5d6652ba6c9a316
   rpm/docker:
-    version: "18.03.1-ce"
-    required: {}
+    version: "18.06"
+    required:
+      DOCKER_CE_RPM_IMAGE: "shared/build/rpm/docker-ce"
+      DOCKER_CE_DEBUG_INFO_RPM_IMAGE: "shared/build/rpm/docker-ce-debuginfo"
+      CONTAINER_SELINUX_RPM_IMAGE: "shared/build/rpm/container-selinux"
     method: build
     directory: "{{ playbook_dir }}/../../rpm-containers/docker"
     push: False
@@ -85,17 +85,14 @@ local_images:
         dest: rpms
   rpm/docker-distribution:
     version: "2.6.2"
-    required: {}
+    required:
+      DOCKER_DISTRIBUTION_RPM_IMAGE: "shared/build/rpm/docker-distribution"
     method: build
     directory: "{{ playbook_dir }}/../../rpm-containers/docker-distribution"
     push: False
     artifacts:
       - src: /out/*
         dest: rpms
-    fetch_files:
-      - src: http://mirror.centos.org/centos/7/extras/x86_64/Packages/docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
-        dest: docker-distribution-2.6.2-2.git48294d9.el7.x86_64.rpm
-        checksum: 52b2c48b9bb4d0d5357057127799e4d71129fe8997dd0f770a9fe68ee7f3eff0
   rpm/cni/rpm:
     version: "v0.7.1"
     required:
@@ -165,31 +162,21 @@ local_images:
         dest: rpms
   rpm/nginx/rpm:
     version: "1.13.9"
-    required: {}
+    required:
+      NGINX_RPM_IMAGE: "shared/build/rpm/nginx"
     method: build
     directory: "{{ playbook_dir }}/../../rpm-containers/nginx"
     push: False
     artifacts:
       - src: /out/*
         dest: rpms
-    fetch_files:
-      - src: http://nginx.org/packages/mainline/centos/7/x86_64/RPMS/nginx-1.13.9-1.el7_4.ngx.x86_64.rpm
-        dest: nginx-1.13.9-1.el7_4.ngx.x86_64.rpm
-        checksum: 169be987c4a291ed8b9699da7c59f96700a0b178dcc55cd7dd835d4253128e07
-  rpm/consul:
-    version: "1.0.0"
-    required:
-      CONSUL_DATA_IMAGE: "shared/build/consul"
-      BASE_IMAGE: "shared/centos/rpm-packer"
-    method: build
-    directory: "{{ playbook_dir }}/../../rpm-containers/consul/prepare"
-    push: False
   rpm/consul/rpm:
     version: "1.0.0"
     required:
-      BASE_IMAGE: "rpm/consul"
+      CONSUL_SOURCES_IMAGE: "shared/build/consul"
+      BASE_IMAGE: "shared/centos/rpm-packer"
     method: build
-    directory: "{{ playbook_dir }}/../../rpm-containers/consul/rpm"
+    directory: "{{ playbook_dir }}/../../rpm-containers/consul"
     push: False
     artifacts:
       - src: /out/*

@@ -1,9 +1,8 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=shared/centos/rpm-packer
 FROM ${BASE_IMAGE}
 
 ENV RPM_VERSION=2.11.0
 ENV RPM_RELEASE=0
-
 
 RUN mkdir -p SOURCES && mkdir -p out && mkdir -p helm
 
