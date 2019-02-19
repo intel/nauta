@@ -319,7 +319,7 @@ class ExperimentCmdTexts:
 
 
 class ExperimentListCmdTexts:
-    SHORT_HELP = "Show logs for a given experiment."
+    SHORT_HELP = "List experiments."
     HELP_A = "Show all experiments, regardless of the owner."
     HELP_N = "A regular expression to narrow down list to experiments that match this expression."
     HELP_S = "List experiments with matching status."
@@ -772,6 +772,7 @@ class LicenseAcceptanceTexts:
                                 "{nctl_config_path} but this name is reserved for nctl app. Please remove it " \
                                 "and try again."
 
+
 class ConfigCmdTexts:
     HELP = "Sets values of limits and requests for resources in templates used by the system."
     HELP_C = "Number of cpu available for training on one node. K8s format expected. Obligatory"
@@ -791,3 +792,64 @@ Both cpu number and memory amount have to be given."""
     SUCCESS_MESSAGE = "Resources' settings have been updated with a success."
     MEMORY_SETTINGS_TOO_LOW = "Memory amount passed to the command shouldn't be lower than {memory_value}."
     CPU_SETTINGS_TOO_LOW = "CPU number passed to the command shouldn't be lower than {cpu_value}."
+
+
+class WorkflowCmdTexts:
+    HELP = "Command for starting, stopping, and managing workflows."
+
+
+class WorkflowLogsTexts:
+    SHORT_HELP = "Show logs for a given workflow."
+    HELP = """
+        Show logs for a given workflow.
+
+        workflow-name - is a name of workflow whose logs should be displayed
+        """
+    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
+    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
+                                 "yes - close it manually."
+    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    OTHER_ERROR_MSG = "Failed to get workflow logs."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+
+
+class WorkflowDeleteTexts:
+    SHORT_HELP = "Delete a workflow."
+    HELP = """
+        Deletes workflow with given name.
+
+        name - is a name of workflow which should be cancelled
+        """
+    OTHER_ERROR_MSG = "Failed to delete workflow."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    PROGRESS_MSG = "Deleting workflow {workflow_name} ..."
+    SUCCESS_MSG = "Deleted workflow {workflow_name}"
+
+
+class WorkflowSubmitTexts:
+    SHORT_HELP = "Submit a workflow."
+    HELP = """
+        Creates a workflow from specification defined in file given as argument.
+
+        workflow-path - is a path to workflow specification that will be used
+        """
+    LOAD_SPEC_ERROR_MSG = "Failed to load workflow definition file. Reason: {msg}"
+    OTHER_ERROR_MSG = "Failed to submit workflow."
+    PROGRESS_MSG = "Creating workflow ..."
+
+class WorkflowViewTexts:
+    SHORT_HELP = "Displays details of workflow with a given name."
+    HELP = """
+        Displays details of worfklow with a given name.
+
+        WORKFLOW_NAME - is a name of workflow whose details should be displayed.
+        """
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    OTHER_ERROR_MSG = "Failed to get workflow details."
+
+
+class WorkflowListTexts:
+    SHORT_HELP = "List workflows."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    OTHER_ERROR_MSG = "Failed to get workflow details."

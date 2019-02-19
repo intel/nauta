@@ -285,3 +285,6 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/documentation-service"
       chart_values:
         image: "{{ image_local_url['nauta/docs'] }}"
+    argo-controller:
+      version: 2.2.1
+      path: "{{ playbook_dir }}/../../nauta-charts/argo-controller"

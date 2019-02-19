@@ -25,6 +25,8 @@ import elasticsearch.client
 from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity, \
     filter_log_by_pod_status, filter_log_by_pod_ids
 from logs_aggregator.k8s_log_entry import LogEntry
+from platform_resources.platform_resource import PlatformResource
+from platform_resources.workflow import ArgoWorkflow
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
 from platform_resources.run import Run
@@ -132,6 +134,42 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             index=index, filters=filters)
 
         return experiment_logs_generator
+
+    def get_argo_workflow_logs_generator(self, workflow: ArgoWorkflow, namespace: str,
+                                         start_date: str, end_date: str = None,
+                                         index='_all', follow=False):
+        """
+        Return logs for given Argo workflow
+        :param workflow: instance of ArgoWorkflow resource
+        :param namespace: Name of namespace where experiment was started
+        :param index: ElasticSearch index from which logs will be retrieved, defaults to all indices
+        :param start_date: if provided, only logs produced after this date will be returned
+        :param end_date: if provided, only logs produced before this date will be returned
+        :param follow: if True, generator will stream logs tail
+        :return: Generator yielding LogEntry (date, log_content, pod_name, namespace) named tuples.
+        """
+        logger.debug(f'Searching for {workflow.name} workflow logs.')
+
+        timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date}}}
+        if end_date:
+            timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date, "lte": end_date}}}
+
+        filters = []
+
+        log_generator = self.get_stream_log_generator if follow else self.get_log_generator
+
+        workflow_logs_generator = log_generator(query_body={
+            "query": {"bool": {"must":
+                                   [{'term':
+                                         {'kubernetes.labels.workflows_argoproj_io/workflow.keyword': workflow.name}},
+                                    {'term': {'kubernetes.namespace_name.keyword': namespace}}
+                                    ],
+                               "filter": timestamp_range_filter
+                               }},
+            "sort": {"@timestamp": {"order": "asc"}}},
+            index=index, filters=filters)
+
+        return workflow_logs_generator
 
     def delete_logs_for_namespace(self, namespace: str, index='_all'):
         """

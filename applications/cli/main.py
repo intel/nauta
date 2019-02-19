@@ -31,7 +31,9 @@ from commands.user import user
 from commands.verify import verify
 from commands.mount import mount
 from commands.version import version
+
 from commands.config import config
+from commands.workflow import workflow
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
 from util.config import Config
@@ -108,6 +110,7 @@ def entry_point():
 
 
 entry_point.add_command(experiment.experiment)
+entry_point.add_command(workflow.workflow)
 entry_point.add_command(launch.launch)
 entry_point.add_command(predict.predict)
 entry_point.add_command(user.user)
