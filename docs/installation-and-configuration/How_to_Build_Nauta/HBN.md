@@ -70,8 +70,7 @@ From the main directory of Nauta repository invoke:
 
 `make k8s-installer-build`
 
-**Note:** Logs from the build process are saved to a file. By default it is `k8s_installer_build.log` inside of the current
-working directory. Log file path can be controller through `K8S_INSTALLER_BUILD_LOG_PATH` env variable.
+**Note:** Logs from the build process are saved to a file and persists if build fails. By default it is `k8s_installer_build.log` in `tools/.workspace` directory. Log file path can be controller through `K8S_INSTALLER_BUILD_LOG_PATH` env variable.
 
 ## Output of the Build
 
