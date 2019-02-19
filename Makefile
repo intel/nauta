@@ -58,7 +58,7 @@ k8s-installer-build-wrapped:
 
 k8s-installer-build:
 	@echo "k8s installer build logs will be saved to $(K8S_INSTALLER_BUILD_LOG_PATH)"
-	@mkdir "$(CURDIR)/tools/.workspace"
+	@mkdir -p "$(CURDIR)/tools/.workspace"
 	@set -o pipefail && make k8s-installer-build-wrapped 2>&1 | tee $(K8S_INSTALLER_BUILD_LOG_PATH)
 
 nctl-build:
