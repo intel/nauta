@@ -125,14 +125,14 @@ def main(_):
 
         tf.summary.scalar("loss", loss)
         tf.summary.scalar("accuracy", accuracy)
-        summary_op = tf.summary.merge_all()
+        tf.summary.merge_all()
 
         # As mentioned above summaries will be saved to EXPERIMENT_OUTPUT_PATH so that they can be automatically
         # discovered by tensorboard.
-        summary_writer = tf.summary.FileWriter(os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"))
+        summary_dir = os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard")
 
         # These ops will be later needed to save servable model.
-        init_op = tf.initialize_all_variables()
+        tf.global_variables_initializer()
         saver = tf.train.Saver()
 
     # Export meta graph to restore it later when saving.
@@ -149,7 +149,9 @@ def main(_):
 
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(task_index == 0),
-                                           hooks=hooks) as mon_sess:
+                                           hooks=hooks,
+                                           summary_dir=summary_dir) as mon_sess:
+
 
         step = 0
         while not mon_sess.should_stop() and step < 500:
