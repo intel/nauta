@@ -146,10 +146,12 @@ class PlatformResource:
                                                                              name=name)
 
         except ApiException as e:
-            logger.exception(f'Failed to find {cls.__name__} {name} in namespace {namespace}.')
             if e.status == http.HTTPStatus.NOT_FOUND:
+                logger.debug(f'Failed to find {cls.__name__} {name} in namespace {namespace}.')
                 raw_object = None
             else:
+                logger.exception(f'The error {e.status} has been returned while getting {cls.__name__} '
+                                 f'{name} object in namespace {namespace}.')
                 raise
 
         return cls.from_k8s_response_dict(raw_object) if raw_object else None
