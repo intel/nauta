@@ -1,4 +1,4 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2019 The TensorFlow Authors, Intel Corporation. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 
 import argparse
 import os
@@ -118,24 +117,26 @@ def main(_):
     publish({"validation_accuracy": str(validation_accuracy_val)})
 
     # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
-    builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(EXPERIMENT_OUTPUT_PATH, str(MODEL_VERSION)))
+    if FLAGS.export_dir is not "":
+        export_dir = os.path.join(FLAGS.export_dir, str(MODEL_VERSION))
+        builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
 
-    prediction_signature = (
-        tf.saved_model.signature_def_utils.build_signature_def(
-            inputs={MODEL_INPUT_NAME: tf.saved_model.utils.build_tensor_info(images_placeholder)},
-            outputs={MODEL_OUTPUT_NAME: tf.saved_model.utils.build_tensor_info(scores)},
-            method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
+        prediction_signature = (
+            tf.saved_model.signature_def_utils.build_signature_def(
+                inputs={MODEL_INPUT_NAME: tf.saved_model.utils.build_tensor_info(images_placeholder)},
+                outputs={MODEL_OUTPUT_NAME: tf.saved_model.utils.build_tensor_info(scores)},
+                method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
 
-    builder.add_meta_graph_and_variables(
-        session, [tf.saved_model.tag_constants.SERVING],
-        signature_def_map={
-            MODEL_SIGNATURE_NAME:
-                prediction_signature
-        },
-        main_op=tf.tables_initializer(),
-        strip_default_attrs=True)
+        builder.add_meta_graph_and_variables(
+            session, [tf.saved_model.tag_constants.SERVING],
+            signature_def_map={
+                MODEL_SIGNATURE_NAME:
+                    prediction_signature
+            },
+            main_op=tf.tables_initializer(),
+            strip_default_attrs=True)
 
-    builder.save()
+        builder.save()
 
 
 if __name__ == "__main__":
@@ -143,5 +144,8 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", type=str,
                         default="/tmp/mnist-data",
                         help="Directory which contains dataset")
+    parser.add_argument("--export_dir", type=str,
+                        default="",
+                        help="Export directory for model")
     FLAGS, _ = parser.parse_known_args()
     tf.app.run()

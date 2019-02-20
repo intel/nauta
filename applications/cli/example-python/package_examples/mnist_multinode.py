@@ -1,4 +1,4 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2019 The TensorFlow Authors, Intel Corporation. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -202,7 +202,6 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", type=str,
                         default="./datasets/mnist",
                         help="Directory which contains dataset")
-    parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int,
                         default=100,
                         help="Training batch size")

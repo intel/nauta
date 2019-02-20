@@ -30,6 +30,7 @@
                     <exclude>**/package_examples/mnist_horovod.py</exclude>
                     <exclude>**/package_examples/mnist_multinode.py</exclude>
                     <exclude>**/package_examples/mnist_single_node.py</exclude>
+                    <exclude>**/package_examples/mnist_tensorboard.py</exclude>
                     <exclude>**/nauta-gui/.eslintrc.js</exclude>
                     <exclude>**/nauta-gui/.postcssrc.js</exclude>
                     <exclude>**/applications/experiment-service/vendor/</exclude>
