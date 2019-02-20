@@ -1,4 +1,4 @@
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 RUN yum update -y && yum -y install nodejs bzip2 gcc

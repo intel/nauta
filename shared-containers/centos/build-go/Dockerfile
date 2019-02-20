@@ -1,4 +1,4 @@
-FROM centos:7.4.1708
+FROM centos:7.6.1810
 
 RUN yum clean all && yum update -y && yum install -y git gcc clang openssl-devel libpcap-devel libevent libevent-devel \
         libffi-devel libcurl-devel gcc-c++ make \

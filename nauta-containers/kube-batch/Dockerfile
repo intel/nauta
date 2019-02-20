@@ -31,7 +31,7 @@ RUN git checkout nauta
 
 RUN go build -o /kube-batch ./cmd/kube-batch
 
-FROM centos:7.4.1708
+FROM centos:7.6.1810
 
 RUN mkdir -p /opt/kube-batch
 

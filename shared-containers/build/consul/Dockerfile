@@ -1,4 +1,4 @@
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
 RUN yum clean all && yum update -y && yum install -y which wget unzip pigz
 

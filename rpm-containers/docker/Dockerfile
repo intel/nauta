@@ -5,7 +5,7 @@ ARG CONTAINER_SELINUX_RPM_IMAGE=shared/build/rpm/container-selinux
 FROM ${DOCKER_CE_RPM_IMAGE} as docker_ce_rpm_image
 FROM ${DOCKER_CE_DEBUG_INFO_RPM_IMAGE} as docker_ce_debuginfo_rpm_image
 FROM ${CONTAINER_SELINUX_RPM_IMAGE} as container_selinux_rpm_image
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
 WORKDIR /out
 

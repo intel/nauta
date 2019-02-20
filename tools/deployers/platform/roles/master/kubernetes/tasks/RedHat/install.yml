@@ -4,8 +4,8 @@
   include_tasks: yum_nauta_install.yml
   vars:
     packages:
-      - nauta-kubernetes-server-1.10.11
-      - nauta-kubernetes-client-1.10.11
+      - nauta-kubernetes-server-1.10.13
+      - nauta-kubernetes-client-1.10.13
       - nauta-helm-2.11.0
     handlers:
       - Reload Systemd

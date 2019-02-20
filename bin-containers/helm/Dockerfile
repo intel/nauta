@@ -1,4 +1,4 @@
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 RUN mkdir -p /out
 RUN yum update -y && yum install -y wget
 RUN wget --quiet https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz -O ./helm-amd64.tar.gz

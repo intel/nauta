@@ -43,7 +43,7 @@ ADD ./ ./
 
 RUN make build
 
-FROM centos:7.4.1708
+FROM centos:7.6.1810
 
 COPY --from=build /go/src/github.com/nervanasystems/carbon/applications/experiment-service/dist/apiserver /apiserver
 COPY --from=build /go/src/github.com/nervanasystems/carbon/applications/experiment-service/dist/controller-manager /controller-manager

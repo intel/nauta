@@ -1,7 +1,7 @@
 ARG NGINX_RPM_IMAGE=shared/build/rpm/nginx
 
 FROM ${NGINX_RPM_IMAGE} as nginx_rpm_image
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
 WORKDIR /out
 
