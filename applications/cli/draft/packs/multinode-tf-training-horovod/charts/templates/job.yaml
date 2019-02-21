@@ -98,7 +98,7 @@ spec:
             -cpus-per-proc {{ .Values.cpus }} --map-by socket --oversubscribe -n {{ .Values.workersCount | add 1 | mul .Values.processesPerNode }}
             {{- range .Values.master.env }} -x {{ .name }} {{- end }}
             --mca orte_keep_fqdn_hostnames t --allow-run-as-root --display-map --tag-output --timestamp-output
-            {{- if .Values.useHostNetwork }} --mca btl_tcp_if_include p3p1 {{ else }} --mca btl_tcp_if_exclude lo,docker0 {{- end }}
+            {{- if and .Values.useHostNetwork .Values.hostNetworkInterface }} --mca btl_tcp_if_include {{ .Values.hostNetworkInterface }} {{ else }} --mca btl_tcp_if_exclude lo,docker0 {{- end }}
             sh -c '/usr/bin/python {{- range .Values.commandline.args }} {{ . }} {{- end }}'
 {{- if .Values.master.args }}
 {{ toYaml .Values.master.args | indent 10 }}

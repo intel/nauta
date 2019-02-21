@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 useHostNetwork: false
+hostNetworkInterface: ""
 useHostPID: false
 
 commandline:
