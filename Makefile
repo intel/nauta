@@ -15,6 +15,8 @@ USER := $(shell id -un)
 USER_ID := $(shell id -u)
 
 K8S_INSTALLER_BUILD_LOG_PATH ?= $(CURDIR)/tools/.workspace/k8s_installer_build.log
+export BUILD_ID=$(shell TZ=UTC date '+%Y%M%d%H%M%S')
+
 
 venv: $(ACTIVATE)
 
