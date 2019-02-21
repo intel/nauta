@@ -47,7 +47,7 @@ function validate_prerequisities {
 function validate_arguments {
     print_log "DEBUG" "Validate arguments"
     check_file_presence "${GcpConfig}"
-    check_file_presence "${SCRIPTDIR}/gcp-service-account.yml"
+    check_file_presence "${ServiceAccountConfigFile}"
     if [ "${InstallFile}" != "" ]; then
         check_file_presence "${InstallFile}"
     fi
@@ -58,6 +58,7 @@ function set_defaults {
     if [ "${K8sCluster}" = "" ] ; then K8sCluster="nauta" ; fi
     if [ "${GcpConfig}" = "" ] ; then GcpConfig="`pwd`/gcp-config.yml" ; fi
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
+    if [ "${ServiceAccountConfigFile}" = "" ] ; then ServiceAccountConfigFile="`pwd`/gcp-service-account.json" ; fi
 
     if [ "${ClusterOwner}" = "" ] ; then ClusterOwner="`whoami`" ; fi
 }
@@ -67,6 +68,7 @@ show_parameters() {
     echo -e "\t\tK8sCluster=${K8sCluster}"
     echo -e "\t\tK8sOutputFile=${K8sOutputFile}"
     echo -e "\t\tClusterOwner=${ClusterOwner}"
+    echo -e "\t\tServiceAccountConfigFile=${ServiceAccountConfigFile}"
 
     echo -e ""
     echo -e "\t\tSCRIPTDIR=${SCRIPTDIR}"
@@ -90,6 +92,8 @@ tag_cluster() {
     print_log "DEBUG" "Tag cluster"
     tags_string="owner=${ClusterOwner},provider=gketf,gateway_ip=${GATEWAY_IP},testnode_ip=${TESTNODE_IP}"
     tags_string=`echo ${tags_string} | sed 's/\./_/g'`
+    print_log "DEBUG" gcloud auth activate-service-account --key-file ${ServiceAccountConfigFile}
+    gcloud auth activate-service-account --key-file ${ServiceAccountConfigFile}
     print_log "DEBUG" gcloud beta container clusters update ${K8sCluster} --update-labels ${tags_string}
     gcloud beta container clusters update ${K8sCluster} --zone ${CLUSTER_ZONE} --update-labels ${tags_string}
 }
@@ -102,6 +106,7 @@ WORKSPACEDIR="${SCRIPTDIR}/../../../.workspace"
 LONG_OPTIONS=""
 LONG_OPTIONS+="k8s-cluster:,"
 LONG_OPTIONS+="cluster-owner:,"
+LONG_OPTIONS+="service-account-config-file:,"
 LONG_OPTIONS+="gcp-config:,"
 
 SHORT_OPTIONS="c:"
@@ -112,6 +117,7 @@ while true; do
         --k8s-cluster) K8sCluster="$2"; shift 2 ;;
         --gcp-config) GcpConfig="$2"; shift 2 ;;
         --cluster-owner) ClusterOwner="$2"; shift 2 ;;
+        --service-account-config-file) ServiceAccountConfigFile="$2"; shift 2 ;;
         --) break;;
         *) echo "Internal error! |$1|$2|" ; exit 1 ;;
    esac

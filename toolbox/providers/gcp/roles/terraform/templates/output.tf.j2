@@ -3,16 +3,16 @@ output "name" {
 }
 
 output "gateway_ip" {
-  value = "${google_compute_instance.gateway.network_interface.0.access_config.0.assigned_nat_ip}"
+  value = "${google_compute_instance.gateway.network_interface.0.access_config.0.nat_ip}"
 }
 
 {% if gcp.generate_test_node %}
 output "testnode_ip" {
-  value = "${google_compute_instance.testnode.network_interface.0.access_config.0.assigned_nat_ip}"
+  value = "${google_compute_instance.testnode.network_interface.0.access_config.0.nat_ip}"
 }
 {% endif %}
 output "nfs_internal_ip" {
-  value = "${google_compute_instance.nfs.network_interface.0.address}"
+  value = "${google_compute_instance.nfs.network_interface.0.network_ip }"
 }
 
 output "k8s_client_certificate" {

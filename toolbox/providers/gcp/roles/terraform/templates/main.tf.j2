@@ -152,7 +152,7 @@ resource "google_compute_route" "nat" {
   name = "${var.prefix}-nat"
   dest_range = "0.0.0.0/0"
   network = "${google_compute_network.vpc.self_link}"
-  next_hop_ip = "${google_compute_instance.gateway.network_interface.0.address}"
+  next_hop_ip = "${google_compute_instance.gateway.network_interface.0.network_ip}"
   priority = 800
   tags = ["nat"]
 
@@ -207,20 +207,24 @@ resource "google_container_cluster" "primary" {
 
   network = "${google_compute_network.vpc.self_link}"
   subnetwork = "${google_compute_subnetwork.k8s.self_link}"
-  master_ipv4_cidr_block = "10.254.0.0/28"
-  private_cluster = true
+
+  private_cluster_config {
+    master_ipv4_cidr_block = "10.254.0.0/28",
+    enable_private_nodes = true
+
+  }
 
   ip_allocation_policy = {
     cluster_secondary_range_name = "pods"
     services_secondary_range_name = "services"
   }
 
-  min_master_version = "1.10.11"
+  min_master_version = "1.11.7"
   master_authorized_networks_config = {
     cidr_blocks = [
-      { cidr_block = "${google_compute_instance.gateway.network_interface.0.access_config.0.assigned_nat_ip}/32", display_name = "gateway" }
+      { cidr_block = "${google_compute_instance.gateway.network_interface.0.access_config.0.nat_ip}/32", display_name = "gateway" }
 {% if gcp.generate_test_node %}
-      ,{ cidr_block = "${google_compute_instance.testnode.network_interface.0.access_config.0.assigned_nat_ip}/32", display_name = "testnode" }
+      ,{ cidr_block = "${google_compute_instance.testnode.network_interface.0.access_config.0.nat_ip}/32", display_name = "testnode" }
 {% endif %}
     ]
   }

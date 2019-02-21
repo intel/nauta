@@ -47,13 +47,19 @@ function validate_prerequisities {
 function validate_arguments {
     print_log "DEBUG" "Validate arguments"
     check_file_presence "${GcpConfig}"
-    check_file_presence "${SCRIPTDIR}/gcp-service-account.json"
+    check_file_presence "${NetworkSettings}"
+    check_file_presence "${ServiceAccountConfigFile}"
+
     if [ "${InstallFile}" != "" ]; then
         check_file_presence "${InstallFile}"
     fi
 
     if [ "${ClientFile}" != "" ]; then
         check_file_presence "${ClientFile}"
+    fi
+
+    if [ "${PlatformConfigFile}" != "" ]; then
+        check_file_presence "${PlatformConfigFile}"
     fi
 
     if [ "${InstallFile}" != "" ] && [ "${CompilePlatformOnCloud}" = "true" ] ; then
@@ -70,7 +76,7 @@ function set_defaults {
     if [ "${ExternalPublicKey}" = "" ] ; then ExternalPublicKey="~/.ssh/id_rsa.pub" ; fi
     if [ "${ExternalKey}" = "" ] ; then ExternalKey="~/.ssh/id_rsa" ; fi
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
-    if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="config.yml" ; fi
+    if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="`pwd`/../../config.yml" ; fi
 
     if [ "${CompilePlatformOnCloud}" = "" ] ; then CompilePlatformOnCloud="false" ; fi
 
@@ -80,6 +86,11 @@ function set_defaults {
 
     if [ "${ClientFile}" != "" ]; then
         CLIENT_FILE_NAME=$(basename -- "${ClientFile}")
+    fi
+    if [ "${ServiceAccountConfigFile}" = "" ] ; then ServiceAccountConfigFile="`pwd`/gcp-service-account.json" ; fi
+
+    if [ "${PlatformConfigFile}" != "" ]; then
+        PLATFORM_CONFIG_FILE_NAME=$(basename -- "${PlatformConfigFile}")
     fi
 
     CurrentBranch=`git status | grep "On branch" | awk '{print $3}'`
@@ -97,6 +108,9 @@ show_parameters() {
     echo -e "\t\tExternalKey=${ExternalKey}"
     echo -e "\t\tK8sOutputFile=${K8sOutputFile}"
     echo -e "\t\tNetworkSettings=${NetworkSettings}"
+    echo -e ""
+    echo -e "\t\tServiceAccountConfigFile=${ServiceAccountConfigFile}"
+    echo -e "\t\tPlatformConfigFile=${PlatformConfigFile}"
     echo -e ""
     echo -e "\t\tInstallFile=${InstallFile}"
     echo -e "\t\tClientFile=${ClientFile}"
@@ -123,6 +137,8 @@ create_cluster() {
         ENV_CLUSTER_CONFIG_FILE=${GcpConfig} \
         ENV_EXTERNAL_PUBLIC_KEY=${ExternalPublicKey} \
         ENV_EXTERNAL_KEY=${ExternalKey} \
+        ENV_SERVICE_ACCOUNT_CONFIG=${ServiceAccountConfigFile} \
+        ENV_PLATFORM_CONFIG=${PlatformConfigFile} \
         K8S_OUTPUT_FILE=${K8sOutputFile} \
     "
 
@@ -136,6 +152,8 @@ create_cluster() {
         ENV_CLUSTER_CONFIG_FILE=${GcpConfig} \
         ENV_EXTERNAL_PUBLIC_KEY=${ExternalPublicKey} \
         ENV_EXTERNAL_KEY=${ExternalKey} \
+        ENV_SERVICE_ACCOUNT_CONFIG=${ServiceAccountConfigFile} \
+        ENV_PLATFORM_CONFIG=${PlatformConfigFile} \
         K8S_OUTPUT_FILE=${K8sOutputFile}
 }
 
@@ -152,6 +170,8 @@ destroy_cluster() {
         ENV_CLUSTER_CONFIG_FILE=${GcpConfig} \
         ENV_EXTERNAL_PUBLIC_KEY=${ExternalPublicKey} \
         ENV_EXTERNAL_KEY=${ExternalKey} \
+        ENV_SERVICE_ACCOUNT_CONFIG=${ServiceAccountConfigFile} \
+        ENV_PLATFORM_CONFIG=${PlatformConfigFile} \
         K8S_OUTPUT_FILE=${K8sOutputFile} \
     "
 
@@ -165,6 +185,8 @@ destroy_cluster() {
         ENV_CLUSTER_CONFIG_FILE=${GcpConfig} \
         ENV_EXTERNAL_PUBLIC_KEY=${ExternalPublicKey} \
         ENV_EXTERNAL_KEY=${ExternalKey} \
+        ENV_SERVICE_ACCOUNT_CONFIG=${ServiceAccountConfigFile} \
+        ENV_PLATFORM_CONFIG=${PlatformConfigFile} \
         K8S_OUTPUT_FILE=${K8sOutputFile}
 }
 
@@ -172,7 +194,7 @@ set_connectivity_params() {
     print_log "DEBUG" "Set connectivity parameters to access gateway node"
     GATEWAY_IP=`cat ${K8sOutputFile} | grep "gateway_ip" | awk -F '"' '{print $2}'`
     GATEWAY_USER=`cat ${GcpConfig} | grep "external_username" | awk -F '"' '{print $2}'`
-    PROXY_TO_GATEWAY=`cat ${SCRIPTDIR}/../../${NetworkSettings} | grep "ssh_args_for_cmd_line" | awk -F '"' '{print $2}'`
+    PROXY_TO_GATEWAY=`cat ${NetworkSettings} | grep "ssh_args_for_cmd_line" | awk -F '"' '{print $2}'`
 }
 
 show_connectivity_parameters() {
@@ -250,6 +272,13 @@ transfer_install_file() {
 transfer_scripts() {
     print_log "DEBUG" "Transfer install scripts"
     run_scp_command ${SCRIPTDIR}/files/remote_scripts ${GATEWAY_USER}@${GATEWAY_IP}:
+}
+
+transfer_config_files() {
+    print_log "DEBUG" "Transfer config files"
+    if [ "${PlatformConfigFile}" != "" ]; then
+        run_scp_command ${PlatformConfigFile} ${GATEWAY_USER}@${GATEWAY_IP}:platform-config.yml
+    fi
 }
 
 install_platform_prerequisities() {
@@ -376,6 +405,8 @@ LONG_OPTIONS+="install-file:,"
 LONG_OPTIONS+="client-file:,"
 LONG_OPTIONS+="network-settings:,"
 LONG_OPTIONS+="compile-platform-on-cloud:,"
+LONG_OPTIONS+="service-account-config-file:,"
+LONG_OPTIONS+="platform-config-file:,"
 LONG_OPTIONS+="help"
 
 SHORT_OPTIONS="c:"
@@ -396,6 +427,8 @@ while true; do
         --client-file) ClientFile="$2"; shift 2 ;;
         --network-settings) NetworkSettings="$2"; shift 2 ;;
         --compile-platform-on-cloud) CompilePlatformOnCloud="$2"; shift 2 ;;
+        --service-account-config-file) ServiceAccountConfigFile="$2"; shift 2 ;;
+        --platform-config-file) PlatformConfigFile="$2"; shift 2 ;;
         --) break;;
         *) echo "Internal error! |$1|$2|" ; exit 1 ;;
    esac
@@ -417,7 +450,7 @@ if [ "${CompilePlatformOnCloud}" = "true" ]; then
     set_connectivity_params
     show_connectivity_parameters
     transfer_scripts
-
+    transfer_config_files
     VERSION_MAJOR=1
     VERSION_MINOR=0
     VERSION_NO=0
@@ -435,6 +468,7 @@ if [ "${InstallFile}" != "" ]; then
     set_connectivity_params
     show_connectivity_parameters
     transfer_scripts
+    transfer_config_files
     transfer_install_file
     install_compiler_prerequisities
     install_platform_prerequisities

@@ -13,11 +13,13 @@
 [BR]\tinstall-file\t\t\t\t\tPath to nauta installer file.
 [BR]\tclient-file\t\t\t\t\tPath to nauta client installer file.
 [BR]\tnetwork-settings\t\t[config.yml]\t\tFile name with network settings in provider directory.
-[BR]\tcompile-platform-on-cloud\t\t[false|true]\t\tIf true plagform packages will be create on bastion/gatway node.
+[BR]\tcompile-platform-on-cloud\t[false|true]\t\tIf true plagform packages will be create on bastion/gatway node.
+[BR]\tservice-account-config-file\t[`pwd`/gcp-service-account.json]\tPath to GCP service account config file.
+[BR]\tplatform-config-file\t\t\t\t\tPath to platform config file
 [BR][BR][YELLOW]Installation resources warning[NOCOLOR]
 [BR]To install cluster the following files have to be available/modified:
 [BR]- gcp-config (set in options) with resources definition
 [BR]- config.yml with network settings
-[BR]- gcp-service-account.yml with data to connect to gcp cloud.
+[BR]- gcp-service-account.json with data to connect to gcp cloud.
 [BR]
 [BR]For more information please refer to installation guide on github.
