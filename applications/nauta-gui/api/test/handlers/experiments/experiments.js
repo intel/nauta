@@ -404,7 +404,8 @@ describe('Handlers | Experiments', function () {
       };
       const searchPattern = 'mnist-SING-18-06-11-09-34-45-41';
       const result = expApi.prepareDataUsingFilters(generatedEntities, null, {
-        pattern: searchPattern, timezoneOffset: reqMock.headers['timezone-offset']});
+        pattern: searchPattern, timezoneOffset: reqMock.headers['timezone-offset']
+      });
       expect(result).to.deep.equal(expectedResult);
     });
   });
@@ -619,7 +620,7 @@ describe('Handlers | Experiments', function () {
           {
             name: 'tensorflow',
             resources: {},
-            status: 'Terminated, Completed'
+            status: `Terminated, containerID: ${podsList.items[0].status.containerStatuses[0].state.terminated.containerID}; exitCode: ${podsList.items[0].status.containerStatuses[0].state.terminated.exitCode}; finishedAt: ${podsList.items[0].status.containerStatuses[0].state.terminated.finishedAt}; reason: ${podsList.items[0].status.containerStatuses[0].state.terminated.reason}; startedAt: ${podsList.items[0].status.containerStatuses[0].state.terminated.startedAt}; `
           }
         ]
       }];
