@@ -106,17 +106,25 @@ module.exports.listPodsByLabelValue = function (token, labelName, labelValue) {
   });
 };
 
+const getFormattedState = function (stateObj) {
+  let result = '';
+  Object.keys(stateObj).forEach((key) => {
+    result += `${key}: ${stateObj[key]}; `;
+  });
+  return result;
+};
+
 module.exports.parseContainerState = function (state) {
   if (!state) {
     return 'Not created';
   }
   if (state.running) {
-    return `Running, ${typeof (state.running) === 'object' ? JSON.stringify(state.running) : state.running}`;
+    return `Running, ${typeof (state.running) === 'object' ? getFormattedState(state.running) : state.running}`;
   }
   if (state.terminated) {
-    return `Terminated, ${typeof (state.terminated.reason) === 'object' ? JSON.stringify(state.terminated.reason) : state.terminated.reason}`;
+    return `Terminated, ${typeof (state.terminated) === 'object' ? getFormattedState(state.terminated) : state.terminated}`;
   }
   if (state.waiting) {
-    return `Waiting, ${typeof (state.waiting) === 'object' ? JSON.stringify(state.waiting) : state.waiting}`;
+    return `Waiting, ${typeof (state.waiting) === 'object' ? getFormattedState(state.waiting) : state.waiting}`;
   }
 };

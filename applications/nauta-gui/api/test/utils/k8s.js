@@ -252,7 +252,7 @@ describe('Utils | k8s', function () {
 
     it('should return static text if state terminated', function () {
       const state = {terminated: {reason: 'reason'}};
-      const expectedResult = `Terminated, reason`;
+      const expectedResult = `Terminated, reason: ${state.terminated.reason}; `;
       const result = k8sApi.parseContainerState(state);
       expect(result).to.deep.equal(expectedResult);
     });
