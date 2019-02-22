@@ -69,3 +69,19 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
             f"release: \"{release_name}\" not found" not in output):
         logger.error(log_output)
         raise RuntimeError(Texts.HELM_RELEASE_REMOVAL_ERROR_MSG.format(release_name=release_name))
+
+
+def install_helm_chart(chart_dirpath: str, release_name: str = None, tiller_namespace: str = None):
+    command = ["helm", "install", chart_dirpath]
+    if release_name:
+        command.extend(["--name", release_name])
+    if tiller_namespace:
+        command.extend(["--tiller-namespace", tiller_namespace])
+
+    env = os.environ.copy()
+    env['PATH'] = f"{Config().config_path}{os.pathsep}{env['PATH']}"
+    output, err_code, log_output = execute_system_command(command, env=env)
+    logger.debug(f"helm exit code: {err_code} returned: {output}")
+
+    if err_code != 0:
+        raise RuntimeError(f"helm returned with non-zero code: {err_code}")

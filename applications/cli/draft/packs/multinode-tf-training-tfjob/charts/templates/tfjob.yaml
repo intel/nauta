@@ -8,7 +8,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
   ttlSecondsAfterFinishing: 60
@@ -23,14 +22,13 @@ spec:
             buildID: {{ .Values.buildID }}
           labels:
             app: {{ template "name" . }}
-            draft: {{ .Values.draft }}
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
           schedulerName: kube-batch
           containers:
             - name: tensorflow
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["/bin/bash", "-c", "python {{ $command_args }}"]
               env:
@@ -82,7 +80,7 @@ spec:
                 claimName: output-public
           initContainers:
             - name: init-experiment-pod
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
               volumeMounts:
                 - name: output-home
@@ -98,14 +96,13 @@ spec:
             buildID: {{ .Values.buildID }}
           labels:
             app: {{ template "name" . }}
-            draft: {{ .Values.draft }}
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
           schedulerName: kube-batch
           containers:
             - name: tensorflow
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["/bin/bash"]
               args:
@@ -177,7 +174,7 @@ spec:
               emptyDir: {}
           initContainers:
             - name: init-experiment-pod
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
               volumeMounts:
                 - name: output-home

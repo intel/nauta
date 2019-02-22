@@ -8,7 +8,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
   ttlSecondsAfterFinishing: 60
@@ -24,13 +23,12 @@ spec:
             scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
           labels:
             app: {{ template "name" . }}
-            draft: {{ .Values.draft }}
             release: {{ .Release.Name }}
             runName: {{ .Release.Name }}
         spec:
           containers:
             - name: tensorflow
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["/bin/bash", "-c", "python {{ $command_args }}"]
               ports:
@@ -83,7 +81,7 @@ spec:
                 claimName: output-public
           initContainers:
             - name: init-experiment-pod
-              image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.clusterRepository }}"
               command: ['mkdir', '-p', '/mnt/output/home/{{ .Release.Name }}']
               volumeMounts:
                 - name: output-home

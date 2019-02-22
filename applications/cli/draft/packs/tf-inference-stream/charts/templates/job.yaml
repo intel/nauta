@@ -8,7 +8,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     runName: {{ .Release.Name }}
 spec:
   backoffLimit: 0
@@ -22,7 +21,6 @@ spec:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}
         chart: {{ template "chart_version" . }}
-        draft: {{ .Values.draft }}
         heritage: {{ .Release.Service }}
         runName: {{ .Release.Name }}
     spec:
@@ -30,7 +28,7 @@ spec:
       schedulerName: kube-batch
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.clusterRepository }}"
           env:
             - name: MODEL_NAME
               value: "{{ .Values.modelName }}"

@@ -58,7 +58,7 @@ spec:
 {{- end }}
       containers:
       - name: worker
-        image: "{{ .Values.image.clusterRepository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.clusterRepository }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: SSHPORT

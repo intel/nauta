@@ -30,19 +30,13 @@ build: $(ACTIVATE) set-version metrics-lib
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/windows/draft-v0.13.0-nauta-windows-amd64.7z -o draft.7z
-	mkdir dist/config/
-	7z x draft.7z -odist/config/
-	rm -f draft.7z
+	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
+
+	mkdir dist/config
+
 	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 
-	rm -rf dist/config/.draft/plugins/
-	mkdir dist/config/packs/
-    
-	cp -Rf draft/packs/* dist/config/packs/
-	rm -rf dist/config/.draft/packs
-	cd dist/config/.draft && cmd /C "cmd /C mklink /D packs ..\packs"
+	cp -Rf draft/packs dist/config
 
 	curl -o helm-v2.9.1-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-windows-amd64.tar.gz
 	rm -rf helm_tmp
@@ -54,20 +48,17 @@ ifeq (Windows,$(OS))
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.9.1-windows-amd64.tar.gz
 	rm -rf helm_tmp
+
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/linux/draft-v0.13.0-nauta-linux-amd64.tar.gz -o draft.tar.gz
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
+
 	mkdir -vp dist/config/
-	tar -zxf draft.tar.gz -C dist/config/
-	rm -f draft.tar.gz
-	mkdir dist/config/packs/
-	cp -Rf draft/packs/* dist/config/packs/
-	rm -rf dist/config/.draft/packs
-	rm -rf dist/config/.draft/plugins/
-	cd dist/config/.draft && ln -s ../packs packs
+
+	cp -Rf draft/packs dist/config
 
 	curl -o helm-v2.9.1-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -80,19 +71,16 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl;
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/draft-bundles/mac/draft-v0.13.0-nauta-darwin-amd64.tar.gz -o draft.tar.gz
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
+
 	mkdir -vp dist/config/
-	tar -zxf draft.tar.gz -C dist/config/
-	rm -f draft.tar.gz
+
 	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
-	mkdir dist/config/packs/
-	cp -Rf draft/packs/* dist/config/packs/
-	rm -rf dist/config/.draft/packs
-	rm -rf dist/config/.draft/plugins/
-	cd dist/config/.draft && ln -s ../packs packs
+
+	cp -Rf draft/packs dist/config
 
 	curl -o helm-v2.9.1-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-darwin-amd64.tar.gz
 	rm -rf helm_tmp

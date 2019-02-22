@@ -7,12 +7,10 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
     nauta_app_name: jupyter
 spec:
   selector:
     app: {{ template "name" . }}
-    draft: {{ .Values.draft }}
     release: {{ .Release.Name }}
     runName: {{ .Release.Name }}
   ports:

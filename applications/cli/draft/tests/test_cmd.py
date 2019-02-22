@@ -19,102 +19,105 @@
 # and approved by Intel in writing.
 #
 
-import os
-
 import pytest
-from unittest.mock import call, ANY
 
-from draft import cmd
-from cli_text_consts import DraftCmdTexts as Texts
-
-
-FAKE_CLI_CONFIG_DIR_PATH = '/home/fakeuser/dist'
-FAKE_DRAFT_BIN_PATH = os.path.join(FAKE_CLI_CONFIG_DIR_PATH, cmd.DRAFT_BIN)
-
-CORRECT_UP_OUTPUT_BUILD_IMAGE = 'Building Docker Image: SUCCESS'
-CORRECT_UP_OUTPUT_PUSH_IMAGE = 'Pushing Docker Image: SUCCESS'
-CORRECT_UP_OUTPUT_DEPLOY = 'Releasing Application: SUCCESS'
-
-INCORRECT_UP_OUTPUT = 'Building Docker Image: SUCCESS Releasing Application: SUCCESS'
-
-CORRECT_CREATE_OUTPUT = '--> Ready to sail'
-
-INCORRECT_CREATE_OUTPUT = '-->  to sail 1234567890 AbCdEF'
+from cli_text_consts import DraftCmdTexts
+import draft
+from draft.cmd import create, up
+import util.helm
 
 
 @pytest.fixture
-def draft_mock(mocker):
-    config_class_mock = mocker.patch('draft.cmd.Config')
-    config_instance_mock = config_class_mock.return_value
-    config_instance_mock.config_path = FAKE_CLI_CONFIG_DIR_PATH
+def cmd_mock(mocker):
+    # 'create' mock
+    mocker.patch('draft.cmd.Config', return_value=mocker.MagicMock(get_config_path=lambda: '/home/user/config'))
+    mocker.patch('os.path.isdir', return_value=True)
+    mocker.patch('draft.cmd.copytree_content')
+    mocker.patch('os.makedirs')
 
-    exe_mock = mocker.patch.object(cmd, 'execute_system_command')
-    exe_mock.return_value = ('some return', 0, 'some_return')
+    # 'up' mock
+    fake_pack_to_be_installed = 'my-pack'
+    docker_client_mock = mocker.MagicMock()
+    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
+    mocker.patch('os.listdir', return_value=[fake_pack_to_be_installed])
+    mocker.patch('util.helm.install_helm_chart')
 
-    return cmd
-
-
-# noinspection PyShadowingNames
-def test_create(draft_mock):
-    draft_mock.create()
-
-    assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'create'], env=ANY, cwd=None,
-                                                             logs_size=0)])
+    return docker_client_mock
 
 
-# noinspection PyShadowingNames
-def test_up(draft_mock, mocker):
-    mocker.patch('subprocess.Popen')
+# noinspection PyUnresolvedReferences,PyUnusedLocal
+def test_create(cmd_mock):
+    output, exit_code = create('/home/fake_dir', 'fake_pack')
 
-    draft_mock.up()
-
-    assert draft_mock.execute_system_command.call_count == 1
-    draft_mock.execute_system_command.assert_has_calls([call([FAKE_DRAFT_BIN_PATH, 'up'], env=ANY, cwd=None,
-                                                             logs_size=0)])
+    assert output == ""
+    assert exit_code == 0
+    assert draft.cmd.copytree_content.call_count == 2
 
 
-def test_check_up_status_success():
-    output, exit_code = cmd.check_up_status('{} {} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
-                                                              CORRECT_UP_OUTPUT_PUSH_IMAGE,
-                                                              CORRECT_UP_OUTPUT_DEPLOY))
+# noinspection PyUnusedLocal,PyUnresolvedReferences
+def test_create_no_pack(mocker, cmd_mock):
+    mocker.patch('os.path.isdir', return_value=False)
 
-    assert not exit_code
-    assert not output
+    output, exit_code = create('/home/fake_dir', 'fake_pack')
+
+    assert output == DraftCmdTexts.PACK_NOT_EXISTS
+    assert exit_code == 1
+    assert draft.cmd.copytree_content.call_count == 0
 
 
-def test_check_up_status_lack_of_push():
-    output, exit_code = cmd.check_up_status('{} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
-                                                           CORRECT_UP_OUTPUT_DEPLOY))
+# noinspection PyUnusedLocal,PyUnresolvedReferences
+def test_create_other_error(mocker, cmd_mock):
+    mocker.patch('draft.cmd.copytree_content', side_effect=PermissionError)
 
+    output, exit_code = create('/home/fake_dir', 'fake_pack')
+
+    assert output == DraftCmdTexts.DEPLOYMENT_NOT_CREATED
+    assert exit_code == 100
+    assert draft.cmd.copytree_content.call_count == 1
+
+
+# noinspection PyUnusedLocal
+def test_up(mocker, cmd_mock):
+    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
+
+    assert output == ""
+    assert exit_code == 0
+    assert cmd_mock.images.build.call_count == 1
+    assert cmd_mock.images.push.call_count == 1
+    # noinspection PyUnresolvedReferences
+    assert '/home/user/config/charts/my-pack' in util.helm.install_helm_chart.call_args[0]
+
+
+# noinspection PyUnusedLocal
+def test_up_build_error(mocker, cmd_mock):
+    docker_client_mock = mocker.MagicMock()
+    docker_client_mock.images.build = lambda: RuntimeError
+    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
+
+    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
+
+    assert output == DraftCmdTexts.DOCKER_IMAGE_NOT_BUILT
+    assert exit_code == 100
+    assert docker_client_mock.images.push.call_count == 0
+
+
+# noinspection PyUnusedLocal
+def test_up_push_error(mocker, cmd_mock):
+    docker_client_mock = mocker.MagicMock()
+    docker_client_mock.images.push = lambda: RuntimeError
+    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
+
+    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
+
+    assert output == DraftCmdTexts.DOCKER_IMAGE_NOT_SENT
     assert exit_code == 101
-    assert output == Texts.DOCKER_IMAGE_NOT_SENT
 
 
-def test_check_up_status_lack_of_build():
-    output, exit_code = cmd.check_up_status('{}'.format(CORRECT_UP_OUTPUT_DEPLOY))
+# noinspection PyUnusedLocal
+def test_up_helm_install_error(mocker, cmd_mock):
+    mocker.patch('util.helm.install_helm_chart', side_effect=RuntimeError)
 
-    assert exit_code == 100
-    assert output == Texts.DOCKER_IMAGE_NOT_BUILT
+    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
 
-
-def test_check_up_status_lack_of_deploy():
-    output, exit_code = cmd.check_up_status('{} {}'.format(CORRECT_UP_OUTPUT_BUILD_IMAGE,
-                                                           CORRECT_UP_OUTPUT_PUSH_IMAGE))
-
+    assert output == DraftCmdTexts.APP_NOT_RELEASED
     assert exit_code == 102
-    assert output == Texts.APP_NOT_RELEASED
-
-
-def test_check_create_status_success():
-    output, exit_code = cmd.check_create_status(CORRECT_CREATE_OUTPUT)
-
-    assert not exit_code
-    assert not output
-
-
-def test_check_create_status_fail():
-    output, exit_code = cmd.check_create_status(INCORRECT_UP_OUTPUT)
-
-    assert exit_code == 100
-    assert output == Texts.DEPLOYMENT_NOT_CREATED

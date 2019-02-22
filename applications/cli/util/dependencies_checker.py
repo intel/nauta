@@ -27,7 +27,6 @@ from typing import Optional, Dict
 
 import yaml
 
-from draft.cmd import call_draft
 from util.system import execute_system_command, get_os_version
 from util.logger import initialize_logger
 from util.exceptions import InvalidDependencyError, InvalidOsError
@@ -68,15 +67,6 @@ DependencySpec = namedtuple('DependencySpec', [
 
 def get_dependency_map() -> Dict[str, DependencySpec]:
     return {
-        'draft':
-        DependencySpec(
-            expected_version=DRAFT_MIN_VERSION,
-            version_command=call_draft,
-            version_command_args=[
-                'version', '--tiller-namespace', NAMESPACE_PLACEHOLDER
-            ],
-            version_field='SemVer',
-            match_exact_version=False),
         'kubectl':
         DependencySpec(
             expected_version=KUBECTL_MIN_VERSION,

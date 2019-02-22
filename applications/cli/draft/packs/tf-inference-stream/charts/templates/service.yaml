@@ -7,7 +7,6 @@ metadata:
     chart: {{ template "chart_version" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    draft: {{ .Values.draft }}
 spec:
   ports:
   - port: {{ .Values.restContainerPort }}
@@ -20,7 +19,6 @@ spec:
     name: grpc-port
   selector:
     app: {{ template "name" . }}
-    draft: {{ .Values.draft }}
     release: {{ .Release.Name }}
     runName: {{ .Release.Name }}
   type: ClusterIP
