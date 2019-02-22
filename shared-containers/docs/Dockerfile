@@ -6,6 +6,9 @@ RUN apt install ./pandoc.deb
 
 ADD ["./", "/docs/"]
 
+RUN ls
+RUN pwd
+
 RUN cd /docs && find . -name "*.md*" | while read file; do \
     pandoc -f markdown --template=.utils/template.html --toc --toc-depth=3 --standalone --lua-filter=.utils/links.lua \
     --metadata title="Nauta documentation" "$file" -o "${file%.*}.html"; done

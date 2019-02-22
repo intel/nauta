@@ -1,29 +1,24 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from enum import Enum
-from typing import Union, List, Tuple
+from typing import List, Tuple
 
-from platform_resources.run_model import Run
-from commands.experiment.common import submit_experiment, RunSubmission, RunKinds
+from platform_resources.run import Run
+from commands.experiment.common import submit_experiment, RunKinds
 from util.k8s.k8s_info import get_kubectl_host, get_kubectl_current_context_namespace
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
@@ -46,7 +41,7 @@ def start_inference_instance(name: str,
                              env_variables: List[str] = None,
                              tf_record: bool = False,
                              pack_params: List[Tuple[str, str]] = None,
-                             requirements: str = None) -> RunSubmission:
+                             requirements: str = None) -> Run:
 
     if pack_params is None:
         pack_params = []
@@ -66,16 +61,15 @@ def start_inference_instance(name: str,
     if tf_record:
         pack_params.append(('inputFormat', 'tf-record'))
 
-    runs, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
-                                script_folder_location=local_model_location, env_variables=env_variables,
-                                requirements_file=requirements)
+    runs, _, _ = submit_experiment(run_kind=RunKinds.INFERENCE, name=name, template=template, pack_params=pack_params,
+                                   script_folder_location=local_model_location, env_variables=env_variables,
+                                   requirements_file=requirements)
     return runs[0]
 
 
-def get_inference_instance_url(inference_instance: Union[Run, RunSubmission], model_name: str = None) -> str:
+def get_inference_instance_url(inference_instance: Run, model_name: str = None) -> str:
     """
-    Get URL to inference instance. If RunDescription is passed as inference_instance, model_name must be also provided.
-    If Run is passed as inference_instance, model name is automatically obtained from Run metadata.
+    Get URL to inference instance.
     """
     service_name = inference_instance.name
     model_name = model_name if model_name else inference_instance.metadata['annotations']['modelName']

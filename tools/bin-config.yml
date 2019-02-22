@@ -24,7 +24,7 @@ local_images:
         dest: Linux/amd64
     push: False
   bin/helm:
-    version: "2.9.1"
+    version: "2.11.0"
     required:
       HELM_DATA_IMAGE: "shared/build/helm"
       BASE_IMAGE: "shared/centos"

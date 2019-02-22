@@ -1,170 +1,202 @@
-Intel® Nauta End User License Agreement
 
-Do not access, copy or perform any portion of the Intel® Nauta pre-release software (the “Pre-Release
-Software”) until You have read and accepted the terms and conditions of this End User License Agreement (the
-“Agreement”). By copying, accessing, or performing the Pre-Release Software, You agree to be legally bound by the terms
-and conditions of this Agreement. If You do not agree to be bound by or the entity for whose benefit You act has not
-authorized You to accept, these terms and conditions, do not access, copy, or perform the Pre-Release Software and
-destroy all copies of the Pre-Release Software in Your possession.
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
 
-This Agreement is entered into between Intel Corporation, a Delaware corporation (“Intel”) and You. “You” refers to you
-or your employer or other entity for whose benefit you act, as applicable. If you agree to the terms and conditions of
-this Agreement on behalf of a company or other legal entity, you represent and warrant that you have the legal authority
-to bind that legal entity to the Agreement, in which case, "You" or "Your" shall be in reference to such entity. Intel
-and You are referred to herein individually as a “Party” or, together, as the “Parties”.
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-1. Purpose. You seek to evaluate and perform, and Intel desires to make available to You, under the terms of this
-Agreement, the Pre-Release Software solely for Your internal efforts to develop, test, or evaluate Intel-based products
-for deep learning solutions. “Pre-Release Software” refers to any or all of early versions of the Intel Deep Learning
-Studio software provided prior to a final release associated with Intel products, software, or services, including, but
-not limited to, reference design or proof-of-concept specifications, documentations, users guides, software (in source
-or object code form) such as software programs, frameworks, models, reference code, application program interfaces,
-device drivers, related components or updates or releases thereto. The Pre-Release Software may be updated or amended
-from time to time. “Intel-based products” refers to devices that include, incorporate, or implement any Intel product,
-software or services for deep learning solutions.
+   1. Definitions.
 
-2. Limited License. Subject to Your compliance with the terms and conditions of this Agreement, Intel grants to You a
-limited, non-exclusive, non-transferable, revocable, worldwide, fully paid-up license, without the right to sublicense
-to perform the Pre-Release Software for the purposes of testing and evaluating the Pre-Release Software under Intel’s
-copyrights and Intel’s suppliers’ copyrights (subject to any third party licensing requirements reflected herein, if
-any) and to create results based on the Pre-Release Software and Your Data for the Purpose.
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
 
-3. License Restrictions. All right, title and interest in and to the intellectual property rights in the Pre-Release
-Software are and will remain the exclusive property of Intel and its licensors or suppliers. You agree to utilize the
-Pre-Release Software consistent with any specifications or documentation provided by Intel. Unless expressly permitted
-under the Agreement, You will not, and will not allow any third-party to (i) install, download, use, copy, distribute,
-sell or offer to sell the Pre-Release Software, associated documentation, or modifications thereof; (ii) modify, adapt,
-enhance, disassemble, decompile, reverse engineer, change or create derivative works from the Pre-Release Software;
-(iii) use or make any or all Pre-Release Software, or modifications thereto, available for the use or benefit of third
-parties; or (iv) publish or provide any benchmark or comparison test results including or based on the Pre-Release
-Software. You acknowledge that an essential basis of the bargain in this Agreement is that Intel grants You no licenses
-or other rights including, but not limited to, patent, copyright, trade secret, trademark, trade name, service mark or
-other intellectual property licenses or rights with respect to the Pre-Release Software, by implication, estoppel or
-otherwise, except for the licenses expressly granted above. You acknowledge there are significant uses of the
-Pre-Release Software in its original, unmodified and uncombined form. You may not remove any copyright notices from or
-associated with the Pre-Release Software.
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
 
-4. Your Data. You may process certain data for testing and evaluation, such as software, models, datasets or other
-information (“Your Data”) on the Intel-based product. You will back up Your Data as loaded, operated, tested or
-validated during testing and evaluation. Intel will not back up Your Data. You are solely responsible for Your Data and
-for its removal or deletion after completion of the testing and evaluation of the Pre-Release Software. You may use any
-results created by testing and evaluating the Pre-Release Software only for Your internal development purposes.
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
 
-5. License to Feedback. This Agreement does not obligate You to provide Intel with materials, information, comments,
-suggestions, descriptions, ideas, input, modifications of the Pre-Release Software or other communication regarding the
-features, functions, performance or use of the Pre-Release Software (“Feedback”). To the extent You provide Intel with
-Feedback, You grant to Intel and its affiliates a non-exclusive, perpetual, sub-licenseable, irrevocable, worldwide,
-royalty-free, fully paid-up and transferable license, to and under all of Your intellectual property rights, whether
-perfected or not, to publicly perform, publicly display, reproduce, use, make, have made, sell, offer for sale,
-distribute, import, create derivative works of and otherwise exploit the Feedback.
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
 
-6. Support. Subject to Your compliance with the terms and conditions of this Agreement, Intel agrees to use commercially
-reasonable efforts to perform customized support, consulting or similar assistance that Intel will provide to You in
-relation to the Pre-Release Software and to facilitate Your productive use of the Pre-Release Software. Support services
-will be provided “as is” in Intel’s sole discretion.
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
 
-7. Open Source Statement. The Pre-Release Software may include or be derived from Open Source Software, open data or
-open material (all “OSS”) licensed pursuant to OSS, creative commons or similar license agreement(s) (all “OSS
-licenses”) identified in comments in the applicable source code file(s), file header(s) or on or associated with the
-Pre-Release Software. Nothing in this Agreement limits any rights under, or grants rights that supersede, the terms of
-any applicable OSS license. Use of any proprietary portion of the Pre-Release Software with OSS is subject to the terms
-and conditions of this Agreement, including Section 2 (Limited License).
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
 
-8. Third-Party Software. Use of certain third-party software provided with or within the Pre-Release Software may
-require that You (a) secure a license directly from the software owner, (b) combine the software with components
-purchased from such third party, or (c) adhere to further license limitations by the software owner. A listing of any
-such third-party limitations is in one or more text files accompanying the Pre-Release Software. You acknowledge Intel
-is not providing You with a license to such third-party software and further that it is Your responsibility to obtain
-appropriate licenses from such third parties directly.
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
 
-9. Confidentiality. The terms and conditions of this Agreement, exchanged confidential information, as well as the Pre-
-Release Software are subject to the terms and conditions of the Non-Disclosure Agreement (the “NDA”) entered into by
-Intel and You. This Agreement and any related discussions are Intel confidential information. If You have not entered
-into a NDA with Intel, You will only use Intel confidential information to use the Pre-Release Software consistent with
-the license granted to You under this Agreement. You will maintain the confidentiality of such information with at least
-the same degree of care that you use to protect your own confidential information, but in no event less than a
-reasonable degree of care. You may only disclose Intel confidential information to employees who have a need to know
-such confidential information and who have entered into a confidentiality agreement that contains terms no less
-restrictive than those set forth in this Agreement. You will be fully responsible for any confidentiality breach by your
-employees. You must not disclose the terms or existence of this Agreement, and must not use Intel's name in any
-publications, advertisements, or other announcements without Intel's prior written consent. You do not have any right to
-use any Intel trademarks or logos.
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
 
-10. No Obligation. No Agency. The Pre-Release Software includes pre-release “alpha,” “beta” or “prototype” versions and
-may not be fully functional. Intel may substantially modify the Pre-Release Software in producing any “final” versions.
-Intel may make changes to the Pre-Release Software, or items included or referenced therein, at any time without notice.
-Intel cannot assure it will ever, and Intel is not obligated to, support, update, provide training for, develop, or make
-available any further version of the Pre-Release Software or to grant any license thereto. No agency, franchise,
-partnership, joint- venture, or employee-employer relationship is intended or created by this Agreement.
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
 
-11. EXCLUSION OF WARRANTIES. UNLESS OTHERWISE SPECIFIED IN WRITING IN THE PRE-RELEASE SOFTWARE, THE PRE-RELEASE SOFTWARE
-AND THE SUPPORT ARE PROVIDED "AS IS" WITHOUT ANY EXPRESS OR IMPLIED WARRANTY OF ANY KIND FROM INTEL OR FROM ANY OTHER
-PERSON OR ENTITY INCLUDING WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, OR FITNESS FOR A PARTICULAR PURPOSE. Intel
-does not warrant or assume responsibility for the accuracy or completeness of any information, text, graphics, links or
-other items within the Pre-Release Software.
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
 
-12. LIMITATION OF LIABILITY. IN NO EVENT WILL INTEL OR ITS AFFILIATES, LICENSORS OR SUPPLIERS (INCLUDING THEIR
-RESPECTIVE DIRECTORS, OFFICERS, EMPLOYEES, AND AGENTS) BE LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT
-LIMITATION, LOST PROFITS, BUSINESS INTERRUPTION, OR LOST DATA) ARISING OUT OF OR IN RELATION TO THIS AGREEMENT,
-INCLUDING THE USE OF OR INABILITY TO USE THE PRE-RELEASE SOFTWARE, EVEN IF INTEL HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES. SOME JURISDICTIONS PROHIBIT EXCLUSION OR LIMITATION OF LIABILITY FOR IMPLIED WARRANTIES OR CONSEQUENTIAL
-OR INCIDENTAL DAMAGES, SO THE ABOVE LIMITATION MAY IN PART NOT APPLY TO YOU. UNLESS OTHERWISE AGREED IN WRITING SIGNED
-BY AUTHORIZED REPRESENTATIVES OF BOTH PARTIES, THE PRE-RELEASE SOFTWARE LICENSED HEREUNDER ARE NOT DESIGNED OR INTENDED
-FOR USE IN ANY MEDICAL, LIFE SAVING OR LIFE SUSTAINING SYSTEMS, TRANSPORTATION SYSTEMS, NUCLEAR SYSTEMS, OR FOR ANY
-OTHER MISSION CRITICAL APPLICATION IN WHICH THE FAILURE OF THE PRE-RELEASE SOFTWARE COULD LEAD TO PERSONAL INJURY OR
-DEATH. YOU MAY ALSO HAVE OTHER LEGAL RIGHTS THAT VARY FROM JURISDICTION TO JURISDICTION. THE LIMITED REMEDIES, WARRANTY
-DISCLAIMER AND LIMITED LIABILITY ARE FUNDAMENTAL ELEMENTS OF THE BASIS OF THE BARGAIN BETWEEN INTEL AND YOU. YOU
-ACKNOWLEDGE INTEL WOULD BE UNABLE TO PROVIDE THE PRE-RELEASE SOFTWARE WITHOUT SUCH LIMITATIONS.
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
 
-13. Termination and Survival. The term of this Agreement is one year from Your first access to the Pre-Release Software.
-Intel may terminate this Agreement for any reason with thirty (30) days’ notice and immediately if You or someone acting
-on Your behalf violates any of its terms or conditions. Upon termination, You will immediately destroy and ensure the
-destruction of the access credentials to the Pre-Release Software and, upon request, provide certification of such
-destruction to Intel. All licenses granted to You hereunder terminate immediately upon termination of the Agreement. All
-but Section 2 of this Agreement will survive termination.
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
 
-14. Governing Law. Jurisdiction. Injunctive Relief. This Agreement and any dispute arising out of or relating to it will
-be governed by the laws of the U.S.A. and the state of Delaware, without regard to conflict of laws principles. The
-Parties exclude the application of the United Nations Convention on Contracts for the International Sale of Goods
-(1980). The state and federal courts sitting in Delaware, U.S.A. will have exclusive jurisdiction over any dispute
-arising out of or relating to this Agreement. The Parties consent to personal jurisdiction and venue in those courts. A
-Party that obtains a judgment against the other Party in the courts identified in this section may enforce that judgment
-in any court having jurisdiction over the Parties. You acknowledge that any disclosure, commercialization, or public use
-of the Pre-Release Software or any portion thereof in violation of this Agreement would cause irreparable injury to
-Intel and You consent to the grant of an injunction by any court of competent jurisdiction in the event of such a
-threatened or actual breach.
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
 
-15. Export Regulations. Export Control. You agree that neither You nor Your subsidiaries will export/re-export the Pre-
-Release Software, directly or indirectly, to any country for which the U.S. Department of Commerce or any other agency
-or department of the U.S. Government or the foreign government from where it is shipping requires an export license, or
-other governmental approval, without first obtaining any required license or approval. In the event the Pre-Release
-Software are exported from the U.S. or re-exported from a foreign jurisdiction by You or Your subsidiary, You will
-ensure that the distribution and export/re-export or import of the Pre-Release Software complies with all laws,
-regulations, orders, or other restrictions of the U.S. Export Administration Regulations and the appropriate foreign
-government.
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
 
-16. Government Restricted Rights. The Pre-Release Software may include commercial items (as defined in 48 C.F.R. 2.101)
-or commercial computer software and commercial computer software documentation (as those terms are used in 48 C.F.R.
-12.212). Consistent with 48 C.F.R. 12.212 and 48 C.F.R 227.7202-1 through 227.7202-4, You will not provide the
-Pre-Release Software, or any part thereof, to the U.S. Government. Contractor or Manufacturer is Intel Corporation, 2200
-Mission College Boulevard, Santa Clara, CA 95054.
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
 
-17. Assignment. You may not delegate, assign or transfer this Agreement, the license granted or any of Your rights or
-duties hereunder, expressly, by implication, by operation of law, or otherwise and any attempt to do so, without Intel’s
-express prior written consent, will be null and void. Intel may assign, delegate and transfer this Agreement, and its
-rights and obligations hereunder, in its sole discretion.
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
 
-18. Entire Agreement. Severability. The terms and conditions of this Agreement and any NDA between You and Intel
-constitute the entire agreement between the Parties with respect to the subject matter hereof, and merge and supersede
-all prior or contemporaneous agreements, understandings, negotiations, and discussions. Neither Party will be bound by
-any terms, conditions, definitions, warranties, understandings, or representations with respect to the subject matter
-hereof other than as expressly provided herein. If any provision of this Agreement is found unenforceable or invalid
-under any applicable law or applicable court decision, such finding will not render this Agreement unenforceable or
-invalid as a whole, instead such provision will be changed and interpreted so as to best accomplish the objectives of
-such provision within legal limits.
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
 
-19. Waiver. The failure of a Party to require performance by the other Party of any provision hereof will not affect the
-full right to require such performance at any time thereafter; nor will waiver by a Party of a breach of any provision
-hereof constitute a waiver of the provision itself.
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
 
-End-User License Agreement for pre-release version of the Intel® Nauta Software Version: November 4, 2018
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.

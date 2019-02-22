@@ -1,0 +1,300 @@
+provider "google" {
+  credentials = "${var.service_account}"
+  project     = "${var.gke_project}"
+  region      = "europe-west1"
+}
+
+resource "google_compute_network" "vpc" {
+  name                    = "${var.prefix}-network"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "gateway" {
+  name          = "${var.prefix}-gateway"
+  ip_cidr_range = "10.0.0.0/16"
+  network       = "${google_compute_network.vpc.self_link}"
+  region        = "${var.region}"
+}
+
+resource "google_compute_subnetwork" "internal" {
+  name          = "${var.prefix}-internal"
+  ip_cidr_range = "10.137.0.0/16"
+  network       = "${google_compute_network.vpc.self_link}"
+  region        = "${var.region}"
+}
+
+resource "google_compute_subnetwork" "k8s" {
+  name          = "${var.prefix}-k8s"
+  ip_cidr_range = "10.1.0.0/16"
+  network       = "${google_compute_network.vpc.self_link}"
+  region        = "${var.region}"
+
+  secondary_ip_range = {
+    range_name = "pods"
+    ip_cidr_range = "10.2.0.0/16"
+  }
+  secondary_ip_range = {
+    range_name = "services"
+    ip_cidr_range = "10.3.0.0/16"
+  }
+
+}
+
+resource "google_compute_firewall" "external-input" {
+  name    = "${var.prefix}-external-input"
+  network = "${google_compute_network.vpc.name}"
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["external"]
+}
+
+resource "google_compute_firewall" "output" {
+  name    = "${var.prefix}-output"
+  network = "${google_compute_network.vpc.name}"
+
+  allow {
+    protocol = "all"
+  }
+
+  direction = "EGRESS"
+}
+
+resource "google_compute_firewall" "internal-in" {
+  name    = "${var.prefix}-internal-in"
+  network = "${google_compute_network.vpc.name}"
+
+  allow {
+    protocol = "all"
+  }
+}
+
+data "template_file" "nat-startup-script" {
+  template = <<EOF
+#!/bin/bash -xe
+# Enable ip forwarding and nat
+sysctl -w net.ipv4.ip_forward=1
+iptables -t nat -A POSTROUTING -o ens4 -j MASQUERADE
+EOF
+}
+
+resource "google_compute_instance" "gateway" {
+  name         = "${var.prefix}-gateway"
+  machine_type = "${var.gateway_type}"
+  zone         = "${var.zone}"
+
+  tags = ["external"]
+
+  can_ip_forward = true
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1604-lts"
+      size = "150"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.gateway.self_link}"
+
+      access_config {
+        // Ephemeral IP
+      }
+  }
+
+  metadata {
+    sshKeys = "${var.external_username}:${file(var.external_public_key_file)}"
+    startup-script = "${data.template_file.nat-startup-script.rendered}"
+  }
+}
+
+{% if gcp.generate_test_node %}
+resource "google_compute_instance" "testnode" {
+  name         = "${var.prefix}-tn"
+  machine_type = "${var.testnode_type}"
+  zone         = "${var.zone}"
+
+  tags = ["external"]
+
+  can_ip_forward = true
+
+  boot_disk {
+    initialize_params {
+      image = "{{ gcp.testnode_image }}"
+      size = "50"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.gateway.self_link}"
+
+      access_config {
+        // Ephemeral IP
+      }
+  }
+
+  metadata {
+    sshKeys = "${var.external_username}:${file(var.external_public_key_file)}"
+    startup-script = "${data.template_file.nat-startup-script.rendered}"
+  }
+}
+{% endif %}
+
+resource "google_compute_route" "nat" {
+  name = "${var.prefix}-nat"
+  dest_range = "0.0.0.0/0"
+  network = "${google_compute_network.vpc.self_link}"
+  next_hop_ip = "${google_compute_instance.gateway.network_interface.0.address}"
+  priority = 800
+  tags = ["nat"]
+
+  depends_on = ["google_compute_instance.gateway"]
+}
+
+resource "google_compute_disk" "nfs" {
+  name = "${var.prefix}-nfs-disk"
+  type = "pd-standard"
+  zone = "${var.zone}"
+  size = "${var.nfs_disk_size}"
+}
+
+resource "google_compute_instance" "nfs" {
+  name         = "${var.prefix}-nfs"
+  machine_type = "${var.nfs_type}"
+  zone         = "${var.zone}"
+  tags         = ["nat"]
+
+  can_ip_forward = true
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1604-lts"
+      size = "50"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.internal.self_link}"
+  }
+
+  metadata {
+    sshKeys = "${var.internal_username}:${file(var.internal_public_key_file)}"
+  }
+
+  attached_disk {
+    source = "${google_compute_disk.nfs.self_link}"
+    device_name = "nfs"
+  }
+
+  depends_on = ["google_compute_route.nat"]
+}
+
+resource "random_string" "password" {
+  length = 16
+}
+
+resource "google_container_cluster" "primary" {
+  name               = "${var.prefix}"
+  zone               = "${var.zone}"
+
+  network = "${google_compute_network.vpc.self_link}"
+  subnetwork = "${google_compute_subnetwork.k8s.self_link}"
+  master_ipv4_cidr_block = "10.254.0.0/28"
+  private_cluster = true
+
+  ip_allocation_policy = {
+    cluster_secondary_range_name = "pods"
+    services_secondary_range_name = "services"
+  }
+
+  min_master_version = "1.10.11"
+  master_authorized_networks_config = {
+    cidr_blocks = [
+      { cidr_block = "${google_compute_instance.gateway.network_interface.0.access_config.0.assigned_nat_ip}/32", display_name = "gateway" }
+{% if gcp.generate_test_node %}
+      ,{ cidr_block = "${google_compute_instance.testnode.network_interface.0.access_config.0.assigned_nat_ip}/32", display_name = "testnode" }
+{% endif %}
+    ]
+  }
+
+  master_auth {
+    username ="admin"
+    password ="${random_string.password.result}"
+  }
+
+  node_pool {
+    name       = "${var.prefix}-pool0"
+    node_count = "1"
+
+    node_config {
+      preemptible  = false
+      machine_type = "${var.pool_type}"
+
+      image_type = "ubuntu"
+      min_cpu_platform = "${var.pool_min_cpu_platform}"
+
+      oauth_scopes = [
+        "compute-rw",
+        "storage-ro",
+        "logging-write",
+        "monitoring",
+      ]
+      tags = ["nat"]
+      labels {
+        master = "True"
+      }
+
+      service_account = ""
+
+      metadata {
+        sshKeys = "${var.internal_username}:${file(var.internal_public_key_file)}"
+      }
+    }
+  }
+
+{% if (gcp.pool_size | int ) > 1 %}
+  node_pool {
+    name       = "${var.prefix}-pool1"
+    node_count = "{{ (gcp.pool_size | int ) - 1 }}"
+
+    node_config {
+      preemptible  = false
+      machine_type = "${var.pool_type}"
+
+      image_type = "ubuntu"
+      min_cpu_platform = "${var.pool_min_cpu_platform}"
+
+      oauth_scopes = [
+        "compute-rw",
+        "storage-ro",
+        "logging-write",
+        "monitoring",
+      ]
+      tags = ["nat"]
+
+      service_account = ""
+
+      metadata {
+        sshKeys = "${var.internal_username}:${file(var.internal_public_key_file)}"
+      }
+    }
+  }
+{% endif %}
+
+  addons_config {
+    http_load_balancing {
+      disabled = true
+    }
+    horizontal_pod_autoscaling {
+      disabled = true
+    }
+  }
+}

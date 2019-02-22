@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from click.testing import CliRunner
@@ -24,11 +19,11 @@ import copy
 import pytest
 from unittest.mock import DEFAULT
 
-from platform_resources.run_model import Run, RunStatus
-from platform_resources.experiment_model import Experiment, ExperimentStatus
+from platform_resources.run import Run, RunStatus
+from platform_resources.experiment import Experiment, ExperimentStatus
 from commands.experiment import cancel
 from commands.experiment.cancel import experiment_name, experiment_name_plural
-from platform_resources.tests.test_experiments import TEST_EXPERIMENTS
+from platform_resources.tests.test_experiment import TEST_EXPERIMENTS
 from util.k8s.pods import K8SPod
 from util.k8s.k8s_info import PodStatus
 
@@ -36,7 +31,7 @@ EXPERIMENT_NAME = "experiment"
 
 
 EXPERIMENT_UNINITIALIZED = Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
-                                      creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                                      creation_timestamp='2018-05-08T13:05:04Z', namespace='namespace-2',
                                       state=ExperimentStatus.CREATING, template_name='test-ex-template',
                                       template_namespace='test-ex-namespace',
                                       metadata={'labels': {'runKind': 'training'}})
@@ -50,7 +45,7 @@ RUN_QUEUED = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training"
                  pod_selector={'matchLabels': {'app': 'tf-training',
                                                'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                 submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                 namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                  template_name="tf-training")
 RUN_CANCELLED = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
                     parameters=['mnist_single_node.py', '--data_dir', '/app'],
@@ -61,7 +56,7 @@ RUN_CANCELLED = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-traini
                     pod_selector={'matchLabels': {'app': 'tf-training',
                                                   'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                   'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                    submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                    namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                     template_name="tf-training")
 RUN_COMPLETE = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-training",
                    parameters=['mnist_single_node.py', '--data_dir', '/app'],
@@ -72,7 +67,7 @@ RUN_COMPLETE = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-2-tf-trainin
                    pod_selector={'matchLabels': {'app': 'tf-training',
                                                  'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                  'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                   submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                   namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                    template_name="tf-training")
 RUN_RUNNING = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training",
                   parameters=['mnist_single_node.py', '--data_dir', '/app'],
@@ -83,7 +78,7 @@ RUN_RUNNING = Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training
                   pod_selector={'matchLabels': {'app': 'tf-training',
                                                 'draft': 'exp-mnist-single-node.py-18.05.17-16.05.45-1',
                                                 'release': 'exp-mnist-single-node.py-18.05.17-16.05.45-1'}},
-                  submitter="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
+                  namespace="mciesiel-dev", creation_timestamp="2018-05-17T14:05:52Z",
                   template_name="tf-training")
 
 
@@ -95,22 +90,31 @@ TEST_RUNS_CANCELLED = [RUN_CANCELLED]
 
 TEST_RUNS_TO_BE_CANCELLED = [RUN_QUEUED, RUN_RUNNING]
 
+TEST_RUNS = [RUN_QUEUED, RUN_RUNNING, RUN_COMPLETE, RUN_CANCELLED]
+
 
 class CancelMocks:
     def __init__(self, mocker) -> None:
         self.mocker = mocker
         self.get_current_namespace = mocker.patch("commands.experiment.cancel.get_current_namespace",
                                                   return_value="namespace")
-        self.list_runs = mocker.patch("commands.experiment.cancel.list_runs",
+        self.list_runs = mocker.patch("commands.experiment.cancel.Run.list",
                                       return_value=[])
         self.cancel_experiment = mocker.patch("commands.experiment.cancel.cancel_experiment",
                                               return_value=([([RUN_COMPLETE], []), ([RUN_COMPLETE], [])]))
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
         self.k8s_proxy = mocker.patch('commands.experiment.cancel.K8sProxy')
-        self.get_experiment = mocker.patch('commands.experiment.cancel.get_experiment',
+        self.get_experiment = mocker.patch('commands.experiment.cancel.Experiment.get',
                                            return_value=None)
-        self.delete_experiment = mocker.patch('commands.experiment.cancel.delete_experiment')
-        self.update_experiment = mocker.patch('commands.experiment.cancel.update_experiment')
+
+
+@pytest.fixture(autouse=True)
+def mock_api_clients(mocker):
+    mocker.patch.object(EXPERIMENT_UNINITIALIZED, 'k8s_custom_object_api')
+    for test_run in TEST_RUNS:
+        mocker.patch.object(test_run, 'k8s_custom_object_api')
+    for test_experiment in TEST_EXPERIMENTS:
+        mocker.patch.object(test_experiment, 'k8s_custom_object_api')
 
 
 @pytest.fixture
@@ -126,7 +130,7 @@ def check_command_asserts(prepare_mocks: CancelMocks, gcn_count=1, lor_count=1, 
 
 
 def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
-    prepare_command_mocks.get_experiment.return_value = None
+    prepare_command_mocks.get_experiment.get.return_value = None
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False)
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
@@ -137,24 +141,24 @@ def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
 
 
 def test_cancel_uninitialized_experiment(prepare_command_mocks: CancelMocks):
-    fake_namespace = prepare_command_mocks.get_current_namespace.return_value
+    update_mock = prepare_command_mocks.mocker.patch.object(EXPERIMENT_UNINITIALIZED, 'update')
     prepare_command_mocks.get_experiment.return_value = EXPERIMENT_UNINITIALIZED
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False, input="y")
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    prepare_command_mocks.update_experiment.assert_called_with(EXPERIMENT_UNINITIALIZED, fake_namespace)
+    update_mock.assert_called_once()
     assert f"Experiment {EXPERIMENT_UNINITIALIZED.name} has no resources submitted for creation.\n" in result.output
     assert f"Cancelling  {EXPERIMENT_UNINITIALIZED.name}" in result.output
 
 
 def test_purge_uninitialized_experiment(prepare_command_mocks: CancelMocks):
-    fake_namespace = prepare_command_mocks.get_current_namespace.return_value
+    delete_mock = prepare_command_mocks.mocker.patch.object(EXPERIMENT_UNINITIALIZED, 'delete')
     prepare_command_mocks.get_experiment.return_value = EXPERIMENT_UNINITIALIZED
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_UNINITIALIZED.name, '--purge'],
                                 catch_exceptions=False, input="y")
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    prepare_command_mocks.delete_experiment.assert_called_with(EXPERIMENT_UNINITIALIZED, fake_namespace)
+    delete_mock.assert_called_once()
     assert f"Experiment {EXPERIMENT_UNINITIALIZED.name} has no resources submitted for creation.\n" in result.output
     assert f"Purging {EXPERIMENT_UNINITIALIZED.name} experiment" in result.output
 
@@ -270,12 +274,10 @@ def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
 class CancelExperimentMocks:
     def __init__(self, mocker):
         self.mocker = mocker
-        self.list_runs = mocker.patch("commands.experiment.cancel.list_runs", return_value=[])
-        self.update_experiment = mocker.patch("commands.experiment.cancel.update_experiment")
-        self.update_run = mocker.patch("commands.experiment.cancel.update_run")
+        self.list_runs = mocker.patch("commands.experiment.cancel.Run.list", return_value=[])
         self.delete_k8s_object = mocker.patch("commands.experiment.cancel.kubectl.delete_k8s_object")
         self.delete_helm_release = mocker.patch("commands.experiment.cancel.delete_helm_release")
-        self.get_experiment = mocker.patch("commands.experiment.cancel.get_experiment",
+        self.get_experiment = mocker.patch("commands.experiment.cancel.Experiment.get",
                                            return_value=None)
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
         # CAN-1099 - it should be uncommented after repairing docker gc
@@ -291,22 +293,16 @@ def prepare_cancel_experiment_mocks(mocker) -> CancelExperimentMocks:
 
 def check_cancel_experiment_asserts(prepare_cancel_experiment_mocks: CancelExperimentMocks,
                                     list_runs_count=1,
-                                    update_experiment_count=1,
                                     delete_k8s_object_count=0,
                                     delete_helm_release_count=1,
-                                    update_run_count=1,
                                     get_experiment_count=1,
                                     delete_images_for_experiment_count=0):
     assert prepare_cancel_experiment_mocks.list_runs.call_count == list_runs_count, \
         "list of runs wasn't taken"
-    assert prepare_cancel_experiment_mocks.update_experiment.call_count == update_experiment_count, \
-        "experiment wasn't updated"
     assert prepare_cancel_experiment_mocks.delete_k8s_object.call_count == delete_k8s_object_count, \
         "experiment object wasn't deleted"
     assert prepare_cancel_experiment_mocks.delete_helm_release.call_count == delete_helm_release_count, \
         "helm release wasn't deleted"
-    assert prepare_cancel_experiment_mocks.update_run.call_count == update_run_count, \
-        "run wasn't updated"
     assert prepare_cancel_experiment_mocks.get_experiment.call_count == get_experiment_count, \
         "experiment wasn't taken"
     # CAN-1099 - it should be uncommented after repairing docker gc
@@ -318,20 +314,25 @@ def test_cancel_experiment_set_cancelling_state_failure(prepare_cancel_experimen
     import logging
     RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     caplog.set_level(logging.CRITICAL)
-    prepare_cancel_experiment_mocks.update_experiment.side_effect = RuntimeError()
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
+    update_exp_mock.side_effect = RuntimeError()
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     with pytest.raises(RuntimeError):
         cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY], namespace="namespace")
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=0, update_run_count=0)
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=0)
 
 
 def test_cancel_experiment_success(prepare_cancel_experiment_mocks: CancelExperimentMocks):
     RUN_QUEUED_COPY = copy.deepcopy(RUN_QUEUED)
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+    update_run_mock = prepare_cancel_experiment_mocks.mocker.patch.object(RUN_QUEUED_COPY, 'update')
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
     cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY], namespace="namespace")
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, update_experiment_count=2)
+    assert update_exp_mock.call_count == 2
+    assert update_run_mock.call_count == 1
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks)
 
 
 def test_cancel_experiment_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
@@ -339,12 +340,16 @@ def test_cancel_experiment_failure(prepare_cancel_experiment_mocks: CancelExperi
     prepare_cancel_experiment_mocks.delete_helm_release.side_effect = RuntimeError()
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+    update_run_mock = prepare_cancel_experiment_mocks.mocker.patch.object(RUN_QUEUED_COPY, 'update')
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
     del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=[RUN_QUEUED_COPY],
                                                       namespace="namespace")
 
     assert len(del_list) == 0
     assert len(not_del_list) == 1
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, update_run_count=0)
+    assert update_exp_mock.call_count == 1
+    assert update_run_mock.call_count == 0
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks)
 
 
 def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: CancelExperimentMocks):
@@ -353,9 +358,14 @@ def test_cancel_experiment_success_with_purge(prepare_cancel_experiment_mocks: C
         = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
+    update_run_mock = prepare_cancel_experiment_mocks.mocker.patch.object(RUN_QUEUED_COPY, 'update')
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
     cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
+
+    assert update_exp_mock.call_count == 1
+    assert update_run_mock.call_count == 0
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1,
                                     delete_k8s_object_count=2)
 
 
@@ -366,14 +376,17 @@ def test_cancel_experiment_purge_failure(prepare_cancel_experiment_mocks: Cancel
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
     prepare_cancel_experiment_mocks.delete_helm_release.side_effect = [RuntimeError]
-
+    update_run_mock = prepare_cancel_experiment_mocks.mocker.patch.object(RUN_QUEUED_COPY, 'update')
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
     del_list, not_del_list = cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY],
                                                      namespace="namespace",
                                                      k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
 
     assert len(del_list) == 0
     assert len(not_del_list) == 1
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0)
+    assert update_exp_mock.call_count == 1
+    assert update_run_mock.call_count == 0
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1)
 
 
 def test_cancel_experiment_with_purge_delete_failure(prepare_cancel_experiment_mocks: CancelExperimentMocks):
@@ -382,11 +395,16 @@ def test_cancel_experiment_with_purge_delete_failure(prepare_cancel_experiment_m
         = [RUN_QUEUED_COPY], []
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
     prepare_cancel_experiment_mocks.list_runs.return_value = [RUN_QUEUED_COPY]
+    update_run_mock = prepare_cancel_experiment_mocks.mocker.patch.object(RUN_QUEUED_COPY, 'update')
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
     # CAN-1099 - it should be uncommented after repairing docker gc
     # prepare_cancel_experiment_mocks.delete_images_for_experiment.side_effect = RuntimeError()
     cancel.purge_experiment(exp_name="experiment-1", runs_to_purge=[RUN_QUEUED_COPY], namespace="namespace",
                             k8s_es_client=prepare_cancel_experiment_mocks.k8s_es_client)
-    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1, update_run_count=0,
+
+    assert update_run_mock.call_count == 0
+    assert update_exp_mock.call_count == 1
+    check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=1,
                                     delete_k8s_object_count=2)
 
 
@@ -394,10 +412,14 @@ def test_cancel_experiment_one_cancelled_one_not(prepare_cancel_experiment_mocks
     prepare_cancel_experiment_mocks.delete_helm_release.side_effect = [DEFAULT, RuntimeError(), DEFAULT, DEFAULT]
     prepare_cancel_experiment_mocks.list_runs.return_value = TEST_RUNS_CORRECT
     prepare_cancel_experiment_mocks.get_experiment.return_value = TEST_EXPERIMENTS[0]
+    update_exp_mock = prepare_cancel_experiment_mocks.mocker.patch.object(TEST_EXPERIMENTS[0], 'update')
+    for test_run in TEST_RUNS_CORRECT:
+        prepare_cancel_experiment_mocks.mocker.patch.object(test_run, 'update')
 
     del_list, not_del_list = cancel.cancel_experiment(exp_name="experiment-1", runs_to_cancel=TEST_RUNS_CORRECT,
                                                       namespace="namespace")
 
+    assert update_exp_mock.call_count == 1
     assert len(del_list) == 1
     assert len(not_del_list) == 1
     check_cancel_experiment_asserts(prepare_cancel_experiment_mocks, delete_helm_release_count=2)

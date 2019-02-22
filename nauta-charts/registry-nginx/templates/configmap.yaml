@@ -36,10 +36,13 @@ data:
         listen 5000;
         client_max_body_size 0;
         client_body_buffer_size 128k;
+        chunked_transfer_encoding on;  # required to avoid HTTP 411: see Issue #1486 (https://github.com/moby/moby/issues/1486)
         location /v2/nauta/ {
           proxy_pass http://{{ .Release.Name }}-registry-{{ .Values.global.nauta_release_standarized }}:5000/v2/nauta/;
           proxy_set_header  Host           $http_host;   # required for docker client's sake
           proxy_set_header  X-Real-IP      $remote_addr; # pass on real client's IP
+          proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header  X-Forwarded-Proto  $scheme;
           proxy_set_header  Authorization  ""; # see https://github.com/dotcloud/docker-registry/issues/170
           proxy_read_timeout               7200;
         }
@@ -47,6 +50,8 @@ data:
           proxy_pass http://{{ .Release.Name }}-docker-registry:5000/;
           proxy_set_header  Host           $http_host;   # required for docker client's sake
           proxy_set_header  X-Real-IP      $remote_addr; # pass on real client's IP
+          proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header  X-Forwarded-Proto  $scheme;
           proxy_set_header  Authorization  ""; # see https://github.com/dotcloud/docker-registry/issues/170
           proxy_read_timeout               7200;
         }

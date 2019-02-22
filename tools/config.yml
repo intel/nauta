@@ -1,9 +1,12 @@
 ---
 
 proxy:
-  http_proxy: http://proxy-mu.intel.com:911
-  https_proxy: http://proxy-mu.intel.com:912
-  no_proxy: os.mirror,.intel.com,127.0.0.1,localhost
+  http_proxy: "{{ lookup('env','http_proxy') }}"
+  HTTP_PROXY: "{{ lookup('env','http_proxy') }}"
+  https_proxy: "{{ lookup('env','https_proxy') }}"
+  HTTPS_PROXY: "{{ lookup('env','https_proxy') }}"
+  no_proxy: "{{ lookup('env','no_proxy') }}"
+  NO_PROXY: "{{ lookup('env','no_proxy') }}"
 
 images: "{{ shared_images | combine(local_images | default({})) }}"
 
@@ -35,6 +38,8 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/rpm-packer"
     push: False
+    args:
+      USER_UID: "{{ user_id }}"
   shared/centos/docs:
     version: "7.6.1810"
     required:
@@ -57,6 +62,8 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/python27"
     push: False
+    args:
+      USER_UID: "{{ user_id }}"
   shared/centos/python36:
     version: "3.6"
     required:
@@ -122,7 +129,7 @@ shared_images:
         dest: heapster-v1.4.3.tar.gz
         checksum: 5a0e6fa74c8602d466338eb881af3bf4260940291e3eeb130e0ef9136c821f6c
   shared/build/tiller:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "shared/centos"
       HELM_DATA_IMAGE: "shared/build/helm"
@@ -315,16 +322,16 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/3.6/run"
     push: False
   shared/build/helm:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/helm"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/helm/v2.9.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/helm/v2.11.0.tar.gz
         dest: helm.tar.gz
-        checksum: 2fee31764117024d1cc4f597d23791c60feef7c3ceedd143cfdbbafca7a7e126
+        checksum: eee403cc1e05ab2eb1c6802eb7ecc4a5c544cb5971b7ee828c0b8d60fe061eb0
   shared/build/cni:
     version: "v0.7.1"
     required:

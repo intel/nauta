@@ -8,7 +8,6 @@ RUN yum clean all && \
     yum update -y && \
     yum install -y iptables
 
-
 COPY --from=dataimage /build-output/kubernetes/kube-proxy /
 RUN chmod +x /kube-proxy
 RUN cp /kube-proxy /bin && chmod +x /bin/kube-proxy

@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 import sys
@@ -30,13 +25,13 @@ from util.config import Config
 from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import execute_system_command, handle_error
-from util.k8s.k8s_info import get_users_token, get_kubectl_host
+from util.k8s.k8s_info import get_users_token, get_kubectl_host, get_certificate
 from util.config import NAUTAConfigMap
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
-from util.k8s.kubectl import check_users_presence, UserState
-from platform_resources.users import validate_user_name, is_user_created
+from util.k8s.kubectl import UserState
+from platform_resources.user_utils import validate_user_name, is_user_created, check_users_presence
 from cli_text_consts import UserCreateCmdTexts as Texts
 
 logger = initialize_logger(__name__)
@@ -50,9 +45,7 @@ clusters:
 - cluster:
     api-version: v1
     server: https://{address}
-    # certificate-authority-data: {cert_data}
-    # BUG/TASK: CAN-261
-    insecure-skip-tls-verify: true
+    certificate-authority-data: {cert_data}
   name: nauta-cluster
 contexts:
 - context:
@@ -146,6 +139,13 @@ def create(state: State, username: str, list_only: bool, filename: str):
                          add_verbosity_msg=state.verbosity == 0)
             users_password = ""
 
+        try:
+            cert = get_certificate(username)
+        except Exception:
+            handle_error(logger, Texts.CERT_GATHER_ERROR_MSG, Texts.CERT_GATHER_ERROR_MSG,
+                         add_verbosity_msg=state.verbosity == 0)
+            cert = ""
+
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
                      Texts.USER_ADD_ERROR_MSG.format(username=username),
@@ -164,7 +164,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
     try:
         kubeconfig = generate_kubeconfig(username, username, get_kubectl_host(),
-                                         users_password, "")
+                                         users_password, cert)
     except Exception:
         handle_error(logger, Texts.CONFIG_CREATION_ERROR_MSG, Texts.CONFIG_CREATION_ERROR_MSG,
                      add_verbosity_msg=state.verbosity == 0)

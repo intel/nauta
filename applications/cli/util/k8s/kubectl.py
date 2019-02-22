@@ -1,43 +1,33 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 import subprocess
 import time
 import random
-import socket
 from enum import Enum
 
 from typing import Optional, Tuple
 
-import platform_resources.users as users_api
 from util import system
-from util.config import Config
 from util.logger import initialize_logger
 from util.exceptions import KubernetesError, KubectlConnectionError, LocalPortOccupiedError
-from util.k8s.k8s_info import get_app_services, find_namespace, NamespaceStatus
+from util.k8s.k8s_info import get_app_services
 from util.app_names import NAUTAAppNames
 from util.system import check_port_availability
 from cli_text_consts import UtilKubectlTexts as Texts
-from util.k8s.k8s_proxy_context_manager import K8sProxy
-
 
 logger = initialize_logger('util.kubectl')
 
@@ -152,35 +142,6 @@ def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_nam
     return process, tunnel_port, service_container_port
 
 
-def check_users_presence(username: str) -> UserState:
-    """
-    Checks whether a user with a given name exists. It searches also for a namespace
-    with a name equal to the given username
-
-    :param username: username
-    :return: returns a current state of user - as an item for UserState enum
-    In case of problems during gathering user's data - it raises an exception.
-    """
-    namespace = find_namespace(username)
-
-    if namespace != NamespaceStatus.NOT_EXISTS:
-        logger.debug("Namespace {} already exists.".format(username))
-        return UserState(namespace.value)
-
-    try:
-        user_data = users_api.get_user_data(username)
-
-        if user_data and user_data.name == username:
-            return UserState.ACTIVE
-        else:
-            return UserState.NOT_EXISTS
-
-    except Exception as exe:
-        error_message = Texts.USER_PRESENCE_CHECK_ERROR_MSG
-        logger.error(error_message)
-        raise KubernetesError(error_message) from exe
-
-
 def delete_k8s_object(kind: str, name: str):
     delete_command = ['kubectl', 'delete', kind, name]
     logger.debug(delete_command)
@@ -197,15 +158,6 @@ def check_connection_to_cluster():
     logger.debug(f"check_connection_to_cluster - output : {err_code} - {log_output}")
     if err_code:
         raise KubectlConnectionError(Texts.K8S_CLUSTER_NO_CONNECTION_ERROR_MSG.format(output=log_output))
-
-
-def check_port_forwarding():
-    config = Config()
-    with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        address = "127.0.0.1", proxy.tunnel_port
-        if sock.connect_ex(address) != 0:
-            raise KubectlConnectionError(Texts.K8S_PORT_FORWARDING_ERROR_MSG)
 
 
 def get_top_for_pod(name: str, namespace: str) -> Tuple[str, str]:

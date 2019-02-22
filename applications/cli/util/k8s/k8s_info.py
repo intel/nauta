@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 import base64
@@ -92,6 +87,36 @@ def get_service_account(service_account_name: str, namespace: str) -> V1ServiceA
 def get_secret(secret_name: str, namespace: str) -> V1Secret:
     api = get_k8s_api()
     return api.read_namespaced_secret(name=secret_name, namespace=namespace)
+
+
+def get_certificate(namespace: str) -> str:
+    """
+    Gets a certificate of a user from a given namespace
+    :param namespace: namespace of a user
+    :return: certificate - if it doesn't exist or errors occurred during gathering
+    the certificate - function returns an empty string
+    """
+    ret_cert = ""
+    try:
+        api = get_k8s_api()
+        secrets_list = api.list_namespaced_secret(namespace)
+
+        if secrets_list:
+            for secret in secrets_list.items:
+                if "default-token" in secret.metadata.name:
+                    ret_cert = str(base64.b64decode(secret.data.get("ca.crt")), encoding="utf-8")
+                    break
+            else:
+                raise ValueError(Texts.LACK_OF_DEFAULT_TOKEN_ERROR_MSG)
+        else:
+            raise ValueError(Texts.EMPTY_LIST_OF_TOKENS_ERROR_MSG)
+
+    except Exception as exe:
+        error_message = Texts.GATHERING_USER_CERTIFICATE_ERROR_MSG
+        logger.exception(error_message)
+        raise KubernetesError(error_message) from exe
+
+    return ret_cert
 
 
 def get_pod_status(pod_name: str, namespace: str) -> PodStatus:

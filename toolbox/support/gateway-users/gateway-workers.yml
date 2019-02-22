@@ -1,0 +1,9 @@
+---
+
+- name: "Configure gateway users"
+  hosts: localhost
+  become: True
+  roles:
+    - { role: gateway-users }
+    - { role: nctl-client }
+    - { role: nctl-users }

@@ -24,6 +24,13 @@ files/*.tar.gz
 .vscode
 
 .workspace
+.bin
+*.tfstate
+gcp-service-account.yml
+gcp-service-account.json
+*-intel.yml
+*.info
+
 htmlcov/
 .coverage
 .make.stamp

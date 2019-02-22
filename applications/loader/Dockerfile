@@ -1,5 +1,6 @@
 ARG BUILD_IMAGE=golang:1.10.2
 ARG BASE_IMAGE=centos:7.4.1708
+
 FROM ${BUILD_IMAGE} as build
 
 RUN mkdir -p ${GOPATH}/src/github.com/NervanaSystems/carbon/applications/loader

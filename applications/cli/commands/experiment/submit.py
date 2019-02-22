@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from sys import exit
@@ -36,7 +31,7 @@ from util.aliascmd import AliasCmd
 from util.exceptions import SubmitExperimentError, K8sProxyCloseError
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names, validate_template_name, \
     validate_pack
-from platform_resources.run_model import RunStatus
+from platform_resources.run import RunStatus
 from util.system import handle_error
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 
@@ -146,12 +141,12 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     runs_list = None
     # noinspection PyBroadException
     try:
-        runs_list, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
-                                         script_folder_location=script_folder_location,
-                                         template=template, name=name, pack_params=pack_param,
-                                         parameter_range=parameter_range, parameter_set=parameter_set,
-                                         script_parameters=script_parameters,
-                                         env_variables=env, requirements_file=requirements)
+        runs_list, runs_errors, _ = submit_experiment(run_kind=RunKinds.TRAINING, script_location=script_location,
+                                                      script_folder_location=script_folder_location,
+                                                      template=template, name=name, pack_params=pack_param,
+                                                      parameter_range=parameter_range, parameter_set=parameter_set,
+                                                      script_parameters=script_parameters,
+                                                      env_variables=env, requirements_file=requirements)
     except K8sProxyCloseError as exe:
         handle_error(user_msg=exe.message)
         click.echo(exe.message)
@@ -166,7 +161,8 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
 
     # display information about status of a training
     click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
-                          run.cli_representation.status, format_run_message(run.message)) for run in runs_list],
+                          run.cli_representation.status, format_run_message(runs_errors.get(run.name, "")))
+                         for run in runs_list],
                         headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
 
     # if there is at least one FAILED experiment - application has to return exit code != 0

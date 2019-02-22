@@ -6,5 +6,5 @@ FROM ${BASE_IMAGE}
 
 COPY --from=data /build-output/helm.tar.gz ./SOURCES/helm.tar.gz
 
-ENV RPM_VERSION=2.9.1
+ENV RPM_VERSION=2.11.0
 ENV RPM_RELEASE=0

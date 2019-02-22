@@ -1,0 +1,27 @@
+---
+
+- name: Ensure ssh directory exists
+  file:
+    path: .ssh
+    state: directory
+    mode: 0700
+
+- name: Copy privatekey
+  copy:
+    src: "{{ local_terraform_dir }}/private"
+    dest: .ssh/id_rsa
+    mode: 0600
+
+- name: Copy publickey
+  copy:
+    src: "{{ local_terraform_dir }}/public"
+    dest: .ssh/id_rsa.pub
+    mode: 0600
+
+- name: Render config.yml
+  vars:
+    k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
+  template:
+    src: config.yml.j2
+    dest: /home/dls4e/config.yml
+    mode: 0444

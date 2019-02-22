@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 import os
@@ -27,7 +22,8 @@ import pytest
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
     validate_script_folder_location, get_default_script_location, clean_script_parameters, validate_pack_params, \
     check_duplicated_params
-from commands.experiment.common import RunSubmission, RunStatus
+from commands.experiment.common import RunStatus
+from platform_resources.run import Run
 from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 from cli_text_consts import ExperimentCommonTexts as CommonTexts
@@ -36,24 +32,23 @@ from cli_text_consts import ExperimentCommonTexts as CommonTexts
 SCRIPT_LOCATION = "training_script.py"
 SCRIPT_FOLDER = "/a/b/c"
 
-SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                experiment_name='test-experiment',
-                                state=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                      experiment_name='test-experiment',
+                      state=RunStatus.QUEUED)]
 
-FAILED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                             experiment_name='test-experiment',
-                             state=RunStatus.QUEUED),
-               RunSubmission(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
-                             experiment_name='test-experiment',
-                             state=RunStatus.FAILED)
-               ]
+FAILED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                   experiment_name='test-experiment',
+                   state=RunStatus.QUEUED),
+               Run(name="exp-mnist-single-node.py-18.05.18-16.05.45-1-tf-training",
+                   experiment_name='test-experiment',
+                   state=RunStatus.FAILED)]
 
 
 class SubmitMocks:
     def __init__(self, mocker):
         self.mocker = mocker
         self.submit_experiment = mocker.patch("commands.experiment.submit.submit_experiment",
-                                              return_value=(SUBMITTED_RUNS, ""))
+                                              return_value=(SUBMITTED_RUNS, {}, ""))
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
         self.isdir = mocker.patch("os.path.isdir", return_value=False)
         self.check_duplicated_params = mocker.patch("commands.experiment.submit.check_duplicated_params")
@@ -202,7 +197,7 @@ def test_get_default_script_location(prepare_mocks: SubmitMocks):
 
 
 def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
-    prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, "")
+    prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, {}, "")
     result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
 
     assert FAILED_RUNS[0].name in result.output

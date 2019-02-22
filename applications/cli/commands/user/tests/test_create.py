@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 import base64
@@ -25,11 +20,12 @@ import pytest
 from click.testing import CliRunner
 from unittest.mock import patch, mock_open
 
-from platform_resources.user_model import User, UserStatus
-from commands.user.create import check_users_presence, generate_kubeconfig, create, UserState
+from platform_resources.user import User, UserStatus
+from commands.user.create import generate_kubeconfig, create, UserState
+from platform_resources.user_utils import check_users_presence
 from util.helm import delete_user, delete_helm_release
-from util.k8s.kubectl import NamespaceStatus
 from cli_text_consts import VERBOSE_RERUN_MSG, UserCreateCmdTexts as Texts
+from util.k8s.k8s_info import NamespaceStatus
 
 test_username = "test_username"
 test_namespace = "test_namespace"
@@ -47,9 +43,7 @@ clusters:
 - cluster:
     api-version: v1
     server: https://{test_address}
-    # certificate-authority-data: {test_cacert_encoded}
-    # BUG/TASK: CAN-261
-    insecure-skip-tls-verify: true
+    certificate-authority-data: {test_cacert_encoded}
   name: nauta-cluster
 contexts:
 - context:
@@ -75,28 +69,20 @@ user_data = User(
 
 
 def test_check_users_presence_success(mocker):
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace",
-        return_value=NamespaceStatus.NOT_EXISTS)
-    mocker.patch(
-        "util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
+    mocker.patch("platform_resources.user.User.get", return_value=user_data)
 
     assert check_users_presence(test_username) == UserState.ACTIVE
 
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace", return_value=NamespaceStatus.ACTIVE)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.ACTIVE)
     assert check_users_presence(test_username) == UserState.ACTIVE
 
 
 def test_check_users_presence_failure(mocker):
-    mocker.patch(
-        "util.k8s.kubectl.find_namespace",
-        return_value=NamespaceStatus.NOT_EXISTS)
-    mocker.patch(
-        "util.k8s.kubectl.users_api.get_user_data", return_value=user_data)
+    mocker.patch("platform_resources.user_utils.find_namespace", return_value=NamespaceStatus.NOT_EXISTS)
+    mocker.patch("platform_resources.user.User.get", return_value=user_data)
 
-    assert check_users_presence(
-        test_username + "_wrong") == UserState.NOT_EXISTS
+    assert check_users_presence(test_username + "_wrong") == UserState.NOT_EXISTS
 
 
 def test_generate_kubeconfig():
@@ -124,7 +110,7 @@ def test_delete_helm_release_success(mocker):
 
     delete_helm_release(test_username)
 
-    esc_mock.call_count == 1
+    assert esc_mock.call_count == 1
 
 
 def test_delete_helm_release_failure(mocker):

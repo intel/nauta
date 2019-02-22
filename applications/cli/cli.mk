@@ -38,15 +38,15 @@ ifeq (Windows,$(OS))
 
 	cp -Rf draft/packs dist/config
 
-	curl -o helm-v2.9.1-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-windows-amd64.tar.gz
+	curl -o helm-v2.11.0-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-windows-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-windows-amd64.tar.gz -C helm_tmp/
+	tar --strip-components=1 -xvf helm-v2.11.0-windows-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm.exe dist/config
 
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-windows-amd64.tar.gz
+	rm -f helm-v2.11.0-windows-amd64.tar.gz
 	rm -rf helm_tmp
 
 endif
@@ -60,14 +60,14 @@ ifeq (Linux,$(OS))
 
 	cp -Rf draft/packs dist/config
 
-	curl -o helm-v2.9.1-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-linux-amd64.tar.gz
+	curl -o helm-v2.11.0-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-linux-amd64.tar.gz -C helm_tmp/
+	tar --strip-components=1 -xvf helm-v2.11.0-linux-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-linux-amd64.tar.gz
+	rm -f helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
@@ -82,14 +82,14 @@ ifeq (Darwin,$(OS))
 
 	cp -Rf draft/packs dist/config
 
-	curl -o helm-v2.9.1-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.9.1-darwin-amd64.tar.gz
+	curl -o helm-v2.11.0-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 	cd helm_tmp
-	tar --strip-components=1 -xvf helm-v2.9.1-darwin-amd64.tar.gz -C helm_tmp/
+	tar --strip-components=1 -xvf helm-v2.11.0-darwin-amd64.tar.gz -C helm_tmp/
 	mv helm_tmp/helm dist/config
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
-	rm -f helm-v2.9.1-darwin-amd64.tar.gz
+	rm -f helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
 endif
 

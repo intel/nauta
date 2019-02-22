@@ -1,0 +1,9 @@
+---
+
+- name: Load gateway users definition
+  include_vars: "{{ gateway_users_config_file }}"
+
+- include_tasks: user.yml
+  loop_control:
+    loop_var: developer_user
+  with_dict: "{{ gateway_users }}"

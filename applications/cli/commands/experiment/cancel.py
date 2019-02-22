@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from collections import defaultdict
@@ -34,10 +29,8 @@ import util.k8s.kubectl as kubectl
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace
-from platform_resources.run_model import Run, RunStatus
-from platform_resources.runs import list_runs, update_run
-from platform_resources.experiment_model import ExperimentStatus, Experiment
-from platform_resources.experiments import update_experiment, get_experiment, delete_experiment
+from platform_resources.run import Run, RunStatus
+from platform_resources.experiment import ExperimentStatus, Experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from util.app_names import NAUTAAppNames
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
@@ -95,7 +88,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     exp_to_be_cancelled = None
 
     if name:
-        exp_to_be_cancelled = get_experiment(namespace=current_namespace, name=name)
+        exp_to_be_cancelled = Experiment.get(namespace=current_namespace, name=name)
         exp_to_be_cancelled_kind = RunKinds(exp_to_be_cancelled.metadata['labels'].get('runKind')) \
             if exp_to_be_cancelled else None
         exp_to_be_cancelled = exp_to_be_cancelled if exp_to_be_cancelled_kind in listed_runs_kinds else None
@@ -116,11 +109,11 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     try:
         if search_for_experiment:
-            list_of_all_runs = list_runs(namespace=current_namespace, exp_name_filter=[name],
-                                         run_kinds_filter=listed_runs_kinds)
+            list_of_all_runs = Run.list(namespace=current_namespace, exp_name_filter=[name],
+                                        run_kinds_filter=listed_runs_kinds)
         else:
-            list_of_all_runs = list_runs(namespace=current_namespace, name_filter=name,
-                                         run_kinds_filter=listed_runs_kinds)
+            list_of_all_runs = Run.list(namespace=current_namespace, name_filter=name,
+                                        run_kinds_filter=listed_runs_kinds)
     except Exception:
         handle_error(logger, Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural),
                      Texts.LIST_RUNS_ERROR_MSG.format(experiment_name_plural=experiment_name_plural))
@@ -290,16 +283,16 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
     purged_runs = []
     not_purged_runs = []
 
-    experiment = get_experiment(name=exp_name, namespace=namespace)
+    experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:
         raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name])
+    experiment_runs = Run.list(namespace=namespace, exp_name_filter=[exp_name])
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_purge))
     if cancel_whole_experiment:
         experiment.state = ExperimentStatus.CANCELLING
-        update_experiment(experiment, namespace)
+        experiment.update()
 
     try:
         cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge, namespace=namespace)
@@ -366,16 +359,16 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
     deleted_runs = []
     not_deleted_runs = []
 
-    experiment = get_experiment(name=exp_name, namespace=namespace)
+    experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:
         raise RuntimeError(Texts.GET_EXPERIMENT_ERROR_MSG)
 
-    experiment_runs = list_runs(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
+    experiment_runs = Run.list(namespace=namespace, exp_name_filter=[exp_name], excl_state=RunStatus.CANCELLED)
     # check whether experiment has more runs that should be cancelled
     cancel_whole_experiment = (len(experiment_runs) == len(runs_to_cancel))
     if cancel_whole_experiment:
         experiment.state = ExperimentStatus.CANCELLING
-        update_experiment(experiment, namespace)
+        experiment.update()
 
     try:
         deleted_runs, not_deleted_runs = cancel_experiment_runs(runs_to_cancel=runs_to_cancel, namespace=namespace)
@@ -384,7 +377,7 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
             try:
                 # change an experiment state to CANCELLED
                 experiment.state = ExperimentStatus.CANCELLED
-                update_experiment(experiment, namespace)
+                experiment.update()
             except Exception:
                 # problems during deleting experiments are hidden as if runs were
                 # cancelled user doesn't have a possibility to remove them
@@ -418,7 +411,8 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
                         # change a run state to CANCELLED
                         run.state = RunStatus.CANCELLED
                         run.end_timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-                        update_run(run, namespace)
+                        run.update()
+
                 deleted_runs.append(run)
             except Exception:
                 logger.exception(Texts.INCOMPLETE_CANCEL_ERROR_MSG
@@ -542,12 +536,12 @@ def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purg
     try:
         if purge:
             click.echo(Texts.PURGING_START_MSG.format(run_name=experiment.name))
-            delete_experiment(experiment, namespace)
+            experiment.delete()
         else:
             click.echo(Texts.CANCELING_RUNS_START_MSG.format(experiment_name=experiment.name,
                                                              run_name=''))
             experiment.state = ExperimentStatus.CANCELLED
-            update_experiment(experiment, namespace)
+            experiment.update()
     except Exception:
         handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
         exit(1)

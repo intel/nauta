@@ -1,0 +1,40 @@
+output "name" {
+  value = "${google_compute_network.vpc.name}"
+}
+
+output "gateway_ip" {
+  value = "${google_compute_instance.gateway.network_interface.0.access_config.0.assigned_nat_ip}"
+}
+
+{% if gcp.generate_test_node %}
+output "testnode_ip" {
+  value = "${google_compute_instance.testnode.network_interface.0.access_config.0.assigned_nat_ip}"
+}
+{% endif %}
+output "nfs_internal_ip" {
+  value = "${google_compute_instance.nfs.network_interface.0.address}"
+}
+
+output "k8s_client_certificate" {
+  value = "${google_container_cluster.primary.master_auth.0.client_certificate}"
+}
+
+output "k8s_client_key" {
+  value = "${google_container_cluster.primary.master_auth.0.client_key}"
+}
+
+output "k8s_cluster_ca_certificate" {
+  value = "${google_container_cluster.primary.master_auth.0.cluster_ca_certificate}"
+}
+
+output "k8s_cluster_endpoint" {
+  value = "https://${google_container_cluster.primary.endpoint}"
+}
+
+output "k8s_password" {
+  value = "${google_container_cluster.primary.master_auth.0.password}"
+}
+
+output "k8s_username" {
+  value = "${google_container_cluster.primary.master_auth.0.username}"
+}

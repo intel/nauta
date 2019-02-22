@@ -3,11 +3,11 @@ FROM ${BASE_IMAGE}
 
 RUN mkdir -vp /build-output/ /build
 
-RUN yum clean all && yum install -y rpm-build gcc make openssl-devel redhat-lsb-core gcc-c++ bzip2
-#                                                                                     ^^^^^^^^^^^^
-#                                                                                          |
-#                                                                                    not distributed,
-#                                                                                image used only to rebuild rpm.
+RUN yum clean all && yum update -y && yum install -y rpm-build gcc make openssl-devel redhat-lsb-core gcc-c++ bzip2
+#                                                                                                      ^^^^^^^^^^^^
+#                                                                                                           |
+#                                                                                                      not distributed,
+#                                                                                                  image used only to rebuild rpm.
 
 COPY node-v8.12.0.tar.gz /build
 

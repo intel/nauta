@@ -1,0 +1,8 @@
+---
+
+gateway_users:
+  nautaoperator:
+    groups:
+      - docker
+    # yamllint disable-line rule:line-length
+    authorized_key: "ssh-rsa dummykey myaccount@mycompany.com"

@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 VERBOSE_RERUN_MSG = "Use -v or -vv option for more info."
@@ -127,6 +122,7 @@ class UserCreateCmdTexts:
     USER_BEING_REMOVED_ERROR_MSG = "User {username} is still being removed."
     USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
     PASSWORD_GATHER_ERROR_MSG = "The app encountered problems while gathering user's password."
+    CERT_GATHER_ERROR_MSG = "The app encountered problems while gathering server's certifcate authority."
     USER_ADD_ERROR_MSG = "Error detected while adding of a user."
     USER_CREATION_SUCCESS_MSG = "User {username} has been added successfully."
     USER_NOT_READY_ERROR_MSG = "User {username} is still not ready."
@@ -138,6 +134,7 @@ class UserCreateCmdTexts:
     CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG = "Content of the generated config file is as follows. Please copy it " \
                                         "to a file manually."
     CREATING_USER_PROGRESS_MSG = "Creating user {username}..."
+
 
 class UserDeleteCmdTexts:
     SHORT_HELP = "Command used to delete a user from the platform. Can be only run by a platform administrator."
@@ -693,12 +690,12 @@ class PlatformResourcesUsersTexts:
     USERNAME_TOO_LONG_ERROR_MSG = "Name of a user cannot be longer than 32 characters."
     INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
     USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
+    USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
 
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
     PROXY_CREATION_OTHER_ERROR_MSG = "Other error during creation of port proxy."
     PROXY_CREATION_MISSING_PORT_ERROR_MSG = "Missing port during creation of port proxy."
-    USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
     K8S_OBJECT_DELETE_ERROR_MSG = "Error when deleting k8s object: {output}"
     K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to K8S cluster: {output}"
     TOP_COMMAND_ERROR = "Problems during getting usage of resources."
@@ -714,6 +711,7 @@ class UtilK8sInfoTexts:
     LACK_OF_DEFAULT_TOKEN_ERROR_MSG = "Lack of default-token on a list of tokens."
     EMPTY_LIST_OF_TOKENS_ERROR_MSG = "Empty list of tokens."
     GATHERING_USERS_TOKEN_ERROR_MSG = "Problem during gathering users token."
+    GATHERING_USER_CERTIFICATE_ERROR_MSG = "Problem during gathering server certificate."
     GATHERING_PASSWORD_ERROR_MSG = "Error during gathering users password."
     LACK_OF_PASSWORD_ERROR_MSG = "Lack of password."
     GATHERING_EVENTS_ERROR_MSG = "Problem during gathering k8s events."
@@ -725,6 +723,8 @@ class UtilK8sProxyTexts:
     PROXY_EXIT_ERROR_MSG = "k8s_proxy - exit - error"
     TUNNEL_NOT_READY_ERROR_MSG = "connection on {address}:{port} NOT READY!"
     TUNNEL_ALREADY_CLOSED = "Proxy tunnel is already closed."
+    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from K8S cluster. Check cluster configuration and " \
+                                    "proxy settings."
 
 
 class CliStateTexts:

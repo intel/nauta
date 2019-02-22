@@ -1,0 +1,191 @@
+---
+
+- include_vars: "{{ cluster_config_file }}"
+
+- name: Load service account credentials
+  set_fact:
+    gcp_service_account: "{{ lookup('file', service_account_config_file) | from_json }}"
+
+- name: Check if state is stored in S3 bucket
+  set_fact:
+    persistent_terraform: "{{ ((s3_access_key | default ('')) != '' ) | bool }}"
+
+- name: "Create terraform files directory {{ local_terraform_dir }}"
+  file:
+    state: directory
+    path: "{{ local_terraform_dir }}"
+    mode: 0755
+
+- name: Generate terraform files in {{ local_terraform_dir }}
+  template:
+    src: "{{ template_item }}.j2"
+    dest: "{{ local_terraform_dir }}/{{ template_item }}"
+  loop_control:
+    loop_var: template_item
+  with_items:
+    - "main.tf"
+    - "variables.tf"
+    - "output.tf"
+
+- name: Set default pool size
+  set_fact:
+    effective_tf_pool_size: "{{ gcp.pool_size }}"
+    effective_tf_pool_type: "{{ gcp.pool_type }}"
+
+- name: Override default pool size with command parameters (1)
+  set_fact:
+    effective_tf_pool_size: "{{ tf_pool_size }}"
+  when: tf_pool_size is defined
+
+- name: Override default pool size with command parameters (2)
+  set_fact:
+    effective_tf_pool_type: "{{ tf_pool_type }}"
+  when: tf_pool_type is defined
+
+- name: Execute terraform block
+  block:
+    - name: Check if state will be maintained by s3 bucket
+      debug:
+        msg: "Use terraform context from s3 bucket: {{ persistent_terraform }}"
+
+    - name: Check if state file is present
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: list
+        rgw: True
+      register: s3_files
+      when: persistent_terraform
+
+    - name: Download file if present
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: get
+        rgw: True
+        object: "{{ terraform_file }}"
+        dest: "{{ local_terraform_file }}"
+      when: persistent_terraform and terraform_file in s3_files.s3_keys
+
+    - name: "Create empty tfstate file {{ local_terraform_file }}"
+      copy:
+        dest: "{{ local_terraform_file }}"
+        content: ""
+      when: not persistent_terraform or (terraform_file not in s3_files.s3_keys)
+
+    - name: Generate private key
+      openssl_privatekey:
+        path: "{{ local_terraform_dir }}/private"
+        mode: 0600
+
+    - name: Generate public key
+      openssl_publickey:
+        path: "{{ local_terraform_dir }}/public"
+        privatekey_path: "{{ local_terraform_dir }}/private"
+        format: OpenSSH
+
+    - name: Install terraform plugins
+      environment: "{{ proxy_env }}"
+      shell: "{{ terraform }} init"
+      args:
+        chdir: "{{ local_terraform_dir }}"
+      changed_when: False
+
+    - name: Terraform definition file
+      debug:
+        msg: "Terraform definition file: {{ local_terraform_file }}"
+
+    - name: Refresh terraform
+      environment:
+        TF_VAR_prefix: "{{ prefix }}"
+        TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
+        TF_VAR_external_public_key_file: "{{ external_public_key }}"
+        TF_VAR_internal_public_key_file: "{{ local_terraform_dir }}/public"
+        TF_VAR_internal_key_file: "{{ local_terraform_dir }}/private"
+        TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
+        TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
+      shell: "{{ terraform }} refresh -state {{ local_terraform_file }}"
+      args:
+        chdir: "{{ local_terraform_dir }}"
+      changed_when: False
+
+    - name: Apply terraform
+      environment:
+        TF_VAR_prefix: "{{ prefix }}"
+        TF_VAR_service_account: "{{ gcp_service_account | to_json }}"
+        TF_VAR_external_public_key_file: "{{ external_public_key }}"
+        TF_VAR_internal_public_key_file: "{{ local_terraform_dir }}/public"
+        TF_VAR_internal_key_file: "{{ local_terraform_dir }}/private"
+        TF_VAR_pool_size: "{{ effective_tf_pool_size }}"
+        TF_VAR_pool_type: "{{ effective_tf_pool_type }}"
+      terraform:
+        binary_path: "{{ terraform }}"
+        project_path: "{{ local_terraform_dir }}"
+        state_file: "{{ local_terraform_file }}"
+        state: present
+      register: terraform_infra
+
+    - name: "Show terraform infrastructure info"
+      debug: var=terraform_infra.outputs
+
+    - name: "Render cluster_info.yml"
+      vars:
+        k8s: "{{ terraform_infra.outputs }}"
+      template:
+        src: cluster_info.yml.j2
+        dest: "{{ output_file }}"
+        mode: 0444
+
+    - name: Register basion host
+      add_host:
+        name: gateway
+        group: gcp
+        ansible_ssh_host: "{{ terraform_infra.outputs.gateway_ip.value }}"
+        ansible_ssh_user: "{{ gcp.external_username }}"
+        ansible_ssh_private_key_file: "{{ external_key }}"
+        ansible_ssh_common_args: "{{ proxy_env.ssh_args_for_proxy }}"
+
+    - name: Register test host
+      add_host:
+        name: testnode
+        group: gcp
+        ansible_ssh_host: "{{ terraform_infra.outputs.testnode_ip.value }}"
+        ansible_ssh_user: "{{ gcp.external_username }}"
+        ansible_ssh_private_key_file: "{{ external_key }}"
+        ansible_ssh_common_args: "{{ proxy_env.ssh_args_for_proxy }}"
+      when: gcp.generate_test_node | bool
+
+    - name: Register nfs host
+      add_host:
+        name: nfs-share
+        group: nfs
+        ansible_ssh_host: "{{ terraform_infra.outputs.nfs_internal_ip.value }}"
+        ansible_ssh_user: "{{ gcp.internal_username }}"
+        ansible_ssh_private_key_file: "{{ local_terraform_dir }}/private"
+        ansible_ssh_common_args: >
+          -o ProxyCommand="ssh -W %h:%p
+          -o GSSAPIAuthentication=no -o ControlMaster=auto -o ControlPersist=60s
+          -o PreferredAuthentications=publickey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+          -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey
+          -o PasswordAuthentication=no -o User={{ gcp.internal_username }} -o ConnectTimeout=120
+          -o 'ProxyCommand={{ proxy_env.ssh_args_prefix_for_proxy }} {{ terraform_infra.outputs.gateway_ip.value }} 22' -i {{ external_key }}
+          {{ gcp.external_username }}@{{ terraform_infra.outputs.gateway_ip.value }}"
+
+  always:
+
+    - name: Upload tfstate file
+      aws_s3:
+        aws_access_key: "{{ s3_access_key }}"
+        aws_secret_key: "{{ s3_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        bucket: terraform
+        mode: put
+        rgw: True
+        object: "{{ terraform_file }}"
+        src: "{{ local_terraform_file }}"
+        permission: []
+      when: persistent_terraform

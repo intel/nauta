@@ -1,0 +1,31 @@
+---
+
+- debug:
+    msg: "Nauta user creation"
+
+- name: "Create nauta user {{ developer_user.key }}"
+  shell: "nctl user create {{ developer_user.key }}"
+  args:
+    chdir: "{{ nauta_admin_home }}"
+  ignore_errors: True
+  register: result
+
+- name: "nctl output"
+  debug:
+    msg: "{{ result.stdout }}"
+
+- name: "Check if nctl produced k8s configuration file"
+  stat:
+    path: "{{ nauta_admin_home }}/{{ developer_user.key }}.config"
+  register: sym
+
+- name: "Debug"
+  debug:
+    msg: "File {{ nauta_admin_home }}/{{ developer_user.key }}.config doesn't exists"
+  when: not sym.stat.exists
+
+- name: "Copy k8s config file into user's location"
+  copy:
+    src: "{{ nauta_admin_home }}/{{ developer_user.key }}.config"
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/.kube/config"
+  when: sym.stat.exists

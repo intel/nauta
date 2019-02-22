@@ -71,9 +71,9 @@ local_images:
       - src: /out/*
         dest: rpms
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/python/python2-pip-8.1.2-6.el7.noarch.rpm
-        dest: python2-pip-8.1.2-6.el7.noarch.rpm
-        checksum: d99bbd6fd197597da392019f62cb982113cfa6d359e916abc3844a138d807377
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/python/python2-pip-8.1.2-7.el7.noarch.rpm
+        dest: python2-pip-8.1.2-7.el7.noarch.rpm
+        checksum: 48a1e429a39599c8be0a5a7e8e31393dd43c0e97f53e3824a5d6652ba6c9a316
   rpm/docker:
     version: "18.03.1-ce"
     required:
@@ -125,7 +125,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/helm:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       HELM_DATA_IMAGE: "shared/build/helm"
       BASE_IMAGE: "shared/centos/rpm-packer"
@@ -133,7 +133,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../rpm-containers/helm/prepare"
     push: False
   rpm/helm/rpm/client:
-    version: "v2.9.1"
+    version: "v2.11.0"
     required:
       BASE_IMAGE: "rpm/helm"
     method: build

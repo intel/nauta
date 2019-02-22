@@ -27,9 +27,9 @@ spec:
             image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA etcd_gc image is required" .Values.etcd_gc_image }}
             imagePullPolicy: "IfNotPresent"
             command:
-            - bash
+            - sh
             - -c
-            - kubectl exec -it $(kubectl get --no-headers=true pods -l app=experiment-service-etcd -n nauta -o custom-columns=:metadata.name) -n nauta -- bash -c 'if [ "$(ETCDCTL_API=3 etcdctl alarm list | grep -c '\''alarm:NOSPACE'\'')" -ne 0 ]; then echo "Alarm NOSPACE, compacting"; rev=$(ETCDCTL_API=3 etcdctl --endpoints=:2379 endpoint status --write-out="json" | egrep -o '\''"revision":[0-9]*'\'' | egrep -o '\''[0-9].*'\''); ETCDCTL_API=3 etcdctl compact $rev; ETCDCTL_API=3 etcdctl defrag; ETCDCTL_API=3 etcdctl alarm disarm; else echo "No alarms found. OK"; fi'
+            - kubectl exec -i $(kubectl get --no-headers=true pods -l app=experiment-service-etcd -n nauta -o custom-columns=:metadata.name) -n nauta -- sh -c 'if [ "$(ETCDCTL_API=3 etcdctl alarm list | grep -c '\''alarm:NOSPACE'\'')" -ne 0 ]; then echo "Alarm NOSPACE, compacting"; rev=$(ETCDCTL_API=3 etcdctl --endpoints=:2379 endpoint status --write-out="json" | egrep -o '\''"revision":[0-9]*'\'' | egrep -o '\''[0-9].*'\''); ETCDCTL_API=3 etcdctl compact $rev; ETCDCTL_API=3 etcdctl defrag; ETCDCTL_API=3 etcdctl alarm disarm; else echo "No alarms found. OK"; fi'
           restartPolicy: OnFailure
           tolerations:
           - key: "master"

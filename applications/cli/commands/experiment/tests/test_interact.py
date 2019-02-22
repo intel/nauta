@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from click.testing import CliRunner
@@ -24,12 +19,11 @@ import pytest
 
 from kubernetes import client
 
-from platform_resources.experiment_model import Experiment, ExperimentStatus
+from platform_resources.experiment import Experiment, ExperimentStatus
 from commands.experiment import interact
-from commands.experiment.common import RunSubmission, RunStatus, SubmitExperimentError
+from commands.experiment.common import RunStatus, SubmitExperimentError
 from cli_text_consts import ExperimentInteractCmdTexts as Texts
-from platform_resources.platform_resource_model import KubernetesObject
-
+from platform_resources.run import Run, KubernetesObject
 
 INCORRECT_INTERACT_NAME = "interact_experiment"
 TOO_LONG_INTERACT_NAME = "interact-experiment-interact-experiment-interact-experiment"
@@ -38,17 +32,18 @@ CORRECT_INTERACT_NAME = "interact-experiment"
 EXPERIMENT_NAMESPACE = "namespace"
 
 JUPYTER_EXPERIMENT = Experiment(name='test-experiment', parameters_spec=['a 1', 'b 2'],
-                                creation_timestamp='2018-04-26T13:43:01Z', submitter='namespace-1',
+                                creation_timestamp='2018-04-26T13:43:01Z', namespace='namespace-1',
                                 state=ExperimentStatus.CREATING, template_name='jupyter',
                                 template_namespace='test-ex-namespace')
 
 NON_JUPYTER_EXPERIMENT = Experiment(name='test-experiment-2', parameters_spec=['a 1', 'b 2'],
-                                    creation_timestamp='2018-05-08T13:05:04Z', submitter='namespace-2',
+                                    creation_timestamp='2018-05-08T13:05:04Z', namespace='namespace-2',
                                     state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
                                     template_namespace='test-ex-namespace')
-SUBMITTED_RUNS = [RunSubmission(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
-                                experiment_name=CORRECT_INTERACT_NAME,
-                                state=RunStatus.QUEUED)]
+SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
+                      experiment_name=CORRECT_INTERACT_NAME,
+                      state=RunStatus.QUEUED)]
+
 KO_EXPERIMENT = KubernetesObject(spec=JUPYTER_EXPERIMENT, metadata=client.V1ObjectMeta())
 
 
@@ -57,10 +52,10 @@ class InteractMocks:
         self.mocker = mocker
         self.get_namespace = mocker.patch("commands.experiment.interact.get_kubectl_current_context_namespace",
                                           side_effect=[EXPERIMENT_NAMESPACE, EXPERIMENT_NAMESPACE])
-        self.get_experiment = mocker.patch("commands.experiment.interact.get_experiment",
+        self.get_experiment = mocker.patch("commands.experiment.interact.Experiment.get",
                                            return_value=None)
         self.submit_experiment = mocker.patch("commands.experiment.interact.submit_experiment",
-                                              return_value=(SUBMITTED_RUNS, ""))
+                                              return_value=(SUBMITTED_RUNS, {}, ""))
         self.launch_app = mocker.patch("commands.experiment.interact.launch_app")
         self.check_pods_status = mocker.patch("commands.experiment.interact.check_pods_status", return_value=True)
         self.calc_number = mocker.patch("commands.experiment.interact.calculate_number_of_running_jupyters",

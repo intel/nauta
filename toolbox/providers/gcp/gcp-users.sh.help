@@ -1,0 +1,15 @@
+[GREEN]Nauta Google Cloud Platform Users maintenance[NOCOLOR][BR]
+[BR]Usage:
+[BR]\t./gcp-users.sh [options]
+[BR]Options:
+[BR]\tk8s-cluster\t\t[nauta]\t\t\tKubernetes cluster name.
+[BR]\tgcp-config\t\t[`pwd`/gcp-config.yml]\tConfig file with cluster parametrs (resources, access).
+[BR]\texternal-key\t\t[~/.ssh/id_rsa]\t\tPath to file with private key used to connect to cluster gateway.
+[BR]\tnetwork-settings\t[config.yml]\t\tFile name with network settings in provider directory.
+[BR]\tgateway-users\t\t\t\t\tPath to users' definition file
+[BR][BR][YELLOW]Installation resources warning[NOCOLOR]
+[BR]To install cluster the following files have to be available/modified:
+[BR]- gcp-config (set in options) with resources definition
+[BR]- config.yml with network settings
+[BR]
+[BR]For more information please refer to installation guide on github.

@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: helm
+    name: tiller
+  name: tiller-deploy
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: helm
+      name: tiller
+  template:
+    metadata:
+      labels:
+        app: helm
+        name: tiller
+    spec:
+      containers:
+      - env:
+        - name: TILLER_NAMESPACE
+          value: kube-system
+        - name: TILLER_HISTORY_MAX
+          value: "0"
+        image: gcr.io/kubernetes-helm/tiller:v2.11.0
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /liveness
+            port: 44135
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: tiller
+        ports:
+        - containerPort: 44134
+          name: tiller
+          protocol: TCP
+        - containerPort: 44135
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /readiness
+            port: 44135
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+      restartPolicy: Always
+      hostNetwork: True
+      serviceAccountName: tiller
+      tolerations:
+      - effect: NoExecute
+        key: node.kubernetes.io/network-unavailable
+        operator: Exists
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tiller
+  namespace: kube-system
+  labels:
+    app: helm
+    name: tiller
+spec:
+  type: ClusterIP
+  ports:
+    - name: helm
+      port: 44134
+      targetPort: 44134
+  selector:
+    app: helm
+    name: tiller

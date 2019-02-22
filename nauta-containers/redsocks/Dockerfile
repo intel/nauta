@@ -11,8 +11,7 @@ RUN make
 
 FROM ${BASE_IMAGE}
 
-RUN yum clean all
-RUN yum install -y iptables libevent openssl pkgconfig
+RUN yum clean all && yum install -y iptables libevent openssl pkgconfig
 
 COPY --from=build /build/redsocks-release-0.5/redsocks /usr/sbin/redsocks
 RUN chmod +x /usr/sbin/redsocks

@@ -47,7 +47,7 @@
     stop_timeout: 0
     recreate: True
     restart_policy: no
-    user: "{{ user_id }}"
+    user: "{{ user_id }}:0"
     command: "bash -c 'while true; do sleep 1; done'"
     env:
       HOME: "/data"
@@ -56,8 +56,6 @@
       - "{{ build_dir }}/platform:/platform:ro"
       - "{{ build_dir }}/rpm:/out"
       - "{{ build_dir }}/arch:/data"
-      - "/etc/passwd:/etc/passwd:ro"
-      - "/etc/group:/etc/group:ro"
   notify:
     - Remove finalizer container
 

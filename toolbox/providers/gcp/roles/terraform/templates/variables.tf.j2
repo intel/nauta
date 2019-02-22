@@ -1,0 +1,67 @@
+variable "service_account" {
+  type = "string"
+}
+
+variable "gke_project" {
+  default = "{{ gcp_service_account.project_id }}"
+}
+
+variable "prefix" {
+  type = "string"
+}
+
+variable "region" {
+  default = "{{ gcp.region }}"
+}
+
+variable "zone" {
+  default = "{{ gcp.zone }}"
+}
+
+variable "external_username" {
+  default = "{{ gcp.external_username }}"
+}
+
+variable "external_public_key_file" {
+  type = "string"
+}
+
+variable "gateway_type" {
+  default = "{{ gcp.gateway_type }}"
+}
+
+variable "testnode_type" {
+  default = "{{ gcp.testnode_type }}"
+}
+
+variable "nfs_type" {
+  default = "{{ gcp.nfs_type }}"
+}
+
+variable "nfs_disk_size" {
+  default = "{{ gcp.nfs_disk_size }}"
+}
+
+variable "internal_username" {
+  default = "{{ gcp.internal_username }}"
+}
+
+variable "internal_public_key_file" {
+  type = "string"
+}
+
+variable "internal_key_file" {
+  type = "string"
+}
+
+variable "pool_type" {
+  type = "string"
+}
+
+variable "pool_size" {
+  type = "string"
+}
+
+variable "pool_min_cpu_platform" {
+  default = "{{ gcp.pool_min_cpu_platform }}"
+}

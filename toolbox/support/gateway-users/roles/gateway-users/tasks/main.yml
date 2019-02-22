@@ -1,0 +1,17 @@
+---
+
+- name: Load a variable file based on the OS type.
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Load gateway users definition
+  include_vars: "{{ gateway_users_config_file }}"
+
+- name: "Create {{ worker_groupname }} group"
+  group:
+    name: "{{ worker_groupname }}"
+    state: present
+
+- include_tasks: user.yml
+  loop_control:
+    loop_var: developer_user
+  with_dict: "{{ gateway_users }}"

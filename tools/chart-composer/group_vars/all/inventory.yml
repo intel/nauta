@@ -1,5 +1,5 @@
 ---
 
-helm_url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm
-helm_sha: 422c1378c2c4fa99cf436c077a50ec54158173f100117763338cf7f2df5de0b9
+helm_url: http://repository.toolbox.nervana.sclab.intel.com/kubernetes/v1.10.0/linux/amd64/helm-v2.11.0
+helm_sha: 76bd2959a0d9bdc16942a27396c697b815a50535be9944dd94a314889a68e474
 helm_local: "{{ build_dir }}/helm"

@@ -1,0 +1,12 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+    terraform_file: "gcp/{{ prefix }}.tfstate"
+    local_terraform_file: "{{ workspace }}/terraform/{{ prefix }}/terraform.tfstate"
+    local_terraform_dir: "{{ workspace }}/terraform/{{ prefix }}"
+  roles:
+    - role: terraform-clean

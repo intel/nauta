@@ -1,22 +1,17 @@
 #
-# INTEL CONFIDENTIAL
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
-# The source code contained or described herein and all documents related to
-# the source code ("Material") are owned by Intel Corporation or its suppliers
-# or licensors. Title to the Material remains with Intel Corporation or its
-# suppliers and licensors. The Material contains trade secrets and proprietary
-# and confidential information of Intel or its suppliers and licensors. The
-# Material is protected by worldwide copyright and trade secret laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published, uploaded, posted, transmitted, distributed, or disclosed in any way
-# without Intel's prior express written permission.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# No license under any patent, copyright, trade secret or other intellectual
-# property right is granted to or conferred upon you by disclosure or delivery
-# of the Materials, either expressly, by implication, inducement, estoppel or
-# otherwise. Any license under such intellectual property rights must be express
-# and approved by Intel in writing.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 from click.testing import CliRunner
@@ -25,7 +20,7 @@ from unittest.mock import MagicMock
 from kubernetes.client import V1Pod, V1PodStatus, V1Event, V1ObjectReference, V1ObjectMeta
 
 from commands.experiment import view
-from platform_resources.run_model import Run, RunStatus
+from platform_resources.run import Run, RunStatus
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 from util.k8s.k8s_statistics import ResourceUsage
 from util.k8s.k8s_info import PodStatus
@@ -36,7 +31,7 @@ TEST_RUNS = [
         name='test-experiment',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-04-26T13:43:01Z',
-        submitter='namespace-1',
+        namespace='namespace-1',
         state=RunStatus.RUNNING,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -47,7 +42,7 @@ TEST_RUNS = [
         name='test-experiment-2',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-05-08T13:05:04Z',
-        submitter='namespace-2',
+        namespace='namespace-2',
         state=RunStatus.COMPLETE,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -61,7 +56,7 @@ QUEUED_RUN = [
         name='test-experiment',
         parameters=['a 1', 'b 2'],
         creation_timestamp='2018-04-26T13:43:01Z',
-        submitter='namespace-1',
+        namespace='namespace-1',
         state=RunStatus.QUEUED,
         template_name='test-ex-template',
         metrics={'any metrics': 'a'},
@@ -93,12 +88,12 @@ EVENTS = [event]
 
 class ViewMocks:
     def __init__(self, mocker):
-        self.get_run = mocker.patch('commands.experiment.view.runs_api.get_run')
+        self.get_run = mocker.patch('commands.experiment.view.Run.get')
         self.get_run.return_value = TEST_RUNS[0]
         self.get_pods = mocker.patch('commands.experiment.view.get_namespaced_pods')
         self.get_pods.return_value = TEST_PODS
         self.get_namespace = mocker.patch('commands.experiment.view.get_kubectl_current_context_namespace')
-        self.format_timestamp = mocker.patch('platform_resources.run_model.format_timestamp_for_cli')
+        self.format_timestamp = mocker.patch('platform_resources.run.format_timestamp_for_cli')
         self.format_timestamp.return_value = '2018-04-26 13:43:01'
         self.sum_cpu_resources = mocker.patch("commands.experiment.view.sum_cpu_resources")
         self.sum_cpu_resources.return_value = "100m"
@@ -118,7 +113,7 @@ def test_view_experiment_success(prepare_mocks: ViewMocks):
     assert prepare_mocks.get_run.call_count == 1, "Run was not retrieved"
 
     assert TEST_RUNS[0].name in result.output, "Bad output."
-    assert TEST_RUNS[0].submitter in result.output, "Bad output."
+    assert TEST_RUNS[0].namespace in result.output, "Bad output."
     assert "2018-04-26 13:43:01" in result.output, result.output
     assert "100m" in result.output, "Bad output"
     assert "1Gi" in result.output, "Bad output"

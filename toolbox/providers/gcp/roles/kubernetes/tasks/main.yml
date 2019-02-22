@@ -1,0 +1,204 @@
+---
+
+- name: Download helm
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
+    dest: ./helm.tar.gz
+    checksum: "sha256:02a4751586d6a80f6848b58e7f6bd6c973ffffadc52b4c06652db7def02773a1"
+
+- name: Download kubectl
+  get_url:
+    url: https://dl.k8s.io/v1.10.0/kubernetes-client-linux-amd64.tar.gz
+    dest: ./kubectl.tar.gz
+    checksum: "sha256:845668fe2f854b05aa6f0b133314df83bb41a486a6ba613dbb1374bf3fbe8720"
+
+- name: Unarchive kubectl
+  unarchive:
+    src: ./kubectl.tar.gz
+    dest: .
+    remote_src: True
+
+- name: Unarchive helm
+  unarchive:
+    src: ./helm.tar.gz
+    dest: .
+    remote_src: True
+
+- name: Set kubectl fact
+  set_fact:
+    kubectl: ./kubernetes/client/bin/kubectl
+    helm: ./linux-amd64/helm
+
+- name: Ensure that kubectl is present
+  file:
+    path: "{{ kubectl }}"
+
+- name: Ensure that helm is present
+  file:
+    path: "{{ helm }}"
+
+- name: Stat kubectl
+  stat:
+    path: "{{ kubectl }}"
+  register: kubectl_real
+
+- name: Install kubectl in path
+  become: True
+  copy:
+    src: "{{ kubectl_real.stat.path }}"
+    dest: "/bin/kubectl"
+    mode: 0755
+    remote_src: True
+
+- name: Stat helm
+  stat:
+    path: "{{ helm }}"
+  register: helm_real
+
+- name: Install helm in path
+  become: True
+  copy:
+    src: "{{ helm_real.stat.path }}"
+    dest: "/bin/helm"
+    mode: 0755
+    remote_src: True
+
+- name: Ensure that kube config directory exists
+  file:
+    path: ".kube"
+    state: directory
+    mode: 0700
+
+- name: Render kube config
+  vars:
+    k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
+  template:
+    src: kubeconfig.j2
+    dest: .kube/config
+    mode: 0600
+
+- name: Verify kubectl command
+  shell: "{{ kubectl }} get nodes"
+  register: kube_config
+  changed_when: kube_config.rc != 0
+  failed_when: False
+
+- name: Grant full privileges for client
+  vars:
+    k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
+  shell: >
+    {{ kubectl }} create clusterrolebinding client-user-rolebinding
+    --clusterrole=cluster-admin --user=client --username '{{ k8s.k8s_username.value }}' --password '{{ k8s.k8s_password.value }}'
+  when: kube_config is changed and inventory_hostname in ['gateway']
+
+- name: Verify kubectl command
+  shell: "{{ kubectl }} get nodes"
+  register: kube_config
+  changed_when: False
+
+- name: Create a k8s dls4e namespace
+  shell: "{{ kubectl }} get namespace dls4e || {{ kubectl }} create namespace dls4e"
+  when: inventory_hostname in ['gateway']
+
+- name: Create kubernetes configuration directory
+  file:
+    path: ./kubernetes/apps
+    state: directory
+
+- name: Render tiller apps
+  template:
+    src: tiller.yml.j2
+    dest: ./kubernetes/apps/tiller.yml
+
+- name: Apply tiller release
+  changed_when: False
+  shell: "{{ kubectl }} apply -f ./kubernetes/apps/tiller.yml"
+  when: inventory_hostname in ['gateway']
+
+- name: Wait for at least one tiller instances to get ready
+  shell: "{{ kubectl }} --namespace=kube-system get deployment tiller-deploy -o jsonpath='{.status.readyReplicas}'"
+  changed_when: False
+  register: tiller_ready
+  until: tiller_ready.stdout | int >= 1
+  retries: 60
+  delay: 1
+
+- name: Fail if all tiller isntances are down
+  fail:
+    msg: Tiller did not get up
+  when: tiller_ready.stdout == '0'
+
+- name: Verify helm access
+  shell: "{{ helm }} ls"
+  changed_when: False
+  register: helm_access
+  until: helm_access is success
+  retries: 10
+  delay: 10
+
+- name: Ensure that kube config directory exists
+  become: True
+  file:
+    path: "/root/.kube"
+    state: directory
+    mode: 0700
+
+- name: Render kube config
+  vars:
+    k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
+  become: True
+  template:
+    src: kubeconfig.j2
+    dest: /root/.kube/config
+    mode: 0600
+
+- name: Render systemd script for ip forward
+  become: True
+  template:
+    src: iptables-k8s-forwarder.sh.j2
+    dest: /usr/sbin/iptables-k8s-forwarder.sh
+    mode: 0700
+
+- name: Render systemd service
+  become: True
+  vars:
+    k8s: "{{ hostvars[groups['localhost'][0]].terraform_infra.outputs }}"
+  template:
+    src: kubernetes-forwarder.service.j2
+    dest: /etc/systemd/system/kubernetes-forwarder.service
+
+- name: Start and enable service
+  become: True
+  service:
+    name: kubernetes-forwarder
+    state: started
+    enabled: True
+    daemon-reload: True
+
+- become: True
+  sysctl:
+    name: fs.file-max
+    value: 200000
+    sysctl_set: True
+    state: present
+    reload: True
+
+- become: True
+  pam_limits:
+    domain: '*'
+    limit_type: soft
+    limit_item: "{{ item }}"
+    value: 200000
+  with_items:
+    - nproc
+    - nofile
+
+- become: True
+  pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: "{{ item }}"
+    value: 200000
+  with_items:
+    - nproc
+    - nofile

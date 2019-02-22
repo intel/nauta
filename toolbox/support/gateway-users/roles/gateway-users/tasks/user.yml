@@ -1,0 +1,40 @@
+---
+
+- name: "Create user {{ developer_user.key }}"
+  user:
+    name: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+    groups: "{{ developer_user.value.groups | join(',') }}"
+    shell: /bin/bash
+    home: "{{ worker_home_prefix }}/{{ developer_user.key }}"
+
+- name: "Create .ssh directory for user {{ developer_user.key }}"
+  file:
+    path: "{{ worker_home_prefix }}/{{ developer_user.key }}/.ssh"
+    state: directory
+    owner: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+    mode: 0700
+
+- name: "Fill {{ developer_user.key }} user ssh configuration"
+  template:
+    src: ssh_conf.j2
+    dest: "{{ worker_home_prefix }}/{{ developer_user.key }}/.ssh/config"
+    mode: 0600
+    owner: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+
+- name: "Add authorized key for user {{ developer_user.key }}"
+  authorized_key:
+    user: "{{ developer_user.key }}"
+    state: present
+    key: "{{ developer_user.value.authorized_key }}"
+  when: developer_user.value.authorized_key is defined
+
+- name: "Create .kube directory for user {{ developer_user.key }}"
+  file:
+    path: "{{ worker_home_prefix }}/{{ developer_user.key }}/.kube"
+    state: directory
+    owner: "{{ developer_user.key }}"
+    group: "{{ worker_groupname }}"
+    mode: 0700
