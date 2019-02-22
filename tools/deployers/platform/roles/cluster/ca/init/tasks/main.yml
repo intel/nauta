@@ -25,6 +25,7 @@
       DNS.6: "{{ kubernetes_api_address | default('kubernetes.nauta') }}"
       IP.1: "{{ kubernetes_network.svc_list.apiservice.ip }}"
       IP.2: "{{ nauta_configuration.external_interface.ipv4_address }}"
+      IP.3: "{{ nauta_configuration.internal_interface.ipv4_address }}"
     key_usage:
       - digitalSignature
       - keyEncipherment
