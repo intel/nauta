@@ -473,6 +473,13 @@ class ExperimentCancelCmdTexts:
                                     "string parameters do not match any existing {experiment_name} in an appropriate " \
                                     "state for the command. Run 'nctl exp list' to find out what are the names and " \
                                     "states of existing {experiment_name_plural}."
+    LACK_OF_EXP_TO_BE_CANCELLED_ERROR_MSG = "Lack of {experiment_name_plural} that can be cancelled. However there " \
+                                            "are {experiment_name_plural} that match given criteria and can be " \
+                                            "purged. If you want to get rid of them - please rerun cancel command " \
+                                            "with -p option."
+    EXP_THAT_CAN_BE_PURGED_EXIST = "Except of {experiment_name_plural} that can be cancelled, there are " \
+                                   "{experiment_name_plural} that can be purged. If you want to remove also them" \
+                                   " - please rerun cancel command with -p option."
     CANCEL_OPERATION = {
         "cancelled": "cancelled",
         "cancellation": "cancellation"

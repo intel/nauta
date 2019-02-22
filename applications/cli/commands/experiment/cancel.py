@@ -123,11 +123,15 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
     if exp_to_be_cancelled and not list_of_all_runs:
         cancel_uninitialized_experiment(experiment=exp_to_be_cancelled, namespace=current_namespace,
                                         purge=purge)
-    # If no experiment and no runs were matched, throw an error
-    elif not [run for run in list_of_all_runs if run.state in list_of_applicable_states]:
+
+    if not list_of_all_runs:
         handle_error(user_msg=Texts.LACK_OF_EXPERIMENTS_ERROR_MSG.format(
             experiment_name_plural=experiment_name_plural,
             experiment_name=experiment_name))
+        exit(1)
+    elif not purge and not [run for run in list_of_all_runs if run.state in [RunStatus.QUEUED, RunStatus.RUNNING]]:
+        handle_error(user_msg=Texts.LACK_OF_EXP_TO_BE_CANCELLED_ERROR_MSG.format(
+            experiment_name_plural=experiment_name_plural))
         exit(1)
 
     # check whether we have at least one experiment in state other than CANCELLED
