@@ -1,40 +1,46 @@
-# # Nauta on Google Cloud Platform - Advanced options
+# # Nauta on Google Cloud* Platform: Advanced Options
 
 This document contains information referring to [Nauta on Google Cloud Platform - Getting Started](gcp.md).
 
-## Overall cluster architecture
-GCP Nauta Kubernetes instance consists of several parts:
-- gateway - bastion host to access to cluster
-- test node (optional) - bastion host with test software to do continuous tests
-- nfs server - internal server with nfs based resources
-- gke cluster - kubernetes cluster.
+## Overall Cluster Architecture
 
-Please refer to terraform definition files (in directory terraform/templates) to see detailed configuration (networking,
+GCP Nauta Kubernetes instance consists of several parts:
+
+- **gateway:** Bastion host to access to cluster
+- **test node: (optional)** Bastion host with test software to do continuous tests
+- **nfs server:** Internal server with nfs based resources
+- **gke cluster:** - Kubernetes cluster
+
+Refer to terraform definition files (in directory terraform/templates) to see detailed configuration (networking,
 resources, etc.)
 
-## Prerequisities
+## Prerequisites
 
 ### Workstation
-To install Nauta on GCP workstation (Linux or Mac based) with access to the internet is required. Installation repository (nauta)
-has to be downloaded or cloned from github repository.
+
+To install Nauta on GCP workstation (Linux or Mac-based) with access to the internet is required. Installation repository (nauta) has to be downloaded or cloned from github repository.
 
 ***All operations described below should be made on workstation. All paths are connected with downloaded or cloned repository*** 
 
 ### Google Cloud Platform
-Service account has to be created to operate on user's project (please refer to https://console.cloud.google.com/iam-admin/serviceaccounts?project=<project_name>).
 
-Service account should have `project-owner` priviliges and be ready to create gke cluster, vpc, virtual machines.
+Service account has to be created to operate on user's project (Refer to https://console.cloud.google.com/iam-admin/serviceaccounts?project=<project_name> for more information).
 
-#### GCP access config
+Service account should have `project-owner` priviliges and be ready to create gke cluster, vpc, and virtual machines.
+
+#### GCP Access Config
+
 Copy previously downloaded JSON configuration file (for service account) as `gcp-service-account.json` into `$NAUTA_DIR/toolbox/providers/gcp` directory. 
 
-Values are defined in config file generated during service account creation.
+**Note:** Values are defined in config file generated during service account creation.
 
-### Connectivity configuration
-During installation several operations on cluster are done using ssh connectivity. Network configuration is stored
-in `toolbox/config.yml` file.
+### Connectivity Configuration
 
-#### No proxy configuration
+During installation several operations on cluster are completed using SSH connectivity. Network configuration is stored
+in the `toolbox/config.yml` file.
+
+#### No Proxy Configuration
+
 ```$xslt
 proxy_env:
   http_proxy: ""
@@ -47,7 +53,8 @@ proxy_env:
 proxy: "{{ proxy_env }}"
 ```
 
-#### Configuration with proxy
+#### Configuration with Proxy
+
 ```$xslt
 proxy_env:
   http_proxy: "{{ lookup('env', 'http_proxy') | default('') }}"
@@ -65,10 +72,12 @@ proxy: "{{ proxy_env }}"
 `ssh`/`scp` options in `ProxyCommand` part
 (`ssh_args_for_proxy` is full value, `ssh_args_for_cmd_line`, `ssh_args_prefix_for_proxy` are parts for specific purposes)
 
-For specific ssh connectivity please refer to `ssh`/`scp` manuals.
+**Note:** For specific SSH connectivity, refer to the `ssh`/`scp` manuals.
 
 ## Basic configuration
-Kubernetes cluster resources and connectivity servers can be defined in yaml file (i.e. `gcp-config.yml`)
+
+Kubernetes cluster resources and connectivity servers can be defined in yaml file (for example: `gcp-config.yml`)
+
 ```$xslt
 gcp:
   region: "europe-west1"
@@ -89,34 +98,37 @@ gcp:
   testnode_image: ""
 ``` 
 
-- `region` and `zone` - typical GCP parameters
-- `external-username` - username to connect to bastion (gateway) server
-- `gateway_type` - node type (see server types accessible in region and zone defined above) for bastion (gateway) server
-- `testnode_type` - node type (see server types accessible in region and zone defined above) for test server
-- `nfs_type` - node type (see server types accessible in region and zone defined above) for internal nfs server
+- `region` and `zone` - Typical GCP parameters
+- `external-username` - Username to connect to Bastion (gateway) server
+- `gateway_type` - Node type (see server types accessible in region and zone defined above) for Bastion (gateway) server
+- `testnode_type` - Node type (see server types accessible in region and zone defined above) for test server
+- `nfs_type` - Node type (see server types accessible in region and zone defined above) for internal NFS server
 - `nfs_disk_size` - Size (in GB) of the disk attached to nfs server to store user data
-- `internal_username` - username for internal ssh connectivity
-- `pool_type` - node type (see server types accessible in region and zone defined above) for gke cluster resources
-- `pool_size` - gke cluster servers quantity
-- `pool_min_cpu_platform` - cpu architecture
-- `generate_test_node` `[True|False]` - boolean flag to decide if test node will be created
-- `test_node_image` - name of the image accessible in the gcp project to create test node with pre-installed test software
+- `internal_username` - Username for internal SSH connectivity
+- `pool_type` - Node type (see server types accessible in region and zone defined above) for GKE cluster resources
+- `pool_size` - GKE cluster servers quantity
+- `pool_min_cpu_platform` - CPU architecture
+- `generate_test_node` `[True|False]` - Boolean flag to decide if test node will be created
+- `test_node_image` - Name of the image accessible in the gcp project to create test node with pre-installed test software
 
 
-## Installation process
+## Installation Process
+
 Installer process uses [Terraform](https://www.terraform.io/) to create resources on Google Cloud Platform.
 
-### Installer options
+### Installer Options
+
 ```Usage:
 gcp.sh [options]
 ```
-Options:
-- `operation` `[create,destroy,]` - Operation to perform. If empty only installation attempt will be perform.
+**Options:** 
+
+- `operation` `[create,destroy,]` - Operation to perform. If an _empty only_ installation attempt will be performed.
 - `k8s-cluster` - [nauta] - Kubernetes cluster name.
 - `gcp-config` `[pwd/gcp-config.yml]` - Config file with cluster parametrs (resources, access).
 - `external-public-key` `[~/.ssh/id_rsa.pub]` - Path to file with public key accepted by cluster gateway to connect.
 - `external-key` `[~/.ssh/id_rsa]` -Path to file with private key used to connect to cluster gateway.
-- `s3-url` Url to s3 bucket to store terraform cluster state. By default local file will be used.
+- `s3-url` Url to s3 bucket to store terraform cluster state. By default, a local file will be used.
 - `s3-secret-key` Secret key to s3 bucket.
 - `s3-access-key` Secret key to s3 bucket.
 - `install-file` Path to nauta installer file.
@@ -126,13 +138,14 @@ Options:
 - `service-account-config-file` `[gcp-service-account.json]` Path to GCP service account config file.
 - `platform-config-file` Path to platform config file
 
-### Use cases
+### Use Cases
 - #### Destroy cluster
 ```$xslt
 ./gcp.sh --k8s-cluster nauta-cluster --operation destroy
 ```
 
-- #### Create cluster
+- #### Create Cluster
+
 This command creates gke cluster and resources related to the cluster (gateway, nfs).
 
 ```$xslt
@@ -140,7 +153,8 @@ This command creates gke cluster and resources related to the cluster (gateway, 
                                      --gcp-config `pwd`/gcp-config.yml
 ```
 
-- #### Create cluster and install platform
+- #### Create Cluster and Install Platform
+
 This command creates gke cluster, resources and installs nauta from local file.
 
 ```$xslt
@@ -149,8 +163,9 @@ This command creates gke cluster, resources and installs nauta from local file.
                                      --install-file /opt/project-data/repository/releases/nauta/nauta-1.0.0-latest.tar.gz
 ```
 
-- #### Create cluster and install platform
-This command creates gke cluster, resources; compiles and create platform distribution artifacts on gateway node and installs nauta.
+- #### Create Cluster and Install Platform
+
+This command creates gke cluster, resources: compiles and create platform distribution artifacts on gateway node and installs Nauta.
 
 ```$xslt
 ./gcp.sh --k8s-cluster nauta-cluster --operation create \
@@ -158,10 +173,11 @@ This command creates gke cluster, resources; compiles and create platform distri
                                      --compile-platform-on-cloud true
 ```
 
-### Installer output
-#### Access data
-Ip addresses for bastion nodes are visible in `<cluster_name>.info` file.
-User can access to bastion/gateway node using:
+### Installer Output
+#### Access Data
+
+IP addresses for Bastion nodes are visible in `<cluster_name>.info` file.
+User can access to Bastion/gateway node using:
 
 ```$xslt
 ssh -i /pathtoprivatekey -o ProxyCommand='nc -X 5 -x myproxy.com:1080 %h %p' <external-user>@<ip-gateway>
