@@ -16,3 +16,4 @@ yaspin==0.14.0
 jinja2==2.10
 ruamel.yaml.jinja2==0.2.2
 retry==0.9.2
+jsonschema==2.6.0
