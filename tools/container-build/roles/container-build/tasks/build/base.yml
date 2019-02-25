@@ -3,21 +3,12 @@
 - set_fact:
     base_image: {}
 
-- name: Calculate base image using cache registry
+- name: Calculate base image
   vars:
     image_to_add: "{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ item.value }}:{{ docker_images_remote_tags[item.value] }}"
   set_fact:
     base_image: "{{ base_image | combine({item.key: image_to_add}) }}"
   with_dict: "{{ image.required }}"
-  when: docker_repository_cache.enabled
-
-- name: Calculate base image
-  vars:
-    image_to_add: "{{ docker_version_prefix }}/{{ item.value }}:{{ docker_images_remote_tags[item.value] }}"
-  set_fact:
-    base_image: "{{ base_image | combine({item.key: image_to_add}) }}"
-  with_dict: "{{ image.required }}"
-  when: not docker_repository_cache.enabled
 
 - name: Add image definition
   set_fact:

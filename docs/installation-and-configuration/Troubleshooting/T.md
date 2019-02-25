@@ -75,9 +75,9 @@ Before running the Docker Garbage Collector, the administrator should remove ima
      
 4) Run Docker Garbage Collector by issuing the following command:
 
-     `kubectl exec -it $(kubectl get --no-headers=true pods -l app=docker-registry -n nauta -o custom-columns=:metadata.name) -n nauta registry garbage-collect /etc/docker/registry/config.yml`
+     `kubectl exec -it $(kubectl get --no-headers=true pods -l app=docker-registry -n dls4e -o custom-columns=:metadata.name) -n dls4e registry garbage-collect /etc/docker/registry/config.yml`
 
-5) Restart system's Docker registry. It can be done by deleting the pod with label: `nauta_app_name=docker-registry` 
+5) Restart system's Docker registry. It can be done by deleting the pod with label: `dls4e_app_name=docker-registry` 
 
 
 ## Command Connection Error

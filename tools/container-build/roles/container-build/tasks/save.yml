@@ -10,7 +10,7 @@
     image: "{{ item.value }}"
   include_tasks: "save_image.yml"
   with_dict: "{{ images }}"
-  when: docker_repository_cache.enabled and not docker_images_remote_exists[name]
+  when: not docker_images_remote_exists[name]
 
 - name: Wait for tasks
   vars:
@@ -26,14 +26,5 @@
     state: present
     create: true
   with_dict: "{{ images }}"
-  when: docker_repository_cache.enabled and build_logs | default(False)
-
-- name: Save image to a file {{ build_logs }}/container_images.txt for IP Plan report generator
-  lineinfile:
-    dest: '{{ build_logs }}/container_images.txt'
-    line: '{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ item.key }}:{{ docker_images_remote_tags[item.key] }}'
-    state: present
-    create: true
-  with_dict: "{{ images }}"
-  when: not docker_repository_cache.enabled and build_logs | default(False)
+  when: build_logs | default(False)
 
