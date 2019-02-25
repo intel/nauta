@@ -5,7 +5,7 @@
     artifact_container: "artifact-{{ build_name }}-{{ user | regex_findall('[A-Za-z]') | join('') }}-{{ version }}-{{ name.replace('/', '-') }}"
 
 - block:
-    - name: Start artifact container
+    - name: Start artifact container using cache registry
       docker_container:
         name: "{{ artifact_container }}"
         image: "{{ docker_repository_cache_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
@@ -14,6 +14,17 @@
         restart_policy: no
         user: "{{ user_id }}:0"
         command: "bash -c 'while true; do sleep 1; done'"
+      when: docker_repository_cache.enabled
+    - name: Start artifact container
+      docker_container:
+        name: "{{ artifact_container }}"
+        image: "{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+        stop_timeout: 0
+        recreate: True
+        restart_policy: no
+        user: "{{ user_id }}:0"
+        command: "bash -c 'while true; do sleep 1; done'"
+      when: not docker_repository_cache.enabled
     - name: Register node
       add_host:
         name: "{{ artifact_container }}"

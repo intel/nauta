@@ -1,0 +1,11 @@
+---
+
+package_attached_images:
+{% for name, image in images.items() %}
+  {{ name }}:
+    remote_url: "{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    version: "{{ image.version }}"
+    local_url: "{{ name }}:{{ image.version }}"
+    local_checksum: "{{ docker_images_local_tags[name] }}"
+    remote_checksum: "{{ docker_images_remote_tags[name] }}"
+{% endfor %}

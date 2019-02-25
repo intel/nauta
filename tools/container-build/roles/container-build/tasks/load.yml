@@ -11,6 +11,7 @@
   include_tasks: "load_image.yml"
   with_dict: "{{ images }}"
   when:
+    - docker_repository_cache.enabled
     - docker_images_remote_exists[name]
     - not docker_defined_images[name]
 
@@ -20,3 +21,4 @@
     task_id: "{{ item.value }}"
   include_tasks: wait.yml
   with_dict: "{{ docker_async_tasks }}"
+  when: docker_repository_cache.enabled
