@@ -17,12 +17,6 @@
 
 # autocomplete for nctl application
 
-LICENSE_ACCEPTANCE_TEXT='DO NOT ACCESS, COPY OR PERFORM ANY PORTION OF THE PRE-RELEASE SOFTWARE
-UNTIL YOU HAVE READ AND ACCEPTED THE TERMS AND CONDITIONS OF THIS
-AGREEMENT LICENSE.TXT . BY COPYING, ACCESSING, OR PERFORMING
-THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND
-CONDITIONS OF THIS AGREEMENT. Agree? (y/n)'
-
 validate_nctl_home_config_directory() {
     local nctl_home_config_directory="$1"
     if [ -d "${nctl_home_config_directory}" ]; then
@@ -58,35 +52,6 @@ get_nctl_config_directory() {
         echo "${NCTL_CONFIG}"
     fi
 }
-
-check_license() {
-    local nctl_config_directory
-    nctl_config_directory=$(get_nctl_config_directory)
-
-    if [ -z "${nctl_config_directory}" ]; then
-        echo 'Unable to determine nctl config directory.'
-        echo 'Please set nctl config directory path as a value of NCTL_CONFIG environment variable.'
-        exit 1
-    fi
-
-    local license_file="${nctl_config_directory}/license_accepted"
-    if [ -f "${license_file}" ]; then
-        return 0
-    fi
-
-    echo "${LICENSE_ACCEPTANCE_TEXT}"
-    read answer
-    if [ "$answer" == 'y' ] || [ "$answer" == 'Y' ]; then
-        touch "${license_file}"
-        return 0
-    else
-        return 1
-    fi
-}
-
-if ! check_license; then
-    exit 1
-fi
 
 if [ ! -f ~/.bash_profile ]; then
     touch ~/.bash_profile

@@ -11,6 +11,7 @@
 [BR]\ts3-secret-key\t\t\t\t\tSecret key to s3 bucket.
 [BR]\ts3-access-key\t\t\t\t\tSecret key to s3 bucket.
 [BR]\tinstall-file\t\t\t\t\tPath to nauta installer file.
+[BR]\tclient-file\t\t\t\t\tPath to nauta client installer file.
 [BR]\tnetwork-settings\t\t[config.yml]\t\tFile name with network settings in provider directory.
 [BR]\tcompile-platform-on-cloud\t\t[false|true]\t\tIf true plagform packages will be create on bastion/gatway node.
 [BR][BR][YELLOW]Installation resources warning[NOCOLOR]

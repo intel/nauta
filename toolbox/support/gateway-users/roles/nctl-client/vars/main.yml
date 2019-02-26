@@ -1,0 +1,13 @@
+---
+
+pack_transition:
+  n1_standard_16:
+    -
+      old: "cpu: 38"
+      new: "cpu: 7"
+    -
+      old: "cpu: 76"
+      new: "cpu: 14"
+    -
+      old: "cpu: 20"
+      new: "cpu: 3"

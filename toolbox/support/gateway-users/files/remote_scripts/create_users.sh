@@ -25,7 +25,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo ${SCRIPTDIR}
 
-sudo rm -rf users
+# Uncomment if venv issues will occur
+# sudo rm -rf users
 mkdir -p users
 
 tar xfz nauta.tar.gz -C users

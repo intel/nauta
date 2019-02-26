@@ -35,7 +35,6 @@ from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
 from util.config import Config
 from util.cli_state import verify_cli_config_path
-from licensing.license_acceptance_manager import check_license_acceptance
 
 logger = initialize_logger(__name__)
 
@@ -125,11 +124,6 @@ if __name__ == '__main__':
     try:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         os.environ["PYTHONIOENCODING"] = DEFAULT_ENCODING
-
-        license_accepted = check_license_acceptance()
-        if not license_accepted:
-            sys.exit(1)
-
         entry_point()
     except (RuntimeError, UnicodeError) as exe:
         if type(exe) == RuntimeError and "was configured to use ASCII as encoding for the environment" not in str(exe):
