@@ -91,3 +91,12 @@
     dest: "{{ facts_dir }}/{{ item }}"
   with_items:
     - images.yaml
+  when: docker_repository_cache.enabled
+
+- name: Render facts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ facts_dir }}/{{ item }}"
+  with_items:
+    - images_no_cache.yaml
+  when: not docker_repository_cache.enabled

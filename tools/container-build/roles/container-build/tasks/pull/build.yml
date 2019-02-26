@@ -11,6 +11,20 @@
   failed_when: "'ansible_job_id' not in pull_async"
   async: 1800
   poll: 0
+  when: docker_repository_cache.enabled
+
+- name: Pull image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
+  docker_image:
+    name: "{{ image.image }}"
+    repository: "{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    pull: True
+    push: False
+    timeout: "{{ docker_timeout }}"
+  register: pull_async
+  failed_when: "'ansible_job_id' not in pull_async"
+  async: 1800
+  poll: 0
+  when: not docker_repository_cache.enabled
 
 - set_fact:
     docker_async_tasks: "{{ docker_async_tasks | combine({name: pull_async.ansible_job_id}) }}"

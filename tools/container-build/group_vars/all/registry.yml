@@ -1,7 +1,7 @@
 ---
 
 docker_repository_cache:
-  external: False
+  enabled: False
   schema: http
   # params below are ignored when 'external' flag is set to 'False'
   url: 127.0.0.1
@@ -10,4 +10,4 @@ docker_repository_cache:
 docker_repository_cache_registry: "{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
 docker_repository_cache_url: "{{ docker_repository_cache.schema }}://{{ docker_repository_cache.url }}:{{ docker_repository_cache.port }}"
 docker_version_prefix: nauta
-docker_timeout: 3600
+docker_timeout: 1200

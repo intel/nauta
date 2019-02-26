@@ -21,6 +21,28 @@
   failed_when: "'ansible_job_id' not in build_async"
   async: 9800
   poll: 0
+  when: docker_repository_cache.enabled
 
 - set_fact:
     docker_async_tasks: "{{ docker_async_tasks | combine({name: build_async.ansible_job_id}) }}"
+  when: docker_repository_cache.enabled
+
+- name: Build image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
+  docker_image:
+    name: "{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    pull: False
+    push: False
+    timeout: "{{ docker_timeout }}"
+    path: "{{ image.directory }}"
+    dockerfile: "{{ image.dockerfile | default(image.directory + '/Dockerfile') }}"
+    buildargs: "{{ proxy | combine(local_buildargs) }}"
+    force: True
+  register: build_async
+  failed_when: "'ansible_job_id' not in build_async"
+  async: 9800
+  poll: 0
+  when: not docker_repository_cache.enabled
+
+- set_fact:
+    docker_async_tasks: "{{ docker_async_tasks | combine({name: build_async.ansible_job_id}) }}"
+  when: not docker_repository_cache.enabled

@@ -1,18 +1,28 @@
 ---
 
-- name: Find base image in repo
+- name: Find base image in repo using registry cache
   environment: "{{ proxy }}"
   uri:
     url: "{{ docker_repository_cache_url }}/v2/{{ docker_version_prefix }}/{{ name }}/manifests/{{ docker_images_remote_tags[name] }}"
     status_code: 200,404
     validate_certs: False
   register: image_present
-  when: not docker_defined_images[name]
+  when: docker_repository_cache.enabled and not docker_defined_images[name]
+
+- name: Add image definition using registry cache
+  set_fact:
+    docker_images_remote_exists: "{{ docker_images_remote_exists | combine({ name: image_present.status == 200 }) }}"
+  when: docker_repository_cache.enabled and not docker_defined_images[name]
+
+- name: Find base image in repo
+  shell: "docker image inspect {{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }} >/dev/null 2>&1 && echo yes || echo no"
+  register: image_present
+  when: not docker_repository_cache.enabled and not docker_defined_images[name]
 
 - name: Add image definition
   set_fact:
-    docker_images_remote_exists: "{{ docker_images_remote_exists | combine({ name: image_present.status == 200 }) }}"
-  when: not docker_defined_images[name]
+    docker_images_remote_exists: "{{ docker_images_remote_exists | combine({ name: image_present.stdout == 'yes' }) }}"
+  when: not docker_repository_cache.enabled and not docker_defined_images[name]
 
 - name: Add image definition
   set_fact:

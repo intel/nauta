@@ -10,8 +10,6 @@
         state: absent
         timeout: "{{ docker_timeout }}"
   roles:
-    - role: cache-registry-init
-      when: not docker_repository_cache.external
     - role: prepare
     - role: container-build
     - role: finalize
