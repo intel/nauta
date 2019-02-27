@@ -22,4 +22,13 @@ mkdir -p /mnt/output/home/${EXP_NAME}
 
 mv -t /mnt/output/experiment !(input|output)
 
+mkdir -p /root/.jupyter/custom
+
+echo "document.title = \"${EXP_NAME}\";
+Object.defineProperty(document, 'title', {
+  set: function(val) {
+    document.querySelector('title').childNodes[0].nodeValue = \"${EXP_NAME}\";
+  }
+});" >> /root/.jupyter/custom/custom.js
+
 jupyter notebook --allow-root
