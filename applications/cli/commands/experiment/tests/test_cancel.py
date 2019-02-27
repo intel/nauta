@@ -168,7 +168,15 @@ def test_cancel_all_exp_cancelled(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False)
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    assert "Lack of experiments fulfilling given criteria. Name or match string parameters" in result.output
+    assert "However there are experiments that match given" in result.output
+
+
+def test_cancel_lack_of_exp(prepare_command_mocks: CancelMocks):
+    prepare_command_mocks.list_runs.return_value = []
+    result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False)
+
+    check_command_asserts(prepare_command_mocks, cne_count=0)
+    assert "Lack of experiments fulfilling given criteria. Name or match" in result.output
 
 
 def test_cancel_some_cancelled(prepare_command_mocks: CancelMocks):
@@ -268,7 +276,7 @@ def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, ["-m", EXPERIMENT_NAME])
 
     check_command_asserts(prepare_command_mocks, cne_count=0, gex_count=0)
-    assert f"Lack of experiments fulfilling given criteria. Name or match string parameters" in result.output
+    assert f"However there are experiments that match given" in result.output
 
 
 class CancelExperimentMocks:
