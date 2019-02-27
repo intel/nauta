@@ -162,6 +162,7 @@
               :pagesCount="experimentsTotalPagesCount"
               :nextPageAction="nextPage"
               :prevPageAction="previousPage"
+              :setPageAction="setPage"
               :paginationStats="paginationStats"
               :updateCountHandler="updateCountPerPage"
               :lastUpdateLabel="refresh.lastUpdateLabel"
@@ -364,6 +365,9 @@ export default {
     },
     nextPage () {
       this.pagination.currentPage++;
+    },
+    setPage (pageNumber) {
+      this.pagination.currentPage = pageNumber;
     },
     previousPage () {
       this.pagination.currentPage--;
