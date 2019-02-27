@@ -33,7 +33,7 @@ ifeq (Windows,$(OS))
 
 	git config --system core.longpaths true
 	# build nctl
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
+	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	mkdir dist/config/
 	cp -Rf draft/packs dist/config
