@@ -28,6 +28,7 @@ describe('VUE components FooterElements', () => {
       pagesCount: 1,
       nextPageAction: sinon.spy(),
       prevPageAction: sinon.spy(),
+      setPageAction: sinon.spy(),
       paginationStats: 'stats',
       lastUpdateLabel: 'moment ago'
     };
@@ -47,5 +48,34 @@ describe('VUE components FooterElements', () => {
   it('Should call updateCountHandler if select switched', function () {
     wrapper.vm.chosenCount = 10;
     expect(props.updateCountHandler.calledOnce).to.equal(true);
+  });
+
+  it('Should call setPageAction if onPageNoInputChange called', function () {
+    const e = {
+      target: {
+        value: 4
+      }
+    };
+    wrapper.vm.onPageNoInputChange(e);
+    expect(props.setPageAction.calledOnce).to.equal(true);
+    expect(props.setPageAction.calledWith(e.target.value)).to.equal(true);
+  });
+
+  it('Should call setPageAction properly if onPageNoInputChange called with negative number', function () {
+    const e = {
+      target: {
+        value: -4
+      }
+    };
+    const defaultPageNumber = 1;
+    wrapper.vm.onPageNoInputChange(e);
+    expect(props.setPageAction.calledOnce).to.equal(true);
+    expect(props.setPageAction.calledWith(defaultPageNumber)).to.equal(true);
+  });
+
+  it('Should set v-model value properly using computed variable', function () {
+    const newValue = 5;
+    expect(wrapper.vm.chosenPageNo).to.equal(props.currentPage);
+    wrapper.vm.chosenPageNo = newValue;
   });
 });

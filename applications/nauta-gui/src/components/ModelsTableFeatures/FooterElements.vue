@@ -35,6 +35,12 @@
       <v-btn flat v-on:click="prevPageAction()" :disabled="currentPage == 1">
         <v-icon>keyboard_arrow_left</v-icon>
       </v-btn>
+      <input
+        id="setPageInput"
+        type="number"
+        v-model="chosenPageNo"
+        v-on:blur="onPageNoInputChange"
+      />
       <v-btn flat v-on:click="nextPageAction()" :disabled="currentPage == pagesCount">
         <v-icon>keyboard_arrow_right</v-icon>
       </v-btn>
@@ -48,8 +54,8 @@ import ELEMENT_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'FooterElements',
-  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'paginationStats',
-    'lastUpdateLabel'],
+  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'setPageAction',
+    'paginationStats', 'lastUpdateLabel'],
   data: () => {
     return {
       labels: ELEMENT_LABELS,
@@ -57,9 +63,25 @@ export default {
       chosenCount: 5
     }
   },
+  computed: {
+    chosenPageNo: {
+      get: function () {
+        return this.currentPage;
+      },
+      set: function (val) {
+        return val;
+      }
+    }
+  },
   watch: {
     chosenCount: function (val) {
       this.updateCountHandler(val);
+    }
+  },
+  methods: {
+    onPageNoInputChange: function (e) {
+      const providedValue = e.target.value >= 1 ? e.target.value : 1;
+      this.setPageAction(providedValue);
     }
   }
 }
@@ -71,5 +93,16 @@ export default {
 }
 .datatable__actions__select {
   margin-top: 18px;
+}
+#setPageInput input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#setPageInput input[type="number"] {
+  -moz-appearance: textfield;
+}
+input {
+  text-align: center;
 }
 </style>

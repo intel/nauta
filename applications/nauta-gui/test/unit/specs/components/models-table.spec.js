@@ -203,6 +203,14 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.pagination.currentPage).to.equal(currentPage + 1);
   });
 
+  it('Should set currentPage if set specific page', function () {
+    const currentPage = 100;
+    const expectedPage = 11;
+    wrapper.vm.pagination.currentPage = currentPage;
+    wrapper.vm.setPage(expectedPage);
+    expect(wrapper.vm.pagination.currentPage).to.equal(expectedPage);
+  });
+
   it('Should set visible columns', function () {
     const visibleColumns = [1, 2, 3];
     const expectedVisibleColumns = [].concat(wrapper.vm.alwaysVisibleColumns, visibleColumns);
@@ -278,6 +286,13 @@ describe('VUE components ModelsTable', () => {
     const trainingDurationTime = 262861000;
     const expectedResult = '3 days, 1 hrs, 1 mins, 1 s';
     const result = wrapper.vm.parseValue('trainingDurationTime', trainingDurationTime);
+    expect(result).to.deep.equal(expectedResult);
+  });
+
+  it('Should return correct training time in queue for training', function () {
+    const trainingTimeInQueue = 0;
+    const expectedResult = '---';
+    const result = wrapper.vm.parseValue('trainingTimeInQueue', trainingTimeInQueue);
     expect(result).to.deep.equal(expectedResult);
   });
 
@@ -380,6 +395,22 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.visibleDetails.push(expName);
     const result = wrapper.vm.areDetailsVisible(expName);
     expect(result).to.equal(true);
+  });
+
+  it('Should set flags when order toggled', function () {
+    const idx = '2';
+    const toggledColumnName = 'name2';
+    const expectedSortingOrder = 'desc';
+    const expectedSortingIcon = 'arrow_downward';
+    wrapper.vm.activeColumnIdx = 999;
+    wrapper.vm.activeColumnName = 'name999';
+    wrapper.vm.sorting.order = 'asc';
+    wrapper.vm.sorting.currentSortIcon = 'arrow_upward';
+    wrapper.vm.toggleOrder(toggledColumnName, idx);
+    expect(wrapper.vm.activeColumnIdx).to.equal(idx);
+    expect(wrapper.vm.activeColumnName).to.equal(toggledColumnName);
+    expect(wrapper.vm.sorting.order).to.equal(expectedSortingOrder);
+    expect(wrapper.vm.sorting.currentSortIcon).to.equal(expectedSortingIcon);
   });
 
   it('Should add exp to visibility list if not visible', function (done) {
