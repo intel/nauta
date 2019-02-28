@@ -10,12 +10,8 @@
   loop_control:
     loop_var: kind
 
-- name: "{{ message_label }} Generate certs for apiservice"
-  include_tasks: cert.yml
-  vars:
-    name: "apiservice"
-    common_name: "{{ kubernetes_network.svc_list.apiservice.consul_name }}"
-    organization_name: "kubernetes"
+- name: "{{ message_label }} Set domains for apiservice cert"
+  set_fact:
     subject_alt_name:
       DNS.1: "{{ kubernetes_network.svc_list.apiservice.consul_name }}"
       DNS.2: "kubernetes"
@@ -26,6 +22,28 @@
       IP.1: "{{ kubernetes_network.svc_list.apiservice.ip }}"
       IP.2: "{{ nauta_configuration.external_interface.ipv4_address }}"
       IP.3: "{{ nauta_configuration.internal_interface.ipv4_address }}"
+
+- name: "{{ message_label }} Set effective domains for apiservice cert (1)"
+  set_fact:
+    effective_subject_alt_name: "{{ subject_alt_name | combine(dns_names_for_certificate) }}"
+  when: dns_names_for_certificate is defined
+
+- name: "{{ message_label }} Set effective domains for apiservice cert (2)"
+  set_fact:
+    effective_subject_alt_name: "{{ subject_alt_name }}"
+  when: dns_names_for_certificate is not defined
+
+- name: "{{ message_label }} Show domains for apiservice cert"
+  debug:
+    msg: "{{ effective_subject_alt_name }}"
+
+- name: "{{ message_label }} Generate certs for apiservice"
+  include_tasks: cert.yml
+  vars:
+    name: "apiservice"
+    common_name: "{{ kubernetes_network.svc_list.apiservice.consul_name }}"
+    organization_name: "kubernetes"
+    subject_alt_name: "{{ effective_subject_alt_name }}"
     key_usage:
       - digitalSignature
       - keyEncipherment
