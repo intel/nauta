@@ -90,6 +90,8 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow/py27"
+    args:
+      TENSORFLOW_VERSION: 1.12.0
   nauta/tensorflow/1.12.0py3/base:
     version: "1.12.0-py3"
     required:
@@ -97,6 +99,8 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow/py36"
+    args:
+      TENSORFLOW_VERSION: 1.12.0
   nauta/tensorflow:
     version: "1.12.0-py3"
     required:
@@ -104,6 +108,8 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow/py36"
+    args:
+      TENSORFLOW_VERSION: 1.12.0
   nauta/horovod/py3:
     version: "1.9.0-py3"
     required:

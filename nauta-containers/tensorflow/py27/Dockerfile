@@ -1,28 +1,15 @@
 ARG BASE_IMAGE
 ARG METRICS_IMAGE
+ARG TENSORFLOW_VERSION
+
+FROM tensorflow/serving:${TENSORFLOW_VERSION} as tensorflow_serving
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_VERSION=1.12.0
-
 COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
+COPY --from=tensorflow_serving /usr/bin/tensorflow_model_server /usr/bin/
 
-################ Temporary workaround due to upstream desync #########################
-
-
-#RUN echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | tee /etc/apt/sources.list.d/tensorflow-serving.list && \
-#    curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | apt-key add -
-
-#RUN apt-get update && apt-get install tensorflow-model-server=${TENSORFLOW_VERSION}
-
-RUN apt update -y
-RUN apt install -y wget
-RUN wget https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server-1.12.0/t/tensorflow-model-server/tensorflow-model-server_1.12.0_all.deb
-RUN dpkg -i tensorflow-model-server_1.12.0_all.deb || true
-RUN apt-get install -y -f
-
-######################################################################################
-
+ARG TENSORFLOW_VERSION
 
 RUN wget https://storage.googleapis.com/intel-optimized-tensorflow/tensorflow-${TENSORFLOW_VERSION}-cp27-cp27mu-linux_x86_64.whl -O /tensorflow-${TENSORFLOW_VERSION}-cp27-cp27mu-linux_x86_64.whl
 
