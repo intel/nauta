@@ -78,6 +78,8 @@ function set_defaults {
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
     if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="`pwd`/../../config.yml" ; fi
 
+    if [ "${GithubOrg}" = "" ] ; then GithubOrg="IntelAI" ; fi
+
     if [ "${CompilePlatformOnCloud}" = "" ] ; then CompilePlatformOnCloud="false" ; fi
 
     if [ "${InstallFile}" != "" ]; then
@@ -116,6 +118,7 @@ show_parameters() {
     echo -e "\t\tClientFile=${ClientFile}"
     echo -e "\t\tCompilePlatformOnCloud=${CompilePlatformOnCloud}"
     echo -e "\t\tCurrentBranch=${CurrentBranch}"
+    echo -e "\t\tGithubOrg=${GithubOrg}"
 
     echo -e ""
     echo -e "\t\tS3Url=${S3Url}"
@@ -342,8 +345,7 @@ function retrieve_repo {
       fi
       set -e
     else
-      #git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
-      git clone -b $BRANCH_NAME https://github.com/IntelAI/$PROJECT_NAME.git --recursive
+      git clone -b $BRANCH_NAME https://github.com/${GithubOrg}/$PROJECT_NAME.git --recursive
       cd $PROJECT_NAME
     fi
 }
@@ -407,6 +409,7 @@ LONG_OPTIONS+="network-settings:,"
 LONG_OPTIONS+="compile-platform-on-cloud:,"
 LONG_OPTIONS+="service-account-config-file:,"
 LONG_OPTIONS+="platform-config-file:,"
+LONG_OPTIONS+="github-org:,"
 LONG_OPTIONS+="help"
 
 SHORT_OPTIONS="c:"
@@ -429,6 +432,7 @@ while true; do
         --compile-platform-on-cloud) CompilePlatformOnCloud="$2"; shift 2 ;;
         --service-account-config-file) ServiceAccountConfigFile="$2"; shift 2 ;;
         --platform-config-file) PlatformConfigFile="$2"; shift 2 ;;
+        --github-org) GithubOrg="$2"; shift 2 ;;
         --) break;;
         *) echo "Internal error! |$1|$2|" ; exit 1 ;;
    esac
