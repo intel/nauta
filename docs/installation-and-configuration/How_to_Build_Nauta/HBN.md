@@ -27,9 +27,9 @@ For the build server, it is recommended to have at least 12 GB of RAM and at lea
 
 #### Proxy Settings Requirements 
 
-Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.`
+Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.` Also docker should be configured to download images from the internet. Check [docker docker manual](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy).
 
-If proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
+If any proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
 
 #### Internet Connection 
 
