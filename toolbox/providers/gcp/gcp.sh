@@ -323,6 +323,8 @@ function retrieve_repo {
     PROJECT_NAME=$1
     BRANCH_NAME=$2
 
+    print_log "INFO" "Trying to retrieve ${BRANCH_NAME} from ${PROJECT_NAME}. Github link: https://github.com/${GithubOrg}/$PROJECT_NAME.git"
+
     if [ -d "$PROJECT_NAME" ]; then
       cd $PROJECT_NAME
       git fetch --all
@@ -345,8 +347,17 @@ function retrieve_repo {
       fi
       set -e
     else
-      git clone -b $BRANCH_NAME https://github.com/${GithubOrg}/$PROJECT_NAME.git --recursive
+      set +e
+      git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+      ret_val=$?
       cd $PROJECT_NAME
+      set -e
+      if [ $ret_val -ne 0 ]; then
+        print_log "ERROR" "Error in clone repository. Probably SHA1 sum is filled as branch name. Trying to clone and reset."
+        git clone git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+        cd $PROJECT_NAME
+        git reset --hard $BRANCH_NAME
+      fi
     fi
 }
 
@@ -354,6 +365,8 @@ compile_platform() {
     print_log "DEBUG" "Compile platform"
 
     # till repo won't be public
+
+    rm -rf ${SCRIPTDIR}/../../../../cloud
 
     mkdir -p ${SCRIPTDIR}/../../../../cloud
     cd ${SCRIPTDIR}/../../../../cloud
