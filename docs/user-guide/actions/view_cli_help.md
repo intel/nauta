@@ -41,7 +41,7 @@ You can view help for any command and available subcommand(s). The following exa
 
 `nctl [command_name] [subcommand] --help`
 
-## Overview of the nctl commands
+## Overview of the nctl Commands
 
 * [nctl experiment](experiment.md)
 * [nctl launch](launch.md)

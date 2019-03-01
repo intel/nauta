@@ -24,7 +24,7 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT`| No | Name of predict session.|
-|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/saved_model). Model content will be copied into an image. |
+|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model _must be_ located on one of the input or output system shares (for example: `/mnt/input/saved_model`). Model content will be copied into an image. |
 |`-l, --local_model_location PATH`| Yes | Local path to saved model that will be used for inference. Model content will be copied into an image. |
 |`-d, --data TEXT`| Yes | Location of a folder with data that will be used to perform the batch inference. Value should point out the location from one of the system's shares.|
 |`-o, --output TEXT`| No | Location of a folder where outputs from inferences will be stored. Value should point out the location from one of the system's shares.|
@@ -36,9 +36,9 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 
 ### Returns
 
-Description of a problem, if any occurs. Otherwise information that the predict job was submitted. 
+A description of an issue, if any occurs. Otherwise, it returns information that the predict job was submitted. 
 
-**Note**: Refer to [Batch Inference Example](batch_inf_example.md) for a detailed example of this command.
+**Note:** Refer to [Batch Inference Example](batch_inf_example.md) for a detailed example of this command.
 
 ## cancel Subcommand
 
@@ -68,7 +68,7 @@ This command cancels prediction instance(s) chosen based on criteria given as a 
 
 ### Returns
 
-Description of a problem - if any occurs. Otherwise information that training job/jobs was/were cancelled sucessfully. 
+A description of an issue, if any occurs. Otherwise, it returns information that training job/jobs was/were cancelled sucessfully. 
 
 ## launch Subcommand
 
@@ -85,7 +85,7 @@ Starts a new prediction instance that can be used for performing prediction, cla
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT`| No | The name of this prediction instance.|
-|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/home/saved_model).|
+|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model _must be_ located on one of the input or output system shares (for example: `/mnt/input/home/saved_model`).|
 |`-l, --local_model_location`<br> `PATH`| No | Local path to saved model that will be used for inference. Model content will be copied into an image. 
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of directory in model's location. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
@@ -93,7 +93,7 @@ Starts a new prediction instance that can be used for performing prediction, cla
 
 ### Returns
 
-Prediction instance URL and authorization token, as well as information about the experiment  (name, model location, state).
+Prediction instance URL and authorization token, as well as information about the experiment (name, model location, state).
 
 ### Example
 
@@ -116,7 +116,7 @@ Prediction instance URL and authorization token, as well as information about th
 
 ### Synopsis
 
-Displays a list of inference instances with some basic information regarding each of them. Results are
+Displays a list of inference instances with some basic information regarding each of them. The results are
 sorted using a date of creation starting with the most recent, and filtered by optional criteria.
 
 ### Syntax
@@ -155,7 +155,7 @@ Perform stream inference task on launched prediction instance.
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT`| Yes | Name of prediction session.|
-|`-d, --data PATH`| Yes | Path to JSON data file that will be streamed to prediction instance. Data must be formatted such that it is compatible with the SignatureDef specified within the model deployed in the selected prediction instance.|
+|`-d, --data PATH`| Yes | Path to JSON data file that will be streamed to prediction instance. Data _must be_ formatted so that it is compatible with the _SignatureDef_ specified within the model deployed in the selected prediction instance.|
 |`-m, --method-verb [classify, regress, predict]`| No | Method verb that will be used when performing inference. Predict verb is used by default.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Show help message and exit. |

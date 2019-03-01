@@ -9,8 +9,6 @@ The following screen displays (this is an example only).
 
 ![](images/web_ui.png) 
 
-
-
 * **Name**: The left-most column lists the experiments by name.
 * **Status**: This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date**: This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
@@ -22,7 +20,7 @@ You can perform the tasks discussed below at the Nauta web UI.
 
 ## Expand Experiment Details
 
-Click on a _listed experiment name_ to see additional details for that experiment.  The following details are examples only. 
+Click _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
 
 This screen is divided into two frames. The left-side frame shows:
 
@@ -49,8 +47,7 @@ See the following figure, Details 2
 
 ## Searching on Experiments
 
-In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the 
-experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
+In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
 
 ## Adding/Deleting Columns
 
@@ -64,8 +61,16 @@ can select to show those metrics in this display as well.
 
 Column additions and deletions you make are retained between logins.
 
-Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png).
+Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information.
 
 ## Launching Kubernetes Dashboard
 
-Click the hamburger menu ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
+* Click the **Hamburger Menu** ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. 
+
+* Click **Resources Dashboard** to open the Kubernetes resources dashboard. 
+
+Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md) for more information.
+
+
+
+

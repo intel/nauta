@@ -15,13 +15,13 @@ Execute the following commands from the command line:
 
 ### Hardware Requirements
 
-Part of Nauta's build process involves the compilation of Tensorflow. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. To make sure SSE is available on a CPU, call `cat /proc/cpuinfo`. `sse sse2` should be listed in `flags` field.
+Part of Nauta's build process involves the compilation of Tensorflow*. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. To make sure SSE is available on a CPU, call `cat /proc/cpuinfo`. `sse sse2` should be listed in `flags` field.
 
 **Note:** For SSE information, refer to: https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions
 
 #### Hardware Configuration Requirements 
 
-For the build server, it is recommended to have at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of the final tar.gz file is ~5GB.
+For the build server, it is recommended to have at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of the final `tar.gz` file is ~5GB.
 
 ### Operating System Requirements
 
@@ -64,24 +64,29 @@ For more information, refer to the [Post-install Docker guide](https://docs.dock
 
 **Note:**  During the Nauta build process, TensorFlow* is checked by the Horovod* installer inside its Docker* container. 
 
+
+
 ## Build 
 
 From the main directory of Nauta repository invoke: 
 
 `make k8s-installer-build`
 
-**Note:** Logs from the build process are saved to a file and persists if build fails. By default it is `k8s_installer_build.log` in `tools/.workspace` directory. Log file path can be controller through `K8S_INSTALLER_BUILD_LOG_PATH` env variable.
+### Build Logs
 
-It is also a possibility to clean a temporary data if any error during build process occurs. Invoke:
+Logs from the build process are saved to a file and persists if build fails. By default, it is `k8s_installer_build.log` in `tools/.workspace` directory. The Log file path can be controlled through `K8S_INSTALLER_BUILD_LOG_PATH` environment variable.
+
+In addition, It is also possible to clean temporary data if any error during build process occurs by invoking: 
+
 `make k8s-installer-clean`
 
-**Note:** Command mentioned above is automatically invoked when build process finishes with success.
+**Note:** The command shown above is automatically invoked when build process finishes with success.
 
 ## Output of the Build
 
-A successful build produces a compressed tarball. The tarball's name appears as follows: `nauta-{version}-{build-id}.tar.gz` (for example: `nauta-1.0.0-190110100005.tar.gz`). It can be found in the `tools/.workspace` directory.  
+A successful build produces a compressed tarball. The tarball's name appears as follows: `nauta-{version}-{build-id}.tar.gz` (for example: `nauta-1.0.0-190110100005.tar.gz`), and it can be found in the `tools/.workspace` directory.  
 
-The tarball contains, among other things, docs, images, config files, and ansible playbooks. To complete the installation of Nauta, follow the rest of this installation guide with a prepared `tar.gz` artifact.
+The tarball contains, among other things, docs, images, config files, and ansible playbooks. See [ansible-playbook](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html) for more information. To complete the installation of Nauta, follow the rest of this installation guide with a prepared `tar.gz` artifact.
 
 **Note** This guide explains how to build the Nauta application, but to interact with an installed Nauta platform, the `nctl` client is also required. For more information on installing the client, refer to the chapter _Client Installation and Configuration_ in section _How to Build Nauta CLI_ in the [Nauta User Guide](../../user-guide/actions/nctl.md).
 

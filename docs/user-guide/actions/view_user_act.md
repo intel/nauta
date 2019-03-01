@@ -1,6 +1,6 @@
 # View All User Activity
 
-The command `nctl user list` displays all current users and all of their experiments (with status). The command shows the following information:
+The command `nctl user list` displays all current users and all of their experiments (with status). Furthermore, the command shows the following information:
 
   * **Name** (user name)
   * **Creation date** (the date this user account was created)
@@ -12,6 +12,8 @@ Administrators are not listed. Previously deleted users are not shown. Enter the
 
 `$ nctl user list`
 
-Following are example results (not all columns are shown).
+The following are example results (not all columns are shown).
 
 ![](images/user_list.png)
+
+

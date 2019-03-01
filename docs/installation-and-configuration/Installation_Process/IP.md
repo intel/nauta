@@ -2,7 +2,7 @@
 
 Before proceeding with this step, you _must_ create an _Inventory_ and _Configuration_ file. 
 
-* See:  [Inventory File Information](../Inventory_Tasks/IT.md) and [Configuration File Information](../Configuration_Tasks_Variables/CTV.md)
+* See the example  [Inventory File Information](../Inventory_Tasks/IT.md) and [Configuration File Information](../Configuration_Tasks_Variables/CTV.md). 
 
 ## Kernel Upgrade
 

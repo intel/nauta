@@ -7,11 +7,11 @@ To list all experiments you have submitted, run the next command.  The possible 
 
 **Syntax:** `nctl experiment list [options]`
 
-Here is an example:  
+An example experiment list is shown below.  
 
 `$ nctl experiment list`
 
-Following are _example results_ (not all columns are shown).
+The following are _example results_ (not all columns are shown).
 
 ![](images/experiment_list.png)
 
@@ -22,11 +22,11 @@ Use the following command to view a single experiment’s details:
 
 **Syntax:** `nctl experiment view [options] EXPERIMENT_NAME`
 
-Here is an example:  
+An example experiment view is shown below.  
 
 `$ nctl experiment view mnist-tb-2-1`
 
-Following are _example results_ (not all information is show).
+The following are _example results_ (not all information is show).
 
 ![](images/experiment_view.png)
 
@@ -34,3 +34,5 @@ Following are _example results_ (not all information is show).
 * [Viewing experiments logs](view_exp_logs.md)
 * [Viewing experiments in TensorBoard](view_exp_logs.md)
 * [Viewing experiments in Nauta Web UI](view_exp_webui.md)
+
+

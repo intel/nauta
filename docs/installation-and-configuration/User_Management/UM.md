@@ -30,7 +30,7 @@ The following is used to create a Nauta user, not an Administrator. Only the per
 
 2. This command also creates a configuration file named: '<username>.config' and places this file in the user's home directory. To verify that your new user has been created:
 
-   `$ nauta user list`
+   `$nctl user list`
 
 3. This lists all users, including the new user just added, but _does not_ show Administrators. An example is shown below. 
 
@@ -63,13 +63,18 @@ This command asks for confirmation.
 
 **Do you want to continue? [y/N]:** press y to confirm deletion.
 
-The command may take up to 30 seconds to delete the user and you may receive the message: User is still being deleted. Check the status of the user in a while. Recheck, as desired.
+The command may take up to 30 seconds to delete the user and you may receive the message: _User is still being deleted_. Check the status of the user in a while. Recheck, as desired.
 
 ## Purging
 
 To permanently remove (purge) all artifacts associated with the user and all data related to past experiments submitted by that user: 
 
 `$ nctl user delete <user_name> -p/--purge`
+
+This command asks for confirmation. 
+
+**Do you want to continue? [y/N]:** press y to confirm deletion.
+
       
 ### Limitations	
 

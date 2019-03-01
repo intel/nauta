@@ -65,17 +65,17 @@ Format of the command is as follows:
 |:--- |:--- |:--- |
 |`EXPERIMENT NAME` | Yes | Experiment name
 
-A user can pass one or more names of experiments separated with spaces. If experiment that should
-be displayed in Tensorboard belongs to a current user - user has to give only its name. If this experiment
-is owned by another user - name of an experiment should be preceded with a name of this second user
-in the following format : `username/experiment_name`
+A user can pass one or more names of experiments separated with spaces. If an experiment that should
+be displayed in TensorBoard belongs to a current user, a user has to give only its name. If this experiment
+is owned by another user, the name of an experiment should be preceded with a name of this second user
+in the following format: `username/experiment_name`
 
 ### Options
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
  |`--no-launch` | No | To create tunnel without launching web browser. |
- |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which tensorboard service client will be started. |
+ |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which the TensorBoard service client will be started. |
  |` -p, --port INTEGER RANGE` | No | Port on which service will be exposed locally. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
@@ -89,7 +89,12 @@ Link to an exposed application.
 
 `nctl launch tensorboard experiment75`
 
-An example might look like the following:
+An example might appear as:
 ```
 http://127.0.0.1/tensorboard/token=AB123CA27F
 ```
+
+
+
+
+

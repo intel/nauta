@@ -3,7 +3,7 @@
 This section provides brief examples for performing some of the most essential and valuable 
 tasks supported by Nauta. 
 
-**Note:** Several commands and training scripts in this section require access to the internet to download data, scripts, etc.
+**Note:** Several commands and training scripts in this section require access to the internet to download data, scripts, and so on.
 
 The section discusses the following topics:
 
@@ -22,15 +22,17 @@ The section discusses the following topics:
 
 Check that the required software packages are available in terminal by PATH and verified that correct version is used.
 
-**Note 1**: Docker* can contain kubectl* binary in a version that is not supported. Please verify that the PATH environment variable has the correct order of paths and that the kubectl from docker package is not used.<br>
+**Note 1**: Docker* can contain kubectl binary file in a version that _is not_ supported. Verify that the PATH environment variable has the correct order of paths and that the kubectl from the Docker package _is not_ used.
+
 **Note 2**: If you are behind a proxy, remember to set http_proxy, https_proxy and no_proxy environment variables.
 
-Enter the following command to verify your installation. 
+### Confirm Installation
+
+To verify your installation has completed, execute the following command: 
 
 `nctl verify`
 
-If any installation issues are found, the command returns information about their cause (which application should be installed and in which version). This command also checks if the CLI can connect to Nauta and if port forwarding to Nauta is working properly. 
- If no issues are found, a message indicates checks were successful. Following are example results of this command:
+If any installation issues are found, the command returns information about the cause: which application should be installed and in which version. This command also checks if the CLI can connect to Nauta; and, if port forwarding to Nauta is working correctly. If no issues are found, a message indicates checks were successful. The following examples are the results of this command:
  
 ![Image](images/verify_results.png)
 
@@ -38,12 +40,14 @@ If any installation issues are found, the command returns information about thei
 
 Each `nctl` command has at least two options:
 
-* `-v, --verbose` - Set verbosity level:
-  * `-v` for INFO - Basic logs on INFO/EXCEPTION/ERROR levels are displayed.
-  * `-vv` for DEBUG - Detailed logs on INFO/DEBUG/EXCEPTION/ERROR levels are displayed.
-* `-h, --help` - The application displays the usage and options available for a specific command or subcommand.
+1. `-v, --verbose` - Set verbosity level:
+    * `-v` for INFO - Basic logs on INFO/EXCEPTION/ERROR levels are displayed.
+    * `-vv` for DEBUG - Detailed logs on INFO/DEBUG/EXCEPTION/ERROR levels are displayed.
+2. `-h, --help` - The application displays the usage and options available for a specific command or subcommand.
  
-Access help for any command with the `--help` or `-h` parameter. The following command provides a list and brief description of all nctl commands. 
+### Accessing Help
+
+To access help for any command use the `--help` or `-h` parameters. The following command provides a list and brief description of all nctl commands. 
 
 `nctl --help`
 
@@ -59,13 +63,22 @@ The Nauta installation includes sample training scripts and utility scripts, con
 ### Examples Folder Content
 
 The examples folder in the nctl installation contains these following experiment scripts:
-* `mnist_single_node.py` - training of digit classifier in single node setting
-* `mnist_multinode.py` - training of digit classifier in distributed TensorFlow setting
-* `mnist_horovod.py` - training of digit classifier in Horovod
 
-There are also the following two utility scripts, `mnist_converter_pb.py` and  `mnist_checker.py`, which are related to inference process and model verification.
+* `mnist_single_node.py` - Training of digit classifier in single node setting
+* `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting
+* `mnist_horovod.py` - Training of digit classifier in Horovod
 
-**Note**: Experiment scripts must be written in Python.  
+### Utility Scripts
+
+There are two utility scripts, these are:
+
+`mnist_converter_pb.py` 
+
+`mnist_checker.py`
+
+Thease are used for inference process and model verification.
+
+**Note**: Experiment scripts _must be_ written in Python.  
 
 ### Launch Training Using the Scripts
 
@@ -81,86 +94,89 @@ training,
 * or `template` = `multinode-tf-training-horovod` and `SCRIPT_LOCATION` = `examples/mnist_horovod.py` for Horovod
 training.
 
-**Note**: All examples assumes macOS.
+**Note**: All the examples shown assumes that macOS is utilized.
 
 ### Submitting an Experiment
   
-**Note 1**: The included example scripts do not require an external data source. Scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements.
+The included example scripts do not require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. To change template-related requirements (if desired), refer to the template packs documentation.
 
-**Note 2**: Please refer to template packs documentation for more info about changing those requirements if you want to.
+**Note:** For experiment submit command information, refer to [experiment Command](experiment.md) for more details.
 
-**Note 3**: For more info about experiment submit command please refer to [experiment Command](experiment.md).
 
-This example will show how to submit a mnist experiment and write the TensorBoard data to a folder in your NAUTA output folder.
+The following example shows how to submit a MNIST experiment and write the TensorBoard data to a folder in your NAUTA output folder.
+
 Enter the following command to run this example:
 
 `$ nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
 
 **Syntax**:
-Following is the basic syntax for experiment submit command:
+
+The following is the basic syntax for experiment submit command:
 
 `nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
 
 **Where**:
-* `-t`,  TEXT: Name of a template that will be used by Nauta to create a description of a job to be submitted. By default, this is a single-node tensorflow training. The template is chosen. The list of available templates can be obtained by issuing the `nctl experiment template_list` command.
-* `SCRIPT_LOCATION`: The path and name of the Python script use to perform this experiment.
+* `-t`,  TEXT: Name of a template used by Nauta to create a description of a job to be submitted. By default, this is a single-node TensorFlow training. The template is chosen, and the list of available templates can be obtained by issuing the `nctl experiment template_list` command.
 
-**Note**: In order to run TensorBoard, TensorBoard data must be written to a folder in the directory `/mnt/output/experiment`. This example script takes care of this requirement, but your scripts will need to do this well.
+* `SCRIPT_LOCATION`: The path and name of the Python script used to perform this experiment.
+
+**Note**: To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts will need to meet the same requirements.
 
 #### Result of this Command
 
-The execution of the submit command may take a few minutes the first time. During this time, resources are allocated, the experiment package is created using parameters, scripts, and settings, a docker image is built then pushed to the Kubernetes cluster. When the experiment submission is complete, the following result is displayed:
+The execution of the _submit command_ may take a few minutes the first time. During this time, resources are allocated, the experiment package is created using parameters, scripts, and settings, a Docker image is built then pushed to the Kubernetes* cluster. When the experiment submission is complete, the following result is displayed:
 
  ![Image](images/single_exp_tensorboard.png) 
 
 #### Viewing Experiment Status
 
-Use the following command to view the status of all your experiments:
+To view the status of all your experiments, execute the following command:
 
 **Syntax**: `nctl experiment list [options]`
 
-Enter this commmand: 
+Execute this command: 
 
 `$ nctl experiment list --brief`
 
-Experiment status displays as below.  This is an example only. The `--brief` option returns a short version of results as shown.
+As shown below, an experiment's status displays. This is an example only. The `--brief` option returns a short version of results, as shown.
 
  ![Image](images/experiment_status.png) 
  
 ### Monitoring Training
- There are three ways to monitor training in Nauta, all which are discussed in the following sections. 
+
+There are three ways to monitor training in Nauta, all which are discussed in the following sections. 
  
 * Viewing Experiment Logs
 * Adding Experiment Metrics
 * Viewing Experiment Results from the Web UI
-* Launching Tensorboard
+* Launching TensorBoard
 
 
 ### Viewing Experiment Logs 
 
-Use the following command to view the experiment log.
+To view the experiment log, execute the following command:
 
 **Syntax**: `nctl experiment logs [options] EXPERIMENT_NAME`
 
-Enter this command:
+Execute this command:
 
 `$ nctl experiment logs mnist-tb`
 
-A log displays as follows. The result below is an example only.
+As shown below, a log displays the example results.
 
  ![Image](images/experiment_log.png)  
 
 ## Adding Experiment Metrics (Optional)
 
-Experiments launched in Nauta can output additional kinds of metrics using the publish function from the experiment metrics API. To see an example of metrics published with the single experiment executed in the above example, enter this command:
+Experiments launched in Nauta can output additional kinds of metrics using the _publish function_ from the experiment metrics API. To see an example of metrics published with the single experiment executed in the above example, execute the following command:
 
 `$ nctl experiment list`
 
-Following are example results (only a fragment is shown):
+As shown in the example, only a fragment result is shown. 
 
 ![Image](images/adding_metrics.png) 
 
-To add metrics to an experiment file you have created, you need to edit the experiment file to use the `experiment_metrics.api` and then publish the accuracy in your experiment file. Perform the following steps: 
+To add metrics to an experiment file you have created, you need to edit the experiment file to use the `experiment_metrics.api` and then publish the accuracy in your experiment file. Execute the following steps: 
 
 1. Add the metrics library API with the following entry in your experiment file:
    `from experiment_metrics.api import publish`
@@ -179,15 +195,14 @@ To add metrics to an experiment file you have created, you need to edit the expe
 
     `$ nctl experiment list`
 
-**Information about saving metrics for multinode experiments**
+**Saving Metrics for Multinode Experiments**
 
 Storing at the same time two (or more) metrics with the same key from two different nodes may lead to errors (such as loosing some logs) due to conflicting names. To avoid this, adding metrics for multinode experiments should be done using one of the two following methods:
 
 **Method 1**:  The key of a certain metric should also contain a node identificator from which this metric comes. Creation of such identificator can be done in the following ways:
-    * For horovod multinode training jobs, result of the `rank()` function provided by the `horovod` package can be used
+    * For Horovod multinode training jobs, the result of the `rank()` function provided by the `horovod` package can be used
     as a node's identificator.  
-    * For `tfjob` multinode training jobs, a user can take all necessary info from the TF_CONFIG environment variable. Here is
-an example piece of a code creating such identificator:
+    * For `tfjob` multinode training jobs, a user can take all necessary info from the TF_CONFIG environment variable. An example piece of a code creating such identificator, is:
 
     ```
     tf_config = os.environ.get('TF_CONFIG')
@@ -204,9 +219,7 @@ an example piece of a code creating such identificator:
 **Method 2**: Only one node should store metrics. Deciding which node should store metrics can be done in the following ways:  
    * For `horovod` multinode training jobs, the horovod python library provides the `rank()` function that returns a number
 of a current worker. _Master_ is marked with the number 0, so only a pod with this number should store logs.
-   * For `tfjob` multinode training jobs, because there is no dedicated master node, a user should choose which worker should
-be responsible for storing metrics. The identificator of a current worker can be obtained as described in method 1 above. A user
-should choose one of such identificators and store logs only from a node having this chosen id. 
+   * For `tfjob` multinode training jobs, because there is no dedicated master node, a user should choose which worker should be responsible for storing metrics. The identificator of a current worker can be obtained as described in method 1 above. A user should choose one of such identificators and store logs only from a node having this chosen ID. 
    
 ## Viewing Experiment Results from the Web UI
 
@@ -214,9 +227,9 @@ The web UI lets you explore the experiments you have submitted. To view your exp
 
 `$ nctl launch webui`
 
-**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling.  After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
+**Note**: If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
 
-The following screen displays (this is an example only).
+An example is shown in the screen below.
 
 ![](images/web_ui.png) 
 
@@ -226,13 +239,13 @@ The following screen displays (this is an example only).
 * **Submission Date**: This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Duration**: This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
-* **Type**: Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (inference) with this model.
+* **Type**: Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (Inference) with this model.
 
 You can perform the tasks discussed below at the web UI.
 
 ### Expand Experiment Details
 
-Click on a _listed experiment name_ to see additional details for that experiment.  The following details are examples only. 
+Click _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
 
 This screen is divided into two frames. The left-side frame shows:
 
@@ -258,8 +271,7 @@ See the following figure:
 
 ### Searching on Experiments
 
-In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the 
-experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
+In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
 
 ### Adding/Deleting Columns
 
@@ -277,22 +289,23 @@ Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png).
 
 ## Launching Kubernetes Dashboard
 
-Click the hamburger menu ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
+Click the **hamburger menu** ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
 
 ## Launching TensorBoard
 
-Generally, every file that the training script outputs to `/mnt/output/experiment` (accessed from the perspective of training script launched in Nauta) is accessible from the outside after mounting the output directory with command provided by `nctl mount`. 
+Generally, every file that the training script outputs to `/mnt/output/experiment` (accessed from the perspective of training script launched in Nauta) is accessible from the outside after mounting the output directory with command provided by `nctl mount`.  
+
 Use the following command to launch TensorBoard and to view graphs of this model's results. (Refer to [Working with Datasets](working_with_datasets.md) for more information.) 
 
-When training scripts output Tensorflow summaries to `/mnt/output/experiment`, they can be automatically picked up by Tensorboard instance launched with command:
+When training scripts output Tensorflow summaries to `/mnt/output/experiment`, they can be automatically picked up by TensorBoard instance launched with command:
 
 **Syntax**: nctl launch tensorboard [options] EXPERIMENT_NAME
 
-Enter this command:
+Execute this command:
 
 `$ nctl launch tensorboard single`
 
-**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling.  After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
+**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl.
 
 The following message displays.
 
@@ -310,7 +323,8 @@ To perform inference testing (using predict batch command in this example) you n
 2.	Acquire a trained model.
 3.	Run a prediction instance with trained model on this data.
 
-### Data preparation
+### Data Preparation
+
 The example `mnist_converter_pb.py` script located in the `examples` folder can be used for data preparation. This script prepares the sample of MNIST test set and converts it to `protobuf` requests acceptable by the served model. This script is run locally and requires `tensorflow`, `numpy`, and `tensorflow_serving` modules. The `mnist_converter_pb.py` script takes two input parameters:
 
 * `--work_dir` which defaults to `/tmp/mnist_test`. It is a path to directory used as `workdir` by this script and `mnist_checker.py`. Downloaded MNIST dataset will be stored there as well as converted test set sample and labels cached for them.
@@ -345,11 +359,12 @@ saved_model.pb  variables
 variables.data-00000-of-00001  variables.index
 ```
 ### Running Prediction Instance
+
 The following provides a brief example of running inference using the batch command. For more information, refer to [Evaluating Experiments with Inference Testing](inference_testing.md)
 
 Before running the `batch` command, you need to copy `protobuf` requests to input storage, because  they need to be accessed by the prediction instance too. 
 
-Enter these commands:
+Execute these commands:
 ```
 $ mkdir /mnt/input/data
 $ cp /tmp/mnist_test/conversion_out/* /mnt/input/data
@@ -358,37 +373,36 @@ Enter the next command to create a prediction instance.
 
 `$ nctl predict batch -m /mnt/input/home/single -d /mnt/input/home/data --model-name mnist --name single-predict`
 
-Following are the example results of this command: 
+The following are the example results of this command: 
 
 ![Image](images/predict_instance.png)
 
-**Note 1**: Notice the additional home directory in path to both model and input data. This is how the path looks from the perspective of the prediction instance.<br>
-**Note 2**: `mnist_converter_pb.py` creates requests to the mnist model. Note that `--model-name mnist` is where this mnist name is given to the prediction instance.<br>
-**Note 3**: For more info about predict command, please refer to [predict Command](predict.md).
+Notice the additional home directory in path to both model and input data. This is how the path looks from the perspective of the prediction instance. The `mnist_converter_pb.py` creates requests to the MNIST model. `--model-name mnist` is where this MNIST name is given to the prediction instance.
 
-After the prediction instance completes (can be checked using the `predict list` command), you can collect instance responses from output storage. In our example, it would contain 100 `protobuf` responses. These can be validated in our case using `mnist_checker.py`. 
+**Note:** Refer to [predict Command](predict.md) for _predict_ command information.
 
-Running the following command locally will display the error rate calculated for this model and this sample of the test set:<br>
+After the prediction instance completes (can be checked using the `predict list` command), you can collect instance responses from output storage. In the example, it contains 100 `protobuf` responses. These can be validated in our case using `mnist_checker.py`. 
+
+Running the following command locally will display the error rate calculated for this model and this sample of the test set:
 
 `$ python examples/mnist_checker.py --input_dir /mnt/output/single-predict`
-
  
 ## Viewing Experiment Output Folder
 
-You can use the following steps to mount the output folder and view TensorBoard data files. Mount a folder to your NAUTA namespace output directory:
+You can use the following steps to mount the output folder and view TensorBoard data files. Mount a folder to your Nauta namespace output directory:
 
-1.	macOS/Ubuntu: First, mount your `NAUTA` output directory to a local folder. Create a folder for mounting named `my_output_folder`. 
+1.	MacOS/Ubuntu: Mount your `NAUTA` output directory to a local folder. Create a folder for mounting named `my_output_folder`. 
 
       `$ mkdir my_output_folder`
 
-2.	To see the correct mount options and command:
+2.	To see the correct mount options and command, execute:
 
        `$ nctl mount`
 
-3.	Use the mounting command that was displayed to mount Nauta storage to your local machine. Following are examples of mounting the local folder to the Nauta output folder for each OS:
+3.	Use the mounting command that was displayed to mount Nauta storage to your local machine. The following are examples of mounting the local folder to the Nauta output folder for each OS:
        * MacOS: `mount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/output my_output_folder`
        * Ubuntu: `sudo mount.cifs -o username=USERNAME,password=PASSWORD,rw,uid=1000 \ //CLUSTER-URL/output my_output_folder`
-       * Windows:  Use Y: drive as mount point. `net case Y: \\CLUSTER-URL\output /user:USERNAME PASSWORD`
+       * Windows: Use Y: drive as mount point. `net case Y: \\CLUSTER-URL\output /user:USERNAME PASSWORD`
 
 4.	Navigate to the mounted location. 
        * MacOS/Ubuntu only: Navigate to my_output_folder
@@ -406,7 +420,12 @@ To unmount previously mounted Nauta input storage from a local folder/machine re
 For more information on mounting, refer to [Working with Datasets](working_with_datasets.md).
 
 ## Removing Experiments
-An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel` command and its `--purge` option. If `--purge` option is not set in `cancel` command, the experiment will only change status to CANCELLED. If `--purge` option is set in `cancel` command, experiment objects and logs will be irreversibly removed (The experiment’s artifacts will remain in the Nauta storage output folder).
+
+An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel` command and its `--purge` option. 
+
+* If `--purge` option _is not_ set in `cancel` command, the experiment will only change status to CANCELLED. 
+
+* If `--purge` option is set in `cancel` command, experiment objects and logs will be irreversibly removed (the experiment’s artifacts will remain in the Nauta storage output folder).
 
 **Syntax**: `nctl experiment cancel [options] EXPERIMENT_NAME`
 

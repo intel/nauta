@@ -6,7 +6,7 @@ Your Nauta cluster will contain one Master node and one or more Worker nodes. Ea
 
 ## Invetory File Example
 
-Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. 
+Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. However, you can copy and modify the information to create your own Ansible inventory file. 
 
 **Note:** Ansible uses the YAML* format.
 
@@ -31,12 +31,12 @@ Each row describes a server (playing either the role of _Master_ or _Worker_ dep
 
 `[SERVER_NAME] [VAR_NAME1]=[VAR_VALUE1] [VAR_NAME2]=[VAR_VALUE2] [VAR_NAME3]=[VAR_VALUE3]...`
 
-**NOTE**: `SERVER_NAME` must conform to standard host naming rules - each element of the hostname must be from 1 to
-63 characters long and the entire hostname, including the dots, can be at most 253 characters long. Valid characters
-for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and the hyphen. A hostname may not start with
-a hyphen.
+**Note**: `SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire hostname, including the dots must not exceed 253 characters long. 
+
+Valid characters for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and a hyphen. Furthermore, _do not_  start a hostname with a hyphen.
 
 ## Per-node Inventory Variables
+
 The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory, some are only required for some, and some variables are entirely optional.
 
 Variable Name | Description | Req? | Type | Default | Used When | Value |

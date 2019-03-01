@@ -1,18 +1,18 @@
 # Configuration Tasks
 
-Nauta's configuration is specified by a YAML* configuration file. Nauta will look for this file at the location defined the `ENV_CONFIG` environment variable (explained in [Installation Process](../Installation_Process/IP.md)). This configuration file specifies network proxies, DNS server locations, and other Nauta related parameters listed below.
+Nauta's configuration is specified by a _YAML* Configuration file_. Nauta will look for this file at the location defined in the `ENV_CONFIG` environment variable (explained in [Installation Process](../Installation_Process/IP.md) and an example configuration file is also shown in [Configuration File Information](../Configuration_Tasks_Variables/CTV.md)). This configuration file specifies network proxies, DNS server locations, and other Nauta related parameters listed below.
 
 **Note 1:** In the examples shown, Green indicates a parameter name, and Blue indicates an example parameter value. Some configuration variables are of type _dictionary_ , and for these: `{}` indicates an empty dictionary. Likewise, some variables are of type _list_, and for these: `[]` indicates an empty list.
 
-**Note 2:** All parameters present in the config file must have values. For example: `proxy:`. Setting the config file with no value causes errors.
+**Note 2:** All parameters present in the configuration file _must_ have values. For example: `proxy:`. Setting the configuration file with no value causes errors.
 
 ## Example Configuration File 
 
 **Note:** This is an _example_ file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section after the YAML file example below.
 
-1. In the YAML file, the _list of items_ is a sequence of elements starting in new line with a dash at the beginning. For example, an empty list: []. In an abbreviated form, elements can also be enclosed in one line.
+1. In the YAML file, the _list of items_ is a sequence of elements starting on a new line with a dash at the beginning. For example, an empty list: []. In an abbreviated form, elements can also be enclosed on a single line.
 
-1.  In the YAML file, a dictionary is a sequence of pairs for the element's _key: value_. It can also be presented with each pair in new line or abbreviated in one line. 
+1.  In the YAML file, a dictionary is a sequence of pairs for the element's _key: value_. It can also be presented with each pair on a new line or abbreviated on a single line. 
 
 ### YAML File Example
 
@@ -39,7 +39,7 @@ domain: nauta
 # Internal subdomain for infrastructure
 nodes_domain: lab007
 
-# This is the Internal subdomain for Kubernetes resources.
+# This is the Internal subdomain for Kubernetes* resources.
 k8s_domain: kubernetes
 
 # This is the Network Range for Kubernetes pods.
@@ -53,15 +53,19 @@ kubernetes_svc_subnet: 10.4.0.0/16
 
 For empty dictionaries, there are 2 defaults:
 
-1. A parameter _is not_ included in config file. In this case, the default value will be utilized. 
+1. If a parameter _is not_ included in configuration file, the default value will be utilized. 
 
-2. A parameter is present in config file with a defualt value included, as shown below. 
+2. If a parameter is present in configuration file with a defualt value included, it appears as shown below. 
 
 * `proxy: {}` 
 
 ### Deciding to Leave the Proxy Parameter Empty
 
-Should you decide to leave the proxy parameter with empty dictionary, for example when you _do not_ need a proxy because you _do not_ have one in your network, or when you intentionally _do not_ want to use a proxy to connect your cluster as an external network, then you keep it isolated from the Internet.
+There may be reasons to leave the proxy parameter set with an empty dictionary and should you decide to do this, it may be for the folowing reasons: 
+
+* When you _do not_ need a proxy because you _do not_ have one in your network.
+
+* You intentionally _do not_ want to use a proxy to connect your cluster as an external network to keep it isolated from the Internet.
 
 ## Configuration Variable Details
 
@@ -100,7 +104,7 @@ dns_search_domains:
   ```
 
 ### domain
-- **Description:** This is the _Internal_ domain name. Note that this variable and 'nodes_domain' (defined below) together form the "full domain" (`<nodes_domain>.<domain>`) for Nauta's internal domain. For example, if `domain` is "nauta" and `sub_domain` is "infra", the full domain is `infra.nauta`.
+- **Description:** This is the _Internal_ domain name. This variable and _nodes_domain_ (defined below) together form the _full domain_ (`<nodes_domain>.<domain>`) for Nauta's internal domain. For example, if `domain` is _nauta_ and `sub_domain` is _infra_, the full domain is `infra.nauta`.
 - **Default value:** nauta
 
 ```yaml
@@ -142,7 +146,7 @@ kubernetes_svc_subnet: 10.4.0.0/16
 ```
 
 ### apiserver_audit_log_maxage
-- **Description:** Max age in days for kubernetes apiserver audit logs
+- **Description:** Max age in days for Kubernetes apiserver audit logs.
 - **Default value:** 7
 
 ```yaml
@@ -150,7 +154,7 @@ apiserver_audit_log_maxage: 7
 ```
 
 ### apiserver_audit_log_maxbackup
-- **Description:** Max number of log files kept for kubernetes apiserver audit
+- **Description:** Max number of log files kept for Kubernetes apiserver audit.
 - **Default value:** 10
 
 ```yaml
@@ -158,7 +162,7 @@ apiserver_audit_log_maxbackup: 10
 ```
 
 ### apiserver_audit_log_maxsize
-- **Description:** Max audit log file size in MB
+- **Description:** Max audit log file size in MB.
 - **Default value:** 1024
 
 ```yaml
@@ -166,7 +170,7 @@ apiserver_audit_log_maxsize: 1024
 ```
 
 ### insecure_registries 
-- **Description:**  This is a list of insecure Docker registries added to configuration.
+- **Description:**  This is a list of insecure Docker* registries added to configuration.
 - **Default value:** []
 
 ```yaml
@@ -228,7 +232,7 @@ use_system_enabled_repos: True
 ```
 
 ### input_nfs
-- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used.
+- **Description:** Definition of input NFS mounts for Samba*. By default, internal NFS provisioner is used.
 - **Default value:** {}
 - **Fields**
     - **path:** NFS path to mount
@@ -253,8 +257,11 @@ nauta_configuration:
     server: "{{ nfs_server }}"
 ```
 
-### Docker log driver settings
-- **Description:** Docker log driver settings for controlling rotation of containers' logs on bare metal environments. In case of cloud deployments, like Google Cloud Platform, instead of changing this parameter, refer to your cloud provider instructions for log rotation configuration. For more infomation about Docker log driver settings, please see: https://docs.docker.com/config/containers/logging/json-file/
+### Docker Log Driver Settings
+- **Description:** This is the Docker log driver settings for controlling rotation of a containers' logs on bare metal environments. In case of cloud deployments, such as Google Cloud Platform, instead of changing this parameter, refer to your cloud provider instructions for log rotation configuration. 
+
+See: https://docs.docker.com/config/containers/logging/json-file/ for Docker log driver settings information. 
+
 - **Default value:**
 ```yaml
 docker_log_driver_settings:
@@ -273,7 +280,7 @@ The Network File System* (NFS*) allows a system to share directories and files w
 
 Either NFS or Redsocks* is installed and configured during the installation process. By default, Redsocks _is not_ installed; however, NFS is installed by default. 
 
-### Example NFS File
+### Example NFS Configuration Settings 
 
 ```yaml
 features:
@@ -291,11 +298,11 @@ Redsocks is the tool that allows you to redirect network traffic through a Socke
 
 ## Redsocks Configuration 
 
-Redsocks configuration is an optional part of the installer; however, if you choose this option configure Redsocks if you decide it is needed in your environment/organizationn.
+Redsocks configuration is an optional part of the installer; however, if you choose this option then, configure Redsocks appropriately in your environment/organization.
 
 Redsocks _is not_ enabled during the installation, as the default is set to _False_ (shown in the example below). Therefore, if you want to install Redsocks you _must_ set the feature switch to **True**. 
 
-**Caution:** After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It _cannot_ be changed to False in your config file after the initial install. Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
+**WARNING:** After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It _**cannot**_ be changed to False in your configuration file after the initial install. Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
 
 
 ### How to Enable Features

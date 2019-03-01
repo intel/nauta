@@ -1,13 +1,12 @@
 # Product Overview
 
 Nauta software provides a multi-user, distributed computing environment for running deep learning model training experiments.
- Results of experiments, can be viewed and monitored using a command line interface, web UI and/or TensorBoard. You can
- use existing data sets, use your own data, or downloaded data from online sources, and create public or private folders
- to make collaboration amongst teams easier. Nauta runs using the industry leading Kubernetes and Docker platform
- for scalability and ease of management. Templates are available (and customizable) on the platform to take the
- complexities out of creating and running single and multi-node deep learning training experiments without all the systems
- overhead and scripting needed with standard container environments. To test your model, Nauta also supports both batch
- and streaming inference, all in a single platform.
+Results of experiments, can be viewed and monitored using a command line interface, web UI and/or TensorBoard. 
+
+You can use existing data sets, use your own data, or downloaded data from online sources, and create public or private folders to make collaboration amongst teams easier. Nauta runs using the industry leading Kubernetes and Docker platform
+for scalability and ease of management. 
+
+Templates are available (and customizable) on the platform to take the complexities out of creating and running single and multi-node deep learning training experiments without all the systems overhead and scripting needed with standard container environments. To test your model, Nauta also supports both batch and streaming inference, all in a single platform.
 
 The Nauta client software runs on the following operating systems:
 
@@ -18,7 +17,7 @@ The Nauta client software runs on the following operating systems:
 
 # Nauta User Guide
 
-This guide describes how to use Nauta, and discusses the following topics:
+This guide describes how to use Nauta, and the following topics:
 
 * [Basic Concepts](actions/concepts.md)
 * [Client Installation and Configuration](actions/install_configure.md)
@@ -40,15 +39,18 @@ This guide describes how to use Nauta, and discusses the following topics:
     * [verify](actions/verify.md) - verifies installation of _dlsctl_ application
     * [version](actions/version.md) - displays version of _dlsctl_ application
 
-## Advanced section
+## Advanced Sections
 
-* [Installing additional dependency](advanced/customlibs.md)
-* [Controlling packs parameters](advanced/packs.md)
+* [Installing Additional Libraries and Dependencies](advanced/customlibs.md)
+* [Controlling Packs Parameters](advanced/packs.md)
 
 # Terms and Conditions
+
+This document is subject to [CC-BY-ND 4.0.](https://creativecommons.org/licenses/by-nd/4.0/) 
 
 Copyright © 2019 Intel Corporation. All rights reserved.
 
 Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and other countries.
 
-\* Other names and brands may be claimed as the property of others.
+'*'    Other names and brands may be claimed as the property of others.
+This document contains information on products and/or processes in development.
