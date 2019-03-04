@@ -141,7 +141,8 @@ local_images:
     directory: "{{ playbook_dir }}/../../nauta-containers/tf-operator"
   nauta/docker:
     version: "18.03"
-    required: {}
+    required:
+      DOCKER_CE_RPM_IMAGE: "shared/build/rpm/docker-ce"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/docker"
   nauta/ps-sidecar:
