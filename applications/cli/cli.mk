@@ -30,7 +30,7 @@ build: $(ACTIVATE) set-version metrics-lib
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pyinstaller --paths "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
+	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
 
 	mkdir dist/config
 
