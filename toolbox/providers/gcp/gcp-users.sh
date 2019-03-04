@@ -49,6 +49,7 @@ function validate_arguments {
     check_file_presence "${K8sOutputFile}"
     check_file_presence "${GcpConfig}"
     check_file_presence "${GatewayUsers}"
+    check_file_presence "${NetworkSettings}"
 }
 
 function set_defaults {
@@ -58,7 +59,7 @@ function set_defaults {
     if [ "${ExternalKey}" = "" ] ; then ExternalKey="~/.ssh/id_rsa" ; fi
     if [ "${GcpConfig}" = "" ] ; then GcpConfig="`pwd`/gcp-config.yml" ; fi
     if [ "${K8sOutputFile}" = "" ] ; then K8sOutputFile="`pwd`/${K8sCluster}.info" ; fi
-    if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="config.yml" ; fi
+    if [ "${NetworkSettings}" = "" ] ; then NetworkSettings="`pwd`/../../config.yml" ; fi
 
     if [ "${GatewayUsers}" = "" ] ; then GatewayUsers="`pwd`/../../support/gateway-users/gateway-users.yml" ; fi
 
@@ -88,7 +89,7 @@ set_connectivity_params() {
     print_log "DEBUG" "Set connectivity parameters to access gateway node"
     GATEWAY_IP=`cat ${K8sOutputFile} | grep "gateway_ip" | awk -F '"' '{print $2}'`
     GATEWAY_USER=`cat "${GcpConfig}" | grep "external_username" | awk -F '"' '{print $2}'`
-    PROXY_TO_GATEWAY=`cat "${SCRIPTDIR}/../../${NetworkSettings}" | grep "ssh_args_for_cmd_line" | awk -F '"' '{print $2}'`
+    PROXY_TO_GATEWAY=`cat "${NetworkSettings}" | grep "ssh_args_for_cmd_line" | awk -F '"' '{print $2}'`
 }
 
 show_connectivity_parameters() {

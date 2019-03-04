@@ -123,6 +123,8 @@ Options:
 - `client-file` Path to nauta client installer file.
 - `network-settings` `config.yml` - File name with network settings in provider directory.
 - `compile-platform-on-cloud` [`false|true]` - If true plagform packages will be create on bastion/gatway node.
+- `service-account-config-file` `[gcp-service-account.json]` Path to GCP service account config file.
+- `platform-config-file` Path to platform config file
 
 ### Use cases
 - #### Destroy cluster

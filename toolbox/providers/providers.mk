@@ -16,7 +16,7 @@ $(BIN):
 	@mkdir -p $(BIN)
 	@touch $(BIN)
 
-TERRAFORM_DOWNLOAD_URL := https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
+TERRAFORM_DOWNLOAD_URL := https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
 
 ifeq (Darwin,$(OS))
 	TERRAFORM_DOWNLOAD_URL := https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_darwin_amd64.zip

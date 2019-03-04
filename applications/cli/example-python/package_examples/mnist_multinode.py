@@ -1,4 +1,4 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2019 The TensorFlow Authors, Intel Corporation. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,9 +22,6 @@ import time
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-from experiment_metrics.api import publish
-
-
 # Output produced by the experiment (summaries, checkpoints etc.) has to be placed in this folder.
 EXPERIMENT_OUTPUT_PATH = "/mnt/output/experiment"
 
@@ -38,10 +35,10 @@ SCORES_NAME = "scores"
 # Set of constant names related to served model.
 # Look into example mnist conversion and checker scripts to see how these constants are used in TF Serving request
 # creation.
-# MODEL_NAME = "mnist" - Model name is not specified at this stage. It is given in "predict" commands as an argument.
 MODEL_SIGNATURE_NAME = "predict_images"
 MODEL_INPUT_NAME = "images"
 MODEL_OUTPUT_NAME = "scores"
+MODEL_VERSION = 1
 
 
 def parse_tf_config():
@@ -124,19 +121,18 @@ def main(_):
 
         loss = tf.losses.softmax_cross_entropy(tf.one_hot(labels_placeholder, 10), logits)
         global_step = tf.train.get_or_create_global_step()
-        train = tf.train.AdamOptimizer().minimize(loss, global_step=global_step)
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, labels_placeholder), tf.float32))
 
         tf.summary.scalar("loss", loss)
         tf.summary.scalar("accuracy", accuracy)
-        summary_op = tf.summary.merge_all()
+        tf.summary.merge_all()
 
         # As mentioned above summaries will be saved to EXPERIMENT_OUTPUT_PATH so that they can be automatically
         # discovered by tensorboard.
-        summary_writer = tf.summary.FileWriter(os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"))
+        summary_dir = os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard")
 
         # These ops will be later needed to save servable model.
-        init_op = tf.initialize_all_variables()
+        tf.global_variables_initializer()
         saver = tf.train.Saver()
 
     # Export meta graph to restore it later when saving.
@@ -144,61 +140,40 @@ def main(_):
 
     is_chief = task_index == 0
 
-    # Create a "supervisor", which oversees the training process.
-    sv = tf.train.Supervisor(is_chief=(task_index == 0),
-                             logdir=EXPERIMENT_OUTPUT_PATH,
-                             init_op=init_op,
-                             summary_op=summary_op,
-                             saver=None,
-                             global_step=global_step,
-                             summary_writer=None)
+    train_op = tf.train.AdagradOptimizer(0.01).minimize(
+        loss, global_step=global_step)
+    hooks = [tf.train.StopAtStepHook(last_step=10000)]
 
     # Read/download dataset locally.
     mnist = input_data.read_data_sets(FLAGS.data_dir)
 
-    # The supervisor takes care of session initialization, restoring from
-    # a checkpoint, and closing when done or an error occurs.
-    with sv.managed_session(server.target) as sess:
-        # Loop until the supervisor shuts down or 500 steps have completed.
-        global_step_val = 0
-        while not sv.should_stop() and global_step_val < 500:
-            # Run a training step asynchronously.
-            # See `tf.train.SyncReplicasOptimizer` for additional details on how to
-            # perform *synchronous* training.
-            images, labels = mnist.train.next_batch(64)
-            _, loss_val, accuracy_val, global_step_val, summary_out = sess.run(
-                [train, loss, accuracy, global_step, summary_op],
-                feed_dict={images_placeholder: images,
-                           labels_placeholder: labels,
-                           dense_dropout_placeholder: 0.5})
+    with tf.train.MonitoredTrainingSession(master=server.target,
+                                           is_chief=(task_index == 0),
+                                           hooks=hooks,
+                                           summary_dir=summary_dir) as mon_sess:
 
-            # Only chief publishes metrics.
-            if is_chief:
-                # Publish metrics just like in the single node example.
-                publish({"loss": str(loss_val), "accuracy": str(accuracy_val), "global_step": str(global_step_val)})
 
-            if global_step_val % 100 == 0:
-                print("Step {}, Loss: {}, Accuracy: {}".format(global_step_val, loss_val, accuracy_val))
-                # Save model every 100 steps without chief constraint because for example step 100 can only be taken
-                # on 1 worker so they won't interfere with each other. As mentioned previously - checkpoints are saved
-                # to EXPERIMENT_OUTPUT_PATH to be accessible by user.
-                saver.save(sess, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"),
-                           global_step=global_step_val)
+        step = 0
+        while not mon_sess.should_stop() and step < 500:
+            batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
+            train_feed = {images_placeholder: batch_xs, labels_placeholder: batch_ys}
 
-            # Only chief writes summary.
-            if is_chief:
-                summary_writer.add_summary(summary_out, global_step=global_step_val)
+            _, step, accuracy_val = mon_sess.run([train_op, global_step, accuracy], feed_dict=train_feed)
+            if step % 100 == 0:
+                print("Done step %d" % step)
+                print("Accuracy {}".format(accuracy_val))
 
-        # Save model by chief at the end.
+            # Save model by chief at the end.
         if is_chief:
-            saver.save(sess, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"), global_step=global_step_val)
+            saver.save(mon_sess, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"), global_step=step)
 
             # Unfinalize the graph as distributed training process already finalized it and we
             tf.get_default_graph()._unsafe_unfinalize()
 
             # Save servable model to EXPERIMENT_OUTPUT_PATH to make it accessible to the user.
-            builder = tf.saved_model.builder.SavedModelBuilder(
-                os.path.join(EXPERIMENT_OUTPUT_PATH, "models", "00001"))
+            export_path = os.path.join(EXPERIMENT_OUTPUT_PATH, str(MODEL_VERSION))
+            print('Exporting trained model to', export_path)
+            builder = tf.saved_model.builder.SavedModelBuilder(export_path)
 
             prediction_signature = (
                 tf.saved_model.signature_def_utils.build_signature_def(
@@ -207,7 +182,7 @@ def main(_):
                     method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
 
             builder.add_meta_graph_and_variables(
-                sess, [tf.saved_model.tag_constants.SERVING],
+                mon_sess, [tf.saved_model.tag_constants.SERVING],
                 signature_def_map={
                     MODEL_SIGNATURE_NAME:
                         prediction_signature
@@ -221,14 +196,14 @@ def main(_):
     # Model saving can hang whole multinode experiment when done at the end. Sleep to give chief time to save.
     time.sleep(30)
 
-    # Ask for all the services to stop.
-    sv.stop()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", type=str,
                         default="./datasets/mnist",
-                        help="Directory for storing input data")
+                        help="Directory which contains dataset")
+    parser.add_argument("--batch_size", type=int,
+                        default=100,
+                        help="Training batch size")
     FLAGS, _ = parser.parse_known_args()
     tf.app.run()

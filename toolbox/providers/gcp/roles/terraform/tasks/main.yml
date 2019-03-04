@@ -99,6 +99,10 @@
       debug:
         msg: "Terraform definition file: {{ local_terraform_file }}"
 
+    - name: Terraform definition directory
+      debug:
+        msg: "Local terraform directory: {{ local_terraform_dir }}"
+
     - name: Refresh terraform
       environment:
         TF_VAR_prefix: "{{ prefix }}"

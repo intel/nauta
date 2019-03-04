@@ -1,7 +1,0 @@
----
-
-- name: Run local tasks
-  hosts: localhost
-  become: False
-  roles:
-    - role: init

@@ -1,5 +1,5 @@
 
-gcp-create: $(ACTIVATE) $(TERRAFORM) ENV_NAME $(VAULT) $(WORKSPACE) ENV_EXTERNAL_PUBLIC_KEY ENV_EXTERNAL_KEY ENV_CLUSTER_CONFIG_FILE ENV_NETWORK_SETTINGS
+gcp-create: $(ACTIVATE) $(TERRAFORM) ENV_NAME $(VAULT) $(WORKSPACE) ENV_EXTERNAL_PUBLIC_KEY ENV_EXTERNAL_KEY ENV_CLUSTER_CONFIG_FILE ENV_NETWORK_SETTINGS ENV_SERVICE_ACCOUNT_CONFIG
 	@. $(ACTIVATE); ANSIBLE_CONFIG=$(CURDIR)/toolbox/providers/gcp/ansible.cfg $(ANSIBLE_PLAYBOOK) -i $(CURDIR)/toolbox/providers/inventory \
 	 $(CURDIR)/toolbox/providers/gcp/gcp.yml \
 	-e s3_url=$(ENV_S3_URL) \
@@ -9,8 +9,8 @@ gcp-create: $(ACTIVATE) $(TERRAFORM) ENV_NAME $(VAULT) $(WORKSPACE) ENV_EXTERNAL
 	-e local_python_interpreter=$(PYTHON) \
 	-e workspace=$(WORKSPACE) \
 	-e terraform=$(TERRAFORM) \
-	-e @$(CURDIR)/toolbox/$(ENV_NETWORK_SETTINGS) \
-	-e service_account_config_file=$(CURDIR)/toolbox/providers/gcp/gcp-service-account.json \
+	-e @$(ENV_NETWORK_SETTINGS) \
+	-e service_account_config_file=$(ENV_SERVICE_ACCOUNT_CONFIG) \
 	-e external_key=$(ENV_EXTERNAL_KEY) \
 	-e external_public_key=$(ENV_EXTERNAL_PUBLIC_KEY) \
 	-e cluster_config_file=$(ENV_CLUSTER_CONFIG_FILE) \
@@ -18,7 +18,7 @@ gcp-create: $(ACTIVATE) $(TERRAFORM) ENV_NAME $(VAULT) $(WORKSPACE) ENV_EXTERNAL
 	$(if $(TF_VAR_POOL_TYPE), -e tf_pool_type=$(TF_VAR_POOL_TYPE),) \
 	-e output_file=$(if $(K8S_OUTPUT_FILE),$(K8S_OUTPUT_FILE),empty)
 
-gcp-destroy: $(ACTIVATE) $(WORKSPACE) $(TERRAFORM) ENV_NAME ENV_NETWORK_SETTINGS
+gcp-destroy: $(ACTIVATE) $(WORKSPACE) $(TERRAFORM) ENV_NAME ENV_NETWORK_SETTINGS ENV_CLUSTER_CONFIG_FILE ENV_SERVICE_ACCOUNT_CONFIG
 	@. $(ACTIVATE); ANSIBLE_CONFIG=$(CURDIR)/toolbox/providers/gcp/ansible.cfg $(ANSIBLE_PLAYBOOK) -i $(CURDIR)/toolbox/providers/inventory \
 	 $(CURDIR)/toolbox/providers/gcp/gcp-clean.yml \
 	-e s3_url=$(ENV_S3_URL) \
@@ -28,10 +28,11 @@ gcp-destroy: $(ACTIVATE) $(WORKSPACE) $(TERRAFORM) ENV_NAME ENV_NETWORK_SETTINGS
 	-e local_python_interpreter=$(PYTHON) \
 	-e workspace=$(WORKSPACE) \
 	-e terraform=$(TERRAFORM) \
+	-e cluster_config_file=$(ENV_CLUSTER_CONFIG_FILE) \
 	$(if $(TF_VAR_POOL_SIZE), -e tf_pool_size=$(TF_VAR_POOL_SIZE),) \
 	$(if $(TF_VAR_POOL_TYPE), -e tf_pool_type=$(TF_VAR_POOL_TYPE),) \
-	-e @$(CURDIR)/toolbox/$(ENV_NETWORK_SETTINGS) \
-	-e service_account_config_file=$(CURDIR)/toolbox/providers/gcp/gcp-service-account.json \
+	-e @$(ENV_NETWORK_SETTINGS) \
+	-e service_account_config_file=$(ENV_SERVICE_ACCOUNT_CONFIG) \
 	--vault-password-file=$(VAULT) \
 	-e external_key=$(ENV_EXTERNAL_KEY) \
 	-e external_public_key=$(ENV_EXTERNAL_PUBLIC_KEY)

@@ -1,5 +1,7 @@
 ---
 
+- include_vars: "{{ cluster_config_file }}"
+
 - name: Load service account credentials
   set_fact:
     gcp_service_account: "{{ lookup('file',service_account_config_file) | from_json }}"
@@ -29,6 +31,17 @@
     state: directory
     path: "{{ local_terraform_dir }}"
     mode: 0755
+
+- name: Generate terraform files in {{ local_terraform_dir }}
+  template:
+    src: "{{ template_item }}.j2"
+    dest: "{{ local_terraform_dir }}/{{ template_item }}"
+  loop_control:
+    loop_var: template_item
+  with_items:
+    - "main.tf"
+    - "variables.tf"
+    - "output.tf"
 
 - name: Execute terraform block
   block:
