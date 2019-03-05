@@ -31,3 +31,5 @@ memory: null
 
 experimentName: {{ NAUTA.ExperimentName }} 
 podCount: 1
+
+cpu_fraction: 0.5

@@ -26,6 +26,11 @@ WRONG_CONFIGURATION_FILE = "cpu_number: 10"
 CORRECT_CONFIGURATION_FILE = "cpu_number: 10 \n" \
                              "memory_amount: 100Gi"
 
+CORRECT_CONFIGURATION_FILE_W_FRACTIONS = "cpu_number: 10 \n" \
+                                         "memory_amount: 100Gi \n" \
+                                         "cpu_fraction: 0.5 \n" \
+                                         "memory_fraction: 0.5"
+
 
 def test_nauta_config(mocker):
     nauta_config = mocker.patch("commands.config.NAUTAConfigMap")

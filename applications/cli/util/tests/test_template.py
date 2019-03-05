@@ -56,10 +56,23 @@ def test_replace_cpu_configuration_without_fraction():
 def test_replace_cpu_configuration_with_fraction():
 
     changed_resources = template.replace_cpu_configuration(RESOURCES_TO_BE_CHANGED, new_cpu_number="2",
-                                                           current_cpu_number="20", fraction=0.5, system_required="1")
+                                                           current_cpu_number="20", fraction=0.5,
+                                                           system_required_min="0.5",
+                                                           system_required_percent="0.5")
 
-    assert changed_resources.get("requests").get("cpu") == "0.5"
-    assert changed_resources.get("limits").get("cpu") == "0.5"
+    assert changed_resources.get("requests").get("cpu") == "0.75"
+    assert changed_resources.get("limits").get("cpu") == "0.75"
+
+
+def test_replace_cpu_configuration_with_fraction_over_min():
+
+    changed_resources = template.replace_cpu_configuration(RESOURCES_TO_BE_CHANGED, new_cpu_number="200",
+                                                           current_cpu_number="20", fraction=0.5,
+                                                           system_required_min="0.5",
+                                                           system_required_percent="0.5")
+
+    assert changed_resources.get("requests").get("cpu") == "99.5"
+    assert changed_resources.get("limits").get("cpu") == "99.5"
 
 
 def test_replace_memory_configuration_without_fraction():
@@ -75,10 +88,22 @@ def test_replace_memory_configuration_with_fraction():
 
     changed_resources = template.replace_memory_configuration(RESOURCES_TO_BE_CHANGED, new_memory_amount="4G",
                                                               current_mem_amount="20G", fraction=0.5,
-                                                              system_required="2G")
+                                                              system_required_min="2G",
+                                                              system_required_percent="0.5")
 
     assert changed_resources.get("requests").get("memory") == "1000000000"
     assert changed_resources.get("limits").get("memory") == "1000000000"
+
+
+def test_replace_memory_configuration_with_fraction_over_min():
+
+    changed_resources = template.replace_memory_configuration(RESOURCES_TO_BE_CHANGED, new_memory_amount="80G",
+                                                              current_mem_amount="20G", fraction=0.5,
+                                                              system_required_min="2G",
+                                                              system_required_percent="5")
+
+    assert changed_resources.get("requests").get("memory") == "38000000000"
+    assert changed_resources.get("limits").get("memory") == "38000000000"
 
 
 def test_replace_single_value_cpu():

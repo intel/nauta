@@ -55,3 +55,6 @@ registryPort: {{ NAUTA.RegistryPort }}
 workersCount: 3
 psSidecarLoggingLevel: "WARNING"
 pServersCount: 1
+
+cpu_fraction: 1
+memory_fraction: 1
