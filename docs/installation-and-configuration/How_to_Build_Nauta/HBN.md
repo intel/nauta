@@ -15,7 +15,7 @@ Execute the following commands from the command line:
 
 ### Hardware Requirements
 
-Part of Nauta's build process involves the compilation of Tensorflow. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. To make sure SSE is available on a CPU, call `cat /proc/cpuinfo`. `sse sse2` should be listed in `flags` field.
+Part of Nauta's build process involves the compilation of Tensorflow. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. To make sure SSE is available on a CPU, call `cat /proc/cpuinfo`. `sse sse2 sse4_1` should be listed in `flags` field.
 
 **Note:** For SSE information, refer to: https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions
 
