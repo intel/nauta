@@ -33,6 +33,11 @@ dns_servers:
 dns_search_domains:
   - example.com
 
+# This is place to define additional domain names for cluster to allow secure communication
+dns_names_for_certificate:
+  DNS.7: "mycluster1.domain.name"
+  DNS.8: "mycluster2.domain.name"
+
 # This is the _Internal_ domain name.
 domain: nauta
 
@@ -90,9 +95,16 @@ proxy:
 - **Default value:** []
 ```yaml
 dns_servers:
-  - 10.102.60.20
-  - 10.102.60.30
+  - 8.8.8.8
+  - 8.8.4.4
 ```
+
+###dns_names_for_certificate
+- **Description:** This is a list of DNS names of the cluster.
+Values from this param will be acceptable addresses to access cluster in secure way.
+Key values have to be in format `DNS.X` where `X` is number greater than 6 (internally allocated symbolic addresses).
+
+- **Default value:** []
 
 ### dns_search_domains
 - **Description:** This is a domain used as part of a domain search list.
