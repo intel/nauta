@@ -30,6 +30,8 @@ The following are _example results_ (not all information is show).
 
 ![](images/experiment_view.png)
 
+Volumes list include mount mode for each volume (in `<>` brackets), which can be either `ro` (read-only) or `rw` (read-write).
+
 #### See also
 * [Viewing experiments logs](view_exp_logs.md)
 * [Viewing experiments in TensorBoard](view_exp_logs.md)

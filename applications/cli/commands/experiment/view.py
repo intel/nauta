@@ -32,12 +32,24 @@ from util.logger import initialize_logger
 from util.system import handle_error, format_timestamp_for_cli
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 
-
 logger = initialize_logger(__name__)
 
-PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
-PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
-
+PREFIX_VALUES = {
+    "E": 10**18,
+    "P": 10**15,
+    "T": 10**12,
+    "G": 10**9,
+    "M": 10**6,
+    "K": 10**3
+}
+PREFIX_I_VALUES = {
+    "Ei": 2**60,
+    "Pi": 2**50,
+    "Ti": 2**40,
+    "Gi": 2**30,
+    "Mi": 2**20,
+    "Ki": 2**10
+}
 
 POD_CONDITIONS_MAX_WIDTH = 30
 UID_MAX_WIDTH = 15
@@ -48,7 +60,8 @@ def container_status_to_msg(state) -> str:
     if not state:
         return Texts.CONTAINER_NOT_CREATED_MSG
     if state.running is not None:
-        return Texts.CONTAINER_RUNNING_MSG + format_timestamp_for_cli(str(state.running.started_at))
+        return Texts.CONTAINER_RUNNING_MSG + format_timestamp_for_cli(
+            str(state.running.started_at))
     if state.terminated is not None:
         msg = Texts.CONTAINER_TERMINATED_MSG + str(state.terminated.reason)
         msg += Texts.REASON + wrap_text(str(state.terminated.message), width=CONTAINER_DETAILS_MAX_WIDTH) \
@@ -59,9 +72,26 @@ def container_status_to_msg(state) -> str:
 
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
+    print(volume_mounts)
+    # conver read only bool flag to string:
+    ux_volume_mounts = []
+    for vm in volume_mounts:
+        rwro = "rw"
+        if vm.read_only:
+            rwro = "ro"
+        ux_volume_mounts.append({
+            "name": vm.name,
+            "mount_path": vm.mount_path,
+            "rwro": rwro
+        })
+    print(ux_volume_mounts)
     indent = ' ' * spaces
-    return indent.join([(wrap_text(f'{mount.name} @ {mount.mount_path}', width=CONTAINER_DETAILS_MAX_WIDTH,
-                                   spaces=spaces + 2) + "\n") for mount in volume_mounts]) if volume_mounts else ''
+    return indent.join(
+        [(wrap_text(
+            f'{mount["name"]} <{mount["rwro"]}> @ {mount["mount_path"]}',
+            width=CONTAINER_DETAILS_MAX_WIDTH,
+            spaces=spaces + 2) + "\n")
+         for mount in ux_volume_mounts]) if ux_volume_mounts else ''
 
 
 def unify_units(name: str, value: str) -> str:
@@ -84,25 +114,42 @@ def container_resources_to_msg(resources, spaces=9) -> str:
     if resources.requests:
         msg += header_indent
         msg += Texts.CONTAINER_REQUESTS_LIST_HEADER.format(indent)
-        msg += indent.join([wrap_text(unify_units(request_name, request_value), width=CONTAINER_DETAILS_MAX_WIDTH,
-                                      spaces=spaces + 2) for request_name, request_value in resources.requests.items()])
+        msg += indent.join([
+            wrap_text(
+                unify_units(request_name, request_value),
+                width=CONTAINER_DETAILS_MAX_WIDTH,
+                spaces=spaces + 2)
+            for request_name, request_value in resources.requests.items()
+        ])
     if resources.limits:
         msg += header_indent
         msg += Texts.CONTAINER_LIMITS_LIST_HEADER.format(indent)
-        msg += indent.join([wrap_text(unify_units(limit_name, limit_value), width=CONTAINER_DETAILS_MAX_WIDTH,
-                                      spaces=spaces + 2) for limit_name, limit_value in resources.limits.items()])
+        msg += indent.join([
+            wrap_text(
+                unify_units(limit_name, limit_value),
+                width=CONTAINER_DETAILS_MAX_WIDTH,
+                spaces=spaces + 2)
+            for limit_name, limit_value in resources.limits.items()
+        ])
 
     return msg
 
 
-@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='v', options_metavar='[options]')
+@click.command(
+    help=Texts.HELP,
+    short_help=Texts.SHORT_HELP,
+    cls=AliasCmd,
+    alias='v',
+    options_metavar='[options]')
 @click.argument("experiment_name")
-@click.option('-tb', '--tensorboard', default=None, help=Texts.HELP_T, is_flag=True)
+@click.option(
+    '-tb', '--tensorboard', default=None, help=Texts.HELP_T, is_flag=True)
 @click.option('-u', '--username', help=Texts.HELP_U)
 @common_options()
 @pass_state
 @click.pass_context
-def view(context, state: State, experiment_name: str, tensorboard: bool, username: str):
+def view(context, state: State, experiment_name: str, tensorboard: bool,
+         username: str):
     """
     Displays details of an experiment.
     """
@@ -114,20 +161,21 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
 
         run = Run.get(name=experiment_name, namespace=namespace)
         if not run:
-            handle_error(user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name=experiment_name))
+            handle_error(
+                user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(
+                    experiment_name=experiment_name))
             exit(2)
 
         click.echo(
             tabulate(
                 [run.cli_representation],
                 headers=EXPERIMENTS_LIST_HEADERS,
-                tablefmt="orgtbl"
-            )
-        )
+                tablefmt="orgtbl"))
 
         click.echo(Texts.PODS_PARTICIPATING_LIST_HEADER)
 
-        pods = get_namespaced_pods(label_selector="runName=" + experiment_name, namespace=namespace)
+        pods = get_namespaced_pods(
+            label_selector="runName=" + experiment_name, namespace=namespace)
 
         tabular_output = []
         containers_resources = []
@@ -142,10 +190,12 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
                                                        wrap_text(cond.reason, width=POD_CONDITIONS_MAX_WIDTH)
                     msg = msg + ", \n message: " + wrap_text(cond.message, width=POD_CONDITIONS_MAX_WIDTH) \
                         if cond.message else msg
-                    status_string += wrap_text(cond.type + ": " + cond.status,
-                                               width=POD_CONDITIONS_MAX_WIDTH) + msg + "\n"
+                    status_string += wrap_text(
+                        cond.type + ": " + cond.status,
+                        width=POD_CONDITIONS_MAX_WIDTH) + msg + "\n"
             else:
-                pod_events = get_pod_events(namespace=namespace, name=pod.metadata.name)
+                pod_events = get_pod_events(
+                    namespace=namespace, name=pod.metadata.name)
 
                 for event in pod_events:
                     msg = "\n" if not event.reason else "\n reason: " + \
@@ -160,65 +210,82 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
             container_statuses = defaultdict(lambda: None)
             if pod.status.container_statuses:
                 for container_status in pod.status.container_statuses:
-                    container_statuses[container_status.name] = container_status.state
+                    container_statuses[
+                        container_status.name] = container_status.state
 
             container_details = []
 
             for container in pod.spec.containers:
-                container_description = Texts.CONTAINER_DETAILS_MSG.format(name=container.name,
-                                                                           status=container_status_to_msg(
-                                                                               container_statuses[container.name]),
-                                                                           volumes=container_volume_mounts_to_msg(
-                                                                               container.volume_mounts,
-                                                                               spaces=2),
-                                                                           resources=container_resources_to_msg(
-                                                                               container.resources, spaces=4))
+                container_description = Texts.CONTAINER_DETAILS_MSG.format(
+                    name=container.name,
+                    status=container_status_to_msg(
+                        container_statuses[container.name]),
+                    volumes=container_volume_mounts_to_msg(
+                        container.volume_mounts, spaces=2),
+                    resources=container_resources_to_msg(
+                        container.resources, spaces=4))
                 container_details.append(container_description)
                 containers_resources.append(container.resources)
 
             container_details = ''.join(container_details)
 
-            tabular_output.append([pod.metadata.name,
-                                   wrap_text(pod.metadata.uid, width=UID_MAX_WIDTH, spaces=0),
-                                   status_string, container_details])
-        click.echo(tabulate(tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
+            tabular_output.append([
+                pod.metadata.name,
+                wrap_text(pod.metadata.uid, width=UID_MAX_WIDTH, spaces=0),
+                status_string, container_details
+            ])
+        click.echo(
+            tabulate(
+                tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
 
         try:
-            cpu_requests_sum = sum_cpu_resources(
-                [container_resource.requests["cpu"]
-                 for container_resource in containers_resources if container_resource.requests and
-                 container_resource.requests.get("cpu")])
-            mem_requests_sum = sum_mem_resources(
-                [container_resource.requests["memory"]
-                 for container_resource in containers_resources if container_resource.requests and
-                 container_resource.requests.get("memory")])
-            cpu_limits_sum = sum_cpu_resources(
-                [container_resource.limits["cpu"]
-                 for container_resource in containers_resources if container_resource.limits and
-                 container_resource.limits.get("cpu")])
-            mem_limits_sum = sum_mem_resources(
-                [container_resource.limits["memory"]
-                 for container_resource in containers_resources if container_resource.limits and
-                 container_resource.limits.get("memory")])
+            cpu_requests_sum = sum_cpu_resources([
+                container_resource.requests["cpu"]
+                for container_resource in containers_resources
+                if container_resource.requests
+                and container_resource.requests.get("cpu")
+            ])
+            mem_requests_sum = sum_mem_resources([
+                container_resource.requests["memory"]
+                for container_resource in containers_resources
+                if container_resource.requests
+                and container_resource.requests.get("memory")
+            ])
+            cpu_limits_sum = sum_cpu_resources([
+                container_resource.limits["cpu"]
+                for container_resource in containers_resources
+                if container_resource.limits
+                and container_resource.limits.get("cpu")
+            ])
+            mem_limits_sum = sum_mem_resources([
+                container_resource.limits["memory"]
+                for container_resource in containers_resources
+                if container_resource.limits
+                and container_resource.limits.get("memory")
+            ])
         except ValueError as exception:
-            handle_error(logger, Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg=str(exception)),
-                         Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(error_msg=str(exception)))
+            handle_error(
+                logger,
+                Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(
+                    error_msg=str(exception)),
+                Texts.RESOURCES_SUM_PARSING_ERROR_MSG.format(
+                    error_msg=str(exception)))
 
         click.echo(Texts.RESOURCES_SUM_LIST_HEADER)
         click.echo(
             tabulate(
                 list(
-                    zip(
-                        Texts.RESOURCES_SUM_TABLE_ROWS_HEADERS,
-                        [cpu_requests_sum, mem_requests_sum, cpu_limits_sum, mem_limits_sum]
-                    )
-                ),
-                Texts.RESOURCES_SUM_TABLE_HEADERS, tablefmt="orgtbl")
-        )
+                    zip(Texts.RESOURCES_SUM_TABLE_ROWS_HEADERS, [
+                        cpu_requests_sum, mem_requests_sum, cpu_limits_sum,
+                        mem_limits_sum
+                    ])),
+                Texts.RESOURCES_SUM_TABLE_HEADERS,
+                tablefmt="orgtbl"))
 
         if tensorboard:
             click.echo()
-            context.invoke(tensorboard_command, experiment_name=[experiment_name])
+            context.invoke(
+                tensorboard_command, experiment_name=[experiment_name])
 
         if pending_pods:
             click.echo()
@@ -247,17 +314,29 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
                 else:
                     resources = "amount of memory"
 
-                click.echo(Texts.INSUFFICIENT_RESOURCES_MESSAGE.format(resources=resources))
+                click.echo(
+                    Texts.INSUFFICIENT_RESOURCES_MESSAGE.format(
+                        resources=resources))
                 click.echo()
                 top_cpu_users, top_mem_users = get_highest_usage()
-                click.echo(Texts.TOP_CPU_CONSUMERS.format(consumers=", ".join(
-                    [res.user_name for res in top_cpu_users[0:3 if len(top_cpu_users) > 2 else len(top_cpu_users)]])))
-                click.echo(Texts.TOP_MEMORY_CONSUMERS.format(consumers=", ".join(
-                    [res.user_name for res in top_mem_users[0:3 if len(top_mem_users) > 2 else len(top_mem_users)]])))
+                click.echo(
+                    Texts.TOP_CPU_CONSUMERS.format(consumers=", ".join([
+                        res.user_name
+                        for res in top_cpu_users[0:3 if len(top_cpu_users) > 2
+                                                 else len(top_cpu_users)]
+                    ])))
+                click.echo(
+                    Texts.TOP_MEMORY_CONSUMERS.format(consumers=", ".join([
+                        res.user_name
+                        for res in top_mem_users[0:3 if len(top_mem_users) > 2
+                                                 else len(top_mem_users)]
+                    ])))
             except Exception:
                 click.echo(Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA)
-                logger.exception(Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS)
+                logger.exception(
+                    Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS)
 
     except Exception:
-        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG, Texts.VIEW_OTHER_ERROR_MSG)
+        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG,
+                     Texts.VIEW_OTHER_ERROR_MSG)
         exit(1)
