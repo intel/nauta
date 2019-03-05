@@ -30,7 +30,7 @@ build: $(ACTIVATE) set-version metrics-lib
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl
+	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	mkdir dist/config
 
@@ -51,7 +51,7 @@ ifeq (Windows,$(OS))
 
 endif
 ifeq (Linux,$(OS))
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -71,7 +71,7 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -100,6 +100,7 @@ endif
 	cp -Rf ../../docs/user-guide dist/docs
 	mkdir -p dist/examples/
 	cp -Rf example-python/package_examples/* dist/examples/
+	cp node_config dist/config/
 
 ifneq (,$(SCM_REPOSITORY_STATE))
 	mkdir dist/config/scm/

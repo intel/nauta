@@ -12,6 +12,8 @@ metadata:
 data:
   external_ip: {{ required "NAUTA Release version is required" .Values.global.nauta_configuration.external_ip }}
   tensorboard.timeout: "1800"
+  minimal.node.memory.amount: "8Gi"
+  minimal.node.cpu.number: "4"
   registry: {{ required "NAUTA registry address is required" .Values.global.nauta_configuration.registry }}
 {{- $root := . -}}
 {{- range (required "List of images is required" .Values.global.images) }}
