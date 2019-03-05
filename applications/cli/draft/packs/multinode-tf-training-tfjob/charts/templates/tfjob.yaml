@@ -162,8 +162,11 @@ spec:
                 privileged: true
               resources:
                 requests:
-                  cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu}}
+                  cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu }}
                   memory: {{ default .Values.sidecar_resources.requests.memory .Values.sidecar_memory }}
+                limits:
+                    cpu: {{ default .Values.sidecar_resources.limits.cpu .Values.sidecar_cpu }}
+                    memory: {{ default .Values.sidecar_resources.limits.memory .Values.sidecar_memory }}
           volumes:
             - name: input-home
               persistentVolumeClaim:

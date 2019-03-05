@@ -43,7 +43,10 @@ ps_memory: null
 sidecar_resources:
   requests:
     cpu: 0.01
-    memory: 1Gi
+    memory: 100Mi
+  limits:
+    cpu: 0.01
+    memory: 100Mi
 
 sidecar_cpu: null
 sidecar_memory: null
