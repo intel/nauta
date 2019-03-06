@@ -13,6 +13,10 @@
   poll: 0
   when: docker_repository_cache.enabled
 
+- set_fact:
+    docker_async_tasks: "{{ docker_async_tasks | combine({name: pull_async.ansible_job_id}) }}"
+  when: docker_repository_cache.enabled
+
 - name: Pull image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
     name: "{{ image.image }}"
@@ -28,3 +32,4 @@
 
 - set_fact:
     docker_async_tasks: "{{ docker_async_tasks | combine({name: pull_async.ansible_job_id}) }}"
+  when: not docker_repository_cache.enabled
