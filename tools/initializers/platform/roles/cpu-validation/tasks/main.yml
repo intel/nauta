@@ -1,0 +1,12 @@
+---
+- name: Get CPU flags
+  shell: "cat /proc/cpuinfo | grep flags"
+  register: cpuflags
+
+- name: Intersect required flags with flags avaible on CPU
+  set_fact:
+    flags: "{{ required_flags | intersect(cpuflags.stdout_lines[0].split()) }}"
+
+- fail:
+    msg: "Your CPU is not supported. Please check 'Hardware Requirements' section in 'How to Build Nauta' doc"
+  when: flags | length != required_flags | length

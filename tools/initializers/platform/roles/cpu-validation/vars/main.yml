@@ -1,0 +1,2 @@
+---
+required_flags: ["avx", "sse", "sse2", "ssse3", "sse4_1", "sse4_2"]

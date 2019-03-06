@@ -54,9 +54,10 @@ k8s-installer-clean:
 	@(cd $(CURDIR)/tools && find .workspace/ -mindepth 1 \( ! -iname "nauta-*.tar.gz" \) 2>/dev/null | xargs rm -rf)
 
 k8s-installer-build-wrapped:
-	@(cd $(CURDIR)/tools/initializers && make check-platform-dependencies)
-	@make tools-release
-	$(MAKE)	k8s-installer-clean
+	@(cd $(CURDIR)/tools/initializers/deps && make check-platform-dependencies)
+	@(cd $(CURDIR)/tools/initializers/platform && make init)
+	@(cd $(CURDIR) && make tools-release)
+	@(cd $(CURDIR) && make k8s-installer-clean)
 
 k8s-installer-build:
 	@echo "k8s installer build logs will be saved to $(K8S_INSTALLER_BUILD_LOG_PATH)"
