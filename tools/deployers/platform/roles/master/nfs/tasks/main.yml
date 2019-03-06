@@ -8,6 +8,12 @@
     - input
     - output
 
+- name: "{{ message_lablel }} Backup exports file"
+  copy:
+    src: /etc/exports
+    dest: /etc/exports.nauta
+    remote_src: yes
+
 - name: "{{ message_label }} Render exports file"
   template:
     src: exports.j2

@@ -88,6 +88,12 @@
   hostname:
     name: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
 
+- name: "{{ message_label }} Backup hostname file"
+  copy:
+    src: /etc/hostname
+    dest: /etc/hostname.nauta
+    remote_src: yes
+
 - name: "{{ message_label }} Set hostname pernamently"
   copy:
     content: "{{ inventory_hostname }}.node.{{ nodes_domain }}.{{ domain }}"
@@ -101,17 +107,23 @@
     owner: root
     group: root
 
-- name: "{{ message_label }} Remove chattr -x from resolver"
+- name: "{{ message_label }} Remove chattr -i from resolver"
   file:
     path: /etc/resolv.conf
     attr: ""
+
+- name: "{{ meesage_label }} Backup resolv.conf"
+  copy:
+    src: /etc/resolv.conf
+    dest: /etc/resolv.conf.nauta
+    remote_src: yes
 
 - name: "{{ message_label }} Override resolver"
   template:
     src: resolv.j2
     dest: /etc/resolv.conf
 
-- name: "{{ message_label }} Add chattr +x to resolver"
+- name: "{{ message_label }} Add chattr +i to resolver"
   file:
     path: /etc/resolv.conf
     attr: "i"
