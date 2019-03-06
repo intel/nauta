@@ -34,6 +34,7 @@ def test_make_prediction_retrying(mocker):
 
     assert result == b'result'
 
+
 def test_make_prediction_too_much_retrying(mocker):
     mocker.patch('builtins.open')
     mocker.patch('tensorflow_serving.apis.predict_pb2.PredictRequest')
@@ -44,3 +45,22 @@ def test_make_prediction_too_much_retrying(mocker):
 
     with pytest.raises(_Rendezvous):
         main.make_prediction(b'', predict_stub_mock)
+
+
+def test_input_dir_does_not_exist(mocker):
+    mocker.patch('os.getenv').return_value = 'fake_run_name'
+    mocker.patch('os.path.isdir').return_value = False
+    mocker.patch('argparse.ArgumentParser')
+
+    with pytest.raises(RuntimeError):
+        main.main()
+
+
+def test_input_dir_is_empty(mocker):
+    mocker.patch('os.getenv').return_value = 'fake_run_name'
+    mocker.patch('os.path.isdir').return_value = True
+    mocker.patch('os.listdir').return_value = []
+    mocker.patch('argparse.ArgumentParser')
+
+    with pytest.raises(RuntimeError):
+        main.main()
