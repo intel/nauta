@@ -44,6 +44,8 @@ describe('VUE components ActionHeaderButtons', () => {
         'type'],
       onLaunchTensorHandler: sinon.spy(),
       onDiscardTensorHandler: sinon.spy(),
+      setIntervalHandler: sinon.spy(),
+      refreshNowHandler: sinon.spy(),
       disabled: false
     };
     localVue = createLocalVue();
@@ -100,5 +102,12 @@ describe('VUE components ActionHeaderButtons', () => {
     wrapper.vm.discardVisibleHeaders();
     expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.selectedByUserColumns);
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
+  });
+
+  it('Should call setIntervalHandler if new refresh interval value has been set', function () {
+    const value = 60;
+    wrapper.vm.setRefreshIntervalValue(value);
+    expect(props.setIntervalHandler.calledOnce).to.equal(true);
+    expect(props.setIntervalHandler.calledWith(value)).to.equal(true);
   });
 });

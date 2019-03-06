@@ -37,8 +37,10 @@
               :launchTensorDisabled="!tensorBtnAvailable"
               :clearSort="clearSort"
               :clearFilterHandler="clearFilter"
+              :refreshNowHandler="getData"
+              :setIntervalHandler="updateRefreshInterval"
             ></ActionHeaderButtons>
-            <v-flex v-if="(experimentsTotal !== 0 || searchPattern)" xs12 md3>
+            <v-flex v-if="(experimentsTotal !== 0 || searchPattern)" xs12 md2>
               <v-card-title>
                 <v-text-field append-icon="search" single-line hide-details v-model="searchPattern"></v-text-field>
               </v-card-title>
@@ -485,6 +487,9 @@ export default {
     },
     isTensorboardAvailableForExp (expType) {
       return this.tbCompatibleExpKinds.includes(expType);
+    },
+    updateRefreshInterval (value) {
+      this.refresh.interval = value;
     }
   }
 }

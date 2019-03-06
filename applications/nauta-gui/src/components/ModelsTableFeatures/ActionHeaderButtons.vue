@@ -31,6 +31,32 @@
       </v-list-tile>
     </v-list>
   </v-menu>
+  <v-menu bottom offset-y>
+    <v-btn slot="activator" dark small>
+      {{ labels.AUTO_REFRESH }}
+    </v-btn>
+    <v-list>
+      <v-menu open-on-hover :close-on-content-click="false" offset-x>
+        <v-list-tile slot="activator">
+          <v-list-tile-title>{{ labels.SET_INTERVAL }}</v-list-tile-title>
+          <v-list-tile-action class="justify-end">
+            <v-icon>play_arrow</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list dense>
+          <v-list-tile :key="'interval-' + interval" v-for="interval in possibleRefreshIntervals" v-on:click="setRefreshIntervalValue(interval)">
+            <v-list-tile-title>{{ interval }}s</v-list-tile-title>
+            <v-list-tile-action v-if="currentRefreshInterval == interval" class="justify-end">
+              <v-icon>done</v-icon>
+            </v-list-tile-action>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <v-list-tile v-on:click="refreshNowHandler()">
+        <v-list-tile-title>{{ labels.REFRESH_NOW }}</v-list-tile-title>
+      </v-list-tile>
+    </v-list>
+  </v-menu>
   <v-btn v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>
     {{ labels.ADD_DEL_COLUMN }}
   </v-btn>
@@ -67,7 +93,7 @@
                       panorama_fish_eye
                     </v-icon>
                     <v-tooltip bottom class="label-box">
-                      <span slot="activator" v-on:click="showColumn(header)">
+                      <span slot="activator">
                         {{ cutLongText(getLabel(header), 20) }}
                       </span>
                       <span>{{ getLabel(header) }}</span>
@@ -110,9 +136,11 @@ export default {
   name: 'ActionHeaderButtons',
   props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns',
     'columns', 'alwaysVisibleColumns', 'initiallyVisibleColumns', 'onLaunchTensorHandler',
-    'launchTensorDisabled', 'disabled'],
+    'launchTensorDisabled', 'refreshNowHandler', 'setIntervalHandler', 'disabled'],
   data: () => {
     return {
+      possibleRefreshIntervals: [5, 10, 15, 30, 60],
+      currentRefreshInterval: 30,
       showColumnMgmtModal: false,
       draft: [],
       labels: ELEMENTS_LABELS,
@@ -161,6 +189,10 @@ export default {
     discardVisibleHeaders: function () {
       this.draft = [].concat(this.selectedByUserColumns);
       this.showColumnMgmtModal = false;
+    },
+    setRefreshIntervalValue: function (value) {
+      this.currentRefreshInterval = value;
+      this.setIntervalHandler(value);
     }
   }
 }
@@ -171,7 +203,7 @@ export default {
   margin-top: 22px;
   color: rgb(0, 113, 197);
   background-color: rgba(0, 113, 197, 0.12);
-  width: 170px;
+  width: 160px;
 }
 #buttons_block button:disabled {
   color: rgb(255, 255, 255) !important;
