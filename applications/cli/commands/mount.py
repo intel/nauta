@@ -23,7 +23,7 @@ import click
 from tabulate import tabulate
 
 from util.logger import initialize_logger
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options, pass_state, State, verify_user_privileges
 from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
     get_kubectl_host
 from util.aliascmd import AliasGroup, AliasCmd
@@ -77,12 +77,12 @@ def print_unmount():
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='m', invoke_without_command=True,
              subcommand_metavar='command [options]')
-@common_options(admin_command=False)
+@common_options()
 @pass_state
 @click.pass_context
 def mount(context, state: State):
     if context.invoked_subcommand is None:
-
+        verify_user_privileges(False, "mount")
         click.echo(Texts.MAIN_MSG)
 
         try:
