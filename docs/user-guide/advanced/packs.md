@@ -1,14 +1,17 @@
-# Controlling packs parameters
+# Controlling Packs Parameters
 
-### Pack definition 
+### Pack Definition 
+
 The packs are located in the _nctl_config_ folder. Navigate to _.draft/packs/https-github.com-Azure-draft/packs_ folder to list existing packs.
+
 The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist of the parts:
+
 * docker image specification _Dockerfile_ 
 * helm deployment _charts_ folder
 
 All the pack parameters that can be controlled by _nctl_ are defined in _charts/values.yml_ file.
 
-Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
+Example _values.yaml_ file taken from _multinode-tf-training-tfjob_ pack:
 
 	# Default values for charts.
 	# This is a YAML-formatted file.
@@ -70,13 +73,15 @@ Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
 
 
     
-### Modifying values
+### Modifying Values
+
 The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
+
  * _nctl experiment submit_
  * _nctl experiment interact_
  
-The _-p_ parameter can be provided multiple times.
-Format specification:
+The _-p_ parameter can be provided multiple times. Format specification:
+
  * 'key value' or 'key.subkey.subkey2 value'
  * for lists: 'key "['val1', 'val2']"'
  * for maps: 'key "{'a': 'b'}"'
@@ -85,7 +90,7 @@ Format specification:
 
     nctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
 
-### Experiment resources
+### Experiment Resources
 
 _nctl_ is using by default following resource limits and requests for each built-in template:
 
@@ -104,13 +109,13 @@ _nctl_ is using by default following resource limits and requests for each built
 
 It is recommended to keep requests and limits on the same values. Also requested limits never should be bigger than resources available on node.
 
-Please note, that you can use `cpu` and `memory` pack parameters when you want to change both requests and limits, e.g. following command:
+**Note:** You can use `cpu` and `memory` pack parameters when you want to change both requests and limits using the following command:
 ```
 nctl experiment submit multinode.py -p cpu 2 -p memory 4Gi
 ```
-will submit an experiment with CPU requests and limits set to 2, and memory requests and limits set to 4Gi.
+Will submit an experiment with CPU requests and limits set to 2, and memory requests and limits set to 4Gi.
 
-In order to change these defaults, following parameters should be adjusted (using methods described in Modifying values section):
+To change these defaults, following parameters should be adjusted (using methods described in Modifying values section):
 
 | Template      | Resource parameters |
 | --- | --- | 
@@ -124,3 +129,6 @@ In order to change these defaults, following parameters should be adjusted (usin
 | tf-inference-stream | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
+
+
+

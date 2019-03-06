@@ -14,13 +14,15 @@ Individual elements within a pack are referred to as templates because they cont
 
 The core Kubernetes definitions within each pack are grouped into [Helm](https://helm.sh/)* packages referred to as _Charts_. Helm is the de-facto standard for Kubernetes application packaging, and reusing this package format allows leveraging of the large resource of community-developed Helm charts when creating new Nauta template packs.
 
-**Note 1**: While Nauta is able to re-use Helm charts mostly verbatim, there are a number of required placeholders that need to be added to these charts for Nauta to track and manage the resulting experiments. Refer to [Creating a New Template Pack](#creating) below for details.
+**Note 1:** While Nauta is able to re-use Helm charts mostly verbatim, there are a number of required placeholders that need to be added to these charts for Nauta to track and manage the resulting experiments. Refer to [Creating a New Template Pack](#creating) below for details.
 
-**Note 2**: All officially supported Nauta template packs are distributed together with the `nctl` package.
+**Note 2:** All officially supported Nauta template packs are distributed together with the `nctl` package.
 
 
 ## The Anatomy of a Pack
+
 ### Location
+
 When the `nctl` package is installed on the client machine, the template packs that come with the official package are deposited in the folder:
 
 ```
@@ -42,28 +44,24 @@ The individual items that form a single pack are laid out in its folder as follo
 ```
 Where:
 
-* `Dockerfile` is the docker file that defines the Docker image which serves as the runtime for the experiment's script supplied by the user. Any dependencies needed to build the Docker image must be placed in this directory, next to the Dockerfile.
+* `Dockerfile` is the Docker file that defines the Docker image which serves as the runtime for the experiment's script supplied by the user. Any dependencies needed to build the Docker image _must be_ placed in this directory, next to the Dockerfile.
 
 * `charts` is a directory that hosts the _Helm_ chart that specifies the definitions of all Kubernetes entities used to deploy and support the experiment's Docker image in the cluster.
 
 * `Chart.yaml` provides the key metadata for the chart, such as name and version, about the chart.
 
-* `values.yaml` serves a key role as it provides definitions for various _Helm_ template placeholders (see Helm's  ["Chart Template Guide"](https://docs.helm.sh/chart_template_guide/) for details) used throughout the chart (mostly in the individual Kubernetes definitions contained within the `templates`
-    sub-folder). This file is also parsed and analyzed by `nctl` to perform substitution on the [NAUTA placeholders](#placeholders).
+* `values.yaml` serves a key role as it provides definitions for various _Helm_ template placeholders (see Helm's  ["Chart Template Guide"](https://docs.helm.sh/chart_template_guide/) for details) used throughout the chart (mostly in the individual Kubernetes definitions contained within the `templates` sub-folder). This file is also parsed and analyzed by `nctl` to perform substitution on the [NAUTA placeholders](#placeholders).
 
 * `templates` folder groups all the YAML files that provide definitions for various Kubernetes (K8s) entities, which define the packs deployment and runtime environment. These definitions are referred to as _templates_ as they _may_ include _Helm_ template placeholders substituted for actual values in the process of deploying the chart on the cluster.
 
 ## Provided Template Packs
+
 The Nauta software is shipped with a number of built-in template packs
 that represent the types of experiments officially supported and validated.
 
-For each of the packs there are two versions provided: one that
-supports Python 2.7.x user scripts (packs with `-py2` suffix in the
-name) and one that supports Python 3.6.x user scripts.
+For each of the packs there are two versions provided: one that supports Python 2.7.x user scripts (packs with `-py2` suffix in the name) and one that supports Python 3.6.x user scripts.
 
-All packs are optimized for non-trivial deep learning tasks executed
-on Intel's two socket Xeon systems, and therefore the default compute configuration is
-the following:
+All packs are optimized for non-trivial deep learning tasks executed on Intel's two socket Xeon systems, and therefore the default compute configuration is the following:
 
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -106,11 +104,7 @@ the following:
 </tbody>
 </table>
 
-In general, the single node packs are configured to take roughly half of
-the available resources on a single node (so that the user can "fit" two
-experiments on a single node), while multi node packs
-utilize the entire resources on each node that participates in the
-multi-node configuration.
+In general, the single node packs are configured to take roughly half of the available resources on a single node (so that the user can _fit_ two experiments on a single node), while multi node packs utilize the entire resources on each node that participates in the multi-node configuration.
 
 While these defaults are intended to guarantee the best possible experience
 when training on Nauta, it is possible to adjust the compute
@@ -132,6 +126,7 @@ The template packs provided with Nauta are listed below:
 * **tf-training-tfjob-py2** - A TensorFlow single-node training job based on TfJob using Python 2.
 
 ## Customizing the Provided Packs
+
 Any customizations to template packs revolve mostly around the `values.yaml` file included in the pack's underlying _Helm_ chart. As mentioned above, this file provides key definitions that are referenced throughout the rest of the _Helm_ chart, and therefore it plays a crucial role in the process of converting the chart's templates into actual
 Kubernetes definitions deployed on the cluster.
 
@@ -144,6 +139,7 @@ By convention, the definitions contained in the `values.yaml` file typically ref
 When altering parameters listed in the `values.yaml` file, there are two approaches:
 
 1. Users _may_ manually modify the pack's `values.yaml` file using a text editor. Any modifications done using this approach will be permanent and apply to all subsequent experiments based on this pack.
+
 2. Users _may_ alter some of the parameters listed in `values.yaml` file temporarily, and only for a single experiment. To do so the user may specify alternative values for any of the parameters listed in `values.yaml` using the `--pack_param` option when submitting an experiment (please see the `nctl` manual for more details).
    
 Advanced users who want full control over how their experiments are deployed and executed on the Kubernetes cluster _may_ also directly modify the templates residing in the `<PACK_NAME>/charts/templates/` folder. Doing this, however requires a good grasp of Kubernetes concepts, notation, and debugging techniques, and is therefore _not recommended_.
@@ -152,6 +148,7 @@ Advanced users who want full control over how their experiments are deployed and
 # Creating a New Template Pack
 
 ## Prerequisites
+
 Creating a new pack, while not overly complex, requires some familiarity with the technologies that packs are built on. Therefore, it is recommended to have at least some working experience in the following areas do this:
 
   * Creating/modifying *Helm* charts and specifically using the 
@@ -160,11 +157,11 @@ Creating a new pack, while not overly complex, requires some familiarity with th
     `jobs`, `deployments`, `services`, etc.
 
 ### Where to Start
-Creating new template packs for Nauta is greatly simplified by leveraging the relatively ubiquitous _Helm_ chart format as the foundation. Thus, the starting point for a new template pack is typically an existing *Helm* chart that packages the technology of
-choice for execution on a `K8s` cluster. Consider creating a chart from scratch only if an existing chart is not
-available. The process of creating a new *Helm* chart from scratch is described in *Helm* [documentation](https://docs.helm.sh/).
+
+Creating new template packs for Nauta is greatly simplified by leveraging the relatively ubiquitous _Helm_ chart format as the foundation. Thus, the starting point for a new template pack is typically an existing *Helm* chart that packages the technology of choice for execution on a `K8s` cluster. Consider creating a chart from scratch only if an existing chart is not available. The process of creating a new *Helm* chart from scratch is described in *Helm* [documentation](https://docs.helm.sh/).
 
 ## A Template Pack in Five Simple Steps
+
 Once a *working* Helm chart is available, the process of adapting it for use as an Nauta template is as follows:
 
 1. Pick the pack's name.
@@ -230,11 +227,11 @@ The name should be unique and not conflict with any other packs available in the
    `values.yaml` (step #3 above).
 
 
-## NAUTA values.yaml placeholders
+## NAUTA values.yaml Placeholders
 
 ### `NAUTA.CommandLine`
 
-The NAUTA.CommandLine placeholder, when placed within the `values.yaml` file, will be
+The `NAUTA.CommandLine` placeholder, when placed within the `values.yaml` file, will be
 substituted for the list of command line parameters specified when
 submitting an experiment via `nctl experiment submit` command.
 
@@ -256,20 +253,15 @@ initialize a parameter named `commandline`:
 ```
 
 ### `NAUTA.ExperimentImage`
-The NAUTA.ExperimentImage placeholder carries the full reference to the docker image resulting
-from building the [`Dockerfile`](#dockerfile) specified within the
-pack. 
 
-During experiment submission, the image will be built by Docker
-and deposited in the NAUTA Docker Registry under the locator represented
-by this placeholder. 
+The `NAUTA.ExperimentImage` placeholder carries the full reference to the docker image resulting
+from building the [`Dockerfile`](#dockerfile) specified within the pack. 
 
-Hence, the placeholder shall be used to initialize a template
-parameter within the `values.yaml` file, that will later be referenced
-within the chart's templates to specify the experiment image.
+During experiment submission, the image will be built by Docker and deposited in the Nauta Docker Registry under the locator represented by this placeholder. 
 
-Below is a sample definition of a parameter within `values.yaml`,
-followed by a sample reference to the image in pod template.
+Hence, the placeholder shall be used to initialize a template parameter within the `values.yaml` file, that will later be referenced within the chart's templates to specify the experiment image.
+
+Below is a sample definition of a parameter within `values.yaml`, followed by a sample reference to the image in pod template.
 ```
     <values.yaml>
     image: {{ NAUTA.ExperimentImage }}
@@ -279,3 +271,7 @@ followed by a sample reference to the image in pod template.
     - name: tensorflow
       image: "{{ .Values.image }}"
 ```
+
+
+
+

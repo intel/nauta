@@ -13,6 +13,7 @@ Saving a file causes the following error:
 The error appears when a user tries to save file in `/input/home` folder, which is a read-only folder. In Jupyter, select the `/output/home` folder to correct this issue.
 
 ## Jupyter Error 2
+
 Closing the Jupyter notebook window in a Web browser causes experiments to stop executing. Attaching to the same Jupyter session still shows the stopped experiment. Currently, there _is no_ workaround.
 
 **Note:** This is a known issue in Jupyter (refer to: [https://github.com/jupyter/notebook/issues/1647](https://github.com/jupyter/notebook/issues/1647) for more information).
@@ -149,11 +150,12 @@ some single-node experiments may still be in RUNNING status even if scripts run 
 Till resolution of the problem on library's side - please monitor the statuses of experiments and check, whether they are not running too long 
 relative to predicted duration. If there are such cases, please cancel an experiment without purging it - results are in such cases still available on shares. 
 
-## DNS server has changed or missed in installation step
+## DNS Server has Changed or Missed in Installation Step
 
 If you would like to change DNS settings in the installation please do on the master node:
-* stop consul service `systemctl stop consul`
-* change file with your favorite text editor i.e. vim `vim /etc/consul/dns.json`
-* in recursor provide proper DNS server i.e. `"recursors" : ["8.8.8.8","8.8.4.4"]`
-* start consul service: `systemctl start consul`
+
+* Stop consul service `systemctl stop consul`
+* Change file with your favorite text editor i.e. vim `vim /etc/consul/dns.json`
+* In recursor provide proper DNS server i.e. `"recursors" : ["8.8.8.8","8.8.4.4"]`
+* Start consul service: `systemctl start consul`
 

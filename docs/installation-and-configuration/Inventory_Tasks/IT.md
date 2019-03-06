@@ -24,19 +24,20 @@ worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pas
 ## Inventory File Structure
 
 The file contains two sections:
-1. `**[master]**` Contains a description of a master node. This section _must_ contain exactly one row.
+1. `**[master]**` Contains a description of a master node. This section _must_ contain **exactly one row**.
+
 1. `**[worker]**` Contains descriptions of workers. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
 
 Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into it, and so on. The format for each row is as follows:
 
 `[SERVER_NAME] [VAR_NAME1]=[VAR_VALUE1] [VAR_NAME2]=[VAR_VALUE2] [VAR_NAME3]=[VAR_VALUE3]...`
 
-**NOTE**: `SERVER_NAME` must conform to standard host naming rules - each element of the hostname must be from 1 to
-63 characters long and the entire hostname, including the dots, can be at most 253 characters long. Valid characters
-for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and the hyphen. A hostname may not start with
-a hyphen.
+**Note**: `SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire hostname, including the dots must not exceed 253 characters long. 
+
+Valid characters for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and a hyphen. Furthermore, _do not_  start a hostname with a hyphen.
 
 ## Per-node Inventory Variables
+
 The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory, some are only required for some, and some variables are entirely optional.
 
 Variable Name | Description | Req? | Type | Default | Used When | Value |

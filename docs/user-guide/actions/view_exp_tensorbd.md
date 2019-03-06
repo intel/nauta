@@ -1,10 +1,10 @@
 # Launching TensorBoard to View Experiments
 
-You can launch TensorBoard from the Nauta web UI or the CLI. Both methods are described next.
+You can launch TensorBoard* from the Nauta web UI or the CLI. Both methods are described next.
 
 ## Launching TensorBoard from the Web UI
 
-**Note:** To view the experiment’s results in TensorBoard, TensorBoard data must be written to a 
+**Note:** To view the experiment’s results in TensorBoard, TensorBoard data _must be_ written to a 
 folder in the directory `/mnt/output/experiment.`
 
 To launch TensorBoard from the web UI and view results for individual experiments, perform these steps:
@@ -13,7 +13,7 @@ To launch TensorBoard from the web UI and view results for individual experiment
 
    `$ nctl launch webui`
 
-2. At the web UI, identify the experiment that you want to see displayed in TensorBoard. Click on the check box to the 
+2. At the web UI, identify the experiment that you want to see displayed in TensorBoard. Click the check box to the 
 left of the experiment name.
 
 3. With an experiment selected (checked), the **LAUNCH TENSORBOARD** button becomes active. Click **LAUNCH TENSORBOARD**. 
@@ -40,4 +40,8 @@ You can also launch TensorBoard and with the `nctl experiment view` command:
 `nctl experiment view -tensorboard <experiment_name>`
 
 This command exposes a TensorBoard instance with data from the named experiment as above.
+
+
+
+
 

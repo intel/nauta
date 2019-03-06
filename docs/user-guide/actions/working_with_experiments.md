@@ -12,6 +12,7 @@ This section provides greater detail about:
 * [Cancelling Experiments](cancel_exp.md)
 
 **Note:** Files located in the input storage are accessible through Jupyter Notebooks. Only files that are 
-written to /output/home/ are persistently stored. Therefore, changes made during a session to other files (including model scripts) 
-will not be saved when the session is closed. It is recommended to save session data to the 
-output/[experiment] folder for future use.
+written to: `output/home/` are persistently stored. Therefore, changes made during a session to other files (including model scripts) _will not be_ saved when the session is closed. As a result, it is recommended that you save session data to the 
+`output/[experiment]` folder for future use.
+
+

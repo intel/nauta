@@ -22,13 +22,23 @@ To install Nauta in a 'bare metal' (for example, non-cloud) server environment, 
  
  - `cd nauta`
 
-2. Build the base package (a makefile will automate the bulk of the process, but there are some minimum packages needed to get going).
+2. Build the base package (a makefile will automate the bulk of the process, but there are some minimum packages needed for Nauta).
 
-3. Populate Nauta's inventory file to tell it where your master and worker nodes are, and how to access them.
+* **Note:** To see the list of installed components and their versions, refer to: [List of Software Components](./System_Software_Components_Requisites/SSCR.md) and for Package information, refer to: [Installation Package Requirements](./Installation_Package_Requirements/IPR.md).
+ 
+3. Populate or create Nauta's inventory file to define where your master and worker nodes are, and how to access them. To create the Inventory file: 
 
-4. Configure Nauta's configuration file to tell it about proxies, network quirks and filesystem preferences.
+    - Copy the Inventory file example information: [Inventory File Information](./Inventory_Tasks/IT.md).
 
-5. Run the installation script.
+   - Modify the newly created Inventory file to suit your needs. 
+
+4. Modify Nauta's configuration file to define your proxy, network quirks and filesystem preferences. To create the configuration file: 
+
+   - Copy the Configuration file example infomation: [Configuration File Information](./Configuration_Tasks_Variables/CTV.md).
+
+   - Modify the newly created Configuration file to suit your needs. 
+
+5. Run the installation script (see [Installation Process](./Installation_Process/IP.md) for more information). 
 
 This process does the following:
 
@@ -36,7 +46,7 @@ This process does the following:
 
 - Installs the Nauta server-side application on your new Kubernetes cluster, and starts the system running.
 
-Completing all of the above takes some time. We are working on streamling the process. 
+Completing all of the above takes some time. We are working on streamlining the process. 
 
 # Document Flow
 
@@ -52,3 +62,7 @@ This guide consists of the following main topics, in order:
 * [Installating and Starting Nauta](Installation_Process/IP.md)
 * [User Management](User_Management/UM.md)
 * [Troubleshooting](Troubleshooting/T.md)
+
+
+
+

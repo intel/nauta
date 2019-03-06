@@ -35,10 +35,16 @@ helm | 2.11.0 | https://github.com/helm/helm
 The Nauta installation package consists of two major components:
 
 1. A package that installs a vanilla Kubernetes* cluster, including necessary OS-level software components, on provisioned Hardware.
-1.  A package that installs Nauta components (including containers, configuration files, etc.) on the above-mentioned Kubernetes cluster.
+
+1.  A package that installs Nauta components (including containers, configuration files, , and so on.) on the above-mentioned Kubernetes cluster.
 
 Nauta software components are optimized for AI containers containing Nauta-optimized libraries.
 
 ## Next Steps: How to Build Nauta
 
 * [Building Nauta](../How_to_Build_Nauta/HBN.md)
+
+
+
+
+

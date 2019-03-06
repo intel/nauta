@@ -45,12 +45,15 @@ postponed for a while, until all user's objects are removed.
 
 In case of any problems, a message is displayed describing their cause/causes. Otherwise a message is returned indicating success. If `--list_only` option was given, the command displays also a content of a configuration file. 
 
-### Notes
+### User Name Requirements
 
-User name must meet the following rules:
-1) Cannot be longer than 32 characters.
-2) Cannot be an empty string.
-3) Must conform to kubernetes naming convention, can contain only lower case alphanumeric 
+A user name _must meet_ the following requirements:
+
+1. Cannot be longer than 32 characters.
+
+2. Cannot be an empty string.
+
+3. Must conform to kubernetes naming convention, can contain only lower case alphanumeric 
 characters and "-" and "."
 
 ### Example
@@ -99,7 +102,7 @@ A message regarding the command's completion. In case of any problems, a short d
 
 `$ nctl user delete jdoe -p`
 
-Removes `jdoe` user with all his/her artifacts.
+Removes `jdoe` user with all a user's artifacts.
 
 ## list Subcommand
 

@@ -68,7 +68,7 @@ This command cancels prediction instance(s) chosen based on criteria given as a 
 
 ### Returns
 
-Description of a problem - if any occurs. Otherwise information that training job/jobs was/were cancelled sucessfully. 
+Description of a problem, if any occurs. Otherwise information that training job/jobs was/were cancelled sucessfully. 
 
 ## launch Subcommand
 

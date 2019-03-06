@@ -4,20 +4,26 @@ For information about stream inference testing, refer to [Stream Inference](stre
 
 ## Example Flow
 
-Following is the general flow of this example:
+The following is the general flow of this example:
 
 1. The user has acquired the dataset and the trained model.
-1. The user converts dataset into serialized protocol buffers (PBs). (Refer to https://developers.google.com/protocol-buffers/ as one information source.)
+
+1. The user converts dataset into _Serialized Protocol Buffers_ (PBs). Refer to https://developers.google.com/protocol-buffers/ as an information source.
+
 1. The user invokes `nctl mount`.
+
 1. The user mounts the Samba shared folder by invoking the command displayed in the previous step.
+
 1. The user copies the serialized PBs and the trained model to the just-mounted share.
+
 1. The user runs `nctl predict batch` command.
 
 ## MNIST Example
 
-You need to have preprocessed MNIST data for feeding the batch inference. You can generate example data performing the following steps:
+You need to have preprocessed MNIST data for feeding the batch inference. You can generate example data by performing the following steps:
 
 ### MNIST Data Preprocessing
+
 1. Create venv. Enter the following command:
    ```
    $ python3 -m venv .venv
@@ -34,7 +40,7 @@ You need to have preprocessed MNIST data for feeding the batch inference. You ca
    $ python mnist_converter_pb.py
    ```
 
-### Start prediction
+### Start Prediction
 
 1. Mount Samba input share to your directory, assumed `/mnt/input` . Use the command printed by 
 `nctl mount`.
@@ -44,14 +50,18 @@ You need to have preprocessed MNIST data for feeding the batch inference. You ca
 
    `$ nctl predict batch --model-location /mnt/input/home/trained_mnist_model --data /mnt/input/home/parsed --model-name mnist`
 
-**Notes**:
-* Paths provided in locations such as `--model-location` and `--data` need to point for files/directory from the container's context, not from user's filesystem or mounts. These paths can be mapped using instructions from `nctl mount`. For
-example, if you've mounted Samba `/input` and copied files there, you should pass `/mnt/input/home/<file>` .
-* `--model-name` is optional, but it must match the model name provided during data preprocessing, since generated requests
-must provide which servable they target. In the `mnist_converter_pb.py` script you can find 
-`request.model_spec.name = 'mnist'`, which saves model name in requests, and that name must match value passed as 
-`--model-name`. If not provided it assumes that model name is equal to last directory in model location:
-`/mnt/input/home/trained_mnist_model` -> `trained_mnist_model`
+### Other Important Information
+
+* **Paths:** Paths provided in locations such as, `--model-location` and `--data` need to point (for files/directory) from the container's context, _not_ from a user's filesystem or mounts. These paths can be mapped using instructions from `nctl mount`. 
+
+   For example, if you have mounted Samba `/input` and copied the files there, you should pass: `/mnt/input/home/<file>`.
+
+* **Model Name:** The`--model-name` is optional, but it _must_ match the model name provided during data preprocessing, since generated requests _must_ define which servable they target. In the `mnist_converter_pb.py` script, you can find 
+`request.model_spec.name = 'mnist'`. This saves the model name in requests, and that name _must_ match a value passed as: 
+`--model-name`
+
+    If not provided, it assumes that the model name is equal to last directory in model location:
+`/mnt/input/home/trained_mnist_model` --> `trained_mnist_model`
 
 ## References
 

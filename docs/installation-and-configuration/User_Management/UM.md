@@ -6,9 +6,9 @@ Creating a new user account creates a user account configuration file with _kube
 
 ### Setting up an Administrator Environment
 
-Before creating user accounts, you need to complete the following steps:
+Before creating user accounts, you _must_ complete the following steps:
 
-1. Install nclt using the description in the _Nauta User Guide_.
+1. Install nclt using the description in the [Nauta User Guide](../user-guide/).
    
 2. Copy the `nauta-admin.config` file to the machine where `nctl` resides. Place this configuration file in the `<location>` on the machine where nctl is running.  
 
@@ -30,7 +30,7 @@ The following is used to create a Nauta user, not an Administrator. Only the per
 
 2. This command also creates a configuration file named: '<username>.config' and places this file in the user's home directory. To verify that your new user has been created:
 
-   `$ nauta user list`
+   `$nctl user list`
 
 3. This lists all users, including the new user just added, but _does not_ show Administrators. An example is shown below. 
 
@@ -70,6 +70,10 @@ The command may take up to 30 seconds to delete the user and you may receive the
 To permanently remove (purge) all artifacts associated with the user and all data related to past experiments submitted by that user: 
 
 `$ nctl user delete <user_name> -p/--purge`
+
+This command asks for confirmation. 
+
+**Do you want to continue? [y/N]:** press y to confirm deletion.
       
 ### Limitations	
 
@@ -97,6 +101,11 @@ The image shows the Nauta Web UI. This UI contains experiment information that c
 ## Troubleshooting Information
 
 * [Troubleshooting Information](../Troubleshooting/T.md)
+
+
+
+
+
 
 
 

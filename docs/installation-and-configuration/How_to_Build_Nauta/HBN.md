@@ -15,7 +15,11 @@ Execute the following commands from the command line:
 
 ### Hardware Requirements
 
-Part of Nauta's build process involves the compilation of Tensorflow. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. To make sure SSE is available on a CPU, call `cat /proc/cpuinfo`. `sse sse2 sse4_1` should be listed in `flags` field.
+Part of Nauta's build process involves the compilation of TensorFlow*. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for SSE instructions. 
+
+To make sure SSE is available on a CPU, call:
+
+`cat /proc/cpuinfo`. `sse sse2 sse4_1` should be listed in `flags` field.
 
 **Note:** For SSE information, refer to: https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions
 
@@ -27,19 +31,21 @@ For the build server, it is recommended to have at least 12 GB of RAM and at lea
 
 #### Proxy Settings Requirements 
 
-Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.` Also docker should be configured to download images from the internet. Check [docker docker manual](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy).
+Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.` 
 
-If any proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
+If proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
+
+**Note:** Docker* _should be_ configured to download images from the internet, follow: [official Docker instructions](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy) for more detials.
 
 #### Internet Connection 
 
-To build the Nauta package, you need an internet connection so that you can untar the tarball, configure your proxy settings, DNS settings, and so on.
+To build the Nauta package, you _must have_ an internet connection so that you can untar the tarball, configure your proxy settings, DNS settings, and so on.
 
 #### Required Packages
 
 #### Ubuntu* 16.04 LTS or 18.04 LTS
 
-When building Nauta within these versions of Ubuntu (currently, the only validated build environments), the following packages must be installed first:
+When building Nauta within these versions of Ubuntu (currently, the only validated build environments), the following packages _must be_ installed first:
 
 - binutils
 - build-essential
@@ -50,28 +56,40 @@ When building Nauta within these versions of Ubuntu (currently, the only validat
 - python3-dev
 - virtualenv
 
-To install the required packages, invoke:
+#### Installing Required Packages
 
+To install the required packages, invoke:
 `sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz`
 
 #### Docker 
 
 To install Docker Community Edition* (CE*), follow: [official Docker instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
-The build process requires access to the `docker` command. Remember to add your user to the `docker` group by running: `sudo usermod -aG docker [user]` if the user _has not_ been added previously. 
+The build process requires access to the `docker` command. Remember to add your user to the `docker` group by running:
+
+`sudo usermod -aG docker [user]` 
+
+Do this, if a user _has not_ been added previously. 
 
 For more information, refer to the [Post-install Docker guide](https://docs.docker.com/install/linux/linux-postinstall).
 
-**Note:**  During the Nauta build process, TensorFlow* is checked by the Horovod* installer inside its Docker* container. 
+**Note:**  During the Nauta build process, TensorFlow is checked by the Horovod* installer inside its Docker container. 
 
 ## Build 
 
-From the main directory of Nauta repository invoke: 
+From the main directory of Nauta repository, invoke: 
 
 `make k8s-installer-build`
 
-**Note:** Logs from the build process are saved to a file. By default it is `k8s_installer_build.log` inside of the current
-working directory. Log file path can be controller through `K8S_INSTALLER_BUILD_LOG_PATH` env variable.
+### Build Logs
+
+Logs from the build process are saved to a file and persists if build fails. By default, it is `k8s_installer_build.log` in `tools/.workspace` directory. The Log file path can be controlled through `K8S_INSTALLER_BUILD_LOG_PATH` environment variable.
+
+In addition, it is also possible to clean temporary data if any error during build process occurs by invoking: 
+
+`make k8s-installer-clean`
+
+**Note:** The command shown above is automatically invoked when build process finishes with success.
 
 It is also a possibility to clean a temporary data if any error during build process occurs. Invoke:
 `make k8s-installer-clean`
@@ -84,7 +102,7 @@ A successful build produces a compressed tarball. The tarball's name appears as 
 
 The tarball contains, among other things, docs, images, config files, and ansible playbooks. To complete the installation of Nauta, follow the rest of this installation guide with a prepared `tar.gz` artifact.
 
-**Note** This guide explains how to build the Nauta application, but to interact with an installed Nauta platform, the `nctl` client is also required. For more information on installing the client, refer to the chapter _Client Installation and Configuration_ in section _How to Build Nauta CLI_ in the [Nauta User Guide](../../user-guide/actions/nctl.md).
+**Note:** This guide explains how to build the Nauta application, but to interact with an installed Nauta platform, the `nctl` client is also required. For more information on installing the client, refer to the chapter _Client Installation and Configuration_ in section _How to Build Nauta CLI_ in the [Nauta User Guide](../../user-guide/actions/nctl.md).
 
 ## Next Steps: Nauta Installer System Requirements
 

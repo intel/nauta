@@ -1,10 +1,10 @@
 # Cancelling Experiments
 
-To cancel one or more experiments, use the following command:
+The `nctl experiment cancel` command stops and cancels any experiment queued or in progress. However, completed experiments _cannot_ be cancelled.  This command may also cancel multiple experiments based on their names, pod IDs or pod statuses. Cancelling multiple experiments is optional. If any such object is found, the command queries if these objects (one or more) should be cancelled.
+
+To cancel one or more experiments, execute the following command:
  
 `$ nctl experiment cancel [Options] EXPERIMENT_NAME`
-
-This command stops and cancels any experiment queued or in progress. Completed experiments cannot be cancelled.  Cancels any experiment based on the name of an experiment/pod/status of a pod. If any such object is found the command queries if these objects (one or more) should be cancelled.
 
 The value of this argument should be created using rules described here. Use this command to cancel one or more experiments with matching or partially-matching names, a matching pod ID, matching pod status, or combinations of these criteria.
 For example, the following command will cancel all experiments with a matching or partially matching name:
@@ -22,3 +22,6 @@ The following command will cancel all experiments with a matching pod-status, us
 Any of the above criteria can be combined. 
 
 You can also purge all information concerning any experiment using the `-p` or `--purge` option.
+
+
+
