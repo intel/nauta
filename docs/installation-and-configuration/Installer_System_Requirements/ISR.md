@@ -11,11 +11,13 @@ Nauta supports the following Operating Systems:
 
 Required on system, software requirements:
   * sshpass (when password authentication is used)
- 
+  * helm 2.9.1 (version of a helm client must be the same as helm server used by the platform)
+   
 ### CentOS 7.5
 
 Required on system, software requirements:
   * sshpass (when password authentication is used)
+  * helm 2.9.1 (version of a helm client must be the same as helm server used by the platform)
   
 ### Ubuntu 16.04
 
@@ -27,6 +29,7 @@ Required on system, software requirements:
     - libffi-dev
     - libssl-dev
     - sshpass
+  * helm 2.9.1 (version of a helm client must be the same as helm server used by the platform)
 
 ## Next Steps: Target Host Requirements
 
