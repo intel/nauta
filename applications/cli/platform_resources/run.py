@@ -86,11 +86,12 @@ class Run(PlatformResource):
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
+        run_state = object_dict.get('spec', {}).get('state')
         return cls(name=object_dict['metadata']['name'],
                    parameters=object_dict.get('spec', {}).get('parameters'),
                    creation_timestamp=object_dict['metadata']['creationTimestamp'],
                    namespace=object_dict['metadata']['namespace'],
-                   state=RunStatus[object_dict.get('spec', {}).get('state')],
+                   state=RunStatus[run_state] if run_state else RunStatus.CREATING,
                    pod_count=object_dict['spec']['pod-count'],
                    pod_selector=object_dict['spec']['pod-selector'],
                    experiment_name=object_dict['spec']['experiment-name'],
