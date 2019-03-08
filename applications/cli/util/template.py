@@ -220,7 +220,7 @@ def validate_memory_settings(memory: str):
 
 
 def validate_cpu_settings(cpu: str):
-    return re.match(r"^[0-9]+m?$", cpu)
+    return re.match(r"^[0-9.]+m?$", cpu)
 
 
 def get_values_file_location(pack_name: str = None):
