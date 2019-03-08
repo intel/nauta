@@ -11,7 +11,7 @@ WORKDIR /build/gopath
 
 
 RUN git clone https://github.com/kubernetes/dns        /build/gopath/src/k8s.io/dns 
-RUN git clone -b release-1.10 https://github.com/kubernetes/kubernetes /build/gopath/src/k8s.io/kubernetes
+RUN git clone -b release-1.11 https://github.com/kubernetes/kubernetes /build/gopath/src/k8s.io/kubernetes
 RUN git clone -b cluster-autoscaler-release-1.12 https://github.com/kubernetes/autoscaler /build/gopath/src/k8s.io/autoscaler
 
 

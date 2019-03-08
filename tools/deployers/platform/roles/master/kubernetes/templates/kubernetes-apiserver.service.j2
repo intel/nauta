@@ -22,7 +22,6 @@ ExecStart=/opt/nauta/kubernetes/kube-apiserver \
             --kubelet-client-key /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
             --service-cluster-ip-range {{ kubernetes_network.svc }} \
             --client-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
-            --tls-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
             --tls-cert-file /etc/nauta-cluster/master/kubernetes/crt/apiservice.crt \
             --tls-private-key-file /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
             --requestheader-client-ca-file /etc/nauta-cluster/master/kubernetes/ca/CA.crt \
