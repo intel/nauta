@@ -1,5 +1,5 @@
 ARG BUILD_IMAGE=golang:1.10.2
-ARG BASE_IMAGE=centos:7.4.1708
+ARG BASE_IMAGE=centos:7.6.1810
 
 FROM ${BUILD_IMAGE} as build
 

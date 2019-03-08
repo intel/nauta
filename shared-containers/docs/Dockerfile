@@ -15,7 +15,7 @@ RUN cd /docs && find . -name "*.md*" | while read file; do \
 
 RUN find /docs -name "*.md" -type f -delete
 
-ARG BASE_IMAGE=centos:7.4.1708
+ARG BASE_IMAGE=centos:7.6.1810
 FROM ${BASE_IMAGE}
 
 COPY --from=0 /docs/user-guide /docs
