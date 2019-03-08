@@ -442,7 +442,7 @@ export default {
       if (lastUpdateTimeDiffer <= this.refresh.interval) {
         this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_A_MOMENT_AGO;
       } else {
-        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_30S_AGO;
+        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_XS_AGO(this.refresh.interval);
         if (!this.fetchingDataActive) {
           const refreshMode = true;
           this.getData(refreshMode);
