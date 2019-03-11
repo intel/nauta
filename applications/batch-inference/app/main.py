@@ -240,6 +240,9 @@ def main():
     output_dir_path = args.output_dir_path if args.output_dir_path else '/mnt/output/experiment'
     input_format = args.input_format
 
+    if not os.path.isdir(input_dir_path) or len(os.listdir(input_dir_path)) == 0:
+        raise RuntimeError(f"input directory: '{input_dir_path}' does not exist or is empty!")
+
     progress_thread = Thread(target=publish_progress)
     progress_thread.start()
 
