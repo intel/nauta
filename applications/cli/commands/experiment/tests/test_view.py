@@ -183,11 +183,12 @@ def test_container_volume_mounts_to_msg():
     volume_mount = MagicMock()
     volume_mount.name = 'mount_name'
     volume_mount.mount_path = 'mount_path'
+    volume_mount.rwro = 'ro'
     volume_mounts = [volume_mount]
 
     msg = view.container_volume_mounts_to_msg(volume_mounts=volume_mounts)
 
-    assert f'{volume_mount.name} @ {volume_mount.mount_path}' in msg
+    assert f'{volume_mount.name} <{volume_mount.rwro}> @ {volume_mount.mount_path}' in msg
 
 
 def test_unify_units():

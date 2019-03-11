@@ -33,6 +33,13 @@ volumeMounts:
     mountPath: /mnt/output/home
   - name: output-public
     mountPath: /mnt/output/root
+    readOnly: True
+  - name: output-public
+    mountPath: /mnt/output/root/public
+    subPath: public
+  - name: input-public
+    mountPath: /mnt/input/root/public
+    subPath: public    
 
 volumes:
   - name: input-home

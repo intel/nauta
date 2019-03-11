@@ -59,9 +59,24 @@ def container_status_to_msg(state) -> str:
 
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
+    # convert read only bool flag to string:
+    ux_volume_mounts = []
+    for vm in volume_mounts:
+        rwro = "rw"
+        if vm.read_only:
+            rwro = "ro"
+        ux_volume_mounts.append({
+            "name": vm.name,
+            "mount_path": vm.mount_path,
+            "rwro": rwro
+        })
     indent = ' ' * spaces
-    return indent.join([(wrap_text(f'{mount.name} @ {mount.mount_path}', width=CONTAINER_DETAILS_MAX_WIDTH,
-                                   spaces=spaces + 2) + "\n") for mount in volume_mounts]) if volume_mounts else ''
+    return indent.join(
+        [(wrap_text(
+            f'{mount["name"]} <{mount["rwro"]}> @ {mount["mount_path"]}',
+            width=CONTAINER_DETAILS_MAX_WIDTH,
+            spaces=spaces + 2) + "\n")
+         for mount in ux_volume_mounts]) if ux_volume_mounts else ''
 
 
 def unify_units(name: str, value: str) -> str:
