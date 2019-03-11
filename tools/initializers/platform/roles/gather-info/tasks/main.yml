@@ -1,0 +1,43 @@
+---
+- name: Get CPU info (cat /proc/cpuinfo)
+  shell: cat /proc/cpuinfo
+  register: cpu_info
+
+- name: Print CPU info
+  debug: var=cpu_info.stdout_lines
+
+- name: Get Nauta commit ID (git rev-parse HEAD)
+  shell: git rev-parse HEAD
+  register: commit_id
+  ignore_errors: True
+
+- name: Print Nauta commit ID
+  debug: var=commit_id.stdout
+
+- name: Get disk usage stats (df -h)
+  shell: df -h
+  register: df
+
+- name: Print disk usage stats
+  debug: var=df.stdout_lines
+
+- name: Get avaible block devices (lsblk)
+  shell: lsblk -o NAME,KNAME,RM,SIZE,TYPE,MOUNTPOINT
+  register: lsblk
+
+- name: List available devices
+  debug: var=lsblk.stdout_lines
+
+- name: Get physical memory status (free -h)
+  shell: free -h
+  register: memory
+
+- name: Print physical memory status
+  debug: var=memory.stdout_lines
+
+- name: Get docker version (docker version)
+  shell: docker version
+  register: docker_version
+
+- name: Print docker version
+  debug: var=docker_version.stdout_lines

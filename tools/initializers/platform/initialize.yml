@@ -5,3 +5,4 @@
   become: False
   roles:
     - role: cpu-validation
+    - role: gather-info

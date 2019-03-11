@@ -49,7 +49,7 @@ k8s-installer-clean:
                 	docker rm -f $$CONTAINER_LIST ; \
 	        fi \
 	fi
-	@(cd $(CURDIR)/tools && find .workspace/ -mindepth 1 \( ! -iname "nauta-*.tar.gz" \) 2>/dev/null | xargs rm -rf)
+	@(cd $(CURDIR)/tools && find .workspace/ -mindepth 1 \( ! -iname "nauta-*.tar.gz" ! -iname "k8s_installer_build.log" \) 2>/dev/null | xargs rm -rf)
 
 k8s-installer-build-wrapped:
 	@(cd $(CURDIR)/tools/initializers/deps && make check-platform-dependencies)
