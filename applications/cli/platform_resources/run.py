@@ -89,17 +89,17 @@ class Run(PlatformResource):
         run_state = object_dict.get('spec', {}).get('state')
         return cls(name=object_dict['metadata']['name'],
                    parameters=object_dict.get('spec', {}).get('parameters'),
-                   creation_timestamp=object_dict['metadata']['creationTimestamp'],
-                   namespace=object_dict['metadata']['namespace'],
+                   creation_timestamp=object_dict.get('metadata', {}).get('creationTimestamp'),
+                   namespace=object_dict.get('metadata', {}).get('namespace'),
                    state=RunStatus[run_state] if run_state else RunStatus.CREATING,
-                   pod_count=object_dict['spec']['pod-count'],
-                   pod_selector=object_dict['spec']['pod-selector'],
-                   experiment_name=object_dict['spec']['experiment-name'],
+                   pod_count=object_dict.get('spec', {}).get('pod-count'),
+                   pod_selector=object_dict.get('spec', {}).get('pod-selector'),
+                   experiment_name=object_dict.get('spec', {}).get('experiment-name'),
                    metrics=object_dict.get('spec', {}).get('metrics', {}),
-                   template_name=object_dict['spec']['pod-selector']['matchLabels']['app'],
-                   metadata=object_dict['metadata'],
-                   start_timestamp=object_dict['spec']['start-time'],
-                   end_timestamp=object_dict['spec']['end-time'])
+                   template_name=object_dict.get('spec', {}).get('pod-selector', {}).get('matchLabels', {}).get('app'),
+                   metadata=object_dict.get('metadata'),
+                   start_timestamp=object_dict.get('spec', {}).get('start-time'),
+                   end_timestamp=object_dict.get('spec', {}).get('end-time'))
 
     @classmethod
     def list(cls, namespace: str = None, state_list: List[RunStatus] = None, name_filter: str = None,
