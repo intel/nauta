@@ -6,11 +6,11 @@ create_package: False
 
 images:
   compiler/centos7:
-    version: "7.4.1708"
-    image: "centos:7.4.1708"
+    version: "7.6.1810"
+    image: "centos:7.6.1810"
     method: "pull"
   compiler/centos7-ready:
-    version: "7.4.1708"
+    version: "7.6.1810"
     required:
       BASE_IMAGE: "compiler/centos7"
     directory: "{{ playbook_dir }}/../../compile-containers/centos7"

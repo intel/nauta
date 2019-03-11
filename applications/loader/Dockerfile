@@ -1,5 +1,5 @@
 ARG BUILD_IMAGE=golang:1.10.2
-ARG BASE_IMAGE=centos:7.5.1804
+ARG BASE_IMAGE=centos:7.6.1810
 
 # GLIDE Section
 FROM ${BASE_IMAGE} as base

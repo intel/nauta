@@ -29,9 +29,9 @@ export_images:
 
 local_images:
   nauta/centos:
-    version: "7.5.1804"
+    version: "7.6.1810"
     method: pull
-    image: "centos:7.5.1804"
+    image: "centos:7.6.1810"
     push: True
   nauta/kubectl:
     version: "1.10.11"

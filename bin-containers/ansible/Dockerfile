@@ -1,5 +1,5 @@
 # This dockerfile builds an Ansible binary for offline installer
-ARG BASE_IMAGE=centos:7.5.1804
+ARG BASE_IMAGE=centos:7.6.1810
 FROM ${BASE_IMAGE}
 
 RUN yum update -y &&  yum install -y centos-release-scl && yum install -y devtoolset-7-gcc* libffi-devel gcc rh-python36
