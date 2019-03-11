@@ -72,8 +72,7 @@ def container_status_to_msg(state) -> str:
 
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
-    print(volume_mounts)
-    # conver read only bool flag to string:
+    # convert read only bool flag to string
     ux_volume_mounts = []
     for vm in volume_mounts:
         rwro = "rw"
@@ -84,7 +83,6 @@ def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
             "mount_path": vm.mount_path,
             "rwro": rwro
         })
-    print(ux_volume_mounts)
     indent = ' ' * spaces
     return indent.join(
         [(wrap_text(
