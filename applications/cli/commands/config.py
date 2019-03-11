@@ -36,9 +36,10 @@ NODE_CONFIG_FILENAME = "node_config"
 
 CPU_NUMBER_FIELDNAME = "cpu_number"
 MEMORY_AMOUNT_FIELDNAME = "memory_amount"
-CPU_SYSTEM_REQUIRED_FIELDNAME = "cpu_system_required"
-MEMORY_SYSTEM_REQUIRED_FIELDNAME = "memory_system_required"
-
+CPU_SYSTEM_REQUIRED_MIN_FIELDNAME = "cpu_system_required_min"
+CPU_SYSTEM_REQUIRED_PERCENT_FIELDNAME = "cpu_system_required_percent"
+MEMORY_SYSTEM_REQUIRED_MIN_FIELDNAME = "memory_system_required_min"
+MEMORY_SYSTEM_REQUIRED_PERCENT_FIELDNAME = "memory_system_required_percent"
 
 logger = initialize_logger(__name__)
 
@@ -87,8 +88,10 @@ def config(state: State, cpu: str, memory: str):
         config_file_content = yaml.load(config_file)
         cpu_number = str(config_file_content.get(CPU_NUMBER_FIELDNAME))
         memory_amount = str(config_file_content.get(MEMORY_AMOUNT_FIELDNAME))
-        cpu_system_required = str(config_file_content.get(CPU_SYSTEM_REQUIRED_FIELDNAME))
-        memory_system_required = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_FIELDNAME))
+        cpu_system_required_min = str(config_file_content.get(CPU_SYSTEM_REQUIRED_MIN_FIELDNAME))
+        cpu_system_required_percent = str(config_file_content.get(CPU_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
+        memory_system_required_min = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_MIN_FIELDNAME))
+        memory_system_required_percent = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
 
         if not cpu_number or cpu_number == "None" or not memory_amount or memory_amount == "None":
             handle_error(logger, Texts.CONFIG_FILE_INCORRECT, Texts.CONFIG_FILE_INCORRECT)
@@ -96,8 +99,10 @@ def config(state: State, cpu: str, memory: str):
 
         try:
             override_values_in_packs(new_cpu_number=cpu, new_memory_amount=memory, current_cpu_number=cpu_number,
-                                     current_mem_amount=memory_amount, cpu_system_required=cpu_system_required,
-                                     mem_system_required=memory_system_required)
+                                     current_mem_amount=memory_amount, cpu_system_required_min=cpu_system_required_min,
+                                     cpu_system_required_percent=cpu_system_required_percent,
+                                     mem_system_required_min=memory_system_required_min,
+                                     mem_system_required_percent=memory_system_required_percent)
         except Exception:
             logger.exception(Texts.ERROR_DURING_UPDATE)
             handle_error(logger, Texts.ERROR_DURING_UPDATE, Texts.ERROR_DURING_UPDATE)

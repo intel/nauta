@@ -67,7 +67,7 @@ def convert_k8s_memory_resource(mem_resource: str) -> int:
 
 
 def replace_cpu_configuration(data: Dict, new_cpu_number: str, current_cpu_number: str, fraction: float,
-                              system_required: str = '0') -> Dict:
+                              system_required_min: str = '0', system_required_percent: str ='0') -> Dict:
 
     if not data:
         return {}
@@ -76,7 +76,13 @@ def replace_cpu_configuration(data: Dict, new_cpu_number: str, current_cpu_numbe
     conv_current_cpu_number = convert_k8s_cpu_resource(current_cpu_number)
 
     if fraction:
-        conv_system_required = convert_k8s_cpu_resource(system_required)
+        conv_system_required_min = convert_k8s_cpu_resource(system_required_min)
+        conv_system_required_percent = float(system_required_percent)/100
+
+        conv_system_required = conv_new_cpu_number * conv_system_required_percent
+        if conv_system_required < conv_system_required_min:
+            conv_system_required = conv_system_required_min
+
         new_req_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
         new_limit_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
     else:
@@ -92,7 +98,7 @@ def replace_cpu_configuration(data: Dict, new_cpu_number: str, current_cpu_numbe
 
 
 def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem_amount: str, fraction: float,
-                                 system_required: str = '0') -> Dict:
+                                 system_required_min: str = '0', system_required_percent: str = '0') -> Dict:
 
     if not data:
         return {}
@@ -101,7 +107,13 @@ def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem
     conv_current_memory_amount = convert_k8s_memory_resource(current_mem_amount)
 
     if fraction:
-        conv_system_required = convert_k8s_memory_resource(system_required)
+        conv_system_required_min = convert_k8s_memory_resource(system_required_min)
+        conv_system_required_percent = float(system_required_percent)/100
+
+        conv_system_required = conv_new_memory_amount * conv_system_required_percent
+        if conv_system_required < conv_system_required_min:
+            conv_system_required = conv_system_required_min
+
         new_req_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
         new_limit_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
     else:
@@ -117,15 +129,22 @@ def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem
 
 
 def replace_single_value(data: Dict, new_value: str, current_value: str, key: str, fraction: float = None,
-                         cpu: bool = True, system_required: str = '0'):
+                         cpu: bool = True, system_required_min: str = '0', system_required_percent: str ='0'):
     value = data.get(key)
 
     if not value or value == "null":
         return
 
+    conv_system_required_percent = float(system_required_percent)/100
+
     if cpu:
         conv_new_value = convert_k8s_cpu_resource(new_value)
-        conv_system_required = convert_k8s_cpu_resource(system_required)
+        conv_system_required_min = convert_k8s_cpu_resource(system_required_min)
+
+        conv_system_required = conv_new_value * conv_system_required_percent
+        if conv_system_required < conv_system_required_min:
+            conv_system_required = conv_system_required_min
+
         if fraction:
             coefficient = fraction
             conv_new_value = conv_new_value - conv_system_required
@@ -136,7 +155,12 @@ def replace_single_value(data: Dict, new_value: str, current_value: str, key: st
         final_value = (conv_new_value * coefficient)/1000
     else:
         conv_new_value = convert_k8s_memory_resource(new_value)
-        conv_system_required = convert_k8s_memory_resource(system_required)
+        conv_system_required_min = convert_k8s_memory_resource(system_required_min)
+
+        conv_system_required = conv_new_value * conv_system_required_percent
+        if conv_system_required < conv_system_required_min:
+            conv_system_required = conv_system_required_min
+
         if fraction:
             coefficient = fraction
             conv_new_value = conv_new_value - conv_system_required
@@ -151,7 +175,8 @@ def replace_single_value(data: Dict, new_value: str, current_value: str, key: st
 
 def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
                              current_cpu_number: str, current_mem_amount: str,
-                             cpu_system_required: str, mem_system_required: str,
+                             cpu_system_required_min: str, cpu_system_required_percent: str,
+                             mem_system_required_min: str, mem_system_required_percent: str,
                              pack_name: str = None):
     yaml_parser = YAML(typ="jinja2", plug_ins=["ruamel.yaml.jinja2.__plug_in__"])
     values_yaml_paths = get_values_file_location(pack_name)
@@ -173,16 +198,19 @@ def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
 
                 for resource_name in RESOURCE_NAMES:
                     if pack_values.get(resource_name):
-                        pack_values[resource_name] = replace_cpu_configuration(data=pack_values.get(resource_name),
-                                                                               new_cpu_number=new_cpu_number,
-                                                                               current_cpu_number=current_cpu_number,
-                                                                               fraction=cpu_fraction,
-                                                                               system_required=cpu_system_required)
+                        pack_values[resource_name] = \
+                            replace_cpu_configuration(data=pack_values.get(resource_name),
+                                                      new_cpu_number=new_cpu_number,
+                                                      current_cpu_number=current_cpu_number,
+                                                      fraction=cpu_fraction,
+                                                      system_required_min=cpu_system_required_min,
+                                                      system_required_percent=cpu_system_required_percent)
 
                 for cpu_single_value in CPU_SINGLE_VALUES:
                     replace_single_value(data=pack_values, new_value=new_cpu_number, current_value=current_cpu_number,
                                          key=cpu_single_value, fraction=cpu_fraction,
-                                         system_required=cpu_system_required)
+                                         system_required_min=cpu_system_required_min,
+                                         system_required_percent=cpu_system_required_percent)
 
             except Exception:
                 logger.exception("Exception during calculation of new cpu values.")
@@ -195,16 +223,21 @@ def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
 
                 for resource_name in RESOURCE_NAMES:
                     if pack_values.get(resource_name):
-                        pack_values[resource_name] = replace_memory_configuration(data=pack_values.get(resource_name),
-                                                                                  new_memory_amount=new_memory_amount,
-                                                                                  current_mem_amount=current_mem_amount,
-                                                                                  fraction=memory_fraction,
-                                                                                  system_required=mem_system_required)
+                        pack_values[resource_name] = \
+                            replace_memory_configuration(data=pack_values.get(resource_name),
+                                                         new_memory_amount=new_memory_amount,
+                                                         current_mem_amount=current_mem_amount,
+                                                         fraction=memory_fraction,
+                                                         system_required_min=mem_system_required_min,
+                                                         system_required_percent=mem_system_required_percent)
 
                 for memory_single_value in MEMORY_SINGLE_VALUES:
                     replace_single_value(data=pack_values, new_value=new_memory_amount,
                                          current_value=current_mem_amount, key=memory_single_value,
-                                         fraction=memory_fraction, cpu=False)
+                                         fraction=memory_fraction,
+                                         system_required_min=mem_system_required_min,
+                                         system_required_percent=mem_system_required_percent,
+                                         cpu=False)
 
             except Exception:
                 logger.exception("Exception during calculation of new memory values.")

@@ -86,3 +86,6 @@ memory: null
 cpus: 20
 
 processesPerNode: 2
+
+cpu_fraction: 1
+memory_fraction: 1

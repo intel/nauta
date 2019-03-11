@@ -40,3 +40,6 @@ podCount: 2
 registryPort: {{ NAUTA.RegistryPort }}
 
 logLevel: 'INFO'
+
+cpu_fraction: 0.5
+memory_fraction: 0.5
