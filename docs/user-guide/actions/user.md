@@ -1,4 +1,4 @@
-# user Commands
+# user Command
 
 Use this command to create, delete, and manage users.
 
