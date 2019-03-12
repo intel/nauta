@@ -32,6 +32,8 @@
                     <exclude>**/package_examples/mnist_single_node.py</exclude>
                     <exclude>**/package_examples/mnist_tensorboard.py</exclude>
                     <exclude>**/package_examples/imdb_lstm.py</exclude>
+                    <exclude>**/package_examples/alexnet_single_node.py</exclude>
+                    <exclude>**/package_examples/alexnet_model.py</exclude>
                     <exclude>**/nauta-gui/.eslintrc.js</exclude>
                     <exclude>**/nauta-gui/.postcssrc.js</exclude>
                     <exclude>**/applications/experiment-service/vendor/</exclude>
