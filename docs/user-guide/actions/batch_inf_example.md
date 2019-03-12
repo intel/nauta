@@ -40,6 +40,12 @@ You need to have preprocessed MNIST data for feeding the batch inference. You ca
    $ python mnist_converter_pb.py
    ```
 
+#### Parameters of mnist_converter_pb.py
+* `work_dir` - Location where files related with conversion will be stored. Default: `/tmp/mnist_tests`.
+* `num_tests` - Number of examples to convert.  Default: `100`.
+
+Please note: Results of conversion are stored in `conversion_out` directory under `work_dir` parameter. Default: `/tmp/mnist_tests/conversion_out`.
+
 ### Start Prediction
 
 1. Mount Samba input share to your directory, assumed `/mnt/input` . Use the command printed by 
@@ -69,7 +75,3 @@ You need to have preprocessed MNIST data for feeding the batch inference. You ca
 * https://developers.google.com/protocol-buffers/docs/pythontutorial
 * https://github.com/tensorflow/serving/blob/master/tensorflow_serving/example/mnist_client.py
 * https://www.tensorflow.org/serving/docker
-
-
-
-
