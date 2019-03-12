@@ -38,6 +38,12 @@ You need to have preprocessed MNIST data for feeding the batch inference. You ca
    $ python mnist_converter_pb.py
    ```
 
+#### Parameters of mnist_converter_pb.py
+* `work_dir` - Location where files related with conversion will be stored. Default: `/tmp/mnist_tests`.
+* `num_tests` - Number of examples to convert.  Default: `100`.
+
+Please note: Results of conversion are stored in `conversion_out` directory under `work_dir` parameter. Default: `/tmp/mnist_tests/conversion_out`.
+
 ### Start Prediction
 
 1. Mount Samba input share to your directory (use `/mnt/input` for mounting). Then, execute the command printed by 
