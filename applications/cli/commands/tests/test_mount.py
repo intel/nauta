@@ -131,6 +131,7 @@ def test_get_unmount_command_osx(mocker):
 def test_mount(mocker):
     host_system = platform.system()
 
+    mocker.patch("commands.mount.verify_user_privileges")
     mocker.patch("commands.mount.is_current_user_administrator", return_value=False)
     gcu_mock = mocker.patch("commands.mount.get_current_user", return_value=TEST_USR)
     gus_mock = mocker.patch("commands.mount.get_users_samba_password", return_value=TEST_PSW)
