@@ -39,7 +39,7 @@ This guide describes how to use Nauta, and discusses the following topics:
     * [verify](actions/verify.md) - verifies installation of _dlsctl_ application
     * [version](actions/version.md) - displays version of _dlsctl_ application
 
-## Advanced section
+## Advanced Sections
 
 * [Installing additional dependency](advanced/customlibs.md)
 * [Controlling packs parameters](advanced/packs.md)

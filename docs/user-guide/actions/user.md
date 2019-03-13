@@ -10,7 +10,7 @@ Use this command to create, delete, and manage users.
 
 ### Synopsis
 
-Creates and initializes a new Nauta user. This command must be executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files.
+Creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files.
 
 ### Syntax
 
@@ -26,15 +26,15 @@ Creates and initializes a new Nauta user. This command must be executed when `ku
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-l, --list_only` | No | If given - content of the generated user's config file is displayed on the screen only. <br> If not given - file with configuration is saved on disk.|
-|`-f, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given <br> configuration is stored in the `config.<username>` file.|
+|`-l, --list_only` | No | If given, the content of the generated user's config file is displayed on the screen only. <br> If not given, the file with configuration is saved on disk.|
+|`-f, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given, the <br> configuration is stored in the `config.<username>` file.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Show help message and exit. |
 
 
-### Additional remarks
+### Additional Remarks
 
-In case of any errors during saving of a file with a configuration, the command displays a content of the configuration file on the screen, even if `-l` option wasn't used.  
+In case of any errors during saving of a file with a configuration, the command displays a content of the configuration file on the screen, even if `-l` option _was not_ used.  
 
 If an admin tries to create a user with a name that was used previously by a deleted user, it may happen that 
 the `create` command displays information that the previous user is still being deleted, even if the previous
@@ -43,7 +43,7 @@ postponed for a while, until all user's objects are removed.
 
 ### Returns
 
-In case of any problems, a message is displayed describing their cause/causes. Otherwise a message is returned indicating success. If `--list_only` option was given, the command displays also a content of a configuration file. 
+If any issues occur, a message is displayed describing their cause/causes. Otherwise a message is returned indicating success. If `--list_only` option was given, the command displays also a content of a configuration file. 
 
 ### User Name Requirements
 
@@ -70,8 +70,10 @@ This command deletes a user with a given name. If option `-p`, `--purge` was use
 
 Before removing a user, the commands asks for a final confirmation. If user chooses `Yes`, the chosen user is deleted.  
 Deletion of a user may take a while to be fully completed. The command requires up to 60 seconds for a complete
-removal of user. If after this time user hasn't been deleted completely, the command displays information that a
-user is still being deleted. In this case the user won't be listed on a list of existing users, but there is no
+removal of user. 
+
+If after this time a user _has not_ been deleted completely, the command displays information that a
+user is still being deleted. In this case the user _will not_ be listed on a list of existing users, but there is no
 possibility to create a user with the same name until the command completes and the user is deleted.
 
 ### Syntax
@@ -82,7 +84,7 @@ possibility to create a user with the same name until the command completes and 
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`USERNAME` | Yes | Name of a user who to be removed from the Nauta user accounts. |
+|`USERNAME` | Yes | The name of a user to be removed from the Nauta user accounts. |
 
 ### Options
 
@@ -95,7 +97,7 @@ possibility to create a user with the same name until the command completes and 
 
 ### Returns
 
-A message regarding the command's completion. In case of any problems, a short description of their causes.
+A message regarding the command's completion. If an issue occurs, a short description of the cause(s) displays.
 
 
 ### Example

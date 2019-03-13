@@ -1,6 +1,6 @@
 # experiment Command
 
-This overall purpose of this command/subcommands is to submit and manage experiments. Following are the subcommands for the nctl experiment command.
+The overall purpose of the command and subcommands is to submit and manage experiments. The following are the subcommands for the nctl experiment command.
 
  - [submit Subcommand](#submit-subcommand)
  - [list Subcommand](#list-subcommand)  
@@ -25,7 +25,7 @@ Submits training jobs. Use this command to submit single and multi-node training
  
  | Name | Required | Description |
  |:--- |:--- |:--- |
- |`SCRIPT_LOCATION` | Yes | Location and name of a python script with a description of training. |
+ |`SCRIPT_LOCATION` | Yes | Location and name of a Python* script with a description of training. |
  |`script_parameters` | No | String with a list of parameters that are passed to a training script. All such parameters should be added at the end of command after "--" string |
  
  
@@ -33,7 +33,7 @@ Submits training jobs. Use this command to submit single and multi-node training
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script. For example, other .py files, data, and so on. If not given, then its content _will not_ be copied into a the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
+ |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script. For example, other .py files, data, etc. If not given, then its content _will not_ be copied into a the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
  |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow* training is used (tf-training). List of available templates can be obtained by issuing the `nctl experiment template_list` command. |
  |`-n, --name TEXT`| No | Name for this experiment.|
  |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use: 'key "{'a': 'b'}"'|
@@ -43,8 +43,7 @@ Submits training jobs. Use this command to submit single and multi-node training
  |`-r, --requirements PATH` | No | Path to file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
- 
- 
+
 #### Additional Remarks
  
  For both types of parameters - `-ps` and `-pr` - if parameter stated in their definitions
@@ -121,7 +120,7 @@ List of experiments matching criteria given in command's options. Each row conta
 
 ### Examples
 
-The following command displays all experiments submitted by a current user
+The following command displays all experiments submitted by a current user.
 
 `$ nctl experiment list`
 
@@ -149,7 +148,7 @@ Cancels training chosen based on provided parameters.
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-m, --match TEXT`| No | If given, command searches for experiments matching the value of this option. This option cannot be used along with the NAME argument.|
+|`-m, --match TEXT`| No | If given, command searches for experiments matching the value of this option. This option _cannot_ be used along with the NAME argument.|
 |`-p, --purge`| No | If given, then all information concerning for identified experiments, completed and currently running, is removed from the system.|
 |`-i, --pod-ids` <br> `TEXT`| No | Comma-separated pods IDs. If given, command matches pods by their IDs and deletes them.|
 |` -s, --pod-status` <br> `TEXT`| No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN'. If given, command searches pods by their status and deletes them.|
@@ -309,8 +308,5 @@ A list of existing templates, or a _Lack of installed packs_ message, if there _
 ### Example
 
 `$ nctl experiment template_list`
-
-
-
 
 

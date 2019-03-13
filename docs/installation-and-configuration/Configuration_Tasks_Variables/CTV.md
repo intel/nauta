@@ -275,7 +275,7 @@ nauta_configuration:
 
 - **Description:** This is the Docker log driver settings for controlling rotation of a containers' logs on bare metal environments. In case of cloud deployments, such as Google Cloud Platform*, instead of changing this parameter, refer to your cloud provider instructions for log rotation configuration. 
 
-See: https://docs.docker.com/config/containers/logging/json-file/ for Docker log driver settings information. 
+See: https://docs.docker.com/config/containers/logging/json-file/ for Docker log driver settings information.
 
 - **Default value:**
 ```yaml

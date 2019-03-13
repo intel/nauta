@@ -14,7 +14,7 @@ The following screen displays (the screen shown is an example only).
 * **Name:** The left-most column lists the experiments by name.
 * **Status:** This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date:** This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
-* **Start Date:** This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM. The Start Date (or time) will always be after the Submission Date (or time).
+* **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM. The Start Date (or time) will always be after the Submission Date (or time).
 * **Duration:** This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
 * **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (inference) with this model.
 
@@ -73,8 +73,6 @@ Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for 
 * Click **Resources Dashboard** to open the Kubernetes resources dashboard. 
 
 Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md) for more information.
-
-
 
 
 

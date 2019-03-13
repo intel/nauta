@@ -40,14 +40,6 @@ To install Nauta in a 'bare metal' (for example, non-cloud) server environment, 
 
 5. Run the installation script (see [Installation Process](./Installation_Process/IP.md) for more information). 
 
-This process does the following:
-
-- Creates a Kubernetes cluster, all the Docker files you need to run Tensorflow*, Jupyter*, Tensorboard, and Horovod*.
-
-- Installs the Nauta server-side application on your new Kubernetes cluster, and starts the system running.
-
-Completing all of the above takes some time. We are working on streamlining the process. 
-
 # Document Flow
 
 This guide consists of the following main topics, in order:
@@ -62,7 +54,6 @@ This guide consists of the following main topics, in order:
 * [Installating and Starting Nauta](Installation_Process/IP.md)
 * [User Management](User_Management/UM.md)
 * [Troubleshooting](Troubleshooting/T.md)
-
 
 
 

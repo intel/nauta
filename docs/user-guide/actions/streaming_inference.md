@@ -87,7 +87,7 @@ $ nctl predict stream --name <prediction instance name> --data inference-data.js
 
 Another way to interact with a running prediction instance is to use TensorFlow Serving REST API. This approach could be useful for more sophisticated use cases, like integrating data-collection scripts/applications with prediction instances.
 
-The URL and authorization header for accessing Tensorflow Serving REST API will be shown after prediction instance is submitted, as in the following example.
+The URL and authorization header for accessing TensorFlow Serving REST API will be shown after prediction instance is submitted, as in the following example.
 
 ```
 Prediction instance URL (append method verb manually, e.g. :predict):

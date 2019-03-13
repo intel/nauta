@@ -36,7 +36,7 @@ The Nauta installation package consists of two major components:
 
 1. A package that installs a vanilla Kubernetes* cluster, including necessary OS-level software components, on provisioned Hardware.
 
-1.  A package that installs Nauta components (including containers, configuration files, , and so on.) on the above-mentioned Kubernetes cluster.
+1. A package that installs Nauta components (including containers, configuration files, and so on.) on the above-mentioned Kubernetes cluster.
 
 Nauta software components are optimized for AI containers containing Nauta-optimized libraries.
 

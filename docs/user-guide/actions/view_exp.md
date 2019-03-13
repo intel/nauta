@@ -7,7 +7,7 @@ To list all experiments you have submitted, run the next command.  The possible 
 
 **Syntax:** `nctl experiment list [options]`
 
-An example experiment list syntax is shown below:  
+An example experiment list syntax is shown below.  
 
 `$ nctl experiment list`
 
@@ -23,7 +23,7 @@ Use the following command to view a single experiment’s details:
 
 **Syntax:** `nctl experiment view [options] EXPERIMENT_NAME`
 
-Here is an example:  
+An example experiment view is shown below.  
 
 `$ nctl experiment view mnist-tb-2-1`
 

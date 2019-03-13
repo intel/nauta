@@ -32,7 +32,7 @@ Each row describes a server (playing either the role of _Master_ or _Worker_ dep
 
 `[SERVER_NAME] [VAR_NAME1]=[VAR_VALUE1] [VAR_NAME2]=[VAR_VALUE2] [VAR_NAME3]=[VAR_VALUE3]...`
 
-**Note**: `SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire hostname, including the dots must not exceed 253 characters long. 
+**Note:**: `SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire hostname, including the dots must not exceed 253 characters long. 
 
 Valid characters for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, and a hyphen. Furthermore, _do not_  start a hostname with a hyphen.
 

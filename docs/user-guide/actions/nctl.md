@@ -50,6 +50,7 @@ Should you need to rebuild nctl after any changes, you can invoke `make clean bu
 
 If you want to create `tar.gz` package with nctl, invoke `make nctl-build` from main directory in the repository.
 After successful build, the `tar.gz` file can be found in `applications/cli` directory. The Package contains the nctl binary and all dependencies, such as helm, draft and so on. Also, docs and examples directories will be available.
+The package contains nctl binary and all dependencies, such as helm, draft etc. In addition, docs and examples directories will be available.
 
 **Note:** Building Nauta CLI on Windows requires `bash` console. One possible solution is to install MSYS (http://www.mingw.org/wiki/msys). If build process is started from Windows `cmd` console, it will fail. 
 
@@ -64,6 +65,5 @@ After successful build, the `tar.gz` file can be found in `applications/cli` dir
 `make venv` - Creates .venv with all modules required by nctl
 
 `make venv-dev` - Internal target used by makefiles
-
 
 

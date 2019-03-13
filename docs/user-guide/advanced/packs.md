@@ -70,8 +70,6 @@ Example _values.yaml_ file taken from _multinode-tf-training-tfjob_ pack:
 	workersCount: 3
 	psSidecarLoggingLevel: "WARNING"
 	pServersCount: 1
-
-
     
 ### Modifying Values
 
@@ -88,7 +86,7 @@ The _-p_ parameter can be provided multiple times. Format specification:
  
 #### Example
 
-    nctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
+_nctl_ experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
 
 ### Experiment Resources
 
@@ -117,7 +115,7 @@ Will submit an experiment with CPU requests and limits set to 2, and memory requ
 
 To change these defaults, following parameters should be adjusted (using methods described in Modifying values section):
 
-| Template      | Resource parameters |
+| Template      | Resource Parameters |
 | --- | --- | 
 | jupyter       | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | jupyter-py2       | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> -  resources.limits.memory |

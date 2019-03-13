@@ -1,9 +1,8 @@
 # Getting Started
 
-This section provides brief examples for performing some of the most essential and valuable 
-tasks supported by Nauta. 
+This section provides brief examples for performing some of the most essential and valuable tasks supported by Nauta. 
 
-**Note:** Several commands and training scripts in this section require access to the internet to download data, scripts, etc.
+**Note:** Several commands and training scripts in this section require access to the internet to download data, scripts, and so on.
 
 The section discusses the following main topics:
 
@@ -18,6 +17,7 @@ The section discusses the following main topics:
  - [Overview of nctl Commands](#overview-of-nctl-commands)
  - [Viewing Experiment Output Folder](#viewing-experiment-output-folder)
  - [Removing Experiments: Optional](#removing-experiments-optional)
+
 
 ## Verifying Installation
 
@@ -40,8 +40,6 @@ To verify your installation has completed, execute the following command:
 `nctl verify`
 
 ### Confirmation Message
-
-If any installation issues are found, the command returns information about the cause: which application should be installed and in which version. This command also checks if the CLI can connect to Nauta; and, if port forwarding to Nauta is working correctly. If no issues are found, a message indicates checks were successful. The following examples are the results of this command
 
 If any installation issues are found, the command returns information about the cause: which application should be installed and in which version. This command also checks if the CLI can connect to Nauta; and, if port forwarding to Nauta is working correctly. If no issues are found, a message indicates checks were successful. The following examples are the results of this command:
  
@@ -127,7 +125,7 @@ The following is the basic syntax for experiment submit command:
 * `-t`,  TEXT: Name of a template that will be used by Nauta to create a description of a job to be submitted. By default, this is a single-node tensorflow training. The template is chosen. The list of available templates can be obtained by issuing the `nctl experiment template_list` command.
 * `SCRIPT_LOCATION`: The path and name of the Python script use to perform this experiment.
 
-**Note**: To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script takes care of this requirement; however, your scriptswill need to meet the same requirements.
+**Note**: To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts will need to meet the same requirements.
 
 #### Result of this Command
 
@@ -145,13 +143,13 @@ Enter this commmand:
 
 `$ nctl experiment list --brief`
 
-Experiment status displays as below.  This is an example only. The `--brief` option returns a short version of results as shown.
+As shown below, an experiment's status displays. This is an example only. The `--brief` option returns a short version of results as shown.
 
  ![Image](images/experiment_status.png) 
  
 ### Monitoring Training
 
- There are four ways to monitor training in Nauta, all which are discussed in the following sections. 
+There are four ways to monitor training in Nauta, all which are discussed in the following sections. 
  
 * Viewing Experiment Logs
 * Adding Experiment Metrics
@@ -160,21 +158,21 @@ Experiment status displays as below.  This is an example only. The `--brief` opt
 
 ### Viewing Experiment Logs 
 
-Use the following command to view the experiment log.
+To view the experiment log, execute the following command.
 
 **Syntax**: `nctl experiment logs [options] EXPERIMENT_NAME`
 
-Enter this command:
+Execute this command:
 
 `$ nctl experiment logs mnist-tb`
 
-A log displays as follows. The result below is an example only.
+As shown below, a log displays the example results.
 
  ![Image](images/experiment_log.png)  
 
 ## Adding Experiment Metrics: Optional
 
-Experiments launched in Nauta can output additional kinds of metrics using the publish function from the experiment metrics API. To see an example of metrics published with the single experiment executed in the above example, enter this command:
+Experiments launched in Nauta can output additional kinds of metrics using the _publish function_ from the experiment metrics API. To see an example of metrics published with the single experiment executed in the above example, execute the following command:
 
 `$ nctl experiment list`
 
@@ -201,17 +199,15 @@ To add metrics to an experiment file you have created, you need to edit the expe
 
     `$ nctl experiment list`
 
-**Saving Metrics for Multinode Experiments**
+### Saving Metrics for Multinode Experiments
 
 Storing at the same time two (or more) metrics with the same key from two different nodes may lead to errors (such as loosing some logs) due to conflicting names. To avoid this, adding metrics for multinode experiments should be done using one of the two following methods:
 
-### Method 1
 
-The key of a certain metric should also contain a node identificator from which this metric comes. Creation of such identificator can be done in the following ways:
-
-* For `horovod` multinode training jobs, result of the rank() function provided by the Horovod package can be used as a node's identificator.  
-    
-* For `tfjob multinode training` jobs, a user can utilize all necessary information from the `TF_CONFIG` environment variable. A code example for creating an identificator is shown below.
+**Method 1**:  The key of a certain metric should also contain a node identificator from which this metric comes. Creation of such identificator can be done in the following ways:
+    * For horovod multinode training jobs, result of the `rank()` function provided by the `horovod` package can be used
+    as a node's identificator.  
+    * For `tfjob` multinode training jobs, a user can take all necessary info from the TF_CONFIG environment variable. Here is an example piece of a code creating such identificator, is:
 
     ```
     tf_config = os.environ.get('TF_CONFIG')
@@ -240,7 +236,7 @@ The web UI lets you explore the experiments you have submitted. To view your exp
 
 `$ nctl launch webui`
 
-**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling.  After establishing a tunnel from the gateway to your local machine, you can use the URL by this command.
+**Note**: If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL by this command.
 
 An example is shown in the screen below.
 
@@ -257,7 +253,7 @@ You can perform the tasks discussed below at the web UI.
 
 ### Expand Experiment Details
 
-Click _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
+Click _listed experiment name_ to see additional details for that experiment.  The following details are examples only. 
 This screen is divided into two frames: left-side and right-side frames. 
 
 ### Left-most Frame
@@ -283,8 +279,7 @@ The right-side frame of the experiment details windows shows (as shown in the fi
 
 ### Searching on Experiments
 
-In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the 
-experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
+In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
 
 ### Adding/Deleting Columns
 
@@ -296,11 +291,11 @@ Click to check and uncheck and select the column headings you prefer. Optional c
 Column headings also include metrics that have been setup using the Metrics API, for a given experiment, and you 
 can select to show those metrics in this display as well. Column additions and deletions you make are retained between logins.
 
-Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information..
+Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information.
 
 ## Launching Kubernetes Dashboard
 
-Click the hamburger menu ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
+Click the **hamburger menu** ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
 
 ## Launching TensorBoard
 
@@ -370,6 +365,7 @@ saved_model.pb  variables
 variables.data-00000-of-00001  variables.index
 ```
 ### Running Prediction Instance
+
 The following provides a brief example of running inference using the batch command. For more information, refer to [Evaluating Experiments with Inference Testing](inference_testing.md).
 
 Before running the `batch` command, you need to copy `protobuf` requests to input storage, because  they need to be accessed by the prediction instance too. 
@@ -429,7 +425,7 @@ You can use the following steps to mount the output folder and view TensorBoard 
        * Ubuntu: `sudo umount my_output_folder`
        * Windows: `Eject or net use Y: /delete`
        
-#### Additional Mounting and Unmounting Information
+To unmount previously mounted Nauta input storage from a local folder/machine refer to [Unmounting Experiment Input to Storage](unmount.md) for more information.
 
 For more information on mounting, refer to [Working with Datasets](working_with_datasets.md). To unmount previously mounted Nauta input storage from a local folder/machine refer to [Unmounting Experiment Input to Storage](unmount.md) for more information).
 
@@ -446,9 +442,6 @@ An experiment that has been completed and is no longer needed can be removed fro
 Enter this command, substituting your experiment name:
 
  `$ nctl experiment cancel –-purge <your_experiment>`
-
-
-
 
 
 

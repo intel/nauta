@@ -37,7 +37,7 @@ Jupyter Notebook will launch in your default web browser. The following displays
 An example active Jupyter Notebook, shows a simple experiment plot.
  
  ![](images/jupyter_plot.png)
-
+ 
  ## Canceling a Jupyter Notebook
 
 In Nauta, running a Jupyter notebook is done through an interact session. The session will remain open such that the Jupyter notebook that is running will continue when the browser is closed. Therefore, a user _must_ manually cancel the interact session, or it will continue to allocate resources.
@@ -52,6 +52,6 @@ In Nauta, running a Jupyter notebook is done through an interact session. The se
    * The --purge option should be used if user wishes to remove session from experiment list
    
 To verify that cancellation has completed, execute: nctl experiment list --status RUNNING 
-
-
-
+ 
+ 
+ 

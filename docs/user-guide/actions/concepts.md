@@ -1,6 +1,6 @@
-# Basic Concepts
+# Nauta Basic Concepts
 
-The following concepts and terms are relevant to using this software.
+Within this user guide, the following concepts and terms are relevant to using this software.
 
 ## User
 
@@ -12,7 +12,7 @@ In this context, the _Administrator_ or _Admin_ creates and monitors users and r
 
 ## Resources
 
-In this context, _Resources_ are the system compute and memory resources the user will assign to a model training experiment. The user can specify the number of processing nodes and the amount of memory in the system that will be reserved for a given experiment or job. The job will not be allowed to exceed the specified memory limit. In a multi-user environment, care should be taken to not dedicate too many resources to a given job, because other applications and services may be impacted.
+In this context, _Resources_ are the system compute and memory resources the user will assign to a model training experiment. The user can specify the number of processing nodes and the amount of memory in the system that will be reserved for a given experiment or job. The job will not be allowed to exceed the specified memory limit. In a multi-user environment, care should be taken _to not_ dedicate too many resources to a given job, because other applications and services may be impacted.
 
 ## Data
 
@@ -27,8 +27,5 @@ Performing deep learning experimentation is what the Nauta application was devel
 After experiments have been run and the model has been trained, you can pass in new (unlabeled) data exemplars, to obtain predicted labels and other details returned. This process is called inference. In general, generating predictions involves pre-processing the new input data, running it through the model, and then collecting the results from the last layer of the network.
 
 The Nauta software supports both batch and streaming inference. Batch inference involves processing a set of prepared input data to a referenced trained model and writing the inference results to a folder. Streaming inference is where the user deploys the model on the system and streaming inference instance processes singular data as it is received.
- 
-
-
 
 

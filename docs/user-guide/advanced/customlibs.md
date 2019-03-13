@@ -1,6 +1,6 @@
 # Installing Libraries and Dependencies
 
-To install an OS library or dependency that is not included in standard NAUTA docker image it is required to modify draft pack definition. To install a pip dependency (like numpy or pandas), refer to `experiment submit` command documentations.
+To install an OS library or dependency that _is not_ included in standard NAUTA docker image it is required to modify draft pack definition. To install a pip dependency (like numpy or pandas), refer to `experiment submit` command documentations.
 
 ## Modifying Existing Draft Packs
 
@@ -50,7 +50,6 @@ Below is an example _Dockerfile_ showing installation of additional packages.
     ADD training.py .
     
     ENV PYTHONUNBUFFERED 1
-
 
 
 

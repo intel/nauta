@@ -56,8 +56,7 @@ Where:
 
 ## Provided Template Packs
 
-The Nauta software is shipped with a number of built-in template packs
-that represent the types of experiments officially supported and validated.
+The Nauta software is shipped with a number of built-in template packs that represent the types of experiments officially supported and validated.
 
 For each of the packs there are two versions provided: one that supports Python 2.7.x user scripts (packs with `-py2` suffix in the name) and one that supports Python 3.6.x user scripts.
 
@@ -254,7 +253,7 @@ initialize a parameter named `commandline`:
 
 ### `NAUTA.ExperimentImage`
 
-The `NAUTA.ExperimentImage` placeholder carries the full reference to the docker image resulting
+The NAUTA.ExperimentImage placeholder carries the full reference to the docker image resulting
 from building the [`Dockerfile`](#dockerfile) specified within the pack. 
 
 During experiment submission, the image will be built by Docker and deposited in the Nauta Docker Registry under the locator represented by this placeholder. 
@@ -262,6 +261,7 @@ During experiment submission, the image will be built by Docker and deposited in
 Hence, the placeholder shall be used to initialize a template parameter within the `values.yaml` file, that will later be referenced within the chart's templates to specify the experiment image.
 
 Below is a sample definition of a parameter within `values.yaml`, followed by a sample reference to the image in pod template.
+
 ```
     <values.yaml>
     image: {{ NAUTA.ExperimentImage }}

@@ -1,7 +1,6 @@
 # Working with Datasets
 
 The section discusses the following topics, these are:
-
  - [Uploading Dataset](#uploading-datasets)  
  - [nctl mount Command](#nctl-mount-command)
  - [Mounting and Accessing Folders](#mounting-and-accessing-folders)
@@ -57,8 +56,6 @@ The `nctl mount` command also returns a command to unmount a folder. Nauta uses 
 
 ## Mounting and Accessing Folders
 
-The following table displays the access permissions for each mounting folder.
-
 The following table shows the access permissions for each mounting folder.
 
 | Nauta Folder | Reference Path | User Access | Shared Access
@@ -109,6 +106,4 @@ in Nauta storage and can be used by any user for their experiments.
 ## Uploading and Using a Shared Dataset Example
 
 If you want to copy your data to a shared folder, use input-shared instead of input in step 3.  Using the shared Nauta storage will allow all Nauta users to use the same MNIST dataset by referencing the shared path, `/mnt/input/root/public/MNIST`.
-
-
 

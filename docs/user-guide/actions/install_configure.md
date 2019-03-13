@@ -20,7 +20,7 @@ The following software _must_ be installed on the client system before installin
 
 * kubectl version 1.10 or later: (https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
 
-* docker version 18.03.0-ce or later: (https://docs.docker.com/install/)
+* Docker version 18.03.0-ce or later: (https://docs.docker.com/install/)
 
 ## Installation
 
@@ -36,7 +36,7 @@ To install the Nauta client software package, do the following:
  
     * For Windows, enter: `set KUBECONFIG=<PATH>\<USERNAME>.config`
  
-4.	(OPTIONAL) Add the package `nctl` to your terminal PATH. `NCTL_HOME` should be the path to the nctl application folder:
+4.	**Optional:** Add the package `nctl` to your terminal PATH. `NCTL_HOME` should be the path to the nctl application folder:
 
     * For MacOS/Ubuntu, enter: `export PATH=$PATH:NCTL_HOME`
     
@@ -52,3 +52,4 @@ Should you want to permanently set the variables, you can add the variables to y
 
 Alternatively, you may want to set the PATH and KUBECONFIG variables in the  _Environment Variables_ window. This is accessed by opening the Control Panel > System and Security > System > Advanced system settings, and accessing Environment variables. This is an administrator function only.
  
+

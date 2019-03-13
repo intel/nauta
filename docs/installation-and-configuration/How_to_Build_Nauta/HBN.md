@@ -30,7 +30,7 @@ Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are
 
 If proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
 
-**Note:** Docker* _should be_ configured to download images from the internet, follow: [official Docker instructions](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy) for more detials.
+**Note:** Docker* _should be_ configured to download images from the internetfrom the internet, follow: [official Docker instructions](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy) for more detials.
 
 #### Internet Connection 
 
@@ -51,9 +51,8 @@ When building Nauta within these versions of Ubuntu (currently, the only validat
 - python3-dev
 - virtualenv
 
-#### Installing Required Packages
-
 To install the required packages, invoke:
+
 `sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz`
 
 #### Docker 
@@ -64,7 +63,7 @@ The build process requires access to the `docker` command. Remember to add your 
 
 `sudo usermod -aG docker [user]` 
 
-Do this, if a user _has not_ been added previously. 
+Do this, if a user _has not_ been added previously
 
 For more information, refer to the [Post-install Docker guide](https://docs.docker.com/install/linux/linux-postinstall).
 
@@ -86,11 +85,6 @@ In addition, it is also possible to clean temporary data if any error during bui
 
 **Note:** The command shown above is automatically invoked when build process finishes with success.
 
-It is also a possibility to clean a temporary data if any error during build process occurs. Invoke:
-`make k8s-installer-clean`
-
-**Note:** Command mentioned above is automatically invoked when build process finishes with success.
-
 ## Output of the Build
 
 A successful build produces a compressed tarball. The tarball's name appears as follows: `nauta-{version}-{build-id}.tar.gz` (for example: `nauta-1.0.0-190110100005.tar.gz`). It can be found in the `tools/.workspace` directory.  
@@ -102,3 +96,7 @@ The tarball contains, among other things, docs, images, config files, and ansibl
 ## Next Steps: Nauta Installer System Requirements
 
 * [Installer System Requirements](../Installer_System_Requirements/ISR.md)
+
+
+
+
