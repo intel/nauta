@@ -21,8 +21,8 @@ from distutils.version import LooseVersion
 
 import pytest
 
-from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
-    get_os_version, get_windows_edition, WINDOWS_EDITIONS
+from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli,\
+    format_duration_for_cli, handle_error, get_os_version, get_windows_edition, WINDOWS_EDITIONS
 
 
 def test_execute_system_command(mocker):
@@ -87,6 +87,14 @@ def test_format_timestamp_for_cli(mocker):
     cli_timestamp = format_timestamp_for_cli("2018-10-11T20:30:30Z")
 
     assert cli_timestamp == "2018-10-11 09:30:30 PM"
+
+
+def test_format_duration_for_cli():
+    start_date = datetime.datetime(year=2019, month=1, day=2, hour=3, minute=34, second=42)
+    end_date = datetime.datetime(year=2019, month=1, day=4, hour=1, minute=22, second=51)
+    timedelta = end_date - start_date
+    expected_string = "1d 21h 48m 9s"
+    assert format_duration_for_cli(timedelta) == expected_string
 
 
 def test_handle_error_no_logger(mocker):

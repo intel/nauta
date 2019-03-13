@@ -32,8 +32,14 @@ describe('VUE components FooterElements', () => {
               name: 'container1',
               status: 'running',
               resources: {
-                cpu: '1',
-                memory: '2'
+                requests: {
+                  cpu: '1',
+                  memory: '2'
+                },
+                limits: {
+                  cpu: '1',
+                  memory: '2'
+                }
               }
             }
           ]
@@ -46,8 +52,14 @@ describe('VUE components FooterElements', () => {
               name: 'container1',
               status: 'running',
               resources: {
-                cpu: '12',
-                memory: '21'
+                requests: {
+                  cpu: '12',
+                  memory: '21'
+                },
+                limits: {
+                  cpu: '12',
+                  memory: '21'
+                }
               }
             }
           ]
@@ -78,9 +90,13 @@ describe('VUE components FooterElements', () => {
   });
 
   it('Should parse exp resources details correctly', function () {
-    const resources = {cpu: '1'};
+    const resources = {
+      limits: {
+        cpu: '1'
+      }
+    };
     const expectedStateString = '1';
-    expect(wrapper.vm.parseValue('resources', 'cpu', resources)).to.equal(expectedStateString);
+    expect(wrapper.vm.parseValue('resources', 'cpu', 'limits', resources)).to.equal(expectedStateString);
   });
 
   it('Should parse exp state details correctly when resources cpu obj empty', function () {

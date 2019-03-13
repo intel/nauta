@@ -23,6 +23,7 @@ from typing import List, Tuple
 import errno
 import socket
 import dateutil
+from datetime import timedelta
 import signal
 import platform
 from distutils.version import LooseVersion
@@ -206,6 +207,13 @@ def format_timestamp_for_cli(timestamp: str) -> str:
     cli_timestamp = dateutil.parser.parse(timestamp).astimezone(
         dateutil.tz.tzlocal()).strftime("%Y-%m-%d %I:%M:%S %p")
     return cli_timestamp
+
+
+def format_duration_for_cli(timedelta: timedelta) -> str:
+    days = timedelta.days
+    hours, remainder = divmod(timedelta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return '{}d {}h {}m {}s'.format(days, hours, minutes, seconds)
 
 
 def wait_for_ctrl_c():
