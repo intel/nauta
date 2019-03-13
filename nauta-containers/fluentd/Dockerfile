@@ -27,7 +27,7 @@ COPY Gemfile* /fluentd/
 
 RUN yum clean all && \
     yum update -y && \
-    yum install -y rpm-build gcc gcc-c++ patch autoconf binutils libtool make libffi-devel openssl-devel rh-ruby23-ruby-devel
+    yum install -y gcc gcc-c++ patch make libffi-devel openssl-devel rh-ruby23-ruby-devel
 
 RUN source /opt/rh/rh-ruby23/enable && gem install fluentd
 
