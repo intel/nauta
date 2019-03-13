@@ -27,6 +27,7 @@ ifeq (Darwin,$(OS))
 endif
 
 build: $(ACTIVATE) set-version metrics-lib
+	. $(ACTIVATE); pip install --upgrade pip==19.0.3
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 ifeq (Windows,$(OS))
