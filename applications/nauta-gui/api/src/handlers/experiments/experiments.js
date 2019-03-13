@@ -255,12 +255,13 @@ const getExperimentResourcesData = function (req, res) {
           containers: pod.spec.containers.map((container) => {
             return {
               name: container.name,
-              resources: container.resources.requests ? container.resources.requests : container.resources,
+              resources: container.resources,
               status: k8s.parseContainerState(containerStatuses[container.name])
             }
           })
         };
       });
+      logger.debug(JSON.stringify(result));
       res.send(result);
     })
     .catch(function (err) {

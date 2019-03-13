@@ -30,8 +30,10 @@
           <ul id="containers-list">
             <li v-bind:key="container.name" v-for="container in pod.containers">
               <b>{{ labels.NAME }}:</b> <i>{{ container.name }}</i> <br/>
-              <b>{{ labels.RESOURCES }}:</b> cpu - <i>{{ parseValue('resources', 'cpu', container.resources) }}, </i>,
-                                        memory - <i>{{ parseValue('resources', 'memory', container.resources) }}</i> <br/>
+              <b>{{ labels.RESOURCES }}: {{ labels.REQUESTS }}:</b> cpu - <i>{{ parseValue('resources', 'cpu', 'requests', container.resources) }}, </i>,
+                                        memory - <i>{{ parseValue('resources', 'memory', 'requests', container.resources) }}</i> <br/>
+              <b>{{ labels.RESOURCES }}: {{ labels.LIMITS }}:</b> cpu - <i>{{ parseValue('resources', 'cpu', 'limits', container.resources) }}, </i>,
+              memory - <i>{{ parseValue('resources', 'memory', 'limits', container.resources) }}</i> <br/>
               <b>{{ labels.STATUS }}:</b> <i>{{ container.status }}</i>
             </li>
           </ul>
@@ -53,16 +55,17 @@ export default {
   },
   props: ['keyname', 'podsList'],
   methods: {
-    parseValue: function (key, arg1, arg2) {
+    parseValue: function (key, arg1, arg2, arg3) {
       switch (key) {
         case 'state':
           return Array.isArray(arg1) ? arg1.join(', ') : '--';
         case 'resources':
-          if (!arg2) {
+          if (!arg3) {
             return '--';
           }
+          const resourceKind = arg2;
           const resourceType = arg1;
-          return arg2[resourceType] ? arg2[resourceType] : '--';
+          return arg3[resourceKind][resourceType] ? arg3[resourceKind][resourceType] : '--';
         default:
           return arg1;
       }

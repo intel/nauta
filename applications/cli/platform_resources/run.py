@@ -15,6 +15,8 @@
 #
 
 from collections import namedtuple
+from datetime import datetime, timezone
+from dateutil import parser
 from enum import Enum
 import re
 import sre_constants
@@ -32,7 +34,7 @@ from platform_resources.platform_resource import PlatformResource, KubernetesObj
 from platform_resources.resource_filters import filter_by_name_regex, filter_by_experiment_name
 from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
-from util.system import format_timestamp_for_cli
+from util.system import format_timestamp_for_cli, format_duration_for_cli
 
 
 logger = initialize_logger(__name__)
@@ -60,9 +62,8 @@ class Run(PlatformResource):
     crd_plural_name = 'runs'
     crd_version = 'v1'
 
-    RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics',
-                                             'submission_date', 'start_date', 'end_date', 'submitter', 'status',
-                                             'template_name'])
+    RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics', 'submission_date', 'start_date',
+                                             'duration', 'submitter', 'status', 'template_name'])
 
     def __init__(self, name: str, experiment_name: str, metrics: dict = None, parameters: List[str] = None,
                  pod_count: int = None, pod_selector: dict = None,
@@ -83,6 +84,12 @@ class Run(PlatformResource):
         self.metadata = metadata
         self.start_timestamp = start_timestamp
         self.end_timestamp = end_timestamp
+        if end_timestamp and start_timestamp:
+            self.duration = parser.parse(end_timestamp) - parser.parse(start_timestamp)
+        elif start_timestamp:
+            self.duration = datetime.now(timezone.utc) - parser.parse(start_timestamp)
+        else:
+            self.duration = None
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -158,7 +165,7 @@ class Run(PlatformResource):
                                status=self.state.value if self.state else "",
                                template_name=self.template_name,
                                start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",
-                               end_date=format_timestamp_for_cli(self.end_timestamp) if self.end_timestamp else "")
+                               duration=format_duration_for_cli(self.duration) if self.duration else "")
 
     def create(self, namespace: str, labels: Dict[str, str] = None, annotations: Dict[str, str] = None):
         run_kubernetes = KubernetesObject(self, client.V1ObjectMeta(name=self.name, namespace=namespace, labels=labels,

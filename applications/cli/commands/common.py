@@ -36,13 +36,13 @@ logger = initialize_logger(__name__)
 A namedtuple representing uninitialized experiments in CLI.
 """
 UninitializedExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec', 'metrics',
-                                                            'creation_timestamp', 'start_date', 'end_date',
+                                                            'creation_timestamp', 'start_date', 'end_date', 'duration',
                                                             'submitter', 'status', 'template_name'])
 
 
 def uninitialized_experiment_cli_representation(experiment: Experiment):
     return UninitializedExperimentCliModel(name=experiment.name, parameters_spec=' '.join(experiment.parameters_spec),
-                                           metrics='', start_date='', end_date='',
+                                           metrics='', start_date='', end_date='', duration='',
                                            creation_timestamp=format_timestamp_for_cli(experiment.creation_timestamp),
                                            submitter=experiment.namespace, status=experiment.state.value,
                                            template_name=experiment.template_name)
@@ -132,7 +132,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
         else:
             runs_table_data = [
                 (run_representation.name, run_representation.parameters, run_representation.submission_date,
-                 run_representation.start_date, run_representation.end_date,
+                 run_representation.start_date, run_representation.duration,
                  run_representation.submitter, run_representation.status, run_representation.template_name)
                 for run_representation in runs_representations
             ]

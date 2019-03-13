@@ -34,6 +34,7 @@ export default {
   LAUNCH_TB: 'Launch Tensorboard',
   LICENSE: 'License',
   LICENSE_PDF: 'license.pdf',
+  LIMITS: 'Limits',
   LAST: 'Last',
   LOAD_MORE: 'Load more',
   LOADING: 'Loading',
@@ -48,6 +49,7 @@ export default {
   REFRESH_NOW: 'Refresh Now',
   RELEASE_NOTES: 'Release Notes',
   RELEASE_NOTES_PDF: 'release-notes.pdf',
+  REQUESTS: 'Requests',
   RESET: 'Reset',
   RESOURCES: 'Resources',
   RESOURCES_DASHBOARD: 'Resources dashboard',
@@ -61,7 +63,7 @@ export default {
   STATUS: 'Status',
   TERMS_OF_USE: 'Terms of Use',
   TENSORBOARD_ELIGIBILITY: 'TensorBoard* Eligibility',
-  TOTAL_EXPERIMENT_DURATION: 'Total Duration',
+  TOTAL_EXPERIMENT_DURATION: 'Duration',
   USER_GUIDE: 'User Guide',
   VIEW: 'View'
 }
