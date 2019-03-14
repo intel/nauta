@@ -16,7 +16,7 @@
 
 import click
 
-from cli_text_consts import ExperimentLogsCmdTexts as Texts
+from cli_text_consts import PredictLogsCmdTexts as Texts
 from commands.common import get_logs
 from logs_aggregator.log_filters import SeverityLevel
 from util.cli_state import common_options, pass_state, State
@@ -27,11 +27,11 @@ from platform_resources.run import RunKinds
 
 logger = initialize_logger(__name__)
 
-LOG_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
+LOG_RUNS_KINDS = [RunKinds.INFERENCE]
 
 
 @click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='lg', options_metavar='[options]')
-@click.argument('experiment-name', required=False, metavar='[experiment_name]')
+@click.argument('name', required=False, metavar='[name]')
 @click.option('-s', '--min-severity', type=click.Choice([level.name for level in SeverityLevel]), help=Texts.HELP_S)
 @click.option('-sd', '--start-date', help=Texts.HELP_SD)
 @click.option('-ed', '--end-date', help=Texts.HELP_ED)
@@ -44,12 +44,12 @@ LOG_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 @click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options(admin_command=False)
 @pass_state
-def logs(state: State, experiment_name: str, min_severity: SeverityLevel, start_date: str,
+def logs(state: State, name: str, min_severity: SeverityLevel, start_date: str,
          end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool, pager: bool, follow: bool):
     """
     Show logs for a given experiment.
     """
     # check whether we have runs with a given name
-    get_logs(experiment_name=experiment_name, min_severity=min_severity, start_date=start_date, end_date=end_date,
+    get_logs(experiment_name=name, min_severity=min_severity, start_date=start_date, end_date=end_date,
              pod_ids=pod_ids, pod_status=pod_status, match=match, output=output, pager=pager, follow=follow,
-             runs_kinds=LOG_RUNS_KINDS, instance_type="experiment")
+             runs_kinds=LOG_RUNS_KINDS, instance_type='prediction instance')
