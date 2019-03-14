@@ -271,7 +271,8 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
 
         # start port forwarding
         # noinspection PyBroadException
-        with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+        with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port,
+                      number_of_retries_wait_for_readiness=90) as proxy:
             # Save port that was actually used in configuration
             if proxy.tunnel_port != config.local_registry_port:
                 config.local_registry_port = proxy.tunnel_port

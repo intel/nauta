@@ -38,12 +38,14 @@ class TunnelSetupError(RuntimeError):
 
 class K8sProxy:
     def __init__(self, nauta_app_name: NAUTAAppNames, port: int = None,
-                 app_name: str = None, number_of_retries: int = 0, namespace: str = None):
+                 app_name: str = None, number_of_retries: int = 0, namespace: str = None,
+                 number_of_retries_wait_for_readiness: int = 30):
         self.nauta_app_name = nauta_app_name
         self.external_port = port
         self.app_name = app_name
         self.number_of_retries = number_of_retries
         self.namespace = namespace
+        self.number_of_retries_wait_for_readiness = number_of_retries_wait_for_readiness
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
@@ -55,7 +57,8 @@ class K8sProxy:
                                                 number_of_retries=self.number_of_retries,
                                                 namespace=self.namespace)
             try:
-                K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port)
+                K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port,
+                                                        tries=self.number_of_retries_wait_for_readiness)
             except Exception as ex:
                 self._close_tunnel()
                 raise ex
