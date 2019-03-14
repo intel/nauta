@@ -40,21 +40,9 @@ ps_resources:
 ps_cpu: null
 ps_memory: null
 
-sidecar_resources:
-  requests:
-    cpu: 0.01
-    memory: 100Mi
-  limits:
-    cpu: 0.01
-    memory: 100Mi
-
-sidecar_cpu: null
-sidecar_memory: null
-
 experimentName: {{ NAUTA.ExperimentName }} 
 registryPort: {{ NAUTA.RegistryPort }}
 workersCount: 3
-psSidecarLoggingLevel: "WARNING"
 pServersCount: 1
 
 cpu_fraction: 1

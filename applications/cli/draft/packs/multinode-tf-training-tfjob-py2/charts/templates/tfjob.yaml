@@ -11,7 +11,7 @@ metadata:
     runName: {{ .Release.Name }}
 spec:
   ttlSecondsAfterFinishing: 60
-  cleanPodPolicy: None # Setting cleanPodPolicy to None, so parameter servers will not be terminated by tf-operator
+  cleanPodPolicy: Running
   tfReplicaSpecs:
     Worker:
       replicas: {{ .Values.workersCount }}
@@ -111,10 +111,11 @@ spec:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              command: ["/bin/bash"]
+              command: ["ps_entry"]
               args:
-                - "-c"
-                - "python {{range .Values.commandline.args}}{{.}} {{end}}& while true ; do if [[ -e /pod-data/END ]] ; then exit 0 ; else sleep 10 ; fi ; done"
+                {{range .Values.commandline.args}}
+                - "{{.}}"
+                {{end}}
               ports:
                 - containerPort: {{ .Values.TensorBoardPort }}
                   name: "tensorboard"
@@ -145,28 +146,6 @@ spec:
                 limits:
                   cpu: {{ default .Values.ps_resources.limits.cpu .Values.ps_cpu }}
                   memory: {{ default .Values.ps_resources.limits.memory .Values.ps_memory }}
-            - name: sidecar
-              image: "127.0.0.1:{{ .Values.registryPort }}/nauta/ps-sidecar:1.0.0"
-              imagePullPolicy: Always
-              env:
-                - name: MY_POD_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.name
-                - name: LOGGING_LEVEL
-                  value: {{ .Values.psSidecarLoggingLevel }}
-              volumeMounts:
-                - name: shared-data
-                  mountPath: /pod-data
-              securityContext:
-                privileged: true
-              resources:
-                requests:
-                  cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu }}
-                  memory: {{ default .Values.sidecar_resources.requests.memory .Values.sidecar_memory }}
-                limits:
-                  cpu: {{ default .Values.sidecar_resources.limits.cpu .Values.sidecar_cpu }}
-                  memory: {{ default .Values.sidecar_resources.limits.memory .Values.sidecar_memory }}
           volumes:
             - name: input-home
               persistentVolumeClaim:
