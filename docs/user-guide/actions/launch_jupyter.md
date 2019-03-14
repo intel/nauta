@@ -18,7 +18,7 @@ Execute this command to launch Jupyter:
 
 ## Storage and Session Data
 
-Files located in the input storage are accessible through Jupyter Notebooks. Only files that are written to `/output/home/` are persistently stored. Therefore, changes made to other files, including model scripts, during the session _will not_ be saved after the session is closed. Therefore, it is recommended that you save session data to the `output/<experiment>` folder for future use.
+Files located in the input storage are accessible through Jupyter Notebooks. Only files that are written to `/output/home/` are persistently stored. Therefore, changes made to other files, including model scripts, during the session _will not_ be saved after the session is closed. Therefore, it is recommended that you save session data to the `output/experiment` folder for future use.
 
 **Note:** Files that are accessible through the Jupyter Notebook are the same folders accessible to the user for experiments.
 
