@@ -7,19 +7,17 @@ export_images:
     value: "{{ image_local_url['nauta/tensorboard-service'] }}"
 # tensorflow part
   - name: tensorflow
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
   - name: horovod
     value: "{{ image_local_url['nauta/horovod/py3'] }}"
   - name: horovod_py2
     value: "{{ image_local_url['nauta/horovod/py2'] }}"
   - name: tensorflow_1.9
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
   - name: tensorflow_1.9_py3
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
   - name: tensorflow_1.9_py2
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py2/haswell/base'] }}"
-  - name: tensorflow_1.9_py3_skylake
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/skylake/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.9.0py2/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['nauta/activity-proxy'] }}"
   - name: batch-inference
@@ -119,30 +117,21 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  nauta/tensorflow/1.9.0py2/haswell/base:
+  nauta/tensorflow/1.9.0py2/base:
     version: "1.9.0-py2"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0/haswell"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
-  nauta/tensorflow/1.9.0py3/haswell/base:
+  nauta/tensorflow/1.9.0py3/base:
     version: "1.9.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
-      METRICS_IMAGE: "shared/build/metrics"
-    method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
-  nauta/tensorflow/1.9.0py3/skylake/base:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/skylake"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/skylake"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
@@ -150,8 +139,8 @@ local_images:
     version: "1.9.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0/haswell"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
@@ -163,7 +152,7 @@ local_images:
         checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0/haswell"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       METRICS_IMAGE: "shared/build/metrics"
@@ -177,7 +166,7 @@ local_images:
         checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0/haswell"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
@@ -355,7 +344,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/tf"
       chart_values:
         image: "{{ image_local_url['nauta/tf/operator'] }}"
-        tfimage: "{{ image_local_url['nauta/tensorflow/1.9.0py3/haswell/base'] }}"
+        tfimage: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
     ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../nauta-charts/ingress"

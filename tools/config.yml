@@ -243,27 +243,6 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.9.0.tar.gz
         dest: tensorflow-v1.9.0.tar.gz
         checksum: ffc3151b06823d57b4a408261ba8efe53601563dfe93af0866751d4f6ca5068c
-  shared/build/tensorflow/py2.7/1.9.0/haswell:
-    version: "1.9.0-py2"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/haswell"
-    push: False
-  shared/build/tensorflow/py3.6/1.9.0/haswell:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/haswell"
-    push: False
-  shared/build/tensorflow/py3.6/1.9.0/skylake:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/skylake"
-    push: False
   shared/build/tensorflow-serving/py2.7/1.9.0:
     version: "1.9.0-py2"
     required:
@@ -286,27 +265,6 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/1.9.0.tar.gz
         dest: tensorflow-serving-v1.9.0.tar.gz
         checksum: 860fc67fe6d385f721bf98b533d6cabb09162f8b1469e69af3c7e9f30dde0b92
-  shared/build/tensorflow-serving/py2.7/1.9.0/haswell:
-    version: "1.9.0-py2"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/haswell"
-    push: False
-  shared/build/tensorflow-serving/py3.6/1.9.0/haswell:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/haswell"
-    push: False
-  shared/build/tensorflow-serving/py3.6/1.9.0/skylake:
-    version: "1.9.0-py3"
-    required:
-      BASE_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/skylake"
-    push: False
   shared/run/tensorflow/py2.7:
     version: "py2"
     required:

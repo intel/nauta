@@ -27,7 +27,7 @@ fake_cm = V1ConfigMap(
     data={
         'registry': '127.0.0.1:30303',
         'image.activity-proxy': 'activity-proxy:dev',
-        'image.tensorflow': 'nauta/tensorflow/1.9.0py3/haswell/base:1.9.0-py3'
+        'image.tensorflow': 'nauta/tensorflow/1.9.0py3/base:1.9.0-py3'
     }
 )
 
@@ -65,7 +65,7 @@ def test_get_tensorboard_image(mocker, nauta_platform_config_mocked: NautaPlatfo
 
     tb_image = nauta_platform_config_mocked.get_tensorboard_image()
 
-    assert tb_image == '127.0.0.1:30303/nauta/tensorflow/1.9.0py3/haswell/base:1.9.0-py3'
+    assert tb_image == '127.0.0.1:30303/nauta/tensorflow/1.9.0py3/base:1.9.0-py3'
 
 
 # noinspection PyShadowingNames
