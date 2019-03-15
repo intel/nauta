@@ -14,4 +14,4 @@ gpgkey=file:///etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY' > /etc/yum.repos.d/ius.rep
 
 RUN yum update -y && \ 
     yum install -y python36u python36u-pip python36u-devel
-RUN pip3.6 install -U pip==10.0.1
+RUN pip3.6 install -U pip==19.0.3

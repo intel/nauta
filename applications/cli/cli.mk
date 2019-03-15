@@ -27,9 +27,9 @@ ifeq (Darwin,$(OS))
 endif
 
 build: $(ACTIVATE) set-version metrics-lib
+ifeq (Windows,$(OS))
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
-ifeq (Windows,$(OS))
 	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	mkdir dist/config
@@ -51,6 +51,9 @@ ifeq (Windows,$(OS))
 
 endif
 ifeq (Linux,$(OS))
+	. $(ACTIVATE); pip install --upgrade pip==19.0.3
+	. $(ACTIVATE); pip install pyinstaller==3.4
+	rm -rf dist/
 	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
@@ -71,6 +74,9 @@ ifeq (Linux,$(OS))
 	rm -rf helm_tmp
 endif
 ifeq (Darwin,$(OS))
+	. $(ACTIVATE); pip install --upgrade pip==19.0.3
+	. $(ACTIVATE); pip install pyinstaller==3.4
+	rm -rf dist/
 	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh

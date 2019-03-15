@@ -18,7 +18,7 @@ RUN source /opt/rh/devtoolset-7/enable && \
             export MANPATH=/opt/rh/rh-python35/root/usr/share/man:$MANPATH && \
             export PKG_CONFIG_PATH=/opt/rh/rh-python35/root/usr/lib64/pkgconfig:$PKG_CONFIG_PATH && \
             export XDG_DATA_DIRS=/opt/rh/rh-python35/root/usr/share:$XDG_DATA_DIRS && \
-            python3.5 -m pip install pip==10.0.1 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
+            python3.5 -m pip install pip==19.0.3 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
 
 RUN source /opt/rh/devtoolset-7/enable && \
             export PATH=/opt/rh/rh-python35/root/usr/bin:$PATH && \
