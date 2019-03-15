@@ -21,7 +21,7 @@ RUN source /opt/rh/devtoolset-7/enable && bazel build \
       --linkopt=-znow \
       --linkopt=-fstack-protector \
       --linkopt=-pie \
-      --jobs=64 \
+      --jobs=16 \
       -c opt --verbose_failures tensorflow_serving/...
 
 RUN ln -sf bazel-serving-1.9.0 bazel-serving

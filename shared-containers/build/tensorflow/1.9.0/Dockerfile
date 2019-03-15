@@ -24,7 +24,7 @@ RUN source /opt/rh/devtoolset-7/enable && bazel build \
       --linkopt=-znow \
       --linkopt=-fstack-protector \
       --linkopt=-pie \
-      --jobs=64 \
+      --jobs=16 \
       -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
 
 RUN source /opt/rh/devtoolset-7/enable && bazel-bin/tensorflow/tools/pip_package/build_pip_package /build-output/
