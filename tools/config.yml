@@ -68,23 +68,23 @@ shared_images:
     directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
     push: False
   shared/build/rpm/docker-ce:
-    version: "18.06"
+    version: "18.09"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
     push: False
     args:
       PACKAGE_NAME: "docker-ce"
-      PACKAGE_VERSION: "18.06"
+      PACKAGE_VERSION: "18.09"
   shared/build/rpm/docker-ce-debuginfo:
-    version: "18.06"
+    version: "18.09"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
     push: False
     args:
       PACKAGE_NAME: "docker-ce-debuginfo"
-      PACKAGE_VERSION: "18.06"
+      PACKAGE_VERSION: "18.09"
   shared/build/rpm/container-selinux:
     version: "2.68"
     required: {}
