@@ -53,12 +53,12 @@ def convert_k8s_memory_resource(mem_resource: str) -> int:
     mem_resource = str(mem_resource)
     if mem_resource[-1] == "i" and mem_resource[-2:] in PREFIX_I_VALUES:
         prefix = mem_resource[-2:]
-        return int(mem_resource[:-2]) * PREFIX_I_VALUES[prefix]
+        return int(float(mem_resource[:-2]) * PREFIX_I_VALUES[prefix])
     # If last character is one of the normal exponent prefixes (with base 10) then assume that resource is given
     # as for example 1000K.
     elif mem_resource[-1] in PREFIX_VALUES:
         prefix = mem_resource[-1]
-        return int(mem_resource[:-1]) * PREFIX_VALUES[prefix]
+        return int(float(mem_resource[:-1]) * PREFIX_VALUES[prefix])
     # If there is e contained inside resource string then assume that it is given in exponential format.
     elif "e" in mem_resource:
         return int(float(mem_resource))

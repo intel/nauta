@@ -21,10 +21,10 @@ service:
 worker_resources:
   requests:
     cpu: 76
-    memory: 240Gi
+    memory: 252.7Gi
   limits:
     cpu: 76
-    memory: 240Gi
+    memory: 252.7Gi
 
 worker_cpu: null
 worker_memory: null
@@ -32,10 +32,10 @@ worker_memory: null
 ps_resources:
   requests:
     cpu: 76
-    memory: 240Gi
+    memory: 252.7Gi
   limits:
     cpu: 76
-    memory: 240Gi
+    memory: 252.7Gi
 
 ps_cpu: null
 ps_memory: null
