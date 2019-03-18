@@ -240,7 +240,7 @@ class PredictLaunchCmdTexts:
     INSTANCE_INFO_MSG = "\nPrediction instance URL (append method verb manually, e.g. :predict):\n" \
                         "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}"
     INSTANCE_URL_ERROR_MSG = "Failed to obtain prediction instance URL."
-    TABLE_HEADERS = ["Prediction instance", "Model Location", "State"]
+    TABLE_HEADERS = ["Prediction instance", "Model Location", "Status"]
     HELP_LOCAL_MODEL_LOCATION = "Local path to saved model that will be used for inference. Model content will be " \
                                 "copied into an image"
     MODEL_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {local_model_location}. local_model_location must be a path to " \
@@ -302,8 +302,8 @@ class PredictBatchCmdTexts:
     OTHER_INSTANCE_CREATION_ERROR_MSG = "Failed to create batch prediction instance."
     TABLE_NAME_HEADER = "Prediction instance"
     TABLE_MODEL_LOCATION_HEADER = "Model location"
-    TABLE_STATUS_HEADER = "State"
-    TABLE_HEADERS = ["Prediction instance", "Model location", "State"]
+    TABLE_STATUS_HEADER = "Status"
+    TABLE_HEADERS = ["Prediction instance", "Model location", "Status"]
     MODEL_DIR_NOT_FOUND_ERROR_MSG = "Cannot find: {local_model_location}. local_model_location must be a path to " \
                                     "existing directory."
     MISSING_MODEL_LOCATION_ERROR_MSG = "Missing model location param - " \
