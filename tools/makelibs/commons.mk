@@ -83,7 +83,7 @@ ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAY
                        -e VERSION_MAJOR=$(DEFAULT_VERSION_MAJOR) -e VERSION_ID=$(DEFAULT_VERSION_ID) \
                        -e VERSION_SUFFIX=$(DEFAULT_VERSION_SUFFIX) \
                        -e version=$(VERSION) -e user="$(USER)" -e user_id=$(USER_ID) -e build_dir=$(BUILD_DIR) \
-                       -e group="$(GROUP)" -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) \
+                       -e group="$(GROUP)" -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) -e NAUTA_COMMIT=$(NAUTA_COMMIT) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml
 
 $(REQUIREMENTS_LOCK): $(WORKSPACE)

@@ -48,10 +48,11 @@ When building Nauta within these versions of Ubuntu (currently, the only validat
 - python3-venv
 - python3-dev
 - virtualenv
+- git
 
 To install the required packages, invoke:
 
-`sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz`
+`sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz git`
 
 #### Docker 
 
