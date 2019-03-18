@@ -64,7 +64,7 @@ TEST_RUN = Run(name="test-experiment", experiment_name="test-experiment", metric
                namespace="submitter", creation_timestamp="2018-05-08T13:05:04Z",
                template_name="template_name")
 
-TEST_LIST_HEADERS = ["Name", "Parameters", "Metrics", "Submission date", "Owner", "State", "Template name"]
+TEST_LIST_HEADERS = ["Name", "Parameters", "Metrics", "Submission date", "Owner", "Status", "Template name"]
 
 
 def test_list_unitialized_experiments_in_cli_success(mocker, capsys):
@@ -159,7 +159,7 @@ def test_list_experiments_one_user_success(mocker, capsys):
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
-    headers = ["Name", "Submission date", "Owner", "State"]
+    headers = ["Name", "Submission date", "Owner", "Status"]
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
                             runs_list_headers=headers, with_metrics=False, count=1, brief=False)
