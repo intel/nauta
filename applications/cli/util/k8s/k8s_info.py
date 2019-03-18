@@ -89,6 +89,16 @@ def get_secret(secret_name: str, namespace: str) -> V1Secret:
     return api.read_namespaced_secret(name=secret_name, namespace=namespace)
 
 
+def update_secret(namespace: str, secret: V1Secret) -> V1Secret:
+    api = get_k8s_api()
+    return api.patch_namespaced_secret(name=secret.metadata.name, namespace=namespace, body=secret)
+
+
+def create_secret(namespace: str, secret_body: V1Secret) -> V1Secret:
+    api = get_k8s_api()
+    return api.create_namespaced_secret(namespace=namespace, body=secret_body)
+
+
 def get_certificate(namespace: str) -> str:
     """
     Gets a certificate of a user from a given namespace

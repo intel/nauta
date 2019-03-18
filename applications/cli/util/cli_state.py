@@ -72,7 +72,7 @@ def verify_cli_dependencies():
 def verify_cli_config_path():
     try:
         config = Config()
-        if not config.config_path:
+        if not config.config_path or not Config.validate_config_path(config.config_path):
             raise ConfigInitError(Texts.NCTL_CONFIG_NOT_SET_ERROR_MSG)
     except ConfigInitError as e:
         error_msg = Texts.NCTL_CONFIG_INIT_ERROR_MSG.format(exception_msg=str(e))

@@ -1,0 +1,26 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-pvc
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: {{ .Values.storage_capacity }}
+{{ if ne (required "NAUTA Storage Type" .Values.global.nauta_storage.type) "pvc" }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      release: {{ .Release.Name }}
+      chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      heritage: {{ .Release.Service }}
+  storageClassName: ""
+{{ end }}

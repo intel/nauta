@@ -71,8 +71,81 @@ WINDOWS_EDITIONS = {
 }
 
 
+class ExternalCliCommand:
+    def __init__(self, cmd: List[str], env: dict = None, cwd: str = None, timeout: int = None):
+        """
+        :param cmd: List of strings which define a command that will be executed, e.g. ['git', 'clone']
+        :param env: Dictionary containing environment variables that will be used during command execution
+        :param cwd: Path to working directory
+        :param timeout: Timeout in seconds
+        """
+        self.cmd = cmd
+        self.env = env
+        self.cwd = cwd
+        self.timeout = timeout
+
+    def __call__(self, *args, **kwargs) -> Tuple[str, int, str]:
+        """
+        Call command.
+        :param args: Positional arguments will be passed unchanged to the executed command
+        :param kwargs: Keyword arguments will be passed as long parameters, e.g. passing `foo=bar` will add
+         `--foo`, 'bar' to the executed command. If keyword argument has binary value, it will be treated as a flag,
+         e.g. passing `foo=True` argument will add `--foo` to the executed command and passing `foo=False` will not add
+         anything new to the command. Underscores in keyword argument names will be replaced with hyphens
+        :return: output, exit code and formatted output of called command
+        """
+        cmd = self.cmd
+        env = kwargs.get('_env') or self.env
+        cwd = kwargs.get('_cwd') or self.cwd
+        for arg in args:
+            cmd.append(arg)
+        for kwarg_name, kwarg_value in kwargs.items():
+            if not kwarg_name.startswith('_'):  # kwargs that have name starting with '_' are reserved
+                option_name = kwarg_name.replace('_', '-')
+                if kwarg_value is False:  # Handle flags
+                    continue
+                elif kwarg_value is True:
+                    cmd.append(f'--{option_name}')
+                else:  # Standard options
+                    cmd.append(f'--{option_name}')
+                    cmd.append(kwarg_value)
+        output, exit_code, log_output = execute_system_command(command=cmd, env=env, cwd=cwd, timeout=self.timeout)
+        if exit_code != 0:
+            log.error(log_output)
+            raise RuntimeError(f'Failed to execute command: {self.cmd}')
+        else:
+            return output, exit_code, log_output
+
+
+class ExternalCliClient:
+    """
+    This class allows to easily create a wrapper for external CLI. Usage example:
+      git_client = ExternalCliClient('git')
+      git_client.clone('https://repo.git', quiet=True)
+      git_client.add('-u')
+      git_client.commit(message='test')
+    """
+    def __init__(self, executable: str, env: dict = None, cwd: str = None, timeout: int = None):
+        """
+        :param executable: Name of external CLI executable e.g. 'git' or 'helm'
+        :param env: Dictionary containing environment variables that will be used by the client
+        :param cwd: Path to working directory
+        :param timeout: Timeout in seconds for commands executed by the client
+        """
+        self.executable = executable
+        self.env = env
+        self.cwd = cwd
+        self.timeout = timeout
+
+    def __getattr__(self, item):
+        return self._make_command(item)
+
+    def _make_command(self, name: str):
+        return ExternalCliCommand(env=self.env, cwd=self.cwd, cmd=[self.executable, name], timeout=self.timeout)
+
+
 def execute_system_command(command: List[str],
-                           timeout: int or None = None,
+                           timeout: int = None,
                            stdin=None,
                            env=None,
                            cwd=None,
@@ -107,6 +180,8 @@ def execute_system_command(command: List[str],
         log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace(
             '\n', '\\n'))
     except subprocess.CalledProcessError as ex:
+        log.exception(f'COMMAND: {command} RESULT: {ex.output}'.replace(
+            '\n', '\\n'))
         return ex.output, ex.returncode, ex.output
     else:
         return output, 0, encoded_output

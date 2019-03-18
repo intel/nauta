@@ -1,0 +1,66 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: exp-image-build-
+spec:
+  entrypoint: experiment-image-build
+  arguments:
+    parameters:
+      - name: experiment-name
+      - name: user-name
+      - name: git-address
+      - name: docker-registry-address
+      - name: git-secret-name
+        value: git-secret
+      - name: git-secret-key
+        value: private_key
+      - name: buildkitd-address
+      - name: cluster-registry-address
+  templates:
+    - name: experiment-image-build
+      inputs:
+        parameters:
+          - name: experiment-name
+          - name: user-name
+          - name: git-address
+          - name: docker-registry-address
+          - name: git-secret-name
+          - name: git-secret-key
+          - name: buildkitd-address
+          - name: cluster-registry-address
+        artifacts:
+          - name: argo-source
+            path: /experiment
+            git:
+              repo: "git@{{inputs.parameters.git-address}}:{{inputs.parameters.user-name}}/experiments.git"
+              revision: "{{inputs.parameters.experiment-name}}"
+              sshPrivateKeySecret:
+                name: "{{inputs.parameters.git-secret-name}}"
+                key: "{{inputs.parameters.git-secret-key}}"
+      container:
+        image: "{{inputs.parameters.cluster-registry-address}}/nauta/buildkit:master"
+        command: [buildctl]
+        args: ["--addr", "tcp://{{inputs.parameters.buildkitd-address}}",
+               "build",
+               "--frontend=dockerfile.v0",
+               "--local", "dockerfile=/experiment/",
+               "--local", "context=/experiment/",
+               "--exporter=image",
+               "--exporter-opt", "name={{inputs.parameters.docker-registry-address}}/{{inputs.parameters.user-name}}/{{inputs.parameters.experiment-name}}:latest",
+               "--exporter-opt", "registry.insecure=true",
+               "--exporter-opt", "push=true"]
+  tolerations:
+    - key: "master"
+      operator: "Exists"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                  - "True"

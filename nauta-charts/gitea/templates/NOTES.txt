@@ -1,0 +1,46 @@
+1. Connect to your Gitea web URL by running:
+
+{{- if .Values.ingress.enabled }}
+
+  
+  Ingress is enabled for this chart deployment.  Please access the web UI at {{ .Values.service.http.externalHost }}
+  
+{{- else if contains "NodePort" .Values.service.http.serviceType }}
+
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP/
+
+{{- else if contains "LoadBalancer" .Values.service.http.serviceType }}
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with: 'kubectl get svc -w {{ template "fullname" . }}http'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "fullname" . }}http -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP/
+{{- else if contains "ClusterIP"  .Values.service.http.serviceType }}
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "fullname" . }}" -o jsonpath="{.items[0].metadata.name}")
+  echo http://127.0.0.1:8080/
+  kubectl port-forward $POD_NAME 8080:80
+{{- end }}
+
+2. Connect to your Gitea ssh port:
+
+{{- if contains "NodePort" .Values.service.ssh.serviceType }}
+
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP/
+
+{{- else if contains "LoadBalancer" .Values.service.ssh.serviceType }}
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with: 'kubectl get svc -w {{ template "fullname" . }}ssh'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "fullname" . }}ssh -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP/
+{{- else if contains "ClusterIP"  .Values.service.ssh.serviceType }}
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "fullname" . }}" -o jsonpath="{.items[0].metadata.name}")
+  echo http://127.0.0.1:8080/
+  kubectl port-forward $POD_NAME 8022:22
+{{- end }}

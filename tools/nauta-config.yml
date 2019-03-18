@@ -185,7 +185,26 @@ local_images:
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kube-batch"
+  nauta/gitea:
+    version: "1.6.1"
+    image: "gitea/gitea:1.6.1"
+    method: pull
+  nauta/postgres:
+    version: "11"
+    image: "postgres:11"
+    method: pull
+  nauta/memcached:
+    version: "1.5.6-alpine"
+    image: "memcached:1.5.6-alpine"
+    method: pull
+  nauta/buildkit:
+    version: "master"
+    image: "moby/buildkit:master"
+    method: pull
 
+
+# WARNING
+# setting chart_values will work only if chart does not contain values.yaml file
 subcharts:
   nauta-registry:
     registry:
@@ -290,3 +309,13 @@ subcharts:
     argo-controller:
       version: 2.2.1
       path: "{{ playbook_dir }}/../../nauta-charts/argo-controller"
+    gitea:
+      version: 1.6.1
+      path: "{{ playbook_dir }}/../../nauta-charts/gitea"
+      chart_values:
+        image: "{{ image_local_url['nauta/gitea'] }}"
+    buildkit:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/buildkit"
+      chart_values:
+        image: "{{ image_local_url['nauta/buildkit'] }}"

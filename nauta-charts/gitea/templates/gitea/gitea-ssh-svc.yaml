@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-ssh
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    nauta_app_name: gitea-ssh
+spec:
+  type: {{ .Values.service.ssh.serviceType }}
+  ports:
+  - name: ssh
+    port: {{ .Values.service.ssh.port }}
+    targetPort: ssh
+    {{- if  .Values.service.ssh.nodePort }}
+    nodePort: {{ .Values.service.ssh.nodePort }}
+    {{- end }}
+  selector:
+    app: {{ template "fullname" . }}

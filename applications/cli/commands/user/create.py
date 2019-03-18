@@ -21,7 +21,10 @@ from sys import exit
 
 import click
 
+from git_repo_manager.client import GitRepoManagerClient
+from util.app_names import NAUTAAppNames
 from util.config import Config
+from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import execute_system_command, handle_error
@@ -125,26 +128,35 @@ def create(state: State, username: str, list_only: bool, filename: str):
             env['PATH'] = Config().config_path + os.pathsep + env['PATH']
             _, err_code, log_output = execute_system_command(' '.join(add_user_command), env=env, shell=True)
 
-        if err_code:
-            handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
+            if err_code:
+                handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
 
-            if not delete_user(username):
-                handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
-            sys.exit(1)
+                if not delete_user(username):
+                    handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
+                sys.exit(1)
 
-        try:
-            users_password = get_users_token(username)
-        except Exception:
-            handle_error(logger, Texts.PASSWORD_GATHER_ERROR_MSG, Texts.PASSWORD_GATHER_ERROR_MSG,
-                         add_verbosity_msg=state.verbosity == 0)
-            users_password = ""
+            try:
+                users_password = get_users_token(username)
+            except Exception:
+                handle_error(logger, Texts.PASSWORD_GATHER_ERROR_MSG, Texts.PASSWORD_GATHER_ERROR_MSG,
+                             add_verbosity_msg=state.verbosity == 0)
+                users_password = ""
 
-        try:
-            cert = get_certificate(username)
-        except Exception:
-            handle_error(logger, Texts.CERT_GATHER_ERROR_MSG, Texts.CERT_GATHER_ERROR_MSG,
-                         add_verbosity_msg=state.verbosity == 0)
-            cert = ""
+            try:
+                cert = get_certificate(username)
+            except Exception:
+                handle_error(logger, Texts.CERT_GATHER_ERROR_MSG, Texts.CERT_GATHER_ERROR_MSG,
+                             add_verbosity_msg=state.verbosity == 0)
+                cert = ""
+
+            try:
+                with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER) as proxy:
+                    grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
+                    grm_client.add_nauta_user(username=username)
+            except Exception:
+                handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG,
+                             add_verbosity_msg=state.verbosity == 0)
+                sys.exit(1)
 
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
@@ -158,7 +170,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
         click.echo(Texts.USER_CREATION_SUCCESS_MSG.format(username=username))
     else:
         # if during 90 seconds a user hasn't been created - app displays information about it
-        # but don't step processing the command - config file generated here my be useful later
+        # but doesn't stop processing the command - config file generated here may be useful later
         # when user has been created
         click.echo(Texts.USER_NOT_READY_ERROR_MSG.format(username=username))
 

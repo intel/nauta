@@ -37,6 +37,7 @@ ifeq (Windows,$(OS))
 
 	mkdir dist/config/
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
@@ -53,13 +54,6 @@ ifeq (Windows,$(OS))
 	rm -f helm-v2.11.0-windows-amd64.zip
 	rm -rf helm_tmp
 
-
-	# download and prepare Socat
-	docker pull alpine/socat:1.0.3
-	docker tag alpine/socat:1.0.3 socat-container-image:1.0.3
-	docker save socat-container-image:1.0.3 > dist/config/socat-container-image.tar
-	gzip dist/config/socat-container-image.tar
-	docker rmi alpine/socat:1.0.3
 endif
 ifeq (Linux,$(OS))
 	. $(ACTIVATE); pip install --upgrade pip==19.0.3
@@ -74,6 +68,7 @@ ifeq (Linux,$(OS))
 	mkdir -vp dist/config/
 
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	curl -o helm-v2.11.0-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -98,6 +93,7 @@ ifeq (Darwin,$(OS))
 	mkdir -vp dist/config/
 
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	curl -o helm-v2.11.0-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
@@ -108,13 +104,6 @@ ifeq (Darwin,$(OS))
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
-
-	# download and prepare Socat
-	docker pull alpine/socat:1.0.3
-	docker tag alpine/socat:1.0.3 socat-container-image:1.0.3
-	docker save socat-container-image:1.0.3 > dist/config/socat-container-image.tar
-	gzip dist/config/socat-container-image.tar
-	docker rmi alpine/socat:1.0.3
 
 endif
 
@@ -145,8 +134,8 @@ test: $(DEV_VIRTUALENV_MARK)
 cli-check: venv-dev test style
 
 test-with-code-cov: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
-	#@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
+	#@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
 
 VERSION_CLIENT_MAJOR ?= 1
 VERSION_CLIENT_MINOR ?= 0

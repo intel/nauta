@@ -38,21 +38,22 @@ import dpath.util as dutil
 from cli_text_consts import PacksTfTrainingTexts as Texts
 
 
-log = initialize_logger('packs.tf_training')
+log = initialize_logger(__name__)
 
 
 WORK_CNT_PARAM = "workersCount"
 P_SERV_CNT_PARAM = "pServersCount"
 POD_COUNT_PARAM = "podCount"
 
+NAUTA_REGISTRY_ADDRESS = 'nauta-registry-nginx.nauta.svc.kubernetes.nauta:5000'
+
 
 def update_configuration(run_folder: str, script_location: str,
                          script_parameters: Tuple[str, ...],
                          experiment_name: str,
-                         run_name: str,
-                         local_registry_port: int,
                          cluster_registry_port: int,
                          pack_type: str,
+                         username: str,
                          pack_params: List[Tuple[str, str]] = None,
                          script_folder_location: str = None,
                          env_variables: List[str] = None):
@@ -72,12 +73,10 @@ def update_configuration(run_folder: str, script_location: str,
 
     try:
         modify_values_yaml(run_folder, script_location, script_parameters, pack_params=pack_params,
-                           experiment_name=experiment_name, run_name=run_name,
-                           pack_type=pack_type, cluster_registry_port=cluster_registry_port,
-                           env_variables=env_variables)
-        with spinner(text=Texts.PREPARING_IMAGES_MSG.format(run_name=experiment_name)):
-            modify_dockerfile(run_folder, script_location, local_registry_port=local_registry_port,
-                              script_folder_location=script_folder_location)
+                           experiment_name=experiment_name, pack_type=pack_type,
+                           cluster_registry_port=cluster_registry_port,
+                           env_variables=env_variables, username=username)
+        modify_dockerfile(run_folder, script_location, script_folder_location=script_folder_location)
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
         raise RuntimeError(Texts.CONFIG_NOT_UPDATED) from exe
@@ -85,8 +84,7 @@ def update_configuration(run_folder: str, script_location: str,
     log.debug("Update configuration - end")
 
 
-def modify_dockerfile(experiment_folder: str, script_location: str, local_registry_port: int,
-                      script_folder_location: str = None):
+def modify_dockerfile(experiment_folder: str, script_location: str = None, script_folder_location: str = None):
     log.debug("Modify dockerfile - start")
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
@@ -103,22 +101,17 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
                     tf_image_name = nauta_config_map.py2_image_name
                 else:
                     tf_image_name = nauta_config_map.py3_image_name
-                tf_image_repository = f'127.0.0.1:{local_registry_port}/{tf_image_name}'
+                tf_image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{tf_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {tf_image_repository}'
 
-                # pull image from platform's registry
-                pull_tf_image(tf_image_repository=tf_image_repository)
             elif line.startswith("FROM nauta/horovod"):
                 nauta_config_map = NAUTAConfigMap()
                 if line.find('-py2') != -1:
-                    image_name = nauta_config_map.py2_horovod_image_name
+                    horovod_image_name = nauta_config_map.py2_horovod_image_name
                 else:
-                    image_name = nauta_config_map.py3_horovod_image_name
-                image_repository = f'127.0.0.1:{local_registry_port}/{image_name}'
+                    horovod_image_name = nauta_config_map.py3_horovod_image_name
+                image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{horovod_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
-
-                # pull image from platform's registry
-                pull_tf_image(tf_image_repository=image_repository)
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
@@ -130,7 +123,7 @@ def modify_dockerfile(experiment_folder: str, script_location: str, local_regist
 
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
-                       experiment_name: str, run_name: str, pack_type: str,
+                       experiment_name: str, pack_type: str, username: str,
                        cluster_registry_port: int, pack_params: List[Tuple[str, str]],
                        env_variables: List[str]):
     log.debug("Modify values.yaml - start")
@@ -142,11 +135,11 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         template = jinja2.Template(values_yaml_file.read())
 
         rendered_values = template.render(NAUTA = {
-            'ExperimentName' : experiment_name,
-            'CommandLine' : common.prepare_script_paramaters(script_parameters, script_location),
-            'RegistryPort' : str(cluster_registry_port),
-            'ExperimentImage' : f'127.0.0.1:{cluster_registry_port}/{run_name}',
-            'ImageRepository' : f'127.0.0.1:{cluster_registry_port}'
+            'ExperimentName': experiment_name,
+            'CommandLine': common.prepare_script_paramaters(script_parameters, script_location),
+            'RegistryPort': str(cluster_registry_port),
+            'ExperimentImage': f'127.0.0.1:{cluster_registry_port}/{username}/{experiment_name}:latest',
+            'ImageRepository': f'127.0.0.1:{cluster_registry_port}/{username}/{experiment_name}:latest'
         })
     
         v = yaml.load(rendered_values)
@@ -154,7 +147,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
         workersCount = None
         pServersCount = None
 
-        regex = re.compile("^\[.*|^\{.*")  # Regex used for detecting dicts/arrays in pack params
+        regex = re.compile(r"^\[.*|^\{.*")  # Regex used for detecting dicts/arrays in pack params
         for key, value in pack_params:
             if re.match(regex, value):
                 try:
@@ -196,15 +189,6 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
 
     shutil.move(values_yaml_temp_filename, values_yaml_filename)
     log.debug("Modify values.yaml - end")
-
-
-def pull_tf_image(tf_image_repository: str):
-    try:
-        log.debug(f'Pulling TF image: {tf_image_repository}')
-        docker_client = docker.from_env()
-        docker_client.images.pull(tf_image_repository)
-    except docker.errors.APIError:
-        log.exception(f'Failed to pull TF image: {tf_image_repository}')
 
 
 def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:

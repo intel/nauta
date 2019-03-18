@@ -32,12 +32,8 @@ def cmd_mock(mocker):
 
     # 'up' mock
     fake_pack_to_be_installed = 'my-pack'
-    docker_client_mock = mocker.MagicMock()
-    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
     mocker.patch('os.listdir', return_value=[fake_pack_to_be_installed])
     mocker.patch('util.helm.install_helm_chart')
-
-    return docker_client_mock
 
 
 # noinspection PyUnresolvedReferences,PyUnusedLocal
@@ -73,46 +69,15 @@ def test_create_other_error(mocker, cmd_mock):
 
 # noinspection PyUnusedLocal
 def test_up(mocker, cmd_mock):
-    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
+    up('my-run', working_directory='/home/user/config', namespace='user')
 
-    assert output == ""
-    assert exit_code == 0
-    assert cmd_mock.images.build.call_count == 1
-    assert cmd_mock.images.push.call_count == 1
     # noinspection PyUnresolvedReferences
     assert '/home/user/config/charts/my-pack' in util.helm.install_helm_chart.call_args[0]
-
-
-# noinspection PyUnusedLocal
-def test_up_build_error(mocker, cmd_mock):
-    docker_client_mock = mocker.MagicMock()
-    docker_client_mock.images.build = lambda: RuntimeError
-    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
-
-    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
-
-    assert output == DraftCmdTexts.DOCKER_IMAGE_NOT_BUILT
-    assert exit_code == 100
-    assert docker_client_mock.images.push.call_count == 0
-
-
-# noinspection PyUnusedLocal
-def test_up_push_error(mocker, cmd_mock):
-    docker_client_mock = mocker.MagicMock()
-    docker_client_mock.images.push = lambda: RuntimeError
-    mocker.patch('docker.from_env', new=lambda: docker_client_mock)
-
-    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
-
-    assert output == DraftCmdTexts.DOCKER_IMAGE_NOT_SENT
-    assert exit_code == 101
 
 
 # noinspection PyUnusedLocal
 def test_up_helm_install_error(mocker, cmd_mock):
     mocker.patch('util.helm.install_helm_chart', side_effect=RuntimeError)
 
-    output, exit_code = up('my-run', local_registry_port=12345, working_directory='/home/user/config', namespace='user')
-
-    assert output == DraftCmdTexts.APP_NOT_RELEASED
-    assert exit_code == 102
+    with pytest.raises(RuntimeError):
+        up('my-run', working_directory='/home/user/config', namespace='user')

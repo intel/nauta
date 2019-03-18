@@ -1,0 +1,32 @@
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingGiteaClaim) (not .Values.persistence.directGiteaVolumeMount) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: gitea
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.persistence.annotations }}
+  annotations:
+{{ toYaml .Values.persistence.annotations | indent 4 }}
+{{- end }}
+
+spec:
+  accessModes:
+    - {{ .Values.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.giteaSize | quote }}
+{{ if ne (required "NAUTA Storage Type" .Values.global.nauta_storage.type) "pvc" }}
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+      release: {{ .Release.Name }}
+      chart: gitea
+      heritage: {{ .Release.Service }}
+  storageClassName: ""
+{{ end }}
+
+{{- end }}

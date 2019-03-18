@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+      - image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA buildkit image is required" .Values.image }}
+        args:
+        - --addr
+        - tcp://0.0.0.0:{{ .Values.buildkitd_port }}
+        name: buildkitd
+        ports:
+        - containerPort: {{ .Values.buildkitd_port }}
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: "/var/lib/buildkit"
+          name: buildkit-storage
+        - mountPath: /etc/buildkit
+          name: config-volume
+      volumes:
+        - name: buildkit-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-{{ .Chart.Name }}-pvc
+        - name: config-volume
+          configMap:
+            items:
+              - key: buildkitd.toml
+                path: buildkitd.toml
+            name: {{ .Release.Name }}-{{ .Chart.Name }}-config
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"

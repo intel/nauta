@@ -95,7 +95,7 @@ def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
 def unify_units(name: str, value: str) -> str:
     if name == "cpu":
         if not value.endswith("m"):
-            value = float(value) * 1000
+            value: float = float(value) * 1000
             if value.is_integer():
                 value = str(int(value)) + "m"
             else:

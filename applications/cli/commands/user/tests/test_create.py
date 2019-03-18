@@ -207,6 +207,12 @@ class CreateUserMock():
         self.execute_system_command = mocker.patch("commands.user.create.execute_system_command",
                                                    return_value=("", 0, ""))
         self.get_users_token = mocker.patch("commands.user.create.get_users_token", return_value=test_samba_password)
+        self.get_certificate = mocker.patch("commands.user.create.get_certificate", return_value="")
+        self.get_user = mocker.patch("platform_resources.user.User.get", return_value=user_data)
+        self.k8s_proxy = mocker.patch("commands.user.create.K8sProxy")
+        self.k8s_proxy.return_value.__enter__.return_value.tunnel_port = 12345
+        self.add_to_git_repo_manager = mocker.patch("commands.user.create.GitRepoManagerClient.add_nauta_user",
+                                                    return_value=user_data)
         self.validate_user_name = mocker.patch("commands.user.create.validate_user_name")
         self.path_join = mocker.patch("os.path.join", return_value="folder")
 

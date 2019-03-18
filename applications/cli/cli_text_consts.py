@@ -142,6 +142,7 @@ class UserCreateCmdTexts:
     USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
     PASSWORD_GATHER_ERROR_MSG = "The app encountered problems while gathering user's password."
     CERT_GATHER_ERROR_MSG = "The app encountered problems while gathering server's certifcate authority."
+    GIT_REPO_MANAGER_ERROR_MSG = "Error detected while adding the user to git repo manager."
     USER_ADD_ERROR_MSG = "Error detected while adding of a user."
     USER_CREATION_SUCCESS_MSG = "User {username} has been added successfully."
     USER_NOT_READY_ERROR_MSG = "User {username} is still not ready."
@@ -183,6 +184,7 @@ class UserDeleteCmdTexts:
     DELETION_DELETING_NAMESPACE = "- deleting user's namespace"
     DELETION_DELETING_USERS_OBJECTS = "- deleting user's objects"
     DELETION_DELETING_USERS_EXPERIMENTS = "- deleting user experiments' logs"
+    DELETION_DELETING_USERS_REPOSITORY = "- deleting user's repository"
 
 
 class LaunchCmdTexts:
@@ -582,9 +584,8 @@ class ExperimentCommonTexts:
     SUBMIT_OTHER_ERROR_MSG = "Other error during submitting experiments."
     DOCKER_TUNNEL_CLOSE_ERROR_MSG = "Local Docker-host tunnel hasn't been closed properly. Check whether it still " \
                                     "exists, if yes - close it manually."
-    DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Draft templates haven't been generated. Reason - {reason}"
+    EXP_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Experiment templates haven't been generated. Reason - {reason}"
     JOB_NOT_DEPLOYED_ERROR_MSG = "Job hasn't been deployed. "
-    JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE = "For more details run: draft logs {log_filename}"
     INCORRECT_PARAM_FORMAT_ERROR_MSG = "Parameter {param_name} has incorrect format."
     PARAM_AMBIGUOUSLY_DEFINED = "Parameter {param_name} ambiguously defined."
     PARAM_SET_INCORRECT_FORMAT_ERROR_MSG = "One of -ps options has incorrect format."
@@ -612,7 +613,6 @@ class DraftCmdTexts:
     APP_NOT_RELEASED = "Application hasn't been released."
     DEPLOYMENT_NOT_CREATED = "Deployment hasn't been created."
     PACK_NOT_EXISTS = "Chosen pack doesn't exist."
-    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error during getting draft logs : {exception}"
 
 
 class PacksTfTrainingTexts:
@@ -625,11 +625,6 @@ class UtilSystemTexts:
     COMMAND_EXE_FAIL_ERROR_MSG = "COMMAND execution FAIL: {command}"
     UNSUPPORTED_PLATFORM_ERROR_MSG = "unsupported platform: {sys_platform}, supported: {supported_os}!"
     PORT_AVAILABILITY_CHECK_ERROR_MSG = "Problem during checking port's availability."
-
-
-class UtilSocatTexts:
-    SOCAT_CONTAINER_START_FAIL_MSG = "failed to start socat container! expected status: 'running', got: " \
-                                     "{container_status}"
 
 
 class UtilJupyterTexts:
@@ -760,7 +755,8 @@ class CliStateTexts:
                                   "example due to invalid path to kubectl config, invalid k8s credentials or k8s " \
                                   "cluster being unavailable. Check your KUBECONFIG environment variable and make " \
                                   "sure that the k8s cluster is online."
-    NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set."
+    NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set or NCTL_CONFIG environment variable " \
+                                    "points to invalid directory."
     NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
     USER_NOT_ADMIN_MSG = "Only nauta administrators can run '{command_name}' command."
     USER_IS_ADMIN_MSG = "You cannot run command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \

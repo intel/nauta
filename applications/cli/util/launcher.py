@@ -21,8 +21,6 @@ from kubernetes import config
 from kubernetes.client import configuration
 
 from util.spinner import spinner
-from util.system import get_current_os, OS
-from util import socat
 from util.network import wait_for_connection
 from util.logger import initialize_logger
 from util.system import wait_for_ctrl_c
@@ -53,16 +51,6 @@ def launch_app(k8s_app_name: NAUTAAppNames = None, no_launch: bool = False, port
              K8sProxy(nauta_app_name=k8s_app_name, port=port, app_name=app_name,
                       number_of_retries=number_of_retries, namespace=namespace) as proxy:
             url = FORWARDED_URL.format(proxy.tunnel_port, url_end)
-
-            # run socat if on Windows or Mac OS
-            if get_current_os() in (OS.WINDOWS, OS.MACOS):
-                # noinspection PyBroadException
-                try:
-                    socat.start(proxy.container_port)
-                except Exception:
-                    err_message = Texts.LOCAL_DOCKER_TUNNEL_ERROR_MSG
-                    logger.exception(err_message)
-                    raise LaunchError(err_message)
 
             if k8s_app_name == NAUTAAppNames.INGRESS:
                 config.load_kube_config()
@@ -105,14 +93,3 @@ def launch_app(k8s_app_name: NAUTAAppNames = None, no_launch: bool = False, port
         err_message = Texts.WEB_APP_LAUCH_FAIL_MSG
         logger.exception(err_message)
         raise LaunchError(err_message)
-    finally:
-        # noinspection PyBroadException
-        # terminate socat if on Windows or Mac OS
-        if get_current_os() in (OS.WINDOWS, OS.MACOS):
-            # noinspection PyBroadException
-            try:
-                with spinner(text=Texts.WEB_APP_CLOSING_MSG):
-                    socat.stop()
-            except Exception:
-                err_message = Texts.PROXY_CLOSE_ERROR_MSG.format(k8s_app_name)
-                raise ProxyClosingError(err_message)

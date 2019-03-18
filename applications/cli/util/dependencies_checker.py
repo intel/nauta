@@ -39,8 +39,9 @@ REDHAT_MIN_VERSION = LooseVersion('7.5')
 DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
 KUBECTL_SERVER_MIN_VERSION = LooseVersion('v1.10')
-DOCKER_MIN_VERSION = LooseVersion('18.03.0-ce')
 HELM_VERSION = LooseVersion('v2.11.0')
+GIT_VERSION = LooseVersion('2.0.0')
+
 HELM_SERVER_CONNECTION_TIMEOUT = 30
 NAMESPACE_PLACEHOLDER = '<namespace>'
 
@@ -67,14 +68,14 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
             expected_version=KUBECTL_MIN_VERSION,
             version_command=execute_system_command,
             version_command_args=['kubectl', 'version', '--client'],
-            version_field='GitVersion',
+            version_field='GitVersion:',
             match_exact_version=False),
         'kubectl server':
         DependencySpec(
             expected_version=KUBECTL_SERVER_MIN_VERSION,
             version_command=execute_system_command,
             version_command_args=['kubectl', 'version', '--short'],
-            version_field='Server Version',
+            version_field='Server Version:',
             match_exact_version=False),
         'helm client':
         DependencySpec(
@@ -84,7 +85,7 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
                 os.path.join(Config().config_path, 'helm'), 'version',
                 '--client'
             ],
-            version_field='SemVer',
+            version_field='SemVer:',
             match_exact_version=True),
         'helm server':
         DependencySpec(
@@ -96,26 +97,18 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
                 f'{HELM_SERVER_CONNECTION_TIMEOUT}', '--tiller-namespace',
                 NAMESPACE_PLACEHOLDER
             ],
-            version_field='SemVer',
+            version_field='SemVer:',
             match_exact_version=True),
-        'docker client':
+        'git':
         DependencySpec(
-            expected_version=DOCKER_MIN_VERSION,
+            expected_version=GIT_VERSION,
             version_command=execute_system_command,
             version_command_args=[
-                'docker', 'version', '-f', '{{.Client.Version}}'
+                'git', '--version'
             ],
-            version_field=None,
-            match_exact_version=False),
-        'docker server':
-        DependencySpec(
-            expected_version=DOCKER_MIN_VERSION,
-            version_command=execute_system_command,
-            version_command_args=[
-                'docker', 'version', '-f', '{{.Server.Version}}'
-            ],
-            version_field=None,
-            match_exact_version=False),
+            version_field='git version',
+            match_exact_version=False
+        ),
     }
 
 
@@ -134,16 +127,13 @@ def _is_version_valid(installed_version: LooseVersion,
     return installed_version == expected_version if match_exact_version else installed_version >= expected_version
 
 
-def _parse_installed_version(version_output: str,
-                             version_field='SemVer') -> LooseVersion:
-    regex = r"{version_field}:(?:\"([\w.-]+)\"| ([\w.-]+)$)".format(
-        version_field=version_field)
+def _parse_installed_version(version_output: str, version_field='SemVer') -> LooseVersion:
+    regex = r"{version_field}(?:\"([\w.-]+)\"| ([\w.-]+))".format(version_field=version_field)
     matches = re.findall(regex, version_output)
 
     if len(matches) != 1:
         raise ValueError(
-            Texts.PARSE_FAIL_ERROR_MSG.format(
-                version_field=version_field, version_output=version_output))
+            Texts.PARSE_FAIL_ERROR_MSG.format(version_field=version_field, version_output=version_output))
 
     installed_version = LooseVersion(matches[0][0] or matches[0][1])
 

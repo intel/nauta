@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-http
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    nauta_app_name: gitea
+spec:
+  type: {{ .Values.service.http.serviceType }}
+  ports:
+  - name: http
+    port: {{ .Values.service.http.port }}
+    {{- if  .Values.service.http.nodePort }}
+    nodePort: {{ .Values.service.http.nodePort }}
+    {{- end }}
+    targetPort: {{ .Values.service.http.port }}
+  selector:
+    app: {{ template "fullname" . }}

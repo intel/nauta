@@ -15,9 +15,10 @@
 #
 
 from collections import namedtuple
+from typing import List, Optional
+
 import dateutil
 from enum import Enum
-from typing import List, Optional
 
 from kubernetes.client import CustomObjectsApi
 

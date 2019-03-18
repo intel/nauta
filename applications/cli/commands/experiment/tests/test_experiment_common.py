@@ -27,7 +27,6 @@ from commands.experiment.common import submit_experiment, values_range, \
 
 from util.exceptions import SubmitExperimentError
 import util.config
-from util.system import get_current_os, OS
 from platform_resources.run import RunStatus, Run
 from cli_text_consts import ExperimentCommonTexts as Texts
 
@@ -101,6 +100,29 @@ def test_create_environment_success(config_mock, mocker):
     assert experiment_path == FAKE_CLI_EXPERIMENT_PATH
 
 
+def test_create_environment_folder_size_warning(config_mock, mocker, tmpdir):
+    os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
+    mocker.patch("os.makedirs")
+    mocker.patch("os.chmod")
+    sem_file_creation_mock = mocker.patch("commands.experiment.common.Path.touch")
+    mocker.patch("shutil.copy2")
+    mocker.patch("commands.experiment.common.copy_tree")
+    confirm_mock = mocker.patch('commands.experiment.common.click.confirm')
+
+    sfl_size = 1024
+    script_folder_location = tmpdir.mkdir('sfl')
+    sfl_file = script_folder_location.join('file.bin')
+    with open(sfl_file, "wb") as f:
+        f.write(os.urandom(sfl_size))
+
+    create_environment(EXPERIMENT_NAME, SCRIPT_LOCATION, folder_location=script_folder_location,
+                       show_folder_size_warning=True, max_folder_size_in_bytes=sfl_size/2)
+
+    assert sem_file_creation_mock.call_count == 1, "semaphore file wasn't created"
+    assert os_pexists_mock.call_count == 1, "existence of an experiment's folder wasn't checked"
+    assert confirm_mock.call_count == 1
+
+
 def test_create_environment_makedir_error(config_mock, mocker):
     os_pexists_mock = mocker.patch("os.path.exists", side_effect=[False])
     mocker.patch("os.makedirs", side_effect=Exception("Test exception"))
@@ -163,18 +185,17 @@ class SubmitExperimentMocks:
         self.update_conf = mocker.patch("commands.experiment.common.update_configuration", side_effect=[0])
         self.create_env = mocker.patch("commands.experiment.common.create_environment",
                                        side_effect=[(EXPERIMENT_FOLDER, "")])
+
+        self.upload_exp_mock = mocker.patch('commands.experiment.common.upload_experiment_to_git_repo_manager')
+        self.image_build_workflow_mock = mocker.patch('commands.experiment.common.ExperimentImageBuildWorkflow')
+
         self.check_run_env = mocker.patch("commands.experiment.common.check_run_environment",
                                           side_effect=[(EXPERIMENT_FOLDER, "")])
         self.del_env = mocker.patch("commands.experiment.common.delete_environment")
 
-        self.k8s_proxy = mocker.patch("commands.experiment.common.K8sProxy")
-        self.k8s_proxy.return_value.__enter__.return_value.tunnel_port = FAKE_NODE_PORT
-
         self.k8s_get_node_port = mocker.patch("commands.experiment.common.get_app_service_node_port")
         self.k8s_get_node_port.return_value = FAKE_NODE_PORT
 
-        self.socat = mocker.patch("commands.experiment.common.socat") \
-            if get_current_os() in (OS.WINDOWS, OS.MACOS) else None
         self.isdir = mocker.patch("os.path.isdir", return_value=True)
         self.isfile = mocker.patch("os.path.isfile", return_value=True)
         self.touch = mocker.patch("commands.experiment.common.Path.touch")
@@ -193,24 +214,18 @@ def prepare_mocks(mocker) -> SubmitExperimentMocks:
 
 def check_asserts(prepare_mocks: SubmitExperimentMocks, get_namespace_count=1, get_exp_name_count=1, create_env_count=1,
                   cmd_create_count=1, update_conf_count=1, k8s_proxy_count=1, add_exp_count=1, add_run_count=1,
-                  update_run_count=0, submit_one_count=1, del_env_count=0, socat_start_count=1,
-                  delete_k8s_object_count=0):
+                  update_run_count=0, submit_one_count=1, del_env_count=0, delete_k8s_object_count=0):
     assert prepare_mocks.get_namespace.call_count == get_namespace_count, "current user namespace was not fetched"
     assert prepare_mocks.gen_exp_name.call_count == get_exp_name_count, "experiment name wasn't created"
     assert prepare_mocks.create_env.call_count == create_env_count, "environment wasn't created"
     assert prepare_mocks.cmd_create.call_count == cmd_create_count, "deployment wasn't created"
     assert prepare_mocks.update_conf.call_count == update_conf_count, "configuration wasn't updated"
-    assert prepare_mocks.k8s_proxy.call_count == k8s_proxy_count, "port wasn't forwarded"
     assert prepare_mocks.add_exp.call_count == add_exp_count, "experiment model was not created"
     assert prepare_mocks.add_run.call_count == add_run_count, "run model was not created"
     assert prepare_mocks.update_run.call_count == update_run_count, "run model was not updated"
     assert prepare_mocks.submit_one.call_count == submit_one_count, "training wasn't deployed"
     assert prepare_mocks.del_env.call_count == del_env_count, "environment folder was deleted"
     assert prepare_mocks.delete_k8s_object_mock.call_count == delete_k8s_object_count, "experiment was not deleted"
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        assert prepare_mocks.socat.start.call_count == socat_start_count, "socat wasn't started"
-        if socat_start_count > 0:
-            prepare_mocks.socat.start.assert_called_with(FAKE_NODE_PORT)
 
 
 def test_submit_success(prepare_mocks: SubmitExperimentMocks):
@@ -230,7 +245,7 @@ def test_submit_fail(prepare_mocks: SubmitExperimentMocks):
         assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
 
     check_asserts(prepare_mocks, cmd_create_count=0, update_conf_count=0, add_exp_count=0, add_run_count=0,
-                  submit_one_count=0, socat_start_count=1, del_env_count=1)
+                  submit_one_count=0, del_env_count=1)
 
 
 def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
@@ -241,8 +256,8 @@ def test_submit_depl_fail(prepare_mocks: SubmitExperimentMocks):
                           run_kind=RunKinds.TRAINING)
 
     assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
-    check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, socat_start_count=1,
-                  del_env_count=1, add_run_count=0)
+    check_asserts(prepare_mocks, update_conf_count=0, add_exp_count=0, submit_one_count=0, del_env_count=1,
+                  add_run_count=0)
 
 
 def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
@@ -256,7 +271,7 @@ def test_submit_env_update_fail(prepare_mocks: SubmitExperimentMocks):
 
     assert Texts.ENV_CREATION_ERROR_MSG in str(exe)
     check_asserts(prepare_mocks, add_exp_count=0, add_run_count=0,
-                  submit_one_count=0, socat_start_count=1, del_env_count=1)
+                  submit_one_count=0, del_env_count=1)
 
 
 def test_submit_start_depl_fail(prepare_mocks: SubmitExperimentMocks):
@@ -628,9 +643,9 @@ def test_prepare_experiment_environment_requirements_file(tmpdir, config_mock, e
     fake_requirements_file.write('fake-dependency==0.0.1')
 
     prepare_experiment_environment(requirements_file=fake_requirements_file.strpath, experiment_name='bla',
-                                   run_name='bla', script_folder_location=None, local_registry_port=1,
+                                   run_name='bla', script_folder_location=None,
                                    cluster_registry_port=1, local_script_location=experiment_dir.strpath,
-                                   pack_type='fake_pack', script_parameters=('experiment.py',))
+                                   pack_type='fake_pack', script_parameters=('experiment.py',), username='fake-user')
 
     assert exp_env_mocks.create_env_mock.call_count == 1
     assert exp_env_mocks.create_draft_env_mock.call_count == 1
@@ -645,9 +660,9 @@ def test_prepare_experiment_environment_requirements_file_not_provided(tmpdir, c
     experiment_dir = tmpdir.mkdir("text-exp")
 
     prepare_experiment_environment(requirements_file=None, experiment_name='bla',
-                                   run_name='bla', script_folder_location=None, local_registry_port=1,
+                                   run_name='bla', script_folder_location=None,
                                    cluster_registry_port=1, local_script_location=experiment_dir.strpath,
-                                   pack_type='fake_pack', script_parameters=('experiment.py',))
+                                   pack_type='fake_pack', script_parameters=('experiment.py',), username='fake-user')
 
     assert exp_env_mocks.create_env_mock.call_count == 1
     assert exp_env_mocks.create_draft_env_mock.call_count == 1

@@ -1,0 +1,74 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      tolerations:
+      - key: "master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                - "True"
+      containers:
+      {{- if .Values.useInPodPostgres }}
+      {{ include "postgres" . | indent 6 }}
+      {{- end -}}
+      {{ include "gitea" . | indent 6 }}
+      {{ include "memcached" . | indent 6 }}
+      initContainers:
+      {{ include "init" . | indent 6 }}
+      {{ include "initPostgres" . | indent 6 }}
+      volumes:
+      - name: gitea-data
+      {{- if .Values.persistence.enabled }}
+        {{- if .Values.persistence.directGiteaVolumeMount }}
+{{ tpl .Values.persistence.directGiteaVolumeMount . | indent 8 }}
+        {{- else }}
+        persistentVolumeClaim:
+         claimName: {{ .Values.persistence.existingGiteaClaim | default (include "fullname" .) }}
+        {{- end }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{ if (.Values.useInPodPostgres) }}
+      - name: postgres-data
+      {{- if .Values.persistence.enabled }}
+        {{- if .Values.persistence.directPostgresVolumeMount }}
+{{ tpl .Values.persistence.directPostgresVolumeMount . | indent 8 }}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingPostgresClaim | default (include "postgresql.fullname" .) }}
+        {{- end }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- end }}
+      - name: gitea-config
+        configMap:
+          name: {{ template "fullname" . }}
+
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      {{- end }}

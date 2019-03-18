@@ -34,21 +34,22 @@ from tabulate import tabulate
 from marshmallow import ValidationError
 
 import draft.cmd as cmd
+from git_repo_manager.utils import upload_experiment_to_git_repo_manager
 from platform_resources.experiment_utils import generate_exp_name_and_labels
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiment as experiments_model
 from platform_resources.run import Run, RunStatus, RunKinds
+from platform_resources.workflow import ExperimentImageBuildWorkflow
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
+from util.filesystem import get_total_directory_size_in_bytes
 from util.helm import delete_helm_release
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.spinner import spinner
 from util.system import get_current_os, OS
-from util import socat
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
     SubmitExperimentError
 from util.app_names import NAUTAAppNames
-from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s.k8s_info import get_app_service_node_port, get_kubectl_current_context_namespace
 from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from util.jupyter_notebook_creator import convert_py_to_ipynb
@@ -78,6 +79,8 @@ EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSIO
 
 CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
+
+EXP_IMAGE_BUILD_WORKFLOW_SPEC = "exp-image-build.yaml"
 
 log = initialize_logger('commands.common')
 
@@ -138,7 +141,8 @@ def check_run_environment(run_environment_path: str):
             exit()
 
 
-def create_environment(experiment_name: str, file_location: str, folder_location: str) -> str:
+def create_environment(experiment_name: str, file_location: str, folder_location: str,
+                       show_folder_size_warning=True, max_folder_size_in_bytes=1024*1024, spinner_to_hide=None) -> str:
     """
     Creates a complete environment for executing a training using draft.
 
@@ -146,6 +150,10 @@ def create_environment(experiment_name: str, file_location: str, folder_location
                             with content of an experiment
     :param file_location: location of a training script
     :param folder_location: location of a folder with additional data
+    :param show_folder_size_warning: if True, a warning will be shown if script folder size exceeds
+     value in max_folder_size_in_bytes param
+    :param max_folder_size_in_bytes: maximum script folder size,
+    :param spinner_to_hide: provide spinner, if it should be hidden before folder size warning
     :return: (experiment_folder)
     experiment_folder - folder with experiment's artifacts
     In case of any problems during creation of an enviornment it throws an
@@ -180,6 +188,17 @@ def create_environment(experiment_name: str, file_location: str, folder_location
 
     # copy folder content
     if folder_location:
+        folder_size = get_total_directory_size_in_bytes(folder_location)
+        if show_folder_size_warning and folder_size >= max_folder_size_in_bytes:
+            if spinner_to_hide:
+                spinner_to_hide.hide()
+            if not click.confirm(f'Experiment\'s script folder location size ({folder_size/1024/1024} MB) '
+                                 f'exceeds {max_folder_size_in_bytes/1024/1024} MB. '
+                                 f'It is highly recommended to use input/output shares for large amounts of data '
+                                 f'instead of submitting them along with experiment. Do you want to continue?'):
+                exit(2)
+            if spinner_to_hide:
+                spinner_to_hide.show()
         try:
             copy_tree(folder_location, folder_path)
         except Exception:
@@ -267,140 +286,146 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
     signal.signal(signal.SIGTERM, ctrl_c_handler_for_submit)
 
     try:
-        config = Config()
+        experiment_run_folders = []  # List of local directories used by experiment's runs
+        try:
+            cluster_registry_port = get_app_service_node_port(nauta_app_name=NAUTAAppNames.DOCKER_REGISTRY)
+            # prepare environments for all experiment's runs
+            for experiment_run in runs_list:
+                if script_parameters and experiment_run.parameters:
+                    current_script_parameters = script_parameters + experiment_run.parameters
+                elif script_parameters:
+                    current_script_parameters = script_parameters
+                elif experiment_run.parameters:
+                    current_script_parameters = experiment_run.parameters
+                else:
+                    current_script_parameters = ""
+                run_folder, script_location, pod_count = \
+                    prepare_experiment_environment(experiment_name=experiment_name,
+                                                   run_name=experiment_run.name,
+                                                   local_script_location=script_location,
+                                                   script_folder_location=script_folder_location,  # noqa: E501
+                                                   script_parameters=current_script_parameters,
+                                                   pack_type=template, pack_params=pack_params,
+                                                   cluster_registry_port=cluster_registry_port,
+                                                   env_variables=env_variables,
+                                                   requirements_file=requirements_file,
+                                                   username=namespace,
+                                                   run_kind=run_kind)
+                # Set correct pod count
+                if not pod_count or pod_count < 1:
+                    raise SubmitExperimentError('Unable to determine pod count: make sure that values.yaml '
+                                                'file in your pack has podCount field with positive integer value.')
 
-        # start port forwarding
-        # noinspection PyBroadException
-        with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port,
-                      number_of_retries_wait_for_readiness=90) as proxy:
-            # Save port that was actually used in configuration
-            if proxy.tunnel_port != config.local_registry_port:
-                config.local_registry_port = proxy.tunnel_port
-
-            experiment_run_folders = []  # List of local directories used by experiment's runs
-            try:
-                # run socat if on Windows or Mac OS
-                if get_current_os() in (OS.WINDOWS, OS.MACOS):
-                    # noinspection PyBroadException
-                    try:
-                        with spinner(text=Texts.CLUSTER_CONNECTION_MSG):
-                            socat.start(proxy.tunnel_port)
-                    except Exception:
-                        error_msg = Texts.LOCAL_DOCKER_TUNNEL_ERROR_MSG
-                        log.exception(error_msg)
-                        raise SubmitExperimentError(error_msg)
-
-                cluster_registry_port = get_app_service_node_port(nauta_app_name=NAUTAAppNames.DOCKER_REGISTRY)
-
-                # prepare environments for all experiment's runs
-                for experiment_run in runs_list:
-                    if script_parameters and experiment_run.parameters:
-                        current_script_parameters = script_parameters + experiment_run.parameters
-                    elif script_parameters:
-                        current_script_parameters = script_parameters
-                    elif experiment_run.parameters:
-                        current_script_parameters = experiment_run.parameters
-                    else:
-                        current_script_parameters = ""
-
-                    run_folder, script_location, pod_count = \
-                        prepare_experiment_environment(experiment_name=experiment_name,
-                                                       run_name=experiment_run.name,
-                                                       local_script_location=script_location,
-                                                       script_folder_location=script_folder_location,  # noqa: E501
-                                                       script_parameters=current_script_parameters,
-                                                       pack_type=template, pack_params=pack_params,
-                                                       local_registry_port=proxy.tunnel_port,
-                                                       cluster_registry_port=cluster_registry_port,
-                                                       env_variables=env_variables,
-                                                       requirements_file=requirements_file)
-                    # Set correct pod count
-                    if not pod_count or pod_count < 1:
-                        raise SubmitExperimentError('Unable to determine pod count: make sure that values.yaml '
-                                                    'file in your pack has podCount field with positive integer value.')
-                    experiment_run.pod_count = pod_count
-
-                    experiment_run_folders.append(run_folder)
-                    script_name = None
-                    if script_location is not None:
-                        script_name = os.path.basename(script_location)
-
-                    # Prepend script_name parameter to run description only for display purposes.
-                    experiment_run.parameters = script_parameters if not experiment_run.parameters \
-                        else experiment_run.parameters + script_parameters
-                    if experiment_run.parameters and script_name:
-                        experiment_run.parameters = (script_name, ) + experiment_run.parameters
-                    elif script_name:
-                        experiment_run.parameters = (script_name, )
-            except SubmitExperimentError as e:
-                log.exception(Texts.ENV_CREATION_ERROR_MSG)
-                e.message += f' {Texts.ENV_CREATION_ERROR_MSG}'
-                raise
-            except Exception:
-                # any error in this step breaks execution of this command
-                message = Texts.ENV_CREATION_ERROR_MSG
-                log.exception(message)
-                # just in case - remove folders that were created with a success
+                experiment_run.pod_count = pod_count
+                experiment_run_folders.append(run_folder)
+                script_name = None
+                if script_location is not None:
+                    script_name = os.path.basename(script_location)
+                # Prepend script_name parameter to run description only for display purposes.
+                experiment_run.parameters = script_parameters if not experiment_run.parameters \
+                    else experiment_run.parameters + script_parameters
+                if experiment_run.parameters and script_name:
+                    experiment_run.parameters = (script_name, ) + experiment_run.parameters
+                elif script_name:
+                    experiment_run.parameters = (script_name, )
+        except SubmitExperimentError as e:
+            log.exception(Texts.ENV_CREATION_ERROR_MSG)
+            e.message += f' {Texts.ENV_CREATION_ERROR_MSG}'
+            raise
+        except Exception:
+            # any error in this step breaks execution of this command
+            message = Texts.ENV_CREATION_ERROR_MSG
+            log.exception(message)
+            # just in case - remove folders that were created with a success
+            for experiment_run_folder in experiment_run_folders:
+                delete_environment(experiment_run_folder)
+        # if ps or pr option is used - first ask whether experiment(s) should be submitted
+        if parameter_range or parameter_set:
+            click.echo(Texts.CONFIRM_SUBMIT_MSG)
+            click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
+                                 RUN_PARAMETERS: ["\n".join(run.parameters) if run.parameters
+                                                  else "" for run in runs_list]},
+                                headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
+            if not click.confirm(Texts.CONFIRM_SUBMIT_QUESTION_MSG, default=True):
                 for experiment_run_folder in experiment_run_folders:
                     delete_environment(experiment_run_folder)
+                exit()
+        # create Experiment model
+        # TODO template_name & template_namespace should be filled after Template implementation
+        parameter_range_spec = [f'-pr {param_name} {param_value}' for param_name, param_value in parameter_range]
+        parameter_set_spec = [f'-ps {ps_spec}' for ps_spec in parameter_set]
+        experiment_parameters_spec = list(script_parameters) + parameter_range_spec + parameter_set_spec
+        experiment = experiments_model.Experiment(name=experiment_name, template_name=template,
+                                                  parameters_spec=experiment_parameters_spec,
+                                                  template_namespace="template-namespace")
+        experiment.create(namespace=namespace, labels=labels)
 
-            # if ps or pr option is used - first ask whether experiment(s) should be submitted
-            if parameter_range or parameter_set:
-                click.echo(Texts.CONFIRM_SUBMIT_MSG)
-                click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
-                                     RUN_PARAMETERS: ["\n".join(run.parameters) if run.parameters
-                                                      else "" for run in runs_list]},
-                                    headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
-
-                if not click.confirm(Texts.CONFIRM_SUBMIT_QUESTION_MSG, default=True):
-                    for experiment_run_folder in experiment_run_folders:
-                        delete_environment(experiment_run_folder)
-                    exit()
-
-            # create Experiment model
-            # TODO template_name & template_namespace should be filled after Template implementation
-            parameter_range_spec = [f'-pr {param_name} {param_value}' for param_name, param_value in parameter_range]
-            parameter_set_spec = [f'-ps {ps_spec}' for ps_spec in parameter_set]
-            experiment_parameters_spec = list(script_parameters) + parameter_range_spec + parameter_set_spec
-            experiment = experiments_model.Experiment(name=experiment_name, template_name=template,
-                                                      parameters_spec=experiment_parameters_spec,
-                                                      template_namespace="template-namespace")
-
-            experiment.create(namespace=namespace, labels=labels)
-
-            # submit runs
-            run_errors = {}
-            for run, run_folder in zip(runs_list, experiment_run_folders):
+        with spinner('Uploading experiment...'):
+            try:
+                upload_experiment_to_git_repo_manager(experiments_workdir=get_run_environment_path(''),
+                                                      experiment_name=experiment_name,
+                                                      run_name=runs_list[0].name,
+                                                      username=namespace)
+            except Exception:
+                log.exception('Failed to upload experiment.')
                 try:
-                    run.state = RunStatus.QUEUED
-                    with spinner(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name)):
-                        # Add Run object with runKind label and pack params as annotations
-                        run.create(namespace=namespace, labels={'runKind': run_kind.value},
-                                   annotations={pack_param_name: pack_param_value
-                                                for pack_param_name, pack_param_value in pack_params})
-                        submitted_runs.append(run)
-                        submit_draft_pack(run_name=run.name,
-                                          run_folder=run_folder,
-                                          namespace=namespace,
-                                          local_registry_port=proxy.tunnel_port)
-                except Exception as exe:
-                    delete_environment(run_folder)
-                    try:
-                        run.state = RunStatus.FAILED
-                        run_errors[run.name] = str(exe)
-                        run.update()
-                    except Exception as rexe:
-                        # update of non-existing run may fail
-                        log.debug(Texts.ERROR_DURING_PATCHING_RUN.format(str(rexe)))
+                    experiment.state = experiments_model.ExperimentStatus.FAILED
+                    experiment.update()
+                except Exception:
+                    log.exception(f'Failed to set state of {experiment.name} experiment '
+                                  f'to {experiments_model.ExperimentStatus.FAILED}')
+                raise SubmitExperimentError('Failed to upload experiment.')
 
-            # Delete experiment if no Runs were submitted
-            if not submitted_runs:
-                click.echo(Texts.SUBMISSION_FAIL_ERROR_MSG)
-                delete_k8s_object("experiment", experiment_name)
-
-            # Change experiment status to submitted
-            experiment.state = experiments_model.ExperimentStatus.SUBMITTED
-            experiment.update()
+        with spinner('Building experiment image...'):
+            try:
+                image_build_workflow = ExperimentImageBuildWorkflow.from_yaml(
+                    yaml_template_path=f'{Config().config_path}/workflows/{EXP_IMAGE_BUILD_WORKFLOW_SPEC}',
+                    username=namespace,
+                    experiment_name=experiment_name)
+                image_build_workflow.create(namespace=namespace)
+                image_build_workflow.wait_for_completion()
+            except Exception:
+                error_msg = 'Failed to build experiment image.'
+                log.exception(error_msg)
+                if image_build_workflow.name:
+                    error_msg += f' Run nctl workflow logs {image_build_workflow.name} command for more details.'
+                try:
+                    experiment.state = experiments_model.ExperimentStatus.FAILED
+                    experiment.update()
+                except Exception:
+                    log.exception(f'Failed to set state of {experiment.name} experiment '
+                                  f'to {experiments_model.ExperimentStatus.FAILED}')
+                raise SubmitExperimentError(error_msg)
+        # submit runs
+        run_errors = {}
+        for run, run_folder in zip(runs_list, experiment_run_folders):
+            try:
+                run.state = RunStatus.QUEUED
+                with spinner(text=Texts.CREATING_RESOURCES_MSG.format(run_name=run.name)):
+                    # Add Run object with runKind label and pack params as annotations
+                    run.create(namespace=namespace, labels={'runKind': run_kind.value},
+                               annotations={pack_param_name: pack_param_value
+                                            for pack_param_name, pack_param_value in pack_params})
+                    submitted_runs.append(run)
+                    submit_draft_pack(run_name=run.name,
+                                      run_folder=run_folder,
+                                      namespace=namespace)
+            except Exception as exe:
+                delete_environment(run_folder)
+                try:
+                    run.state = RunStatus.FAILED
+                    run_errors[run.name] = str(exe)
+                    run.update()
+                except Exception as rexe:
+                    # update of non-existing run may fail
+                    log.debug(Texts.ERROR_DURING_PATCHING_RUN.format(str(rexe)))
+        # Delete experiment if no Runs were submitted
+        if not submitted_runs:
+            click.echo(Texts.SUBMISSION_FAIL_ERROR_MSG)
+            delete_k8s_object("experiment", experiment_name)
+        # Change experiment status to submitted
+        experiment.state = experiments_model.ExperimentStatus.SUBMITTED
+        experiment.update()
     except LocalPortOccupiedError as exe:
         click.echo(exe.message)
         raise SubmitExperimentError(exe.message)
@@ -418,13 +443,6 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
         log.exception(error_msg)
         raise SubmitExperimentError(error_msg) from exe
     finally:
-        with spinner(text=Texts.CLUSTER_CONNECTION_CLOSING_MSG):
-            # noinspection PyBroadException
-            try:
-                socat.stop()
-            except Exception:
-                log.exception("Error during closing of a proxy for a local docker-host tunnel")
-                raise K8sProxyCloseError(Texts.DOCKER_TUNNEL_CLOSE_ERROR_MSG)
         # remove semaphores from all exp folders
         remove_sempahore(experiment_name)
 
@@ -472,11 +490,13 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
 
 def prepare_experiment_environment(experiment_name: str, run_name: str, local_script_location: str,
                                    script_parameters: Tuple[str, ...],
-                                   pack_type: str, local_registry_port: int, cluster_registry_port: int,
+                                   pack_type: str, cluster_registry_port: int,
+                                   username: str,
                                    script_folder_location: str = None,
                                    pack_params: List[Tuple[str, str]] = None,
                                    env_variables: List[str] = None,
-                                   requirements_file: str = None) -> PrepareExperimentResult:
+                                   requirements_file: str = None,
+                                   run_kind: RunKinds = RunKinds.TRAINING) -> PrepareExperimentResult:
     """
     Prepares draft's environment for a certain run based on provided parameters
     :param experiment_name: name of an experiment
@@ -485,7 +505,6 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     :param script_folder_location: location of an additional folder used in training
     :param script_parameters: parameters passed to a script
     :param pack_type: type of a pack used to start training job
-    :param local_registry_port: port on which docker registry is accessible locally
     :param cluster_registry_port: port on which docker registry is accessible within nauta cluster
     :param pack_params: additional pack params
     :param env_variables: environmental variables to be passed to training
@@ -499,9 +518,11 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
     try:
         # check environment directory
         check_run_environment(run_folder)
-        with spinner(text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name)):
+        with spinner(text=Texts.CREATING_ENVIRONMENT_MSG.format(run_name=run_name)) as create_env_spinner:
             # create an environment
-            create_environment(run_name, local_script_location, script_folder_location)
+            create_environment(run_name, local_script_location, script_folder_location,
+                               show_folder_size_warning=bool(run_kind == RunKinds.TRAINING),
+                               spinner_to_hide=create_env_spinner)
             # generate draft's data
             output, exit_code = cmd.create(working_directory=run_folder, pack_type=pack_type)
             # copy requirements file if it was provided, create empty requirements file otherwise
@@ -512,7 +533,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
                 Path(dest_requirements_file).touch()
 
         if exit_code:
-            raise SubmitExperimentError(Texts.DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=output))
+            raise SubmitExperimentError(Texts.EXP_TEMPLATES_NOT_GENERATED_ERROR_MSG.format(reason=output))
 
         # Script location on experiment container
         remote_script_location = Path(local_script_location).name if local_script_location else ''
@@ -526,11 +547,12 @@ def prepare_experiment_environment(experiment_name: str, run_name: str, local_sc
         # reconfigure draft's templates
         update_configuration(run_folder=run_folder, script_location=remote_script_location,
                              script_parameters=script_parameters,
-                             experiment_name=experiment_name, run_name=run_name,
-                             local_registry_port=local_registry_port, cluster_registry_port=cluster_registry_port,
+                             experiment_name=experiment_name,
+                             cluster_registry_port=cluster_registry_port,
                              pack_type=pack_type, pack_params=pack_params,
                              script_folder_location=script_folder_location,
-                             env_variables=env_variables)
+                             env_variables=env_variables,
+                             username=username)
 
         pod_count = get_pod_count(run_folder=run_folder, pack_type=pack_type)
     except Exception as exe:
@@ -553,7 +575,7 @@ def get_log_filename(log_output: str):
     return None
 
 
-def submit_draft_pack(run_folder: str, run_name: str, local_registry_port: int, namespace: str = None):
+def submit_draft_pack(run_folder: str, run_name: str, namespace: str = None):
     """
     Submits one run using draft's environment located in a folder given as a parameter.
     :param run_folder: location of a folder with a description of an environment
@@ -565,12 +587,9 @@ def submit_draft_pack(run_folder: str, run_name: str, local_registry_port: int, 
     log.debug(f'Submit one run: {run_folder} - start')
 
     # run training
-    output, exit_code = cmd.up(run_name=run_name,
-                               local_registry_port=local_registry_port,
-                               working_directory=run_folder,
-                               namespace=namespace)
-
-    if exit_code:
+    try:
+        cmd.up(run_name=run_name, working_directory=run_folder, namespace=namespace)
+    except Exception:
         delete_environment(run_folder)
         raise SubmitExperimentError(Texts.JOB_NOT_DEPLOYED_ERROR_MSG)
     log.debug(f'Submit one run {run_folder} - finish')
