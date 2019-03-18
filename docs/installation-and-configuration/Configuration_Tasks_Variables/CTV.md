@@ -101,7 +101,7 @@ dns_servers:
   - 8.8.4.4
 ```
 
-###dns_names_for_certificate
+### dns_names_for_certificate
 - **Description:** This is a list of DNS names of the cluster.
 Values from this param will be acceptable addresses to access cluster in secure way.
 Key values have to be in format `DNS.X` where `X` is number greater than 6 (internally allocated symbolic addresses).
@@ -192,58 +192,6 @@ insecure_registries:
 - my.company.registry:9876
 ```
 **Note:** This refers to Docker registries only. 
-
-### enabled_plugins 
-- **Description:** This is a list of enabled Yum* plugins.
-- **Default value:** []
-
-```yaml
-enabled_plugins:
-  - presto
-```
-
-### disabled_plugins
-- **Description:** This is a list of disabled Yum plugins.
-- **Default value:** []
-
-```yaml
-disabled_plugins:
-  - presto
-```
-
-### use_system_enabled_plugins
-- **Description:** This defines if Yum should use system-enabled plugins.
-- **Default value:** False
-
-```yaml
-use_system_enabled_plugins: False
-```
-
-### enabled_repos 
-- **Description:** This is a list of enabled repositories, and is used for external dependencies installation.
-- **Default value:** []
-
-```yaml
-enabled_repos:
-  - rhel
-```
-
-### disabled_repos 
-- **Description:** This is a list of disabled repositories, and is used for external dependencies installation.
-- **Default value:** []
-
-```yaml
-disabled_repos:
-  - rhel
-```
-
-### use_system_enabled_repos 
-- **Description:** This defines if the default system repositories should be enabled in external dependencies installation.
-- **Default value:** True
-
-```yaml
-use_system_enabled_repos: True
-```
 
 ### input_nfs
 - **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used.
