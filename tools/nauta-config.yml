@@ -140,9 +140,12 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tf-operator"
   nauta/docker:
-    version: "18.03"
+    version: "18.09"
     required:
       DOCKER_CE_RPM_IMAGE: "shared/build/rpm/docker-ce"
+      DOCKER_CE_CLI_RPM_IMAGE: "shared/build/rpm/docker-ce-cli"
+      DOCKER_CONTAINERIO_RPM_IMAGE: "shared/build/rpm/containerd-io"
+      CONTAINER_SELINUX_RPM_IMAGE: "shared/build/rpm/container-selinux"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/docker"
   nauta/ingress:

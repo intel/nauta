@@ -76,15 +76,24 @@ shared_images:
     args:
       PACKAGE_NAME: "docker-ce"
       PACKAGE_VERSION: "18.09"
-  shared/build/rpm/docker-ce-debuginfo:
+  shared/build/rpm/docker-ce-cli:
     version: "18.09"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
     push: False
     args:
-      PACKAGE_NAME: "docker-ce-debuginfo"
+      PACKAGE_NAME: "docker-ce-cli"
       PACKAGE_VERSION: "18.09"
+  shared/build/rpm/containerd-io:
+    version: "1.2"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
+    push: False
+    args:
+      PACKAGE_NAME: "containerd.io"
+      PACKAGE_VERSION: "1.2"
   shared/build/rpm/container-selinux:
     version: "2.68"
     required: {}

@@ -1,3 +1,4 @@
+
 [docker-ce-stable]
 name=Docker CE Stable - $basearch
 baseurl=https://download.docker.com/linux/centos/7/$basearch/stable
@@ -5,9 +6,3 @@ enabled=1
 gpgcheck=1
 gpgkey=https://download.docker.com/linux/centos/gpg
 
-[docker-ce-stable-debuginfo]
-name=Docker CE Stable - Debuginfo $basearch
-baseurl=https://download.docker.com/linux/centos/7/debug-$basearch/stable
-enabled=1
-gpgcheck=1
-gpgkey=https://download.docker.com/linux/centos/gpg
