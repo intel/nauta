@@ -6,6 +6,8 @@ Nauta's configuration is specified by a _YAML* Configuration file_. Nauta will l
 
 **Note 2:** All parameters present in the configuration file _must_ have values. For example: `proxy:`. Setting the configuration file with no value causes errors.
 
+**Note 3:** Host names must conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire host name, including the dots must not exceed 253 characters long. Valid characters for host and domain names are ASCII(7) letters from a to z, the digits from 0 to 9, and a hyphen. Furthermore, do not start a host and domain names with a hyphen. 
+
 ## Example Configuration File 
 
 **Note:** This is an _example_ file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section after the YAML file example below.
