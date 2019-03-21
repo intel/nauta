@@ -35,14 +35,14 @@ ifeq (Windows,$(OS))
 	# build nctl
 	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
-	mkdir dist/config/
+	mkdir -vp dist/config/packs
 
 	cp -Rf workflows dist/config
 	cp zoo-repository.config dist/config/
 
     # populate draft/packs with nauta-zoo repo
 	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
-	mv dist/config/packs/nauta-zoo/* dist/config/packs/packs
+	mv dist/config/packs/nauta-zoo/* dist/config/packs/
 	rm -rf dist/config/packs/nauta-zoo
 
 	cp zoo-repository.config dist/config/
