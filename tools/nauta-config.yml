@@ -50,7 +50,7 @@ local_images:
     image: "fluent/fluentd-kubernetes-daemonset:v1.3-debian-elasticsearch"
     method: pull
   nauta/registry:
-    version: "2.6.2"
+    version: "2.7.1"
     image: "registry:2"
     method: pull
   nauta/samba:
@@ -211,7 +211,7 @@ local_images:
 subcharts:
   nauta-registry:
     registry:
-      version: 2.6.2
+      version: 2.7.1
       path: "{{ playbook_dir }}/../../nauta-registry-charts/registry"
   nauta:
     gui:
