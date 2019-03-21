@@ -33,6 +33,7 @@ This guide describes how to use Nauta, and the following topics:
     * [experiment](actions/experiment.md) - training and managing training jobs 
     * [launch](actions/launch.md) - launching browser for Web UI and Tensorboard
     * [mount](actions/mount.md) - displaying details concerning how to mount user's folders
+    * [template](actions/template.md)
     * [predict](actions/predict.md) - deploy and manage inference on trained model
     * [user](actions/user.md) - adding/deleting/listing users of the system 
     * [verify](actions/verify.md) - verifies installation of _dlsctl_ application

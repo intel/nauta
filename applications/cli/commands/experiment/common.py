@@ -33,6 +33,7 @@ from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
 
+from commands.template.common import get_template_version
 import draft.cmd as cmd
 from git_repo_manager.utils import upload_experiment_to_git_repo_manager
 from platform_resources.experiment_utils import generate_exp_name_and_labels
@@ -69,13 +70,14 @@ RUN_START_DATE = "Start date"
 RUN_DURATION = "Duration"
 RUN_SUBMITTER = "Owner"
 RUN_TEMPLATE_NAME = "Template name"
+RUN_TEMPLATE_VERSION = "Template version"
 
 JUPYTER_NOTEBOOK_TEMPLATES_NAMES = ["jupyter", "jupyter-py2"]
 
 EXP_SUB_SEMAPHORE_FILENAME = ".underSubmission"
 
 EXPERIMENTS_LIST_HEADERS = [RUN_NAME, RUN_PARAMETERS, RUN_METRICS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_DURATION,
-                            RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+                            RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RUN_TEMPLATE_VERSION]
 
 CHART_YAML_FILENAME = "Chart.yaml"
 TEMPL_FOLDER_NAME = "templates"
@@ -355,9 +357,11 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
         parameter_range_spec = [f'-pr {param_name} {param_value}' for param_name, param_value in parameter_range]
         parameter_set_spec = [f'-ps {ps_spec}' for ps_spec in parameter_set]
         experiment_parameters_spec = list(script_parameters) + parameter_range_spec + parameter_set_spec
+        template_version = get_template_version(template)
         experiment = experiments_model.Experiment(name=experiment_name, template_name=template,
                                                   parameters_spec=experiment_parameters_spec,
-                                                  template_namespace="template-namespace")
+                                                  template_namespace="template-namespace",
+                                                  template_version=template_version)
         experiment.create(namespace=namespace, labels=labels)
 
         with spinner('Uploading experiment...'):

@@ -8,8 +8,8 @@ The overall purpose of the command and subcommands is to submit and manage exper
  - [view Subcommand](#view-subcommand)
  - [logs Subcommand](#logs-subcommand)
  - [interact Subcommand](#interact-subcommand)
- - [template_list Subcommand](#template_list-subcommand)
-
+ 
+ 
 ## submit Subcommand
 
 ### Synopsis
@@ -34,7 +34,7 @@ Submits training jobs. Use this command to submit single and multi-node training
  | Name | Required | Description | 
  |:--- |:--- |:--- |
  |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used   by a script. For example, other .py files, data, etc. If not given, then its content _will not_ be copied into a the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
- |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow* training is used (tf-training). A list of available templates can be obtained by executing the `nctl experiment template_list` command. |
+ |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow* training is used (tf-training). A list of available templates can be obtained by executing the `nctl template list command` command. |
  |`-n, --name TEXT`| No | Name for this experiment.|
  |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: 'key "['val1', 'val2']"' For maps use: 'key "{'a': 'b'}"'|
  |`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> <br> Contains values of this paramater that are passed to different instance of experiments. `[definition]` can have two forms: <br> <br> Range: `{x...y:step}` This form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> <br> Set of values: `{x, y, z}` This form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
@@ -288,36 +288,3 @@ Should issues arise, a message provides a description of possible causes. Otherw
 `$ nctl experiment interact --filename training_script.py`
 
 Launches in a default browser a Jupyter notebook with `training_script.py` script.
-
-
-## template_list Subcommand
-
-### Synopsis
-
-The command returns a list of templates installed on a client machine. A template contains all details needed 
-to  deploy a training job on a cluster correctly.
-
-### Syntax
-
-`nctl experiment template_list [options]`
-
-### Options
-
-| Name | Required | Description | 
-|:--- |:--- |:--- |
-|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
-|`-h, --help` | No | Show help message and exit. |
-
-
-### Returns
-
-A list of existing templates, or a _Lack of installed packs._ message if there are no templates installed.
-
-
-### Example
-
-`$ nctl experiment template_list`
-
-
-
-

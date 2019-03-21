@@ -30,6 +30,9 @@ spec:
             template-name:
               description: The name of the Experiment Template that this experiment has been instantiated based on
               type: string
+            template-version:
+              description: The version of the Experiment Template that this experiment has been instantiated based on
+              type: string
             template-namespace:
               description: The name of the namespace where the template is defined
               type: string

@@ -116,8 +116,7 @@ The following is the basic syntax for experiment submit command:
 `nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
 
 **Where**:
-* `-t`,  TEXT: Name of a template used by Nauta to create a description of a job to be submitted. By default, this is a single-node TensorFlow training. The template is chosen, and the list of available templates can be obtained by issuing the `nctl experiment template_list` command.
-
+* `-t`,  TEXT: Name of a template used by Nauta to create a description of a job to be submitted. By default, this is a single-node TensorFlow training. The template is chosen, and the list of available templates can be obtained by issuing the `nctl template list` command.
 * `SCRIPT_LOCATION`: The path and name of the Python script used to perform this experiment.
 
 **Note**: To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts will need to meet the same requirements.

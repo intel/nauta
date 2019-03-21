@@ -28,6 +28,7 @@ Entering `nctl --help` or `nctl -h` provides a listing of all nctl commands (wit
       predict, p       Command for starting, stopping, and managing prediction
                        jobs and instances. To get further help on commands use
                        COMMAND with -h or --help option.
+      template, tmp    Command for handling templates used by the system.
       user, u          Command for creating/deleting/listing users of the
                        platform. Can only be run by a platform administrator.
       verify, ver      Command verifies whether all external components required

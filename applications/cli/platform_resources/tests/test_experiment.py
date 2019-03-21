@@ -26,10 +26,12 @@ EXPERIMENT_NAME = 'test-exp'
 NAMESPACE = 'test-env'
 TEMPLATE_NAME = 'template'
 TEMPLATE_NAMESPACE = 'template-namespace-test'
+TEMPLATE_VERSION = '1.0.1'
 
 TEST_EXPERIMENTS = [Experiment(name='test-experiment-old', parameters_spec=['a 1', 'b 2'],
                                creation_timestamp='2018-04-26T13:43:01Z', namespace='namespace-1',
                                state=ExperimentStatus.CREATING, template_name='test-ex-template',
+                               template_version='1.0.1',
                                template_namespace='test-ex-namespace',
                                metadata={'annotations':
                                             {'kubectl.kubernetes.io/last-applied-configuration':
@@ -55,6 +57,7 @@ TEST_EXPERIMENTS = [Experiment(name='test-experiment-old', parameters_spec=['a 1
                     Experiment(name='test-experiment-new', parameters_spec=['a 1', 'b 2'],
                                creation_timestamp='2018-05-08T13:05:04Z', namespace='namespace-2',
                                state=ExperimentStatus.SUBMITTED, template_name='test-ex-template',
+                               template_version='1.0.1',
                                template_namespace='test-ex-namespace',
                                metadata={
                                         'annotations': {
@@ -84,13 +87,15 @@ def mock_platform_resources_api_client(mocker) -> CustomObjectsApi:
 
 def test_create_experiment(mock_platform_resources_api_client: CustomObjectsApi):
     mock_platform_resources_api_client.create_namespaced_custom_object.return_value = ADD_EXPERIMENT_RESPONSE_RAW
-    exp = Experiment(name=EXPERIMENT_NAME, template_name=TEMPLATE_NAME, template_namespace=TEMPLATE_NAMESPACE)
+    exp = Experiment(name=EXPERIMENT_NAME, template_name=TEMPLATE_NAME, template_namespace=TEMPLATE_NAMESPACE,
+                     template_version=TEMPLATE_VERSION)
     result = exp.create(namespace=NAMESPACE)
 
     assert result
     assert result.spec.name == EXPERIMENT_NAME
     assert result.spec.template_name == TEMPLATE_NAME
     assert result.spec.template_namespace == TEMPLATE_NAMESPACE
+    assert result.spec.template_version == TEMPLATE_VERSION
     assert result.spec.state == ExperimentStatus.CREATING
     assert result.metadata.name == EXPERIMENT_NAME
     assert result.metadata.namespace == NAMESPACE
@@ -131,13 +136,16 @@ def test_list_experiments_invalid_name_filter(mock_platform_resources_api_client
 ADD_EXPERIMENT_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment',
                                'metadata': {'name': EXPERIMENT_NAME, 'namespace': NAMESPACE},
                                'spec': {'name': EXPERIMENT_NAME, 'parameters-spec': [], 'state': 'CREATING',
-                                        'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE}}
+                                        'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE,
+                                        'template-version': TEMPLATE_VERSION}}
+
 
 GET_EXPERIMENT_RESPONSE_RAW = {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment',
                                'metadata': {'name': EXPERIMENT_NAME, 'namespace': NAMESPACE,
                                             'creationTimestamp': '2018-04-26T13:43:01Z'},
                                'spec': {'name': EXPERIMENT_NAME, 'parameters-spec': [], 'state': 'CREATING',
-                                        'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE}}
+                                        'template-name': TEMPLATE_NAME, 'template-namespace': TEMPLATE_NAMESPACE,
+                                        'template-version': TEMPLATE_VERSION}}
 
 LIST_EXPERIMENTS_EMPTY_RESPONSE_RAW = {'items': []}
 LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
@@ -168,7 +176,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                  'uid': 'bd298c60-4957-11e8-96f7-527100002000'},
                                             'spec': {'name': 'test-experiment-old', 'parameters-spec': ['a 1', 'b 2'],
                                                      'state': 'CREATING', 'template-name': 'test-ex-template',
-                                                     'template-namespace': 'test-ex-namespace'}},
+                                                     'template-namespace': 'test-ex-namespace', 'template-version': '1.0.1'}},
                                            {'apiVersion': 'aipg.intel.com/v1', 'kind': 'Experiment', 'metadata': {
                                                'annotations': {
                                                    'kubectl.kubernetes.io/last-applied-configuration':
@@ -188,7 +196,7 @@ LIST_EXPERIMENTS_RESPONSE_RAW = {'apiVersion':
                                                'uid': '6ce9d932-52c0-11e8-ae8b-527100001230'},
                                             'spec': {'name': 'test-experiment-new', 'parameters-spec': ['a 1', 'b 2'],
                                                      'state': 'SUBMITTED', 'template-name': 'test-ex-template',
-                                                     'template-namespace': 'test-ex-namespace'}}],
+                                                     'template-namespace': 'test-ex-namespace', 'template-version': '1.0.1'}}],
                                  'kind': 'ExperimentList',
                                  'metadata': {'continue': '', 'resourceVersion': '3136167',
                                               'selfLink': '/apis/aipg.intel.com/v1/experiments'}}

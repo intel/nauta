@@ -36,11 +36,20 @@ ifeq (Windows,$(OS))
 	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
 	mkdir dist/config/
-	cp -Rf draft/packs dist/config
+
 	cp -Rf workflows dist/config
+	cp zoo-repository.config dist/config/
+
+    # populate draft/packs with nauta-zoo repo
+	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	mv dist/config/packs/nauta-zoo/* dist/config/packs/packs
+	rm -rf dist/config/packs/nauta-zoo
+
+	cp zoo-repository.config dist/config/
 
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
+
 	rm -rf helm_tmp
 	mkdir -vp helm_tmp
 
@@ -65,10 +74,15 @@ ifeq (Linux,$(OS))
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 
-	mkdir -vp dist/config/
+	mkdir -vp dist/config/packs
+	cp zoo-repository.config dist/config
 
-	cp -Rf draft/packs dist/config
 	cp -Rf workflows dist/config
+
+	# populate draft/packs with nauta-zoo repo
+	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	mv dist/config/packs/nauta-zoo/* dist/config/packs
+	rm -rf dist/config/packs/nauta-zoo
 
 	curl -o helm-v2.11.0-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -91,9 +105,14 @@ ifeq (Darwin,$(OS))
 	chmod +x dist/set-autocomplete.sh
 
 	mkdir -vp dist/config/
+	cp zoo-repository.config dist/config
 
-	cp -Rf draft/packs dist/config
+
 	cp -Rf workflows dist/config
+	# populate draft/packs with nauta-zoo repo
+	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	mv dist/config/packs/nauta-zoo/* dist/config/packs
+	rm -rf dist/config/packs/nauta-zoo
 
 	curl -o helm-v2.11.0-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp

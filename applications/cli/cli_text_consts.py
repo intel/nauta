@@ -331,12 +331,6 @@ class ExperimentListCmdTexts:
              " be print."
 
 
-class ExperimentTemplateListCmdTexts:
-    SHORT_HELP = "Show logs for a given experiment."
-    HELP = "Returns a list of available templates that can be used to submit training jobs."
-    LACK_OF_PACKS_ERROR_MSG = "Lack of installed packs."
-
-
 class ExperimentLogsCmdTexts:
     SHORT_HELP = "Show logs for a given experiment."
     HELP = """
@@ -392,7 +386,7 @@ class ExperimentSubmitCmdTexts:
                "given - its content won't be copied into an image."
     HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
              " Template is chosen. List of available templates might be obtained by" \
-             " Issuing nctl experiment template_list command."
+             " Issuing dlsctl template list command."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
     HELP_PR = "Values (set or range) of a single parameter."
@@ -714,6 +708,7 @@ class PlatformResourcesUsersTexts:
     USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
     USER_PRESENCE_CHECK_ERROR_MSG = "Error during checking user's presence."
 
+
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
     PROXY_CREATION_OTHER_ERROR_MSG = "Other error during creation of port proxy."
@@ -856,3 +851,47 @@ class WorkflowListTexts:
     SHORT_HELP = "List workflows."
     NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
     OTHER_ERROR_MSG = "Failed to get workflow details."
+
+
+class TemplateCmdTexts:
+    HELP = "Command for handling templates used by the system."
+
+
+class TemplateListCmdTexts:
+    HELP = "Displays list of available templates - both local and remote."
+    MISSING_REPOSITORY = "Repository {repository_name} doesn't exist or you don't have access to it. List below " \
+                         "doesn't contain then any data of remote templates."
+    UNAUTHORIZED = "GitHub credentials are incorrect."
+    OTHER_GITHUB_ERROR = "Error during accessing github."
+    OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY = "Other error during accessing remote repository."
+    ERROR_DURING_LOADING_LOCAL_TEMPLATES = "Errors during loading local templates. List below doesn't contain then " \
+                                           "any data of local templates."
+    MISSING_CONFIGURATION_FILE = "Lack or incorrect file with configuration of model-zoo repository. Please " \
+                                 "check, whether file zoo-repository.config exists in folder with dlsctl folder."
+    GETTING_LIST_OF_TEMPLATES_MSG = "Getting templates list ..."
+
+
+class TemplateCopyCmdTexts:
+    HELP = "Create a new template based on existing one."
+    HELP_DESCRIPTION = "Description of a new template. If this parameter will not be provided, " \
+                       "command will display prompt asking for template's description."
+    HELP_VERSION = "Version of a new template. 0.1.0 version will be used by default."
+    SRC_TEMPLATE_NOT_FOUND = "Source template {src_template_name} has not been found."
+    TEMPLATE_ALREADY_EXISTS = "Template with name {dest_template_name} already exists."
+    DESCRIPTION_PROMPT = "Enter new template description (up to {max_len} chars): "
+    COPY_SUCCESS = "Template {dest_template_name} was successfully created from {src_template_name} template."
+    COPY_FAILURE = "Failed to create {dest_template_name} template from {src_template_name} template."
+
+    
+class GithubMessages:
+    GET_REQUEST_ERROR = "Error during accessing github reposiotry {url} : {http_code}"
+    GET_OTHER_ERROR = "Other error during connecting github."
+    MISSING_CHART_FILE = "Chart file doesn't exist in the checked folder."
+
+
+class TemplateInstallCmdTexts(TemplateListCmdTexts):
+    HELP = "Download and install template from remote repository."
+    REMOTE_TEMPLATE_NOT_FOUND = "Remote template {template_name} has not been found."
+    DOWNLOADING_TEMPLATE = "Installing template..."
+    LOCAL_VERSION_ALREADY_INSTALLED = "Local version '{local_version}' of a '{template_name}' template is already " \
+                                      "installed. Continue with replacing it with remote version '{remote_version}'?"
