@@ -104,7 +104,7 @@ ifeq (Darwin,$(OS))
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
 
-	mkdir -vp dist/config/
+	mkdir -vp dist/config/packs
 	cp zoo-repository.config dist/config
 
 
