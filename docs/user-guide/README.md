@@ -9,6 +9,7 @@ for scalability and ease of management.
 Templates are available (and customizable) on the platform to take the complexities out of creating and running single and multi-node deep learning training experiments without all the systems overhead and scripting needed with standard container environments. To test your model, Nauta also supports both batch and streaming inference, all in a single platform.
 
 The Nauta client software has been validated on the following operating systems and versions:
+
 * Ubuntu* (16.04, 18.04)
 * RedHat* 7.5
 * macOS* High Sierra (10.13)
@@ -44,13 +45,10 @@ This guide describes how to use Nauta, and the following topics:
 * [Installing Additional Libraries and Dependencies](advanced/customlibs.md)
 * [Controlling Packs Parameters](advanced/packs.md)
 
-# Terms and Conditions
+- - - -
 
-This document is subject to [CC-BY-ND 4.0.](https://creativecommons.org/licenses/by-nd/4.0/) 
+#### Terms and Conditions
+To read Intel Terms and Conditions [check T.O.C.](TOC.md) document.
 
-Copyright © 2019 Intel Corporation. All rights reserved.
+This user guide is subject to [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).
 
-Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and other countries.
-
-'*'    Other names and brands may be claimed as the property of others.
-This document contains information on products and/or processes in development.

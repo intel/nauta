@@ -17,7 +17,7 @@
   <v-footer app color="intel_lightest_gray">
     <v-layout row justify-center>
       &#9400; Intel Corporation. {{ labels.ALL_RIGHTS_RESERVED }}
-      <a href="/documentation/Content/NAUTA%20V1.0/legal_disclaimer.htm" target="_blank">{{ labels.TERMS_OF_USE }}</a>
+      <a href="/documentation/TOC.html" target="_blank">{{ labels.TERMS_OF_USE }}</a>
     </v-layout>
   </v-footer>
 </template>
