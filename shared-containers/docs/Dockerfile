@@ -18,4 +18,5 @@ ARG BASE_IMAGE=centos:7.6.1810
 FROM ${BASE_IMAGE}
 
 COPY --from=0 /docs/user-guide /docs
-COPY --from=0 /docs/.utils/uikit.css /docs/uikit.css
+COPY --from=0 /docs/.utils/*.css /docs/
+COPY --from=0 /docs/.utils/img /docs/img/
