@@ -186,6 +186,7 @@ local_images:
       DOCS_IMAGE: "shared/centos/docs"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/docs-nginx"
+    dockerfile: "{{ playbook_dir }}/../../nauta-containers/docs-nginx/Dockerfile"
   nauta/tf/operator:
     version: "v2"
     required:

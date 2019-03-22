@@ -1,4 +1,5 @@
 FROM ubuntu:18.04
+ARG DOCS_VERSION="develop"
 
 RUN apt update && apt install wget -y
 RUN wget -q -t 3 -O pandoc.deb https://github.com/jgm/pandoc/releases/download/2.6/pandoc-2.6-1-amd64.deb
@@ -9,9 +10,7 @@ ADD ["./", "/docs/"]
 RUN ls
 RUN pwd
 
-RUN cd /docs && find . -name "*.md*" | while read file; do \
-    pandoc -f markdown --template=.utils/template.html --toc --toc-depth=3 --standalone --lua-filter=.utils/links.lua \
-    --metadata title="Nauta documentation" "$file" -o "${file%.*}.html"; done
+RUN cd /docs && chmod +x .utils/convert_to_html.sh && .utils/convert_to_html.sh $DOCS_VERSION
 
 RUN find /docs -name "*.md" -type f -delete
 

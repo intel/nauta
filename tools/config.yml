@@ -48,6 +48,8 @@ shared_images:
     directory: "{{ playbook_dir }}/../../docs"
     dockerfile: "{{ playbook_dir }}/../../shared-containers/docs/Dockerfile"
     push: False
+    args:
+      DOCS_VERSION: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ NAUTA_COMMIT }}"
   shared/centos/build:
     version: "7.6.1810"
     required:
