@@ -133,7 +133,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../docs"
     dockerfile: "{{ playbook_dir }}/../../nauta-containers/docs-nginx/Dockerfile"
     args:
-      DOCS_VERSION: "{{ NAUTA_COMMIT }}"
+      DOCS_VERSION: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ NAUTA_COMMIT }}"
   nauta/tf/operator:
     version: "v2"
     required: {}
