@@ -44,13 +44,10 @@ This guide describes how to use Nauta, and discusses the following topics:
 * [Installing additional dependency](advanced/customlibs.md)
 * [Controlling packs parameters](advanced/packs.md)
 
-# Terms and Conditions
+- - - -
 
-This document is subject to [CC-BY-ND 4.0.](https://creativecommons.org/licenses/by-nd/4.0/) 
+#### Terms and Conditions
+To read Intel Terms and Conditions [check T.O.C.](TOC.md) document.
 
-Copyright © 2019 Intel Corporation. All rights reserved.
+This user guide is subject to [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).
 
-Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and other countries.
-
-'*'    Other names and brands may be claimed as the property of others.
-This document contains information on products and/or processes in development.
