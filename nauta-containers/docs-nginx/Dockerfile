@@ -14,7 +14,8 @@ RUN find /docs -name "*.md" -type f -delete
 FROM nginx:1.13.9
 
 COPY --from=0 /docs/user-guide /docs
-COPY --from=0 /docs/.utils/uikit.css /docs/uikit.css
+COPY --from=0 /docs/.utils/*.css /docs/
+COPY --from=0 /docs/.utils/img /docs/img/
 
 RUN echo "user  nginx; \n\
            worker_processes  1; \n\
