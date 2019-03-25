@@ -182,11 +182,11 @@ local_images:
   nauta/docs:
     version: "v0.0.1"
     required:
-      BASE_IMAGE: "shared/utils/nginx"
-      DOCS_IMAGE: "shared/centos/docs"
+      BASE_IMAGE: "shared/docs"
+      NGINX_IMAGE: "shared/utils/nginx"
     method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/docs-nginx"
-    dockerfile: "{{ playbook_dir }}/../../nauta-containers/docs-nginx/Dockerfile"
+    directory: "{{ playbook_dir }}/../../applications/nauta-docs"
+    dockerfile: "{{ playbook_dir }}/../../applications/nauta-docs/Dockerfile"
   nauta/tf/operator:
     version: "v2"
     required:

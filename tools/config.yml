@@ -40,8 +40,8 @@ shared_images:
     push: False
     args:
       USER_UID: "{{ user_id }}"
-  shared/centos/docs:
-    version: "7.6.1810"
+  shared/docs:
+    version: "v0.0.1"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
