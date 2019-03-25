@@ -31,7 +31,7 @@
   register: image_dockerfile
 
 - set_fact:
-    dir_sha_list: "{{ dir_sha_list + [image_dockerfile.stat.checksum] }}"
+    dir_sha_list: "{{ dir_sha_list + [image_dockerfile.stat.checksum] + [image.version] }}"
 
 - set_fact:
     dir_sha: "{{ dir_sha_list | sort | unique | sort | join(' ' ) | hash('sha1') }}"
