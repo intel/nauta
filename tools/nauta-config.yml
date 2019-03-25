@@ -130,10 +130,12 @@ local_images:
     image: "nginx:1.13.9"
   nauta/docs:
     version: "v0.0.1"
-    required: {}
+    required:
+      NGINX_IMAGE: "nauta/nginx"
+      BASE_IMAGE: "shared/docs"
     method: build
-    directory: "{{ playbook_dir }}/../../docs"
-    dockerfile: "{{ playbook_dir }}/../../nauta-containers/docs-nginx/Dockerfile"
+    directory: "{{ playbook_dir }}/../../applications/nauta-docs/"
+    dockerfile: "{{ playbook_dir }}/../../applications/nauta-docs/Dockerfile"
     args:
       DOCS_VERSION: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ NAUTA_COMMIT }}"
   nauta/tf/operator:

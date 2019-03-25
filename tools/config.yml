@@ -130,3 +130,11 @@ shared_images:
     args:
       PACKAGE_NAME: "python2-pip"
       PACKAGE_VERSION: "8.1.2"
+  shared/docs:
+    version: "v0.0.1"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../docs"
+    dockerfile: "{{ playbook_dir }}/../../shared-containers/docs/Dockerfile"
+    push: False
