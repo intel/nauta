@@ -21,7 +21,7 @@ rm -rf %{buildroot}
 mkdir -p  %{buildroot}
 
 mkdir -p %{buildroot}/opt/nauta/pip
-pip wheel ansible==2.5.5.0 pip==19.0.3 virtualenv==16.0.0 \
+pip wheel ansible==2.7.9 pip==19.0.3 virtualenv==16.0.0 \
     setuptools==39.2.0 wheel==0.31.1 \
     docker==3.4.0 pyOpenSSL==17.5.0 \
     -w %{buildroot}/opt/nauta/pip/

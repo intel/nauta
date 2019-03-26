@@ -1,13 +1,23 @@
 ---
 
-- name: "{{ message_label }} Install nauta packages {{ packages | join(', ') }}"
+- name: "{{ message_label }} Install nauta packages {{ packages | join(', ') }} - empty plugin"
+  yum:
+    disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
+    #enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"
+    update_cache: "True"
+    disablerepo: "*"
+    enablerepo: "NAUTARepository"
+    name: "{{ packages }}"
+    state: "{{ state | default('present') }}"
+  when: (calculated_enabled_plugins | join(',') | default('') | regex_replace('^\\/|\\/$', '')) == ''
+
+- name: "{{ message_label }} Install nauta packages {{ packages | join(', ') }} - filled plugin"
   yum:
     disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
     enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"
     update_cache: "True"
     disablerepo: "*"
     enablerepo: "NAUTARepository"
-    name: "{{ item }}"
+    name: "{{ packages }}"
     state: "{{ state | default('present') }}"
-  with_items: "{{ packages }}"
-  notify: "{{ task_handlers | default([]) }}"
+  when: (calculated_enabled_plugins | join(',') | default('') | regex_replace('^\\/|\\/$', '')) != ''

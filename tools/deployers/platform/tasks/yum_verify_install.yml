@@ -6,6 +6,5 @@
     disable_plugin: "*"
     update_cache: "False"
     disablerepo: "*"
-    name: "{{ item }}"
+    name: "{{ packages }}"
     state: "present"
-  with_items: "{{ packages }}"
