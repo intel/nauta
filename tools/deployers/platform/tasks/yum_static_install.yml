@@ -1,6 +1,21 @@
 ---
 
-- name: "{{ message_label }} Install packages {{ packages | join(', ') }}"
+# After ansible upgrade from 2.5.5.0 to 2.7.9 emtpy (space) enable_plugin field is a problem.
+# For future check.
+
+- name: "{{ message_label }} Install packages {{ packages | join(' ') }} - empty plugin"
+  environment: "{{ proxy }}"
+  yum:
+    disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
+#    enable_plugin: "{{ calculated_enabled_plugins | join(',') }}"
+    update_cache: "{{ update_cache | default(False) }}"
+    disablerepo: "{{ calculated_disabled_repos | join(',') }}"
+    enablerepo: "{{ calculated_enabled_repos | join(',') }}"
+    name: "{{ packages | join(',') }}"
+    state: "{{ state | default('present') }}"
+  when: (calculated_enabled_plugins | join(',') | default('') | regex_replace('^\\/|\\/$', '')) == ''
+
+- name: "{{ message_label }} Install packages {{ packages | join(' ') }} - filled plugin"
   environment: "{{ proxy }}"
   yum:
     disable_plugin: "{{ calculated_disabled_plugins | join(',') }}"
@@ -8,6 +23,6 @@
     update_cache: "{{ update_cache | default(False) }}"
     disablerepo: "{{ calculated_disabled_repos | join(',') }}"
     enablerepo: "{{ calculated_enabled_repos | join(',') }}"
-    name: "{{ item }}"
+    name: "{{ packages | join(',') }}"
     state: "{{ state | default('present') }}"
-  with_items: "{{ packages }}"
+  when: (calculated_enabled_plugins | join(',') | default('') | regex_replace('^\\/|\\/$', '')) != ''
