@@ -41,7 +41,7 @@ ifeq (Windows,$(OS))
 	cp zoo-repository.config dist/config/
 
     # populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
 	mv dist/config/packs/nauta-zoo/* dist/config/packs/
 	rm -rf dist/config/packs/nauta-zoo
 
@@ -80,7 +80,7 @@ ifeq (Linux,$(OS))
 	cp -Rf workflows dist/config
 
 	# populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
 	mv dist/config/packs/nauta-zoo/* dist/config/packs
 	rm -rf dist/config/packs/nauta-zoo
 
@@ -110,7 +110,7 @@ ifeq (Darwin,$(OS))
 
 	cp -Rf workflows dist/config
 	# populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone git@github.com:IntelAI/nauta-zoo.git
+	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
 	mv dist/config/packs/nauta-zoo/* dist/config/packs
 	rm -rf dist/config/packs/nauta-zoo
 
