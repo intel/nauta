@@ -54,6 +54,22 @@ spec:
         securityContext:
           privileged: true
       containers:
+      - name: {{ .Chart.Name }}-proxy
+        image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA elasticsearch proxy image is required" .Values.proxy_image }}
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 9201
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: _cluster/health%3Fwait_for_status=yellow&wait_for_no_initializing_shards&timeout=60s
+            port: 9201
+          initialDelaySeconds: 20
+          timeoutSeconds: 60
+        volumeMounts:
+          - mountPath: "/var/es-proxy-auth"
+            name: es-proxy-auth
+            readOnly: true
       - name: {{ .Chart.Name }}
         image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA elasticsearch image is required" .Values.image }}
         imagePullPolicy: "IfNotPresent"
@@ -75,13 +91,10 @@ spec:
 #          limits:
 #            memory: 3Gi
 #            cpu: 4
-        ports:
-        - containerPort: 9200
-          protocol: TCP
         readinessProbe:
           httpGet:
             path: /_cluster/health?wait_for_status=yellow&wait_for_no_initializing_shards&timeout=60s
-            port: 9200
+            port: 9201
           initialDelaySeconds: 20
           timeoutSeconds: 60
         volumeMounts:
@@ -91,3 +104,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-{{ .Chart.Name }}
+        - name: es-proxy-auth
+          secret:
+            secretName: es-proxy-auth

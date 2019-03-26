@@ -1,0 +1,5 @@
+---
+
+elasticsearch:
+  admin_username: esadmin
+  admin_password: esadmin

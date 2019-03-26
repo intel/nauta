@@ -47,6 +47,12 @@ local_images:
     version: "v6.4.0"
     image: "quay.io/pires/docker-elasticsearch-kubernetes:6.4.0"
     method: pull
+  nauta/elasticsearch/proxy:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch-proxy"
   nauta/fluentd:
     version: "v1.3.0"
     image: "fluent/fluentd-kubernetes-daemonset:v1.3-debian-elasticsearch"
@@ -259,6 +265,7 @@ subcharts:
       chart_values:
         image: "{{ image_local_url['nauta/elasticsearch'] }}"
         init_image: "{{ image_local_url['nauta/centos'] }}"
+        proxy_image: "{{ image_local_url['nauta/elasticsearch/proxy'] }}"
     elasticsearch-curator:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../nauta-charts/elasticsearch-curator"

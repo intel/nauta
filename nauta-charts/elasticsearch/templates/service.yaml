@@ -17,7 +17,7 @@ spec:
   ports:
     - name: nauta
       port: 9200
-      targetPort: 9200
+      targetPort: 9201
       protocol: TCP
   selector:
     app: {{ .Chart.Name }}
