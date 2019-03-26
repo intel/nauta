@@ -1,19 +1,22 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN apt update
-RUN apt install -y openjdk-11-jdk
+RUN apt -y update && apt autoremove default-jre
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+ADD openjdk-11.0.2_linux-x64_bin.tar.gz /usr/lib/jvm
+RUN sh -c 'for bin in /usr/lib/jvm/jdk-11.0.2/bin/*; do update-alternatives --install /usr/bin/$(basename $bin) $(basename $bin) $bin 100; done'
+RUN sh -c 'for bin in /usr/lib/jvm/jdk-11.0.2/bin/*; do update-alternatives --set $(basename $bin) $bin; done'
+
+ENV JAVA_HOME=/usr/lib/jvm/jdk-11.0.2
 
 RUN mkdir -vp /build-output/ /build
 
-COPY elasticsearch-6.4.0.tar.gz /build
+COPY elasticsearch-6.6.2.tar.gz /build
 COPY gradle.build.footer /build
 
 WORKDIR /build
-RUN tar -xvf /build/elasticsearch-6.4.0.tar.gz
-WORKDIR /build/elasticsearch-6.4.0/
+RUN tar -xvf /build/elasticsearch-6.6.2.tar.gz
+WORKDIR /build/elasticsearch-6.6.2/
 
 RUN cat /build/gradle.build.footer >> gradle.build
 
@@ -24,5 +27,3 @@ RUN mkdir -vp /build-output/sources
 RUN find / -iname '*sources.jar' -exec cp {} /build-output/sources/ \;
 
 RUN cp -vR ./distribution/* /build-output/
-
-
