@@ -50,15 +50,14 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
     In case of any problems it throws an exception
     """
     if purge:
-        delete_release_command = ["helm", "delete", "--purge", release_name]
+        delete_release_command = [os.path.join(Config().config_path, 'helm'), "delete", "--purge", release_name]
     else:
-        delete_release_command = ["helm", "delete", release_name]
+        delete_release_command = [os.path.join(Config().config_path, 'helm'), "delete", release_name]
 
     if namespace:
         delete_release_command += ["--tiller-namespace", namespace]
-    env = os.environ.copy()
-    env['PATH'] = Config().config_path + os.pathsep + env['PATH']
-    output, err_code, log_output = execute_system_command(' '.join(delete_release_command), env=env, shell=True)
+
+    output, err_code, log_output = execute_system_command(' '.join(delete_release_command), shell=True)
 
     if (f"release \"{release_name}\" deleted" not in output and
             f"release: \"{release_name}\" not found" not in output):
@@ -67,15 +66,13 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
 
 
 def install_helm_chart(chart_dirpath: str, release_name: str = None, tiller_namespace: str = None):
-    command = ["helm", "install", chart_dirpath]
+    command = [os.path.join(Config().config_path, 'helm'), "install", chart_dirpath]
     if release_name:
         command.extend(["--name", release_name])
     if tiller_namespace:
         command.extend(["--tiller-namespace", tiller_namespace])
 
-    env = os.environ.copy()
-    env['PATH'] = f"{Config().config_path}{os.pathsep}{env['PATH']}"
-    output, err_code, log_output = execute_system_command(command, env=env)
+    output, err_code, log_output = execute_system_command(command)
     logger.debug(f"helm exit code: {err_code} returned: {output}")
 
     if err_code != 0:
