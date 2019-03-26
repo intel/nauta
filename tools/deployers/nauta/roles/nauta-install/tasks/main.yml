@@ -28,6 +28,9 @@
       MasterHost: "{{ (calculated_storage | default({})).local_selector | default('') }}"
       images: "{{ registry_images }}"
       features: "{{ calc_features | default({}) }}"
+      elasticsearch:
+        admin_username: "{{ elasticsearch.admin_username }}"
+        admin_password: "{{ elasticsearch.admin_password }}"
 
 - name: "{{ message_label }} Render configuration"
   set_fact:

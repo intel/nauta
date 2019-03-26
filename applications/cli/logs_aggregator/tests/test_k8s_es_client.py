@@ -16,6 +16,8 @@
 
 from unittest.mock import MagicMock
 
+import pytest
+
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from platform_resources.run import Run
@@ -94,7 +96,13 @@ TEST_SEARCH_OUTPUT_EMPTY = { "took": 6,
                            }
 
 
-def test_full_log_search(mocker):
+@pytest.fixture()
+def mock_k8s_info(mocker):
+    get_secret_mock = mocker.patch('logs_aggregator.k8s_es_client.get_secret')
+    get_secret_mock.return_value = "aaa="
+
+
+def test_full_log_search(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
@@ -102,7 +110,7 @@ def test_full_log_search(mocker):
     assert list(client.get_log_generator()) == TEST_LOG_ENTRIES
 
 
-def test_full_log_search_filter(mocker):
+def test_full_log_search_filter(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
@@ -111,7 +119,7 @@ def test_full_log_search_filter(mocker):
     assert filter_all_results == []
 
 
-def test_full_log_search_filter_idempotent(mocker):
+def test_full_log_search_filter_idempotent(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     es_scan_mock = mocker.patch('logs_aggregator.k8s_es_client.elasticsearch.helpers.scan')
     es_scan_mock.return_value = iter(TEST_SCAN_OUTPUT)
@@ -120,7 +128,7 @@ def test_full_log_search_filter_idempotent(mocker):
     assert filter_all_results == TEST_LOG_ENTRIES
 
 
-def test_get_experiment_logs(mocker):
+def test_get_experiment_logs(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocked_log_search = mocker.patch.object(client, 'get_log_generator')
     mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)
@@ -150,7 +158,7 @@ def test_get_experiment_logs(mocker):
         filters=[], index='_all')
 
 
-def test_get_experiment_logs_time_range(mocker):
+def test_get_experiment_logs_time_range(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocked_log_search = mocker.patch.object(client, 'get_log_generator')
     mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)
@@ -183,7 +191,7 @@ def test_get_experiment_logs_time_range(mocker):
         filters=[], index='_all')
 
 
-def test_delete_logs_for_namespace(mocker):
+def test_delete_logs_for_namespace(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocked_delete_logs = mocker.patch.object(client, 'delete_by_query')
 
@@ -192,7 +200,7 @@ def test_delete_logs_for_namespace(mocker):
     assert mocked_delete_logs.call_count == 1
 
 
-def test_delete_logs_for_run(mocker):
+def test_delete_logs_for_run(mock_k8s_info, mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocked_delete_logs = mocker.patch.object(client, 'delete_by_query')
 

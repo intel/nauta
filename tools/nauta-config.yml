@@ -56,6 +56,12 @@ local_images:
       BUILD_IMAGE: "shared/build/elasticsearch"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch"
+  nauta/elasticsearch/proxy:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch-proxy"
   nauta/fluentd:
     version: "v0.12"
     required:
@@ -303,6 +309,7 @@ subcharts:
       chart_values:
         image: "{{ image_local_url['nauta/elasticsearch'] }}"
         init_image: "{{ image_local_url['nauta/centos'] }}"
+        proxy_image: "{{ image_local_url['nauta/elasticsearch/proxy'] }}"
     elasticsearch-curator:
       version: 0.0.1
       path: "{{ playbook_dir }}/../../nauta-charts/elasticsearch-curator"

@@ -28,7 +28,7 @@ from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_info import get_current_namespace
+from util.k8s.k8s_info import get_current_namespace, is_current_user_administrator
 from platform_resources.run import Run, RunStatus
 from platform_resources.experiment import ExperimentStatus, Experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
@@ -216,7 +216,8 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         try:
             with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
                 es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                                   verify_certs=False, use_ssl=False)
+                                                   verify_certs=False, use_ssl=False,
+                                                   with_admin_privledges=is_current_user_administrator())
                 for exp_name, run_list in exp_with_runs.items():
                     try:
                         exp_del_runs, exp_not_del_runs = purge_experiment(exp_name=exp_name,
@@ -320,9 +321,10 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
                     raise exe
             try:
                 # clear run logs
-                logger.debug(f"Clearing logs for {run.name} run.")
-                with spinner(text=Texts.PURGING_LOGS_PROGRESS_MSG.format(run_name=run.name)):
-                    k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
+                if is_current_user_administrator():
+                    logger.debug(f"Clearing logs for {run.name} run.")
+                    with spinner(text=Texts.PURGING_LOGS_PROGRESS_MSG.format(run_name=run.name)):
+                        k8s_es_client.delete_logs_for_run(run=run.name, namespace=namespace)
             except Exception:
                 logger.exception("Error during clearing run logs.")
 

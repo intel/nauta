@@ -26,7 +26,7 @@ from logs_aggregator.log_filters import SeverityLevel, filter_log_by_severity, \
     filter_log_by_pod_status, filter_log_by_pod_ids
 from logs_aggregator.k8s_log_entry import LogEntry
 from util.logger import initialize_logger
-from util.k8s.k8s_info import PodStatus
+from util.k8s.k8s_info import PodStatus, get_secret
 from platform_resources.run import Run
 
 logger = initialize_logger(__name__)
@@ -35,11 +35,21 @@ ELASTICSEARCH_K8S_SERVICE = 'elasticsearch-svc'
 
 
 class K8sElasticSearchClient(elasticsearch.Elasticsearch):
+
+    ES_PROXY_SECRET_NAME = "es-proxy-secret"
+
     def __init__(self, host: str, port: int,
-                 use_ssl=True, verify_certs=True, **kwargs):
+                 use_ssl=True, verify_certs=True, with_admin_privledges=False, **kwargs):
         hosts = [{'host': host,
                   'port': port}]
-        super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, **kwargs)
+        headers = {}
+        if with_admin_privledges:
+            secret = get_secret(
+                K8sElasticSearchClient.ES_PROXY_SECRET_NAME, "nauta")
+            admin_token = secret.data["token"]
+            headers = {"Authorization": f"Basic ${admin_token}"}
+        super().__init__(
+            hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, headers=headers, **kwargs)
 
     def get_log_generator(self, query_body: dict = None, index='_all', scroll='1m',
                           filters: List[Callable[[LogEntry], bool]] = None) -> Generator[LogEntry, None, None]:

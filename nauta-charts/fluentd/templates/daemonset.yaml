@@ -42,9 +42,9 @@ spec:
           - name:  FLUENTD_CONF
             value: custom-config/fluent.conf
           - name: FLUENT_ELASTICSEARCH_USER
-            value: none
+            value: {{ .Values.global.elasticsearch.admin_username }}
           - name: FLUENT_ELASTICSEARCH_PASSWORD
-            value: none
+            value: {{ .Values.global.elasticsearch.admin_password }}
         resources:
           limits:
             memory: 1Gi
