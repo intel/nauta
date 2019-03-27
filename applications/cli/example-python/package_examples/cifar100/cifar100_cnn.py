@@ -213,8 +213,8 @@ if __name__ == '__main__':
     # performance settings
     if not args.cpu_count:
         args.cpu_count = multiprocessing.cpu_count()
-    config = tf.ConfigProto(intra_op_parallelism_threads=args.cpu_count, inter_op_parallelism_threads=2,
-                            allow_soft_placement=True, device_count={'CPU': args.cpu_count})
+    config = tf.ConfigProto(intra_op_parallelism_threads=int(args.cpu_count), inter_op_parallelism_threads=2,
+                            allow_soft_placement=True, device_count={'CPU': int(args.cpu_count)})
     session = tf.Session(config=config)
     K.set_session(session)
     os.environ["OMP_NUM_THREADS"] = str(args.cpu_count)
