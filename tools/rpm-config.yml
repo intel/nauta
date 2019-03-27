@@ -191,7 +191,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/nginx/rpm:
-    version: "1.13.9"
+    version: "1.15.9"
     required:
       NGINX_BUILD_IMAGE: "shared/build/nginx"
       BASE_IMAGE: "shared/centos/rpm-packer"

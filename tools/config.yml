@@ -199,16 +199,16 @@ shared_images:
         dest: node-v8.12.0.tar.gz
         checksum: b4797843136edd9195c28221a1680ae52c29d867fc5fc1c99f7d6e2f2126a67b
   shared/build/nginx:
-    version: "v1.13.9"
+    version: "v1.15.9"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/nginx"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/nginx/nginx-1.13.9-1.el7_4.ngx.src.rpm
-        dest: nginx-1.13.9-1.el7_4.ngx.src.rpm
-        checksum: 98d4329318dc9a681fa5e13cba5bc809bd2f7a97e38b36a1d07cb15a53b855ee
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/nginx/nginx-1.15.9-1.el7_4.ngx.src.rpm
+        dest: nginx-1.15.9-1.el7_4.ngx.src.rpm
+        checksum: 1db2900f2f64e338887f625292d279b401b7126edfe76a0c2bb3179980b20167
   shared/build/tensorflow/py2.7:
     version: "py2"
     required:
@@ -391,7 +391,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
     push: False
   shared/utils/nginx:
-    version: "v1.13.9"
+    version: "v1.15.9"
     required:
       BASE_IMAGE: "shared/centos"
       NGINX_BUILD_IMAGE: "shared/build/nginx"

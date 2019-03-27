@@ -4,7 +4,7 @@
   include_tasks: yum_nauta_install.yml
   vars:
     packages:
-      - nginx-1.13.9
+      - nginx-1.15.9
     handlers:
       - Reload Systemd
       - Restart Nginx
