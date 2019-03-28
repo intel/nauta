@@ -30,7 +30,7 @@ from cli_text_consts import UtilK8sInfoTexts as Texts
 
 logger = initialize_logger('util.kubectl')
 
-PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
+PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3, "m": 10 ** (-3)}
 PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
 
 
@@ -429,7 +429,6 @@ def sum_mem_resources_unformatted(mem_resources: List[str]):
     Sum memory resources given in k8s format and return the sum as a number.
     """
     mem_sum = 0
-
     for mem_resource in mem_resources:
         if not mem_resource:
             continue
