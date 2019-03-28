@@ -1,6 +1,6 @@
 ARG BUILD_IMAGE
 ARG DUMBINIT_DATA_IMAGE
-ARG BASE_IMAGE=nauta/centos/java8
+ARG BASE_IMAGE=nauta/centos/java
 FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 
 FROM ${BUILD_IMAGE} as build

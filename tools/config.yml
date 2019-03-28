@@ -93,13 +93,17 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/glide/glide-v0.13.1-linux-amd64
         dest: glide-v0.13.1-linux-amd64
         checksum: b3e126a0034ab41005b51fc9542997b632f2802ee64ad0e3850c0353ba2867cf
-  shared/centos/java8:
-    version: "8"
+  shared/centos/java:
+    version: "11"
     required:
       BASE_IMAGE: "shared/centos"
     method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/centos/java8"
+    directory: "{{ playbook_dir }}/../../shared-containers/centos/java"
     push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/openjdk-11.0.2_linux-x64_bin.tar.gz
+        dest: openjdk-11.0.2_linux-x64_bin.tar.gz
+        checksum: 99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
   shared/centos/go-apiserver-builder:
     version: "v1.9-alpha.4"
     required:

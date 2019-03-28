@@ -49,9 +49,9 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../applications/nauta-gui"
   nauta/elasticsearch:
-    version: "v6.4.0"
+    version: "v6.6.2"
     required:
-      BASE_IMAGE: "shared/centos/java8"
+      BASE_IMAGE: "shared/centos/java"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       BUILD_IMAGE: "shared/build/elasticsearch"
     method: build
