@@ -18,11 +18,15 @@
 set -x
 
 cd user-guide
-find . -name "*.md*" | while read file; do \
+find . -name "*.md*" | while read file; do
+    pretty_filename=`(echo ${file} | cut -c 3-)`
+
     pandoc -f markdown \
     --template=/app/tools/template.html \
     --toc --toc-depth=3 --standalone \
     --lua-filter=/app/tools/links.lua \
     --metadata version="$1" \
-    --metadata title="Nauta documentation: ${file%.*}.html" \
-    "$file" -o "${file%.*}.html"; done
+    --metadata filename="${pretty_filename}" \
+    --metadata title="Nauta user-guide: ${pretty_filename%.*}.html" \
+    "$file" -o "${file%.*}.html";
+done

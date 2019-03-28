@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-.header {
+code{white-space: pre;}
+
+.docs-header {
      width:100%;
      height:100px;
      top:0;
@@ -22,7 +24,30 @@
      background-color:#0071c5;
 }
 
-.header img {
+.docs-header img {
     margin-left: 100px;
     float: left;
+}
+
+.material-icons.md-36 { font-size: 36px; }
+
+.docs-navbar ul {
+    margin-top: 20px;
+    margin-right: 400px;
+    float:right;
+    padding: 5px;
+    list-style-type: none;
+    text-align: center;
+    background-color: transparent;
+}
+
+.docs-navbar ul li {
+    display: inline;
+}
+
+.docs-navbar ul li a {
+    text-decoration: none;
+    padding-left: 10px;
+    color: #fff;
+    background-color: transparent;
 }
