@@ -159,6 +159,18 @@ kubernetes_pod_subnet: 10.3.0.0/16
 kubernetes_svc_subnet: 10.4.0.0/16
 ```
 
+### elasticsearch
+- **Description:** Password and username which will be set for authorized access
+to elasticsearch. Authorized access allows usage of HTTP methods other than GET.
+Changing these parameters is recommended.
+- **Default value:** {admin_username: esadmin, admin_password: esadmin}
+
+```yaml
+elasticsearch:
+  admin_username: esadmin
+  admin_password: esadmin
+```
+
 ### apiserver_audit_log_maxage
 - **Description:** Max age in days for Kubernetes apiserver audit logs.
 - **Default value:** 7
