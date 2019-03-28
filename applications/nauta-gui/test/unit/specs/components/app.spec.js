@@ -16,6 +16,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Vuetify from 'vuetify';
+import Notifications from 'vue-notification';
 import sinon from 'sinon';
 import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
@@ -46,6 +47,7 @@ describe('VUE components App', () => {
     localVue.use(Vuex);
     localVue.use(VueRouter);
     localVue.use(Vuetify);
+    localVue.use(Notifications);
     router = new VueRouter();
     wrapper = shallowMount(App, {store, router, localVue});
   });

@@ -14,39 +14,45 @@
  * limitations under the License.
  */
 import Vuetify from 'vuetify';
-import Vuex from 'vuex';
 import sinon from 'sinon';
 import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import ActionHeaderButtons from '../../../../../src/components/ModelsTableFeatures/ActionHeaderButtons';
+import Vuex from "vuex";
 
 describe('VUE components ActionHeaderButtons', () => {
-  let wrapper, router, props, getters, state, store, localVue;
+  let wrapper, router, props, getters, actions, state, store, localVue;
   beforeEach(function () {
     state = {
-      tensorMode: false
+      experimentsParams: [],
+      selectedExperimentsByUser: [],
+      currentlyVisibleColumns: [],
+      allUsersMode: false,
+      refreshInterval: 30
     };
     getters = {
-      tensorMode: (state) => state.tensorMode
+      experimentsParams: state => state.experimentsParams,
+      selectedExperimentsByUser: state => state.selectedExperimentsByUser,
+      currentlyVisibleColumns: state => state.currentlyVisibleColumns,
+      allUsersMode: state => state.allUsersMode,
+      refreshInterval: state => state.refreshInterval
+    };
+    actions = {
+      showColumns: sinon.spy(),
+      clearColumnsSelection: sinon.spy(),
+      switchAllUsersMode: sinon.spy(),
+      updateRefreshInterval: sinon.spy()
     };
     store = new Vuex.Store({
       state,
+      actions,
       getters
     });
     props = {
       clearSort: sinon.spy(),
-      setVisibleColumnsHandler: sinon.spy(),
-      selectedByUserColumns: [],
-      columns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
-        'type', 'test_01'],
-      alwaysVisibleColumns: ['name', 'state'],
-      initiallyVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
-        'type'],
       onLaunchTensorHandler: sinon.spy(),
-      onDiscardTensorHandler: sinon.spy(),
-      setIntervalHandler: sinon.spy(),
       refreshNowHandler: sinon.spy(),
-      disabled: false
+      clearFilterHandler: sinon.spy()
     };
     localVue = createLocalVue();
     localVue.use(Vuex);
@@ -60,29 +66,18 @@ describe('VUE components ActionHeaderButtons', () => {
     expect(wrapper.html().includes('buttons_block')).to.equal(true);
   });
 
-  it('Should call setVisibleColumnsHandler on revert click', function () {
-    const initiallyVisibleColumns = ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
-        'type'];
+  it('Should call this.clearColumnsSelection on revert click', function () {
     wrapper.vm.showColumnMgmtModal = true;
     wrapper.vm.revertToDefault();
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
-    expect(props.setVisibleColumnsHandler.calledTwice).to.equal(true);
-    expect(props.setVisibleColumnsHandler.calledWith(props.initiallyVisibleColumns)).to.equal(true);
+    expect(actions.clearColumnsSelection.calledOnce).to.equal(true);
   });
 
-  it('Should call setVisibleColumnsHandler on apply visible headers action', function () {
+  it('Should call showColumns on apply visible headers action', function () {
     wrapper.vm.showColumnMgmtModal = true;
     wrapper.vm.applyVisibleHeaders();
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
-    expect(props.setVisibleColumnsHandler.calledTwice).to.equal(true);
-    expect(props.setVisibleColumnsHandler.calledWith(wrapper.vm.draft)).to.equal(true);
-  });
-
-  it('Should prepare draft on selectedByUserColumns update', function () {
-    props.headers = ['header1'];
-    wrapper = shallowMount(ActionHeaderButtons, {propsData: props, router, localVue, store});
-    wrapper.setProps({selectedByUserColumns: ['header1']});
-    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.selectedByUserColumns);
+    expect(actions.showColumns.calledOnce).to.equal(true);
   });
 
   it('Should add to draft if visible', function () {
@@ -100,14 +95,54 @@ describe('VUE components ActionHeaderButtons', () => {
     wrapper.vm.draft = ['test'];
     wrapper.vm.showColumnMgmtModal = true;
     wrapper.vm.discardVisibleHeaders();
-    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.selectedByUserColumns);
+    expect(wrapper.vm.draft).to.deep.equal(wrapper.vm.currentlyVisibleColumns);
     expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
   });
 
-  it('Should call setIntervalHandler if new refresh interval value has been set', function () {
+  it('Should call updateRefreshInterval if new refresh interval value has been set', function () {
     const value = 60;
     wrapper.vm.setRefreshIntervalValue(value);
-    expect(props.setIntervalHandler.calledOnce).to.equal(true);
-    expect(props.setIntervalHandler.calledWith(value)).to.equal(true);
+    expect(actions.updateRefreshInterval.calledOnce).to.equal(true);
   });
+
+  it('Should return true if hidden', function () {
+    const header = 'test';
+    wrapper.vm.draft = [];
+    const result = wrapper.vm.isHidden(header);
+    expect(result).to.equal(true);
+  });
+
+  it('Should return true if always visible', function () {
+    const header = 'name';
+    const result = wrapper.vm.isAlwaysVisible(header);
+    expect(result).to.deep.equal(true);
+  });
+
+  it('Should switch modal flag', function () {
+    wrapper.vm.showColumnMgmtModal = true;
+    wrapper.vm.showColumnMgmtModalHandler();
+    expect(wrapper.vm.showColumnMgmtModal).to.equal(false);
+  });
+
+  it('Should get label for key', function () {
+    const key = 'test';
+    const expectedLabel = 'Test';
+    const result = wrapper.vm.getLabel(key);
+    expect(result).to.equal(expectedLabel);
+  });
+
+  it('Should cut label if too long', function () {
+    const label = 'Nauta is the best application ever';
+    const expectedLabel = 'Nauta is the b...';
+    const result = wrapper.vm.cutLongText(label, 14);
+    expect(result).to.equal(expectedLabel);
+  });
+
+  it('Should not cut label if not too long', function () {
+    const label = 'Nauta';
+    const expectedLabel = 'Nauta';
+    const result = wrapper.vm.cutLongText(label, 14);
+    expect(result).to.equal(expectedLabel);
+  });
+
 });

@@ -36,7 +36,7 @@
             </notifications>
           </v-container>
         </v-content>
-        <Footer v-if="isLogged"></Footer>
+        <FooterElement v-if="isLogged"></FooterElement>
       </div>
     </v-app>
   </div>
@@ -46,14 +46,14 @@
 import {mapGetters} from 'vuex';
 import Navigation from './components/Navigation.vue';
 import Toolbar from './components/Toolbar.vue';
-import Footer from './components/Footer.vue';
+import FooterElement from './components/Footer.vue';
 
 export default {
   name: 'App',
   components: {
     Navigation,
     Toolbar,
-    Footer
+    FooterElement
   },
   computed: {
     ...mapGetters({

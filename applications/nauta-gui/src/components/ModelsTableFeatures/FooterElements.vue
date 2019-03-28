@@ -17,7 +17,7 @@
 <div class="datatable table">
   <div class="datatable__actions">
     <div class="refreshStat">
-      {{ lastUpdateLabel }}
+      {{ refreshMessage }}
     </div>
     <v-spacer></v-spacer>
     {{ labels.ROWS_PER_PAGE }}:
@@ -32,7 +32,7 @@
       <div class="datatable__actions__pagination">
         {{ paginationStats }}
       </div>
-      <v-btn flat v-on:click="prevPageAction()" :disabled="currentPage == 1">
+      <v-btn flat v-on:click="previousPage()" :disabled="currentPage == 1">
         <v-icon>keyboard_arrow_left</v-icon>
       </v-btn>
       <input
@@ -41,7 +41,7 @@
         v-model="chosenPageNo"
         v-on:blur="onPageNoInputChange"
       />
-      <v-btn flat v-on:click="nextPageAction()" :disabled="currentPage == pagesCount">
+      <v-btn flat v-on:click="nextPage()" :disabled="currentPage == pagesCount">
         <v-icon>keyboard_arrow_right</v-icon>
       </v-btn>
     </div>
@@ -50,12 +50,11 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import ELEMENT_LABELS from '../../utils/constants/labels';
 
 export default {
   name: 'FooterElements',
-  props: ['updateCountHandler', 'currentPage', 'pagesCount', 'nextPageAction', 'prevPageAction', 'setPageAction',
-    'paginationStats', 'lastUpdateLabel'],
   data: () => {
     return {
       labels: ELEMENT_LABELS,
@@ -64,6 +63,16 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      pagesCount: 'experimentsTotalPagesCount',
+      experimentsBegin: 'experimentsBegin',
+      experimentsEnd: 'experimentsEnd',
+      filteredDataCount: 'filteredDataCount',
+      itemsCountPerPage: 'itemsCountPerPage',
+      currentPage: 'currentPage',
+      experimentsPageNumber: 'experimentsPageNumber',
+      refreshMessage: 'refreshMessage'
+    }),
     chosenPageNo: {
       get: function () {
         return this.currentPage;
@@ -71,17 +80,45 @@ export default {
       set: function (val) {
         return val;
       }
+    },
+    paginationStats: function () {
+      return `${this.experimentsBegin}-${this.experimentsEnd} ${this.labels.OF} ${this.filteredDataCount}`;
     }
   },
   watch: {
     chosenCount: function (val) {
-      this.updateCountHandler(val);
+      this.updateCountPerPage(val);
+    },
+    experimentsPageNumber: function () {
+      this.updatePageNumber({data: this.experimentsPageNumber});
     }
   },
   methods: {
+    ...mapActions([
+      'updatePageNumber',
+      'updateItemsCountPerPage'
+    ]),
+    updateCountPerPage (count) {
+      this.updatePageNumber({data: 1});
+      this.updateItemsCountPerPage({data: count});
+    },
+    nextPage () {
+      this.updatePageNumber({data: this.currentPage + 1});
+    },
+    setPage (pageNumber) {
+      this.updatePageNumber({data: pageNumber});
+    },
+    previousPage () {
+      this.updatePageNumber({data: this.currentPage - 1});
+    },
     onPageNoInputChange: function (e) {
-      const providedValue = e.target.value >= 1 ? e.target.value : 1;
-      this.setPageAction(providedValue);
+      const requiredPage = e.target.value;
+      if (requiredPage >= 1) {
+        this.setPage(requiredPage);
+      } else {
+        this.setPage(1);
+        this.chosenPageNo = 1;
+      }
     }
   }
 }
