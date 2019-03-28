@@ -83,7 +83,7 @@ spec:
         - name: NODE_DATA
           value: "true"
         - name: NETWORK_HOST
-          value: "_local_,_site_"
+          value: "_site_"
         resources:
           requests:
             memory: 2Gi
