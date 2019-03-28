@@ -91,10 +91,10 @@ if [ ! -f "${NAUTA_VIRTUALENV}/.done" ]; then
     mkdir -p "${NAUTA_VIRTUALENV}"
 
     if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
-        ${PIP} install --upgrade pip==19.0.3
+        ${PIP} install --upgrade pip==19.0.3 --isolated --ignore-installed --no-cache-dir
         ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --isolated --ignore-installed --no-cache-dir
     else
-        ${PIP} install --upgrade pip==19.0.3
+        ${PIP} install --upgrade pip==19.0.3 --isolated --ignore-installed --no-cache-dir
         ${PIP} install -U -r ${BINDIR}/pip/requirements.txt --user --isolated --ignore-installed --no-cache-dir
     fi
 
