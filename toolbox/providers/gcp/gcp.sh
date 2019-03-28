@@ -348,13 +348,21 @@ function retrieve_repo {
       set -e
     else
       set +e
-      git clone -b $BRANCH_NAME git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+      if [ "${GithubOrg}" = "IntelAI" ]; then
+        git clone -b $BRANCH_NAME https://github.com/${GithubOrg}/${PROJECT_NAME}.git --recursive
+      else
+        git clone -b $BRANCH_NAME git@github.com:${GithubOrg}/${PROJECT_NAME}.git --recursive
+      fi
       ret_val=$?
       cd $PROJECT_NAME
       set -e
       if [ $ret_val -ne 0 ]; then
         print_log "ERROR" "Error in clone repository. Probably SHA1 sum is filled as branch name. Trying to clone and reset."
-        git clone git@github.com:NervanaSystems/$PROJECT_NAME.git --recursive
+        if [ "${GithubOrg}" = "IntelAI" ]; then
+            git clone https://github.com/${GithubOrg}/${PROJECT_NAME}.git --recursive
+        else
+            git clone git@github.com:${GithubOrg}/${PROJECT_NAME}.git --recursive
+        fi
         cd $PROJECT_NAME
         git reset --hard $BRANCH_NAME
       fi
