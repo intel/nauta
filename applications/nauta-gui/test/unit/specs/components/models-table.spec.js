@@ -30,7 +30,6 @@ describe('VUE components ModelsTable', () => {
       messages: messages
     };
     state = {
-      fetchingDataActive: false,
       experiments: {
         data: [],
         params: ['param1', 'param2', 'param3'],
@@ -44,7 +43,18 @@ describe('VUE components ModelsTable', () => {
           datetime: 0
         }
       },
-      tensorMode: false,
+      selectedExperimentsByUser: [],
+      currentlyVisibleColumns: [],
+      columnValuesOptions: [],
+      columnValuesApplied: [],
+      isCheckingAuth: true,
+      isInitializedData: true,
+      experimentResources: [],
+      itemsCountPerPage: 5,
+      currentPage: 2,
+      refreshInterval: 30,
+      allUsersMode: false,
+      fetchingDataActive: false,
       isLogged: true,
       initializedDataFlag: true,
       tensorboardLaunching: false,
@@ -52,7 +62,11 @@ describe('VUE components ModelsTable', () => {
     };
     getters = {
       experimentsData: state => state.experiments.data,
+      selectedExperimentsByUser: state => state.selectedExperimentsByUser,
       experimentsParams: state => state.experiments.params,
+      currentlyVisibleColumns: state => state.currentlyVisibleColumns,
+      columnValuesOptions: state => state.columnValuesOptions,
+      columnValuesApplied: state => state.columnValuesApplied,
       experimentsBegin: state => state.experiments.stats.a,
       experimentsTotal: state => state.experiments.stats.total,
       filteredDataCount: state => state.experiments.stats.filteredDataCount,
@@ -61,18 +75,28 @@ describe('VUE components ModelsTable', () => {
       experimentsTotalPagesCount: state => state.experiments.stats.totalPagesCount,
       lastUpdate: state => state.experiments.stats.datetime,
       fetchingDataActive: state => state.fetchingDataActive,
-      tensorMode: state => state.tensorMode,
-      isLogged: state => state.isLogged,
-      initializedDataFlag: state => state.initializedDataFlag,
       tensorboardLaunching: state => state.tensorboardLaunching,
-      username: state => state.username
+      isCheckingAuth: state => state.authLoadingState,
+      initializedDataFlag: state => state.initializedDataFlag,
+      isLogged: state => state.isLogged,
+      username: state => state.username,
+      experimentResources: state => state.experimentResources,
+      itemsCountPerPage: state => state.itemsCountPerPage,
+      currentPage: state => state.currentPage,
+      refreshInterval: state => state.refreshInterval,
+      allUsersMode: state => state.allUsersMode
     };
     defered = Q.defer();
     actions = {
       getUserExperiments: sinon.spy(),
-      enableTensorMode: sinon.spy(),
+      clearExperimentSelection: sinon.spy(),
+      markExperimentsAsSelected: sinon.spy(),
+      markExperimentAsSelected: sinon.spy(),
+      showColumns: sinon.spy(),
+      showColumn: sinon.spy(),
+      showRefreshMessage: sinon.spy(),
+      clearAllUsersMode: sinon.spy(),
       launchTensorboard: sinon.spy(),
-      disableTensorMode: sinon.spy(),
       getExperimentResources: sinon.stub().returns(defered.promise)
     };
     store = new Vuex.Store({
@@ -94,18 +118,6 @@ describe('VUE components ModelsTable', () => {
     expect(setInterval.calledOnce).to.equal(true);
     wrapper.destroy();
     expect(clearInterval.calledOnce).to.equal(true);
-  });
-
-  it('Should return pagination stats correctly', function () {
-    const expectedResult = `${state.experiments.stats.a}-${state.experiments.stats.b} of ${state.experiments.stats.filteredDataCount}`;
-    expect(wrapper.vm.paginationStats).to.equal(expectedResult);
-  });
-
-  it('Should return tensorBtnAvailable correctly', function () {
-    wrapper.vm.selected = [1];
-    expect(wrapper.vm.tensorBtnAvailable).to.equal(true);
-    wrapper.vm.selected = [];
-    expect(wrapper.vm.tensorBtnAvailable).to.equal(false);
   });
 
   it('Should return "true" as activity status of custom filters if any filter active', function () {
@@ -139,12 +151,6 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.currentlyVisibleColumns).to.deep.equal([]);
   });
 
-  it('Should return visible columns (one visible)', function () {
-    wrapper.vm.selectedByUserColumns = ['param1'];
-    expect(wrapper.vm.currentlyVisibleColumns).to.not.deep.equal(state.experiments.params);
-    expect(wrapper.vm.currentlyVisibleColumns.includes('param1')).to.equal(true);
-  });
-
   it('Should get data if search pattern provided', function () {
     wrapper.vm.searchPattern = 'test';
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
@@ -156,22 +162,13 @@ describe('VUE components ModelsTable', () => {
   });
 
   it('Should get data if count of items per page updated', function () {
-    wrapper.vm.pagination.itemsCountPerPage = 23;
+    wrapper.vm.$store.state.itemsCountPerPage = 23;
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
   });
 
   it('Should get data if page number updated', function () {
-    wrapper.vm.pagination.currentPage = 23;
+    wrapper.vm.$store.state.currentPage = 23;
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
-  });
-
-  it('Should update currentPage if stats provided from backend', function (done) {
-    wrapper.vm.$store.state.experiments.stats.pageNumber = 24;
-    Vue.nextTick()
-      .then(() => {
-        expect(wrapper.vm.pagination.currentPage).to.equal(24);
-        done()
-      }).catch(done);
   });
 
   it('Should clear sort params on clear sort action', function () {
@@ -182,58 +179,21 @@ describe('VUE components ModelsTable', () => {
     expect(wrapper.vm.activeColumnName).to.equal('creationTimestamp');
   });
 
-  it('Should set pagination params if count of rows per page updated', function () {
-    const currentCount = 50;
-    wrapper.vm.updateCountPerPage(currentCount);
-    expect(wrapper.vm.pagination.itemsCountPerPage).to.equal(currentCount);
-    expect(wrapper.vm.pagination.currentPage).to.equal(1);
-  });
-
-  it('Should decrement currentPage if previous page', function () {
-    const currentPage = 100;
-    wrapper.vm.pagination.currentPage = currentPage;
-    wrapper.vm.previousPage();
-    expect(wrapper.vm.pagination.currentPage).to.equal(currentPage - 1);
-  });
-
-  it('Should increment currentPage if previous page', function () {
-    const currentPage = 100;
-    wrapper.vm.pagination.currentPage = currentPage;
-    wrapper.vm.nextPage();
-    expect(wrapper.vm.pagination.currentPage).to.equal(currentPage + 1);
-  });
-
-  it('Should set currentPage if set specific page', function () {
-    const currentPage = 100;
-    const expectedPage = 11;
-    wrapper.vm.pagination.currentPage = currentPage;
-    wrapper.vm.setPage(expectedPage);
-    expect(wrapper.vm.pagination.currentPage).to.equal(expectedPage);
-  });
-
-  it('Should set visible columns', function () {
-    const visibleColumns = [1, 2, 3];
-    const expectedVisibleColumns = [].concat(wrapper.vm.alwaysVisibleColumns, visibleColumns);
-    wrapper.vm.setVisibleColumns(visibleColumns);
-    expect(wrapper.vm.selectedByUserColumns).to.deep.equal(expectedVisibleColumns);
-  });
-
-  it('Should add exp to selected list', function () {
+  it('Should call markExperimentAsSelected on exp select', function () {
     const selectedExp = 'exp';
-    wrapper.vm.selectExp(selectedExp);
-    expect(wrapper.vm.selected).to.deep.equal([selectedExp]);
+    wrapper.vm.selectExp({data: [selectedExp]});
+    expect(actions.markExperimentAsSelected.calledOnce).to.equal(true);
   });
 
-  it('Should delete exp from selected list on deselect', function () {
+  it('Should call markExperimentsAsSelected on exp deselect', function () {
     const selectedExp = {attributes:{name: 'test'}};
-    wrapper.vm.selected = [selectedExp];
     wrapper.vm.deselectExp(selectedExp);
-    expect(wrapper.vm.selected).to.deep.equal([]);
+    expect(actions.markExperimentsAsSelected.calledOnce).to.equal(true);
   });
 
   it('Should check is selected item correctly', function () {
     const selectedExp = {attributes:{name: 'test'}};
-    wrapper.vm.selected = [selectedExp];
+    wrapper.vm.$store.state.selectedExperimentsByUser = [selectedExp];
     const result = wrapper.vm.isSelected(selectedExp);
     expect(result).to.deep.equal(true);
   });
@@ -243,7 +203,7 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.$store.state.experiments.stats.datetime = 1528190409842;
     wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated a moment ago');
+    expect(actions.showRefreshMessage.called).to.equal(true);
   });
 
   it('Should refresh data if older than 30s', function () {
@@ -251,7 +211,7 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.$store.state.experiments.stats.datetime = 1128190409842;
     wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledTwice).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago');
+    expect(actions.showRefreshMessage.called).to.equal(true);
   });
 
   it('Should not refresh data if older than 30s but request is pending', function () {
@@ -260,7 +220,7 @@ describe('VUE components ModelsTable', () => {
     wrapper.vm.$store.state.fetchingDataActive = true;
     wrapper.vm.timer(context);
     expect(actions.getUserExperiments.calledOnce).to.equal(true);
-    expect(wrapper.vm.refresh.lastUpdateLabel).to.equal('Last updated over 30 seconds ago');
+    expect(actions.showRefreshMessage.called).to.equal(true);
   });
 
   it('Should clear all filters on clear action', function () {
@@ -360,16 +320,21 @@ describe('VUE components ModelsTable', () => {
 
   it('Should return false if column is invisible', function () {
     const columnName = 'param3';
-    wrapper.vm.hiddenColumns = [];
     const result = wrapper.vm.isVisibleColumn(columnName);
     expect(result).to.equal(false);
   });
 
   it('Should return true if column is visible', function () {
     const columnName = 'param3';
-    wrapper.vm.selectedByUserColumns = [columnName];
+    wrapper.vm.$store.state.currentlyVisibleColumns = [columnName];
     const result = wrapper.vm.isVisibleColumn(columnName);
     expect(result).to.equal(true);
+  });
+
+  it('Should call showColumns if column marked as visible', function () {
+    const columnName = 'param3';
+    const result = wrapper.vm.setVisibleColumns(columnName);
+    expect(actions.showColumns.calledOnce).to.equal(true);
   });
 
   it('Should return true if column is filterable by value', function () {

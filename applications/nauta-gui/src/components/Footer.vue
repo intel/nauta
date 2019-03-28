@@ -26,7 +26,7 @@
 import ELEMENT_LABELS from '../utils/constants/labels';
 
 export default {
-  name: 'Footer',
+  name: 'FooterElement',
   data () {
     return {
       labels: ELEMENT_LABELS

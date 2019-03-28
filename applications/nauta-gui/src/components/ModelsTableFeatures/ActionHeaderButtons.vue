@@ -15,14 +15,20 @@
  */
 <template>
 <div id="buttons_block">
-  <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="launchTensorDisabled">
+  <v-btn dark small v-on:click="onLaunchTensorHandler()" :disabled="!tensorBtnAvailable">
     {{ labels.LAUNCH_TB }}*
   </v-btn>
   <v-menu bottom offset-y>
     <v-btn slot="activator" dark small>
-      {{ labels.RESET }}
+      {{ labels.SORT_AND_FILTER }}
     </v-btn>
     <v-list>
+      <v-list-tile v-on:click="switchAllUsersMode">
+        <v-list-tile-title>{{ labels.ALL_USERS }}</v-list-tile-title>
+        <v-list-tile-action v-if="allUsersMode" class="justify-end">
+          <v-icon>done</v-icon>
+        </v-list-tile-action>
+      </v-list-tile>
       <v-list-tile v-on:click="clearSort()">
         <v-list-tile-title>{{ labels.CLEAR_SORT }}</v-list-tile-title>
       </v-list-tile>
@@ -46,7 +52,7 @@
         <v-list dense>
           <v-list-tile :key="'interval-' + interval" v-for="interval in possibleRefreshIntervals" v-on:click="setRefreshIntervalValue(interval)">
             <v-list-tile-title>{{ interval }}s</v-list-tile-title>
-            <v-list-tile-action v-if="currentRefreshInterval == interval" class="justify-end">
+            <v-list-tile-action v-if="refreshInterval === interval" class="justify-end">
               <v-icon>done</v-icon>
             </v-list-tile-action>
           </v-list-tile>
@@ -57,7 +63,7 @@
       </v-list-tile>
     </v-list>
   </v-menu>
-  <v-btn v-on:click="showColumnMgmtModal = !showColumnMgmtModal" dark small>
+  <v-btn v-on:click="showColumnMgmtModalHandler()" dark small>
     {{ labels.ADD_DEL_COLUMN }}
   </v-btn>
   <v-dialog
@@ -74,8 +80,8 @@
           <v-container grid-list-md>
             <v-layout row wrap>
               <v-flex xs12>
-                <div id="options" v-if="columns.length" class="scroll-y">
-                  <div v-for="header in columns" v-bind:key="header" class="option">
+                <div id="options" v-if="isNonEmptyTable" class="scroll-y">
+                  <div v-for="header in experimentsParams" v-bind:key="header" class="option">
                     <v-icon
                       :id="header + '_switch'"
                       v-if="!isHidden(header)"
@@ -100,21 +106,21 @@
                     </v-tooltip>
                   </div>
                 </div>
-                <div v-if="!columns.length">
+                <div v-if="!isNonEmptyTable">
                   {{ messages.SUCCESS.NO_DATA_FOR_CURRENT_USER }}
                 </div>
               </v-flex>
               <v-flex md8 xs12 offset-md2>
-                <v-btn id="revert" v-if="columns.length" block dark small v-on:click="revertToDefault()">
+                <v-btn id="revert" v-if="isNonEmptyTable" block dark small v-on:click="revertToDefault()">
                   {{ labels.REVERT_TO_DEFAULT }}
                 </v-btn>
               </v-flex>
               <v-flex md6 xs12>
                 <v-btn color="intel_primary" block dark small v-on:click="discardVisibleHeaders()">
-                  {{ columns.length ? labels.CANCEL : labels.OK }}
+                  {{ isNonEmptyTable ? labels.CANCEL : labels.OK }}
                 </v-btn>
               </v-flex>
-              <v-flex v-if="columns.length" md6 xs12>
+              <v-flex v-if="isNonEmptyTable" md6 xs12>
                 <v-btn color="intel_primary" block dark small v-on:click="applyVisibleHeaders()">
                   {{ labels.SAVE }}
                 </v-btn>
@@ -128,34 +134,49 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import HEADERS_LABELS from '../../utils/header-titles';
 import ELEMENTS_LABELS from '../../utils/constants/labels';
 import MESSAGES from '../../utils/constants/messages';
+import { ALWAYS_VISIBLE_COLUMNS } from '../../store/modules/experiments-table';
 
 export default {
   name: 'ActionHeaderButtons',
-  props: ['clearSort', 'clearFilterHandler', 'setVisibleColumnsHandler', 'selectedByUserColumns',
-    'columns', 'alwaysVisibleColumns', 'initiallyVisibleColumns', 'onLaunchTensorHandler',
-    'launchTensorDisabled', 'refreshNowHandler', 'setIntervalHandler', 'disabled'],
+  props: ['clearSort', 'clearFilterHandler', 'onLaunchTensorHandler', 'refreshNowHandler'],
   data: () => {
     return {
       possibleRefreshIntervals: [5, 10, 15, 30, 60],
-      currentRefreshInterval: 30,
       showColumnMgmtModal: false,
-      draft: [],
       labels: ELEMENTS_LABELS,
-      messages: MESSAGES
+      messages: MESSAGES,
+      draft: []
     }
   },
-  watch: {
-    selectedByUserColumns: function () {
-      this.draft = [].concat(this.selectedByUserColumns)
+  computed: {
+    ...mapGetters({
+      experimentsParams: 'experimentsParams',
+      selectedExperimentsByUser: 'selectedExperimentsByUser',
+      currentlyVisibleColumns: 'currentlyVisibleColumns',
+      allUsersMode: 'allUsersMode',
+      refreshInterval: 'refreshInterval'
+    }),
+    tensorBtnAvailable: function () {
+      return this.selectedExperimentsByUser.length > 0;
+    },
+    isNonEmptyTable: function () {
+      return this.experimentsParams.length > 0;
     }
   },
   created: function () {
-    this.setVisibleColumnsHandler(this.selectedByUserColumns.concat(this.initiallyVisibleColumns))
+    this.draft = [].concat(this.currentlyVisibleColumns);
   },
   methods: {
+    ...mapActions({
+      showColumns: 'showColumns',
+      clearColumnsSelection: 'clearColumnsSelection',
+      switchAllUsersMode: 'switchAllUsersMode',
+      updateRefreshInterval: 'updateRefreshInterval'
+    }),
     getLabel: function (header) {
       return HEADERS_LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
@@ -163,8 +184,7 @@ export default {
       return str.length > limit ? `${str.substr(0, limit)}...` : str;
     },
     revertToDefault: function () {
-      this.draft = this.initiallyVisibleColumns;
-      this.setVisibleColumnsHandler(this.draft);
+      this.clearColumnsSelection();
       this.showColumnMgmtModal = false;
     },
     switchColumn: function (name) {
@@ -180,19 +200,21 @@ export default {
       return !this.draft.includes(name);
     },
     isAlwaysVisible: function (name) {
-      return this.alwaysVisibleColumns.includes(name);
+      return ALWAYS_VISIBLE_COLUMNS.includes(name);
     },
     applyVisibleHeaders: function () {
-      this.setVisibleColumnsHandler(this.draft);
+      this.showColumns({ data: this.draft });
       this.showColumnMgmtModal = false;
     },
     discardVisibleHeaders: function () {
-      this.draft = [].concat(this.selectedByUserColumns);
+      this.draft = [].concat(this.currentlyVisibleColumns);
       this.showColumnMgmtModal = false;
     },
     setRefreshIntervalValue: function (value) {
-      this.currentRefreshInterval = value;
-      this.setIntervalHandler(value);
+      this.updateRefreshInterval({data: value});
+    },
+    showColumnMgmtModalHandler: function () {
+      this.showColumnMgmtModal = !this.showColumnMgmtModal;
     }
   }
 }

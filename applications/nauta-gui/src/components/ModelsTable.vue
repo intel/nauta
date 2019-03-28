@@ -28,17 +28,10 @@
             <h2>{{ labels.EXPERIMENTS }}</h2>
             <v-spacer></v-spacer>
             <ActionHeaderButtons v-if="experimentsTotal !== 0"
-              :columns="experimentsParams"
-              :selectedByUserColumns="selectedByUserColumns"
-              :initiallyVisibleColumns="initiallyVisibleColumns"
-              :alwaysVisibleColumns="alwaysVisibleColumns"
-              :setVisibleColumnsHandler="setVisibleColumns"
               :onLaunchTensorHandler="onLaunchTensorboardClick"
-              :launchTensorDisabled="!tensorBtnAvailable"
               :clearSort="clearSort"
               :clearFilterHandler="clearFilter"
               :refreshNowHandler="getData"
-              :setIntervalHandler="updateRefreshInterval"
             ></ActionHeaderButtons>
             <v-flex v-if="(experimentsTotal !== 0 || searchPattern)" xs12 md2>
               <v-card-title>
@@ -159,16 +152,7 @@
                 Click <u class="pointer-btn" v-on:click="showAllUsersData()">here</u> to load all users data.
               </v-alert>
             </div>
-            <FooterElements v-if="filteredDataCount"
-              :currentPage="pagination.currentPage"
-              :pagesCount="experimentsTotalPagesCount"
-              :nextPageAction="nextPage"
-              :prevPageAction="previousPage"
-              :setPageAction="setPage"
-              :paginationStats="paginationStats"
-              :updateCountHandler="updateCountPerPage"
-              :lastUpdateLabel="refresh.lastUpdateLabel"
-            ></FooterElements>
+            <FooterElements v-if="filteredDataCount"/>
           </div>
         </v-card>
       </v-flex>
@@ -187,6 +171,7 @@ import LogsDetail from './ModelsTableFeatures/LogsDetail';
 import ExpResourcesDetail from './ModelsTableFeatures/ExpResourcesDetail';
 import FooterElements from './ModelsTableFeatures/FooterElements';
 import {TimedateExtractor, toLocaleFormat} from '../utils/timedate-utils';
+import {FILTERABLE_BY_VAL_COLUMNS} from '../store/modules/experiments-table';
 
 const SORTING_ORDER = {
   ASC: 'asc',
@@ -217,11 +202,6 @@ export default {
       filterIcon: 'filter_list',
       tbCompatibleExpKinds: ['training'],
       searchPattern: '',
-      selectedByUserColumns: [],
-      alwaysVisibleColumns: ['name', 'state'],
-      initiallyVisibleColumns: ['name', 'state', 'creationTimestamp', 'trainingStartTime', 'trainingDurationTime',
-        'type'],
-      filterableByValColumns: ['name', 'namespace', 'state', 'type'],
       filterByValModals: {
         name: {
           visible: false,
@@ -246,19 +226,10 @@ export default {
         iconDesc: 'arrow_downward',
         currentSortIcon: 'arrow_downward'
       },
-      pagination: {
-        itemsCountPerPage: 5,
-        currentPage: 1
-      },
       visibleDetails: [],
       activeColumnIdx: DEFAULT_ORDER.key,
       activeColumnName: DEFAULT_ORDER.orderBy,
-      hoveredColumnIdx: null,
-      selected: [],
-      refresh: {
-        interval: 30,
-        lastUpdateLabel: 'Last updated moment ago.'
-      }
+      hoveredColumnIdx: null
     }
   },
   created: function () {
@@ -274,7 +245,9 @@ export default {
   computed: {
     ...mapGetters({
       experimentsData: 'experimentsData',
+      selectedExperimentsByUser: 'selectedExperimentsByUser',
       experimentsParams: 'experimentsParams',
+      currentlyVisibleColumns: 'currentlyVisibleColumns',
       columnValuesOptions: 'columnValuesOptions',
       columnValuesApplied: 'columnValuesApplied',
       experimentsBegin: 'experimentsBegin',
@@ -290,24 +263,15 @@ export default {
       isInitializedData: 'initializedDataFlag',
       isLogged: 'isLogged',
       username: 'username',
-      experimentResources: 'experimentResources'
+      experimentResources: 'experimentResources',
+      itemsCountPerPage: 'itemsCountPerPage',
+      currentPage: 'currentPage',
+      refreshInterval: 'refreshInterval',
+      allUsersMode: 'allUsersMode'
     }),
-    paginationStats: function () {
-      return `${this.experimentsBegin}-${this.experimentsEnd} ${this.labels.OF} ${this.filteredDataCount}`;
-    },
-    currentlyVisibleColumns: function () {
-      return this.experimentsParams.filter((header) => {
-        if (this.alwaysVisibleColumns.includes(header) || this.selectedByUserColumns.includes(header)) {
-          return header;
-        }
-      });
-    },
     refreshTableDataTriggers: function () {
-      return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.pagination.itemsCountPerPage}|
-      ${this.pagination.currentPage}|${JSON.stringify(this.filterByValModals)}`;
-    },
-    tensorBtnAvailable: function () {
-      return this.selected.length > 0;
+      return `${this.searchPattern}|${this.sorting.order}|${this.activeColumnName}|${this.itemsCountPerPage}|
+      ${this.currentPage}|${JSON.stringify(this.filterByValModals)}|${this.allUsersMode}`;
     },
     columnsCount: function () {
       return this.currentlyVisibleColumns.length > 6 ? 8 : this.currentlyVisibleColumns.length + 1;
@@ -329,13 +293,21 @@ export default {
     refreshTableDataTriggers: function () {
       const refreshMode = false;
       this.getData(refreshMode);
-    },
-    experimentsPageNumber: function () {
-      this.pagination.currentPage = this.experimentsPageNumber;
     }
   },
   methods: {
-    ...mapActions(['getUserExperiments', 'getExperimentResources', 'launchTensorboard']),
+    ...mapActions([
+      'getUserExperiments',
+      'getExperimentResources',
+      'launchTensorboard',
+      'clearExperimentSelection',
+      'markExperimentsAsSelected',
+      'markExperimentAsSelected',
+      'showColumns',
+      'showColumn',
+      'showRefreshMessage',
+      'clearAllUsersMode'
+    ]),
     getLabel: function (header) {
       return LABELS[header] || header.charAt(0).toUpperCase() + header.slice(1);
     },
@@ -357,38 +329,26 @@ export default {
       });
       this.filterByValModals.namespace.params.push(this.username);
       this.searchPattern = '';
+      this.clearAllUsersMode();
     },
     showAllUsersData () {
       this.filterByValModals.namespace.params = [];
-    },
-    updateCountPerPage (count) {
-      this.pagination.itemsCountPerPage = count;
-      this.pagination.currentPage = 1;
-    },
-    nextPage () {
-      this.pagination.currentPage++;
-    },
-    setPage (pageNumber) {
-      this.pagination.currentPage = pageNumber;
-    },
-    previousPage () {
-      this.pagination.currentPage--;
     },
     isVisibleColumn (column) {
       return this.currentlyVisibleColumns.includes(column);
     },
     isFilterableByValColumn (column) {
-      return this.filterableByValColumns.includes(column);
+      return FILTERABLE_BY_VAL_COLUMNS.includes(column);
     },
     setVisibleColumns (columns) {
-      this.selectedByUserColumns = this.alwaysVisibleColumns.concat(columns);
+      this.showColumns({data: columns});
     },
     onLaunchTensorboardClick () {
-      const experiments = this.selected.map((exp) => {
+      const experiments = this.selectedExperimentsByUser.map((exp) => {
         return `${exp.attributes.namespace}=${encodeURIComponent(exp.attributes.name)}`;
       }).join('&');
       window.open(`/tensorboard?${experiments}`);
-      this.selected = [];
+      this.clearExperimentSelection();
     },
     toggleDetails (expName) {
       if (this.areDetailsVisible(expName)) {
@@ -406,28 +366,29 @@ export default {
       return this.visibleDetails.includes(expName);
     },
     selectExp (exp) {
-      this.selected.push(exp);
+      this.markExperimentAsSelected({data: [exp]})
     },
     deselectExp (exp) {
-      this.selected = this.selected.filter((item) => {
+      const filteredExperiments = this.selectedExperimentsByUser.filter((item) => {
         return item.attributes.name !== exp.attributes.name;
       });
+      this.markExperimentsAsSelected({ data: filteredExperiments });
     },
     isSelected (exp) {
-      const filtered = this.selected.filter((item) => {
+      const filtered = this.selectedExperimentsByUser.filter((item) => {
         return item.attributes.name === exp.attributes.name;
       });
       return filtered.length !== 0;
     },
     getData (refreshMode) {
       this.getUserExperiments({
-        limitPerPage: this.pagination.itemsCountPerPage,
-        pageNo: this.pagination.currentPage,
+        limitPerPage: this.itemsCountPerPage,
+        pageNo: this.currentPage,
         orderBy: this.activeColumnName,
         order: this.sorting.order,
         searchBy: this.searchPattern,
         names: this.filterByValModals.name.params,
-        namespaces: this.filterByValModals.namespace.params,
+        namespaces: this.allUsersMode ? [] : this.filterByValModals.namespace.params,
         states: this.filterByValModals.state.params,
         types: this.filterByValModals.type.params,
         refreshMode: refreshMode
@@ -437,12 +398,10 @@ export default {
       });
     },
     timer (context) {
+      this.showRefreshMessage({data: context.messages.SUCCESS.LAST_UPDATED_ON(this.lastUpdate)});
       const currentTime = Date.now();
       const lastUpdateTimeDiffer = Math.ceil((currentTime - this.lastUpdate) / 1000); // in seconds
-      if (lastUpdateTimeDiffer <= this.refresh.interval) {
-        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_A_MOMENT_AGO;
-      } else {
-        this.refresh.lastUpdateLabel = context.messages.SUCCESS.LAST_UPDATED_XS_AGO(this.refresh.interval);
+      if (lastUpdateTimeDiffer >= this.refreshInterval) {
         if (!this.fetchingDataActive) {
           const refreshMode = true;
           this.getData(refreshMode);
@@ -487,9 +446,6 @@ export default {
     },
     isTensorboardAvailableForExp (expType) {
       return this.tbCompatibleExpKinds.includes(expType);
-    },
-    updateRefreshInterval (value) {
-      this.refresh.interval = value;
     }
   }
 }

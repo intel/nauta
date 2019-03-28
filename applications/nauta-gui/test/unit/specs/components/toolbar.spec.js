@@ -31,7 +31,8 @@ describe('VUE components Toolbar', () => {
       getUserboxParams: () => {
         return {visible: true}
       },
-      tensorMode: () => 'username'
+      tensorMode: () => 'username',
+      menuBtnVisibility: () => true
     };
     actions = {
       toggleMenu: sinon.spy(),

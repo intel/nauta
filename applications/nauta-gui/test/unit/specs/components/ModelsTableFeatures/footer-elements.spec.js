@@ -18,36 +18,60 @@ import sinon from 'sinon';
 import VueRouter from 'vue-router'
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import FooterElements from '../../../../../src/components/ModelsTableFeatures/FooterElements';
+import Vuex from "vuex";
 
 describe('VUE components FooterElements', () => {
-  let wrapper, router, props, localVue;
+  let wrapper, router, props, localVue, state, getters, actions, store;
   beforeEach(function () {
-    props = {
-      updateCountHandler: sinon.spy(),
+    state = {
+      experimentsTotalPagesCount: 3,
+      experimentsBegin: 1,
+      experimentsEnd: 5,
+      filteredDataCount: 5,
+      itemsCountPerPage: 5,
       currentPage: 1,
-      pagesCount: 1,
-      nextPageAction: sinon.spy(),
-      prevPageAction: sinon.spy(),
-      setPageAction: sinon.spy(),
-      paginationStats: 'stats',
-      lastUpdateLabel: 'moment ago'
+      experimentsPageNumber: 1,
+      refreshMessage: ''
     };
+    getters = {
+      experimentsTotalPagesCount: state => state.experimentsTotalPagesCount,
+      experimentsBegin: state => state.experimentsBegin,
+      experimentsEnd: state => state.experimentsEnd,
+      filteredDataCount: state => state.filteredDataCount,
+      itemsCountPerPage: state => state.itemsCountPerPage,
+      currentPage: state => state.currentPage,
+      experimentsPageNumber: state => state.experimentsPageNumber,
+      refreshMessage: state => state.refreshMessage
+    };
+    actions = {
+      updatePageNumber: sinon.spy(),
+      updateItemsCountPerPage: sinon.spy()
+    };
+    store = new Vuex.Store({
+      state,
+      actions,
+      getters
+    });
     localVue = createLocalVue();
     localVue.use(VueRouter);
     localVue.use(Vuetify);
     router = new VueRouter();
-    wrapper = shallowMount(FooterElements, {propsData: props, router, localVue});
+    wrapper = shallowMount(FooterElements, {store, router, localVue});
   });
 
   it('Should render footer elements correctly', function () {
-    expect(wrapper.text().includes(props.paginationStats)).to.equal(true);
-    expect(wrapper.text().includes(props.lastUpdateLabel)).to.equal(true);
+    expect(wrapper.text().includes(state.refreshMessage)).to.equal(true);
     expect(wrapper.text().includes('Rows per page')).to.equal(true);
   });
 
-  it('Should call updateCountHandler if select switched', function () {
+  it('Should call updateCountPerPage if select switched', function () {
     wrapper.vm.chosenCount = 10;
-    expect(props.updateCountHandler.calledOnce).to.equal(true);
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
+  });
+
+  it('Should call updateCountPerPage if experimentsPageNumber updated', function () {
+    wrapper.vm.$store.state.experimentsPageNumber = 10;
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
   });
 
   it('Should call setPageAction if onPageNoInputChange called', function () {
@@ -57,8 +81,7 @@ describe('VUE components FooterElements', () => {
       }
     };
     wrapper.vm.onPageNoInputChange(e);
-    expect(props.setPageAction.calledOnce).to.equal(true);
-    expect(props.setPageAction.calledWith(e.target.value)).to.equal(true);
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
   });
 
   it('Should call setPageAction properly if onPageNoInputChange called with negative number', function () {
@@ -67,15 +90,23 @@ describe('VUE components FooterElements', () => {
         value: -4
       }
     };
-    const defaultPageNumber = 1;
     wrapper.vm.onPageNoInputChange(e);
-    expect(props.setPageAction.calledOnce).to.equal(true);
-    expect(props.setPageAction.calledWith(defaultPageNumber)).to.equal(true);
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
   });
 
   it('Should set v-model value properly using computed variable', function () {
     const newValue = 5;
-    expect(wrapper.vm.chosenPageNo).to.equal(props.currentPage);
+    expect(wrapper.vm.chosenPageNo).to.equal(state.currentPage);
     wrapper.vm.chosenPageNo = newValue;
+  });
+
+  it('Should call updatePageNumber if previous page', function () {
+    wrapper.vm.previousPage();
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
+  });
+
+  it('Should call updatePageNumber if next page', function () {
+    wrapper.vm.nextPage();
+    expect(actions.updatePageNumber.calledOnce).to.equal(true);
   });
 });
