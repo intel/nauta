@@ -70,7 +70,7 @@ def main(_):
 
     # Load pre-computed IDs matrix
     try:
-        ids = np.load(os.path.join(FLAGS.data_dir, 'ids_matrix_imdb.npy'))
+        ids = np.load(os.path.join(FLAGS.data_dir, 'idsMatrix.npy'))
         print('Loaded the dataset!')
     except Exception:
         print('Make sure to provide ids_matrix_imdb.npy in specified directory')
