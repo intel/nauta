@@ -113,9 +113,8 @@ def test_modify_values_yaml(mocker):
 
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
-                                   experiment_name='test-experiment', run_name='test-experiment',
-                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
-                                   env_variables=ENV_VARIABLES)
+                                   experiment_name='test-experiment', pack_type=EXAMPLE_PACK_TYPE,
+                                   cluster_registry_port=1111, env_variables=ENV_VARIABLES, username='fake-user')
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -143,9 +142,8 @@ def test_modify_values_yaml_without_pod_count(mocker):
 
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
-                                   experiment_name='test-experiment', run_name='test-experiment',
-                                   pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
-                                   env_variables=None)
+                                   experiment_name='test-experiment',pack_type=EXAMPLE_PACK_TYPE,
+                                   cluster_registry_port=1111,  env_variables=None, username='fake-user')
 
     assert sh_move_mock.call_count == 1, "job yaml file wasn't moved."
     output = yaml_dump_mock.call_args[0][0]
@@ -173,7 +171,7 @@ def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
     with pytest.raises(AttributeError):
         tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                        script_parameters=SCRIPT_PARAMETERS, pack_params=wrong_pack_params,
-                                       experiment_name='test-experiment', run_name='test-experiment',
+                                       experiment_name='test-experiment', username='fake-user',
                                        pack_type=EXAMPLE_PACK_TYPE, cluster_registry_port=1111,
                                        env_variables=None)
 
@@ -209,7 +207,8 @@ def test_modify_dockerfile_if_script_path_provided(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_DOCKERFILE)
     sh_move_mock = mocker.patch("shutil.move")
 
-    tf_training.modify_dockerfile(EXPERIMENT_FOLDER, None, None, script_folder_location=script_folder_location)
+    tf_training.modify_dockerfile(experiment_folder=EXPERIMENT_FOLDER, script_location=None,
+                                  script_folder_location=script_folder_location)
 
     assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
@@ -221,9 +220,9 @@ def test_update_configuration_success(mocker):
 
     output = tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                               script_parameters=SCRIPT_PARAMETERS,
-                                              experiment_name='test-experiment', run_name='test-experiment',
-                                              cluster_registry_port=12345, local_registry_port=12345,
-                                              pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
+                                              experiment_name='test-experiment', username='fake-user',
+                                              cluster_registry_port=12345, pack_type=EXAMPLE_PACK_TYPE,
+                                              pack_params=[])
 
     assert not output, "configuration wasn't updated"
     assert modify_dockerfile_mock.call_count == 1, "dockerfile wasn't modified"
@@ -238,8 +237,8 @@ def test_update_configuration_failure(mocker):
     with pytest.raises(RuntimeError):
         tf_training.update_configuration(run_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                          script_parameters=SCRIPT_PARAMETERS,
-                                         experiment_name='test-experiment', run_name='test-experiment',
-                                         cluster_registry_port= 12345, local_registry_port=12345,
+                                         experiment_name='test-experiment',
+                                         cluster_registry_port= 12345, username='fake-user',
                                          pack_type=EXAMPLE_PACK_TYPE, pack_params=[])
 
     assert modify_dockerfile_mock.call_count == 0, "dockerfile was modified"

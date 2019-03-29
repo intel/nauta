@@ -8,40 +8,12 @@ The section discusses the following topics, these are:
 
 ## Uploading Datasets
 
-Nauta offers two ways for users to upload and use datasets for experiments, these are uploading during experiment submission and upload to Nauta storage.
-
-### Uploading During Experiment Submission
-
-Uploading additional datasets or files is an option available for the _submit_ command, using the following option:
-
-`-sfl, --script-folder-location`
-
-Where `script-folder-location` is the name of a folder with additional files used by a script, for example: other .py files, 
-datasets, and so on. If the option _is not_ included, the files _will not_ be included in the experiment.
-
-**Syntax:**
-
-`nctl experiment submit --script-folder-location DATASET-PATH SCRIPT_LOCATION`
-
-### Small Datasets 
-
-This option is recommended for small datasets or datasets that _are not_ reused often. In using this option, 
-the dataset will be uploaded each time the submit command is executed, which may add to the overall submission time.
-
-**Note:** The `script-folder-location` is also used for script files, not only for datasets.
-
-### Upload to Nauta Storage
-
-Depending on the Nauta configuration, the application uses NFS to connect to a storage location where each user 
+Nauta uses NFS to connect to a storage location where each user 
 has folders that have been setup to store experiment input and output data. This option allows the user to upload 
 files and datasets for private use and for sharing. Once uploaded, the files are referenced by the  path.
 
 All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the following 
 sections in this chapter for information on how to access and use Nauta storage.
-
-### Large Datasets
-
-This option is recommended for large datasets, data that will be reused often, and data that will be shared among users.
 
 ## nctl mount Command
 
@@ -107,3 +79,20 @@ in Nauta storage and can be used by any user for their experiments.
 
 If you want to copy your data to a shared folder, use input-shared instead of input in step 3.  Using the shared Nauta storage will allow all Nauta users to use the same MNIST dataset by referencing the shared path, `/mnt/input/root/public/MNIST`.
 
+## Uploading during experiment submission
+
+Uploading additional files is an option available for the ‘submit’ command, using the following option:
+
+`-sfl, --script-folder-location`
+
+Where `script-folder-location` is the name of a folder with additional files used by a script, e.g., other .py files, 
+assets, etc.
+
+**Syntax:**
+
+`nctl experiment submit --script-folder-location DATASET-PATH SCRIPT_LOCATION`
+
+This option may be used only for small datasets for development purposes (datasets larger than several MB should be uploaded
+ using standard mechanism described above). 
+
+**WARNING:** Submitting large amount of data using this option will prolong experiments' submission time.

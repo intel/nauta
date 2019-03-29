@@ -1,0 +1,11 @@
+---
+
+
+- name: Squash image {{ name }}
+  command: docker-squash "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}" -t "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:squash-{{ docker_images_remote_tags[name] }}" -v
+  register: squash_async
+  async: 9800
+  poll: 0
+
+- set_fact:
+    docker_async_tasks: "{{ docker_async_tasks | combine({name: squash_async.ansible_job_id}) }}"

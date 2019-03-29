@@ -1,0 +1,174 @@
+## Gitea image
+## ref: https://hub.docker.com/r/gitea/gitea/tags/
+##
+
+images:
+  gitea: "nauta/gitea:1.6.1"
+  postgres: "nauta/postgres:11"
+  memcached: "nauta/memcached:1.5.6-alpine"
+  imagePullPolicy: IfNotPresent
+  ## Specify imagePullSecrets
+  ## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+  ##
+  # imagePullSecrets: myregistrykey
+
+## cache settings
+memcached:
+  maxItemMemory: 64
+  verbosity: v
+  extendedOptions: modern
+
+## ingress settings - Optional
+ingress:
+  enabled: false
+  ## annotations used by the ingress - ex for k8s nginx ingress controller:
+  #ingress_annotations:
+  #  kubernetes.io/ingress.class: nginx
+  #  nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  #  nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+  #  nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+  ##tls support for the ingress
+  #tls:
+  #  - secretName: <TLS_SECRET>
+  #    hosts:
+  #      - 'git.example.com'
+
+## chart defaults to using an ingress for http, but change to LoadBalancer if using you cluster supports it
+service:
+  http:
+    serviceType: ClusterIP
+    port: 3000
+    #nodePort: 30280
+    # sometimes if is necesary to access through an external port i.e. http(s)://<dns-name>:<external-port>
+    externalPort: 8280
+    externalHost: localhost # gitea is not exposed externally through DNS name
+  ssh:
+    serviceType: ClusterIP
+    port: 22
+    #nodePort: 30222
+    ## if serving on a different external port used for determining the ssh url in the gui
+    #externalPort: 8022
+    #externalHost: git.example.com
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  gitea:
+    requests:
+      memory: 500Mi
+      cpu: 1000m
+    limits:
+      memory: 1Gi
+      cpu: 1
+  postgres:
+    requests:
+      memory: 200Mi
+      cpu: 200m
+    limits:
+      memory: 1Gi
+      cpu: 1
+  memcached:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 500Mi
+      cpu: 1
+
+
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+## ref:
+##
+persistence:
+  enabled: true
+  #existingGiteaClaim: gitea-gitea
+  #existingPostgresClaim: gitea-postgres
+  giteaSize: 32Gi
+  postgresSize: 32Gi
+  #storageClass: ""
+  accessMode: ReadWriteOnce
+## addtional annotations for hte pvcs  uncommenting below will prevent helm from deleting the pvc when hte chart is deleted
+#  annotations:
+#    "helm.sh/resource-policy": keep
+
+## if you want to mount a volume directly without using a storageClass or pvcs
+#  directGiteaVolumeMount:
+#    glusterfs:
+#      endpoints: "192.168.1.1 192.168.1.2 192.168.1.3"
+#      path: giteaData
+#  directPostgresVolumeMount:
+#    glusterfs:
+#      endpoints: "192.168.1.1 192.168.1.2 192.168.1.3"
+#      path: giteaPostgresData
+
+#Connect to an external database
+# externalDB:
+#   dbUser: "postgres"
+#   dbPassword: "<MY_PASSWORD>"
+#   dbHost: "service-name.namespace.svc.cluster.local" # or some external host
+#   dbPort: "5432"
+#   dbDatabase: "gitea"
+
+# valid types: postgres, mysql, mssql, sqllite
+dbType: "postgres"
+useInPodPostgres: true
+
+inPodPostgres:
+    secret: postgresecrets
+    subPath: "postgresql-db"
+    dataMountPath: /var/lib/postgresql/data/pgdata
+
+    ## Create a database user
+    ## Default: postgres
+    # postgresUser:
+    ## Default: random 10 character string
+    # postgresPassword:
+
+    ## Inject postgresPassword via a volume mount instead of environment variable
+    usePasswordFile: false
+
+    ## Use Existing secret instead of creating one
+    ## It must have a postgres-password key containing the desired password
+    # existingSecret: 'secret'
+
+    ## Create a database
+    ## Default: the postgres user
+    postgresDatabase: gitea
+
+    ## Specify initdb arguments, e.g. --data-checksums
+    ## ref: https://github.com/docker-library/docs/blob/master/postgres/content.md#postgres_initdb_args
+    ## ref: https://www.postgresql.org/docs/current/static/app-initdb.html
+    # postgresInitdbArgs:
+
+    ## Specify runtime config parameters as a dict, using camelCase, e.g.
+    ## {"sharedBuffers": "500MB"}
+    ## ref: https://www.postgresql.org/docs/current/static/runtime-config.html
+    # postgresConfig:
+
+
+## Node labels and tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+## Annotations for the deployment and nodes.
+deploymentAnnotations: {}
+podAnnotations: {}
+
+## In order to disable initial install screen you must have secretKey and disableInstaller=true
+config:
+  secretKey: ""
+  disableInstaller: true
+
+# This section allows automatic creation of gitea's admin user
+admin_user:
+  create: true
+  name: nauta-admin
+  password: "" # Random password will be generated if empty string is provided
+  email: admin@nauta.invalid

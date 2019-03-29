@@ -18,6 +18,7 @@ import time
 
 from marshmallow import ValidationError
 
+from git_repo_manager.client import GitRepoManagerClient
 from platform_resources.user import User
 import platform_resources.user as model
 from util.k8s.k8s_info import find_namespace, NamespaceStatus
@@ -34,10 +35,6 @@ from cli_text_consts import UserDeleteCmdTexts as TextsDel
 from util.spinner import spinner
 
 logger = initialize_logger(__name__)
-
-API_GROUP_NAME = 'aipg.intel.com'
-USERS_PLURAL = 'users'
-USERS_VERSION = 'v1'
 
 # Samba users must match system users, therefore there is a need to blacklist some names.
 # This list is genetated by running shell on samba containers and listing all users
@@ -59,18 +56,24 @@ def purge_user(username: str):
     :param username: name of a user for which artifacts should be removed
     It throws exception in case of any problems detected during removal of a user
     """
-    # remove data from elasticsearch
     try:
+        # remove data from elasticsearch
         with k8s_proxy_context_manager.K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy,\
             spinner(text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS):
             es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
                                                verify_certs=False, use_ssl=False)
             es_client.delete_logs_for_namespace(username)
+
+        # remove data from git repo manager
+        with k8s_proxy_context_manager.K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER) as proxy,\
+                spinner(text=TextsDel.DELETION_DELETING_USERS_REPOSITORY):
+            grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
+            grm_client.delete_nauta_user(username=username)
     except K8sProxyCloseError as exe:
-        logger.exception("Error during closing of a proxy for elasticsearch.")
+        logger.exception("Error during closing of a proxy.")
         raise exe
     except Exception as exe:
-        logger.exception("Error during removal of data from elasticsearch")
+        logger.exception(f"Error during removal of {username} user data")
         raise exe
 
 

@@ -14,12 +14,7 @@
 # limitations under the License.
 #
 
-import os
 from typing import List, Tuple
-
-
-# list of files/folders created by helm/draft
-draft_files = ['.draftignore', 'dockerignore', 'Dockerfile', 'draft.toml']
 
 
 def prepare_script_paramaters(script_parameters: Tuple[str, ...], script_location: str) -> List[str]:

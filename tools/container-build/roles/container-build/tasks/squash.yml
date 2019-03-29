@@ -1,0 +1,23 @@
+---
+
+- name: Set squash async task
+  set_fact:
+    docker_async_tasks: {}
+
+- name: Squash images
+  vars:
+    name: "{{ item.key }}"
+    image: "{{ item.value }}"
+  include_tasks: "squash_image.yml"
+  with_dict: "{{ images }}"
+  when: image.squash | default(False)
+
+- debug:
+    msg: "Squash async tasks: {{ docker_async_tasks }}"
+
+- name: Wait for squash tasks
+  vars:
+    name: "Squash {{ item.key }}"
+    task_id: "{{ item.value }}"
+  include_tasks: wait.yml
+  with_dict: "{{ docker_async_tasks }}"

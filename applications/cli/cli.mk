@@ -34,9 +34,9 @@ ifeq (Windows,$(OS))
 
 	mkdir dist/config
 
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	curl -o helm-v2.11.0-windows-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-windows-amd64.tar.gz
 	rm -rf helm_tmp
@@ -62,6 +62,7 @@ ifeq (Linux,$(OS))
 	mkdir -vp dist/config/
 
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	curl -o helm-v2.11.0-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -84,9 +85,9 @@ ifeq (Darwin,$(OS))
 
 	mkdir -vp dist/config/
 
-	curl http://repository.toolbox.nervana.sclab.intel.com/files/socat-container-image.tar.gz -o dist/config/socat-container-image.tar.gz
 
 	cp -Rf draft/packs dist/config
+	cp -Rf workflows dist/config
 
 	curl -o helm-v2.11.0-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/files/helm-bundles/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
@@ -125,8 +126,8 @@ test: $(DEV_VIRTUALENV_MARK)
 cli-check: venv-dev test style
 
 test-with-code-cov: $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
-	#@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
+	#@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test --cov=. --cov-config tox.ini --cov-report term-missing
 
 VERSION_CLIENT_MAJOR ?= 1
 VERSION_CLIENT_MINOR ?= 0

@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: "{{ .Release.Name }}-view"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    {{ .Values.api_group_name }}/admin: "true"
+  name: "{{ .Release.Name }}-workflows"
+rules:
+- apiGroups:
+    - argoproj.io
+  resources:
+    - workflows
+  verbs:
+    - "*"

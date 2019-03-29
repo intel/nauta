@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-cache-cleaner
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+    nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
+    nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
+spec:
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: buildkit-cache-cleaner
+            image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA buildkit image is required" .Values.image }}
+            command: [buildctl]
+            args:
+            - "--addr"
+            - "tcp://{{ .Release.Name }}-{{ .Chart.Name }}.nauta.svc.kubernetes.nauta:{{ .Values.buildkitd_port }}"
+            - "prune"
+            - "--keep-storage"
+            - "{{ .Values.prune_storage_limit }}"
+          restartPolicy: OnFailure

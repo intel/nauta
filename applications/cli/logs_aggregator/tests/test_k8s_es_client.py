@@ -21,6 +21,7 @@ import pytest
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from platform_resources.run import Run
+from platform_resources.workflow import ArgoWorkflow
 
 TEST_SCAN_OUTPUT = [{'_index': 'fluentd-20180417',
                                     '_type': 'access_log',
@@ -158,7 +159,39 @@ def test_get_experiment_logs(mock_k8s_info, mocker):
         filters=[], index='_all')
 
 
-def test_get_experiment_logs_time_range(mock_k8s_info, mocker):
+def test_get_workflow_logs(mocker):
+    client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
+    mocked_log_search = mocker.patch.object(client, 'get_log_generator')
+    mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)
+
+    namespace = 'fake-namespace'
+
+    workflow_name = 'test-workflow'
+    workflow_mock = MagicMock(spec=ArgoWorkflow)
+    workflow_mock.name = workflow_name
+
+    workflow_start_date = '2018-04-17T09:28:39+00:00'
+
+    experiment_logs = client.get_argo_workflow_logs_generator(workflow=workflow_mock, namespace=namespace,
+                                                              start_date=workflow_start_date)
+
+    for log, expected_log in zip(experiment_logs, TEST_LOG_ENTRIES):
+        assert log == expected_log
+
+    mocked_log_search.assert_called_with(query_body={
+            "query": {"bool": {"must":
+                                   [{'term':
+                                         {'kubernetes.labels.workflows_argoproj_io/workflow.keyword':
+                                              workflow_mock.name}},
+                                    {'term': {'kubernetes.namespace_name.keyword': namespace}}
+                                    ],
+                               "filter": {"range": {"@timestamp": {"gte": workflow_start_date}}}
+                               }},
+            "sort": {"@timestamp": {"order": "asc"}}},
+        filters=[], index='_all')
+
+
+def test_get_experiment_logs_time_range(mocker):
     client = K8sElasticSearchClient(host='fake', port=8080, namespace='kube-system')
     mocked_log_search = mocker.patch.object(client, 'get_log_generator')
     mocked_log_search.return_value = iter(TEST_LOG_ENTRIES)

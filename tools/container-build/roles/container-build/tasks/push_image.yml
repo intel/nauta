@@ -1,13 +1,16 @@
 ---
 
+- set_fact:
+    image_tag_prefix: "{{ 'squash-' if image.squash is defined and image.squash else '' }}"
+
 - name: Push image {{ name }} as 127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}
   docker_image:
-    name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ docker_images_remote_tags[name] }}"
+    name: "{{ docker_repository_registry }}/{{ docker_version_prefix }}/{{ name }}:{{ image_tag_prefix }}{{ docker_images_remote_tags[name] }}"
     repository: "127.0.0.1:{{ registry_port }}/{{ name }}:{{ image.version }}"
     pull: False
     push: "{{ image.push | default(True) }}"
     timeout: "{{ docker_timeout }}"
-    force: True
+    force: "{{ False if image.squash is defined and image.squash else True }}"
   register: push_async
   failed_when: "'ansible_job_id' not in push_async"
   async: 1800

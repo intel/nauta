@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-import unittest.mock as mock
 
 import packs.common as common
 

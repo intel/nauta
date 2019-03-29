@@ -24,7 +24,6 @@ import commands
 from commands.launch import launch
 from tensorboard.client import Tensorboard, TensorboardStatus, TensorboardServiceAPIException
 from util import launcher
-from util.system import get_current_os, OS
 from cli_text_consts import LaunchCmdTexts as Texts
 
 
@@ -55,9 +54,6 @@ def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_che
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("util.launcher.socat")
-
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
 
@@ -65,10 +61,6 @@ def test_launch_webui_with_browser_success(mocked_k8s_config, mocked_browser_che
     assert wfc_mock.call_count == 1, "connection wasn't checked"
     assert browser_mock.call_count == 1, "browser wasn't started"
     assert input_mock.call_count == 1, "enter wasn't prompted"
-
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyUnboundLocalVariable
-        assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
 # noinspection PyUnusedLocal,PyShadowingNames
@@ -80,9 +72,6 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("util.launcher.socat")
-
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
 
@@ -93,10 +82,6 @@ def test_launch_webui_with_kube_config_loading_success(mocked_browser_check, moc
     assert browser_mock.call_count == 1, "browser wasn't started"
     assert input_mock.call_count == 1, "enter wasn't prompted"
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyUnboundLocalVariable
-        assert socat_mock.start.call_count == 1, "socat wasn't started"
-
 
 # noinspection PyUnusedLocal,PyShadowingNames
 def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_check, mocker):
@@ -105,9 +90,6 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("util.launcher.socat")
-
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME, DISABLE_BROWSER_ARG])
 
@@ -115,10 +97,6 @@ def test_launch_webui_without_browser_success(mocked_k8s_config, mocked_browser_
     assert wfc_mock.call_count == 0, "connection was checked"
     assert browser_mock.call_count == 0, "browser was started"
     assert input_mock.call_count == 1, "enter wasn't prompted"
-
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyUnboundLocalVariable
-        assert socat_mock.start.call_count == 1, "socat wasn't started"
 
 
 # noinspection PyUnusedLocal,PyShadowingNames
@@ -129,9 +107,6 @@ def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check,
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("util.launcher.socat")
-
     runner = CliRunner()
     runner.invoke(launch.launch, [APP_NAME])
 
@@ -139,10 +114,6 @@ def test_launch_webui_start_tunnel_fail(mocked_k8s_config, mocked_browser_check,
     assert wfc_mock.call_count == 0, "connection was checked"
     assert browser_mock.call_count == 0, "browser wasn started"
     assert input_mock.call_count == 0, "enter was prompted"
-
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyUnboundLocalVariable
-        assert socat_mock.start.call_count == 0, "socat was started"
 
 
 # noinspection PyUnusedLocal,PyShadowingNames
@@ -155,9 +126,6 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
     browser_mock = mocker.patch("util.launcher.webbrowser.open_new")
     input_mock = mocker.patch("util.launcher.wait_for_ctrl_c")
 
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        socat_mock = mocker.patch("util.launcher.socat")
-
     runner = CliRunner()
     result = runner.invoke(launch.launch, [APP_NAME])
 
@@ -165,10 +133,6 @@ def test_launch_webui_unsupported_browser(mocked_k8s_config, mocked_browser_chec
     assert wfc_mock.call_count == 0, "connection was checked"
     assert browser_mock.call_count == 0, "browser was not started"
     assert input_mock.call_count == 0, "enter was prompted"
-
-    if get_current_os() in (OS.WINDOWS, OS.MACOS):
-        # noinspection PyUnboundLocalVariable
-        assert socat_mock.start.call_count == 0, "socat was started"
 
     assert result.exit_code == 1
 

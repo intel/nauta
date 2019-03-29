@@ -37,3 +37,12 @@ def copytree_content(src: str, dst: str, ignored_objects: List[str] = None, syml
                 shutil.copytree(s, d, symlinks, ignore)
             else:
                 shutil.copy2(s, d)
+
+
+def get_total_directory_size_in_bytes(directory: str) -> int:
+    size = 0
+    for path, dirs, files in os.walk(directory):
+        for file in files:
+            full_filename = os.path.join(path, file)
+            size += os.path.getsize(full_filename)
+    return size

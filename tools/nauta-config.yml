@@ -70,12 +70,12 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/fluentd"
   nauta/registry:
-    version: "2.6.2"
     required:
       BUILD_IMAGE: "shared/centos/build-go"
       BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/registry"
+    version: "2.7.1"
   nauta/samba:
     version: "1.0.0"
     required:
@@ -131,6 +131,7 @@ local_images:
       TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
+    squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/tensorflow/1.9.0py3/base:
     version: "1.9.0-py3"
@@ -140,6 +141,7 @@ local_images:
       TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
+    squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/tensorflow:
     version: "1.9.0-py3"
@@ -149,6 +151,7 @@ local_images:
       TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
+    squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/horovod/py3:
     version: "1.9.0-py3"
@@ -163,6 +166,7 @@ local_images:
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
+    squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/horovod/3.6"
   nauta/horovod/py2:
     version: "1.9.0-py2"
@@ -177,6 +181,7 @@ local_images:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
     method: build
+    squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/horovod/2.7"
   nauta/nginx:
     version: "1.14.0"
@@ -267,10 +272,30 @@ local_images:
       BUILD_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kube-batch"
+  nauta/gitea:
+    version: "1.6.1"
+    image: "gitea/gitea:1.6.1"
+    method: pull
+  nauta/postgres:
+    version: "11"
+    image: "postgres:11"
+    method: pull
+  nauta/memcached:
+    version: "1.5.6-alpine"
+    image: "memcached:1.5.6-alpine"
+    method: pull
+  nauta/buildkit:
+    version: "master"
+    image: "moby/buildkit:master"
+    method: pull
+
+
+# WARNING
+# setting chart_values will work only if chart does not contain values.yaml file
 subcharts:
   nauta-registry:
     registry:
-      version: 2.6.2
+      version: 2.7.1
       path: "{{ playbook_dir }}/../../nauta-registry-charts/registry"
   nauta:
     gui:
@@ -369,3 +394,16 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/documentation-service"
       chart_values:
         image: "{{ image_local_url['nauta/docs'] }}"
+    argo-controller:
+      version: 2.2.1
+      path: "{{ playbook_dir }}/../../nauta-charts/argo-controller"
+    gitea:
+      version: 1.6.1
+      path: "{{ playbook_dir }}/../../nauta-charts/gitea"
+      chart_values:
+        image: "{{ image_local_url['nauta/gitea'] }}"
+    buildkit:
+      version: 1.0.0
+      path: "{{ playbook_dir }}/../../nauta-charts/buildkit"
+      chart_values:
+        image: "{{ image_local_url['nauta/buildkit'] }}"

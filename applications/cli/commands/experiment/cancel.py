@@ -16,7 +16,6 @@
 
 from collections import defaultdict
 from datetime import datetime
-from enum import Enum
 import re
 import sys
 from sys import exit
@@ -26,6 +25,7 @@ import click
 
 from commands.experiment.common import RunKinds
 import util.k8s.kubectl as kubectl
+from platform_resources.workflow import ArgoWorkflow
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace, is_current_user_administrator
@@ -59,7 +59,7 @@ experiment_name_plural = 'experiments'
 @common_options(admin_command=False)
 @pass_state
 def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
-           listed_runs_kinds: List[Enum] = None):
+           listed_runs_kinds: List[RunKinds] = None):
     """
     Cancels chosen experiments based on a name provided as a parameter.
     """
@@ -302,6 +302,14 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
     try:
         cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge, namespace=namespace)
         not_purged_runs = not_cancelled_runs
+
+        # Delete associated workflows
+        if cancel_whole_experiment:
+            experiment_associated_workflows = [wf for wf in ArgoWorkflow.list(namespace=namespace)
+                                               if wf.labels.get('experimentName') == experiment.name]
+            for wf in experiment_associated_workflows:
+                wf.delete()
+
         for run in cancelled_runs:
             logger.debug(f"Purging {run.name} run ...")
             click.echo(Texts.PURGING_START_MSG.format(run_name=run.name))

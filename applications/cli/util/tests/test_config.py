@@ -15,7 +15,7 @@
 #
 
 import os
-from unittest.mock import patch, mock_open, ANY
+from unittest.mock import patch
 
 import pytest
 
@@ -132,51 +132,3 @@ def test_validate_config_path_error(os_env_get, exists_mock, expanduser_mock):
         Config.get_config_path()
 
     assert exists_mock.call_count == 2
-
-
-@patch('sys.executable', APP_BINARY_PATH)
-@patch('os.path.expanduser')
-@patch('os.path.exists')
-@patch('os.environ.get')
-@patch('os.path.join')
-@patch('os.path.isfile', return_value=False)
-def test_get_local_registry_port_no_file(*args):
-    assert Config().local_registry_port is None
-
-
-@patch('sys.executable', APP_BINARY_PATH)
-@patch('os.path.expanduser')
-@patch('os.path.exists')
-@patch('os.environ.get')
-@patch('os.path.join')
-@patch('os.path.isfile', return_value=True)
-@patch('builtins.open')
-@patch('yaml.load', return_value=None)
-def test_get_local_registry_port_empty_yaml(*args):
-    assert Config().local_registry_port is None
-
-
-@patch('sys.executable', APP_BINARY_PATH)
-@patch('os.path.expanduser')
-@patch('os.path.exists')
-@patch('os.environ.get')
-@patch('os.path.join')
-@patch('os.path.isfile', return_value=True)
-@patch('util.config.open', mock_open(), create=True)
-@patch('yaml.load', return_value={'local_registry_port': 1234})
-def test_get_local_registry_port(*args):
-    assert Config().local_registry_port == 1234
-
-
-@patch('sys.executable', APP_BINARY_PATH)
-@patch('os.path.expanduser')
-@patch('os.path.exists')
-@patch('os.environ.get')
-@patch('os.path.join')
-@patch('os.path.isfile', return_value=True)
-@patch('util.config.open', mock_open(), create=True)
-@patch('yaml.load', return_value={'local_registry_port': 4321})
-@patch('yaml.dump')
-def test_set_local_registry_port(dump_mock, *args):
-    Config().local_registry_port = 1234
-    dump_mock.assert_called_with({'local_registry_port': 1234}, ANY, default_flow_style=False)

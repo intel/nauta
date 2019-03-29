@@ -87,19 +87,19 @@ def test_is_version_valid_strict_wrong_versions(installed_version,
 def test_parse_installed_version():
     assert _parse_installed_version(
         version_output=TEST_VERSION_OUTPUT,
-        version_field='SemVer') == TEST_VERSION
+        version_field='SemVer:') == TEST_VERSION
 
 
 def test_parse_installed_version_without_quotes():
     assert _parse_installed_version(
         version_output=TEST_SHORT_VERSION_OUTPUT,
-        version_field='Server Version') == TEST_VERSION
+        version_field='Server Version:') == TEST_VERSION
 
 
 def test_parse_installed_version_failure():
     with pytest.raises(ValueError):
         _parse_installed_version(
-            version_output='version: 0.0.1', version_field='SemVer')
+            version_output='version: 0.0.1', version_field='SemVer:')
 
 
 def test_check_dependency():
@@ -148,7 +148,7 @@ def test_check_dependency_parse():
         expected_version=test_version,
         version_command=version_command_mock,
         version_command_args=[],
-        version_field='version',
+        version_field='version:',
         match_exact_version=False)
 
     assert check_dependency(test_dependency_name,

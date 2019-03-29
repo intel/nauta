@@ -15,7 +15,7 @@
 #
 
 import http
-from typing import Dict
+from typing import Dict, List, Optional
 
 import yaml
 from kubernetes import client, config
@@ -103,17 +103,17 @@ class PlatformResource:
         return False
 
     @classmethod
-    def from_k8s_response_dict(cls, object_dict: dict):
+    def from_k8s_response_dict(cls, object_dict: dict) -> 'PlatformResource':
         raise NotImplementedError
 
     @classmethod
-    def from_yaml(cls, yaml_template_path: str):
+    def from_yaml(cls, yaml_template_path: str, *args, **kwargs) -> 'PlatformResource':
         with open(yaml_template_path, mode='r', encoding='utf-8') as yaml_template_file:
             resource_body = yaml.safe_load(yaml_template_file)
-        return cls(body=resource_body)
+        return cls(body=resource_body, *args, **kwargs)
 
     @classmethod
-    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None):
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None) -> List['PlatformResource']:
         logger.debug(f'Getting list of {cls.__name__}s.')
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
@@ -129,7 +129,8 @@ class PlatformResource:
         return [cls.from_k8s_response_dict(raw_resource) for raw_resource in raw_resources['items']]
 
     @classmethod
-    def get(cls, name: str, namespace: str = None, custom_objects_api: CustomObjectsApi = None):
+    def get(cls, name: str, namespace: str = None,
+            custom_objects_api: CustomObjectsApi = None) -> Optional['PlatformResource']:
         logger.debug(f'Getting {cls.__name__} {name} in namespace {namespace}.')
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         try:
@@ -160,8 +161,18 @@ class PlatformResource:
     def cli_representation(self) -> namedtuple:
         raise NotImplementedError
 
+    @property
+    def labels(self) -> Dict[str, str]:
+        return self.body.get('metadata', {}).get('labels', {})
+
+    @labels.setter
+    def labels(self, value: Dict[str, str]):
+        if not self.body.get('metadata'):
+            self.body['metadata'] = {}
+        self.body['metadata']['labels'] = value
+
     def create(self, namespace: str, labels: Dict[str, str] = None,
-               annotations: Dict[str, str] = None):
+               annotations: Dict[str, str] = None) -> KubernetesObject:
         logger.debug(f'Creating {self.__class__.__name__} {self.name}.')
         try:
             if labels:
@@ -197,7 +208,7 @@ class PlatformResource:
             logger.exception(f'Failed to delete {self.__class__.__name__} {self.name}.')
             raise
 
-    def update(self):
+    def update(self) -> KubernetesObject:
         logger.debug(f'Updating {self.__class__.__name__} {self.name}.')
         try:
             response = self.k8s_custom_object_api.patch_namespaced_custom_object(group=self.api_group_name,

@@ -22,7 +22,6 @@ import time
 
 import psutil
 
-from util.config import Config
 from util.k8s import kubectl
 from util.app_names import NAUTAAppNames
 from util.logger import initialize_logger
@@ -57,8 +56,8 @@ class K8sProxy:
                                                 number_of_retries=self.number_of_retries,
                                                 namespace=self.namespace)
             try:
-                K8sProxy._wait_for_connection_readiness('localhost', self.tunnel_port,
-                                                        tries=self.number_of_retries_wait_for_readiness)
+                self._wait_for_connection_readiness('localhost', self.tunnel_port,
+                                                    tries=self.number_of_retries_wait_for_readiness)
             except Exception as ex:
                 self._close_tunnel()
                 raise ex
@@ -104,9 +103,32 @@ class K8sProxy:
             survivor.kill()
 
 
+class TcpK8sProxy(K8sProxy):
+    def __init__(self, nauta_app_name: NAUTAAppNames, port: int = None,
+                 app_name: str = None, number_of_retries: int = 0, namespace: str = None):
+        super().__init__(nauta_app_name=nauta_app_name, port=port, app_name=app_name,
+                         number_of_retries=number_of_retries, namespace=namespace)
+
+    @staticmethod
+    def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
+        sock = None
+        for retry in range(tries):
+            try:
+                sock = socket.create_connection((address, port))
+                break
+            except (ConnectionError, ConnectionRefusedError) as e:
+                error_msg = f'can not connect to {address}:{port}. Error: {e}'
+                logger.exception(error_msg) if retry == tries - 1 else logger.debug(error_msg)
+                time.sleep(1)
+            finally:
+                if sock:
+                    sock.close()
+        else:
+            raise TunnelSetupError(Texts.TUNNEL_NOT_READY_ERROR_MSG.format(address=address, port=port))
+
+
 def check_port_forwarding():
-    config = Config()
-    with K8sProxy(NAUTAAppNames.DOCKER_REGISTRY, port=config.local_registry_port) as proxy:
+    with K8sProxy(NAUTAAppNames.WEB_GUI) as proxy:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         address = "127.0.0.1", proxy.tunnel_port
         if sock.connect_ex(address) != 0:

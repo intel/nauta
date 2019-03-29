@@ -1,0 +1,30 @@
+{{- if and .Values.persistence.enabled .Values.useInPodPostgres (not .Values.persistence.existingPostgresClaim) (not .Values.persistence.directPostgresVolumeMount) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "postgresql.fullname" . }}
+  labels:
+    app: {{ template "postgresql.name" . }}
+    chart: gitea
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.persistence.annotations }}
+  annotations:
+{{ toYaml .Values.persistence.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.postgresSize | quote }}
+{{ if ne (required "NAUTA Storage Type" .Values.global.nauta_storage.type) "pvc" }}
+  selector:
+    matchLabels:
+      app: {{ template "postgresql.name" . }}
+      release: {{ .Release.Name }}
+      chart: gitea
+      heritage: {{ .Release.Service }}
+  storageClassName: ""
+{{ end }}
+{{- end -}}

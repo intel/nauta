@@ -16,7 +16,7 @@
 
 import os
 
-from util.filesystem import copytree_content
+from util.filesystem import copytree_content, get_total_directory_size_in_bytes
 
 
 def test_copytree_content(mocker):
@@ -45,3 +45,17 @@ def test_copytree_content_ignored_objects(mocker):
 
     assert shutil_copytree.call_count == 1
     assert shutil_copy2.call_count == 1
+
+
+def test_get_total_directory_size_in_bytes(tmpdir):
+    test_dir = tmpdir.mkdir('test-dir')
+    test_subdir = test_dir.mkdir('test-subdir')
+
+    files = [{'path': test_dir.join('file-1.bin'), 'size': 1500},
+             {'path': test_subdir.join('file-1.bin'), 'size': 10900}]
+
+    for file in files:
+        with open(file['path'], "wb") as f:
+            f.write(os.urandom(file['size']))
+
+    assert get_total_directory_size_in_bytes(test_dir) == sum(file['size'] for file in files)

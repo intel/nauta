@@ -21,8 +21,10 @@ from distutils.version import LooseVersion
 
 import pytest
 
-from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli,\
-    format_duration_for_cli, handle_error, get_os_version, get_windows_edition, WINDOWS_EDITIONS
+
+from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
+    get_os_version, get_windows_edition, WINDOWS_EDITIONS, ExternalCliClient, ExternalCliCommand, \
+    format_duration_for_cli
 
 
 def test_execute_system_command(mocker):
@@ -217,3 +219,29 @@ def test_execute_system_command_limited_logs(mocker):
     assert len(output) == 50
     # noinspection PyUnresolvedReferences
     assert subprocess.check_output.call_count == 1
+
+
+def test_external_cli_client(mocker):
+    command_mock = mocker.patch('util.system.ExternalCliCommand')
+    client = ExternalCliClient(executable='test')
+    client.fake_command()
+
+    assert command_mock.called_with(cmd=['test', 'fake_command'])
+
+
+def test_external_cli_command(mocker):
+    exec_mock = mocker.patch('util.system.execute_system_command')
+    exec_mock.return_value = '', 0, ''
+    cmd = ExternalCliCommand(cmd=['foo', 'bar'])
+    cmd('arg-1', long_parameter='bla')
+
+    assert exec_mock.called_with(cmd=['foo', 'bar', 'arg-1', '--long-parameter', 'bla'])
+
+
+def test_external_cli_command_flags(mocker):
+    exec_mock = mocker.patch('util.system.execute_system_command')
+    exec_mock.return_value = '', 0, ''
+    cmd = ExternalCliCommand(cmd=['foo', 'bar'])
+    cmd('arg-1', flag=True, unset_flag=False)
+
+    assert exec_mock.called_with(cmd=['foo', 'bar', 'arg-1', '--flag'])

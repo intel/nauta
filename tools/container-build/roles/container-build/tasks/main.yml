@@ -75,6 +75,9 @@
     loop_var: layer
   with_list: "{{ docker_images_organized }}"
 
+- name: Squash image layers
+  include_tasks: squash.yml
+
 - name: Save image layers
   include_tasks: save.yml
 

@@ -26,3 +26,5 @@ class NAUTAAppNames(Enum):
     TENSORBOARD_SERVICE = "tensorboard-service"
     INGRESS = "ingress"
     JUPYTER = "jupyter"
+    GIT_REPO_MANAGER = "gitea"
+    GIT_REPO_MANAGER_SSH = "gitea-ssh"

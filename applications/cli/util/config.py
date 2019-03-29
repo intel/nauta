@@ -16,9 +16,6 @@
 
 import os
 import sys
-from typing import Optional
-
-import yaml
 
 from util.k8s.k8s_info import get_config_map_data
 from util.logger import initialize_logger
@@ -40,6 +37,7 @@ DOCKER_REGISTRY_CONFIG_FILE = 'docker_registry.yaml'
 
 NAUTA_NAMESPACE = "nauta"
 NAUTA_CONFIGURATION_CM = "nauta"
+NAUTA_SERVICE_DNS = "svc.kubernetes.nauta"
 
 
 log = initialize_logger(__name__)
@@ -62,9 +60,9 @@ class Config:
     def validate_config_path(path: str) -> bool:
         if os.path.isdir(path):
             directory_content = os.listdir(path)
-            expected_content = ['draft.exe', 'helm.exe'] if system.get_current_os() == system.OS.WINDOWS \
-                else ['draft', 'helm']
-            return set(expected_content).issubset(directory_content)
+            expected_content = {'helm.exe'} if system.get_current_os() == system.OS.WINDOWS \
+                else {'helm'}
+            return expected_content.issubset(directory_content)
         return False
 
     @staticmethod
@@ -94,28 +92,6 @@ class Config:
             )
             raise ConfigInitError(message)
 
-    @property
-    def local_registry_port(self) -> Optional[int]:
-        docker_registry_config_file_path = os.path.join(self.config_path, DOCKER_REGISTRY_CONFIG_FILE)
-        if not os.path.isfile(docker_registry_config_file_path):
-            log.debug(f'Docker registry config file not found ({docker_registry_config_file_path}).')
-            return None
-
-        with open(docker_registry_config_file_path, mode='r', encoding='utf-8') as docker_registry_config_file:
-            docker_registry_config = yaml.load(docker_registry_config_file) or {}
-
-        return docker_registry_config.get('local_registry_port')
-
-    @local_registry_port.setter
-    def local_registry_port(self, port: int):
-        docker_registry_config_file_path = os.path.join(self.config_path, DOCKER_REGISTRY_CONFIG_FILE)
-        log.debug(f'Saving local registry port ({port}) to {docker_registry_config_file_path}.')
-
-        with open(docker_registry_config_file_path, mode='w+', encoding='utf-8') as docker_registry_config_file:
-            docker_registry_config = yaml.load(docker_registry_config_file) or {}
-            docker_registry_config['local_registry_port'] = port
-            yaml.dump(docker_registry_config, docker_registry_config_file, default_flow_style=False)
-
 
 class NAUTAConfigMap:
     """
@@ -143,6 +119,7 @@ class NAUTAConfigMap:
         if not self.__dict__:
             config_map_data = get_config_map_data(name=NAUTA_CONFIGURATION_CM, namespace=NAUTA_NAMESPACE,
                                                   request_timeout=config_map_request_timeout)
+            self.registry = config_map_data[self.REGISTRY_FIELD]
             self.image_tiller = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
                                                config_map_data[self.IMAGE_TILLER_FIELD])
             self.external_ip = config_map_data[self.EXTERNAL_IP_FIELD]

@@ -15,8 +15,6 @@ COPY --from=serving /build-output/tensorflow_model_server /bin/
 COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 
 
-RUN chmod +x /bin/tensorflow_model_server
-
 RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install /tensorflow_serving_api-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz && \

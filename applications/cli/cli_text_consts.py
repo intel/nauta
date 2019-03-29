@@ -142,6 +142,7 @@ class UserCreateCmdTexts:
     USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
     PASSWORD_GATHER_ERROR_MSG = "The app encountered problems while gathering user's password."
     CERT_GATHER_ERROR_MSG = "The app encountered problems while gathering server's certifcate authority."
+    GIT_REPO_MANAGER_ERROR_MSG = "Error detected while adding the user to git repo manager."
     USER_ADD_ERROR_MSG = "Error detected while adding of a user."
     USER_CREATION_SUCCESS_MSG = "User {username} has been added successfully."
     USER_NOT_READY_ERROR_MSG = "User {username} is still not ready."
@@ -183,6 +184,7 @@ class UserDeleteCmdTexts:
     DELETION_DELETING_NAMESPACE = "- deleting user's namespace"
     DELETION_DELETING_USERS_OBJECTS = "- deleting user's objects"
     DELETION_DELETING_USERS_EXPERIMENTS = "- deleting user experiments' logs"
+    DELETION_DELETING_USERS_REPOSITORY = "- deleting user's repository"
 
 
 class LaunchCmdTexts:
@@ -319,7 +321,7 @@ class ExperimentCmdTexts:
 
 
 class ExperimentListCmdTexts:
-    SHORT_HELP = "Show logs for a given experiment."
+    SHORT_HELP = "List experiments."
     HELP_A = "Show all experiments, regardless of the owner."
     HELP_N = "A regular expression to narrow down list to experiments that match this expression."
     HELP_S = "List experiments with matching status."
@@ -582,9 +584,8 @@ class ExperimentCommonTexts:
     SUBMIT_OTHER_ERROR_MSG = "Other error during submitting experiments."
     DOCKER_TUNNEL_CLOSE_ERROR_MSG = "Local Docker-host tunnel hasn't been closed properly. Check whether it still " \
                                     "exists, if yes - close it manually."
-    DRAFT_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Draft templates haven't been generated. Reason - {reason}"
+    EXP_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Experiment templates haven't been generated. Reason - {reason}"
     JOB_NOT_DEPLOYED_ERROR_MSG = "Job hasn't been deployed. "
-    JOB_NOT_DEPLOYED_ERROR_MSG_LOGFILE = "For more details run: draft logs {log_filename}"
     INCORRECT_PARAM_FORMAT_ERROR_MSG = "Parameter {param_name} has incorrect format."
     PARAM_AMBIGUOUSLY_DEFINED = "Parameter {param_name} ambiguously defined."
     PARAM_SET_INCORRECT_FORMAT_ERROR_MSG = "One of -ps options has incorrect format."
@@ -625,11 +626,6 @@ class UtilSystemTexts:
     COMMAND_EXE_FAIL_ERROR_MSG = "COMMAND execution FAIL: {command}"
     UNSUPPORTED_PLATFORM_ERROR_MSG = "unsupported platform: {sys_platform}, supported: {supported_os}!"
     PORT_AVAILABILITY_CHECK_ERROR_MSG = "Problem during checking port's availability."
-
-
-class UtilSocatTexts:
-    SOCAT_CONTAINER_START_FAIL_MSG = "failed to start socat container! expected status: 'running', got: " \
-                                     "{container_status}"
 
 
 class UtilJupyterTexts:
@@ -760,7 +756,8 @@ class CliStateTexts:
                                   "example due to invalid path to kubectl config, invalid k8s credentials or k8s " \
                                   "cluster being unavailable. Check your KUBECONFIG environment variable and make " \
                                   "sure that the k8s cluster is online."
-    NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set."
+    NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set or NCTL_CONFIG environment variable " \
+                                    "points to invalid directory."
     NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
     USER_NOT_ADMIN_MSG = "Only nauta administrators can run '{command_name}' command."
     USER_IS_ADMIN_MSG = "You cannot run command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \
@@ -778,6 +775,7 @@ class LicenseAcceptanceTexts:
     CANNOT_ACCEPT_LICENSE_MSG = "Cannot save license agreement - \"config\" file or directory already exists in " \
                                 "{nctl_config_path} but this name is reserved for nctl app. Please remove it " \
                                 "and try again."
+
 
 class ConfigCmdTexts:
     HELP = "Sets values of limits and requests for resources in templates used by the system."
@@ -798,3 +796,64 @@ Both cpu number and memory amount have to be given."""
     SUCCESS_MESSAGE = "Resources' settings have been updated with a success."
     MEMORY_SETTINGS_TOO_LOW = "Memory amount passed to the command shouldn't be lower than {memory_value}."
     CPU_SETTINGS_TOO_LOW = "CPU number passed to the command shouldn't be lower than {cpu_value}."
+
+
+class WorkflowCmdTexts:
+    HELP = "Command for starting, stopping, and managing workflows."
+
+
+class WorkflowLogsTexts:
+    SHORT_HELP = "Show logs for a given workflow."
+    HELP = """
+        Show logs for a given workflow.
+
+        workflow-name - is a name of workflow whose logs should be displayed
+        """
+    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
+    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
+    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy hasn't been closed properly. Check whether it still exists, if " \
+                                 "yes - close it manually."
+    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    OTHER_ERROR_MSG = "Failed to get workflow logs."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+
+
+class WorkflowDeleteTexts:
+    SHORT_HELP = "Delete a workflow."
+    HELP = """
+        Deletes workflow with given name.
+
+        name - is a name of workflow which should be cancelled
+        """
+    OTHER_ERROR_MSG = "Failed to delete workflow."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    PROGRESS_MSG = "Deleting workflow {workflow_name} ..."
+    SUCCESS_MSG = "Deleted workflow {workflow_name}"
+
+
+class WorkflowSubmitTexts:
+    SHORT_HELP = "Submit a workflow."
+    HELP = """
+        Creates a workflow from specification defined in file given as argument.
+
+        workflow-path - is a path to workflow specification that will be used
+        """
+    LOAD_SPEC_ERROR_MSG = "Failed to load workflow definition file. Reason: {msg}"
+    OTHER_ERROR_MSG = "Failed to submit workflow."
+    PROGRESS_MSG = "Creating workflow ..."
+
+class WorkflowViewTexts:
+    SHORT_HELP = "Displays details of workflow with a given name."
+    HELP = """
+        Displays details of worfklow with a given name.
+
+        WORKFLOW_NAME - is a name of workflow whose details should be displayed.
+        """
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    OTHER_ERROR_MSG = "Failed to get workflow details."
+
+
+class WorkflowListTexts:
+    SHORT_HELP = "List workflows."
+    NOT_FOUND_MSG = "Workflow with name {workflow_name} was not found."
+    OTHER_ERROR_MSG = "Failed to get workflow details."
