@@ -1,0 +1,18 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-admin
+  labels:
+    app: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    {{ .Values.api_group_name }}/admin: "true"
+rules:
+  - apiGroups:
+      - "kubeflow.org"
+    resources:
+      - pytorchjobs
+    verbs:
+      - "*"

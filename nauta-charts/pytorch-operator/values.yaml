@@ -1,0 +1,4 @@
+---
+api_group_name: aipg.intel.com
+
+image: "nauta/pytorch-operator:v0.4.0"
