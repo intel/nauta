@@ -29,16 +29,15 @@ nctl launch tb cifar-100-cnn
 
 * Start prediction instance: 
 ```bash
-nctl predict launch -n cifar-100-cnn-inference --model-location /mnt/output/cifar-100-cnn/cifar_100_tf_model
+nctl predict launch -n cifar-100-cnn-inference --model-location /mnt/output/home/cifar-100-cnn/cifar100_tf_model
 ```
 
 Test prediction instance using either: 
 - Jupyter notebook:
 ```bash
-nctl experiment -i cifar100.ipynb
+nctl experiment interact --filename cifar100.ipynb
 ```
 - nctl:
 ```bash
-echo '{"instances": [<three dimensional matrix containing image>]}' > image.json
-nctl predict stream --name cifar-100-cnn-inference --data image.json
+nctl predict stream --name cifar-100-cnn-inference --data example-image.json
 ``` 
