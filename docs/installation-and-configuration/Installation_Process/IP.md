@@ -71,15 +71,27 @@ As an output of the Nauta installation, files are created in main installation d
 
 To upgrade Nauta, do the following:
 
-`export NAUTA_KUBECONFIG=/<PATH>/nauta-admin.config`
+1. Set the following environment variables that point to the configuration, inventory and configuration file on the Installer Machine:
+
+* **ENV_INVENTORY (mandatory):** Inventory file location, for example:
+  
+`export ENV_INVENTORY=<absolute path to inventory file>`
+  
+* **ENV_CONFIG (mandatory):** Configuration file location, for example:
+
+`export ENV_CONFIG=<absolute path to config file>`
+
+* **NAUTA_KUBECONFIG (mandatory): ** Nauta admin file location, for example:
+
+`export NAUTA_KUBECONFIG=<absolute path to nauta-admin.config file>`
    
-Call the installer with nauta-upgrade option:
+2. Call the installer with nauta-upgrade option:
 
 `./installer.sh nauta-upgrade`
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
 
-This completes the Nauta Installtion Process.
+This completes the Nauta Upgrade Process.
 
 ## User Management Tasks & Troublshooting
 
