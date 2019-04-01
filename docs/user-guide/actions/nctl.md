@@ -10,6 +10,7 @@
 * build-essential
 * binutils
 * curl
+* git
 
 ```
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -22,7 +23,7 @@ sudo apt update && sudo apt install python3.6 python3.6-dev python3.6-venv build
 * binutils
 * make
 * curl
-* docker
+* git
 
 ### Windows 10
 * Python 3.6.5 64-bit (https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe)
@@ -31,7 +32,6 @@ sudo apt update && sudo apt install python3.6 python3.6-dev python3.6-venv build
 * wget (https://eternallybored.org/misc/wget/)
 * MSYS2 (http://www.msys2.org/)
 * Git (https://git-scm.com/download/win)
-* Docker (https://docs.docker.com/docker-for-windows/install/)
 * Windows 10 SDK (https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
 
 Ensure that you have these tools (except Windows SDK) available system-wide via command-line (add them to PATH).
