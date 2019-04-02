@@ -44,6 +44,12 @@ def create_flask_response(original_response):
     return flask_response
 
 
+def is_gui_search_scroll_request(url, request):
+    return request.method == "POST" \
+           and (url == "_all/_search" or url == "_all/scroll"
+                or url == "_search/scroll")
+
+
 @app.route('/', methods=['GET', 'POST', 'DELETE', 'PUT', 'HEAD'])
 @app.route('/<path:url>', methods=['GET', 'POST', 'DELETE', 'PUT', 'HEAD'])
 def redirect(url=""):
@@ -54,7 +60,8 @@ def redirect(url=""):
     headers = dict(request.headers)
 
     if (
-        request.method != "GET"
+        not is_gui_search_scroll_request(url, request)
+        and request.method != "GET"
         and ("Authorization" not in headers
              or headers["Authorization"] != f"Basic {ADMIN_KEY}")
     ):
