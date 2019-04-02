@@ -24,10 +24,10 @@ export_images:
     value: "{{ image_local_url['nauta/batch-inference'] }}"
   - name: tf-serving-sidecar
     value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
-  - name: ps-sidecar
-    value: "{{ image_local_url['nauta/ps-sidecar'] }}"
   - name: pytorch
     value: "{{ image_local_url['nauta/pytorch'] }}"
+  - name: tfjob-multinode-sidecar
+    value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
 
 local_images:
   nauta/centos:
@@ -160,11 +160,11 @@ local_images:
       CONTAINER_SELINUX_RPM_IMAGE: "shared/build/rpm/container-selinux"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/docker"
-  nauta/ps-sidecar:
+  nauta/tfjob-multinode-sidecar:
     version: "1.0.0"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
+    directory: "{{ playbook_dir }}/../../applications/tfjob-multinode-sidecar"
   nauta/ingress:
     version: "0.14.0"
     image: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.14.0"

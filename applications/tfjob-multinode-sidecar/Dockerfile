@@ -1,4 +1,4 @@
-FROM python:3.6.7-stretch
+FROM python:3.6.7-slim
 
 WORKDIR /app
 
@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 ADD main.py .
 
-ENTRYPOINT python3.6 main.py
+ENTRYPOINT python3.6 -u main.py
