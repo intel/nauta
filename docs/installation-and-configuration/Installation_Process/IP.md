@@ -81,7 +81,7 @@ To upgrade Nauta, do the following:
 
 `export ENV_CONFIG=<absolute path to config file>`
 
-* **NAUTA_KUBECONFIG (mandatory): ** Nauta admin file location, for example:
+* **NAUTA_KUBECONFIG (mandatory):** Nauta admin file location, for example:
 
 `export NAUTA_KUBECONFIG=<absolute path to nauta-admin.config file>`
    
@@ -98,4 +98,3 @@ This completes the Nauta Upgrade Process.
 * [User Management Tasks](../User_Management/UM.md)
 
 * [Troubleshooting Information](../Troubleshooting/T.md)
-
