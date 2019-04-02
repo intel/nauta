@@ -21,12 +21,14 @@ from flask import request
 import requests
 
 import base64
+from subprocess import check_output
 
 
 app = Flask(__name__)
 
 ELASTICSEARCH_PORT = 9200
-REDIRECT_TO = f'http://localhost:{ELASTICSEARCH_PORT}/'
+ip = check_output(['hostname', '--all-ip-addresses']).decode("ascii").split('\n')[0].strip()
+REDIRECT_TO = f'http://{ip}:{ELASTICSEARCH_PORT}/'
 ADMIN_KEY = base64.b64encode(
     open("/var/es-proxy-auth/token").read().encode("ascii")).decode("ascii")
 
