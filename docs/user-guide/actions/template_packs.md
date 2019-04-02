@@ -225,6 +225,7 @@ The name should be unique and not conflict with any other packs available in the
    `image` *Helm* template placeholder as previously defined in
    `values.yaml` (step #3 above).
 
+[Test](nauta-values.yaml-placeholders)
 
 ## NAUTA values.yaml Placeholders
 

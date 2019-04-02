@@ -97,7 +97,6 @@ func load_image(name string, file string) (error) {
 
     fmt.Println("Loading image")
     response, error := cli.ImageLoad(ctx, reader, false)
-
     scanner := bufio.NewScanner(response.Body)
     scanner.Split(bufio.ScanWords)
     for scanner.Scan() {

@@ -7,17 +7,17 @@ export_images:
     value: "{{ image_local_url['nauta/tensorboard-service'] }}"
 # tensorflow part
   - name: tensorflow
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
   - name: horovod
     value: "{{ image_local_url['nauta/horovod/py3'] }}"
   - name: horovod_py2
     value: "{{ image_local_url['nauta/horovod/py2'] }}"
-  - name: tensorflow_1.9
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
-  - name: tensorflow_1.9_py3
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
-  - name: tensorflow_1.9_py2
-    value: "{{ image_local_url['nauta/tensorflow/1.9.0py2/base'] }}"
+  - name: tensorflow_1.13
+    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
+  - name: tensorflow_1.13_py3
+    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
+  - name: tensorflow_1.13_py2
+    value: "{{ image_local_url['nauta/tensorflow/1.13.1py2/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['nauta/activity-proxy'] }}"
   - name: batch-inference
@@ -123,32 +123,43 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  nauta/tensorflow/1.9.0py2/base:
-    version: "1.9.0-py2"
+  nauta/tensorflow/1.13.1py2/base:
+    version: "1.13.1-py2"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.13.0"
       METRICS_IMAGE: "shared/build/metrics"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        checksum: 6d88b635d6d8b0599ee578983e7b1afa8eb24123607ab5bb197fda50c3d4ee75
     method: build
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
-  nauta/tensorflow/1.9.0py3/base:
-    version: "1.9.0-py3"
+  nauta/tensorflow/1.13.1py3/base:
+    version: "1.13.1-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.13.0"
       METRICS_IMAGE: "shared/build/metrics"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        checksum: 6d88b635d6d8b0599ee578983e7b1afa8eb24123607ab5bb197fda50c3d4ee75
     method: build
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/tensorflow:
-    version: "1.9.0-py3"
+    version: "1.13.1-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.9.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.13.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     squash: True
@@ -159,9 +170,14 @@ local_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
         dest: horovod-v0.15.1.tar.gz
         checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        checksum: 6d88b635d6d8b0599ee578983e7b1afa8eb24123607ab5bb197fda50c3d4ee75
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.9.0"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       METRICS_IMAGE: "shared/build/metrics"
@@ -174,9 +190,14 @@ local_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
         dest: horovod-v0.15.1.tar.gz
         checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        checksum: 6d88b635d6d8b0599ee578983e7b1afa8eb24123607ab5bb197fda50c3d4ee75
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.9.0"
       METRICS_IMAGE: "shared/build/metrics"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
@@ -257,7 +278,15 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos/python36"
       METRICS_IMAGE: "shared/build/metrics"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.13.0"
     method: build
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+        checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        dest: intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl
+        checksum: 6d88b635d6d8b0599ee578983e7b1afa8eb24123607ab5bb197fda50c3d4ee75
     directory: "{{ playbook_dir }}/../../applications/batch-inference"
   nauta/tf-serving-sidecar:
     version: "v1.0.0"
@@ -377,7 +406,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/tf"
       chart_values:
         image: "{{ image_local_url['nauta/tf/operator'] }}"
-        tfimage: "{{ image_local_url['nauta/tensorflow/1.9.0py3/base'] }}"
+        tfimage: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
     ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../nauta-charts/ingress"

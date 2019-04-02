@@ -8,7 +8,7 @@ RUN yum clean all && \
     yum update -y && \
     yum install -y python-pip python-devel python libffi-devel openssl-devel gcc gcc-c++
 
-RUN pip install -U pip==19.0.3 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
+RUN pip install --no-binary :all: -U pip==19.0.3 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
 
 ADD ./*.spec ./SPECS/
 

@@ -13,7 +13,7 @@ FROM ${BASE_IMAGE}
 RUN yum clean all && \
     yum update -y && \
     yum install -y samba
-RUN pip install pysmb
+RUN pip install --no-binary :all: --no-clean pysmb
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
 RUN chmod +x /bin/dumb-init

@@ -4,6 +4,8 @@ FROM ${BASE_IMAGE}
 WORKDIR /app
 
 ADD requirements.txt .
-RUN pip install -r requirements.txt
+
+RUN pip install --no-binary :all: --no-clean --force-reinstall -U pip
+RUN pip install --no-binary :all: --no-clean -r requirements.txt
 
 ADD main.py .
