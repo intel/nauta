@@ -14,10 +14,10 @@ service:
 resources:
   requests:
     cpu: 38
-    memory: 126.35Gi
+    memory: 125226378304
   limits:
     cpu: 38
-    memory: 126.35Gi
+    memory: 125226378304
 
 cpu: null
 memory: null
