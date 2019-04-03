@@ -12,28 +12,30 @@
 - name: "{{ message_label }} Install pip core"
   environment:
     PIP_CONFIG_FILE: /opt/nauta/pip.ini
+  vars:
+    install_packages:
+      - pip
+      - virtualenv
+      - setuptools
+      - wheel
   pip:
-    name: "{{ item }}"
+    name: "{{ install_packages }}"
     state: latest
-  with_items:
-    - pip
-    - virtualenv
-    - setuptools
-    - wheel
 
 - name: "{{ message_label }} Install pip apps"
   environment:
     PIP_CONFIG_FILE: /opt/nauta/pip.ini
+  vars:
+    install_packages:
+      - ansible
+      - docker
+      - pyOpenSSL
   pip:
     name: "{{ item }}"
     state: latest
     virtualenv: /opt/nauta/python
     virtualenv_site_packages: True
     virtualenv_python: "{{ ansible_python_interpreter }}"
-  with_items:
-    - ansible
-    - docker
-    - pyOpenSSL
 
 - name: "{{ message_label }} Ensure that python exists"
   file:

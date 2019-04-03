@@ -10,6 +10,8 @@
 
 - name: Copy all files
   vars:
-    file: "{{ item.path }}"
+    file: "{{ file_item.path }}"
   include_tasks: artifact_file_fetch.yml
+  loop_control:
+    loop_var: file_item
   with_items: "{{ files.files }}"
