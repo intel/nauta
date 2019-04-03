@@ -16,6 +16,7 @@
 #
 
 set -x
+TOC_DEPTH=3
 
 cd user-guide
 find . -name "*.md*" | while read file; do
@@ -23,7 +24,7 @@ find . -name "*.md*" | while read file; do
 
     pandoc -f markdown \
     --template=/app/tools/template.html \
-    --toc --toc-depth=3 --standalone \
+    --toc --toc-depth=${TOC_DEPTH} --standalone \
     --lua-filter=/app/tools/links.lua \
     --metadata version="$1" \
     --metadata filename="${pretty_filename}" \

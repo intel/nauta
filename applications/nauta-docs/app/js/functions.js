@@ -14,40 +14,14 @@
  * limitations under the License.
  */
 
-code{white-space: pre;}
+$(function(){
+    $("#docs-index").load("/documentation/menu.html");
+});
 
-.docs-header {
-     width:100%;
-     height:100px;
-     top:0;
-     left:0;
-     background-color:#0071c5;
-}
-
-.docs-header img {
-    margin-left: 100px;
-    float: left;
-}
-
-.material-icons.md-36 { font-size: 36px; }
-
-.docs-navbar ul {
-    margin-top: 20px;
-    margin-right: 400px;
-    float:right;
-    padding: 5px;
-    list-style-type: none;
-    text-align: center;
-    background-color: transparent;
-}
-
-.docs-navbar ul li {
-    display: inline;
-}
-
-.docs-navbar ul li a {
-    text-decoration: none;
-    padding-left: 10px;
-    color: #fff;
-    background-color: transparent;
+function showIndex() {
+    if ($("#docs-index-container").css("visibility") === "hidden") {
+        $("#docs-index-container").css("visibility", "visible");
+    } else {
+        $("#docs-index-container").css("visibility", "hidden");
+    }
 }
