@@ -6,11 +6,11 @@ For instructions to install and configure Nauta to run on the host server, refer
 
 ## Required Software Packages
 
-The following software _must_ be installed on the client system before installing Nauta:
+The following software _must_ be installed on the client system before installing Nauta client:
 
 * kubectl version 1.10 or later: https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl
 
-* Docker version 18.03.0-ce or later: https://docs.docker.com/install
+* git version 2.0.0 or later
 
 
 ## Installation
