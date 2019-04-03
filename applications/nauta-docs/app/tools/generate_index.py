@@ -94,7 +94,7 @@ def handle_parameters(argv):
 
 def fix_link(link, directory):
     link = link.replace(".md", ".html")
-    return link.replace(directory, "")
+    return "/documentation" + link.replace(directory, "")
 
 
 def generate_html(menu, directory):
