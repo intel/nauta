@@ -24,6 +24,7 @@ Required on system, software requirements:
 ### Ubuntu 16.04
 
 Required on system, software requirements:
+  * Python 2.7 and /usr/bin/python available
   * Python 3.5
   * apt packages installed:
     - python3-pip
