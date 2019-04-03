@@ -18,8 +18,7 @@
 import argparse
 import multiprocessing
 import os
-from pathlib import Path
-import shutil
+from keras.datasets.cifar import load_batch
 
 import keras
 from keras.models import Sequential
@@ -28,6 +27,7 @@ from keras.layers import Conv2D, MaxPooling2D
 import keras.backend as K
 from tensorflow import saved_model
 import tensorflow as tf
+import numpy as np
 
 try:
     from experiment_metrics.api import publish
@@ -58,12 +58,25 @@ class NautaExperimentMetricsCallback(keras.callbacks.Callback):
                  'validation_loss': str(logs.get('val_loss'))})
 
 
-def load_data(dataset_path: str = None):
+def load_data(dataset_path: str = None, label_mode='fine'):
     if dataset_path:
-        shutil.copytree(dataset_path, f'{Path.home()}/.keras/datasets/cifar-100-python')
+        fpath = os.path.join(dataset_path, 'train')
+        x_train, y_train = load_batch(fpath, label_key=label_mode + '_labels')
 
-    (x_train, y_train), (x_test, y_test) = keras.datasets.cifar100.load_data(label_mode='fine')
-    return x_train, y_train, x_test, y_test
+        fpath = os.path.join(dataset_path, 'test')
+        x_test, y_test = load_batch(fpath, label_key=label_mode + '_labels')
+
+        y_train = np.reshape(y_train, (len(y_train), 1))
+        y_test = np.reshape(y_test, (len(y_test), 1))
+
+        if K.image_data_format() == 'channels_last':
+            x_train = x_train.transpose(0, 2, 3, 1)
+            x_test = x_test.transpose(0, 2, 3, 1)
+
+        return x_train, y_train, x_test, y_test
+    else:
+        (x_train, y_train), (x_test, y_test) = keras.datasets.cifar100.load_data(label_mode='fine')
+        return x_train, y_train, x_test, y_test
 
 
 def create_model(input_shape, num_classes=100) -> keras.Model:

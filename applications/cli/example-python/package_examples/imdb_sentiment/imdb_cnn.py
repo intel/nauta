@@ -18,8 +18,6 @@
 
 
 import argparse
-import shutil
-from pathlib import Path
 import multiprocessing
 import os
 
@@ -31,8 +29,10 @@ from keras.layers import Embedding
 from keras.layers import Conv1D, GlobalMaxPooling1D
 from keras.datasets import imdb
 from keras import backend as K
+from keras_preprocessing.sequence import _remove_long_seq
 from tensorflow import saved_model
 import tensorflow as tf
+import numpy as np
 
 try:
     from experiment_metrics.api import publish
@@ -64,14 +64,64 @@ class NautaExperimentMetricsCallback(keras.callbacks.Callback):
 
 
 
-def load_data(dataset_path: str = None):
+def load_data(dataset_path: str = None, num_words=None, skip_top=0, maxlen=None, seed=113, start_char=1, oov_char=2,
+              index_from=3):
     print('Loading data...')
     if dataset_path:
-        shutil.copytree(dataset_path, f'{Path.home()}/.keras/datasets/cifar-100-python')
-    (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_features)
-    print(len(x_train), 'train sequences')
-    print(len(x_test), 'test sequences')
-    return x_train, y_train, x_test, y_test
+        with np.load(dataset_path) as f:
+            x_train, labels_train = f['x_train'], f['y_train']
+            x_test, labels_test = f['x_test'], f['y_test']
+
+        np.random.seed(seed)
+        indices = np.arange(len(x_train))
+        np.random.shuffle(indices)
+        x_train = x_train[indices]
+        labels_train = labels_train[indices]
+
+        indices = np.arange(len(x_test))
+        np.random.shuffle(indices)
+        x_test = x_test[indices]
+        labels_test = labels_test[indices]
+
+        xs = np.concatenate([x_train, x_test])
+        labels = np.concatenate([labels_train, labels_test])
+
+        if start_char is not None:
+            xs = [[start_char] + [w + index_from for w in x] for x in xs]
+        elif index_from:
+            xs = [[w + index_from for w in x] for x in xs]
+
+        if maxlen:
+            xs, labels = _remove_long_seq(maxlen, xs, labels)
+            if not xs:
+                raise ValueError('After filtering for sequences shorter than maxlen=' +
+                                 str(maxlen) + ', no sequence was kept. '
+                                               'Increase maxlen.')
+        if not num_words:
+            num_words = max([max(x) for x in xs])
+
+        # by convention, use 2 as OOV word
+        # reserve 'index_from' (=3 by default) characters:
+        # 0 (padding), 1 (start), 2 (OOV)
+        if oov_char is not None:
+            xs = [[w if (skip_top <= w < num_words) else oov_char for w in x]
+                  for x in xs]
+        else:
+            xs = [[w for w in x if skip_top <= w < num_words]
+                  for x in xs]
+
+        idx = len(x_train)
+        x_train, y_train = np.array(xs[:idx]), np.array(labels[:idx])
+        x_test, y_test = np.array(xs[idx:]), np.array(labels[idx:])
+
+        print(len(x_train), 'train sequences')
+        print(len(x_test), 'test sequences')
+        return x_train, y_train, x_test, y_test
+    else:
+        (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=num_words)
+        print(len(x_train), 'train sequences')
+        print(len(x_test), 'test sequences')
+        return x_train, y_train, x_test, y_test
 
 
 def preprocess_data(x_train, x_test):
@@ -200,7 +250,7 @@ if __name__ == '__main__':
     hidden_dims = int(args.hidden_dims)
     epochs = int(args.epochs)
 
-    x_train, y_train, x_test, y_test = load_data(dataset_path=args.dataset_path)
+    x_train, y_train, x_test, y_test = load_data(dataset_path=args.dataset_path, num_words=max_features)
     x_train, x_test = preprocess_data(x_train, x_test)
     model = create_model()
     model = train(model, x_train, y_train, x_test, y_test, output_path=args.output_path)
