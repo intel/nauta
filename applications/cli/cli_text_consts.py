@@ -31,7 +31,7 @@ class VersionCmdTexts:
 
 
 class MountCmdTexts:
-    HELP = "Displays a command that can be used to mount client's folders on his/her local machine."
+    HELP = "Displays a command to mount folders on a local machine."
     MAIN_MSG = """Use the following command to mount those folders:
  - replace <MOUNTPOINT> with a proper location on your local machine)
  - replace <NAUTA_FOLDER> with one of the following:
@@ -85,8 +85,7 @@ class CmdsCommonTexts:
 
 
 class VerifyCmdTexts:
-    HELP = "Command verifies whether all external components required by nctl are installed in proper versions. " \
-           "If something is missing, the application displays detailed information about it."
+    HELP = "Verifies whether all required external components contain the proper versions installed."
     KUBECTL_NOT_INSTALLED_ERROR_MSG = "kubectl is not installed."
     KUBECTL_INVALID_VERSION_ERROR_MSG = "the installed version of kubectl ({installed_version}) is not " \
                                         "supported, supported version {supported_versions_sign} {expected_version}"
@@ -109,8 +108,7 @@ class VerifyCmdTexts:
 
 
 class UserCmdTexts:
-    HELP = "Command for creating/deleting/listing users of the platform. Can only be run by a platform " \
-           "administrator."
+    HELP = "Create, delete, or list users of the platform. Can only be run by a platform administrator."
 
 
 class UserListCmdTexts:
@@ -188,9 +186,8 @@ class UserDeleteCmdTexts:
 
 
 class LaunchCmdTexts:
-    HELP = "Command for launching web user-interface or tensorboard. It works as process in the system console " \
-           "until user does not stop it. If process should be run as background process, please add '&' at the end " \
-           "of line"
+    HELP = "Launch the web user-interface or TensorBoard. Runs as a process in the system console until the " \
+           "user stops the process. To run in the background, add '&' at the end of the line."
     HELP_P = "Port on which service will be exposed locally."
     HELP_N = "Run command without a web browser starting, only proxy tunnel is created"
     WEBUI_HELP = "Subcommand for launching webUI with credentials"
@@ -214,8 +211,7 @@ class LaunchCmdTexts:
 
 
 class PredictCmdTexts:
-    HELP = "Command for starting, stopping, and managing prediction jobs and instances. To get further help on " \
-           "commands use COMMAND with -h or --help option."
+    HELP = "Start, stop, and manage prediction jobs and instances."
 
 
 class PredictListCmdTexts:
@@ -226,8 +222,7 @@ class PredictListCmdTexts:
     HELP_U = "List uninitialized prediction instances, i.e. prediction instances" \
              " without resources submitted for creation."
     HELP_C = "If given - command displays c last rows."
-    HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
-             " be print."
+    HELP_B = "Use to print short version of the experiment result table."
 
 
 class PredictLaunchCmdTexts:
@@ -317,37 +312,36 @@ class PredictBatchCmdTexts:
 
 
 class ExperimentCmdTexts:
-    HELP = "Command for starting, stopping, and managing training jobs."
+    HELP = "Start, stop, or manage training jobs."
 
 
 class ExperimentListCmdTexts:
     SHORT_HELP = "List experiments."
-    HELP_A = "Show all experiments, regardless of the owner."
-    HELP_N = "A regular expression to narrow down list to experiments that match this expression."
-    HELP_S = "List experiments with matching status."
-    HELP_U = "List uninitialized experiments, i.e. experiments without resources submitted for creation."
-    HELP_C = "If given - command displays c last rows."
+    HELP_A = "Displays all experiments."
+    HELP_N = "Displays a list of experiments that match this expression."
+    HELP_S = "Displays experiments with matching status."
+    HELP_U = "Displays a list of uninitialized experiments waiting for specified resources."
+    HELP_C = "Displays the specified number count of the most recent experiments."
     HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
              " be print."
 
 
 class ExperimentLogsCmdTexts:
-    SHORT_HELP = "Show logs for a given experiment."
+    SHORT_HELP = "Displays an experiment/s log."
     HELP = """
-    Show logs for a given experiment.
+    Displays an experiment/s log.
 
     experiment_name - is a name of experiment whose logs should be displayed, experiment_name argument value can be
     empty when 'match' option is used.
     """
-    HELP_S = "Show all events with this specified minimal and greater severity."
+    HELP_S = "Displays all minimal and greater severity events."
     HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
     HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
     HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
     HELP_P = "Get logs only for pods with given status."
-    HELP_M = "If given, command searches for logs from experiments matching the value of this option. " \
-             "This option cannot be used along with the NAME argument."
-    HELP_O = "If given - logs are stored in a file with a name derived from a name of an experiment."
-    HELP_F = "Specify if logs should be streamed. Only logs from a single experiment can be streamed."
+    HELP_M = "Searches for experiment logs from matching values. Cannot be used with the experiment_name argument."
+    HELP_O = "Stores file-named experiment logs."
+    HELP_F = "Specifies if logs should be streamed. Streams only logs from a single experiment."
     HELP_PAGER = "Display logs in interactive pager."
 
 
@@ -360,10 +354,10 @@ class PredictLogsCmdTexts:
     value can be empty when 'match' option is used.
     """
     HELP_S = "Show all events with this specified minimal and greater severity."
-    HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
-    HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
-    HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
-    HELP_P = "Get logs only for pods with given status."
+    HELP_SD = "Retrieves logs produced on or after this date (ISO 8601 date format)."
+    HELP_ED = "Retrieves logs produced on or before this date ( ISO 8601 date format)."
+    HELP_I = "Lists comma-separated pod ID logs only."
+    HELP_P = "Retrieves pod status logs only."
     HELP_M = "If given, command searches for logs from prediction instances matching the value of this option. " \
              "This option cannot be used along with the NAME argument."
     HELP_O = "If given - logs are stored in a file with a name derived from a name of a prediction instance."
@@ -372,29 +366,27 @@ class PredictLogsCmdTexts:
 
 
 class ExperimentSubmitCmdTexts:
-    SHORT_HELP = "Command used to submitting training scripts."
+    SHORT_HELP = "Submit training scripts."
     HELP = """
-    Command used to submitting training scripts.
+    Submit training scripts.
 
     SCRIPT_LOCATION - is a location of the script used for training purposes - it is an obligatory argument.
 
     script_parameters - contains parameters passed directly to the script - all such parameters should be added
     at the end of command after '--' string.
     """
-    HELP_N = "Name for this experiment."
-    HELP_SFL = "Name of a folder with additional files used by a script, e.g., other .py files, data etc. If not " \
-               "given - its content won't be copied into an image."
-    HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
-             " Template is chosen. List of available templates might be obtained by" \
-             " Issuing dlsctl template list command."
-    HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
-             "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+    HELP_N = "Experiment name."
+    HELP_SFL = "Folder name containing files used by a script: py files, data, etc. Contents not copied into an image if not given."
+    HELP_T = "Template name used to create a deployment. By default, this is a single-node TensorFlow training. " \
+             "Use the nctl experiment template_list command to list available templates."
+    HELP_P = "Additional pack parameters in format: 'key value' or 'key.subkey.subkey2 value'. For lists,  " \
+             "use: 'key \"['val1', 'val2']\"' For maps, use:'key \"{'a': 'b'}\"'"
     HELP_PR = "Values (set or range) of a single parameter."
-    HELP_PS = "Set of values of one or several parameters."
-    HELP_E = "Environment variables passed to training. User can pass as many environmental variables as it is " \
-             "needed - each variable should be in such case passed as a separate -e parameter."
-    HELP_R = "Path to file with experiment's pip requirements." \
-             " Dependencies listed in this file will be automatically installed using pip."
+    HELP_PS = "Values for one or several parameters."
+    HELP_E = "Environment variables passed to training. No limits passing environmental variables; however, each " \
+             "variable should be passed as a separate -e parameter."
+    HELP_R = "File path containing experiment's pip requirements. Dependencies listed in this file are automatically " \
+             "installed using pip"
     SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find: {script_location}. Make sure that provided path is correct."
     DEFAULT_SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find script: {default_script_name} in directory: " \
                                          "{script_directory}. If path to directory was passed as submit command " \
@@ -410,8 +402,8 @@ class ExperimentSubmitCmdTexts:
 
 
 class ExperimentInteractCmdTexts:
-    SHORT_HELP = "Launches a local browser with Jupyter Notebook."
-    HELP = "Launches a local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
+    SHORT_HELP = "Launches local browser with Jupyter Notebook."
+    HELP = "Launches local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
            "into the opened notebook."
     HELP_N = "The name of this Jupyter Notebook session."
     HELP_F = "File with a notebook or a python script that should be opened in Jupyter notebook."
@@ -449,9 +441,9 @@ class ExperimentInteractCmdTexts:
 
 
 class ExperimentCancelCmdTexts:
-    SHORT_HELP = "Cancels experiment/s or deletes pods chosen based on criteria given as parameters."
+    SHORT_HELP = "Cancels experiment/s or deletes selected pods."
     HELP = """
-    Cancels experiment/s or deletes pods chosen based on criteria given as parameters.
+    Cancels experiment/s or deletes selected pods.
 
     name - is a name of experiment which should be cancelled, name argument value can be empty when 'match'
     option is used.
@@ -521,9 +513,9 @@ class ExperimentCancelCmdTexts:
 
 
 class ExperimentViewCmdTexts:
-    SHORT_HELP = "Displays details of experiment with a given name."
+    SHORT_HELP = "Displays details given experiment/s name."
     HELP = """
-    Displays details of experiment with a given name.
+    Displays details given experiment/s name.
 
     EXPERIMENT_NAME - is a name of experiment whose details should be displayed.
     """
@@ -772,7 +764,7 @@ class LicenseAcceptanceTexts:
 
 
 class ConfigCmdTexts:
-    HELP = "Sets values of limits and requests for resources in templates used by the system."
+    HELP = "Set limits and request resources in templates."
     HELP_C = "Number of cpu available for training on one node. K8s format expected. Obligatory"
     HELP_M = "Amount of memory available for training on one node. K8s format expected. Obligatory"
     HELP_PN = "Name of a pack which resources' settings should be changed. If not given - command changes resources " \
