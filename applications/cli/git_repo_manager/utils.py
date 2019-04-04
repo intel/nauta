@@ -114,7 +114,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
 
 
 def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str):
-    git_repo_dir = f'.nauta-git-{username}'
+    git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
 
     try:
         private_key_path = get_git_private_key_path(username=username, config_dir=Config().config_path)
