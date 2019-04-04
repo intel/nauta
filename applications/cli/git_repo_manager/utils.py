@@ -14,13 +14,13 @@
 # limitations under the License.
 #
 
-import os
-
 import base64
+import hashlib
+import os
 
 from util.app_names import NAUTAAppNames
 from util.config import Config
-from util.k8s.k8s_info import get_secret
+from util.k8s.k8s_info import get_secret, get_kubectl_host
 from util.k8s.k8s_proxy_context_manager import TcpK8sProxy
 from util.logger import initialize_logger
 from util.system import ExternalCliClient
@@ -29,9 +29,15 @@ logger = initialize_logger(__name__)
 _encoding = 'utf-8'  # Encoding used for bytes <-> str conversions
 
 
+def compute_hash_of_k8s_env_address():
+    nauta_hostname = get_kubectl_host()
+    nauta_hostname_hash = hashlib.md5(nauta_hostname.encode('utf-8')).hexdigest()
+    return nauta_hostname_hash
+
+
 def get_git_private_key_path(config_dir: str, username: str) -> str:
     k8s_secret_name = 'git-secret'
-    key_path = os.path.join(config_dir, f'.{username}-ssh-key')
+    key_path = os.path.join(config_dir, f'.ssh-key-{username}-{compute_hash_of_k8s_env_address()}')
     # If private key is already saved in config, return it
     if not os.path.isfile(key_path):
         # If not, get key from k8s secret, save it with proper permissions
@@ -55,7 +61,7 @@ def create_gitignore_file_for_experiments(git_workdir):
 
 
 def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str, run_name: str):
-    git_repo_dir = f'.nauta-git-{username}'
+    git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
     git_work_dir = os.path.join(experiments_workdir, run_name)
 
     try:
@@ -70,6 +76,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
         env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
         logger.debug(f'Git client env: {env}')
         git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
+        git.ls_remote = git._make_command(name='ls-remote')  # This command must be created manually due to hyphen
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
             if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
                 git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,
@@ -77,14 +84,16 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
             git.config('--local', 'user.email', f'{username}@nauta.invalid')
             git.config('--local', 'user.name', f'{username}')
-            branches, _, _ = git.branch()
             git.add('.')
-            if branches:
-                git.pull(all=True)
+            git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
+            remote_branches, _, _ = git.ls_remote()
+            local_branches, _, _ = git.branch()
+            if 'master' in local_branches:
                 git.checkout('master')
             else:
                 git.checkout('-b', 'master')
-            git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
+            if 'master' in remote_branches:
+                git.pull('--rebase')
             git.push('--set-upstream', 'origin', 'master')
             git.tag(experiment_name)
             git.push('--tags')
