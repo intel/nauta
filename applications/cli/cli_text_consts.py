@@ -505,6 +505,7 @@ class ExperimentCancelCmdTexts:
     BAD_POD_STATUS_PASSED = "Wrong status: {status_passed} , available: {available_statuses}"
     LACK_OF_PODS_ERROR_MSG = "Lack of pods fulfilling given criteria. Pod ID or pod status parameters do not match " \
                              "any existing pod."
+    GIT_REPO_MANAGER_ERROR_MSG = "Failed to delete experiment from Git Repo Manager."
     CANCELING_PODS_MSG = "Deleting the pod: {pod_name} ..."
     OTHER_POD_CANCELLING_ERROR_MSG = "Error during deleting the pod."
     UNINITIALIZED_EXPERIMENT_CANCEL_MSG = "Experiment {experiment_name} has no resources submitted for creation."

@@ -23,8 +23,9 @@ from typing import List, Tuple
 
 import click
 
-from commands.experiment.common import RunKinds
+from commands.experiment.common import RunKinds, get_run_environment_path
 import util.k8s.kubectl as kubectl
+from git_repo_manager.utils import delete_exp_tag_from_git_repo_manager
 from platform_resources.workflow import ArgoWorkflow
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
@@ -303,12 +304,20 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
         cancelled_runs, not_cancelled_runs = cancel_experiment_runs(runs_to_cancel=runs_to_purge, namespace=namespace)
         not_purged_runs = not_cancelled_runs
 
-        # Delete associated workflows
         if cancel_whole_experiment:
+            # Delete associated workflows
             experiment_associated_workflows = [wf for wf in ArgoWorkflow.list(namespace=namespace)
                                                if wf.labels.get('experimentName') == experiment.name]
             for wf in experiment_associated_workflows:
                 wf.delete()
+
+            # Remove tags from git repo manager
+            try:
+                delete_exp_tag_from_git_repo_manager(experiment_name=experiment.name, username=namespace,
+                                                     experiments_workdir=get_run_environment_path(''))
+            except Exception:
+                handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG)
+                raise
 
         for run in cancelled_runs:
             logger.debug(f"Purging {run.name} run ...")
