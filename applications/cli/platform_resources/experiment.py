@@ -54,7 +54,7 @@ class ExperimentSchema(Schema):
                                   dump_to='parameters-spec', load_from='parameters-spec')
     state = EnumField(ExperimentStatus, required=True, allow_none=False, by_value=True)
     template_name = fields.String(required=True, allow_none=False, dump_to='template-name', load_from='template-name')
-    template_version = fields.String(required=True, allow_none=False, dump_to='template-version',
+    template_version = fields.String(required=False, allow_none=False, dump_to='template-version',
                                      load_from='template-version')
     template_namespace = fields.String(required=True, allow_none=False, dump_to='template-namespace',
                                        load_from='template-namespace')
