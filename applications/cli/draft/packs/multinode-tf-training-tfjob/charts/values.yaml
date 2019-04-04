@@ -56,7 +56,7 @@ experimentName: {{ NAUTA.ExperimentName }}
 registryPort: {{ NAUTA.RegistryPort }}
 
 workersCount: 3
-psSidecarLoggingLevel: "WARNING"
+sidecarLoggingLevel: "WARNING"
 pServersCount: 1
 
 cpu_fraction: 1

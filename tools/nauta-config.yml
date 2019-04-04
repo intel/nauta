@@ -24,8 +24,8 @@ export_images:
     value: "{{ image_local_url['nauta/batch-inference'] }}"
   - name: tf-serving-sidecar
     value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
-  - name: ps-sidecar
-    value: "{{ image_local_url['nauta/ps-sidecar'] }}"
+  - name: tfjob-multinode-sidecar
+    value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
 
 local_images:
   nauta/centos:
@@ -232,12 +232,12 @@ local_images:
       BASE_IMAGE: "nauta/kubectl"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/docker"
-  nauta/ps-sidecar:
+  nauta/tfjob-multinode-sidecar:
     version: "1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
     method: build
-    directory: "{{ playbook_dir }}/../../applications/ps-sidecar"
+    directory: "{{ playbook_dir }}/../../applications/tfjob-multinode-sidecar"
   nauta/ingress:
     version: "0.14.0"
     required:
