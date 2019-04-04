@@ -59,11 +59,6 @@ def create_generator(path_train, path_val, batch_size=128):
 
 
 def main(_):
-    # here we train and validate the model
-    if len(sys.argv) < 2:
-        print('Example usage: alexnet.py [--training_epoch=20] '
-              '[--data_dir=/data/dir] [--export_dir=/output/dir]')
-        sys.exit(-1)
 
     if FLAGS.training_epoch <= 0:
         print('Please specify a positive value for training iteration.')
