@@ -150,7 +150,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
                 cert = ""
 
             try:
-                with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER) as proxy:
+                with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=60) as proxy:
                     grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
                     grm_client.add_nauta_user(username=username)
             except Exception:
