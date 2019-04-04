@@ -48,16 +48,14 @@ RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params
     echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf && \
     echo "btl_tcp_if_exclude = lo,docker0" >> /usr/local/etc/openmpi-mca-params.conf
 
-#RUN ln -sf /opt/rh/rh-python36/root/usr/bin/${PYTHON} /usr/bin/python
-
 RUN mkdir /horovod
-COPY horovod-v0.15.1.tar.gz /horovod/
+COPY horovod-v0.15.2.tar.gz /horovod/
 WORKDIR /horovod
-RUN tar -xf horovod-v0.15.1.tar.gz
-WORKDIR /horovod/horovod-0.15.1
+RUN tar -xf horovod-v0.15.2.tar.gz
+WORKDIR /horovod/horovod-0.15.2
 RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary :all: --ignore-installed scikit-build setuptools rsa==3.4.2
 RUN source /opt/rh/rh-python36/enable && HOROVOD_WITHOUT_PYTORCH=1 python3 setup.py bdist_wheel
-RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --no-clean --force-reinstall /horovod/horovod-0.15.1/dist/horovod-0.15.1-cp36-cp36m-linux_x86_64.whl
+RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --no-clean --force-reinstall /horovod/horovod-0.15.2/dist/horovod-0.15.2-cp36-cp36m-linux_x86_64.whl
 
 ADD requirements.txt /horovod/
 RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary :all: --ignore-installed scikit-build setuptools

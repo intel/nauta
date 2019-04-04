@@ -37,12 +37,12 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64/openmpi/lib
 
 RUN mkdir /horovod
 
-COPY horovod-v0.15.1.tar.gz /horovod/
+COPY horovod-v0.15.2.tar.gz /horovod/
 WORKDIR /horovod
-RUN tar -xf horovod-v0.15.1.tar.gz
-WORKDIR /horovod/horovod-0.15.1
+RUN tar -xf horovod-v0.15.2.tar.gz
+WORKDIR /horovod/horovod-0.15.2
 RUN HOROVOD_WITHOUT_PYTORCH=1 python setup.py bdist_wheel
-RUN ${PIP} install --no-cache-dir --no-clean --force-reinstall /horovod/horovod-0.15.1/dist/horovod-0.15.1-cp27-cp27mu-linux_x86_64.whl
+RUN ${PIP} install --no-cache-dir --no-clean --force-reinstall /horovod/horovod-0.15.2/dist/horovod-0.15.2-cp27-cp27mu-linux_x86_64.whl
 
 ADD requirements.txt /horovod/
 RUN ${PIP} install --no-binary :all: --ignore-installed scikit-build

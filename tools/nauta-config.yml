@@ -167,9 +167,9 @@ local_images:
   nauta/horovod/py3:
     version: "1.9.0-py3"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
-        dest: horovod-v0.15.1.tar.gz
-        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.2.tar.gz
+        dest: horovod-v0.15.2.tar.gz
+        checksum: fc2373acec83e5f231697590fbf8570653432f816ed2427a9f5ffb8f3550ea89
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
         dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
         checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
@@ -187,9 +187,9 @@ local_images:
   nauta/horovod/py2:
     version: "1.9.0-py2"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.1.tar.gz
-        dest: horovod-v0.15.1.tar.gz
-        checksum: 6912177f9e22a71288eb2e07cb78f8630fe2a8fab88d123b69c4ce7967593004
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.2.tar.gz
+        dest: horovod-v0.15.2.tar.gz
+        checksum: fc2373acec83e5f231697590fbf8570653432f816ed2427a9f5ffb8f3550ea89
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/mkl/intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
         dest: intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl
         checksum: 2b85daf1ff266a363b701a52cd23564680b16a3f95a8d8037e959c4d5fdd7192
