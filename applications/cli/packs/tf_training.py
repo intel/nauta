@@ -76,7 +76,9 @@ def update_configuration(run_folder: str, script_location: str,
                            experiment_name=experiment_name, pack_type=pack_type,
                            cluster_registry_port=cluster_registry_port,
                            env_variables=env_variables, username=username)
-        modify_dockerfile(run_folder, script_location, script_folder_location=script_folder_location)
+        modify_dockerfile(experiment_folder=run_folder, script_location=script_location,
+                          experiment_name=experiment_name, username=username,
+                          script_folder_location=script_folder_location)
     except Exception as exe:
         log.exception("Update configuration - i/o error : {}".format(exe))
         raise RuntimeError(Texts.CONFIG_NOT_UPDATED) from exe
@@ -84,7 +86,8 @@ def update_configuration(run_folder: str, script_location: str,
     log.debug("Update configuration - end")
 
 
-def modify_dockerfile(experiment_folder: str, script_location: str = None, script_folder_location: str = None):
+def modify_dockerfile(experiment_folder: str, experiment_name: str, username: str,
+                      script_location: str = None, script_folder_location: str = None):
     log.debug("Modify dockerfile - start")
     dockerfile_name = os.path.join(experiment_folder, "Dockerfile")
     dockerfile_temp_name = os.path.join(experiment_folder, "Dockerfile_Temp")
@@ -114,6 +117,12 @@ def modify_dockerfile(experiment_folder: str, script_location: str = None, scrip
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
+
+    # Append experiment metadata to Dockerfile - besides enabling access to experiment/user name in experiment's
+    # container, it will also make image manifest digest unique, in order to avoid issues with race conditions when
+    # image manifest is pushed to docker registry
+    dockerfile_temp_content += f'\nENV NAUTA_EXPERIMENT_NAME {experiment_name}\n'
+    dockerfile_temp_content += f'\nENV NAUTA_USERNAME {username}\n'
 
     with open(dockerfile_temp_name, "w") as dockerfile_temp:
         dockerfile_temp.write(dockerfile_temp_content)
