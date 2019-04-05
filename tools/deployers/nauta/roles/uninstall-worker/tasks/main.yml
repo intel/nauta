@@ -1,0 +1,48 @@
+---
+
+- name: Delete all packages
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - nauta-cni-plugins.x86_64
+    - docker-distribution
+    - docker-ce.x86_64
+    - container-selinux.noarch
+    - nauta-consul.x86_64
+    - python2-pip.noarch
+    - nauta-consul.x86_64
+    - nauta-kubernetes-kubelet.x86_64
+    - nauta-kubernetes-worker.x86_64
+    - nauta-pip-repository.x86_64
+    - nauta-registry.x86_64
+    - nauta-yum.x86_64
+    - nauta-yum-repository.x86_64
+    - nauta-commons.x86_64
+
+- name: restore backup files
+  include_tasks: restore_backup.yml
+
+- name: restart workers
+  include_tasks: restart_hosts.yml
+
+- name: Delete all worker files and directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/nauta-cluster
+    - /etc/cgconfig.d/50-NAUTA.conf
+    - /etc/kubelet
+    - /var/lib/kubelet
+    - /etc/systemd/system/kubelet.service
+    - /var/lib/cni
+    - /root/nauta
+    - /root/flannel
+    - /etc/cni
+    - /etc/consul
+    - /var/consul
+    - /etc/docker
+    - /var/lib/docker
+    - /var/lib/dockershim
+    - /root/.ansible

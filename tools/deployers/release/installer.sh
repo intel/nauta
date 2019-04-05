@@ -131,6 +131,20 @@ platform_verify_ansible_run() {
     return $ret_val
 }
 
+nauta_uninstall_run() {
+    export KIND=uninstaller
+    if [ X"${ENV_INVENTORY}" = X"" ]; then
+        >&2 echo "Inventory file should be provided for platform installation"
+        exit 1
+    fi
+    set +e
+    ansible_run ${CURDIR}/nauta/uninstall.yml
+    ret_val=$?
+    set -i
+    show_error_message $ret_val
+    return $ret_val
+}
+
 get_diagnostic_data() {
     export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
     inventory || return 1
@@ -170,6 +184,8 @@ case "${COMMAND}" in
   nauta-upgrade) UPGRADE=True nauta_ansible_run
      ;;
   nauta-fetch) nauta_fetch_ansible_run
+     ;;
+  nauta-uninstall) nauta_uninstall_run
      ;;
   platform-verify) platform_verify_ansible_run
      ;;

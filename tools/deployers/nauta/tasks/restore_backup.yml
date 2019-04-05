@@ -1,0 +1,53 @@
+---
+
+- name: "{{ message_label }} Remove chattr -i from resolver"
+  file:
+    path: /etc/resolv.conf
+    attr: ""
+
+- name: check if nauta resolv.conf exist
+  stat:
+    path: /etc/resolv.conf.nauta
+  register: resolv_conf
+
+- name: restore resolv.conf
+  copy:
+    src: /etc/resolv.conf.nauta
+    dest: /etc/resolv.conf
+    remote_src: yes
+  when: resolv_conf.stat.exists == true
+
+- name: check if nauta hostname exist
+  stat:
+    path: /etc/hostname.nauta
+  register: hostname
+
+- name: restore hostname
+  copy:
+    src: /etc/hostname.nauta
+    dest: /etc/hostname
+    remote_src: yes
+  when: hostname.stat.exists == true
+
+- name: check if nauta dhclient exist
+  stat:
+    path: /etc/dhclient-enter-hooks
+  register: dhclient_hooks
+
+- name: delete dhclient-enter-hooks
+  file:
+    path: /etc/dhclient-enter-hooks
+    state: absent
+  when: dhclient_hooks.stat.exists == true
+
+- name: check if nauta exports exist
+  stat:
+    path: /etc/exports.nauta
+  register: exports
+
+- name: restore exports
+  copy:
+    src: /etc/exports.nauta
+    dest: /etc/exports
+    remote_src: yes
+  when: exports.stat.exists == true

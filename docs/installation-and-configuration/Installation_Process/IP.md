@@ -50,6 +50,7 @@ Invoke `./installer.sh` with one of the following options:
 * **nauta-install:** Nauta installation only
     - **Note:** It is assumed that Kubernetes is already installed. In addition, this requires the same procedure for Nauta upgrades.
 * **nauta-upgrade:** Nauta installation upgrade
+* **nauta-uninstall:** Nauta uninstallation process
 
 ## Installation Output 
 
@@ -92,6 +93,28 @@ To upgrade Nauta, do the following:
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
 
 This completes the Nauta Upgrade Process.
+
+## Deleting Nauta
+
+** This is very dangerous operation, please use with caution **
+
+**Common packages and files that will be deleted:**
+
+    * Docker and all images 
+    * Nginx and all configuration
+    * python2-pip
+    * container-selinux
+    * Kubernetes and all configuration
+
+To delete Nauta, do the following:
+
+`export ENV_INVENTORY=<absolute path to inventory file>`
+
+Call the installer with nauta-uninstall option:
+
+`./installer.sh nauta-uninstall`
+
+This completetly uninstall nauta from system.
 
 ## User Management Tasks & Troublshooting
 
