@@ -1,0 +1,15 @@
+---
+
+- name: Reboot instance
+  shell: /usr/bin/systemd-run --on-active=5 --timer-property=AccuracySec=100ms /bin/systemctl reboot
+
+- name: Wait for connection
+  wait_for_connection:
+    delay: 20
+    timeout: 600
+    connect_timeout: 1
+    sleep: 1
+  register: host_on
+  until: host_on|success
+  retries: 5
+  delay: 5

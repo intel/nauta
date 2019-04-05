@@ -1,0 +1,15 @@
+---
+
+- name: clean up workers
+  hosts: worker
+  gather_facts: True
+  become: True
+  roles:
+    - role: "uninstall-worker"
+
+- name: clean up master
+  hosts: master
+  gather_facts: True
+  become: True
+  roles:
+    - role: "uninstall-master"
