@@ -104,3 +104,4 @@ if [ ! -f "${NAUTA_VIRTUALENV}/.done" ]; then
 fi
 ANSIBLE_PATH="${NAUTA_VIRTUALENV}/bin/ansible-playbook"
 PATH=${NAUTA_VIRTUALENV}/bin:${PATH}
+

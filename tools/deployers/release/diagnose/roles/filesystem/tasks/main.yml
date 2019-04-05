@@ -1,0 +1,25 @@
+---
+- name: Get directories info
+  command: "ls -la {{ item }}"
+  with_items:
+    - /etc
+    - /var
+    - /var/lib
+    - /usr/bin
+    - /root
+  become: yes
+  ignore_errors: True
+  register: dirs
+
+- name: Display directories info
+  debug:
+    msg: "{{ dirs }}"
+
+- name: Get mounted volumes info
+  command: "mount -a"
+  become: yes
+  register: mounted_volumes
+
+- name: Display mounted volumes info
+  debug:
+    var: mounted_volumes.stdout_lines

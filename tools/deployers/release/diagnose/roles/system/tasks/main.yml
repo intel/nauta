@@ -1,0 +1,68 @@
+---
+- name: Get CPU info (cat /proc/cpuinfo)
+  command: cat /proc/cpuinfo
+  register: cpu_info
+
+- name: Print CPU info
+  debug:
+    var: cpu_info.stdout_lines
+
+- name: Get disk usage stats (df -h)
+  command: df -h
+  register: df
+
+- name: Print disk usage stats
+  debug:
+    var: df.stdout_lines
+
+- name: Get avaible block devices (lsblk)
+  command: lsblk -o NAME,KNAME,RM,SIZE,TYPE,MOUNTPOINT
+  register: lsblk
+
+- name: List available devices
+  debug:
+    var: lsblk.stdout_lines
+
+- name: Get physical memory status (free -h)
+  command: free -h
+  register: memory
+
+- name: Print physical memory status
+  debug:
+    var: memory.stdout_lines
+
+- name: Get services info
+  service_facts:
+
+- name: Display services info
+  debug:
+    var: ansible_facts.services
+
+- name: Get environment variables info
+  command: "env"
+  register: env_variables
+
+- name: Display environment variables info
+  debug:
+    var: env_variables.stdout_lines
+
+- name: Get configuration file content
+  command: "cat {{ item }}"
+  register: files_content
+  with_items:
+    - /etc/passwd
+    - /etc/exports
+    - /etc/fstab
+  ignore_errors: True
+
+- name: Display configuration files content
+  debug:
+    var: files_content
+
+- name: Get journalctl last logs
+  command: "journalctl --no-pager -n 1000"
+  register: journalctl_logs
+
+- name: Display configuration files content
+  debug:
+    var: journalctl_logs.stdout_lines
