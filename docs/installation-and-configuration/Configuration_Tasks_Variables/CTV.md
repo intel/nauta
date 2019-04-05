@@ -212,7 +212,7 @@ insecure_registries:
 * **Note** For NFS information, see below. 
 
 ```yaml
-nauta_configuration:
+nauta_extra_configuration:
   input_nfs:
     path: "{{ nfs_base_path }}/input"
     server: "{{ nfs_server }}"
