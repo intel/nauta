@@ -1,0 +1,13 @@
+---
+
+- name: Run kubectl
+  hosts: localhost
+  roles:
+    - kubectl-info
+
+- name: Run diagnostic tasks
+  hosts: all
+  roles:
+    - system
+    - filesystem
+    - network

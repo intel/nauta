@@ -131,11 +131,25 @@ platform_verify_ansible_run() {
     return $ret_val
 }
 
+get_diagnostic_data() {
+    export ANSIBLE_CONFIG=${CURDIR}/ansible.cfg
+    inventory || return 1
+    config || return 1
+    mkdir -p ${CURDIR}/logs || exit 1
+    export ANSIBLE_LOG_PATH="${CURDIR}/logs/log-${DATE}-diagnose.log"
+    ansible $(inventory) $(config) \
+    -e "upgrade=${UPGRADE:-False}" -e "kubectl=${KUBECTL}" -e "helm=${HELM}" \
+    -e "kubeconfig=$(realpath $(kubeconfig))" -e "loader=${LOADER}" \
+    -e "root=${CURDIR}" -e "default_ansible_python_interpreter=${PYTHON}" \
+    ${CURDIR}/diagnose/diagnose.yml
+}
+
 show_error_message() {
     if [ "$1" != "0" ]; then
         echo ""
         echo "\033[0;31mAn error during installation occurred. Please refer to installation documentation. In case of further problems please contact with technical support.\033[0m"
         echo ""
+        get_diagnostic_data
     fi
 }
 

@@ -1,0 +1,60 @@
+---
+- name: Get nodes descriptions
+  command: "{{ kubectl }} describe --all-namespaces nodes"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: nodes
+
+- name: Display nodes descriptions
+  debug:
+    var: nodes.stdout_lines
+
+- name: Get pods descriptions
+  command: "{{ kubectl }} describe --all-namespaces pods"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: pods
+
+- name: Display pods descriptions
+  debug:
+    var: pods.stdout_lines
+
+- name: Get services descriptions
+  command: "{{ kubectl }} describe --all-namespaces services"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: services
+
+- name: Display services descriptions
+  debug:
+    var: services.stdout_lines
+
+- name: Get persistent volumes descriptions
+  command: "{{ kubectl }} describe --all-namespaces pv"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: pv
+
+- name: Display persistent volumes descriptions
+  debug:
+    var: pv.stdout_lines
+
+- name: Get persistent volume claims descriptions
+  command: "{{ kubectl }} describe --all-namespaces pvc"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: pvc
+
+- name: Display persistent volume claims descriptions
+  debug:
+    var: pvc.stdout_lines
+
+- name: Get jobs descriptions
+  command: "{{ kubectl }} describe --all-namespaces jobs"
+  environment:
+    KUBECONFIG: "{{ kubeconfig }}"
+  register: jobs
+
+- name: Display jobs descriptions
+  debug:
+    var: jobs.stdout_lines

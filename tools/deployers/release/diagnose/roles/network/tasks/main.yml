@@ -1,0 +1,26 @@
+---
+- name: Get open ports info
+  command: "netstat -tulpn"
+  register: open_ports
+
+- name: Display open ports info
+  debug:
+    var: open_ports.stdout_lines
+
+- name: Get iptables info
+  command: "iptables -L"
+  become: yes
+  register: iptables_info
+
+- name: Display iptables info
+  debug:
+    var: iptables_info.stdout_lines
+
+- name: Get IP settings info
+  command: "ifconfig -a"
+  become: yes
+  register: ip_info
+
+- name: Display IP info
+  debug:
+    var: ip_info
