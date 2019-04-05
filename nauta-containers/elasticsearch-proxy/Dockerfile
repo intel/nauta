@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 ADD elasticsearch_proxy.py /elasticsearch_proxy.py
 ADD requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install --no-binary :all: --no-clean -r /requirements.txt
 
 WORKDIR /
 
