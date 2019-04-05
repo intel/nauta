@@ -671,8 +671,8 @@ class UtilDependenciesCheckerTexts:
                                    "expected version: {expected_version}"
     UNKNOWN_OS_ERROR_MSG = "Unknown OS version."
     GET_OS_VERSION_ERROR_MSG = "Could not determine OS version"
-    UNSUPPORTED_OS_ERROR_MSG = "This OS ({os_name} {os_version}) is not supported. Please check the list of " \
-                               "supported OS in the documentation."
+    UNSUPPORTED_OS_ERROR_MSG = "This OS version ({os_name} {os_version}) is unsupported. Please check the release " \
+                               "notes for supported operating systems and proceed at your own risk."
     INVALID_OS_VERSION_ERROR_MSG = "This version ({os_name} {os_version}) of the OS is not supported. Please check " \
                                    "the list of supported OS in the documentation."
 
