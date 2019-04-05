@@ -111,3 +111,31 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
         except Exception:
             logger.exception(f'Failed to rollback {experiment_name} experiment upload to git repo manager.')
         raise
+
+
+def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str):
+    git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
+
+    try:
+        private_key_path = get_git_private_key_path(username=username, config_dir=Config().config_path)
+        git_env = {'GIT_SSH_COMMAND': f'ssh -o StrictHostKeyChecking=no -i "{private_key_path}"',
+                   'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
+                   'GIT_TERMINAL_PROMPT': '0',
+                   'SSH_AUTH_SOCK': '', # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
+                   }
+        env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
+        logger.debug(f'Git client env: {env}')
+        git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
+        with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
+            if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
+                git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,
+                          bare=True)
+            git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
+            git.config('--local', 'user.email', f'{username}@nauta.invalid')
+            git.config('--local', 'user.name', f'{username}')
+            git.fetch()
+            git.tag('-d', experiment_name)
+            git.push('origin', f':refs/tags/{experiment_name}')
+    except Exception:
+        logger.exception(f'Failed to delete tag {experiment_name} from git repo manager.')
+        raise

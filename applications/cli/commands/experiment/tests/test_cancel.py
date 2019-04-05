@@ -288,6 +288,11 @@ class CancelExperimentMocks:
         self.get_experiment = mocker.patch("commands.experiment.cancel.Experiment.get",
                                            return_value=None)
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
+        self.argo_workflow = mocker.patch('commands.experiment.cancel.ArgoWorkflow')
+        self.delete_exp_tag_from_git_repo_manager = mocker.patch('commands.experiment.cancel.'
+                                                                 'delete_exp_tag_from_git_repo_manager')
+        self.get_run_environment_path = mocker.patch('commands.experiment.cancel.get_run_environment_path')
+        self.is_current_user_administrator = mocker.patch('commands.experiment.cancel.is_current_user_administrator')
         # CAN-1099 - it should be uncommented after repairing docker gc
         # self.delete_images_for_experiment = mocker.patch('commands.experiment.cancel.'
         #                                                 'delete_images_for_experiment')
