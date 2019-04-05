@@ -36,7 +36,6 @@ from marshmallow import ValidationError
 from commands.template.common import get_template_version
 import draft.cmd as cmd
 from git_repo_manager.utils import upload_experiment_to_git_repo_manager
-from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.experiment_utils import generate_exp_name_and_labels
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiment as experiments_model
@@ -45,11 +44,10 @@ from platform_resources.workflow import ExperimentImageBuildWorkflow, ArgoWorkfl
 from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.filesystem import get_total_directory_size_in_bytes
 from util.helm import delete_helm_release
-from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
 from util.spinner import spinner
-from util.system import get_current_os, OS
+from util.system import get_current_os, OS, execute_system_command
 from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError, \
     SubmitExperimentError
 from util.app_names import NAUTAAppNames
@@ -816,17 +814,7 @@ def validate_pack(name: str):
 
 def _debug_workflow_logs(workflow: ArgoWorkflow, namespace: str):
     try:
-        with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                               verify_certs=False, use_ssl=False)
-            start_date = workflow.started_at
-            workflow_logs_generator = es_client.get_argo_workflow_logs_generator(workflow=workflow,
-                                                                                 namespace=namespace,
-                                                                                 start_date=start_date)
-            log.debug(f'=== Workflow {workflow.name} logs ===')
-            for log_entry in workflow_logs_generator:
-                if not log_entry.content.isspace():
-                    log.debug(f'{log_entry.date} {log_entry.pod_name} {log_entry.content}')
-            log.debug(f'=== Workflow {workflow.name} logs ===')
+        output, _, _ = execute_system_command(command=['kubectl', 'logs', '-n', namespace, workflow.name, 'main'])
+        log.debug(output)
     except Exception:
         log.exception(f'Failed to get {workflow.name} worklfow logs.')
