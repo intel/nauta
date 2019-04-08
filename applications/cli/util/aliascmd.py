@@ -64,3 +64,16 @@ class AliasGroup(click.Group):
         # Skip first element of usage pieces of this command. This will be "[OPTIONS]".
         rv = super(AliasGroup, self).collect_usage_pieces(ctx)[1:]
         return rv
+
+    def get_help_option(self, ctx):
+        help_options = self.get_help_option_names(ctx)
+        if not help_options or not self.add_help_option:
+            return
+
+        def show_help(ctx, param, value):
+            if value and not ctx.resilient_parsing:
+                click.echo(ctx.get_help(), color=ctx.color)
+                ctx.exit()
+
+        return click.Option(help_options, is_flag=True, is_eager=True, expose_value=False, callback=show_help,
+                            help='Displays help messaging information.')

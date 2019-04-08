@@ -31,7 +31,7 @@ class VersionCmdTexts:
 
 
 class MountCmdTexts:
-    HELP = "Displays a command to mount folders on a local machine."
+    HELP = "Displays a command that can be used to mount a client's folder on their local machine."
     MAIN_MSG = """Use the following command to mount those folders:
  - replace <MOUNTPOINT> with a proper location on your local machine)
  - replace <NAUTA_FOLDER> with one of the following:
@@ -312,7 +312,8 @@ class PredictBatchCmdTexts:
 
 
 class ExperimentCmdTexts:
-    HELP = "Start, stop, or manage training jobs."
+    SHORT_HELP = "Start, stop, or manage training jobs."
+    HELP = "Starting, stopping, and managing training jobs COMMAND."
 
 
 class ExperimentListCmdTexts:
@@ -321,24 +322,23 @@ class ExperimentListCmdTexts:
     HELP_N = "Displays a list of experiments that match this expression."
     HELP_S = "Displays experiments with matching status."
     HELP_U = "Displays a list of uninitialized experiments waiting for specified resources."
-    HELP_C = "Displays the specified number count of the most recent experiments."
-    HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
-             " be print."
+    HELP_C = "Displays the specified number of the most recent experiments."
+    HELP_B = "Use to print short version of the experiment result table."
 
 
 class ExperimentLogsCmdTexts:
-    SHORT_HELP = "Displays an experiment/s log."
+    SHORT_HELP = "Displays experiment logs."
     HELP = """
-    Displays an experiment/s log.
+    Displays experiment logs.
 
-    experiment_name - is a name of experiment whose logs should be displayed, experiment_name argument value can be
-    empty when 'match' option is used.
+    experiment_name - name of the experiment. The experiment_name argument value can be empty when 'match' 
+    option is used.
     """
     HELP_S = "Displays all minimal and greater severity events."
-    HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
-    HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
-    HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
-    HELP_P = "Get logs only for pods with given status."
+    HELP_SD = "Retrieves logs produced on or after this date (ISO 8601 date format)."
+    HELP_ED = "Retrieves logs produced on or before this date ( ISO 8601 date format)."
+    HELP_I = "Lists comma-separated pod ID logs only."
+    HELP_P = "Retrieves pod status logs only."
     HELP_M = "Searches for experiment logs from matching values. Cannot be used with the experiment_name argument."
     HELP_O = "Stores file-named experiment logs."
     HELP_F = "Specifies if logs should be streamed. Streams only logs from a single experiment."
@@ -368,17 +368,18 @@ class PredictLogsCmdTexts:
 class ExperimentSubmitCmdTexts:
     SHORT_HELP = "Submit training scripts."
     HELP = """
-    Submit training scripts.
+    Used to submit training scripts.
 
-    SCRIPT_LOCATION - is a location of the script used for training purposes - it is an obligatory argument.
+    SCRIPT_LOCATION - Required argument that shows the location of the script used for training purposes.
 
-    script_parameters - contains parameters passed directly to the script - all such parameters should be added
-    at the end of command after '--' string.
+    Script_parameters - Used to pass parameters directly to the script. When used, parameters should be added at the 
+    end of command after '--' a string.
     """
     HELP_N = "Experiment name."
-    HELP_SFL = "Folder name containing files used by a script: py files, data, etc. Contents not copied into an image if not given."
+    HELP_SFL = "Folder name containing files used by a script: py files, data, etc. Contents not copied into an " \
+               "image if not given."
     HELP_T = "Template name used to create a deployment. By default, this is a single-node TensorFlow training. " \
-             "Use the nctl experiment template_list command to list available templates."
+             "Use the nctl template list command to list available templates."
     HELP_P = "Additional pack parameters in format: 'key value' or 'key.subkey.subkey2 value'. For lists,  " \
              "use: 'key \"['val1', 'val2']\"' For maps, use:'key \"{'a': 'b'}\"'"
     HELP_PR = "Values (set or range) of a single parameter."
@@ -514,13 +515,13 @@ class ExperimentCancelCmdTexts:
 
 
 class ExperimentViewCmdTexts:
-    SHORT_HELP = "Displays details given experiment/s name."
+    SHORT_HELP = "Displays experiment’s details."
     HELP = """
-    Displays details given experiment/s name.
+    Displays experiment’s details.
 
-    EXPERIMENT_NAME - is a name of experiment whose details should be displayed.
+    EXPERIMENT_NAME - Experiment’s name and details.
     """
-    HELP_T = "If given, then exposes a tensorboard's instance with experiment's data."
+    HELP_T = "Displays a TensorBoard's instance showing an experiment's data."
     CONTAINER_DETAILS_MSG = "\n- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:  {resources}"
     EXPERIMENT_NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
     PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
@@ -765,7 +766,7 @@ class LicenseAcceptanceTexts:
 
 
 class ConfigCmdTexts:
-    HELP = "Set limits and request resources in templates."
+    HELP = "Set limits and requested resources in templates."
     HELP_C = "Number of cpu available for training on one node. K8s format expected. Obligatory"
     HELP_M = "Amount of memory available for training on one node. K8s format expected. Obligatory"
     HELP_PN = "Name of a pack which resources' settings should be changed. If not given - command changes resources " \
@@ -786,7 +787,7 @@ Both cpu number and memory amount have to be given."""
 
 
 class WorkflowCmdTexts:
-    HELP = "Command for starting, stopping, and managing workflows."
+    HELP = "Start, stop, and manage workflows."
 
 
 class WorkflowLogsTexts:
@@ -828,6 +829,7 @@ class WorkflowSubmitTexts:
     LOAD_SPEC_ERROR_MSG = "Failed to load workflow definition file. Reason: {msg}"
     OTHER_ERROR_MSG = "Failed to submit workflow."
     PROGRESS_MSG = "Creating workflow ..."
+
 
 class WorkflowViewTexts:
     SHORT_HELP = "Displays details of workflow with a given name."

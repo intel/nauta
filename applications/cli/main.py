@@ -44,7 +44,7 @@ logger = initialize_logger(__name__)
 
 BANNER = """Nauta Client
 
-            To get further help on commands use COMMAND with -h or --help option."""
+            Displays additional help information when the -h or --help COMMAND is used."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)
 DEFAULT_LANG = "en_US.UTF-8"
 DEFAULT_ENCODING = "UTF-8"

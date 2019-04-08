@@ -25,7 +25,7 @@ from cli_text_consts import ExperimentCmdTexts as Texts
 logger = initialize_logger(__name__)
 
 
-@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='exp',
+@click.group(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasGroup, alias='exp',
              subcommand_metavar="COMMAND [options] [args]...")
 def experiment():
     pass
