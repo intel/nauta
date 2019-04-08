@@ -2,8 +2,6 @@ FROM nauta/tensorflow-py3
 
 WORKDIR /app
 
-ADD training.py .
-
 ENV PYTHONUNBUFFERED 1
 
 COPY requirements.txt ./
