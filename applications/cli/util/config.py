@@ -37,7 +37,6 @@ DOCKER_REGISTRY_CONFIG_FILE = 'docker_registry.yaml'
 
 NAUTA_NAMESPACE = "nauta"
 NAUTA_CONFIGURATION_CM = "nauta"
-NAUTA_SERVICE_DNS = "svc.kubernetes.nauta"
 
 
 log = initialize_logger(__name__)
