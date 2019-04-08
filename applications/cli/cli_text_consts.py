@@ -338,7 +338,7 @@ class ExperimentLogsCmdTexts:
     HELP = """
     Displays experiment logs.
 
-    experiment_name - Displays experiment name and log. The experiment_name argument value can be empty when 'match' 
+    experiment_name - name of the experiment. The experiment_name argument value can be empty when 'match' 
     option is used.
     """
     HELP_S = "Displays all minimal and greater severity events."
