@@ -317,6 +317,14 @@ local_images:
     version: "master"
     image: "moby/buildkit:master"
     method: pull
+  nauta/argo-controller:
+    version: "v2.2.1"
+    image: "argoproj/workflow-controller:v2.2.1"
+    method: pull
+  nauta/argoexec:
+    version: "v2.2.1"
+    image: "argoproj/argoexec:v2.2.1"
+    method: pull
 
 
 # WARNING
@@ -426,6 +434,9 @@ subcharts:
     argo-controller:
       version: 2.2.1
       path: "{{ playbook_dir }}/../../nauta-charts/argo-controller"
+      chart_values:
+        image: "{{ image_local_url['nauta/argo-controller'] }}"
+        image2: "{{ image_local_url['nauta/argoexec'] }}"
     gitea:
       version: 1.6.1
       path: "{{ playbook_dir }}/../../nauta-charts/gitea"
