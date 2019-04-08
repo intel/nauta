@@ -219,6 +219,8 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../applications/nauta-docs"
     dockerfile: "{{ playbook_dir }}/../../applications/nauta-docs/Dockerfile"
+    args:
+      DOCS_VERSION: "{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ NAUTA_COMMIT }}"
   nauta/tf/operator:
     version: "v2"
     required:
