@@ -31,9 +31,8 @@ from commands.user import user
 from commands.verify import verify
 from commands.mount import mount
 from commands.version import version
-
 from commands.config import config
-from commands.workflow import workflow
+
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
 from util.config import Config
@@ -43,7 +42,7 @@ logger = initialize_logger(__name__)
 
 BANNER = """Nauta Client
 
-            To get further help on commands use COMMAND with -h or --help option."""
+            Displays additional help information when the -h or --help COMMAND is used."""
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], ignore_unknown_options=True)
 DEFAULT_LANG = "en_US.UTF-8"
 DEFAULT_ENCODING = "UTF-8"
@@ -110,7 +109,7 @@ def entry_point():
 
 
 entry_point.add_command(experiment.experiment)
-entry_point.add_command(workflow.workflow)
+# entry_point.add_command(workflow.workflow)
 entry_point.add_command(launch.launch)
 entry_point.add_command(predict.predict)
 entry_point.add_command(user.user)
