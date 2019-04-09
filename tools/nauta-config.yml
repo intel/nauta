@@ -76,6 +76,13 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/registry"
     version: "2.7.1"
+  nauta/docker:
+    version: "18.06"
+    required:
+      BASE_IMAGE: "nauta/kubectl"
+      DOCKER_RPM_IMAGE: "shared/build/docker"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/docker"
   nauta/samba:
     version: "1.0.0"
     required:
@@ -228,12 +235,6 @@ local_images:
       BUILD_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/tf-operator"
-  nauta/docker:
-    version: "18.03"
-    required:
-      BASE_IMAGE: "nauta/kubectl"
-    method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/docker"
   nauta/tfjob-multinode-sidecar:
     version: "1.0.0"
     required:

@@ -196,9 +196,9 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
         dest: docker-ce-selinux-17.03.3.ce-1.el7.src.rpm
         checksum: 994c76793afde01ae467ead3aef7ad30369dbd9447b2752f62bb251e6f0a24ba
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/docker-ce-18.06.0.ce-3.el7.centos.src.rpm
-        dest: docker-ce-18.06.0.ce-3.el7.centos.src.rpm
-        checksum: 2926f66a94f5b3bcd1e3feb0d7107f2fd2713cf3f412f84dcc8fe89120c43392
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/docker/docker-ce-18.06.3.ce-3.el7.src.rpm
+        dest: docker-ce-18.06.3.ce-3.el7.src.rpm
+        checksum: f0a53681413dfad62c3899856bf4824be9c1922de257033f708a323d750f84e2
   shared/build/nodejs:
     version: "v8.12.0"
     required:

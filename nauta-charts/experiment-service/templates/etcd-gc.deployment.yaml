@@ -22,6 +22,7 @@ spec:
             heritage: {{ .Release.Service }}
             nauta_app_name: etcd-gc
         spec:
+          serviceAccount: {{ .Release.Name }}-{{ .Chart.Name }}
           containers:
           - name: {{ .Chart.Name }}
             image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA etcd_gc image is required" .Values.etcd_gc_image }}
