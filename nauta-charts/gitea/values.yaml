@@ -5,7 +5,7 @@
 images:
   gitea: "nauta/gitea:1.6.1"
   postgres: "nauta/postgres:11"
-  memcached: "nauta/memcached:1.5.6-alpine"
+  memcached: "nauta/memcached:1.5.6"
   imagePullPolicy: IfNotPresent
   ## Specify imagePullSecrets
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
@@ -16,7 +16,6 @@ images:
 memcached:
   maxItemMemory: 64
   verbosity: v
-  extendedOptions: modern
 
 ## ingress settings - Optional
 ingress:
