@@ -93,8 +93,6 @@ spec:
               volumeMounts:
                 - name: shared-data
                   mountPath: /pod-data
-              securityContext:
-                privileged: true
               resources:
                 requests:
                   cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu }}

@@ -30,7 +30,13 @@ spec:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              command: ["/bin/bash", "-c", "python {{ $command_args }}"]
+              command: ["python"]
+              args: [
+                "main.py",
+                {{ range .Values.commandline.args }}
+                "{{.}}",
+                {{ end }}
+              ]
               env:
               - name: RUN_NAME
                 value: {{ .Release.Name }}
@@ -63,6 +69,8 @@ spec:
                 - name: output-home
                   mountPath: /mnt/output/experiment
                   subPath: {{ .Values.experimentName }}
+                - name: shared-data
+                  mountPath: /pod-data
               securityContext:
                 privileged: true
               resources:
@@ -72,6 +80,26 @@ spec:
                 limits:
                   cpu: {{ default .Values.worker_resources.limits.cpu .Values.worker_cpu }}
                   memory: {{ default .Values.worker_resources.limits.memory .Values.worker_memory }}
+            - name: sidecar
+              image: "127.0.0.1:{{ .Values.registryPort }}/nauta/tfjob-multinode-sidecar:1.0.0"
+              imagePullPolicy: Always
+              env:
+                - name: MY_POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: LOGGING_LEVEL
+                  value: {{ .Values.sidecarLoggingLevel }}
+              volumeMounts:
+                - name: shared-data
+                  mountPath: /pod-data
+              resources:
+                requests:
+                  cpu: {{ default .Values.sidecar_resources.requests.cpu .Values.sidecar_cpu }}
+                  memory: {{ default .Values.sidecar_resources.requests.memory .Values.sidecar_memory }}
+                limits:
+                  cpu: {{ default .Values.sidecar_resources.limits.cpu .Values.sidecar_cpu }}
+                  memory: {{ default .Values.sidecar_resources.limits.memory .Values.sidecar_memory }}
           volumes:
             - name: input-home
               persistentVolumeClaim:
@@ -85,6 +113,8 @@ spec:
             - name: output-public
               persistentVolumeClaim:
                 claimName: output-public
+            - name: shared-data
+              emptyDir: {}
           initContainers:
             - name: init-experiment-pod
               image: "{{ .Values.image.clusterRepository }}"
@@ -111,10 +141,13 @@ spec:
             - name: tensorflow
               image: "{{ .Values.image.clusterRepository }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              command: ["/bin/bash"]
-              args:
-                - "-c"
-                - "python {{range .Values.commandline.args}}{{.}} {{end}}& while true ; do if [[ -e /pod-data/END ]] ; then exit 0 ; else sleep 10 ; fi ; done"
+              command: ["python"]
+              args: [
+                "main.py",
+                {{ range .Values.commandline.args }}
+                "{{.}}",
+                {{ end }}
+              ]
               ports:
                 - containerPort: {{ .Values.TensorBoardPort }}
                   name: "tensorboard"
@@ -146,7 +179,7 @@ spec:
                   cpu: {{ default .Values.ps_resources.limits.cpu .Values.ps_cpu }}
                   memory: {{ default .Values.ps_resources.limits.memory .Values.ps_memory }}
             - name: sidecar
-              image: "127.0.0.1:{{ .Values.registryPort }}/nauta/ps-sidecar:1.0.0"
+              image: "127.0.0.1:{{ .Values.registryPort }}/nauta/tfjob-multinode-sidecar:1.0.0"
               imagePullPolicy: Always
               env:
                 - name: MY_POD_NAME
@@ -154,7 +187,7 @@ spec:
                     fieldRef:
                       fieldPath: metadata.name
                 - name: LOGGING_LEVEL
-                  value: {{ .Values.psSidecarLoggingLevel }}
+                  value: {{ .Values.sidecarLoggingLevel }}
               volumeMounts:
                 - name: shared-data
                   mountPath: /pod-data

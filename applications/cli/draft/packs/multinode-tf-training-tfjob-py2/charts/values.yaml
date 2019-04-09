@@ -51,10 +51,12 @@ sidecar_resources:
 sidecar_cpu: null
 sidecar_memory: null
 
+
 experimentName: {{ NAUTA.ExperimentName }} 
 registryPort: {{ NAUTA.RegistryPort }}
+
 workersCount: 3
-psSidecarLoggingLevel: "WARNING"
+sidecarLoggingLevel: "WARNING"
 pServersCount: 1
 
 cpu_fraction: 1
