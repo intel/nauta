@@ -388,3 +388,12 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/utils/nginx"
     push: False
+  shared/build/argo:
+    version: "v2.2.1"
+    required:
+      BASE_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/argo"
+    push: False
+    args:
+      ARGO_VERSION: "v2.2.1"

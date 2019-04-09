@@ -331,13 +331,18 @@ local_images:
     directory: "{{ playbook_dir }}/../../nauta-containers/buildkit"
   nauta/argo-controller:
     version: "v2.2.1"
-    image: "argoproj/workflow-controller:v2.2.1"
-    method: pull
+    required:
+      ARGO_IMAGE: "shared/build/argo"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/argo/argo-controller"
   nauta/argoexec:
     version: "v2.2.1"
-    image: "argoproj/argoexec:v2.2.1"
-    method: pull
-
+    required:
+      ARGO_IMAGE: "shared/build/argo"
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/argo/argoexec"
 
 # WARNING
 # setting chart_values will work only if chart does not contain values.yaml file
