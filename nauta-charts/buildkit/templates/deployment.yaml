@@ -21,6 +21,7 @@ spec:
     spec:
       containers:
       - image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ required "NAUTA buildkit image is required" .Values.image }}
+        command: [ "/usr/bin/buildkitd" ]
         args:
         - --addr
         - tcp://0.0.0.0:{{ .Values.buildkitd_port }}

@@ -317,8 +317,17 @@ local_images:
     method: pull
   nauta/buildkit:
     version: "master"
-    image: "moby/buildkit:master"
-    method: pull
+    required:
+      BASE_IMAGE: "shared/centos/build-go-1-12"
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/buildkit/buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz
+        dest: buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz
+        checksum: 7d37ac5769781acfa73bdf4ec1906ff2817c474b97a9c5e0cd86c07973741647
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/buildkit/runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz
+        dest: runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz
+        checksum: dc0a26cb7a14837c86abfdde71e9d29e12008298660d77d4de1de162726c8ddd
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/buildkit"
   nauta/argo-controller:
     version: "v2.2.1"
     image: "argoproj/workflow-controller:v2.2.1"
