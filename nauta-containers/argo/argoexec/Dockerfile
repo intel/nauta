@@ -1,14 +1,24 @@
 ARG ARGO_IMAGE
 ARG BASE_IMAGE=centos:7.6.1810
 
+ARG KUBERNETES_DATA_IMAGE
+
+ARG DOCKER_RPM_IMAGE
+FROM ${DOCKER_RPM_IMAGE} as dockerrpm
+
+FROM ${KUBERNETES_DATA_IMAGE} as k8s
+
 FROM ${ARGO_IMAGE} as argo-build
 FROM ${BASE_IMAGE}
 
+RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2
+
+COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.x86_64.rpm /
+RUN yum install -y /docker-ce-18.06.3-nauta.x86_64.rpm
+
+COPY --from=k8s /build-output/kubernetes/kubectl /usr/local/bin/kubectl
+RUN chmod +x /usr/local/bin/kubectl
+
 RUN yum update -y && yum install -y curl jq procps git tar mime-support
 
-ENV KUBECTL_VERSION=1.13.4
-RUN curl -L -o /usr/local/bin/kubectl -LO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
-    chmod +x /usr/local/bin/kubectl
-
-COPY --from=argo-build /usr/local/bin/docker /usr/local/bin/
 COPY --from=argo-build /build/work/src/github.com/argoproj/argo/dist/argoexec /usr/local/bin/
