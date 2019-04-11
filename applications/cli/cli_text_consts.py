@@ -185,6 +185,13 @@ class UserDeleteCmdTexts:
     DELETION_DELETING_USERS_REPOSITORY = "- deleting user's repository"
 
 
+class UserUpgradeCmdTexts:
+    SHORT_HELP = "Command used to upgrade users on the platform. Can only be run by a platform administrator."
+    UPGRADE_IN_PROGRESS = "Users upgrade in progress..."
+    UPGRADE_SUCCEEDED = "Users upgrade succeeded"
+    UPGRADE_FAILED = "Users upgrade failed"
+
+
 class LaunchCmdTexts:
     HELP = "Launch the web user-interface or TensorBoard. Runs as a process in the system console until the " \
            "user stops the process. To run in the background, add '&' at the end of the line."

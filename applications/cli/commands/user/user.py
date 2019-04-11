@@ -19,6 +19,7 @@ import click
 from commands.user.create import create
 from commands.user.delete import delete
 from commands.user.list_users import list_users
+from commands.user.upgrade import upgrade
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger
 from cli_text_consts import UserCmdTexts as Texts
@@ -36,3 +37,4 @@ def user():
 user.add_command(create)
 user.add_command(list_users)
 user.add_command(delete)
+user.add_command(upgrade)
