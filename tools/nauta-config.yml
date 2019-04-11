@@ -309,9 +309,12 @@ local_images:
     image: "gitea/gitea:1.6.1"
     method: pull
   nauta/postgres:
-    version: "11"
-    image: "postgres:11"
-    method: pull
+    version: "9.2.24"
+    required:
+      BASE_IMAGE: "shared/centos"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/postgres"
   nauta/memcached:
     version: "1.5.6"
     required:

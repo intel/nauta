@@ -41,6 +41,7 @@
                     <exclude>**/tmp-go/</exclude>
                     <exclude>**/applications/cli/build/</exclude>
                     <exclude>**/docs/</exclude>
+                    <exclude>**/systemctl-replacement/**</exclude>
                 </excludes>
                 <mapping>
                     <js>JAVADOC_STYLE</js>
