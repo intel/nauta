@@ -208,7 +208,8 @@ def test_modify_dockerfile_if_script_path_provided(mocker):
     sh_move_mock = mocker.patch("shutil.move")
 
     tf_training.modify_dockerfile(experiment_folder=EXPERIMENT_FOLDER, script_location=None,
-                                  script_folder_location=script_folder_location)
+                                  script_folder_location=script_folder_location, experiment_name='test-experiment',
+                                  username='fake-user')
 
     assert sh_move_mock.call_count == 1, "dockerfile wasn't moved"
     assert open_mock.call_count == 2, "dockerfiles weren't read/modified"
