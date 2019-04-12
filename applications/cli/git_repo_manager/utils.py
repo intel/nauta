@@ -71,7 +71,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_WORK_TREE': git_work_dir,
                    'GIT_TERMINAL_PROMPT': '0',
-                   'SSH_AUTH_SOCK': '', # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
+                   'SSH_AUTH_SOCK': '',  # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
                    }
         env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
         logger.debug(f'Git client env: {env}')
@@ -121,7 +121,7 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
         git_env = {'GIT_SSH_COMMAND': f'ssh -o StrictHostKeyChecking=no -i "{private_key_path}"',
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_TERMINAL_PROMPT': '0',
-                   'SSH_AUTH_SOCK': '', # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
+                   'SSH_AUTH_SOCK': '',  # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
                    }
         env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
         logger.debug(f'Git client env: {env}')
@@ -134,8 +134,10 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
             git.config('--local', 'user.email', f'{username}@nauta.invalid')
             git.config('--local', 'user.name', f'{username}')
             git.fetch()
-            git.tag('-d', experiment_name)
-            git.push('origin', f':refs/tags/{experiment_name}')
+            output, _, _ = git.tag('-l', experiment_name)
+            if output:
+                git.tag('-d', experiment_name)
+                git.push('origin', f':refs/tags/{experiment_name}')
     except Exception:
         logger.exception(f'Failed to delete tag {experiment_name} from git repo manager.')
         raise
