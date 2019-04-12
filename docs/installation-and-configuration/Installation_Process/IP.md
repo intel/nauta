@@ -92,6 +92,12 @@ To upgrade Nauta, do the following:
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
 
+After successful execution of platform upgrade you need to also upgrade users by running:
+
+`nctl user upgrade`
+
+This command can be run only by an administrator.
+
 This completes the Nauta Upgrade Process.
 
 ## Deleting Nauta
