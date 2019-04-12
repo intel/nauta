@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE}
 
 RUN mkdir -p /build/work
 
-ENV GO_VERSION=1.10.2
+ENV GO_VERSION=1.12.1
 ENV GO_ARCH=amd64
 ENV GO_OS=linux
 ENV GO_FILE=go${GO_VERSION}.${GO_OS}-${GO_ARCH}.tar.gz

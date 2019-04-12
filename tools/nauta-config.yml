@@ -306,8 +306,15 @@ local_images:
     directory: "{{ playbook_dir }}/../../nauta-containers/kube-batch"
   nauta/gitea:
     version: "1.6.1"
-    image: "gitea/gitea:1.6.1"
-    method: pull
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/gitea/v1.6.1.tar.gz
+        dest: gitea-v1.6.1.tar.gz
+        checksum: cf4e283df164841f1b302e26ae1cbcdea68539de41f2086533c095b264df9a7c
+    required:
+      BASE_IMAGE: "shared/centos/build-go-1-12"
+      DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/gitea"
   nauta/postgres:
     version: "9.2.24"
     required:
