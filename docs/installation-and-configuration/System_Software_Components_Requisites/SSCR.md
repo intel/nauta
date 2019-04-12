@@ -8,26 +8,25 @@ The following table lists Nauta's external software components and their version
 
 Name | Version | Project link
 --- | --- | --- 
-addon-resizer | 1.8.1 | https://github.com/kubernetes/autoscaler/tree/master/addon-resizer 
+addon-resizer | 1.12 | https://github.com/kubernetes/autoscaler/tree/master/addon-resizer 
 dashboard | 1.8.3 | https://github.com/kubernetes/dashboard
 defaultbackend | 1.4 | https://github.com/kubernetes/ingress-nginx
 dnsmasq-nanny | 1.14.8 | https://github.com/kubernetes/dns
 dns-sidecar | 1.14.8 | https://github.com/kubernetes/dns
 etcd | 3.3.9 | https://github.com/coreos/etcd
-elasticsearch | 6.4.0 | https://github.com/elastic/elasticsearch
+elasticsearch | 6.6.2 | https://github.com/elastic/elasticsearch
 flannel | 0.9.1 | https://github.com/coreos/flannel
-fluentd | 1.3 | https://www.fluentd.org/
-heapster | 1.4.2 | https://github.com/kubernetes/heapster
-ingress | 0.14.0 | http://quay.io/kubernetes-ingress-controller/nginx-ingress-controller
-kubectl | 1.10.6 | https://github.com/kubernetes/kubernetes/tree/master/pkg/kubectl
-kube-dns | 1.14.8 | https://github.com/kubernetes/dns 
-kube-proxy | 1.10.6 | https://hub.docker.com/r/googlecontainer/kube-proxy-amd64/
-mkl-dnn | 0.14 | https://github.com/intel/mkl-dnn
-nginx | 1.14.0 | https://www.nginx.com/ 
+fluentd | 1.2.5 | https://www.fluentd.org/
+heapster | 1.4.3 | https://github.com/kubernetes/heapster
+ingress | 0.24.0 | http://quay.io/kubernetes-ingress-controller/nginx-ingress-controller
+kubectl | 1.10.11 | https://github.com/kubernetes/kubernetes/tree/master/pkg/kubectl
+kube-dns | 1.14.12 | https://github.com/kubernetes/dns 
+kube-proxy | 1.10.11 | https://hub.docker.com/r/googlecontainer/kube-proxy-amd64/
+nginx | 1.15.9 | https://www.nginx.com/ 
 pause | 3.1 | https://hub.docker.com/r/googlecontainer/pause-amd64/
 redsocks | 0.5 | https://github.com/darkk/redsocks
-registry | 2.6.2 | https://github.com/docker/distribution
-tensorflow | 1.12.0 | https://github.com/tensorflow/tensorflow
+registry | 2.7 | https://github.com/docker/distribution
+tensorflow | 1.13.1 | https://github.com/tensorflow/tensorflow
 helm | 2.11.0 | https://github.com/helm/helm
 
 ## Key Components
