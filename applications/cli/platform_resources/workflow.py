@@ -22,7 +22,7 @@ from typing import Optional
 
 from platform_resources.platform_resource import PlatformResource
 from util.logger import initialize_logger
-from util.config import NAUTA_NAMESPACE, NAUTA_SERVICE_DNS, NAUTAConfigMap
+from util.config import NAUTA_NAMESPACE, NAUTAConfigMap
 
 logger = initialize_logger(__name__)
 
@@ -116,9 +116,9 @@ class ArgoWorkflow(PlatformResource):
 
 
 class ExperimentImageBuildWorkflow(ArgoWorkflow):
-    GIT_REPO_MANAGER_SERVICE = f'nauta-gitea-ssh.{NAUTA_NAMESPACE}.{NAUTA_SERVICE_DNS}'
-    DOCKER_REGISTRY_SERVICE = f'nauta-docker-registry.{NAUTA_NAMESPACE}.{NAUTA_SERVICE_DNS}:5000'
-    BUILDKITD_SERVICE = f'nauta-buildkit.{NAUTA_NAMESPACE}.{NAUTA_SERVICE_DNS}:1234'
+    GIT_REPO_MANAGER_SERVICE = f'nauta-gitea-ssh.{NAUTA_NAMESPACE}'
+    DOCKER_REGISTRY_SERVICE = f'nauta-docker-registry.{NAUTA_NAMESPACE}:5000'
+    BUILDKITD_SERVICE = f'nauta-buildkit.{NAUTA_NAMESPACE}:1234'
 
     def __init__(self, username: str = None, experiment_name: str = None,
                  name: str = None, namespace: str = None,

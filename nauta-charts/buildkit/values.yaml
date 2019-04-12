@@ -7,4 +7,4 @@ storage_capacity: 32Gi
 storage_host_path: /data/nauta/buildkit 
 prune_storage_limit: 16000
 
-http_docker_registry: nauta-registry-nginx.nauta.svc.kubernetes.nauta:5000
+http_docker_registry: nauta-registry-nginx.nauta:5000

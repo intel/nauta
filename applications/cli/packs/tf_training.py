@@ -21,18 +21,12 @@ import shutil
 from typing import Tuple, List, Optional
 import jinja2
 
-import docker
-import docker.errors
 import yaml
-import toml
 
 
-from util.k8s import k8s_info
 from util.logger import initialize_logger
 from util.config import FOLDER_DIR_NAME
-from util.config import NAUTAConfigMap
-from util.spinner import spinner
-
+from util.config import NAUTAConfigMap, NAUTA_NAMESPACE
 import packs.common as common
 import dpath.util as dutil
 from cli_text_consts import PacksTfTrainingTexts as Texts
@@ -45,7 +39,7 @@ WORK_CNT_PARAM = "workersCount"
 P_SERV_CNT_PARAM = "pServersCount"
 POD_COUNT_PARAM = "podCount"
 
-NAUTA_REGISTRY_ADDRESS = 'nauta-registry-nginx.nauta.svc.kubernetes.nauta:5000'
+NAUTA_REGISTRY_ADDRESS = f'nauta-registry-nginx.{NAUTA_NAMESPACE}:5000'
 
 
 def update_configuration(run_folder: str, script_location: str,
