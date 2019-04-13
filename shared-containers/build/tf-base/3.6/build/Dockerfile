@@ -14,10 +14,12 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python3.6
 ENV PIP=pip3.6
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean -U pip==19.0.* setuptools==40.6.*
-RUN ${PIP} install --no-binary :all: --no-clean --ignore-installed scikit-build
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean -U pip==18.0.* setuptools==40.6.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean --ignore-installed scikit-build ptyprocess==0.5.2
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install \
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --ignore-installed entrypoints
+
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean \
         Pillow==5.4.* \
         h5py==2.9.* \
         ipykernel==5.1.* \

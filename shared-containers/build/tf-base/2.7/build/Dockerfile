@@ -14,30 +14,30 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python2.7
 ENV PIP=pip2.7
 
-RUN ${PIP} install --force-reinstall --no-binary :all: --no-clean -U setuptools==40.6.*
-RUN ${PIP} install --force-reinstall --no-binary :all: --no-clean -U pip==19.0.*
-RUN ${PIP} install --no-binary :all: --no-clean --ignore-installed scikit-build
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary :all: --no-clean -U setuptools==40.6.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary :all: --no-clean -U pip==19.0.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean --ignore-installed scikit-build ptyprocess==0.5.2 MarkupSafe==1.1.1 numpy==1.16.*
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install \
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --ignore-installed nbconvert entrypoints
+
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean \
+        ipykernel==4.8.2 \
         Pillow==5.4.* \
         h5py==2.9.* \
+        matplotlib==2.2.0 \
         ipykernel==4.8.2 \
         jupyter==1.0.* \
-        matplotlib==2.2.* \
         mock==2.0.* \
-        numpy==1.16.* \
         scipy==1.2.* \
         scikit-learn==0.20.* \
         pandas==0.23.* \
         wheel==0.32.* \
         sklearn \
         tornado==4.5.3 \
-        ptyprocess==0.5.0 \
         prompt-toolkit==1.0.15 \
         testpath==0.3.1 \
-        nbconvert==4.3.0 \
         terminado==0.6 \
-        notebook==4.3.2 \
+        notebook==4.4.1 \
         keras-applications==1.0.7 \
         keras-preprocessing==1.0.9
 
