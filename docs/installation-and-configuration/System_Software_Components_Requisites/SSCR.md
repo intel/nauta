@@ -18,16 +18,18 @@ elasticsearch | 6.6.2 | https://github.com/elastic/elasticsearch
 flannel | 0.9.1 | https://github.com/coreos/flannel
 fluentd | 1.2.5 | https://www.fluentd.org/
 heapster | 1.4.3 | https://github.com/kubernetes/heapster
+helm | 2.11.0 | https://github.com/helm/helm
 ingress | 0.24.0 | http://quay.io/kubernetes-ingress-controller/nginx-ingress-controller
 kubectl | 1.10.11 | https://github.com/kubernetes/kubernetes/tree/master/pkg/kubectl
 kube-dns | 1.14.12 | https://github.com/kubernetes/dns 
 kube-proxy | 1.10.11 | https://hub.docker.com/r/googlecontainer/kube-proxy-amd64/
-nginx | 1.15.9 | https://www.nginx.com/ 
+mkl-dnn | 0.14 | https://github.com/intel/mkl-dnn
+nginx | 1.14.0 | https://www.nginx.com/ 
 pause | 3.1 | https://hub.docker.com/r/googlecontainer/pause-amd64/
 redsocks | 0.5 | https://github.com/darkk/redsocks
 registry | 2.7 | https://github.com/docker/distribution
 tensorflow | 1.13.1 | https://github.com/tensorflow/tensorflow
-helm | 2.11.0 | https://github.com/helm/helm
+
 
 ## Key Components
 
@@ -39,9 +41,9 @@ The Nauta installation package consists of two major components:
 
 Nauta software components are optimized for AI containers containing Nauta-optimized libraries.
 
-## Next Steps: How to Build Nauta
+## Next Steps: Installer System Requirements
 
-* [Building Nauta](../How_to_Build_Nauta/HBN.md)
+* [Installer System Requirements](../Installer_System_Requirements/ISR.md)
 
 ----------------------
 
@@ -50,7 +52,6 @@ Nauta software components are optimized for AI containers containing Nauta-optim
 * [README](../README.md)
 
 ----------------------
-
 
 
 

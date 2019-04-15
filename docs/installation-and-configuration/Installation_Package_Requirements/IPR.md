@@ -11,7 +11,7 @@ Copy the package to the installer machine, then untar it using the following com
 In extracted archive, the following appears:
 - **Files**
   - **installer.sh:** sh script
-  - **ansible.cfg:**  configuration file for Ansible*
+  - **ansible.cfg:** configuration file for Ansible*
 
 - **Folders**
    - **bin:** binary directory

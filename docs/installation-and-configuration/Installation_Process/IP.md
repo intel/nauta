@@ -4,7 +4,6 @@ Before proceeding with this step, you _must_ create an _Inventory_ and _Configur
 
 This section discusses the following main topics: 
 
-- [Creating an Inventory or Configuration File ](#creating-an-inventory-or-configuration-file)  
 - [Kernel Upgrade](#kernel-upgrade)
 - [Nauta Installation](#nauta-installation)
 - [Installation Script Options](#installation-script-options)
@@ -12,29 +11,9 @@ This section discusses the following main topics:
 - [Upgrading Nauta](#upgrading-nauta)
 - [Deleting Nauta](#deleting-nauta)  
 
-## Creating an Inventory or Configuration File 
-
-The Inventory file defines where your master and worker nodes reside, and how to access them. The Configuration file defines  your proxy settings, network quirks and filesystem preferences. Should you need to create an _Inventory_ and/or _Configuration_ the instructions are below. 
-
-### Inventory File Creation
-
-To create Nauta's _Inventory file_, do the following:
-
-1. Copy the Inventory file example information: [Inventory File Information](../Inventory_Tasks/IT.md).
-
-1. Modify the newly created Inventory file to suit your needs using your favorite text editor (vi for example). 
-
-### Configuration File Creation 
-
-To modify Nauta's Configuration file to define your proxy, network quirks and filesystem preferences. To create the configuration file:
-
-1. Copy the Configuration file example information: [Configuration File Information](../Configuration_Tasks_Variables/CTV.md).
-
-1. Modify the newly created Configuration file to suit your needs using your favorite text editor (vi for example).
-
 ## Kernel Upgrade
 
-If you run Linux* kernel prior to 4.* version it is recommended that you upgrade it on all nodes of a cluster before performing a platform installation. 
+If you run Linux kernel prior to 4.* version it is recommended that you upgrade it on all nodes of a cluster before performing a platform installation. 
 
 Running heavy training jobs on workers with the operating system kernel older than 4.* may lead to hanging the worker node. 
 - See [Red Hat Bugzilla – Bug 1507149](https://bugzilla.redhat.com/show_bug.cgi?id=1507149) for more information.
@@ -51,7 +30,7 @@ To install the new kernel refer to: [CHAPTER 5. MANUALLY UPGRADING THE KERNEL](h
 
 ## Nauta Installation
 
-Before installing Nauta, ensure that you have met all the hardware and software requirements. Refer to [How to Build Nauta](../How_to_Build_Nauta/HBN.md) for more information. 
+Before installing Nauta, ensure that you have met all the hardware and software requirements.  
 
 ### Nauta Installation Procedure
 
@@ -75,9 +54,9 @@ To install Nauta, follow these steps:
 
 Invoke `./installer.sh` with one of the following options:
 
-* **install:** Use this script to install Kubernetes and Nauta as part of your installation
-* **platform-install:** Use this script to install **Kubernetes only**
-* **nauta-install:** Use this script to install **Nauta only**
+* **install:** Use this option to install Kubernetes and Nauta as part of your installation
+* **platform-install:** Use this option to install **Kubernetes only**
+* **nauta-install:** Use this option to install **Nauta only**
     - **Note:** If you select this option, it is _assumed_ that Kubernetes is already installed. In addition, this requires the same procedure for Nauta upgrades (see below). 
 * **nauta-upgrade:** Nauta installation upgrade (see [Nauta Installation Process](../Installation_Process/IP.md) for Nauta upgrade  procedures). 
 
@@ -101,7 +80,7 @@ As an output of the Nauta installation, files are created in main installation d
 
 As an admin, you may be required to upgrade Nauta to gain new features, implement new networking configurations, or stay up-to-date with current versions, and so on. 
 
-### Upgrading Nauta Procedure
+## Upgrading Nauta
 
 To upgrade Nauta, do the following:
 
@@ -125,7 +104,6 @@ To upgrade Nauta, do the following:
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
 
-<<<<<<< HEAD
 After successful execution of platform upgrade you need to also upgrade users by running:
 
 `nctl user upgrade`
@@ -133,31 +111,6 @@ After successful execution of platform upgrade you need to also upgrade users by
 This command can be run only by an administrator.
 
 This completes the Nauta Upgrade Process.
-
-## Deleting Nauta
-
-** This is very dangerous operation, please use with caution **
-
-**Common packages and files that will be deleted:**
-
-    * Docker and all images 
-    * Nginx and all configuration
-    * python2-pip
-    * container-selinux
-    * Kubernetes and all configuration
-
-To delete Nauta, do the following:
-
-`export ENV_INVENTORY=<absolute path to inventory file>`
-
-Call the installer with nauta-uninstall option:
-
-`./installer.sh nauta-uninstall`
-
-This completetly uninstall nauta from system.
-=======
-This completes the Nauta Installation Process.
->>>>>>> 6755dd5... KAM Updates Large
 
 
 ## Next Steps: User Management Tasks
@@ -171,5 +124,3 @@ This completes the Nauta Installation Process.
 * [README](../README.md)
 
 ----------------------
-
-

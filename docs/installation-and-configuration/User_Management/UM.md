@@ -15,15 +15,15 @@ When you create a new user account it creates a _user account configuration file
 
 Before creating user accounts, you need to complete the following steps:
 
-1. Install nclt using the description in the [Nauta User Guide](/docs/user-guide).
+1. Install nctl using the description in the [Nauta User Guide](/docs/user-guide).
    
-1. Copy the `nauta-admin.config` file to the machine where `nctl` resides. Place this configuration file in the `<location>` on the machine where nctl is running.  
+2. Copy the `nauta-admin.config` file to the machine where nctl resides.  
 
 - An Administrator will need the `nauta-admin.config` file on their machine (the machine where nctl resides) and it needs to be set in the `kube.config' file.
 
 1. Set up `KUBECONFIG` variable to point to the full path of `nauta-admin.config` to where you copied the file in step 2. Follow the instructions below (_Creating a User_) to create users.
 
-`$ export KUBECONFIG=<PATH>/nauta-admin.config`
+`export KUBECONFIG=<PATH>/nauta-admin.config`
 
 ## Creating a User Account
 
@@ -33,13 +33,13 @@ The following is used to create a Nauta user, not an Administrator. Only the per
 
 1. The Nauta user create command sets up a namespace and associated roles for the named user on the cluster. It sets up home directories, named after the username, on the input and output network shares with file-system level access privileges. To create a user:
  
-   `$ nctl user create <username>`
+   `nctl user create <username>`
 
 2. This command also creates a configuration file named: '<username>.config' and places this file in the user's home directory. To verify that your new user has been created:
 
-   `$nctl user list`
+   `nctl user list`
 
-3. This lists all users, including the new user just added, but _does not_ show Administrators. An example is shown below (scroll right to see full contents). 
+3. This lists all users, including the new user just added, but _does not_ show Administrators. An example is shown below. (scroll right to see full contents). 
 
 ```
 | Name    | Creation date          | Date of last submitted job   |   Number of running jobs |   Number of queued jobs|
@@ -56,11 +56,11 @@ The above command lists all users, including any new user just added.
 
 4. As an Administrator, you need to provide '<username>.config' file to the Nauta user. The user _must save_ this file to an appropriate location of their choosing on the machine that is running Nauta; for example, their `home directory` using the following command:
    
-   `$ cp <username>.config ~/`
+   `cp <username>.config ~/`
 
 5. Use the export command to set this variable for the user:
 
-   `$ export KUBECONFIG=~/<local_user_folder>/<username>.config`
+   `export KUBECONFIG=~/<username>.config`
 
 ### Limitations
 
@@ -73,7 +73,7 @@ Only an Administrator can delete user accounts and deleting a user removes that 
 
 To remove a user:
 
- `$ nctl user delete <user_name>`
+ `nctl user delete <user_name>`
 
 This command asks for confirmation. 
 
@@ -85,7 +85,7 @@ The command may take up to 30 seconds to delete the user and you may receive the
 
 To permanently remove (_Purge_) all artifacts associated with the user and all data related to past experiments submitted by that user (but excluding the contents of the user’s input and output folders): 
 
-`$ nctl user delete <user_name> -p/--purge`
+`nctl user delete <user_name> -p/--purge`
 
 This command asks for confirmation. 
 
@@ -103,13 +103,13 @@ Do the following to launch the Web UI:
 
 1. Use the following command:
 
-`$ nctl launch webui` 
+`nctl launch webui` 
     
 2. Your default Web browser opens and displays the Web UI. For Administrators, the Web UI displays a list experiments and shows the following message:
 
 `No data for currently signed user. Click here to load all users data.`
 
-The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates. Refer to the [Nauta User Guide](/docs/user-guide) for detailed Nauta Web UI information.
+The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates. Refer to the [Nauta User Guide](/docs/user-guide) for detailed Nauta Web UI information.  
 
 ![New Users Added](../Z_examples/WEB.PNG)
 
@@ -125,3 +125,4 @@ The image shows the Nauta Web UI. This UI contains experiment information that c
 * [README](../README.md)
 
 ----------------------
+

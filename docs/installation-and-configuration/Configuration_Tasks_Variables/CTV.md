@@ -1,17 +1,17 @@
-# Configuration Tasks
+# Configuration File Tasks
 
 This section discusses the following main topics: 
 
+- [Configuration Overview](#configuration-overview)  
 - [Configuration Considerations](#configuration-considerations)  
 - [Example Configuration File](#example-configuration-file)  
 - [YAML File Example](#yaml-file-example)
 - [Default Value of an Empty Dictionary](#default-value-of-an-empty-dictionary)
 - [Deciding to Leave the Proxy Parameter Empty](#deciding-to-leave-the-proxy-parameter-empty)
 - [Docker Log Driver Settings](#docker-log-driver-settings)  
-- [Network File System (NFS) Overview](#network-file-system-overview)
+- [Network File System Overview](#network-file-system-overview)
 - [Redsocks Overview](#redsocks-overview)  
 - [Networking Configuration Example Diagram](#networking-configuration-example)
-- [System Architecture Diagram Example](#system-architecture-diagram-example)  
 
 ## Configuration Overview
 
@@ -48,6 +48,9 @@ This is an _example_ file, containing dummy values for a few of the supported co
 Below is an example YAML file that provides examples of proxy settings, DNS server settings, Kubernetes, and so on. 
 If you are unsure how to do this, see the example  [Inventory File Example](../Inventory_Tasks/IT.md) and [Configuration File Example](../Configuration_Tasks_Variables/CTV.md) and refer to the [Installation Process](../Installation_Process/IP.md). 
 
+Below is an example YAML file that provides examples of proxy settings, DNS server settings, Kubernetes, and so on. 
+If you are unsure how to do this, see the example  [Inventory File Example](../Inventory_Tasks/IT.md) and [Configuration File Example](../Configuration_Tasks_Variables/CTV.md) and refer to the [Installation Process](../Installation_Process/IP.md). 
+
 ```yaml
 # Proxy Settings
 proxy:
@@ -56,8 +59,7 @@ proxy:
   https_proxy: http://<your proxy address and port>
   no_proxy: <localhost, any other addresses>, 10.0.0.1,localhost,.nauta
 
-# This is a list of DNS servers used for resolution: a max of three entries.
-
+# This is a list of DNS servers used for resolution: a maximum of three entries.
 dns_servers:
   - 8.8.8.8
   - 8.8.4.4
@@ -193,7 +195,7 @@ kubernetes_svc_subnet: 10.4.0.0/16
 ```
 
 ### apiserver_audit_log_maxage
-- **Description:** Maximum age in days for Kubernetes apiserver audit logs.
+- **Description:** The maximum age in days for kubernetes apiserver audit logs.
 - **Default value:** 7
 
 ```yaml
@@ -201,7 +203,7 @@ apiserver_audit_log_maxage: 7
 ```
 
 ### apiserver_audit_log_maxbackup
-- **Description:** Maximum number of log files kept for Kubernetes apiserver audit.
+- **Description:** The maximum number of log files kept for kubernetes apiserver audit.
 - **Default value:** 10
 
 ```yaml
@@ -209,7 +211,7 @@ apiserver_audit_log_maxbackup: 10
 ```
 
 ### apiserver_audit_log_maxsize
-- **Description:** Maximum audit log file size in MB.
+- **Description:** The maximum audit log file size in MB.
 - **Default value:** 1024
 
 ```yaml
@@ -346,6 +348,8 @@ Redsocks is a tool that allows you to redirect network traffic through a Socket 
 
 - Refer to [How to transparently use a proxy with any application (Docker) using Iptables and Redsocks](https://medium.com/datadriveninvestor/how-to-transparently-use-a-proxy-with-any-application-docker-using-iptables-and-redsocks-b8301ddc4e1e) for more information. 
 
+- Refer to [How to transparently use a proxy with any application (Docker) using Iptables and Redsocks](https://medium.com/datadriveninvestor/how-to-transparently-use-a-proxy-with-any-application-docker-using-iptables-and-redsocks-b8301ddc4e1e) for more information. 
+
 ## Redsocks Configuration 
 
 Redsocks configuration is an **optional** part of the installer; however, if you choose this option then configure Redsocks appropriately in your environment/organization.
@@ -403,13 +407,6 @@ Default: cni0
 The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.5. All interfaces (both external and internal) are Ethernet interfaces. 
 
 ![New Users Added](../Z_examples/NN.png)
-
-#  System Architecture Diagram Example
-
-The Figure below shows an example of the Natua System Architecture and how the Nauta system works with Docker, Kubernetes, and so on.  
-
-![New Users Added](../Z_examples/SAD.png)
-
 
 ## Next Steps: Nauta Installation Requirements
 

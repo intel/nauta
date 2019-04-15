@@ -37,6 +37,6 @@ Copyright © 2019 Intel Corporation. All rights reserved.
 
 Intel and the Intel logo are trademarks of Intel Corporation in the U.S. and other countries.
 
-'*'    Other names and brands may be claimed as the property of others.
+Other names and brands may be claimed as the property of others.
 This document contains information on products and/or processes in development.
 
