@@ -8,3 +8,11 @@ Nauta input folder.
    `nctl mount`
 
 2. Execute the unmount using `umount` or `net use` as appropriate. The command is dependent on the operating system.
+
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------

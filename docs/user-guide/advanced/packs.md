@@ -1,18 +1,26 @@
 # Controlling Packs Parameters
 
+This section discusses the following main topics: 
+
+ - [Pack Definition](#pack-definition)
+ - [Modifying Values](#modifying-values)  
+ - [Experiment Resources](#experiment-resources)
+
 ### Pack Definition 
 
-The packs are located in the _nctl_config_ folder. Navigate to _.draft/packs/https-github.com-Azure-draft/packs_ folder to list existing packs.
+The packs are located in the _nctl_config_ folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs.
 
 The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist of the parts:
 
-* docker image specification _Dockerfile_ 
-* helm deployment _charts_ folder
+* Docker image specification _Dockerfile_
 
-All the pack parameters that can be controlled by _nctl_ are defined in _charts/values.yml_ file.
+* Helm deployment _charts_ folder
 
-Example _values.yaml_ file taken from _multinode-tf-training-tfjob_ pack:
+All the pack parameters that can be controlled by _nctl_ are defined in `charts/values.yml` file.
 
+The example `values.yaml` file (shown below) is taken from `multinode-tf-training-tfjob` pack:
+
+```
 	# Default values for charts.
 	# This is a YAML-formatted file.
 	# Declare variables to be passed into your templates.
@@ -70,7 +78,8 @@ Example _values.yaml_ file taken from _multinode-tf-training-tfjob_ pack:
 	workersCount: 3
 	psSidecarLoggingLevel: "WARNING"
 	pServersCount: 1
-    
+```    
+
 ### Modifying Values
 
 The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
@@ -81,9 +90,11 @@ The values can be modified directly by editing the _values.yml_ file or by provi
 The _-p_ parameter can be provided multiple times. Format specification:
 
  * 'key value' or 'key.subkey.subkey2 value'
- * for lists: 'key "['val1', 'val2']"'
- * for maps: 'key "{'a': 'b'}"'
  
+ * for lists: 'key "['val1', 'val2']"'
+ 
+ * for maps: 'key "{'a': 'b'}"'
+  
 #### Example
 
 _nctl_ experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
@@ -128,5 +139,11 @@ To change these defaults, following parameters should be adjusted (using methods
 | tf-training-tfjob | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------
+**IMPORTANT:** Where you see * for example TensorBoard* this indicates other names and brands may be claimed as the property of others. It _**does not**_ indicate a special character, command, variable, or parameter unless otherwise indicated. 
 
 

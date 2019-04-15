@@ -1,17 +1,23 @@
-# Accessing the Kubernetes Resource Dashboard
+# Kubernetes Resource Dashboard Overview
 
-Kubernetes manages containerized workloads and services, to manage resources given to a particular experiment and monitor workload statuses and resource consumption. Here is an overview: https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+Kubernetes provides a way to manage containerized workloads and services, to manage resources given to a particular experiment and monitor workload statuses and resource consumption. Refer to [Kubernetes Web UI (Dashboard)](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard) for detailed Kubernetes information.
+
+## Access Kubernetes Resource Dashboard
 
 To access Kubernetes:
 
-1. Click the **hamburger menu** ![Image](images/hamburger_menu.png) at the far left of the UI to open a left frame.
+1. Click the **Hamburger Menu** ![Image](images/hamburger_menu.png) at the far left of the UI to open a left frame.
 
-2. Click **Resources Dashboard** to open the Kubernetes resources dashboard in a separate browser tab.
+2. Click **Resources Dashboard** to open the Kubernetes resources dashboard in a new browser window/tab.
 
-The following is an example display of the Kubernetes dashboard.
+An example Kubernetes Dashboard is shown below.
 
 ![Image](images/kubernetes_dashbd.png)
 
+----------------------
 
+## Return to Start of Document
 
+* [README](../README.md)
+----------------------
 

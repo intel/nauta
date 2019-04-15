@@ -2,46 +2,47 @@
 
 The `--help` command provides man-page style help for each nctl command. You can view help for any command and subcommand, and all related parameters.
 
+This section discusses the following main topics:
+
+ - [nctl Help Commands Overview](#nctl-help-commands-overview)
+ - [Other nctl Commands](#other-nctl-commands)
+
+## nctl Help Commands Overview
+
 Entering `nctl --help` or `nctl -h` provides a listing of all nctl commands (without subcommands), as shown next.
 
-    $ nctl -h
+     nctl -h
+```
+   Usage: nctl COMMAND [options] [args]...
 
-    Usage: nctl COMMAND [OPTIONS] [ARGS]...
+  Nauta Client
 
-     Nauta Client
-     
-     To get further help on commands use COMMAND with -h or --help option.
+ Displays additional help information when the -h or --help COMMAND is used.
 
-    Options:
-      -h, --help  Show this message and exit.
+Options:
+  -h, --help Displays help messaging information.
 
-    Commands:
-      config, cfg      Sets values of limits and requests for resources in templates 
-                       used by the system.
-      experiment, exp  Command for starting, stopping, and managing training jobs.
-      launch, l        Command for launching web user-interface or tensorboard. It
-                       works as process in the system console until user does not
-                       stop it. If process should be run as background process,
-                       please add '&' at the end of line
-      mount, m         Displays a command that can be used to mount client's
-                       folders on his/her local machine.
-      predict, p       Command for starting, stopping, and managing prediction
-                       jobs and instances. To get further help on commands use
-                       COMMAND with -h or --help option.
-      user, u          Command for creating/deleting/listing users of the
-                       platform. Can only be run by a platform administrator.
-      verify, ver      Command verifies whether all external components required
-                       by nctl are installed in proper versions. If something is
-                       missing, the application displays detailed information
-                       about it.
-      version, v       Displays the version of the installed nctl application.
+Commands:
+  config, cfg      Set limits and requested resources in templates.          
+  experiment, exp  Start, stop, or manage training jobs.   
+  launch, l        Launch the web user-interface or TensorBoard. Runs as a process 
+                   in the system console until the user stops the process. 
+                   To run in the background, add '&' at the end of the line.
+  mount, m         Displays a command to mount folders on a local machine.
+  predict, p       Start, stop, and manage prediction jobs and instances.
+  user, u          Create, delete, or list users of the platform. 
+                   Can only be run by a platform administrator.
+  verify, ver      Verifies whether all required external components contain 
+                   the proper versions installed.
+  version, v       Displays the version of the installed nctl application.
 
+```
 
 You can view help for any command and available subcommand(s). The following example shows generic syntax; brackets are optional parameters, but [subcommand] requires [command].
 
 `nctl [command_name] [subcommand] --help`
 
-## Overview of the nctl Commands
+## Other nctl Commands
 
 * [nctl experiment](experiment.md)
 * [nctl launch](launch.md)
@@ -51,3 +52,12 @@ You can view help for any command and available subcommand(s). The following exa
 * [nctl verify](verify.md)
 * [nctl version](version.md)
 
+## Return to Start of Document
+
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+---------------------- 

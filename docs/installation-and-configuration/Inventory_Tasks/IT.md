@@ -47,7 +47,7 @@ ansible_ssh_pass | The SSH password to use. | Yes | string | none | always | Pas
 ansible_ssh_host | The name (DNS name) or IP Address of the host to connect to. | Yes | IPaddr | none | always | IP Address
 ansible_ssh_port | The SSH port number, if not defined 22 is used. | No | int | 22 | not using 22 | Port Address
 ansible_ssh_private_key_file | This is a Private Key file used by SSH. | No | string | none | using a keyfile | filename
-internal_interface | This is used for internal communication between Kubernetes* processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always for both for master and worker nodes |  Interface name
+internal_interface | This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always for both for master and worker nodes |  Interface name
 local_data_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_data_path | This is used as the mountpoint for `local_data_device` | No | string | none | used with master nodes |  Absolute path where data is located in file system
@@ -56,3 +56,11 @@ external_interface | This is used for external network communication. | Yes | st
 ## Next Steps: Configuration Tasks
 
 * [Configuring Nauta - Proxies, File System and Network](../Configuration_Tasks_Variables/CTV.md)
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------

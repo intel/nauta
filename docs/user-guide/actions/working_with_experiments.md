@@ -1,6 +1,6 @@
 # Working with Experiments
 
-This section provides greater detail about:
+This section provides greater detail on:
 
 * [Mounting Experiment Input to Storage](mount_exp_input.md)
 * [Launching Jupyter Interactive Notebook](launch_jupyter.md)
@@ -11,9 +11,11 @@ This section provides greater detail about:
 * [Mounting Storage to View Experiment Output](mount_exp_output.md)
 * [Cancelling Experiments](cancel_exp.md)
 
-**Note:** Files located in the input storage are accessible through Jupyter Notebooks. Only files that are 
-written to: `output/home/` are persistently stored. Therefore, changes made during a session to other files (including model scripts) _will not be_ saved when the session is closed. As a result, it is recommended that you save session data to the 
-`output/[experiment]` folder for future use.
 
+----------------------
 
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------
 

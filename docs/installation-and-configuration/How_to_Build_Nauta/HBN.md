@@ -5,40 +5,50 @@
 
 Before building Nauta, ensure that _your system meets_ the following requirements listed below: hardware, operating system, and proxy settings. 
 
-## How to Clone a Repository
+This section discusses the following main topics:
+
+- [How to Clone the Nauta Repository](#how-to-clone-the-nauta-repository)
+- [Hardware Requirements](#hardware-requirements)  
+- [Overall Operating System Requirements](#overall-operating-system-requirements)
+- [Build](#build)
+- [Output of the Build](#output-of-the-build)
+
+## How to Clone the Nauta Repository
 
 Execute the following commands from the command line:
 
-- `git clone --recursive https://github.com/IntelAI/nauta.git`
+`git clone --recursive https://github.com/IntelAI/nauta.git`
 
-- `cd nauta`
+`cd nauta`
+
+**Note:** For full installation information, refer to the Installation Overview section of the [Nauta Installation, Configuration, and Administration Guide](../installation-and-configuration/README.md))
 
 ### Hardware Requirements
 Part of Nauta's build process involves the compilation of Tensorflow*. Because of this, your build server _must meet_ all TensorFlow build requirements. In particular, your CPU _must have_ support for AVX and SSE instructions. To make sure required flags are available on a CPU, call `cat /proc/cpuinfo`. In flags field, instruction sets `avx, sse, sse2, ssse3, sse4_1, sse4_2` should be listed.
 
-**Note:** For SSE information, refer to: https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions
+**Note:** For SSE information, refer to:  [Streaming SIMD Extensions](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and for AVX information, refer to: [Advanced Vector Extensions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
 
 #### Hardware Configuration Requirements 
 
 For the build server, it is recommended to have at least 12 GB of RAM and at least 100GB of space for temporary containers, registries, and so on. The size of the final tar.gz file is ~5GB.
 
-### Operating System Requirements
+### Overall Operating System Requirements
+
+To make your Nauta build successful, _**you must**_ set your proxies, ensure you have internet connection and ensure the required packages are installed as shown below. 
 
 #### Proxy Settings Requirements 
 
-Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.` 
+Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. Your `no_proxy` option should include the following: `127.0.0.1` and `localhost.` 
 
 If proxy issues occur during the build process, it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
 
-**Note:** Docker* _should be_ configured to download images from the internetfrom the internet, follow: [official Docker instructions](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy) for more detials.
+**Note:** Docker _should be_ configured to download images from the internetfrom the internet, follow: [official Docker instructions](https://docs.docker.com/config/daemon/systemd/#httphttps-proxy) for more detials.
 
 #### Internet Connection 
 
 To build the Nauta package, you _must have_ an internet connection so that you can untar the tarball, configure your proxy settings, DNS settings, and so on.
 
-#### Required Packages
-
-#### Ubuntu* 16.04 LTS or 18.04 LTS
+#### Required Packages: Ubuntu 16.04 LTS or 18.04 LTS
 
 When building Nauta within these versions of Ubuntu (currently, the only validated build environments), the following packages _must be_ installed first:
 
@@ -56,19 +66,15 @@ To install the required packages, invoke:
 
 `sudo apt update && sudo apt install python3-venv python3-dev virtualenv binutils build-essential make pigz git`
 
-#### Docker 
+### Docker Community Edition Information  
 
-To install Docker Community Edition* (CE*), follow: [official Docker instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
+To install Docker Community Edition (CE), follow: [official Docker instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
-The build process requires access to the `docker` command. Remember to add your user to the `docker` group by running:
-
-`sudo usermod -aG docker [user]` 
-
-Do this, if a user _has not_ been added previously
+The build process requires access to the `docker` command. Remember to add your user to the `docker` group by running: `sudo usermod -aG docker [user]` if the user _has not_ been previously added. 
 
 For more information, refer to the [Post-install Docker guide](https://docs.docker.com/install/linux/linux-postinstall).
 
-**Note:**  During the Nauta build process, TensorFlow is checked by the Horovod* installer inside its Docker container. 
+**Note:** During the Nauta build process, TensorFlow is checked by the Horovod installer inside its Docker container. 
 
 ## Build 
 
@@ -98,6 +104,12 @@ The tarball contains, among other things, docs, images, config files, and ansibl
 
 * [Installer System Requirements](../Installer_System_Requirements/ISR.md)
 
+----------------------
 
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------
 
 

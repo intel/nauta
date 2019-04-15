@@ -1,6 +1,6 @@
 # launch Command
 
-This command launches a browser for Web UI or Tensorboard.
+The `launch` command launches a browser for Web UI or TensorBoard. The following main topics are discussed in this section:
 
 - [webui Subcommand](#webui-subcommand)  
 - [tensorboard Subcommand](#tensorboard-subcommand)
@@ -9,7 +9,9 @@ This command launches a browser for Web UI or Tensorboard.
 
 ### Synopsis
 
-Launches the Nauta web user interface with credentials.
+The `webui` subcommand launches the Nauta web user interface with credentials. 
+
+**Note:** If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by this command. 
 
 ### Syntax
 
@@ -24,9 +26,9 @@ None.
  | Name | Required | Description | 
  |:--- |:--- |:--- |
  |`--no-launch` | No | Run this command without a web browser starting; only proxy tunnel is created.
- |`-p, --port <port>` <br> `INTEGER RANGE`| No | If given, application will be exposed on a local machine under [port] port.|
+ |`-p, --port INTEGER RANGE` <br> `INTEGER RANGE`| No | If given, the application will be exposed on a local machine under [port] port.|
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+ |`-h, --help` | No | Displays help messaging information. |
  
 ### Returns
 
@@ -37,7 +39,7 @@ Link to an exposed application.
 `nctl launch webui`
 
 This command returns a Go-to URL. The following is an example only:
-<!-- language: lang-none -->
+
 ```
 Launching...Go to http://localhost:14000?token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrd
 WJlcm5ldVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uY
@@ -51,36 +53,38 @@ Press Ctrl-C key to close a port forwarding process...
 
 ### Synopsis
 
-Launches the TensorBoard* web user interface front end with credentials, with the indicated experiment loaded. 
+The `tensorboard` subcommand launches the TensorBoard web user interface front end with credentials, with the indicated experiment loaded. 
+
+**Note:** If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by this command.
 
 ### Syntax
 
 Format of the command is as follows:
 
-`nctl launch tensorboard [options] EXPERIMENT NAME`
+`nctl launch tensorboard [options] EXPERIMENT-NAME`
 
 ### Arguments
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`EXPERIMENT NAME` | Yes | Experiment name
+|`EXPERIMENT-NAME` | Yes | Experiment name
 
 A user can pass one or more names of experiments separated with spaces. If an experiment that should
 be displayed in TensorBoard belongs to a current user, the user has to give only its name. If this experiment
 is owned by another user, the name of an experiment should be preceded with a name of this second user
-in the following format: `username/experiment_name`
+in the following format: `username/experiment-name`
 
 ### Options
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
  |`--no-launch` | No | To create tunnel without launching web browser. |
- |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which tensorboard service client will be started. |
- |` -p, --port INTEGER RANGE` | No | Port on which service will be exposed locally. |
+ |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which TensorBoard service client will be started. |
+ |`--p, --port INTEGER RANGE` <br> | No | Port on which service will be exposed locally. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+ |`-h, --help` | No | Displays help messaging information. |
  
- 
+
 ### Returns
 
 Link to an exposed application. 
@@ -93,3 +97,10 @@ An example might appear as:
 ```
 http://127.0.0.1/tensorboard/token=AB123CA27F
 ```
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------

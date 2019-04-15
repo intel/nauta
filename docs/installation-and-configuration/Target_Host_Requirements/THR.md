@@ -2,16 +2,23 @@
 
 # Target Host Requirements
 
-For the target host, install Nauta on bare metal only with Red Hat Enterprise Linux 7.5* (can be preinstalled).
+For the _Target host_, install Nauta **on bare metal only** with Red Hat Enterprise Linux 7.5* (this can be preinstalled).
 
 - Configured access to the master host over SSH.
-  - This is configured access from your _Installer Machine to your Target Host (master)._
+  - This is configured access from your _Installer Machine to your Target Host (master)_.
+  
 - Full network connectivity between target hosts is required. In addition, Installer connectivity is only required to the master node.
 
+This section discusses the following main topics: 
 
-## Red Hat* Enterprise Linux 7.5
+- [Red Hat Enterprise Linux 7.5](#red-hat-enterprise-linux)  
+- [Valid Repositories](#valid-repositories)  
+- [Repositories List](#repositories-list)
 
-Required packages:
+## Red Hat Enterprise Linux 7.5
+
+Red Hat Enterprise Linux 7.5 is required, as well as the following required packages:
+
   - byacc
   - cifs-utils
   - ebtables
@@ -52,8 +59,35 @@ Required packages:
 
 ## Valid Repositories
 
-If the operating system is installed and configured with a valid repository that contains the required packages, an Administrator _does not_ need to install the packages manually. However, if the repository _is not_ valid the Installer  attempts to install the package automatically. If this fails an error message is displayed. 
+If the operating system is installed and configured with a valid repository that contains the required packages, an Administrator _does not_ need to install the packages manually. However, if the repository _is not_ valid, the Installer  attempts to install the package automatically. If this fails an error message is displayed.
+
+## Repositories List
+
+Use the following command to check your repository list: `yum repolist all`
+
+A list of **required** enabled repositories for RHEL 7.5, is:
+
+- Extra Packages for Enterprise Linux 7 - x86_64
+- Red Hat Enterprise Linux 7 Server - x86_64
+- Red Hat Enterprise Linux 7 Server (High Availability) - x86_64
+- Red Hat Enterprise Linux 7 Server (Optional) - x86_64
+- Red Hat Enterprise Linux 7 Server (Supplementary) - x86_64
+
+A list of **required** enabled repositories for Centos 7.5, is:
+
+- CentOS-7 - Base
+- CentOS-7 - Extras
+- CentOS-7 - Updates
+- Extra Packages for Enterprise (epel) 
 
 ## Next Steps: Preparing for the Nauta Installation
 
 * [Inventory File Configuration Tasks](../Inventory_Tasks/IT.md)
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------

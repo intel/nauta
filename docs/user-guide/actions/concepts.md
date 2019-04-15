@@ -1,6 +1,15 @@
 # Nauta Basic Concepts
 
-Within this user guide, the following concepts and terms are relevant to using this software.
+Within this user guide, the following concepts and terms are relevant to using this software: user, administrator, resources, data, experiments, and predictions, all of which are described below. 
+
+This section discusses the following main topics:
+
+- [User](#user)
+- [Administrator](#administrator)  
+- [Resources](#resources)
+- [Data](#data)
+- [Experiments](#experiments)
+- [Predictions](#predictions)
 
 ## User
 
@@ -28,4 +37,10 @@ After experiments have been run and the model has been trained, you can pass in 
 
 The Nauta software supports both batch and streaming inference. Batch inference involves processing a set of prepared input data to a referenced trained model and writing the inference results to a folder. Streaming inference is where the user deploys the model on the system and streaming inference instance processes singular data as it is received.
 
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------
 
