@@ -46,8 +46,8 @@ spec:
         - --configmap
         - {{ .Release.Name }}-{{ .Chart.Name }}
         - --executor-image
-        - argoproj/argoexec:v2.2.1
+        - {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ .Values.image2 }}
         command:
         - workflow-controller
-        image: argoproj/workflow-controller:v2.2.1
+        image: {{ required "NAUTA Registry is required" .Values.global.nauta_registry }}/{{ .Values.image }}
         name: workflow-controller
