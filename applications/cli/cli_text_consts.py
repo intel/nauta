@@ -428,6 +428,8 @@ class ExperimentInteractCmdTexts:
     SUBMIT_ERROR_MSG = "Error during starting jupyter notebook session: {exception_message}"
     SUBMIT_OTHER_ERROR_MSG = "Other error during starting jupyter notebook session."
     SESSION_EXISTS_MSG = "Jupyter notebook's session exists. nctl connects to this session ..."
+    FILENAME_BUT_SESSION_EXISTS = "Jupyter notebook's session exists - \"interact\" command cannot be used with " \
+                                  "\"-f/--filename\" option in this case."
     NOTEBOOK_STATE_CHECK_ERROR_MSG = "Error during checking state of Jupyter notebook."
     ATTACHING_SCRIPT_NOT_SUPPORTED_MSG = "Attaching script to existing Jupyter notebook's session is not supported. " \
                                          "Please create a new Jupyter notebook's session to attach script."

@@ -77,6 +77,10 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
         try:
             jupyter_experiment = Experiment.get(name=name, namespace=current_namespace)
 
+            if jupyter_experiment and filename:
+                handle_error(user_msg=Texts.FILENAME_BUT_SESSION_EXISTS)
+                sys.exit(1)
+
             if jupyter_experiment:
                 metadata = jupyter_experiment.metadata
                 if metadata and metadata.get("labels") and metadata.get("labels").get("script_name"):
