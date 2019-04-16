@@ -43,7 +43,7 @@
   shell: helm ls
   changed_when: False
   register: helm_access
-  until: helm_access|success
+  until: helm_access is success
   retries: 10
   delay: 10
 
