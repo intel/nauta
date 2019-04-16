@@ -15,5 +15,5 @@ jsonschema==2.6.0
 distro==1.3.0
 yaspin==0.14.0
 ruamel.yaml.jinja2==0.2.2
-jinja2==2.10
+jinja2==2.10.1
 pycryptodome==3.7.3
