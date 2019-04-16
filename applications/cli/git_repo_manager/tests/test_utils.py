@@ -19,7 +19,7 @@ import pytest
 from unittest.mock import MagicMock
 
 from git_repo_manager.utils import get_git_private_key_path, upload_experiment_to_git_repo_manager, \
-    create_gitignore_file_for_experiments, compute_hash_of_k8s_env_address
+    create_gitignore_file_for_experiments, compute_hash_of_k8s_env_address, delete_exp_tag_from_git_repo_manager
 
 
 def test_get_git_private_key_path(mocker, tmpdir):
@@ -177,3 +177,26 @@ def test_create_gitignore_file_for_experiments(tmpdir):
 def test_compute_hash_of_k8s_env_address(mocker):
     mocker.patch('git_repo_manager.utils.get_kubectl_host', return_value='http://some.host:1234')
     assert compute_hash_of_k8s_env_address() == 'cc1a4a407dab8411a13897809514c945'
+
+
+def test_delete_exp_tag_from_git_repo_manager_experiments_dir_not_exist(mocker):
+    config_mock = mocker.patch('git_repo_manager.utils.Config')
+    compute_hash_of_k8s_env_address_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value='some_hash')
+    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_git_private_key_path')
+    external_cli_mock = mocker.patch('git_repo_manager.utils.ExternalCliClient')
+    git_command_mock = MagicMock()
+    git_command_mock.tag.return_value = '', 0, ''
+    external_cli_mock.return_value = git_command_mock
+    proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
+    os_path_is_dir_mock = mocker.patch('os.path.isdir', return_value=False)
+    os_makedirs_mock = mocker.patch('os.makedirs')
+
+    delete_exp_tag_from_git_repo_manager(username='user', experiment_name='exp-1', experiments_workdir='workdir')
+
+    assert config_mock.call_count == 1
+    assert compute_hash_of_k8s_env_address_mock.call_count == 1
+    assert get_private_key_path_mock.call_count == 1
+    assert external_cli_mock.call_count == 1
+    assert proxy_mock.call_count == 1
+    assert os_path_is_dir_mock.call_count == 2
+    assert os_makedirs_mock.call_count == 1
