@@ -93,7 +93,11 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
             else:
                 git.checkout('-b', 'master')
             if 'master' in remote_branches:
-                git.pull('--rebase')
+                try:
+                    git.pull('--rebase', '--strategy=recursive', '--strategy-option=theirs')
+                except Exception:
+                    git.rebase('--abort')
+                    raise
             git.push('--set-upstream', 'origin', 'master')
             git.tag(experiment_name)
             git.push('--tags')
