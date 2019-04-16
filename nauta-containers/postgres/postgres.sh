@@ -19,9 +19,10 @@
 echo "Checking PGDATA($PGDATA) content..."
 ls -A "${PGDATA}"
 
+chown -R postgres:postgres "${PGDATA}"
+
 if [ -z "$(ls -A ${PGDATA})" ]; then
     echo 'Initialize postgres...'
-    chown -R postgres:postgres "${PGDATA}"
     if [ -n "${POSTGRES_PASSWORD}" ]; then
         echo 'Setting up postgres with password..'
         echo "${POSTGRES_PASSWORD}" > /tmp/pwfile
