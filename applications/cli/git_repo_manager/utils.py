@@ -128,6 +128,8 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
         git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
             if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
+                if not os.path.isdir(experiments_workdir):
+                    os.makedirs(experiments_workdir, 0o755)
                 git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,
                           bare=True)
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
