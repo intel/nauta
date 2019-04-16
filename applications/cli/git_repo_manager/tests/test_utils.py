@@ -156,13 +156,14 @@ def test_upload_experiment_to_git_repo_manager_error(mocker, tmpdir, git_client_
         upload_experiment_to_git_repo_manager(experiments_workdir=experiments_workdir, run_name=experiment_name,
                                               experiment_name=experiment_name, username='fake-user')
 
-    assert env_hash_mock.call_count == 1
-    assert config_mock.call_count == 1
-    assert get_private_key_path_mock.call_count == 1
-    assert proxy_mock.call_count == 1
+    # function is retried 5 times
+    assert env_hash_mock.call_count == 5
+    assert config_mock.call_count == 5
+    assert get_private_key_path_mock.call_count == 5
+    assert proxy_mock.call_count == 5
 
     # Check if rollback was called
-    assert git_client_mock.reset.call_count == 1
+    assert git_client_mock.reset.call_count == 5
 
 
 def test_create_gitignore_file_for_experiments(tmpdir):
