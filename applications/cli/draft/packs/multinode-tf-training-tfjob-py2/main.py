@@ -22,7 +22,7 @@ import time
 if len(sys.argv) < 2:
     raise RuntimeError("please provide at least 1 argument")
 
-main_process = subprocess.Popen(["python", *sys.argv[1:]], stdout=sys.stdout, stderr=sys.stderr)
+main_process = subprocess.Popen(["python"] + sys.argv[1:], stdout=sys.stdout, stderr=sys.stderr)
 
 while True:
     if os.path.isfile("/pod-data/END"):
