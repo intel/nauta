@@ -30,4 +30,6 @@ find . -name "*.md*" | while read file; do
     --metadata filename="${pretty_filename}" \
     --metadata title="Nauta user-guide: ${pretty_filename%.*}.html" \
     "$file" -o "${file%.*}.html";
+
+    sed -e 's/<figcaption>Image<\/figcaption>//g' "${file%.*}.html" -i
 done
