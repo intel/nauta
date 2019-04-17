@@ -17,6 +17,7 @@
 
 import os
 import argparse
+import sys
 
 import tensorflow as tf
 import horovod.tensorflow as hvd
@@ -93,15 +94,22 @@ def main(_):
     FLAGS, _ = parser.parse_known_args()
 
     # Ensure data directory passed to the script contains proper dataset
-    dir_content = os.listdir(FLAGS.data_dir)
-    for file in FILENAMES:
-        if file not in dir_content:
-            print("Directory provided by user does not contains proper dataset")
-            FLAGS.data_dir = os.path.join(FLAGS.data_dir, "input_data_{}".format(hvd.rank()))
-            break
-
-    # Read/download local dataset. Different copy for each process.
-    mnist = learn.datasets.mnist.read_data_sets(FLAGS.data_dir)
+    if FLAGS.data_dir is not None:
+        if not os.path.isfile(FLAGS.data_dir):
+            print("Provided data_dir path: {} does not exist!".format(FLAGS.data_dir))
+            sys.exit(1)
+        else:
+            dir_content = os.listdir(FLAGS.data_dir)
+            for file in FILENAMES:
+                if file not in dir_content:
+                    print("Directory provided by user does not contains proper dataset")
+                    FLAGS.data_dir = os.path.join(FLAGS.data_dir, "input_data_{}".format(hvd.rank()))
+                    break
+            # Read/download local dataset. Different copy for each process.
+            mnist = learn.datasets.mnist.read_data_sets(FLAGS.data_dir)
+    else:
+        # Read/download local dataset. Different copy for each process.
+        mnist = learn.datasets.mnist.read_data_sets()
 
     # Name images placeholder to be able to retrieve it from saved meta graph.
     images_placeholder = tf.placeholder(tf.float32, [None, 784], name=INPUT_NAME)
