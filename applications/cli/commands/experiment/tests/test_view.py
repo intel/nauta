@@ -21,6 +21,7 @@ from kubernetes.client import V1Pod, V1PodStatus, V1Event, V1ObjectReference, V1
 
 from commands.experiment import view
 from platform_resources.run import Run, RunStatus
+from platform_resources.experiment import Experiment
 from cli_text_consts import ExperimentViewCmdTexts as Texts
 from util.k8s.k8s_statistics import ResourceUsage
 from util.k8s.k8s_info import PodStatus
@@ -65,6 +66,12 @@ QUEUED_RUN = [
         pod_selector={})
 ]
 
+TEST_EXPERIMENT = Experiment(
+        name='test-experiment',
+        template_name='template-name',
+        template_namespace='namespace',
+        template_version='0.1.0')
+
 mocked_test_pod = MagicMock(spec=V1Pod)
 mocked_test_pod.metadata.name = "test"
 mocked_test_pod.metadata.uid = "uid"
@@ -99,6 +106,8 @@ class ViewMocks:
         self.sum_cpu_resources.return_value = "100m"
         self.sum_mem_resources = mocker.patch("commands.experiment.view.sum_mem_resources")
         self.sum_mem_resources.return_value = "1Gi"
+        self.get_experiment = mocker.patch('commands.experiment.view.Experiment.get')
+        self.get_experiment.return_value = TEST_EXPERIMENT
 
 
 @pytest.fixture

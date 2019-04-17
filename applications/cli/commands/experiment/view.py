@@ -24,6 +24,7 @@ from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
 from util.cli_state import common_options, pass_state, State
 from platform_resources.run import Run
+from platform_resources.experiment import Experiment
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
     sum_cpu_resources, PodStatus, get_pod_events, add_bytes_to_unit
@@ -163,6 +164,10 @@ def view(context, state: State, experiment_name: str, tensorboard: bool,
                 user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(
                     experiment_name=experiment_name))
             exit(2)
+
+        experiment = Experiment.get(name=experiment_name, namespace=namespace)
+        if experiment:
+            run.template_version = experiment.template_version
 
         click.echo(
             tabulate(

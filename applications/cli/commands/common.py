@@ -141,7 +141,8 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
             runs_table_data = [
                 (run_representation.name, run_representation.parameters, run_representation.submission_date,
                  run_representation.start_date, run_representation.duration,
-                 run_representation.submitter, run_representation.status, run_representation.template_name)
+                 run_representation.submitter, run_representation.status, run_representation.template_name,
+                 run_representation.template_version)
                 for run_representation in runs_representations
             ]
         click.echo(tabulate(runs_table_data if not count else runs_table_data[-count:],

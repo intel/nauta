@@ -17,7 +17,7 @@
 import click
 
 from commands.experiment.common import RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_START_DATE, RUN_DURATION, \
-    RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RunKinds
+    RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RUN_TEMPLATE_VERSION, RunKinds
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
 from util.cli_state import common_options, pass_state, State
 from platform_resources.run import RunStatus
@@ -45,7 +45,7 @@ def list_inference_instances(state: State, all_users: bool, name: str, status: R
         table_headers = [RUN_INFERENCE_NAME, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS]
     else:
         table_headers = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_DURATION,
-                         RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME]
+                         RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RUN_TEMPLATE_VERSION]
     if uninitialized:
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
                                             headers=table_headers,
