@@ -16,6 +16,8 @@
 
 import os
 
+from retry import retry
+
 from util.config import Config
 from util.spinner import spinner
 from util.system import execute_system_command
@@ -41,6 +43,7 @@ def delete_user(username: str):
         delete_helm_release(username, purge=True)
 
 
+@retry(tries=5, delay=1)
 def delete_helm_release(release_name: str, purge=False, namespace: str = None):
     """
     Deletes release of a helm's chart.
