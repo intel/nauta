@@ -22,13 +22,12 @@ import click
 
 from util.cli_state import common_options, pass_state, State
 from cli_text_consts import TemplateInstallCmdTexts as Texts
-from commands.template.common import get_remote_templates, get_repository_configuration, get_local_templates
+from commands.template.common import load_chart, get_repository_configuration, get_local_templates
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.spinner import spinner
 from util.github import Github
 from util.config import Config
-from util.exceptions import ExceptionWithMessage
 
 
 logger = initialize_logger(__name__)
@@ -44,15 +43,9 @@ def install(state: State, template_name: str):
     with spinner(text=Texts.GETTING_LIST_OF_TEMPLATES_MSG):
         repository_name, access_token = get_repository_configuration()
 
-        try:
-            remote_templates = get_remote_templates(repository_name, access_token)
-        except ExceptionWithMessage as e:
-            click.echo(e.message)
-            sys.exit(1)
+        remote_template = load_chart(template_name, Github(repository_name=repository_name, token=access_token))
 
-        remote_template_counterpart = remote_templates.get(template_name)
-
-        if not remote_template_counterpart:
+        if not remote_template:
             click.echo(Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name))
             sys.exit(1)
 
@@ -63,7 +56,7 @@ def install(state: State, template_name: str):
         click.confirm(Texts.LOCAL_VERSION_ALREADY_INSTALLED.format(
                                                             local_version=local_template_counterpart.local_version,
                                                             template_name=local_template_counterpart.name,
-                                                            remote_version=remote_template_counterpart.remote_version),
+                                                            remote_version=remote_template.remote_version),
                       abort=True)
 
         # noinspection PyBroadException

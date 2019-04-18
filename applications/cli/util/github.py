@@ -60,7 +60,9 @@ class Github:
             logger.exception(Texts.GET_OTHER_ERROR)
             raise GithubException(HTTPStatus.SEE_OTHER) from exe
 
-        if output.status_code != HTTPStatus.OK:
+        if output.status_code == HTTPStatus.NOT_FOUND:
+            logger.debug(Texts.GET_MISSING_FILE.format(url=url))
+        elif output.status_code != HTTPStatus.OK:
             logger.error(Texts.GET_REQUEST_ERROR.format(url=url, http_code=output.status_code))
             raise GithubException(output.status_code)
 

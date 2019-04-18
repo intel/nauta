@@ -95,13 +95,10 @@ def get_remote_templates(repository_name: str, access_token: str = None) -> Dict
         g = Github(repository_name=repository_name, token=access_token)
         contents = g.get_repository_content()
         for content in contents:
-            file_path = "/".join([content.name, Template.CHART_FILE_LOCATION, Template.CHART_FILE_NAME])
-            file = g.get_file_content(file_path=file_path)
+            remote_template = load_chart(content.name, g)
 
-            if file:
-                remote_template = extract_chart_description(file, local=False)
-                if remote_template:
-                    remote_model_list[remote_template.name] = remote_template
+            if remote_template:
+                remote_model_list[remote_template.name] = remote_template
 
         return remote_model_list
     except GithubException as gexe:
@@ -130,6 +127,17 @@ def extract_chart_description(chart_content: str, local: bool) -> Optional[Templ
                         remote_version=remote_version)
     else:
         return None
+
+
+def load_chart(name: str, g: Github) -> Optional[Template]:
+    file_path = "/".join([name, Template.CHART_FILE_LOCATION, Template.CHART_FILE_NAME])
+    file = g.get_file_content(file_path=file_path)
+
+    if file:
+        remote_template = extract_chart_description(file, local=False)
+        return remote_template
+
+    return None
 
 
 def get_template_version(template_name: str) -> Optional[str]:

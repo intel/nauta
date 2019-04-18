@@ -873,6 +873,7 @@ class TemplateListCmdTexts:
     MISSING_CONFIGURATION_FILE = "Lack or incorrect file with configuration of model-zoo repository. Please " \
                                  "check, whether file zoo-repository.config exists in folder with dlsctl folder."
     GETTING_LIST_OF_TEMPLATES_MSG = "Getting templates list ..."
+    CHECKING_PRESENCE_OF_TEMPLATE_MSG = "Checking presence of a template ..."
 
 
 class TemplateCopyCmdTexts:
@@ -888,9 +889,10 @@ class TemplateCopyCmdTexts:
 
     
 class GithubMessages:
-    GET_REQUEST_ERROR = "Error during accessing github reposiotry {url} : {http_code}"
+    GET_REQUEST_ERROR = "Error during accessing github repository {url} : {http_code}"
     GET_OTHER_ERROR = "Other error during connecting github."
     MISSING_CHART_FILE = "Chart file doesn't exist in the checked folder."
+    GET_MISSING_FILE = "File {url} doesn't exist."
 
 
 class TemplateInstallCmdTexts(TemplateListCmdTexts):
