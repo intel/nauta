@@ -17,6 +17,7 @@
 import logging
 import time
 from enum import Enum
+import os
 import subprocess
 import sys
 from typing import List, Tuple
@@ -301,6 +302,9 @@ def wait_for_ctrl_c():
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+    if get_current_os() in (OS.LINUX, OS.MACOS):
+        os.system("setterm --cursor on")
+
     while continue_loop:
         time.sleep(0.1)
 
