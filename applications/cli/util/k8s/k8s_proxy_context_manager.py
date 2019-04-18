@@ -21,6 +21,7 @@ from requests.exceptions import ConnectionError
 import time
 
 import psutil
+from urllib3.exceptions import NewConnectionError
 
 from util.k8s import kubectl
 from util.app_names import NAUTAAppNames
@@ -87,7 +88,7 @@ class K8sProxy:
             try:
                 requests.get(f'http://{address}:{port}')
                 return
-            except ConnectionError as e:
+            except (ConnectionError, NewConnectionError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
                 logger.exception(error_msg) if retry == tries-1 else logger.debug(error_msg)
                 time.sleep(1)
