@@ -219,7 +219,7 @@ resource "google_container_cluster" "primary" {
     services_secondary_range_name = "services"
   }
 
-  min_master_version = "1.11.7"
+  min_master_version = "1.12.7"
   master_authorized_networks_config = {
     cidr_blocks = [
       { cidr_block = "${google_compute_instance.gateway.network_interface.0.access_config.0.nat_ip}/32", display_name = "gateway" }
