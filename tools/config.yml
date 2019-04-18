@@ -336,7 +336,7 @@ shared_images:
     fetch_files:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/elasticsearch-v6.6.2.tar.gz
         dest: elasticsearch-6.6.2.tar.gz
-        checksum: fde0e083022cdb90879d609de7b0e1a9813cee704bf6e32c6b72f55e54c689cc
+        checksum: 28b31ae75cac0ee7ae749dea56f00b9aac84a5b2e474f5b86386bd540cae55fe
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/openjdk-11.0.2_linux-x64_bin.tar.gz
         dest: openjdk-11.0.2_linux-x64_bin.tar.gz
         checksum: 99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
