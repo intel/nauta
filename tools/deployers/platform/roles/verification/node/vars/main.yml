@@ -5,10 +5,7 @@ verification_checks:
     condition: "{{ internal_interface not in ansible_interfaces }}"
   - message: "Can not find external_interface {{ external_interface }} on host. Found: {{ ansible_interfaces | join(', ') }}"
     condition: "{{ external_interface not in ansible_interfaces }}"
-  - message: "Can not find data_interface {{ data_interface }} on host. Found: {{ ansible_interfaces | join(', ') }}"
-    condition: "{{ data_interface not in ansible_interfaces }}"
 
 required_parameters:
   - internal_interface
   - external_interface
-  - data_interface

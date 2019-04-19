@@ -47,5 +47,4 @@ required_parameters:
   - local_data_path
   - local_data_device
   - internal_interface
-  - data_interface
   - external_interface
