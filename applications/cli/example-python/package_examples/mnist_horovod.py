@@ -95,7 +95,7 @@ def main(_):
 
     # Ensure data directory passed to the script contains proper dataset
     if FLAGS.data_dir is not None:
-        if not os.path.isfile(FLAGS.data_dir):
+        if not os.path.isdir(FLAGS.data_dir):
             print("Provided data_dir path: {} does not exist!".format(FLAGS.data_dir))
             sys.exit(1)
         else:
