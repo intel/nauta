@@ -37,8 +37,7 @@ RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real && \
 # Configure OpenMPI to run good defaults:
 #   --bind-to none --map-by slot --mca btl_tcp_if_exclude lo,docker0
 RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params.conf && \
-    echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf && \
-    echo "btl_tcp_if_exclude = lo,docker0" >> /usr/local/etc/openmpi-mca-params.conf
+    echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf
 
 RUN apt-get install -y openssh-client openssh-server && \
     mkdir -p /var/run/sshd /app /root/.ssh
