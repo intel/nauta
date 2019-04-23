@@ -334,9 +334,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/elasticsearch"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/elasticsearch-v6.6.2.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/elasticsearch-v6.6.2.1.tar.gz
         dest: elasticsearch-6.6.2.tar.gz
-        checksum: 28b31ae75cac0ee7ae749dea56f00b9aac84a5b2e474f5b86386bd540cae55fe
+        checksum: 8f46c67ed35017843250eef612b2669ffe5a7311709b5ca14996c70f561c890a
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/openjdk-11.0.2_linux-x64_bin.tar.gz
         dest: openjdk-11.0.2_linux-x64_bin.tar.gz
         checksum: 99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
