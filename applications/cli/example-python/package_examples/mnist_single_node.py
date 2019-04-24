@@ -84,7 +84,7 @@ def main(_):
 
     saver = tf.train.Saver()
 
-    for i in range(500):
+    for i in range(FLAGS.steps):
         images, labels = mnist.train.next_batch(64)
         _, summary_out, loss_val, accuracy_val = session.run(
             [train, summary_op, loss, accuracy],
@@ -147,5 +147,8 @@ if __name__ == "__main__":
     parser.add_argument("--export_dir", type=str,
                         default="",
                         help="Export directory for model")
+    parser.add_argument("--steps", type=int,
+                        default=500,
+                        help="Number of steps to run training")
     FLAGS, _ = parser.parse_known_args()
     tf.app.run()
