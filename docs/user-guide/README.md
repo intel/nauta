@@ -34,8 +34,8 @@ This guide describes how to use Nauta, and discusses the following topics:
     * [mount](actions/mount.md) - displaying details concerning how to mount user's folders
     * [predict](actions/predict.md) - deploy and manage inference on trained model
     * [user](actions/user.md) - adding/deleting/listing users of the system 
-    * [verify](actions/verify.md) - verifies installation of _dlsctl_ application
-    * [version](actions/version.md) - displays version of _dlsctl_ application
+    * [verify](actions/verify.md) - verifies installation of _nctl_ application
+    * [version](actions/version.md) - displays version of _nctl_ application
 
 ## Advanced Sections
 
