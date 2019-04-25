@@ -36,6 +36,10 @@ Required on system, software requirements:
   * Upgrade pip to pip==19.0.3
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
 
+**Note:** If during installation any issues related to pip version occur, please create a virtual environment (using
+virtualenv tool), activate it, install pip there in the desired version (19.0.3) and rerun installation
+ from within virtualenv.
+
 ## Next Steps: Target Host Requirements
 
 * [Target Host Requirements](../Target_Host_Requirements/THR.md)
