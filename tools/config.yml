@@ -260,14 +260,14 @@ shared_images:
   shared/run/tensorflow/py2.7:
     version: "py2"
     required:
-      BASE_IMAGE: "shared/centos/python27"
+      BASE_IMAGE: "shared/build/tensorflow/py2.7"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/2.7/run"
     push: False
   shared/run/tensorflow/py3.6:
     version: "py3"
     required:
-      BASE_IMAGE: "shared/centos/python36"
+      BASE_IMAGE: "shared/build/tensorflow/py3.6"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/3.6/run"
     push: False

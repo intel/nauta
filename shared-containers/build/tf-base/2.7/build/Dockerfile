@@ -21,11 +21,10 @@ RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-
 RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --ignore-installed nbconvert entrypoints
 
 RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean \
-        ipykernel==4.8.2 \
         Pillow==5.4.* \
         h5py==2.9.* \
+        ipykernel==4.10.* \
         matplotlib==2.2.0 \
-        ipykernel==4.8.2 \
         jupyter==1.0.* \
         mock==2.0.* \
         scipy==1.2.* \
