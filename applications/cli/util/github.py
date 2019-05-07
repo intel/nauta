@@ -77,8 +77,10 @@ class Github:
         repo_item_list = json.loads(output)
 
         for item in repo_item_list:
-            repository = GithubRepository(name=item.get("name"))
-            ret_list.append(repository)
+            logger.debug(item)
+            if item.get("type") == "dir":
+                repository = GithubRepository(name=item.get("name"))
+                ret_list.append(repository)
 
         return ret_list
 
