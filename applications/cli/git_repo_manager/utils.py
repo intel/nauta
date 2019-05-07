@@ -85,8 +85,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                 git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,
                           bare=True)
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
-            git.config('--local', 'user.email', f'{username}@nauta.invalid')
-            git.config('--local', 'user.name', f'{username}')
+            _initialize_git_client_config(git, username=username)
             git.add('.')
             git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
             remote_branches, _, _ = git.ls_remote()
@@ -140,8 +139,7 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
                 git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,
                           bare=True)
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
-            git.config('--local', 'user.email', f'{username}@nauta.invalid')
-            git.config('--local', 'user.name', f'{username}')
+            _initialize_git_client_config(git, username=username)
             git.fetch()
             output, _, _ = git.tag('-l', experiment_name)
             if output:
@@ -150,3 +148,9 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
     except Exception:
         logger.exception(f'Failed to delete tag {experiment_name} from git repo manager.')
         raise
+
+
+def _initialize_git_client_config(git: ExternalCliClient, username: str):
+    git.config('--local', 'user.email', f'{username}@nauta.invalid')
+    git.config('--local', 'user.name', f'{username}')
+    git.config('--local', 'credential.helper', 'store')  # Use store helper for repos cloned by nctl
