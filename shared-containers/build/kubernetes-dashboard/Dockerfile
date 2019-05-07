@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 RUN yum clean all && \ 
     yum update -y && \
-    yum -y install rh-nodejs8 bzip2 gcc mercurial which git \
+    yum -y install rh-nodejs8 bzip2 gcc which git \
                                     java-1.8.0-openjdk-devel java-1.8.0-openjdk \
                                     zip rsync curl pkg-config make libtool \
                                     libcurl patch automake patch gcc-c++

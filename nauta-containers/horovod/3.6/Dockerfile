@@ -20,7 +20,7 @@ RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN yum clean all && \
     yum update -y && \
     yum install -y gcc-c++ gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make \
-                   git mercurial wget hdf5-devel
+                   git wget hdf5-devel
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 

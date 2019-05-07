@@ -28,7 +28,7 @@ RUN ${PIP} install --no-cache-dir --force-reinstall /${PIP}/intel_tensorflow*.wh
 RUN yum clean all && \
     yum update -y && \
     yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
-    python2-devel openblas-devel lapack-devel Cython cmake3 make git mercurial
+    python2-devel openblas-devel lapack-devel Cython cmake3 make git
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 
