@@ -6,9 +6,9 @@ RUN yum clean all && yum update -y && yum install -y which
 RUN mkdir /build-output/consul
 
 RUN mkdir -vp /build/gopath/src/github.com/hashicorp/consul
-COPY consul-1.1.0.tar.gz /build/
+COPY consul-1.4.4.tar.gz /build/
 WORKDIR /build
-RUN tar -xf consul-1.1.0.tar.gz --strip-components=1 -C /build/gopath/src/github.com/hashicorp/consul/
+RUN tar -xf consul-1.4.4.tar.gz --strip-components=1 -C /build/gopath/src/github.com/hashicorp/consul/
 ENV GOPATH=/build/gopath
 ENV PATH=$PATH:$GOPATH/bin
 WORKDIR /build/gopath/src/github.com/hashicorp/consul

@@ -305,27 +305,27 @@ shared_images:
         dest: flannel-0.9.1.tar.gz
         checksum: 9e1ba3d52895f98b8fcc6157725735e4c446e3f3addf4971b0edb1d296f098e3
   shared/build/etcd:
-    version: "3.3.9"
+    version: "3.3.13"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/etcd"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/etcd/v3.3.9.tar.gz
-        dest: etcd-v3.3.9.tar.gz
-        checksum: 96639d35772108004da53e568489ce7572171d39ee507245848cc42fbd3a3032
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/etcd/v3.3.13.tar.gz
+        dest: etcd-v3.3.13.tar.gz
+        checksum: 02df2eb25d67dafc355d19a91791f686fcf59b04cea46110c3a11fcd5e365100
   shared/build/consul:
-    version: "v1.1.0"
+    version: "v1.4.4"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/consul/v1.1.0.tar.gz
-        dest: consul-1.1.0.tar.gz
-        checksum: 8e2539561eb07b2623d9828587e68f5ef46cee882227c7331ff26dddcdc0e9df
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/consul/v1.4.4.tar.gz
+        dest: consul-1.4.4.tar.gz
+        checksum: 8bfb3be5c25cb20b7d8682582fa54969a4745794701efb967d37c06ab075dfe4
   shared/build/elasticsearch:
     version: "v6.6.2.2"
     required:

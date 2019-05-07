@@ -6,9 +6,9 @@ RUN yum clean all && yum update -y && yum install -y which
 RUN mkdir /build-output/etcd
 
 RUN mkdir -vp /build/gopath/src/github.com/coreos/etcd
-COPY etcd-v3.3.9.tar.gz /build/
+COPY etcd-v3.3.13.tar.gz /build/
 WORKDIR /build
-RUN tar -xf etcd-v3.3.9.tar.gz --strip-components=1 -C /build/gopath/src/github.com/coreos/etcd
+RUN tar -xf etcd-v3.3.13.tar.gz --strip-components=1 -C /build/gopath/src/github.com/coreos/etcd
 ENV GOPATH=/build/gopath
 ENV PATH=$PATH:$GOPATH/bin
 WORKDIR /build/gopath/src/github.com/coreos/etcd
