@@ -19,9 +19,6 @@
     <v-toolbar-title>
       <v-container grid-list-md>
         <v-layout row >
-          <v-flex md6>
-            <img src="../img/intel-ai-acrnym-rgb-3000-wht.png"/>
-          </v-flex>
           <v-flex md6 hidden-xs-only>
             {{ labels.NAUTA.toUpperCase() }}
           </v-flex>
