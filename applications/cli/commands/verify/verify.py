@@ -27,6 +27,7 @@ from util.k8s.k8s_proxy_context_manager import check_port_forwarding
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_user_administrator
 from util.spinner import spinner
 from util.system import handle_error
+from util.template import verify_values_in_packs
 from cli_text_consts import VerifyCmdTexts as Texts
 from util.exceptions import KubectlConnectionError, InvalidOsError
 
@@ -142,3 +143,18 @@ def verify(state: State):
         # This block is entered if all dependencies were validated successfully
         # Save dependency versions in a file
         save_dependency_versions(dependency_versions)
+
+    try:
+        list_of_incorrect_packs = None
+        with spinner(text=Texts.VERIFYING_RESOURCES_CORRECTNESS):
+            list_of_incorrect_packs = verify_values_in_packs()
+        if list_of_incorrect_packs:
+            click.echo(Texts.INCORRECT_PACKS_EXIST)
+            for incorrect_pack in list_of_incorrect_packs:
+                click.echo(incorrect_pack)
+            exit(1)
+        else:
+            click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name="packs resources' correctness"))
+    except Exception as e:
+        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        exit(1)
