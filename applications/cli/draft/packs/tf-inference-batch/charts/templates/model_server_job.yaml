@@ -34,6 +34,12 @@ spec:
               value: "/models"
             - name: MODEL_PATH
               value: "{{ .Values.modelPath }}"
+            - name: OMP_NUM_THREADS
+              value: "{{ .Values.resources.requests.cpu }}"
+            - name: TENSORFLOW_INTER_OP_PARALLELISM
+              value: "2"
+            - name: TENSORFLOW_INTRA_OP_PARALLELISM
+              value: "{{ .Values.resources.requests.cpu }}"
           command: ["tf_serving_nauta"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
