@@ -3,7 +3,7 @@ ARG BASE_IMAGE
 FROM ${PIP_IMAGE} as pip
 FROM ${BASE_IMAGE}
 
-RUN yum update -y && yum install -y devtoolset-8-gcc*
+RUN yum update -y && yum install -y devtoolset-8-gcc* libffi-devel openssl-devel
 
 COPY --from=pip /out/requirements.txt /requirements.txt
 
@@ -14,7 +14,7 @@ RUN ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.so.rh-python36 /opt/rh/
     ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so.1.0 && \
     ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so.rh-python36-1.0 /opt/rh/rh-python36/root/usr/lib64/libpython3.6.so.1.0
 
-RUN source /opt/rh/devtoolset-8/enable && mkdir -p /out && virtualenv -p python3.6 /venv && /venv/bin/pip3.6 install -Ur /requirements.txt
+RUN source /opt/rh/devtoolset-8/enable && mkdir -p /out && virtualenv -p python3.6 /venv && /venv/bin/pip3.6 install --no-binary=:all: -Ur /requirements.txt
 RUN source /opt/rh/devtoolset-8/enable && /venv/bin/pip3.6 install pip==18.1
 RUN source /opt/rh/devtoolset-8/enable && /venv/bin/pip3.6 install -U pyinstaller==3.4 && \
     /venv/bin/pyinstaller \
