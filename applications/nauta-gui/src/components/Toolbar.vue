@@ -19,8 +19,8 @@
     <v-toolbar-title>
       <v-container grid-list-md>
         <v-layout row >
-          <v-flex md6 hidden-xs-only>
-            {{ labels.NAUTA.toUpperCase() }}
+          <v-flex md6>
+            <img src="../img/white_logo.png"/>
           </v-flex>
         </v-layout>
       </v-container>
