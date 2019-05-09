@@ -28,7 +28,8 @@ endif
 
 build: $(ACTIVATE) set-version metrics-lib
 ifeq (Windows,$(OS))
-	. $(ACTIVATE); pip install pyinstaller==3.4
+
+	. $(ACTIVATE); pip install C:/pythondev/pyinstaller
 	rm -rf dist/
 	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
 
