@@ -88,7 +88,7 @@ def main(_):
     parser.add_argument(
         '--steps',
         type=int,
-        default=100,
+        default=300,
         help='steps')
 
     FLAGS, _ = parser.parse_known_args()
@@ -157,7 +157,7 @@ def main(_):
         hooks += [
             # As previously mentioned summaries are saved to EXPERIMENT_OUTPUT_PATH so that they can be discovered by
             # tensorboard.
-            tf.train.SummarySaverHook(save_steps=1, output_dir=os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"),
+            tf.train.SummarySaverHook(save_steps=10, output_dir=os.path.join(EXPERIMENT_OUTPUT_PATH, "tensorboard"),
                                       summary_op=summary_op)]
 
     # Horovod: save checkpoints only on worker 0 to prevent other workers from corrupting them. As previously mentioned
