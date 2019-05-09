@@ -1,7 +1,9 @@
+ARG TENSORFLOW_BUILD_IMAGE
 ARG DUMBINIT_DATA_IMAGE
 ARG KUBERNETES_DATA_IMAGE
 ARG BASE_IMAGE
 ARG METRICS_IMAGE
+FROM ${TENSORFLOW_BUILD_IMAGE} as data
 FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${METRICS_IMAGE} as metrics
@@ -9,10 +11,7 @@ FROM ${BASE_IMAGE}
 
 ENV TENSORFLOW_VERSION=1.13.1
 
-# PIP shall == pip2.7 or pip3.6 and match paths below
-RUN mkdir /pip2.7 /pip3.6
-COPY intel_tensorflow-1.13.1-cp27-cp27mu-manylinux1_x86_64.whl /pip2.7
-COPY intel_tensorflow-1.13.1-cp36-cp36m-manylinux1_x86_64.whl /pip3.6
+COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
 
 COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 
@@ -23,7 +22,7 @@ RUN chmod +x /bin/dumb-init /usr/bin/dumb-init /dumb-init
 
 RUN ls -lah /
 
-RUN ${PIP} install --no-cache-dir --force-reinstall /${PIP}/intel_tensorflow*.whl && \
+RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
 RUN yum clean all && \
     yum update -y && \
