@@ -40,10 +40,7 @@ ifeq (Windows,$(OS))
 	cp -Rf workflows dist/config
 	cp zoo-repository.config dist/config/
 
-    # populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
-	mv dist/config/packs/nauta-zoo/* dist/config/packs/
-	rm -rf dist/config/packs/nauta-zoo
+	$(call clone_packs, $(shell git rev-parse --abbrev-ref HEAD))
 
 	cp zoo-repository.config dist/config/
 
@@ -79,10 +76,7 @@ ifeq (Linux,$(OS))
 
 	cp -Rf workflows dist/config
 
-	# populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
-	mv dist/config/packs/nauta-zoo/* dist/config/packs
-	rm -rf dist/config/packs/nauta-zoo
+	$(call clone_packs, $(shell git rev-parse --abbrev-ref HEAD))
 
 	curl -o helm-v2.11.0-linux-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
@@ -107,12 +101,7 @@ ifeq (Darwin,$(OS))
 	mkdir -vp dist/config/packs
 	cp zoo-repository.config dist/config
 
-
-	cp -Rf workflows dist/config
-	# populate draft/packs with nauta-zoo repo
-	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git
-	mv dist/config/packs/nauta-zoo/* dist/config/packs
-	rm -rf dist/config/packs/nauta-zoo
+	$(call clone_packs, $(shell git rev-parse --abbrev-ref HEAD))
 
 	curl -o helm-v2.11.0-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
@@ -212,3 +201,11 @@ endif
 
 set-version:
 	./set-version.sh "$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(VERSION_SUFFIX)-$(BUILD_ID)"
+
+define clone_packs
+	# populate draft/packs with nauta-zoo repo
+	cd dist/config/packs && git clone https://github.com/IntelAI/nauta-zoo.git && cd nauta-zoo && git checkout $(1) 2> /dev/null || true
+	cd dist/config/packs/nauta-zoo && echo "Using packs from nauta-zoo repository with branch:" && git rev-parse --abbrev-ref HEAD
+	mv dist/config/packs/nauta-zoo/* dist/config/packs/
+	rm -rf dist/config/packs/nauta-zoo
+endef
