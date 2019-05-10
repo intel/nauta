@@ -100,6 +100,7 @@ ifeq (Darwin,$(OS))
 
 	mkdir -vp dist/config/packs
 	cp zoo-repository.config dist/config
+	cp -Rf workflows dist/config
 
 	$(call clone_packs, $(shell git rev-parse --abbrev-ref HEAD))
 
