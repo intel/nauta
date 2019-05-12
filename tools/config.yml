@@ -243,9 +243,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.13.1"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.13.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.13.1.intel.tar.gz
         dest: tensorflow-v1.13.1.tar.gz
-        checksum: 7cd19978e6bc7edc2c847bce19f95515a742b34ea5e28e4389dade35348f58ed
+        checksum: 93e7bd99f90ebc95cc735f69ef6d0a091df0863a2f2ea33b670665172105b10a
   shared/build/tensorflow/py3.6/1.13.1:
     version: "1.13.1-py3"
     required:
@@ -254,9 +254,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow/1.13.1"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.13.1.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/mkl/v1.13.1.intel.tar.gz
         dest: tensorflow-v1.13.1.tar.gz
-        checksum: 7cd19978e6bc7edc2c847bce19f95515a742b34ea5e28e4389dade35348f58ed
+        checksum: 93e7bd99f90ebc95cc735f69ef6d0a091df0863a2f2ea33b670665172105b10a
   shared/build/tensorflow-serving/py2.7/1.13.0:
     version: "1.13.0-py2"
     required:
@@ -265,9 +265,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.13.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/1.13.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/tensorflow-serving-v1.13.0.tar.gz
         dest: tensorflow-serving-v1.13.0.tar.gz
-        checksum: 203da51d5de211d4fb2106c89dd4f52e119fd9ca7945b9c57675b1299bbbd381
+        checksum: 34738d4836790ea4a4a792b2ccf0367504ecde9e7471cf5f3332c33b88fcfafd
   shared/build/tensorflow-serving/py3.6/1.13.0:
     version: "1.13.0-py3"
     required:
@@ -276,9 +276,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/tensorflow-serving/1.13.0"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/1.13.0.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/tf-serving/tensorflow-serving-v1.13.0.tar.gz
         dest: tensorflow-serving-v1.13.0.tar.gz
-        checksum: 203da51d5de211d4fb2106c89dd4f52e119fd9ca7945b9c57675b1299bbbd381
+        checksum: 34738d4836790ea4a4a792b2ccf0367504ecde9e7471cf5f3332c33b88fcfafd
   shared/run/tensorflow/py2.7:
     version: "py2"
     required:
