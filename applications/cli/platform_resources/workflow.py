@@ -90,7 +90,7 @@ class ArgoWorkflow(PlatformResource):
     def generate_name(self, value: str):
         self.body['metadata']['generateName'] = str(value)
 
-    def wait_for_completion(self, timeout=300, poll_interval=3):
+    def wait_for_completion(self, timeout=600, poll_interval=3):
         """
         Wait until workflow will enter Succeeded phase. If workflow will enter Failed phase or will not enter
         Succeeded phase in expected time, a RuntimeError will be raised.
