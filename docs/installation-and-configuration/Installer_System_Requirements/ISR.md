@@ -12,6 +12,7 @@ Nauta supports the following Operating Systems:
 
 Required on system, software requirements:
   * Python 2.7 and /usr/bin/python available
+  * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm* client _must be_ the same as Helm server used by the platform)
    
@@ -19,6 +20,7 @@ Required on system, software requirements:
 
 Required on system, software requirements:
   * Python 2.7 and /usr/bin/python available
+  * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
   
