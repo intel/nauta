@@ -28,15 +28,27 @@
   changed_when: False
   when: namespace is changed
 
+- name: "{{ message_label }} Fetch all pods"
+  shell: "{{ runtime_kubectl }} get nodes -o 'jsonpath={.items[*].status.images[*].names[*]}'"
+  environment: "{{ local_envs }}"
+  changed_when: False
+  register: images_from_pods
+
+- set_fact:
+    pause_image: "{{ (images_from_pods.stdout.split(' ') | map('regex_search', '.*pause.*') | select('string') | list | sort | unique)[0] }}"
+  when: images_from_pods
+
 - name: "{{ message_label }} Fetch pause image name"
   shell: "cat /etc/systemd/system/kubelet.service | grep 'core/pause' | cut -d'-'  -f 6 | cut -d' ' -f2 | tr -d '\n'"
   delegate_to: "{{ groups['master'][0] }}"
   environment: "{{ local_envs }}"
   changed_when: False
   register: image
+  when: not images_from_pods
 
 - set_fact:
     pause_image: "{{ image.stdout }}"
+  when: not images_from_pods
 
 - name: "{{ message_label }} Render kubernetes workspace pod deployment template"
   template:
