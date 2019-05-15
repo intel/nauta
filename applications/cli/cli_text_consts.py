@@ -699,6 +699,8 @@ class PlatformResourcesExperimentsTexts:
                                    " purge old experiment using following command: nctl experiment cancel --purge" \
                                    " {name}"
     EXPERIMENT_UPDATE_ERROR_MSG = "Error during patching an Experiment"
+    EXPERIMENT_PREV_EXP_STILL_TERMINATING = "Artfiacts of the previous experiment with the same name still exist. " \
+                                            "Please wait for a while and submit experiment again."
 
 
 class PlatformResourcesRunsTexts:
