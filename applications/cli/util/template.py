@@ -31,7 +31,7 @@ from cli_text_consts import VerifyCmdTexts as Texts
 PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
 PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
 
-RESOURCE_NAMES = ["worker_resources", "ps_resources", "resources"]
+RESOURCE_NAMES = ["worker_resources", "ps_resources", "resources", "master_resources"]
 CPU_SINGLE_VALUES = ["worker_cpu", "ps_cpu", "cpu", "cpus"]
 MEMORY_SINGLE_VALUES = ["worker_memory", "ps_memory", "memory"]
 
