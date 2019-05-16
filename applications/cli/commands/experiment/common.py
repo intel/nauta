@@ -194,8 +194,8 @@ def create_environment(experiment_name: str, file_location: str, folder_location
         if show_folder_size_warning and folder_size >= max_folder_size_in_bytes:
             if spinner_to_hide:
                 spinner_to_hide.hide()
-            if not click.confirm(f'Experiment\'s script folder location size ({folder_size/1024/1024} MB) '
-                                 f'exceeds {max_folder_size_in_bytes/1024/1024} MB. '
+            if not click.confirm(f'Experiment\'s script folder location size ({folder_size/1024/1024:.2f} MB) '
+                                 f'exceeds {max_folder_size_in_bytes/1024/1024:.2f} MB. '
                                  f'It is highly recommended to use input/output shares for large amounts of data '
                                  f'instead of submitting them along with experiment. Do you want to continue?'):
                 exit(2)
