@@ -4,7 +4,7 @@ FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
 ENV TENSORFLOW_VERSION=1.12.0
-ENV HOROVOD_VERSION=0.15.2
+ENV HOROVOD_VERSION=0.16.2
 
 RUN wget https://storage.googleapis.com/intel-optimized-tensorflow/tensorflow-${TENSORFLOW_VERSION}-cp27-cp27mu-linux_x86_64.whl -O /tensorflow-${TENSORFLOW_VERSION}-cp27-cp27mu-linux_x86_64.whl
 
