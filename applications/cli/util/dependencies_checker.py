@@ -18,7 +18,7 @@ from collections import namedtuple
 from distutils.version import LooseVersion
 import re
 import os
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 
 import yaml
 
@@ -165,7 +165,7 @@ def check_dependency(dependency_name: str,
                      dependency_spec: DependencySpec,
                      namespace: str = None,
                      saved_versions: Dict[str, LooseVersion] = None
-                     ) -> (bool, LooseVersion):
+                     ) -> Tuple[bool, LooseVersion]:
     """
     Check if dependency defined by given DependencySpec is valid
     :param dependency_name: name of dependency to check

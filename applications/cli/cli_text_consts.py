@@ -58,6 +58,7 @@ as output/<EXPERIMENT_NAME>.
     UNMOUNT_OPTIONS_OSX_MSG = "In case of problems with unmounting (disconnected disk etc.) try out -f (force) " \
                               "option. For more info about these options refer to man umount."
     MOUNTS_LIST_COMMAND_ERROR_MSG = "Error detected while gathering list of mounted shares."
+    ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying current user privileges."
 
 
 class CmdsCommonTexts:
@@ -77,7 +78,7 @@ class CmdsCommonTexts:
     LOGS_STORING_CONFIRMATION_FILE_EXISTS = "Logs from the {experiment_name} {instance_type} will be stored in the " \
                                             "{filename} file. The file with this name already exists. Should the app " \
                                             "proceed?"
-    LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs. {exception_message}"
+    LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs."
     LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
     LOGS_STORING_CANCEL_MESSAGE = "Logs have not been written to the file mentioned above - cancelled by user."
     MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."

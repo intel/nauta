@@ -167,13 +167,14 @@ def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool =
             try:
                 mount_data = re.search(mnt_regex, item)
                 if osx:
-                    username = mount_data.group(1)
-                    remote_location = mount_data.group(2)
-                    local_folder = mount_data.group(3)
+                    # Type checking is disabled here - we are catching AttributeError exception anyway
+                    username = mount_data.group(1)  # type: ignore
+                    remote_location = mount_data.group(2)  # type: ignore
+                    local_folder = mount_data.group(3)  # type: ignore
                 else:
-                    remote_location = mount_data.group(1)
-                    local_folder = mount_data.group(2)
-                    username = re.search("username=(.*?),", item).group(1)
+                    remote_location = mount_data.group(1)  # type: ignore
+                    local_folder = mount_data.group(2)  # type: ignore
+                    username = re.search("username=(.*?),", item).group(1)  # type: ignore
 
                 ret_list.append(ShareData(remote_share=remote_location, local_share=local_folder, username=username))
             except Exception:

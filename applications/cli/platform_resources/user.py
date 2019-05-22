@@ -15,7 +15,7 @@
 #
 
 from collections import namedtuple
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import dateutil
 from enum import Enum
@@ -43,7 +43,7 @@ class User(PlatformResource):
     UserCliModel = namedtuple('UserCliModel', ['name', 'created', 'date_of_last_submitted_job',
                                                'running_jobs', 'queued_jobs'])
 
-    def __init__(self, name: str, uid: int, state: UserStatus = UserStatus.DEFINED,
+    def __init__(self, name: str, uid: Union[int, str], state: UserStatus = UserStatus.DEFINED,
                  creation_timestamp: str = None, experiment_runs: List[Run] = None):
         super().__init__()
         self.name = name
@@ -77,7 +77,7 @@ class User(PlatformResource):
                    creation_timestamp=creation_timestamp)
 
     @classmethod
-    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None):
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs):
         """
         Return list of users.
         :namespace:

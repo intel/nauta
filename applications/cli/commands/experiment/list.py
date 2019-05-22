@@ -40,9 +40,10 @@ LISTED_RUNS_KINDS = [RunKinds.TRAINING, RunKinds.JUPYTER]
 @click.option('-b', '--brief', is_flag=True, help=Texts.HELP_B)
 @common_options()
 @pass_state
-def list_experiments(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool, count: int,
+def list_experiments(state: State, all_users: bool, name: str, status: str, uninitialized: bool, count: int,
                      brief: bool):
     """ List experiments. """
+    status = RunStatus[status] if status else None
     if brief:
         list_headers = [RUN_NAME, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS]
     else:
@@ -51,5 +52,5 @@ def list_experiments(state: State, all_users: bool, name: str, status: RunStatus
         list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
                                             headers=list_headers, count=count, brief=brief)
     else:
-        list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, list_headers, with_metrics=True,
-                         count=count, brief=brief)
+        list_runs_in_cli(state.verbosity, all_users, name, LISTED_RUNS_KINDS, list_headers, with_metrics=True,
+                         status=status, count=count, brief=brief)

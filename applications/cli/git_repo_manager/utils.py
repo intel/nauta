@@ -83,7 +83,8 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
             del env['LD_LIBRARY_PATH']
         logger.debug(f'Git client env: {env}')
         git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
-        git.ls_remote = git._make_command(name='ls-remote')  # This command must be created manually due to hyphen
+        # ls-remote command must be created manually due to hyphen
+        git.ls_remote = git._make_command(name='ls-remote')  #type: ignore
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
             if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
                 git.clone(f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git', git_repo_dir,

@@ -42,14 +42,14 @@ class ResourceUsage():
         return self.user_name+":"+self.get_formatted_cpu_usage()+":"+self.get_formatted_mem_usage()
 
 
-def get_highest_usage() -> Tuple[List[str], List[str]]:
+def get_highest_usage() -> Tuple[List[ResourceUsage], List[ResourceUsage]]:
 
-    available_pods = get_pods(None)
+    available_pods = get_pods(label_selector=None)
     CPU_KEY = "cpu"
     MEM_KEY = "mem"
     NAME_KEY = "name"
 
-    users_data = {}
+    users_data: dict = {}
     summarized_usage = []
 
     for item in available_pods:
@@ -60,8 +60,8 @@ def get_highest_usage() -> Tuple[List[str], List[str]]:
             try:
                 cpu, mem = get_top_for_pod(name=name, namespace=namespace)
                 if namespace in users_data:
-                    users_data.get(namespace).get(CPU_KEY).append(cpu)
-                    users_data.get(namespace).get(MEM_KEY).append(mem)
+                    users_data.get(namespace, {}).get(CPU_KEY).append(cpu)
+                    users_data.get(namespace, {}).get(MEM_KEY).append(mem)
                 else:
                     users_data[namespace] = {CPU_KEY: [cpu], MEM_KEY: [mem]}
             except Exception as exe:

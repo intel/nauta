@@ -28,7 +28,7 @@ import yaml
 
 import click
 
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Union, Optional
 from pathlib import Path
 from tabulate import tabulate
 from marshmallow import ValidationError
@@ -89,7 +89,7 @@ log = initialize_logger('commands.common')
 
 PrepareExperimentResult = namedtuple('PrepareExperimentResult', ['folder_name', 'script_name', 'pod_count'])
 
-submitted_runs = []
+submitted_runs: List[Run] = []
 submitted_experiment = ""
 submitted_namespace = ""
 
@@ -143,7 +143,7 @@ def check_run_environment(run_environment_path: str):
             exit()
 
 
-def create_environment(experiment_name: str, file_location: str, folder_location: str,
+def create_environment(experiment_name: str, file_location: str = None, folder_location: str = None,
                        show_folder_size_warning=True, max_folder_size_in_bytes=1024*1024, spinner_to_hide=None) -> str:
     """
     Creates a complete environment for executing a training using draft.
@@ -230,7 +230,7 @@ def delete_environment(experiment_folder: str):
         log.error("Delete environment - i/o error : {}".format(exe))
 
 
-def convert_to_number(s: str) -> int or float:
+def convert_to_number(s: str) -> Union[int, float]:
     """
     Converts string to number of a proper type.
 
@@ -249,11 +249,12 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                       parameter_set: Tuple[str, ...] = None,
                       script_folder_location: str = None,
                       env_variables: List[str] = None,
-                      requirements_file: str = None) -> (List[Run], Dict[str, str], str):
+                      requirements_file: str = None) -> Tuple[List[Run], Dict[str, str], Optional[str]]:
 
-    script_parameters = script_parameters if script_parameters else ()
-    parameter_set = parameter_set if parameter_set else ()
+    script_parameters: Union[Tuple[str, ...], Tuple[()]] = script_parameters if script_parameters else ()
+    parameter_set: Union[Tuple[str, ...], Tuple[()]] = parameter_set if parameter_set else ()
     parameter_range = parameter_range if parameter_range else []
+    pack_params = pack_params if pack_params else []
 
     log.debug("Submit experiment - start")
     try:
@@ -300,7 +301,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                 elif experiment_run.parameters:
                     current_script_parameters = experiment_run.parameters
                 else:
-                    current_script_parameters = ""
+                    current_script_parameters = None
                 run_folder, script_location, pod_count = \
                     prepare_experiment_environment(experiment_name=experiment_name,
                                                    run_name=experiment_run.name,
@@ -382,7 +383,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
 
         with spinner('Building experiment image...'):
             try:
-                image_build_workflow = ExperimentImageBuildWorkflow.from_yaml(
+                image_build_workflow: ExperimentImageBuildWorkflow = ExperimentImageBuildWorkflow.from_yaml(
                     yaml_template_path=f'{Config().config_path}/workflows/{EXP_IMAGE_BUILD_WORKFLOW_SPEC}',
                     username=namespace,
                     experiment_name=experiment_name)
@@ -404,7 +405,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                                   f'to {experiments_model.ExperimentStatus.FAILED}')
                 raise SubmitExperimentError(error_msg)
         # submit runs
-        run_errors = {}
+        run_errors: Dict[str, str] = {}
         for run, run_folder in zip(runs_list, experiment_run_folders):
             try:
                 run.state = RunStatus.QUEUED
@@ -460,13 +461,13 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
 def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name: str,
                          parameter_set: Tuple[str, ...], template_name: str) -> List[Run]:
 
-    run_list = []
+    run_list: List[Run] = []
 
     if not parameter_range and not parameter_set:
         run_list = [Run(name=experiment_name, experiment_name=experiment_name,
                         pod_selector={'matchLabels': {'app': template_name, 'release': experiment_name}})]
     else:
-        list_of_range_parameters = [("", )]
+        list_of_range_parameters: List[Tuple[str, ...]] = [("", )]
         list_of_set_parameters = [("", )]
 
         if parameter_range:
@@ -479,7 +480,7 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
         for set_param in list_of_set_parameters:
             for range_param in list_of_range_parameters:
                 current_run_name = experiment_name + "-" + str(run_index)
-                current_params = ()
+                current_params: Tuple[str, ...] = ()
 
                 if len(set_param) >= 1 and set_param[0]:
                     current_params = set_param
@@ -495,10 +496,11 @@ def prepare_list_of_runs(parameter_range: List[Tuple[str, str]], experiment_name
     return run_list
 
 
-def prepare_experiment_environment(experiment_name: str, run_name: str, local_script_location: str,
+def prepare_experiment_environment(experiment_name: str, run_name: str,
                                    script_parameters: Tuple[str, ...],
                                    pack_type: str, cluster_registry_port: int,
                                    username: str,
+                                   local_script_location: str = None,
                                    script_folder_location: str = None,
                                    pack_params: List[Tuple[str, str]] = None,
                                    env_variables: List[str] = None,
@@ -575,8 +577,8 @@ def get_log_filename(log_output: str):
     if logs_location in log_output:
         m = re.search(logs_location + '(.*)`', log_output)
         try:
-            return m.group(1)
-        except IndexError:
+            return m.group(1)  # type: ignore
+        except (IndexError, AttributeError):
             pass
 
     return None
@@ -667,7 +669,7 @@ def prepare_list_of_values(param_name: str, param_values: str) -> List[str]:
     return ret_values
 
 
-def analyze_pr_parameters_list(list_of_params: List[Tuple[str]]) -> List[Tuple[str, ...]]:
+def analyze_pr_parameters_list(list_of_params: List[Tuple[str, str]]) -> List[Tuple[str, ...]]:
     """
     Analyzes a list of -pr/--parameter_range parameters. It returns a list
     containing a tuples with all combinations of values of parameters given by a user.
@@ -680,8 +682,8 @@ def analyze_pr_parameters_list(list_of_params: List[Tuple[str]]) -> List[Tuple[s
     an exception with a short message about a detected problem.
     More details concerning a cause of such issue can be found in logs.
     """
-    param_names = []
-    param_values = []
+    param_names: List[str] = []
+    param_values: List[str] = []
 
     for param_name, param_value in list_of_params:
         if param_name in param_names:
@@ -690,15 +692,14 @@ def analyze_pr_parameters_list(list_of_params: List[Tuple[str]]) -> List[Tuple[s
             raise ValueError(exe_message)
 
         param_names.append(param_name)
-
-        param_values.append(prepare_list_of_values(param_name, param_value))
+        param_values.append(prepare_list_of_values(param_name, param_value))  # type: ignore
 
     ret_list = list(itertools.product(*param_values))
 
     return ret_list
 
 
-def analyze_ps_parameters_list(list_of_params: List[Tuple[str]]):
+def analyze_ps_parameters_list(list_of_params: Tuple[str, ...]):
     """
     Analyzes a list of values of -ps options.
     :param list_of_params:
@@ -715,8 +716,8 @@ def analyze_ps_parameters_list(list_of_params: List[Tuple[str]]):
 
         try:
             param_values = str.strip(param_set, "{}")
-            param_values = [l.strip() for l in param_values.split(",")]
-            param_tuple = tuple([l.replace(":", "=", 1) for l in param_values])
+            param_values_list = [l.strip() for l in param_values.split(",")]
+            param_tuple = tuple([l.replace(":", "=", 1) for l in param_values_list])
             ret_list.append(param_tuple)
         except Exception as e:
             log.exception(error_message)
@@ -749,14 +750,15 @@ def validate_pack_params_names(ctx: click.Context, param, value: List[Tuple[str,
     return value
 
 
-def check_experiment_name(value: str) -> str:
+def check_experiment_name(value: str) -> Optional[str]:
     try:
-        if value:
-            if len(value) > 30:
-                # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit this
-                raise ValidationError(Texts.EXPERIMENT_NAME_TOO_LONG_ERROR_MSG)
-            validate_kubernetes_name(value)
-            return value
+        if not value:
+            return None
+        if len(value) > 30:
+            # tf-operator requires that {user}-{tfjob's name} is no longer than 63 chars, so we need to limit this
+            raise ValidationError(Texts.EXPERIMENT_NAME_TOO_LONG_ERROR_MSG)
+        validate_kubernetes_name(value)
+        return value
     except ValidationError as ex:
         raise click.BadParameter(str(ex))
 

@@ -16,7 +16,7 @@
 
 from http import HTTPStatus
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 import json
 import requests
@@ -37,14 +37,15 @@ class TensorboardStatus(Enum):
 
 
 class Tensorboard:
-    def __init__(self, id: str, status: TensorboardStatus, url: str, invalid_runs: List[str]):
+    def __init__(self, id: str, status: TensorboardStatus, url: str, invalid_runs: List[dict] = None):
+        #TODO: reduce type complexicity for invalid_runs
         self.id = id
         self.status = status
         self.url = url
         self.invalid_runs = invalid_runs
 
     @classmethod
-    def from_dict(cls, tensorboard_dict: Dict[str, str]):
+    def from_dict(cls, tensorboard_dict: Dict[str, Any]):
         id = tensorboard_dict['id']
         status = TensorboardStatus(tensorboard_dict['status'].upper())
         url = tensorboard_dict['url']
@@ -69,7 +70,7 @@ class TensorboardCreationRequest:
         self.runs = tr_list
 
     def to_dict(self) -> dict:
-        result = {
+        result: dict = {
             'runNames': []
         }
         for run in self.runs:

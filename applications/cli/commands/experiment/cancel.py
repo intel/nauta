@@ -136,8 +136,8 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         exit(1)
 
     # check whether we have at least one experiment in state other than CANCELLED
-    list_of_runs_to_be_deleted = []
-    names_of_cancelled_runs = []
+    list_of_runs_to_be_deleted: List[Run] = []
+    names_of_cancelled_runs: List[str] = []
 
     if not purge:
         # check whether we have at least one experiment in state other than CANCELLED
@@ -169,16 +169,16 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                                                                      "deleted"] if experiment_name_plural == 'pods'
                                                                  else Texts.CANCEL_OPERATION["cancelled"]
                                                                  ))
-            for name in list_of_runs_to_be_deleted:
-                click.echo(f"     - {name.name}")
+            for run in list_of_runs_to_be_deleted:
+                click.echo(f"     - {run.name}")
         else:
             click.echo(Texts.WILL_BE_CANCELLED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
                                                                   operation_word=Texts.DELETE_OPERATION[
                                                                       "deleted"] if experiment_name_plural == 'pods'
                                                                   else Texts.CANCEL_OPERATION["cancelled"]
                                                                   ))
-            for name in list_of_runs_to_be_deleted:
-                click.echo(f"     - {name.name}")
+            for run in list_of_runs_to_be_deleted:
+                click.echo(f"     - {run.name}")
     else:
         list_of_runs_to_be_deleted = list_of_all_runs
         click.echo(Texts.WILL_BE_PURGED_LIST_HEADER.format(experiment_name_plural=experiment_name_plural,
@@ -186,8 +186,8 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
                                                                "deleted"] if experiment_name_plural == 'pods'
                                                            else Texts.CANCEL_OPERATION["cancelled"]
                                                            ))
-        for name in list_of_runs_to_be_deleted:
-            click.echo(f"     - {name.name}")
+        for run in list_of_runs_to_be_deleted:
+            click.echo(f"     - {run.name}")
 
     if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural,
                                                          operation_word=Texts.DELETE_OPERATION[
@@ -204,7 +204,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         exit(0)
 
     # group runs by experiments
-    exp_with_runs = defaultdict(list)
+    exp_with_runs: defaultdict = defaultdict(list)
 
     for run in list_of_runs_to_be_deleted:
         exp_with_runs[run.experiment_name].append(run)
@@ -286,8 +286,8 @@ def purge_experiment(exp_name: str, runs_to_purge: List[Run],
        """
     logger.debug(f"Purging {exp_name} experiment ...")
 
-    purged_runs = []
-    not_purged_runs = []
+    purged_runs: List[Run] = []
+    not_purged_runs: List[Run] = []
 
     experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:
@@ -379,8 +379,8 @@ def cancel_experiment(exp_name: str, runs_to_cancel: List[Run], namespace: str) 
     """
     logger.debug(f"Cancelling {exp_name} experiment ...")
 
-    deleted_runs = []
-    not_deleted_runs = []
+    deleted_runs: List[Run] = []
+    not_deleted_runs: List[Run] = []
 
     experiment = Experiment.get(name=exp_name, namespace=namespace)
     if not experiment:

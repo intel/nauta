@@ -38,9 +38,10 @@ LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
 @click.option('-b', '--brief', is_flag=True, help=Texts.HELP_B)
 @common_options()
 @pass_state
-def list_inference_instances(state: State, all_users: bool, name: str, status: RunStatus, uninitialized: bool,
+def list_inference_instances(state: State, all_users: bool, name: str, status: str, uninitialized: bool,
                              count: int, brief: bool):
     """ List inference instances. """
+    status = RunStatus[status] if status else None
     if brief:
         table_headers = [RUN_INFERENCE_NAME, RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS]
     else:
@@ -51,5 +52,5 @@ def list_inference_instances(state: State, all_users: bool, name: str, status: R
                                             headers=table_headers,
                                             listed_runs_kinds=LISTED_RUNS_KINDS, count=count, brief=brief)
     else:
-        list_runs_in_cli(state.verbosity, all_users, name, status, LISTED_RUNS_KINDS, table_headers,
-                         with_metrics=False, count=count, brief=brief)
+        list_runs_in_cli(state.verbosity, all_users, name, LISTED_RUNS_KINDS, table_headers,
+                         status=status, with_metrics=False, count=count, brief=brief)

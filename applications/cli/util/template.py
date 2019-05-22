@@ -21,7 +21,7 @@ from pathlib import PurePath
 import re
 
 from ruamel.yaml import YAML
-from typing import Dict
+from typing import Dict, Tuple
 
 from util.config import Config
 from util.k8s.k8s_info import get_k8s_api
@@ -91,8 +91,8 @@ def replace_cpu_configuration(data: Dict, new_cpu_number: str, current_cpu_numbe
         new_req_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
         new_limit_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
     else:
-        req_cpu = convert_k8s_cpu_resource(data.get("requests").get("cpu"))
-        limit_cpu = convert_k8s_cpu_resource(data.get("limits").get("cpu"))
+        req_cpu = convert_k8s_cpu_resource(data.get("requests", {}).get("cpu"))
+        limit_cpu = convert_k8s_cpu_resource(data.get("limits", {}).get("cpu"))
 
         new_req_cpu = (conv_new_cpu_number * req_cpu/conv_current_cpu_number)/1000
         new_limit_cpu = (conv_new_cpu_number * limit_cpu/conv_current_cpu_number)/1000
@@ -122,8 +122,8 @@ def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem
         new_req_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
         new_limit_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
     else:
-        req_memory = convert_k8s_memory_resource(data.get("requests").get("memory"))
-        limit_memory = convert_k8s_memory_resource(data.get("limits").get("memory"))
+        req_memory = convert_k8s_memory_resource(data.get("requests", {}).get("memory"))
+        limit_memory = convert_k8s_memory_resource(data.get("limits", {}).get("memory"))
 
         new_req_memory = int(conv_new_memory_amount * req_memory/conv_current_memory_amount)
         new_limit_memory = int(conv_new_memory_amount * limit_memory/conv_current_memory_amount)
@@ -269,7 +269,7 @@ def get_values_file_location(pack_name: str = None):
     return f"{dlsctl_config_dir_path}/packs/{pack}/charts/values.yaml"
 
 
-def get_k8s_worker_min_resources() -> (str, str):
+def get_k8s_worker_min_resources() -> Tuple[str, str]:
     api = get_k8s_api()
 
     nodes = api.list_node()

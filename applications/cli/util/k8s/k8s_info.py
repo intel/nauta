@@ -161,11 +161,11 @@ def check_pods_status(run_name: str, namespace: str, status: PodStatus, app_name
     return True
 
 
-def get_pods(label_selector: str) -> List[client.V1Pod]:
+def get_pods(label_selector: str = None) -> List[client.V1Pod]:
     logger.debug(f'Getting pods with label selector: {label_selector}')
     api = get_k8s_api()
 
-    pods = []
+    pods: List[client.V1Pod] = []
     try:
         if label_selector:
             pods_response = api.list_pod_for_all_namespaces(watch=False, label_selector=label_selector)
@@ -184,7 +184,7 @@ def get_namespaced_pods(label_selector: str, namespace: str) -> List[client.V1Po
     logger.debug(f'Getting namespaced pods with label selector: {label_selector}')
     api = get_k8s_api()
 
-    pods = []
+    pods: List[client.V1Pod] = []
     try:
         if label_selector:
             pods_response = api.list_namespaced_pod(watch=False, label_selector=label_selector, namespace=namespace)
@@ -236,7 +236,7 @@ def find_namespace(namespace: str) -> NamespaceStatus:
         if e.status == 404:
             return NamespaceStatus.NOT_EXISTS
         else:
-            error_message = Texts.OTHER_FIND_NAMESPACE_ERROR
+            error_message = Texts.OTHER_FIND_NAMESPACE_ERROR_MSG
             logger.exception(error_message)
             raise KubernetesError(error_message)
 
@@ -440,7 +440,7 @@ def sum_mem_resources_unformatted(mem_resources: List[str]):
         # as for example 1000K.
         elif mem_resource[-1] in PREFIX_VALUES:
             prefix = mem_resource[-1]
-            mem_sum += int(mem_resource[:-1]) * PREFIX_VALUES[prefix]
+            mem_sum += int(mem_resource[:-1]) * PREFIX_VALUES[prefix]  # type: ignore
         # If there is e contained inside resource string then assume that it is given in exponential format.
         elif "e" in mem_resource:
             mem_sum += int(float(mem_resource))
@@ -476,14 +476,14 @@ def get_pod_events(namespace: str, name: str = None) -> List[client.V1Event]:
     try:
         api = get_k8s_api()
 
-        events = []
+        events: List[client.V1Event] = []
 
         try:
             if name:
                 event_list: client.V1EventList = api.list_namespaced_event(namespace=namespace,
                                                                            field_selector=f"involvedObject.name={name}")
             else:
-                event_list: client.V1EventList = api.list_namespaced_event(namespace=namespace)
+                event_list: client.V1EventList = api.list_namespaced_event(namespace=namespace)  # type: ignore
             events = event_list.items
         except ApiException as ex:
             if ex.status != HTTPStatus.NOT_FOUND:

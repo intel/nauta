@@ -15,7 +15,7 @@
 #
 
 import http
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, NamedTuple, TypeVar
 
 import yaml
 from kubernetes import client, config
@@ -71,13 +71,15 @@ class PlatformResourceApiClient:
                 logger.exception(f'Failed to initialize {cls.__name__}')
 
 
+PlatformResourceTypeVar = TypeVar('PlatformResourceTypeVar', bound='PlatformResource')
+
 class PlatformResource:
     """
     Class representing any platform resource in form of Kubernetes CRD
     """
-    api_group_name: str = None
-    crd_plural_name: str = None
-    crd_version: str = None
+    api_group_name: str
+    crd_plural_name: str
+    crd_version: str
 
     def __init__(self, body: dict = None, name: str = None, namespace: str = None,
                  creation_timestamp: str = None, k8s_custom_object_api: CustomObjectsApi = None):
@@ -103,17 +105,18 @@ class PlatformResource:
         return False
 
     @classmethod
-    def from_k8s_response_dict(cls, object_dict: dict) -> 'PlatformResource':
+    def from_k8s_response_dict(cls, object_dict: dict) -> PlatformResourceTypeVar:
         raise NotImplementedError
 
     @classmethod
-    def from_yaml(cls, yaml_template_path: str, *args, **kwargs) -> 'PlatformResource':
+    def from_yaml(cls, yaml_template_path: str, *args, **kwargs) -> PlatformResourceTypeVar:
         with open(yaml_template_path, mode='r', encoding='utf-8') as yaml_template_file:
             resource_body = yaml.safe_load(yaml_template_file)
-        return cls(body=resource_body, *args, **kwargs)
+        kwargs.pop('body', None)
+        return cls(body=resource_body, *args, **kwargs)  #type: ignore
 
     @classmethod
-    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None) -> List['PlatformResource']:
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs) -> List[PlatformResourceTypeVar]:
         logger.debug(f'Getting list of {cls.__name__}s.')
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
@@ -130,7 +133,7 @@ class PlatformResource:
 
     @classmethod
     def get(cls, name: str, namespace: str = None,
-            custom_objects_api: CustomObjectsApi = None) -> Optional['PlatformResource']:
+            custom_objects_api: CustomObjectsApi = None) -> Optional[PlatformResourceTypeVar]:
         logger.debug(f'Getting {cls.__name__} {name} in namespace {namespace}.')
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         try:
@@ -158,7 +161,7 @@ class PlatformResource:
         return cls.from_k8s_response_dict(raw_object) if raw_object else None
 
     @property
-    def cli_representation(self) -> namedtuple:
+    def cli_representation(self) -> NamedTuple:
         raise NotImplementedError
 
     @property

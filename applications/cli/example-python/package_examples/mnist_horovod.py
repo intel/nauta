@@ -22,13 +22,13 @@ import sys
 import tensorflow as tf
 import horovod.tensorflow as hvd
 
-from experiment_metrics.api import publish
+#from experiment_metrics.api import publish
 
 layers = tf.contrib.layers
 learn = tf.contrib.learn
 
 # Output produced by the experiment (summaries, checkpoints etc.) has to be placed in this folder.
-EXPERIMENT_OUTPUT_PATH = "/mnt/output/experiment"
+EXPERIMENT_OUTPUT_PATH = "./experiment"
 FILENAMES = ('train-images-idx3-ubyte.gz', 'train-labels-idx1-ubyte.gz',
              't10k-images-idx3-ubyte.gz', 't10k-labels-idx1-ubyte.gz')
 
@@ -179,7 +179,8 @@ def main(_):
             # Only master publishes metrics.
             if hvd.rank() == 0:
                 # Publish metrics just like in the single node example.
-                publish({"loss": str(loss_val), "accuracy": str(accuracy_val), "global_step": str(global_step_val)})
+                print({"loss": str(loss_val), "accuracy": str(accuracy_val), "global_step": str(global_step_val)})
+                pass
 
     # Save servable model only from Horovod master.
     if hvd.rank() == 0:

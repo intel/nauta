@@ -20,10 +20,11 @@ from enum import Enum
 import os
 import subprocess
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import errno
 import socket
-import dateutil
+import dateutil.tz
+import dateutil.parser
 from datetime import timedelta
 import signal
 import platform
@@ -145,13 +146,13 @@ class ExternalCliClient:
         return ExternalCliCommand(env=self.env, cwd=self.cwd, cmd=[self.executable, name], timeout=self.timeout)
 
 
-def execute_system_command(command: List[str],
+def execute_system_command(command: Union[List[str], str],
                            timeout: int = None,
                            stdin=None,
                            env=None,
                            cwd=None,
                            logs_size: int = 0,
-                           shell=False) -> (str, int, str):
+                           shell=False) -> Tuple[str, int, str]:
     """
     Executes system's command
     :param command: command to be exeucted
@@ -167,7 +168,7 @@ def execute_system_command(command: List[str],
              attribute contains information about a need of changing system's encoding
     """
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # type: ignore
             command,
             timeout=timeout,
             stderr=subprocess.STDOUT,
@@ -178,11 +179,9 @@ def execute_system_command(command: List[str],
             encoding='utf-8',
             shell=shell)
         encoded_output = output[-logs_size:].encode('utf-8')
-        log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace(
-            '\n', '\\n'))
+        log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace('\n', '\\n'))
     except subprocess.CalledProcessError as ex:
-        log.exception(f'COMMAND: {command} RESULT: {ex.output}'.replace(
-            '\n', '\\n'))
+        log.exception(f'COMMAND: {command} RESULT: {ex.output}'.replace('\n', '\\n'))
         return ex.output, ex.returncode, ex.output
     else:
         return output, 0, encoded_output
@@ -200,11 +199,11 @@ def execute_subprocess_command(command: List[str],
     std_error_destination = subprocess.STDOUT if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
 
     if join:
-        final_command = ' '.join(command)
+        final_command: Union[str, List[str]] = ' '.join(command)
     else:
         final_command = command
 
-    log.debug(f'executing COMMAND in subprocess: {final_command}')
+    log.debug(f'executing COMMAND in subprocess: {str(final_command)}')
     process = subprocess.Popen(
         args=final_command,
         stdout=std_output_destination,

@@ -44,12 +44,14 @@ LOG_RUNS_KINDS = [RunKinds.INFERENCE]
 @click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options(admin_command=False)
 @pass_state
-def logs(state: State, name: str, min_severity: SeverityLevel, start_date: str,
-         end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool, pager: bool, follow: bool):
+def logs(state: State, name: str, min_severity: str, start_date: str,
+         end_date: str, pod_ids: str, pod_status: str, match: str, output: bool, pager: bool, follow: bool):
     """
     Show logs for a given experiment.
     """
     # check whether we have runs with a given name
+    min_severity = SeverityLevel[min_severity] if min_severity else None
+    pod_status = PodStatus[pod_status] if pod_status else None
     get_logs(experiment_name=name, min_severity=min_severity, start_date=start_date, end_date=end_date,
              pod_ids=pod_ids, pod_status=pod_status, match=match, output=output, pager=pager, follow=follow,
              runs_kinds=LOG_RUNS_KINDS, instance_type='prediction instance')

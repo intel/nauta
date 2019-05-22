@@ -56,7 +56,8 @@ def find_random_available_port() -> int:
 
 
 def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_name: str = None,
-                          number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen, Optional[int], int):
+                          number_of_retries: int = 0,
+                          namespace: str = None) -> Tuple[subprocess.Popen, Optional[int], int]:
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -139,7 +140,7 @@ def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_nam
         raise RuntimeError(Texts.PROXY_CREATION_OTHER_ERROR_MSG)
 
     logger.info("Port forwarding - proxy set up")
-    return process, tunnel_port, service_container_port
+    return process, tunnel_port, service_container_port  # type: ignore
 
 
 def delete_k8s_object(kind: str, name: str):

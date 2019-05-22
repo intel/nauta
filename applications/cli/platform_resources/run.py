@@ -22,7 +22,7 @@ import re
 import sre_constants
 import textwrap
 from functools import partial
-from typing import List, Dict
+from typing import List, Tuple, Dict
 
 from kubernetes.client import CustomObjectsApi
 from marshmallow import Schema, fields, post_load
@@ -66,7 +66,7 @@ class Run(PlatformResource):
                                              'submission_date', 'start_date', 'duration', 'submitter', 'status',
                                              'template_name', 'template_version'])
 
-    def __init__(self, name: str, experiment_name: str, metrics: dict = None, parameters: List[str] = None,
+    def __init__(self, name: str, experiment_name: str, metrics: dict = None, parameters: Tuple[str, ...] = None,
                  pod_count: int = None, pod_selector: dict = None,
                  state: RunStatus = None, namespace: str = None,
                  creation_timestamp: str = None, template_name: str = None, metadata: dict = None,
@@ -111,9 +111,7 @@ class Run(PlatformResource):
                    end_timestamp=object_dict.get('spec', {}).get('end-time'))
 
     @classmethod
-    def list(cls, namespace: str = None, state_list: List[RunStatus] = None, name_filter: str = None,
-             exp_name_filter: List[str] = None, excl_state: RunStatus = None,
-             run_kinds_filter: List[Enum] = None, custom_objects_api: CustomObjectsApi = None):
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs):
         """
         Return list of experiment runs.
         :param namespace: If provided, only runs from this namespace will be returned
@@ -126,6 +124,12 @@ class Run(PlatformResource):
         :return: List of Run objects
         In case of problems during getting a list of runs - throws an error
         """
+        state_list = kwargs.pop('state_list', None)
+        name_filter = kwargs.pop('name_filter', None)
+        exp_name_filter = kwargs.pop('exp_name_filter', None)
+        excl_state = kwargs.pop('excl_state', None)
+        run_kinds_filter = kwargs.pop('run_kinds_filter', None)
+        
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
             raw_runs = k8s_custom_object_api.list_namespaced_custom_object(group=Run.api_group_name,

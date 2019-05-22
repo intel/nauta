@@ -87,7 +87,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
                 click.echo(Texts.TB_INVALID_RUNS_MSG.format(invalid_runs=list_of_invalid_runs))
         except Exception as exe:
             err_message = Texts.TB_CREATE_ERROR_MSG
-            if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:
+            if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:  # type: ignore
                 err_message = str(exe)
             handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
@@ -96,6 +96,8 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             # noinspection PyTypeChecker
             # tb.id is str
             tb = tensorboard_service_client.get_tensorboard(tb.id)
+            if not tb:
+                continue
             if tb.status == TensorboardStatus.RUNNING:
                 proxy_spinner.hide()
                 launch_app_with_proxy(k8s_app_name=NAUTAAppNames.TENSORBOARD, no_launch=no_launch,

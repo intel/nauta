@@ -32,7 +32,7 @@ class InvalidRegularExpressionError(RuntimeError):
 class ExceptionWithMessage(Exception):
     """Exception with placeholder for a message"""
     def __init__(self, message: str = None):
-        self.message = message
+        self.message = message if message else ''
 
 
 class K8sProxyOpenError(ExceptionWithMessage):

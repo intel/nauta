@@ -258,7 +258,7 @@ def _log_and_raise_response(response: requests.Response):
     logger.debug(f'Request: {response.request.method} {response.url}')
     # Filter passwords from logs
     filtered_request_body = re.sub(r'"password": "\w+"', 'password: "*****"',
-                                   response.request.body.decode(_encoding)) if response.request.body else ''
+                                   response.request.body.decode(_encoding)) if response.request.body else ''  #type: ignore
     logger.debug(f'Request body: {filtered_request_body}')
     logger.debug(f'Request response: {response.status_code} {response.content}')
     response.raise_for_status()
