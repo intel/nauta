@@ -11,10 +11,10 @@ Below is an example of Inventory file and shows one Master Node and five Worker 
 **Note:** Ansible uses the YAML* format.
 
 ```yaml
-**[master]** 
+[master] 
 master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 external_interface=em3 local_data_device=/dev/sdb1
 
-**[worker]** 
+[worker] 
 worker-0 ansible_ssh_host=192.168.100.61 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 external_interface=em1
 worker-1 ansible_ssh_host=192.168.100.55 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=p3p1 external_interface=em1
 worker-3 ansible_ssh_host=192.168.100.106 ansible_ssh_user=root ansible_ssh_ pass=YourPassword internal_interface=p3p1 external_interface=em1
@@ -24,8 +24,8 @@ worker-4 ansible_ssh_host=192.168.100.107 ansible_ssh_user=root ansible_ssh_ pas
 ## Inventory File Structure
 
 The file contains two sections:
-1. `**[master]**` Contains a description of a master node. This section _must_ contain exactly one row.
-1. `**[worker]**` Contains descriptions of workers. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
+1. `[master]` Contains a description of a master node. This section _must_ contain exactly one row.
+1. `[worker]` Contains descriptions of workers. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
 
 Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into it, and so on. The format for each row is as follows:
 
