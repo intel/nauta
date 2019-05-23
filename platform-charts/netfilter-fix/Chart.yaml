@@ -1,0 +1,4 @@
+apiVersion: v1
+name: netfilter-fix
+description: Fix for clusterIP service issues due to netfilter settings
+version: 0.1.0
