@@ -94,7 +94,7 @@ def test_upload_experiment_to_git_repo_manager(mocker, tmpdir, git_client_mock):
 
     assert git_client_mock.clone.call_count == 1
 
-    assert git_client_mock.config.call_count == 2
+    assert git_client_mock.config.call_count == 3
     assert git_client_mock.checkout.call_count == 1
     assert git_client_mock.pull.call_count == 0
     assert git_client_mock.add.call_count == 1
@@ -129,7 +129,7 @@ def test_upload_experiment_to_git_repo_manager_already_cloned(mocker, tmpdir, gi
 
     assert git_client_mock.clone.call_count == 0
 
-    assert git_client_mock.config.call_count == 2
+    assert git_client_mock.config.call_count == 3
     assert git_client_mock.checkout.call_count == 1
     assert git_client_mock.pull.call_count == 0
     assert git_client_mock.add.call_count == 1
