@@ -71,7 +71,10 @@ def verify(state: State):
                                                                     supported_versions_sign=supported_versions_sign,
                                                                     expected_version=  # noqa
                                                                     kubectl_dependency_spec.expected_version),
-                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG,
+                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG.format(installed_version=installed_version,
+                                                                    supported_versions_sign=supported_versions_sign,
+                                                                    expected_version=  # noqa
+                                                                    kubectl_dependency_spec.expected_version),
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
