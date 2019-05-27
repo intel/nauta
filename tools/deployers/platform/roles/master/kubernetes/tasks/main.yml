@@ -20,18 +20,16 @@
 
 ### Apiserver
 
-- name: "{{ message_label }} Create apiserver audit directory"
+- name: "{{ message_label }} Create {{ item }} audit directory"
   file:
-    path: /var/log/kubernetes-apiserver-audit
+    path: "{{ item }}"
     state: directory
     owner: root
     group: cluster
     mode: 0750
-
-- name: "{{ message_label }} Create kubeconfigs directory"
-  file:
-    path: /etc/nauta-cluster/master/kubernetes/kubeconfigs
-    state: directory
+  with_items:
+    - /var/log/kubernetes-apiserver-audit
+    - /etc/nauta-cluster/master/kubernetes/kubeconfigs
 
 - name: "{{ message_label }} Copy audit config"
   copy:
@@ -153,62 +151,19 @@
 
 - meta: flush_handlers
 
-- name: "{{ message_label }} Start and enable apiservice"
+- name: "{{ message_label }} Start and enable {{ item }} service"
   service:
-    name: kubernetes-apiserver
+    name: "{{ item }}"
     state: started
     enabled: True
-
-- name: "{{ message_label }} Start and enable apiservice check"
-  service:
-    name: kubernetes-apiserver-check
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable apiserver target"
-  service:
-    name: kubernetes-apiserver.target
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable controller"
-  service:
-    name: kubernetes-controller
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable controller check"
-  service:
-    name: kubernetes-controller-check
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable controller target"
-  service:
-    name: kubernetes-controller.target
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable scheduler"
-  service:
-    name: kubernetes-scheduler
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable scheduler check"
-  service:
-    name: kubernetes-scheduler-check
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable scheduler target"
-  service:
-    name: kubernetes-scheduler.target
-    state: started
-    enabled: True
-
-- name: "{{ message_label }} Start and enable server target"
-  service:
-    name: kubernetes-server.target
-    state: started
-    enabled: True
+  with_items:
+    - kubernetes-apiserver
+    - kubernetes-apiserver-check
+    - kubernetes-apiserver.target
+    - kubernetes-controller
+    - kubernetes-controller-check
+    - kubernetes-controller.target
+    - kubernetes-scheduler
+    - kubernetes-scheduler-check
+    - kubernetes-scheduler.target
+    - kubernetes-server.target
