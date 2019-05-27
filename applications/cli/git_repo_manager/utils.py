@@ -18,6 +18,8 @@ import base64
 import hashlib
 import os
 
+from retry import retry
+
 from util.app_names import NAUTAAppNames
 from util.config import Config
 from util.k8s.k8s_info import get_secret, get_kubectl_host
@@ -60,6 +62,7 @@ def create_gitignore_file_for_experiments(git_workdir):
         gitignore_file.write('charts/*')
 
 
+@retry(tries=5, delay=1)
 def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str, run_name: str):
     git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
     git_work_dir = os.path.join(experiments_workdir, run_name)
