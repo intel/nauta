@@ -41,6 +41,7 @@
                     <exclude>**/tmp-go/</exclude>
                     <exclude>**/applications/cli/build/</exclude>
                     <exclude>**/docs/</exclude>
+                    <exclude>**/toolbox/providers/vagrant/virtualbox/disk-extend.sh</exclude>
                 </excludes>
                 <mapping>
                     <js>JAVADOC_STYLE</js>

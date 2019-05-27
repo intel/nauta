@@ -1,0 +1,6 @@
+[master]
+master-0 ansible_ssh_host=192.168.50.10 ansible_ssh_user=nauta internal_interface=eth1 external_interface=eth1 local_data_device=/dev/sdb
+
+[worker]
+worker-0 ansible_ssh_host=192.168.50.11 ansible_ssh_user=nauta internal_interface=eth1 external_interface=eth1
+

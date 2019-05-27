@@ -1,0 +1,139 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+  raise 'vagrant-disksize is not installed!'
+end
+
+##################################
+#                                #
+#    configuration variables     #
+#                                #
+##################################
+
+storage_disk = 'c:\vagrant-files\secondDisk.vdi' # where the virtual disk will be created
+storage_script = 'c:\vagrant-files\disk-extend.sh' # where the disk-extend script has landed
+http_proxy="http://proxy.example.com:123" # proxy if used, else leave blank
+https_proxy="https://proxy.example.com:123" # proxy if used, else leave blank
+no_proxy="localhost,127.0.0.1,intel.com,.nauta,192.168.0.0/8,10.0.0.0/8" # no_proxy if used, else leave blank
+nauta_installer="c:/vagrant-files/nauta-vagrant" # path to nauta compiled package
+nauta_private_ssh_key="c:/vagrant-files/id_rsa" # path to private RSA key used on platform
+nauta_public_ssh_key="c:/vagrant-files/id_rsa.pub" # path to public RSA key used on platform
+
+##################################
+#                                #
+#      end of configuration      #
+#                                #
+##################################
+
+
+Vagrant.configure("2") do |config|
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    config.proxy.http     = http_proxy
+    config.proxy.https    = https_proxy
+    config.proxy.no_proxy = no_proxy
+  end
+  config.vm.box = "centos/7"
+  config.vm.box_version = "1902.01"
+
+
+  config.vm.define :"master" do |t|
+    t.vm.network "private_network", ip: "192.168.50.10" 
+    t.vm.provider "virtualbox" do |vb|
+      vb.name = "master"
+      vb.memory = 12288
+      vb.cpus = 7
+      unless File.exist?(storage_disk)
+        vb.customize ['createhd', '--filename', storage_disk, '--variant', 'Fixed', '--size', 20 * 1024]
+      end
+	  vb.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', storage_disk]
+    end
+	t.disksize.size = "100GB"
+	t.vm.provision "shell", path: storage_script
+    t.vm.provision "shell", inline: <<-SHELL
+      growpart /dev/sda 1
+      xfs_growfs -d /dev/sda1
+	SHELL
+  end
+
+  config.vm.define "slave" do |s|
+    s.vm.network "private_network", ip: "192.168.50.11"
+    s.vm.provider "virtualbox" do |v|
+	  v.name = "slave"
+	  v.memory = 12288
+	  v.cpus = 7
+	end
+	s.disksize.size = "100GB"
+	s.vm.provision "shell", path: storage_script
+    s.vm.provision "shell", inline: <<-SHELL
+      growpart /dev/sda 1
+      xfs_growfs -d /dev/sda1
+	SHELL
+  end
+	
+  config.vm.define "jumphost" do |r|
+    r.vm.network "private_network", ip: "192.168.50.9"
+    r.vm.provider "virtualbox" do |v|
+      v.name = "jumphost"
+      v.memory = 4096
+      v.cpus = 1      
+    end
+  end	  
+
+  public_key = File.read(nauta_public_ssh_key)
+  config.vm.provision "shell", inline: <<-SHELL
+    yum -y update
+    yum install -y byacc cifs-utils ebtables ethtool gcc gcc-c++ git iproute iptables libcgroup libcgroup-devel libcgroup-tools libffi-devel libseccomp-devel libtool-ltdl-devel make nfs-utils openssh openssh-clients openssl openssl-devel policycoreutils-python python python-backports python-backports-ssl_match_hostname python-devel python-ipaddress python-setuptools rsync selinux-policy selinux-policy-base selinux-policy-targeted socat systemd-libs util-linux vim wget cloud-utils-growpart linux-headers-$(uname -r) build-essential dkms
+    wget http://download.virtualbox.org/virtualbox/6.0.4/VBoxGuestAdditions_6.0.4.iso
+	mkdir /media/VBoxGuestAdditions
+    mount -o loop,ro VBoxGuestAdditions_6.0.4.iso /media/VBoxGuestAdditions
+    sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run
+    rm VBoxGuestAdditions_6.0.4.iso
+    umount /media/VBoxGuestAdditions
+    rmdir /media/VBoxGuestAdditions
+  	echo 'Create nauta user'
+	useradd -m nauta
+	echo 'nauta ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+	mkdir -p /home/nauta/.ssh
+    echo 'Copying public SSH Keys to the VM'
+    chmod 700 /home/nauta/.ssh
+    echo '#{public_key}' >> /home/nauta/.ssh/authorized_keys
+    chmod -R 600 /home/nauta/.ssh/authorized_keys
+    echo 'Host 192.168.*.*' >> /home/nauta/.ssh/config
+    echo 'StrictHostKeyChecking no' >> /home/nauta/.ssh/config
+    echo 'UserKnownHostsFile /dev/null' >> /home/nauta/.ssh/config
+    chmod -R 600 /home/nauta/.ssh/config
+	chown -R nauta:nauta /home/nauta
+  SHELL
+  config.vm.define "jumphost" do |r|
+    r.vm.provision "file", source: nauta_installer, destination: "/tmp/nauta-vagrant"
+    r.vm.provision "file", source: nauta_private_ssh_key, destination: "/tmp/id_rsa"
+    r.vm.provision "shell", inline: <<-SHELL
+	  mv /tmp/nauta-vagrant /home/nauta/nauta-vagrant
+	  mv /tmp/id_rsa /home/nauta/.ssh/id_rsa
+      chmod -R 600 /home/nauta/.ssh/id_rsa
+      chown -R nauta:nauta /home/nauta/nauta-vagrant
+      chown -R nauta:nauta /home/nauta/.ssh/id_rsa
+	  chmod +x /home/nauta/nauta-vagrant/installer.sh
+	  rm -f /home/nauta/nauta-vagrant/bin/Linux/amd64/CENTOS/7/ansible-playbook
+	  yum install -y epel-release 
+	  yum update -y
+	  yum install -y python36
+      echo 'ensure that /usr/local/bin is in the $PATH:'
+	  echo 'export PATH=/usr/local/bin:$PATH' >> /etc/profile
+	  python3.6 -m ensurepip
+	  pip3 install -U pip==19.0.3
+	  pip3 install -U virtualenv
+	  echo 'export ENV_CONFIG=/home/nauta/nauta-vagrant/config.yml' >> /home/nauta/.bashrc
+	  echo 'export ENV_INVENTORY=/home/nauta/nauta-vagrant/inventory' >> /home/nauta/.bashrc
+	  echo 'ensure that .bashrc is nauta'
+	  chown nauta:nauta /home/nauta/.bashrc
+	  wget https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz -P /tmp/
+    SHELL
+  end
+end
+
+
+
+
+

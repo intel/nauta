@@ -1,0 +1,14 @@
+dns_servers:
+  - 10.0.2.3
+#proxy:
+#  http_proxy: http://proxy.example.com:123
+#  https_proxy: http://proxy.example.com:123
+#  no_proxy: localhost,.nauta,10.0.0.0/8,192.168.0.0/8,127.0.0.1
+
+#features:
+#  redsocks: true
+#
+#features_config:
+#  redsocks:
+#    IP: 10.0.0.1
+#    Port: 1080
