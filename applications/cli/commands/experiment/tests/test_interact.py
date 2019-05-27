@@ -183,3 +183,12 @@ def test_interact_too_much_notebooks(prepare_mocks: InteractMocks):
     assert Texts.INTERACT_ABORT_MSG in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=0, submit_experiment_count=0,
                   launch_app_count=0)
+
+
+def test_interact_reconnect_to_session_with_filename(prepare_mocks: InteractMocks):
+    prepare_mocks.get_experiment.return_value = JUPYTER_EXPERIMENT
+    result = CliRunner().invoke(interact.interact, ["-n", JUPYTER_EXPERIMENT.name, "-f", "file.py"], input="y")
+
+    assert Texts.FILENAME_BUT_SESSION_EXISTS in result.output
+    check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,
+                  launch_app_count=0)
