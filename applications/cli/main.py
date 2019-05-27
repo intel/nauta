@@ -48,6 +48,8 @@ DEFAULT_LANG = "en_US.UTF-8"
 DEFAULT_ENCODING = "UTF-8"
 
 ERROR_MESSAGE = "Other error during starting application."
+BAD_PERMISSION_ERROR_MESSAGE = "Permissions for config directory are incorrect. Please set rights to read, write " \
+                               "and execute."
 UTF_ERROR_MESSAGE = f"""Environment localization settings are incorrect. Please set following environment variables:
 export LC_ALL={DEFAULT_LANG}
 export LC_CTYPE={DEFAULT_LANG}
@@ -87,7 +89,12 @@ def configure_cli_logs():
         log_file_directory = '{}/logs'.format(Config().config_path)
 
     if not os.path.isdir(log_file_directory):
-        os.mkdir(log_file_directory)
+        try:
+            os.mkdir(log_file_directory)
+        except PermissionError:
+            print(BAD_PERMISSION_ERROR_MESSAGE)
+            logger.exception(BAD_PERMISSION_ERROR_MESSAGE)
+            sys.exit(1)
 
     file_handler = setup_log_file(log_file_directory=log_file_directory, log_level=log_level,
                                   log_backup_count=log_retention)
