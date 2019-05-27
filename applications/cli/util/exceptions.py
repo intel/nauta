@@ -80,3 +80,8 @@ class InvalidDependencyError(Exception):
 class InvalidOsError(Exception):
     """Error raised when nctl fails to read user's OS version, or this version does not meet the requirements."""
     pass
+
+
+class InvalidOsVersionError(Exception):
+    """Error raised when os version does not meet the requirements."""
+    pass

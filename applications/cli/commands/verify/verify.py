@@ -28,7 +28,7 @@ from util.k8s.k8s_info import get_kubectl_current_context_namespace, is_current_
 from util.spinner import spinner
 from util.system import handle_error
 from cli_text_consts import VerifyCmdTexts as Texts
-from util.exceptions import KubectlConnectionError, InvalidOsError
+from util.exceptions import KubectlConnectionError, InvalidOsError, InvalidOsVersionError
 
 
 logger = initialize_logger(__name__)
@@ -42,6 +42,8 @@ def verify(state: State):
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
+    except InvalidOsVersionError as exception:
+        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
     except InvalidOsError as exception:
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)

@@ -24,7 +24,7 @@ import yaml
 
 from util.system import execute_system_command, get_os_version
 from util.logger import initialize_logger
-from util.exceptions import InvalidDependencyError, InvalidOsError
+from util.exceptions import InvalidDependencyError, InvalidOsError, InvalidOsVersionError
 from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 from version import VERSION
 from util.config import Config
@@ -156,7 +156,7 @@ def check_os():
             Texts.UNSUPPORTED_OS_ERROR_MSG.format(
                 os_name=os_name, os_version=os_version))
     if not _is_version_valid(os_version, SUPPORTED_OS_MAP[os_name]):
-        raise InvalidOsError(
+        raise InvalidOsVersionError(
             Texts.INVALID_OS_VERSION_ERROR_MSG.format(
                 os_name=os_name, os_version=os_version))
 
