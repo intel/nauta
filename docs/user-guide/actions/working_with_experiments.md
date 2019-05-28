@@ -2,7 +2,6 @@
 
 This section provides greater detail on:
 
-* [Mounting Experiment Input to Storage](mount_exp_input.md)
 * [Launching Jupyter Interactive Notebook](launch_jupyter.md)
 * [Submitting a Single Experiment](submit_single_exp.md)
 * [Submitting Multiple Experiments](submit_mult_exp.md)
