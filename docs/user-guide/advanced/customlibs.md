@@ -4,8 +4,8 @@ This section discusses the following main topics:
 
  - [Installing an Operating System library](#installing-an-operating-system-library)
  - [Modifying Existing Draft Packs](#modifying-existing-draft-packs)
- - [Installing Operating System Packages](#installing-operating-system-packages)  
- - [Proxy Settings](#proxy-settings)
+ - [Installing Operating System Packages](#installing-os-packages)
+ - [Proxy Settings](#proxy)
  - [Example Dockerfile Modification](#example-dockerfile-modification) 
 
 ## Installing an Operating System library

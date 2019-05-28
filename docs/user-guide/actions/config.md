@@ -6,7 +6,7 @@
 - [Syntax](#syntax)
 - [Options](#options)
 - [Returns](#returns)
-- [Example](#examples) 
+- [Example](#example)
 - [Outcome](#outcome)  
 
 

@@ -6,7 +6,7 @@ The section discusses the following main topics:
  - [nctl mount Command](#nctl-mount-command)
  - [Mounting and Accessing Folders](#mounting-and-accessing-folders)
  - [Uploading and Using Shared Dataset Example](#uploading-and-using-shared-dataset-example)
- - [Uploading and Using Shared Dataset](#uploading-and-using-shared-dataset)
+ - [Uploading and Using Shared Dataset](#uploading-and-using-a-shared-dataset)
  - [Uploading During Experiment Submission](#uploading-during-experiment-submission)
  
 ## Uploading Datasets

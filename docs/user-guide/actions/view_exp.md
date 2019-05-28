@@ -3,7 +3,7 @@
 This section discusses the following main topics: 
 
  - [Viewing All Experiments Using the CLI](#viewing-all-experiments-using-the-cli)
- - [Viewing a Single Experiment's Details](#viewing-a-single-experiment-details)  
+ - [Viewing a Single Experiment's Details](#viewing-a-single-experiments-details)
  - [Useful References](#useful-references)  
  
 ## Viewing All Experiments Using the CLI
