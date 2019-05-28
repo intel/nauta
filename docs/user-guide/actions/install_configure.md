@@ -10,7 +10,7 @@ The following software _must_ be installed on the client system before installin
 
 * kubectl version 1.10 or later: https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl
 
-* git version 2.0.0 or later
+* git version 2.7.4 or later
 
 
 ## Installation

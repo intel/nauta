@@ -40,7 +40,7 @@ DRAFT_MIN_VERSION = LooseVersion('v0.13.0')
 KUBECTL_MIN_VERSION = LooseVersion('v1.10')
 KUBECTL_SERVER_MIN_VERSION = LooseVersion('v1.10')
 HELM_VERSION = LooseVersion('v2.11.0')
-GIT_VERSION = LooseVersion('2.0.0')
+GIT_VERSION = LooseVersion('2.7.4')
 
 HELM_SERVER_CONNECTION_TIMEOUT = 30
 NAMESPACE_PLACEHOLDER = '<namespace>'
