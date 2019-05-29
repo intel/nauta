@@ -60,8 +60,16 @@ DependencySpec = namedtuple('DependencySpec', [
     'version_field', 'match_exact_version'
 ])
 
+SUPPORTED_OS_MAP = {
+    'ubuntu': UBUNTU_MIN_VERSION,
+    'rhel': REDHAT_MIN_VERSION,
+    'macos': MACOS_MIN_VERSION,
+    'windows_pro': WINDOWS_MIN_VERSION,
+    'windows_enterprise': WINDOWS_MIN_VERSION
+}
 
-def get_dependency_map() -> Dict[str, DependencySpec]:
+
+def get_local_dependency_map() -> Dict[str, DependencySpec]:
     return {
         'kubectl':
         DependencySpec(
@@ -70,13 +78,6 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
             version_command_args=['kubectl', 'version', '--client'],
             version_field='GitVersion:',
             match_exact_version=False),
-        'kubectl server':
-        DependencySpec(
-            expected_version=KUBECTL_SERVER_MIN_VERSION,
-            version_command=execute_system_command,
-            version_command_args=['kubectl', 'version', '--short'],
-            version_field='Server Version:',
-            match_exact_version=False),
         'helm client':
         DependencySpec(
             expected_version=HELM_VERSION,
@@ -84,18 +85,6 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
             version_command_args=[
                 os.path.join(Config().config_path, 'helm'), 'version',
                 '--client'
-            ],
-            version_field='SemVer:',
-            match_exact_version=True),
-        'helm server':
-        DependencySpec(
-            expected_version=HELM_VERSION,
-            version_command=execute_system_command,
-            version_command_args=[
-                os.path.join(Config().config_path, 'helm'), 'version',
-                '--server', '--debug', '--tiller-connection-timeout',
-                f'{HELM_SERVER_CONNECTION_TIMEOUT}', '--tiller-namespace',
-                NAMESPACE_PLACEHOLDER
             ],
             version_field='SemVer:',
             match_exact_version=True),
@@ -112,13 +101,28 @@ def get_dependency_map() -> Dict[str, DependencySpec]:
     }
 
 
-SUPPORTED_OS_MAP = {
-    'ubuntu': UBUNTU_MIN_VERSION,
-    'rhel': REDHAT_MIN_VERSION,
-    'macos': MACOS_MIN_VERSION,
-    'windows_pro': WINDOWS_MIN_VERSION,
-    'windows_enterprise': WINDOWS_MIN_VERSION
-}
+def get_remote_dependency_map() -> Dict[str, DependencySpec]:
+    return {
+        'helm server':
+        DependencySpec(
+            expected_version=HELM_VERSION,
+            version_command=execute_system_command,
+            version_command_args=[
+                os.path.join(Config().config_path, 'helm'), 'version',
+                '--server', '--debug', '--tiller-connection-timeout',
+                f'{HELM_SERVER_CONNECTION_TIMEOUT}', '--tiller-namespace',
+                NAMESPACE_PLACEHOLDER
+            ],
+            version_field='SemVer:',
+            match_exact_version=True),
+        'kubectl server':
+        DependencySpec(
+            expected_version=KUBECTL_SERVER_MIN_VERSION,
+            version_command=execute_system_command,
+            version_command_args=['kubectl', 'version', '--short'],
+            version_field='Server Version:',
+            match_exact_version=False),
+    }
 
 
 def _is_version_valid(installed_version: LooseVersion,
@@ -220,9 +224,10 @@ def check_all_binary_dependencies(namespace: str):
     :param namespace: k8s namespace where server components of checked dependencies are located
     """
     saved_versions = load_dependency_versions()
+    dependencies = {**get_local_dependency_map(), **get_remote_dependency_map()}
     dependency_versions = {}
 
-    for dependency_name, dependency_spec in get_dependency_map().items():
+    for dependency_name, dependency_spec in dependencies.items():
         try:
             supported_versions_sign = '==' if dependency_spec.match_exact_version else '>='
             valid, installed_version = check_dependency(

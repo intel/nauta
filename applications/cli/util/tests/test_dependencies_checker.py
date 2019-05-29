@@ -21,10 +21,10 @@ import yaml
 
 from util.dependencies_checker import _is_version_valid, LooseVersion, \
     _parse_installed_version, check_dependency, \
-    DependencySpec, check_all_binary_dependencies, get_dependency_map, \
+    DependencySpec, check_all_binary_dependencies, get_local_dependency_map, \
     NAMESPACE_PLACEHOLDER, check_os, SUPPORTED_OS_MAP, \
     get_dependency_versions_file_path, save_dependency_versions, \
-    load_dependency_versions, DEPENDENCY_VERSIONS_FILE_SUFFIX
+    load_dependency_versions, DEPENDENCY_VERSIONS_FILE_SUFFIX, get_remote_dependency_map
 from util.exceptions import InvalidDependencyError, InvalidOsError, InvalidOsVersionError
 from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 
@@ -175,7 +175,7 @@ def test_check_all_binary_dependencies(mocker):
     assert load_dependency_versions_mock.call_count == 1, 'Saved dependency versions were not loaded.'
     assert save_dependency_versions_mock.call_count == 1, 'Dependency versions were not saved.'
     assert check_dependency_mock.call_count == len(
-        get_dependency_map()), 'Not all dependencies were checked.'
+        get_local_dependency_map()) + len(get_remote_dependency_map()), 'Not all dependencies were checked.'
 
 
 def test_check_all_binary_dependencies_saved_versions(mocker):
@@ -190,7 +190,7 @@ def test_check_all_binary_dependencies_saved_versions(mocker):
 
     saved_versions = {
         dependency_name: fake_version
-        for dependency_name in get_dependency_map().keys()
+        for dependency_name in get_local_dependency_map().keys()
     }
 
     load_dependency_versions_mock = mocker.patch(
@@ -205,14 +205,14 @@ def test_check_all_binary_dependencies_saved_versions(mocker):
     assert load_dependency_versions_mock.call_count == 1, 'Saved dependency versions were not loaded.'
     assert save_dependency_versions_mock.call_count == 0, 'Saved dependencies versions were overwritten.'
     assert check_dependency_mock.call_count == len(
-        get_dependency_map()), 'Not all dependencies were checked.'
+        get_local_dependency_map()) + len(get_remote_dependency_map()), 'Not all dependencies were checked.'
     expected_check_dependency_calls = [
         call(
             dependency_name=dependency_name,
             dependency_spec=dependency_spec,
             namespace=fake_namespace,
             saved_versions=saved_versions)
-        for dependency_name, dependency_spec in get_dependency_map().items()
+        for dependency_name, dependency_spec in get_local_dependency_map().items()
     ]
     check_dependency_mock.assert_has_calls(
         expected_check_dependency_calls, any_order=True)

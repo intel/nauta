@@ -21,6 +21,7 @@ import pytest
 
 from commands.verify import verify
 from util.exceptions import KubectlConnectionError
+from util.dependencies_checker import get_local_dependency_map, get_remote_dependency_map
 from cli_text_consts import VerifyCmdTexts as Texts
 
 
@@ -40,10 +41,10 @@ def test_verify_with_kubectl_connection_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
-    assert check_dependency_mock.call_count == 1
+    assert check_dependency_mock.call_count == len(get_local_dependency_map())
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     # noinspection PyUnresolvedReferences
-    assert verify.save_dependency_versions.call_count == 0
+    assert verify.save_dependency_versions.call_count == 1
 
     assert "Cannot connect to K8S cluster" in result.output, \
         "Bad output. Connection error should be indicated in console output."
@@ -59,10 +60,10 @@ def test_verify_with_kubectl_not_found_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
-    assert check_dependency_mock.call_count == 1, "dependency wasn't checked"
+    assert check_dependency_mock.call_count == len(get_local_dependency_map()), "dependency wasn't checked"
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     # noinspection PyUnresolvedReferences
-    assert verify.save_dependency_versions.call_count == 0
+    assert verify.save_dependency_versions.call_count == 1
 
     assert Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG in result.output, \
         "Bad output. FileNotFoundError indicates that kubectl is not installed."
@@ -84,9 +85,10 @@ def test_verify_with_kubectl_connection_success(mocker):
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
-    assert check_dependency_mock.call_count != 0, "dependency wasn't checked"
+    assert check_dependency_mock.call_count == len(get_local_dependency_map()) + len(get_remote_dependency_map()),\
+        "dependency wasn't checked"
     # noinspection PyUnresolvedReferences
-    assert verify.save_dependency_versions.call_count == 1
+    assert verify.save_dependency_versions.call_count == 2
 
 
 def test_verify_with_kubectl_namespace_get_error(mocker):
@@ -102,11 +104,11 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
-    assert check_dependency_mock.call_count == 1
+    assert check_dependency_mock.call_count == len(get_local_dependency_map())
     assert check_connection_mock.call_count == 1
     assert check_port_forwarding_mock.call_count == 1
     # noinspection PyUnresolvedReferences
-    assert verify.save_dependency_versions.call_count == 0
+    assert verify.save_dependency_versions.call_count == 1
 
     assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
         "Bad output. Namespace get error should be indicated in the console."
@@ -124,7 +126,7 @@ def test_verify_with_kubectl_admin_check_error(mocker):
 
     assert check_connection_mock.call_count == 1
     assert check_port_forwarding_mock.call_count == 1
-    assert check_dependency_mock.call_count == 1
+    assert check_dependency_mock.call_count == len(get_local_dependency_map())
 
     assert Texts.GET_K8S_NAMESPACE_ERROR_MSG in result.output, \
         "Bad output. Admin check error should be indicated in the console."
@@ -141,7 +143,7 @@ def test_verify_with_port_forwarding_error(mocker):
 
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
-    assert check_dependency_mock.call_count == 1, "dependency wasn't checked"
+    assert check_dependency_mock.call_count == len(get_local_dependency_map()), "dependency wasn't checked"
 
     assert Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG in result.output, \
         "Bad output. Port forwarding error should be indicated in the console."

@@ -15,11 +15,13 @@
 #
 
 from sys import exit
+from typing import Dict
 
 import click
 
 from util.cli_state import common_options, pass_state, State
-from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
+from util.dependencies_checker import check_dependency, get_local_dependency_map, check_os, \
+   save_dependency_versions, get_remote_dependency_map, DependencySpec
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.k8s.kubectl import check_connection_to_cluster
@@ -48,39 +50,8 @@ def verify(state: State):
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
         exit(1)
 
-    dependencies = get_dependency_map()
-    kubectl_dependency_name = 'kubectl'
-    kubectl_dependency_spec = dependencies[kubectl_dependency_name]
-
-    with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=kubectl_dependency_name)):
-        valid, installed_version = check_dependency(dependency_name=kubectl_dependency_name,
-                                                    dependency_spec=kubectl_dependency_spec)
-
-    supported_versions_sign = '>='
-    logger.info(
-        Texts.VERSION_CHECKING_MSG.format(
-            dependency_name=kubectl_dependency_name, installed_version=installed_version,
-            supported_versions_sign=supported_versions_sign,
-            expected_version=kubectl_dependency_spec.expected_version
-        )
-    )
-
-    if valid:
-        click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name=kubectl_dependency_name))
-    else:
-        handle_error(logger,
-                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG.format(installed_version=installed_version,
-                                                                    supported_versions_sign=supported_versions_sign,
-                                                                    expected_version=  # noqa
-                                                                    kubectl_dependency_spec.expected_version),
-                     Texts.KUBECTL_INVALID_VERSION_ERROR_MSG.format(installed_version=installed_version,
-                                                                    supported_versions_sign=supported_versions_sign,
-                                                                    expected_version=  # noqa
-                                                                    kubectl_dependency_spec.expected_version),
-                     add_verbosity_msg=state.verbosity == 0)
-        exit(1)
-
-    del dependencies[kubectl_dependency_name]
+    local_dependencies = get_local_dependency_map()
+    _check_dependencies(local_dependencies, state=state)
 
     try:
         with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):
@@ -102,6 +73,15 @@ def verify(state: State):
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
+    remote_dependencies = get_remote_dependency_map()
+    _check_dependencies(remote_dependencies, state=state, namespace=namespace)
+
+
+def _check_dependencies(dependencies: Dict[str, DependencySpec], state: State, namespace: str = None):
+    """
+    Checks if dependencies provided in dependencies dict are installed and have correct versions.
+    In case of error, a proper message will be displayed and cli will return non zero exit code.
+    """
     dependency_versions = {}
     for dependency_name, dependency_spec in dependencies.items():
         try:
