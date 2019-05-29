@@ -31,7 +31,8 @@ RUN source /opt/rh/devtoolset-8/enable && bazel build \
       --linkopt=-znow \
       --linkopt=-fstack-protector \
       --incompatible_disallow_data_transition=false \
-      --jobs=16 \
+      --jobs=8 \
+      --local_resources=32000.0,16.0,1.0 \
       -c opt --verbose_failures tensorflow_serving/...
 
 RUN ln -sf bazel-serving-1.9.0 bazel-serving

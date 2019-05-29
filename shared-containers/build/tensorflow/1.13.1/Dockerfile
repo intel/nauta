@@ -35,7 +35,8 @@ RUN source /opt/rh/devtoolset-8/enable && bazel build \
       --linkopt=-znow \
       --linkopt=-fstack-protector \
       --linkopt=-pie \
-      --jobs=16\
+      --jobs=8 \
+      --local_resources=32000.0,16.0,1.0 \
       -c opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package
 
 RUN source /opt/rh/devtoolset-8/enable && bazel-bin/tensorflow/tools/pip_package/build_pip_package /build-output/

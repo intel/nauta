@@ -6,5 +6,5 @@
   changed_when: False
   register: task_state
   until: task_state.finished
-  retries: "{{ retries | default(3600) }}"
+  retries: "{{ retries | default(7200) }}"
   delay: "{{ delay | default(1) }}"
