@@ -50,19 +50,14 @@ def test_verify_with_kubectl_connection_error(mocker):
 
 
 def test_verify_with_kubectl_not_found_error(mocker):
-    check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
-    check_connection_mock.side_effect = FileNotFoundError
-    check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
+    check_dependency_mock = mocker.patch.object(verify, "check_dependency")
+    check_dependency_mock.side_effect = FileNotFoundError
     mocker.patch.object(verify, "check_os")
-    mocker.patch.object(verify, "save_dependency_versions")
 
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
     assert check_dependency_mock.call_count == 1, "dependency wasn't checked"
-    assert check_connection_mock.call_count == 1, "connection wasn't checked"
-    # noinspection PyUnresolvedReferences
-    assert verify.save_dependency_versions.call_count == 0
 
     assert Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG in result.output, \
         "Bad output. FileNotFoundError indicates that kubectl is not installed."

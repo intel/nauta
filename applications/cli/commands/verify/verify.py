@@ -53,9 +53,14 @@ def verify(state: State):
     kubectl_dependency_name = 'kubectl'
     kubectl_dependency_spec = dependencies[kubectl_dependency_name]
 
-    with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=kubectl_dependency_name)):
-        valid, installed_version = check_dependency(dependency_name=kubectl_dependency_name,
-                                                    dependency_spec=kubectl_dependency_spec)
+    try:
+        with spinner(text=Texts.VERIFYING_DEPENDENCY_MSG.format(dependency_name=kubectl_dependency_name)):
+            valid, installed_version = check_dependency(dependency_name=kubectl_dependency_name,
+                                                        dependency_spec=kubectl_dependency_spec)
+    except FileNotFoundError:
+        handle_error(logger, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG,
+                     add_verbosity_msg=state.verbosity == 0)
+        exit(1)
 
     supported_versions_sign = '>='
     logger.info(
@@ -90,10 +95,6 @@ def verify(state: State):
             check_port_forwarding()
     except KubectlConnectionError as e:
         handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
-        exit(1)
-    except FileNotFoundError:
-        handle_error(logger, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
     try:
