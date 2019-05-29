@@ -47,7 +47,7 @@ logger = initialize_logger(__name__)
 
 @click.command(short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='i', options_metavar='[options]')
 @click.option('-n', '--name', default=None, help=Texts.HELP_N)
-@click.option('-f', '--filename', default=None, help=Texts.HELP_F)
+@click.option('-f', '--filename', default=None, type=click.Path(exists=True), help=Texts.HELP_F)
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=Texts.HELP_NO_LAUNCH)
