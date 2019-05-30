@@ -38,4 +38,10 @@ def list_templates(state: State):
 
     for message in error_messages:
         click.echo(message)
+
     click.echo(tabulate.tabulate(list_of_templates, headers=TEMPLATE_LIST_HEADERS, tablefmt="orgtbl"))
+
+    if error_messages:
+        exit(1)
+    else:
+        exit(0)
