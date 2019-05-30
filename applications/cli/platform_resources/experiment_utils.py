@@ -26,6 +26,7 @@ from platform_resources.experiment import Experiment, ExperimentKubernetesSchema
 from platform_resources.platform_resource import KubernetesObject
 from platform_resources.run import RunKinds, Run
 from util.exceptions import SubmitExperimentError
+from util.k8s.pods import list_pods
 
 """
 Utility functions for Experiments
@@ -60,6 +61,9 @@ def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = N
         # subcase when experiment has no associated runs.
         if experiment and not experiment_runs:
             raise SubmitExperimentError(Texts.EXPERIMENT_INVALID_STATE_MSG.format(name=name))
+        # if there are still artifacts from previous experiment with the same name
+        if list_pods(namespace=namespace, label_selector=f'runName={name}'):
+            raise SubmitExperimentError(Texts.EXPERIMENT_PREV_EXP_STILL_TERMINATING)
         return name, prepare_label(script_name, name, name, run_kind=run_kind)
     else:
         # CASE 2: If user submit exp without name, but there is already exp with the same script name, then:
