@@ -53,12 +53,12 @@ def install(state: State, template_name: str):
     local_template_counterpart = local_templates.get(template_name)
 
     if local_template_counterpart:
-        click.confirm(Texts.LOCAL_VERSION_ALREADY_INSTALLED.format(
-                                                            local_version=local_template_counterpart.local_version,
-                                                            template_name=local_template_counterpart.name,
-                                                            remote_version=remote_template.remote_version),
-                      abort=True)
-
+        if not click.confirm(
+                Texts.LOCAL_VERSION_ALREADY_INSTALLED.format(
+                    local_version=local_template_counterpart.local_version,
+                    template_name=local_template_counterpart.name,
+                    remote_version=remote_template.remote_version)):
+            sys.exit(0)
         # noinspection PyBroadException
         try:
             shutil.rmtree(chart_file_location)
