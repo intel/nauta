@@ -152,3 +152,4 @@ class ExperimentImageBuildWorkflow(ArgoWorkflow):
         labels = self.labels
         labels['experimentName'] = value
         self.labels = labels
+
