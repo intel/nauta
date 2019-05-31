@@ -88,6 +88,10 @@ def build_net(images_placeholder, dense_dropout_placeholder):
 
     return logits, scores, predictions
 
+def convert_to_session(session):
+    while type(session).__name__ != 'Session':
+        session = session._sess
+    return session
 
 def main(_):
     cluster, job_name, task_index = parse_tf_config()
@@ -164,8 +168,10 @@ def main(_):
                 print("Accuracy {}".format(accuracy_val))
 
             # Save model by chief at the end.
+
+        session = convert_to_session(mon_sess)
         if is_chief:
-            saver.save(mon_sess, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"), global_step=step)
+            saver.save(session, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"), global_step=step)
 
             # Unfinalize the graph as distributed training process already finalized it and we
             tf.get_default_graph()._unsafe_unfinalize()
@@ -182,7 +188,7 @@ def main(_):
                     method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
 
             builder.add_meta_graph_and_variables(
-                mon_sess, [tf.saved_model.tag_constants.SERVING],
+                session, [tf.saved_model.tag_constants.SERVING],
                 signature_def_map={
                     MODEL_SIGNATURE_NAME:
                         prediction_signature
