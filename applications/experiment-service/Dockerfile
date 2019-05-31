@@ -32,8 +32,7 @@ ENV APISERVER_BUILDER_PATH=/apiserver-builder/bin
 ENV PATH=${PATH}:${APISERVER_BUILDER_PATH}
 
 # Experiment service section
-
-RUN apt update && apt install -y make mercurial
+RUN apt update && apt install -y make
 
 ENV EXP_SVC_PATH=${GOPATH}/src/github.com/nervanasystems/carbon/applications/experiment-service
 RUN mkdir -p ${EXP_SVC_PATH}
