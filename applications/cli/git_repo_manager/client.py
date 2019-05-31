@@ -44,18 +44,23 @@ class GitRepoManagerClient:
         self.namespace = namespace
         self.base_url = f'http://{host}:{port}' if port else f'http://{host}'
         self._token = None
+        self._session = None
+        self.timeout = 60
 
 
     @property
-    def token(self):
-        if not self._token:
+    def session(self) -> requests.Session:
+        if not self._session:
+            self._session = requests.Session()
             self._token = self._get_admin_token()
-        return  self._token
+            self._session.trust_env = False  # Ignore proxy related variables - we assume that repo manager is on localhost
+            self._session.headers = {'Authorization': self._token}
+        return self._session
+
 
     def get_user(self, username: str) -> Optional[requests.Response]:
         try:
-            get_user_response = requests.get(f'{self.base_url}/api/v1/users/{username}',
-                                             headers={'Authorization': self.token})
+            get_user_response = self.session.get(f'{self.base_url}/api/v1/users/{username}', timeout=self.timeout)
             _log_and_raise_response(get_user_response)
             return get_user_response
         except requests.exceptions.HTTPError as e:
@@ -87,9 +92,8 @@ class GitRepoManagerClient:
             user_data = {'email': email,
                          'username': username,
                          'password': password}
-            create_user_response = requests.post(f'{self.base_url}/api/v1/admin/users',
-                                                 json=user_data,
-                                                 headers={'Authorization': self.token})
+            create_user_response = self.session.post(f'{self.base_url}/api/v1/admin/users',
+                                                     json=user_data, timeout=self.timeout)
             _log_and_raise_response(create_user_response)
             return create_user_response
         except Exception:
@@ -108,8 +112,8 @@ class GitRepoManagerClient:
                 logger.debug(f'User {username} does not exists in git repo manager.')
                 return None
 
-            delete_user_response = requests.delete(f'{self.base_url}/api/v1/admin/users/{username}',
-                                                   headers={'Authorization': self.token})
+            delete_user_response = self.session.delete(f'{self.base_url}/api/v1/admin/users/{username}',
+                                                       timeout=self.timeout)
             _log_and_raise_response(delete_user_response)
             return delete_user_response
         except Exception:
@@ -121,9 +125,8 @@ class GitRepoManagerClient:
             # Generate unique random name for key in order to avoid conflicts with previously added keys
             key_name = str(uuid.uuid4())
 
-            add_key_response = requests.post(f'{self.base_url}/api/v1/admin/users/{username}/keys',
-                                             json={'key': public_key, 'title': key_name},
-                                             headers={'Authorization': self.token})
+            add_key_response = self.session.post(f'{self.base_url}/api/v1/admin/users/{username}/keys',
+                                                 json={'key': public_key, 'title': key_name}, timeout=self.timeout)
             _log_and_raise_response(add_key_response)
             return add_key_response
         except Exception:
@@ -132,8 +135,8 @@ class GitRepoManagerClient:
 
     def get_repository(self, username: str, repository_name: str) -> Optional[requests.Response]:
         try:
-            get_repository_name_response = requests.get(f'{self.base_url}/api/v1/repos/{username}/{repository_name}',
-                                                 headers={'Authorization': self.token})
+            get_repository_name_response = self.session.get(f'{self.base_url}/api/v1'
+                                                            f'/repos/{username}/{repository_name}')
             _log_and_raise_response(get_repository_name_response)
             return get_repository_name_response
         except requests.exceptions.HTTPError as e:
@@ -152,9 +155,8 @@ class GitRepoManagerClient:
                 logger.debug(f'Repository {repository_name} of user {username} already exists in git repo manager.')
                 return existing_repository
 
-            create_repository_response = requests.post(f'{self.base_url}/api/v1/admin/users/{username}/repos',
-                                                       json={'name': repository_name},
-                                                       headers={'Authorization': self.token})
+            create_repository_response = self.session.post(f'{self.base_url}/api/v1/admin/users/{username}/repos',
+                                                           json={'name': repository_name}, timeout=self.timeout)
             _log_and_raise_response(create_repository_response)
             return create_repository_response
         except Exception:
@@ -168,8 +170,9 @@ class GitRepoManagerClient:
                 logger.debug(f'Repository {repository_name} of user {username} does not exists in git repo manager.')
                 return None
 
-            delete_repository_response = requests.delete(f'{self.base_url}/api/v1/repos/{username}/{repository_name}',
-                                                         headers={'Authorization': self.token})
+            delete_repository_response = self.session.delete(f'{self.base_url}/api/v1'
+                                                             f'/repos/{username}/{repository_name}',
+                                                             timeout=self.timeout)
             _log_and_raise_response(delete_repository_response)
             return delete_repository_response
         except Exception:
@@ -220,7 +223,7 @@ class GitRepoManagerClient:
         try:
             create_token_response = requests.post(f'{self.base_url}/api/v1/users/{admin_username}/tokens',
                                                   auth=(admin_username, admin_password),
-                                                  json={'Name': admin_username})
+                                                  json={'Name': admin_username}, timeout=self.timeout)
             _log_and_raise_response(create_token_response)
             token = create_token_response.json()['sha1']
             return token

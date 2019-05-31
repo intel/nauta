@@ -30,6 +30,11 @@ def mock_kubectl_calls(mocker):
     mocker.patch("commands.verify.verify.is_current_user_administrator")
 
 
+@pytest.fixture(autouse=True)
+def mock_dependency_map(mocker):
+    mocker.patch("commands.verify.verify.get_dependency_map")
+
+
 def test_verify_with_kubectl_connection_error(mocker):
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = KubectlConnectionError("Cannot connect to K8S cluster")
@@ -38,7 +43,7 @@ def test_verify_with_kubectl_connection_error(mocker):
     mocker.patch.object(verify, "check_os")
 
     runner = CliRunner()
-    result = runner.invoke(verify.verify, [])
+    result = runner.invoke(verify.verify, [], catch_exceptions=False)
 
     assert check_dependency_mock.call_count == 1
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
