@@ -92,7 +92,8 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
             git.config('--local', 'user.email', f'{username}@nauta.invalid')
             git.config('--local', 'user.name', f'{username}')
-            git.add('.')
+
+            git.add('.', '--all')
             git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
             remote_branches, _, _ = git.ls_remote()
             local_branches, _, _ = git.branch()
