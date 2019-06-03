@@ -18,11 +18,11 @@ import base64
 import pytest
 from unittest.mock import MagicMock
 
-from git_repo_manager.utils import get_git_private_key_path, upload_experiment_to_git_repo_manager, \
+from git_repo_manager.utils import get_fake_ssh_path, upload_experiment_to_git_repo_manager, \
     create_gitignore_file_for_experiments, compute_hash_of_k8s_env_address, delete_exp_tag_from_git_repo_manager
 
 
-def test_get_git_private_key_path(mocker, tmpdir):
+def test_get_fake_ssh_path(mocker, tmpdir):
     fake_secret = MagicMock()
     fake_key = 'private ssh key'
     fake_username = 'fake-user'
@@ -32,31 +32,37 @@ def test_get_git_private_key_path(mocker, tmpdir):
     env_hash_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value=fake_hash)
     config_dir = tmpdir.mkdir('config')
     private_key_file = config_dir.join(f'.ssh-key-{fake_username}-{fake_hash}')
-
-    get_git_private_key_path(config_dir=config_dir, username=fake_username)
+    fake_ssh_file = config_dir.join(f'ssh-{fake_username}-{fake_hash}')
+    get_fake_ssh_path(config_dir=config_dir, username=fake_username)
 
     get_secret_mock.assert_called_with(namespace=fake_username, secret_name='git-secret')
     assert env_hash_mock.call_count == 1
     assert private_key_file.read() == fake_key
+    assert "ssh -i" in fake_ssh_file.read()
 
 
-def test_get_git_private_key_path_exists(mocker, tmpdir):
+def test_get_fake_ssh_path_exists(mocker, tmpdir):
     fake_secret = MagicMock()
     fake_key = 'private ssh key'
     fake_username = 'fake-user'
     fake_hash = 'a12b34c'
     fake_secret.data = {'private_key': base64.encodebytes(str.encode(fake_key)).decode(encoding='utf-8')}
+
     get_secret_mock = mocker.patch('git_repo_manager.utils.get_secret', return_value=fake_secret)
     env_hash_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value=fake_hash)
     config_dir = tmpdir.mkdir('config')
     private_key_file = config_dir.join(f'.ssh-key-{fake_username}-{fake_hash}')
     private_key_file.write(fake_key)
+    fake_ssh = f'ssh -i key_file -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $*'
+    fake_ssh_file = config_dir.join(f'ssh-{fake_username}-{fake_hash}')
+    fake_ssh_file.write(fake_ssh)
 
-    get_git_private_key_path(config_dir=config_dir, username=fake_username)
+    get_fake_ssh_path(config_dir=config_dir, username=fake_username)
 
     assert get_secret_mock.call_count == 0
     assert env_hash_mock.call_count == 1
     assert private_key_file.read() == fake_key
+    assert fake_ssh_file.read() == fake_ssh
 
 
 @pytest.fixture()
@@ -70,8 +76,8 @@ def git_client_mock(mocker):
 
 
 def test_upload_experiment_to_git_repo_manager(mocker, tmpdir, git_client_mock):
-    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_git_private_key_path',
-                                             return_value='/fake-config/.fake-user-ssh-key')
+    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_fake_ssh_path',
+                                             return_value='/fake-config/ssh')
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
     fake_hash = 'a12b34c'
@@ -104,8 +110,8 @@ def test_upload_experiment_to_git_repo_manager(mocker, tmpdir, git_client_mock):
 
 
 def test_upload_experiment_to_git_repo_manager_already_cloned(mocker, tmpdir, git_client_mock):
-    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_git_private_key_path',
-                                             return_value='/fake-config/.fake-user-ssh-key')
+    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_fake_ssh_path',
+                                             return_value='/fake-config/ssh')
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
     fake_hash = 'a12b34c'
@@ -139,8 +145,8 @@ def test_upload_experiment_to_git_repo_manager_already_cloned(mocker, tmpdir, gi
 
 
 def test_upload_experiment_to_git_repo_manager_error(mocker, tmpdir, git_client_mock):
-    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_git_private_key_path',
-                                             return_value='/fake-config/.fake-user-ssh-key')
+    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_fake_ssh_path',
+                                             return_value='/fake-config/ssh')
     git_client_mock.push.side_effect = RuntimeError
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
@@ -182,7 +188,7 @@ def test_compute_hash_of_k8s_env_address(mocker):
 def test_delete_exp_tag_from_git_repo_manager_experiments_dir_not_exist(mocker):
     config_mock = mocker.patch('git_repo_manager.utils.Config')
     compute_hash_of_k8s_env_address_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value='some_hash')
-    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_git_private_key_path')
+    get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_fake_ssh_path')
     external_cli_mock = mocker.patch('git_repo_manager.utils.ExternalCliClient')
     git_command_mock = MagicMock()
     git_command_mock.tag.return_value = '', 0, ''
