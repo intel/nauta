@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-import logging
 import time
 from enum import Enum
 import os
@@ -31,7 +30,7 @@ from distutils.version import LooseVersion
 import click
 import distro
 
-from util.logger import initialize_logger, get_verbosity_level
+from util.logger import initialize_logger
 from cli_text_consts import UtilSystemTexts as Texts, VERBOSE_RERUN_MSG
 
 log = initialize_logger('util.system')
@@ -195,10 +194,6 @@ def execute_subprocess_command(command: List[str],
                                shell=False,
                                join=False) -> subprocess.Popen:
 
-    # if a log level is set to DEBUG - additional information from creation of a proxy are sent to console
-    std_output_destination = None if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
-    std_error_destination = subprocess.STDOUT if get_verbosity_level == logging.DEBUG else subprocess.DEVNULL
-
     if join:
         final_command = ' '.join(command)
     else:
@@ -207,8 +202,8 @@ def execute_subprocess_command(command: List[str],
     log.debug(f'executing COMMAND in subprocess: {final_command}')
     process = subprocess.Popen(
         args=final_command,
-        stdout=std_output_destination,
-        stderr=std_error_destination,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         universal_newlines=True,
         stdin=stdin,
         env=env,
@@ -216,8 +211,11 @@ def execute_subprocess_command(command: List[str],
         encoding='utf-8',
         shell=shell)
 
-    if not process or process.poll() != (0 or None):
-        log.error(f'COMMAND execution FAIL: {command}')
+    if process.poll() is not None:
+        log.error(f'{final_command} execution FAIL: {command}')
+        out, err = process.communicate()
+        log.error(f'{final_command} stdout: {out}')
+        log.error(f'{final_command} stderr: {err}')
         raise RuntimeError(
             Texts.COMMAND_EXE_FAIL_ERROR_MSG.format(command=command))
     return process

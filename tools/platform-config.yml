@@ -101,7 +101,12 @@ local_images:
       BASE_IMAGE: "shared/centos"
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/registry"
-
+  core/startup-script:
+    version: "v1"
+    required:
+      BASE_IMAGE: "shared/centos"
+    method: build
+    directory: "{{ playbook_dir }}/../../platform-containers/startup-script"
 
 chart_values:
   features: {}
@@ -145,3 +150,8 @@ subcharts:
       chart_values:
         ingress_image: "{{ image_local_url['core/ingress'] }}"
         defaultbackend_image: "{{ image_local_url['core/defaultbackend'] }}"
+    netfilter-fix:
+      version: 0.1.0
+      path: "{{ playbook_dir }}/../../platform-charts/netfilter-fix"
+      chart_values:
+        image: "{{ image_local_url['core/startup-script'] }}"
