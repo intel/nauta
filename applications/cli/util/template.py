@@ -28,6 +28,7 @@ PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "
 
 RESOURCE_NAMES = ["worker_resources", "ps_resources", "resources", "master_resources"]
 CPU_SINGLE_VALUES = ["worker_cpu", "ps_cpu", "cpu", "cpus"]
+CPU_INT_VALUES = ["cpus"]
 MEMORY_SINGLE_VALUES = ["worker_memory", "ps_memory", "memory"]
 
 CPU_FRACTION = "cpu_fraction"
@@ -129,7 +130,8 @@ def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem
 
 
 def replace_single_value(data: Dict, new_value: str, current_value: str, key: str, fraction: float = None,
-                         cpu: bool = True, system_required_min: str = '0', system_required_percent: str ='0'):
+                         cpu: bool = True, system_required_min: str = '0', system_required_percent: str ='0',
+                         round_to_int: bool = False):
     value = data.get(key)
 
     if not value or value == "null":
@@ -152,7 +154,9 @@ def replace_single_value(data: Dict, new_value: str, current_value: str, key: st
             conv_current_value = convert_k8s_cpu_resource(current_value)
             conv_value = convert_k8s_cpu_resource(value)
             coefficient = conv_value / conv_current_value
-        final_value = (conv_new_value * coefficient)/1000
+
+        final_value = int((conv_new_value * coefficient)/1000) if round_to_int else (conv_new_value * coefficient)/1000
+        final_value = 1 if final_value == 0 else final_value
     else:
         conv_new_value = convert_k8s_memory_resource(new_value)
         conv_system_required_min = convert_k8s_memory_resource(system_required_min)
@@ -210,7 +214,8 @@ def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
                     replace_single_value(data=pack_values, new_value=new_cpu_number, current_value=current_cpu_number,
                                          key=cpu_single_value, fraction=cpu_fraction,
                                          system_required_min=cpu_system_required_min,
-                                         system_required_percent=cpu_system_required_percent)
+                                         system_required_percent=cpu_system_required_percent,
+                                         round_to_int=(cpu_single_value in CPU_INT_VALUES))
 
             except Exception:
                 logger.exception("Exception during calculation of new cpu values.")

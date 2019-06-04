@@ -26,7 +26,7 @@ RESOURCES_TO_BE_CHANGED = {
     'limits': {'cpu': '10', 'memory': '10G'}
 }
 
-SINGLE_VALUES_SET = {"worker_cpu": "10", "worker_memory": "10G", "memory": "null"}
+SINGLE_VALUES_SET = {"worker_cpu": "10", "worker_memory": "10G", "memory": "null", "cpus": "6"}
 
 
 @pytest.mark.parametrize("input,expected", [("1", 1000), ("1m", 1)])
@@ -111,6 +111,13 @@ def test_replace_single_value_cpu():
     template.replace_single_value(SINGLE_VALUES_SET, new_value="5", current_value="20", key="worker_cpu")
 
     assert SINGLE_VALUES_SET.get("worker_cpu") == "2.5"
+
+
+def test_replace_single_value_cpu_for_horovod():
+
+    template.replace_single_value(SINGLE_VALUES_SET, new_value="5", current_value="20", key="cpus", round_to_int=True)
+
+    assert SINGLE_VALUES_SET.get("cpus") == "1"
 
 
 def test_replace_single_value_memory():
