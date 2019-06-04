@@ -31,6 +31,12 @@ def mock_kubectl_calls(mocker):
     mocker.patch("commands.verify.verify.is_current_user_administrator")
 
 
+@pytest.fixture(autouse=True)
+def mock_config(mocker):
+    config_mock = mocker.patch('util.dependencies_checker.Config')
+    config_mock.return_value.config_path = '/fake_config_dir'
+
+
 def test_verify_with_kubectl_connection_error(mocker):
     check_connection_mock = mocker.patch.object(verify, "check_connection_to_cluster")
     check_connection_mock.side_effect = KubectlConnectionError("Cannot connect to K8S cluster")
@@ -41,6 +47,7 @@ def test_verify_with_kubectl_connection_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 1
     assert check_dependency_mock.call_count == len(get_local_dependency_map())
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     # noinspection PyUnresolvedReferences
@@ -60,6 +67,7 @@ def test_verify_with_kubectl_not_found_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 1
     assert check_dependency_mock.call_count == len(get_local_dependency_map()), "dependency wasn't checked"
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     # noinspection PyUnresolvedReferences
@@ -81,8 +89,9 @@ def test_verify_with_kubectl_connection_success(mocker):
     fake_config.return_value.config_path = fake_config_path
 
     runner = CliRunner()
-    runner.invoke(verify.verify, [])
+    result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 0
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
     assert check_dependency_mock.call_count == len(get_local_dependency_map()) + len(get_remote_dependency_map()),\
@@ -104,6 +113,7 @@ def test_verify_with_kubectl_namespace_get_error(mocker):
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 1
     assert check_dependency_mock.call_count == len(get_local_dependency_map())
     assert check_connection_mock.call_count == 1
     assert check_port_forwarding_mock.call_count == 1
@@ -120,10 +130,12 @@ def test_verify_with_kubectl_admin_check_error(mocker):
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
     admin_check_mock = mocker.patch("commands.verify.verify.is_current_user_administrator")
     admin_check_mock.side_effect = Exception
+    mocker.patch.object(verify, "save_dependency_versions")
 
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 1
     assert check_connection_mock.call_count == 1
     assert check_port_forwarding_mock.call_count == 1
     assert check_dependency_mock.call_count == len(get_local_dependency_map())
@@ -137,10 +149,12 @@ def test_verify_with_port_forwarding_error(mocker):
     check_port_forwarding_mock = mocker.patch.object(verify, "check_port_forwarding")
     check_dependency_mock = mocker.patch.object(verify, "check_dependency", return_value=(True, LooseVersion('1.0')))
     check_port_forwarding_mock.side_effect = Exception
+    mocker.patch.object(verify, "save_dependency_versions")
 
     runner = CliRunner()
     result = runner.invoke(verify.verify, [])
 
+    assert result.exit_code == 1
     assert check_connection_mock.call_count == 1, "connection wasn't checked"
     assert check_port_forwarding_mock.call_count == 1, "port forwarding wasn't checked"
     assert check_dependency_mock.call_count == len(get_local_dependency_map()), "dependency wasn't checked"
