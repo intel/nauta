@@ -4,14 +4,18 @@
 
 Copy the package to the installer machine, then untar it using the following command:
 
-`tar -zxf nauta-1.0.0-beta.tar.gz -C <destination>`
+`nauta-1.0.0-ent-20190513065650.tar.gz -C <destination>`
+
+**Note:** Refer to [How to Build Nauta, Required Packages ](../How_to_Build_Nauta/HBN.md) section for required package information.
 
 ### Nauta Structure
+
+Nauta Structure includes two files and five folders, all of which are installed during the installation process. 
 
 In extracted archive, the following appears:
 - **Files**
   - **installer.sh:** sh script
-  - **ansible.cfg:**  configuration file for Ansible*
+  - **ansible.cfg:**  configuration file for Ansible
 
 - **Folders**
    - **bin:** binary directory
@@ -29,5 +33,12 @@ To see the list of installed components and their versions, refer to: [List of S
 
 * [Installation Process](../Installation_Process/IP.md)
 
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------
 
 

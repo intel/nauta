@@ -33,8 +33,16 @@ To verify your installation has completed, execute the following command:
 `nctl verify`
 
 If any installation issues are found, the command returns information about the cause: which application should be installed and in which version. This command also checks if the CLI can connect to Nauta; and, if port forwarding to Nauta is working correctly. If no issues are found, a message indicates checks were successful. The following examples are the results of this command:
- 
-![Image](images/verify_results.png)
+
+```
+This OS is supported.
+kubectl verified successfully.
+kubectl server verified successfully.
+helm client verified successfully.
+helm server verified successfully.
+docker client verified successfully.
+docker server verified successfully.
+```
 
 ## Overview of nctl Commands
 
@@ -53,8 +61,38 @@ To access help for any command use the `--help` or `-h` parameters. The followin
 
 The results are shown below.
 
-![Image](images/nctl_help.png) 
+```
+Usage: nctl COMMAND [options] [args]...
 
+  Nauta Client
+
+  To get further help on commands use COMMAND with -h or --help option.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  config, cfg      Sets values of limits and requests for resources in
+                   templates used by the system.
+  experiment, exp  Command for starting, stopping, and managing training jobs.
+  launch, l        Command for launching web user-interface or tensorboard. It
+                   works as process in the system console until user does not
+                   stop it. If process should be run as background process,
+                   please add '&' at the end of line
+  mount, m         Displays a command that can be used to mount client's
+                   folders on his/her local machine.
+  predict, p       Command for starting, stopping, and managing prediction
+                   jobs and instances. To get further help on commands use
+                   COMMAND with -h or --help option.
+  user, u          Command for creating/deleting/listing users of the
+                   platform. Can only be run by a platform administrator.
+  verify, ver      Command verifies whether all external components required
+                   by nctl are installed in proper versions. If something is
+                   missing, the application displays detailed information
+                   about it.
+  version, v       Displays the version of the installed nctl application.
+
+```
 
 ## Example Experiments
 
@@ -76,60 +114,62 @@ There are two utility scripts, these are:
 
 `mnist_checker.py`
 
-Thease are used for inference process and model verification.
-
-**Note**: Experiment scripts _must be_ written in Python.  
-
-### Launch Training Using the Scripts
-
-Launching training in Nauta is performed with the following command:
-
-**Syntax**: `nctl experiment submit -t template SCRIPT_LOCATION`
-
-with:
-* `template` = `tf-training-tfjob` and `SCRIPT_LOCATION` = `examples/mnist_single_node.py` (relative to nctl
-root) for single node training. The template parameter in this case is optional.
-* or `template` = `multinode-tf-training-tfjob` and `SCRIPT_LOCATION` = `examples/mnist_multinode.py` for multinode
-training,
-* or `template` = `multinode-tf-training-horovod` and `SCRIPT_LOCATION` = `examples/mnist_horovod.py` for Horovod
-training.
-
-**Note**: All the examples shown assumes that macOS is utilized.
-
-### Submitting an Experiment
-  
-The included example scripts do not require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. To change template-related requirements (if desired), refer to the template packs documentation.
-
-**Note:** For experiment submit command information, refer to [experiment Command](experiment.md) for more details.
+These utility scripts used for inference process and model verification.
 
 
-The following example shows how to submit a MNIST experiment and write the TensorBoard data to a folder in your NAUTA output folder.
+##Submitting an Experiment
+
+Launch training experiments with Nauta using the following:
+
+**Syntax**:
+
+`nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
+
+**Where**:
+
+* `-- SCRIPT_LOCATION`: The path and name of the Python script used to perform this experiment.
+
+To submit the example experiments, use the following:
+
+For single node training (template parameter in this case is optional)
+
+`$ nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
+
+For multinode training:
+
+`$ nctl experiment submit -t multinode-tf-training-tfjob examples/mnist_multinode.py --name multinode`
+
+For Horovod training:
+
+`$ nctl experiment submit -t multinode-tf-training-horovod examples/mnist_horovod.py --name horovod `
+
+
+The included example scripts do not require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing nctl experiment `template_list` command.
+
+**Note:** To run TensorBoard, TensorBoard data must be written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts will need to meet the same requirement.
+The following example shows how to submit a MNIST experiment and write the TensorBoard data to a folder in your NAUTA output folder
 
 Enter the following command to run this example:
 
 `$ nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
 
-**Syntax**:
-
-The following is the basic syntax for experiment submit command:
-
-`nctl experiment submit [options] SCRIPT_LOCATION [-- script_parameters]`
-
-**Where**:
-* `-t`,  TEXT: Name of a template used by Nauta to create a description of a job to be submitted. By default, this is a single-node TensorFlow training. The template is chosen, and the list of available templates can be obtained by issuing the `nctl template list` command.
-* `SCRIPT_LOCATION`: The path and name of the Python script used to perform this experiment.
-
-**Note**: To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts will need to meet the same requirements.
 
 #### Result of this Command
 
 The execution of the _submit command_ may take a few minutes the first time. During this time, resources are allocated, the experiment package is created using parameters, scripts, and settings, a Docker image is built then pushed to the Kubernetes* cluster. When the experiment submission is complete, the following result is displayed:
 
- ![Image](images/single_exp_tensorboard.png) 
+```
+
+Submitting experiments.
+| Experiment   | Parameters           | State   | Message   |
+|--------------+----------------------+---------+-----------|
+| single       | mnist_single_node.py | QUEUED  |           |
+
+```
 
 #### Viewing Experiment Status
 
-To view the status of all your experiments, execute the following command:
+TUse the following command to view the status of all your experiments:
 
 **Syntax**: `nctl experiment list [options]`
 
@@ -138,6 +178,16 @@ Execute this command:
 `$ nctl experiment list --brief`
 
 As shown below, an experiment's status displays. This is an example only. The `--brief` option returns a short version of results, as shown.
+
+```
+
+Submitting experiments.
+| Experiment   | Parameters           | State   | Message   |
+|--------------+----------------------+---------+-----------|
+| single       | mnist_single_node.py | QUEUED  |           |
+
+```
+
 
  ![Image](images/experiment_status.png) 
  

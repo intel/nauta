@@ -25,8 +25,7 @@ Allows a user to change the current system's settings concerning maximum and req
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Show help message and exit. |
 
-**Note**  
-Number of CPUs given here should be interpreted according to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu.
+**Note:** Number of CPUs shown here should be interpreted according to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu.
 Amount of memory given here should be interpreted according to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory.
 
 

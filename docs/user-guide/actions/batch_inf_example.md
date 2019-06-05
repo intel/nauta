@@ -2,7 +2,7 @@
 
 For information about stream inference testing, refer to [Stream Inference](streaming_inference.md).
 
-## Example Flow
+## Flow Example
 
 An example of the general flow is shown below. Ensure that the user:
 

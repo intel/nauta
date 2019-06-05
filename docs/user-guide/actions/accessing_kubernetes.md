@@ -5,9 +5,13 @@ Kubernetes* manages containerized workloads and services. To manage resources gi
 To access Kubernetes:
 
 1. Click the **hamburger menu** ![Image](images/hamburger_menu.png) at the far left of the UI to open a left frame.
+
+
 2. Click the **Resources Dashboard** to open the Kubernetes resources dashboard in a separate browser tab.
 
-An example Kubernetes dashboard is shown below.
+An example Kubernetes Dashboard is shown below.
 
 ![Image](images/kubernetes_dashbd.png)
+
+
 
