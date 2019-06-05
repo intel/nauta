@@ -19,7 +19,7 @@ import time
 import random
 from enum import Enum
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 from util import system
 from util.logger import initialize_logger
@@ -56,7 +56,8 @@ def find_random_available_port() -> int:
 
 
 def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_name: str = None,
-                          number_of_retries: int = 0, namespace: str = None) -> (subprocess.Popen, Optional[int], int):
+                          number_of_retries: int = 0,
+                          namespace: str = None) -> Tuple[subprocess.Popen, int, int]:
     """
     Creates a proxy responsible for forwarding requests to and from a
     kubernetes' local docker proxy. In case of any errors during creating the
@@ -98,11 +99,8 @@ def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_nam
             logger.error(f'Cannot find open ports for {k8s_app_name} app')
             raise KubernetesError(Texts.PROXY_CREATION_MISSING_PORT_ERROR_MSG)
 
-        if port:
-            if check_port_availability(port):
-                tunnel_port = port
-            else:
-                tunnel_port = find_random_available_port()
+        if port and check_port_availability(port):
+            tunnel_port = port
         else:
             tunnel_port = find_random_available_port()
 

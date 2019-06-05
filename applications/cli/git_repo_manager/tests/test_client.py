@@ -206,7 +206,8 @@ def test_token_saved(mocker):
     save_token_mock = mocker.patch('git_repo_manager.client.GitRepoManagerClient._save_admin_token')
     grm = GitRepoManagerClient(host='fake.host')
 
-    assert grm.token == f'token {fake_token}'
+    assert grm.session is not None
+    assert grm._token == f'token {fake_token}'
     assert get_secret_mock.call_count == 1
     assert create_token_mock.call_count == 0
     assert save_token_mock.call_count == 0
@@ -222,7 +223,8 @@ def test_token_create(mocker):
     save_token_mock = mocker.patch('git_repo_manager.client.GitRepoManagerClient._save_admin_token')
     grm = GitRepoManagerClient(host='fake.host')
 
-    assert grm.token == f'token {fake_token}'
+    assert grm.session is not None
+    assert grm._token == f'token {fake_token}'
     assert get_secret_mock.call_count == 1
     assert create_token_mock.call_count == 1
     assert save_token_mock.call_count == 1

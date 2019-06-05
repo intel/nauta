@@ -133,7 +133,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
 
                 if not delete_user(username):
                     handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
-                sys.exit(1)
+                raise RuntimeError(Texts.USER_ADD_ERROR_MSG)
 
             try:
                 users_password = get_users_token(username)
@@ -156,7 +156,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
             except Exception:
                 handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG,
                              add_verbosity_msg=state.verbosity == 0)
-                sys.exit(1)
+                raise
 
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),

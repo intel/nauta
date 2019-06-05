@@ -45,7 +45,7 @@ def test_verify_with_kubectl_connection_error(mocker):
     mocker.patch.object(verify, "check_os")
 
     runner = CliRunner()
-    result = runner.invoke(verify.verify, [])
+    result = runner.invoke(verify.verify, [], catch_exceptions=False)
 
     assert result.exit_code == 1
     assert check_dependency_mock.call_count == len(get_local_dependency_map())

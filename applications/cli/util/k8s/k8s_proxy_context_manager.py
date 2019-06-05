@@ -57,7 +57,7 @@ class K8sProxy:
                                                 number_of_retries=self.number_of_retries,
                                                 namespace=self.namespace)
             try:
-                self._wait_for_connection_readiness('localhost', self.tunnel_port,
+                self._wait_for_connection_readiness('127.0.0.1', self.tunnel_port,
                                                     tries=self.number_of_retries_wait_for_readiness)
             except Exception as ex:
                 self._close_tunnel()
