@@ -19,9 +19,9 @@ $(function(){
 });
 
 function showIndex() {
-    if ($("#docs-index-container").css("visibility") === "hidden") {
-        $("#docs-index-container").css("visibility", "visible");
+    if ($("#docs-index-container").css("display") === "none") {
+        $("#docs-index-container").css("display", "block");
     } else {
-        $("#docs-index-container").css("visibility", "hidden");
+        $("#docs-index-container").css("display", "none");
     }
 }

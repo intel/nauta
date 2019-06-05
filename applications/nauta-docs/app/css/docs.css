@@ -40,5 +40,5 @@ code{white-space: pre;}
 .material-icons.md-36 { font-size: 36px; }
 
 #docs-index-container {
-    visibility: hidden;
+    display: none;
 }
