@@ -14,12 +14,13 @@
 # limitations under the License.
 #
 
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 import pytest
 
 from util import template
 import util.config
+from util.system import get_current_os, OS
 
 RESOURCES_TO_BE_CHANGED = {
     'requests': {'cpu': '10', 'memory': '1G'},
@@ -27,6 +28,12 @@ RESOURCES_TO_BE_CHANGED = {
 }
 
 SINGLE_VALUES_SET = {"worker_cpu": "10", "worker_memory": "10G", "memory": "null", "cpus": "6"}
+
+VALUES_FILE = {"resources": {"requests": {"cpu": "10", "memory": "10Gi"},
+                             "limits": {"cpu": "10", "memory": "10Gi"}},
+               "cpu": "10", "memory": "10Gi"}
+
+TEST_PACK_NAME = "test_pack"
 
 
 @pytest.mark.parametrize("input,expected", [("1", 1000), ("1m", 1)])
@@ -164,3 +171,80 @@ def test_get_values_file_location_without_pack():
         file_location = template.get_values_file_location(None)
 
     assert file_location == "/config/packs/*/charts/values.yaml"
+
+
+def test_extract_pack_name_from_path_success():
+    pack_name = "test_pack_name"
+    if get_current_os() == OS.WINDOWS:
+        path_to_check = f"C:\\dist\\config\\packs\\{pack_name}\\charts\\values.yaml"
+    else:
+        path_to_check = f"dist/config/packs/{pack_name}/charts/values.yaml"
+
+    ret_pack_name = template.extract_pack_name_from_path(path_to_check)
+
+    assert ret_pack_name == pack_name
+
+
+def test_extract_pack_name_from_path_lack_of_file():
+    pack_name = "test_pack_name"
+    if get_current_os() == OS.WINDOWS:
+        path_to_check = f"C:\\dist\\config\\packs\\{pack_name}\\charts"
+    else:
+        path_to_check = f"dist/config/packs/{pack_name}/charts"
+
+    ret_pack_name = template.extract_pack_name_from_path(path_to_check)
+
+    assert not ret_pack_name
+
+
+def test_extract_pack_name_from_path_folder_too_short():
+    pack_name = "test_pack_name"
+    if get_current_os() == OS.WINDOWS:
+        path_to_check = f"C:\\{pack_name}\\charts"
+    else:
+        path_to_check = f"/{pack_name}/charts"
+
+    ret_pack_name = template.extract_pack_name_from_path(path_to_check)
+
+    assert not ret_pack_name
+
+
+class VerifyMocks:
+    def __init__(self, mocker):
+        self.mocker = mocker
+        self.gvfl_mock = mocker.patch("util.template.get_values_file_location")
+        self.gwmr_mock = mocker.patch("util.template.get_k8s_worker_min_resources", return_value=("10", " 10Gi"))
+        self.glob_mock = mocker.patch("glob.glob", return_value=["test_file"])
+        self.epnp_mock = mocker.patch("util.template.extract_pack_name_from_path", return_value=TEST_PACK_NAME)
+        self.yaml_mock = mocker.patch("util.template.YAML", )
+        self.yaml_mock.return_value.load.return_value = VALUES_FILE
+
+
+@pytest.fixture
+def prepare_mocks(mocker) -> VerifyMocks:
+    return VerifyMocks(mocker=mocker)
+
+
+def test_verfiy_values_in_packs_success(prepare_mocks: VerifyMocks):
+    with patch("builtins.open", mock_open(read_data=VALUES_FILE)):
+        list_of_packs = template.verify_values_in_packs()
+
+        assert not list_of_packs
+
+
+def test_verfiy_values_in_packs_cpu_failure(prepare_mocks: VerifyMocks):
+    prepare_mocks.gwmr_mock.return_value = ("5", "10Gi")
+    with patch("builtins.open", mock_open(read_data=VALUES_FILE)):
+        list_of_packs = template.verify_values_in_packs()
+
+        assert len(list_of_packs) == 1
+        assert TEST_PACK_NAME in list_of_packs[0]
+
+
+def test_verfiy_values_in_packs_memory_failure(prepare_mocks: VerifyMocks):
+    prepare_mocks.gwmr_mock.return_value = ("10", "5Gi")
+    with patch("builtins.open", mock_open(read_data=VALUES_FILE)):
+        list_of_packs = template.verify_values_in_packs()
+
+        assert len(list_of_packs) == 1
+        assert TEST_PACK_NAME in list_of_packs[0]

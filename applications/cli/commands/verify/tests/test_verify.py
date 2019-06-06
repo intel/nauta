@@ -22,6 +22,7 @@ import pytest
 from commands.verify import verify
 from util.exceptions import KubectlConnectionError
 from util.dependencies_checker import get_local_dependency_map, get_remote_dependency_map
+import util.config
 from cli_text_consts import VerifyCmdTexts as Texts
 
 
@@ -29,6 +30,8 @@ from cli_text_consts import VerifyCmdTexts as Texts
 def mock_kubectl_calls(mocker):
     mocker.patch("commands.verify.verify.get_kubectl_current_context_namespace")
     mocker.patch("commands.verify.verify.is_current_user_administrator")
+    mocker.patch.object(util.config.Config, 'get_config_path', return_value="")
+    mocker.patch.object(verify, 'verify_values_in_packs', return_value=[])
 
 
 @pytest.fixture(autouse=True)

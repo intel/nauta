@@ -105,6 +105,10 @@ class VerifyCmdTexts:
     CHECKING_OS_MSG = "Checking operating system..."
     VERIFYING_DEPENDENCY_MSG = "Verifying {dependency_name} ..."
     CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG = "Checking port forwarding from cluster..."
+    WRONG_REQUIREMENTS_SETTINGS = "- {pack_name}"
+    VERIFYING_RESOURCES_CORRECTNESS = "Verifying packs resources' correctness ..."
+    INCORRECT_PACKS_EXIST = "The following packs have incorrect resources' settings. Please use 'config' command to " \
+                            "align those settings with resources available on a cluster."
 
 
 class UserCmdTexts:

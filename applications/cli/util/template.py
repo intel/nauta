@@ -16,12 +16,17 @@
 
 import glob
 import logging
+import os
+from pathlib import PurePath
 import re
 
 from ruamel.yaml import YAML
-from typing import Dict
+from typing import Dict, Tuple, Optional
 
 from util.config import Config
+from util.k8s.k8s_info import get_k8s_api
+from cli_text_consts import VerifyCmdTexts as Texts
+
 
 PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
 PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
@@ -182,6 +187,7 @@ def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
                              cpu_system_required_min: str, cpu_system_required_percent: str,
                              mem_system_required_min: str, mem_system_required_percent: str,
                              pack_name: str = None):
+
     yaml_parser = YAML(typ="jinja2", plug_ins=["ruamel.yaml.jinja2.__plug_in__"])
     values_yaml_paths = get_values_file_location(pack_name)
 
@@ -192,8 +198,9 @@ def override_values_in_packs(new_cpu_number: str, new_memory_amount: str,
             pack_values = yaml_parser.load(values_yaml_file)
 
             if not pack_values:
-                logger.error(f"{values_yaml_path} file empty!")
-                raise ValueError
+                message = f"{values_yaml_path} file empty!"
+                logger.error(message)
+                raise ValueError(message)
 
             try:
                 cpu_fraction = pack_values.get(CPU_FRACTION)
@@ -265,3 +272,108 @@ def get_values_file_location(pack_name: str = None):
     dlsctl_config_dir_path = Config().get_config_path()
     pack = "*" if not pack_name else pack_name
     return f"{dlsctl_config_dir_path}/packs/{pack}/charts/values.yaml"
+
+
+def get_k8s_worker_min_resources() -> Tuple[str, str]:
+    api = get_k8s_api()
+
+    nodes = api.list_node()
+
+    allocatable_cpus_per_node = []
+    allocatable_memory_per_node = []
+
+    for node in nodes.items:
+        allocatable_cpus_per_node.append(node.status.allocatable['cpu'])
+        allocatable_memory_per_node.append(node.status.allocatable['memory'])
+
+    return min(allocatable_cpus_per_node), min(allocatable_memory_per_node)
+
+
+def extract_pack_name_from_path(path: str) -> Optional[str]:
+    if path and os.path.basename(path) == "values.yaml":
+        parts = PurePath(path).parts
+        if len(parts) > 3:
+            # name of a template is a folder located two level above the values.yaml file, that is why here
+            # the third (two folders and a file) part from the end is returned as a template name
+            return parts[-3]
+    return None
+
+
+def verify_values_in_packs():
+    yaml_parser = YAML(typ="jinja2", plug_ins=["ruamel.yaml.jinja2.__plug_in__"])
+    values_yaml_paths = get_values_file_location()
+
+    list_of_incorrect_packs = []
+
+    min_available_cpu, min_available_mem = get_k8s_worker_min_resources()
+
+    conv_min_available_cpu = convert_k8s_cpu_resource(min_available_cpu)
+    conv_min_available_memory = convert_k8s_memory_resource(min_available_mem)
+
+    for values_yaml_path in glob.glob(values_yaml_paths):
+        logger.info(f"Resources verification - reading resources for pack: {values_yaml_path}")
+
+        pack_name = extract_pack_name_from_path(values_yaml_path)
+        if not pack_name:
+            continue
+
+        with open(values_yaml_path, mode="r") as values_yaml_file:
+            pack_values = yaml_parser.load(values_yaml_file)
+
+            if not pack_values:
+                logger.error(f"{values_yaml_path} file empty!")
+                raise ValueError
+
+            if not check_cpu_values(pack_values, conv_min_available_cpu):
+                list_of_incorrect_packs.append(Texts.WRONG_REQUIREMENTS_SETTINGS.
+                                               format(pack_name=pack_name))
+                continue
+
+            if not check_memory_values(pack_values, conv_min_available_memory):
+                list_of_incorrect_packs.append(Texts.WRONG_REQUIREMENTS_SETTINGS.
+                                               format(pack_name=pack_name))
+
+    return list_of_incorrect_packs
+
+
+def check_cpu_values(pack_values: Dict, conv_min_available_cpu: int) -> bool:
+    try:
+        for cpu_single_value in CPU_SINGLE_VALUES:
+            if pack_values.get(cpu_single_value):
+                cpu_single = convert_k8s_cpu_resource(pack_values.get(cpu_single_value))
+                if cpu_single > conv_min_available_cpu:
+                    return False
+
+        for resource_name in RESOURCE_NAMES:
+            if pack_values.get(resource_name):
+                req_cpu = convert_k8s_cpu_resource(pack_values.get(resource_name).get("requests", {}).
+                                                   get("cpu"))
+                if req_cpu and req_cpu > conv_min_available_cpu:
+                    return False
+    except Exception:
+        logger.exception("Exception during verification of available cpu values.")
+        raise ValueError
+
+    return True
+
+
+def check_memory_values(pack_values: Dict, conv_min_available_memory: int) -> bool:
+    try:
+        for memory_single_value in MEMORY_SINGLE_VALUES:
+            if pack_values.get(memory_single_value):
+                memory_single = convert_k8s_memory_resource(pack_values.get(memory_single_value))
+                if memory_single > conv_min_available_memory:
+                    return False
+
+        for resource_name in RESOURCE_NAMES:
+            if pack_values.get(resource_name):
+                req_memory = convert_k8s_memory_resource(pack_values.get(resource_name).
+                                                         get("requests", {}).get("memory"))
+                if req_memory and req_memory > conv_min_available_memory:
+                    return False
+
+    except Exception:
+        logger.exception("Exception during verification of available memory values.")
+        raise ValueError
+
+    return True
