@@ -115,7 +115,7 @@ def get_remote_templates(repository_name: str, access_token: str = None) -> Dict
 
 
 def extract_chart_description(chart_content: str, local: bool) -> Optional[Template]:
-    chart = yaml.load(chart_content)
+    chart = yaml.safe_load(chart_content)
 
     name = chart.get(Template.CHART_NAME_FIELD)
     description = chart.get(Template.CHART_DESCRIPTION_FIELD)
@@ -204,7 +204,7 @@ def get_repository_configuration() -> (Optional[str], Optional[str]):
 
     with open(model_zoo_conf_file, "r") as file:
         content = file.read()
-        configuration = yaml.load(content)
+        configuration = yaml.safe_load(content)
 
         model_zoo_address = configuration.get(MODEL_ZOO_ADDRESS_KEY)
         model_zoo_access_token = configuration.get(MODEL_ZOO_TOKEN_KEY)

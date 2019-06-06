@@ -143,7 +143,7 @@ def get_unmount_command_osx() -> str:
 
 
 def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool = False):
-    output, error_code, log_output = execute_system_command("mount")
+    output, error_code, log_output = execute_system_command(["mount"])
 
     if error_code:
         handle_error(logger, Texts.MOUNTS_LIST_COMMAND_ERROR_MSG, Texts.MOUNTS_LIST_COMMAND_ERROR_MSG)

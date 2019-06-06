@@ -25,7 +25,7 @@ import uuid
 
 import requests
 
-from Crypto.PublicKey import RSA
+from Crypto.PublicKey import RSA  # nosec - it is actually an import from secure pycryptodome library
 from kubernetes.client import V1Secret, V1ObjectMeta
 
 from util.k8s.k8s_info import get_secret, update_secret, create_secret
@@ -43,8 +43,8 @@ class GitRepoManagerClient:
     def __init__(self, host: str, namespace: str = NAUTA_NAMESPACE, port: int = None):
         self.namespace = namespace
         self.base_url = f'http://{host}:{port}' if port else f'http://{host}'
-        self._token = None
-        self._session = None
+        self._token: str = None
+        self._session: requests.Session = None
         self.timeout = 60
 
 

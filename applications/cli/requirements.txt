@@ -3,8 +3,7 @@ dpath==1.4.2
 pyyaml==4.2b1
 tabulate==0.8.2
 elasticsearch==5.5.0
-kubernetes==6.0.0
-docker==3.3.0
+kubernetes==7.0.1
 toml==0.9.4
 marshmallow==2.15.2
 marshmallow-enum==1.4

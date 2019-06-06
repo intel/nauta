@@ -183,7 +183,7 @@ def create_environment(experiment_name: str, file_location: str = None, folder_l
         try:
             shutil.copy2(file_location, folder_path)
             if get_current_os() == OS.WINDOWS:
-                os.chmod(os.path.join(folder_path, os.path.basename(file_location)), 0o666)
+                os.chmod(os.path.join(folder_path, os.path.basename(file_location)), 0o666)  # nosec
         except Exception:
             log.exception("Create environment - copying training script error.")
             raise SubmitExperimentError(message_prefix.format(reason=Texts.TRAINING_SCRIPT_CANT_BE_CREATED))
@@ -808,7 +808,7 @@ def validate_pack(name: str):
         exit(2)
 
     with open(chart_location, 'r', encoding='utf-8') as chart_file:
-            chart_content = yaml.load(chart_file)
+            chart_content = yaml.safe_load(chart_file)
             if chart_content.get("name") != name:
                 handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))
                 exit(2)

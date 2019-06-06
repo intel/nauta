@@ -4,3 +4,5 @@ pytest-mock==1.7.1
 pytest-cov==2.5.1
 requests-mock==1.5.2
 mypy==0.701
+bandit==1.6.0
+safety==1.8.5

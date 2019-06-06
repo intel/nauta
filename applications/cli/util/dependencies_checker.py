@@ -295,7 +295,7 @@ def load_dependency_versions() -> Optional[Dict[str, LooseVersion]]:
             log.info(
                 f'Loaded dependency versions from {dependency_versions_file_path}'
             )
-            dependency_versions = yaml.load(dependency_versions_file)
+            dependency_versions = yaml.load(dependency_versions_file)  # nosec - we need to load LooseVersion here
             return dependency_versions
     else:
         log.info(

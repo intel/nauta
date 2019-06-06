@@ -60,7 +60,7 @@ def delete_helm_release(release_name: str, purge=False, namespace: str = None):
     if namespace:
         delete_release_command += ["--tiller-namespace", namespace]
 
-    output, err_code, log_output = execute_system_command(' '.join(delete_release_command), shell=True)
+    output, err_code, log_output = execute_system_command(delete_release_command)
 
     if (f"release \"{release_name}\" deleted" not in output and
             f"release: \"{release_name}\" not found" not in output):
