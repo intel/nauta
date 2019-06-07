@@ -20,22 +20,22 @@ service:
 
 worker_resources:
   requests:
-    cpu: 76
-    memory: 250452756608
+    cpu: 38
+    memory: 189.4Gi
   limits:
-    cpu: 76
-    memory: 250452756608
+    cpu: 38
+    memory: 189.4Gi
 
 worker_cpu: null
 worker_memory: null
 
 ps_resources:
   requests:
-    cpu: 76
-    memory: 250452756608
+    cpu: 38
+    memory: 189.4Gi
   limits:
-    cpu: 76
-    memory: 250452756608
+    cpu: 38
+    memory: 189.4Gi
 
 ps_cpu: null
 ps_memory: null
