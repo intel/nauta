@@ -8,7 +8,7 @@ RUN yum clean all && \
         libmpc-devel mpfr-devel gmp-devel zlib-devel* \
         device-mapper device-mapper-devel btrfs-progs btrfs-progs-devel \
         libnl3 libnl3-devel libseccomp libseccomp-devel systemd-devel \
-        libgudev1 libgudev1-devel pigz
+        libgudev1 libgudev1-devel pigz autoconf libtool automake file
 
 RUN mkdir /build-process /build-output
 WORKDIR /build-process

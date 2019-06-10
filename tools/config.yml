@@ -362,17 +362,20 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/elasticsearch/openjdk-11.0.2_linux-x64_bin.tar.gz
         dest: openjdk-11.0.2_linux-x64_bin.tar.gz
         checksum: 99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
-  shared/build/jq:
-    version: "v1.5"
+  shared/build/jq16:
+    version: "v1.6"
     required:
       BASE_IMAGE: "shared/centos/build"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/jq"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/jq/jq-1.5.tar.gz
-        dest: jq-1.5.tar.gz
-        checksum: c4d2bfec6436341113419debf479d833692cc5cdab7eb0326b5a4d4fbe9f493c
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/jq/jq-1.6-git.tar.gz
+        dest: jq-1.6.tar.gz
+        checksum: 843bdfda0c04af12ec92b4263d6d2d83fe8f2609bf56aaad48f7dc84433e5e4d
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/automake/automake-1.14.tar.gz
+        dest: automake-1.14.tar.gz
+        checksum: 7847424d4204d1627c129e9c15b81e145836afa2a1bf9003ffe10aa26ea75755
   shared/build/dumb-init:
     version: "v1.2.1"
     required:

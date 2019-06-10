@@ -87,7 +87,7 @@ local_images:
     version: "1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
-      JQ_DATA_IMAGE: "shared/build/jq"
+      JQ_DATA_IMAGE: "shared/build/jq16"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
     method: build
