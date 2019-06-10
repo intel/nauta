@@ -13,8 +13,8 @@ FROM ${BASE_IMAGE}
 
 RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2
 
-COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.x86_64.rpm /
-RUN yum install -y /docker-ce-18.06.3-nauta.x86_64.rpm
+COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.el7.x86_64.rpm /
+RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm
 
 COPY --from=k8s /build-output/kubernetes/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl

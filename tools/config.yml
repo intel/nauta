@@ -28,9 +28,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/core"
     required: {}
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/centos-docker-1553589255.tar.xz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/centos-docker-7.6.1810.tar.xz
         dest: centos-docker.tar.xz
-        checksum: 9f5c3bb6644f8a7e2a1c788668bbd7a29ef4c44bcffe3a7f1ed2cade9b123196
+        checksum: 4de17ce88874786ed00aa67373e8c28c38ccbd9e87a95e91df4d931fa96a8445
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/centos/icu4c-63_1-src.tgz
         dest: icu4c-63_1-src.tgz
         checksum: 05c490b69454fce5860b7e8e2821231674af0a11d7ef2febea9a32512998cb9d

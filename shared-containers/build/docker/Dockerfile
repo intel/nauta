@@ -33,8 +33,8 @@ RUN ls -Rlah /root/rpmbuild/RPMS/x86_64/
 #RUN cp -vR /root/rpmbuild/RPMS/noarch/docker-ce-selinux-2.9-nauta.noarch.rpm /build-output/rpm/docker-ce-selinux-2.9-nauta.noarch.rpm
 ##### END OF SELINUX SUPPORT #############
 
-RUN cp -vR /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.x86_64.rpm /build-output/rpm/docker-ce-18.06.3-nauta.x86_64.rpm
-RUN cp -vR /root/rpmbuild/RPMS/x86_64/docker-ce-debuginfo-18.06.3-nauta.x86_64.rpm /build-output/rpm/docker-ce-debuginfo-18.06.3-nauta.x86_64.rpm
+RUN cp -vR /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.el7.x86_64.rpm /build-output/rpm/docker-ce-18.06.3-nauta.el7.x86_64.rpm
+RUN cp -vR /root/rpmbuild/RPMS/x86_64/docker-ce-debuginfo-18.06.3-nauta.el7.x86_64.rpm /build-output/rpm/docker-ce-debuginfo-18.06.3-nauta.el7.x86_64.rpm
 
 ADD container-selinux-2.66-1.el7.noarch.rpm /build-output/rpm/ 
 
