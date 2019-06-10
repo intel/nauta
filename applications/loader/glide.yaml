@@ -9,3 +9,5 @@ import:
       - api/types/container
       - api/types/strslice
       - client
+  - package: github.com/docker/go-connections
+    version: 9885905e989f4d8cc9f42d3549c5be9c27e4460d # version from 13 Jan 2019 https://github.com/docker/go-connections/pull/61
