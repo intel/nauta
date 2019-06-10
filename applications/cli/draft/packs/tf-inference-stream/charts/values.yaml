@@ -17,10 +17,10 @@ workersCount: 1
 resources:
   requests:
     cpu: 19
-    memory: 94.7Gi
+    memory: 90Gi
   limits:
     cpu: 19
-    memory: 94.7Gi
+    memory: 90Gi
 
 cpu: null
 memory: null
