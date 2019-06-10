@@ -48,7 +48,7 @@ class ConfigInitError(Exception):
 
 
 class Config:
-    __shared_state = {}
+    __shared_state: dict = {}
 
     def __init__(self):
         self.__dict__ = self.__shared_state
@@ -72,8 +72,8 @@ class Config:
         log.debug(f"{NCTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
         log.debug(f'{NCTL_CONFIG_DIR_NAME} user home path:  {binary_config_dir_path}')
 
-        if NCTL_CONFIG_ENV_NAME in os.environ and os.environ.get(NCTL_CONFIG_ENV_NAME):
-            user_path = os.environ.get(NCTL_CONFIG_ENV_NAME)
+        if os.environ.get(NCTL_CONFIG_ENV_NAME):
+            user_path = os.environ[NCTL_CONFIG_ENV_NAME]
             if os.path.exists(user_path):
                 return user_path
             else:
@@ -111,7 +111,7 @@ class NAUTAConfigMap:
     MINIMAL_NODE_MEMORY_AMOUNT = 'minimal.node.memory.amount'
     MINIMAL_NODE_CPU_NUMBER = 'minimal.node.cpu.number'
 
-    __shared_state = {}
+    __shared_state: dict = {}
 
     def __init__(self, config_map_request_timeout: int = None):
         self.__dict__ = self.__shared_state

@@ -3,3 +3,4 @@ pytest==3.5.0
 pytest-mock==1.7.1
 pytest-cov==2.5.1
 requests-mock==1.5.2
+mypy==0.701

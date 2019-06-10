@@ -45,7 +45,7 @@ class ArgoWorkflow(PlatformResource):
         self.phase = phase
 
     @classmethod
-    def from_k8s_response_dict(cls, object_dict: dict) -> 'ArgoWorkflow':
+    def from_k8s_response_dict(cls, object_dict: dict):
         return cls(name=object_dict['metadata'].get('name'),
                    namespace=object_dict['metadata'].get('namespace'),
                    started_at=object_dict.get('status', {}).get('startedAt'),

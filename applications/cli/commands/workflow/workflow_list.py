@@ -15,6 +15,7 @@
 #
 
 from sys import exit
+from typing import List
 
 import click
 from tabulate import tabulate
@@ -31,13 +32,14 @@ from util.system import handle_error
 logger = initialize_logger(__name__)
 
 
-@click.command(name='list', cls=AliasCmd, alias='ls', options_metavar='[options]', short_help=Texts.SHORT_HELP)
+@click.command(name='list', cls=AliasCmd, alias='ls', options_metavar='[options]',  # type: ignore
+               short_help=Texts.SHORT_HELP)
 @common_options(admin_command=False)
 @pass_state
 def workflow_list(state: State):
     try:
         namespace = get_kubectl_current_context_namespace()
-        workflows = ArgoWorkflow.list(namespace=namespace)
+        workflows: List[ArgoWorkflow] = ArgoWorkflow.list(namespace=namespace)
         click.echo(tabulate([workflow.cli_representation for workflow in workflows], headers=HEADERS,
                             tablefmt="orgtbl"))
     except Exception:

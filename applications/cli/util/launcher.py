@@ -44,7 +44,7 @@ def is_gui_browser_available() -> bool:
         return False
 
 
-def launch_app(k8s_app_name: NAUTAAppNames = None, no_launch: bool = False, port: int = None, app_name: str = None,
+def launch_app(k8s_app_name: NAUTAAppNames, no_launch: bool = False, port: int = None, app_name: str = None,
                number_of_retries: int = 0, url_end: str = "", namespace: str = None):
     try:
         with spinner(text=Texts.LAUNCHING_APP_MSG) as proxy_spinner, \

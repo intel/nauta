@@ -124,6 +124,7 @@ style: $(DEV_VIRTUALENV_MARK)
 
 test: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 python scripts/mypy_check.py || true
 
 cli-check: venv-dev test style
 

@@ -188,7 +188,7 @@ def test_get_workflow_logs(mocker):
                                "filter": {"range": {"@timestamp": {"gte": workflow_start_date}}}
                                }},
             "sort": {"@timestamp": {"order": "asc"}}},
-        filters=[], index='_all')
+            index='_all')
 
 
 def test_get_experiment_logs_time_range(mocker):

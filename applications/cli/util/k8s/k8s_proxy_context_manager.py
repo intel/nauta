@@ -90,7 +90,7 @@ class K8sProxy:
                 return
             except (ConnectionError, NewConnectionError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
-                logger.exception(error_msg) if retry == tries-1 else logger.debug(error_msg)
+                logger.exception(error_msg) if retry == tries-1 else logger.debug(error_msg)  # type: ignore
                 time.sleep(1)
         raise TunnelSetupError(Texts.TUNNEL_NOT_READY_ERROR_MSG.format(address=address, port=port))
 
@@ -119,7 +119,7 @@ class TcpK8sProxy(K8sProxy):
                 break
             except (ConnectionError, ConnectionRefusedError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
-                logger.exception(error_msg) if retry == tries - 1 else logger.debug(error_msg)
+                logger.exception(error_msg) if retry == tries - 1 else logger.debug(error_msg)  # type: ignore
                 time.sleep(1)
             finally:
                 if sock:

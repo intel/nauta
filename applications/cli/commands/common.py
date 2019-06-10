@@ -102,9 +102,9 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
         exit(1)
 
 
-def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: RunStatus,
+def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str,
                      listed_runs_kinds: List[RunKinds], runs_list_headers: List[str], with_metrics: bool,
-                     count: int = None, brief: bool = False):
+                     status: RunStatus = None, count: int = None, brief: bool = False):
     """
     Display a list of selected runs in the cli.
 
@@ -121,7 +121,6 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
 
     try:
         namespace = None if all_users else get_kubectl_current_context_namespace()
-        status = RunStatus[status] if status else None
 
         # List experiments command is actually listing Run resources instead of Experiment resources with one
         # exception - if run is initialized - dlsctl displays data of an experiment instead of data of a run
@@ -139,7 +138,8 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str, status: Run
             runs_table_data = runs_representations
         else:
             runs_table_data = [
-                (run_representation.name, run_representation.parameters, run_representation.submission_date,
+                (run_representation.name, run_representation.parameters,  # type: ignore
+                 run_representation.submission_date,
                  run_representation.start_date, run_representation.duration,
                  run_representation.submitter, run_representation.status, run_representation.template_name)
                 for run_representation in runs_representations
@@ -163,7 +163,7 @@ def replace_initializing_runs(run_list: List[Run]):
     :param run_list: list of runs to be checked
     :return: list without runs that are initialized at the moment
     """
-    initializing_experiments = set()
+    initializing_experiments: set = set()
     ret_list = []
     for run in run_list:
         exp_name = run.experiment_name
@@ -186,8 +186,8 @@ def create_fake_run(experiment: Experiment) -> Run:
 
 
 def get_logs(experiment_name: str, min_severity: SeverityLevel, start_date: str,
-             end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool, pager: bool, follow: bool,
-             runs_kinds: List[RunKinds], instance_type: str):
+             end_date: str, pod_ids: str, pod_status: PodStatus, match: str, output: bool,
+             pager: bool, follow: bool, runs_kinds: List[RunKinds], instance_type: str):
     """
     Show logs for a given experiment.
     """
@@ -213,9 +213,7 @@ def get_logs(experiment_name: str, min_severity: SeverityLevel, start_date: str,
             if not runs:
                 raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
 
-            pod_ids = pod_ids.split(',') if pod_ids else None
-            min_severity = SeverityLevel[min_severity] if min_severity else None
-            pod_status = PodStatus[pod_status] if pod_status else None
+            pod_ids = pod_ids.split(',') if pod_ids else None  # type: ignore
             follow_logs = True if follow and not output else False
 
             if output and len(runs) > 1:
@@ -276,7 +274,7 @@ def print_logs(run_logs_generator: Generator[LogEntry, None, None], pager=False)
     if pager:
         # set -K option for less, so ^C will be respected
         os.environ['LESS'] = os.environ.get('LESS', '') + ' -K'
-        click.echo_via_pager(formatted_logs)
+        click.echo_via_pager(formatted_logs)  # type: ignore
     else:
         for formatted_log in formatted_logs():
             click.echo(formatted_log, nl=False)
@@ -303,8 +301,8 @@ def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, No
             click.echo(Texts.LOGS_STORING_FINAL_MESSAGE)
         except Exception as exe:
             handle_error(logger,
-                         Texts.LOGS_STORING_ERROR.format(exception_message=exe.message),
-                         Texts.LOGS_STORING_ERROR.format(exception_message=exe.message))
+                         Texts.LOGS_STORING_ERROR,
+                         Texts.LOGS_STORING_ERROR)
             exit(1)
     else:
         click.echo(Texts.LOGS_STORING_CANCEL_MESSAGE)

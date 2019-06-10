@@ -45,7 +45,7 @@ notebook_metadata = {"kernelspec": {
                     }
 
 
-def convert_py_to_ipynb(py_filename: str, ipynb_location: str) -> bool:
+def convert_py_to_ipynb(py_filename: str, ipynb_location: str) -> str:
     """
     Function converts a python file with a name given as the py_filename paramater to
     Jupyter Notebook file (.ipynb) and stores this file in the location taken from

@@ -131,7 +131,7 @@ def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_nam
         raise RuntimeError(Texts.PROXY_CREATION_OTHER_ERROR_MSG)
 
     logger.info("Port forwarding - proxy set up")
-    return process, tunnel_port, service_container_port
+    return process, tunnel_port, service_container_port  # type: ignore
 
 
 def delete_k8s_object(kind: str, name: str):

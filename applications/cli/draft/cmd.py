@@ -30,7 +30,7 @@ class NoPackError(Exception):
     pass
 
 
-def create(working_directory: str = None, pack_type: str = None) -> Tuple[str, int]:
+def create(working_directory: str, pack_type: str) -> Tuple[str, int]:
     try:
         config_dirpath = Config().get_config_path()
 

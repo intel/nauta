@@ -78,7 +78,7 @@ def validate_script_folder_location(script_folder_location: str):
 
 
 def check_duplicated_params(pack_params: List[Tuple[str, str]]):
-    provided_keys = []
+    provided_keys: List[str] = []
     for key, val in pack_params:
         if key not in provided_keys:
             provided_keys.append(key)
@@ -123,7 +123,7 @@ def format_run_message(run_message: Optional[str]) -> str:
 @pass_state
 def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
-           env: List[str], script_parameters: Tuple[str, ...], requirements: str):
+           env: List[str], script_parameters: Tuple[str, ...], requirements: Optional[str]):
     logger.debug(Texts.SUBMIT_START_LOG_MSG)
     validate_script_location(script_location)
     validate_pack_params(pack_param)

@@ -92,8 +92,8 @@ def replace_cpu_configuration(data: Dict, new_cpu_number: str, current_cpu_numbe
         new_req_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
         new_limit_cpu = ((conv_new_cpu_number - conv_system_required) * fraction)/1000
     else:
-        req_cpu = convert_k8s_cpu_resource(data.get("requests").get("cpu"))
-        limit_cpu = convert_k8s_cpu_resource(data.get("limits").get("cpu"))
+        req_cpu = convert_k8s_cpu_resource(data.get("requests", {}).get("cpu"))
+        limit_cpu = convert_k8s_cpu_resource(data.get("limits", {}).get("cpu"))
 
         new_req_cpu = (conv_new_cpu_number * req_cpu/conv_current_cpu_number)/1000
         new_limit_cpu = (conv_new_cpu_number * limit_cpu/conv_current_cpu_number)/1000
@@ -123,8 +123,8 @@ def replace_memory_configuration(data: Dict, new_memory_amount: str, current_mem
         new_req_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
         new_limit_memory = int(((conv_new_memory_amount - conv_system_required) * fraction))
     else:
-        req_memory = convert_k8s_memory_resource(data.get("requests").get("memory"))
-        limit_memory = convert_k8s_memory_resource(data.get("limits").get("memory"))
+        req_memory = convert_k8s_memory_resource(data.get("requests", {}).get("memory"))
+        limit_memory = convert_k8s_memory_resource(data.get("limits", {}).get("memory"))
 
         new_req_memory = int(conv_new_memory_amount * req_memory/conv_current_memory_amount)
         new_limit_memory = int(conv_new_memory_amount * limit_memory/conv_current_memory_amount)

@@ -127,9 +127,11 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
 
 def modify_values_yaml(experiment_folder: str, script_location: str, script_parameters: Tuple[str, ...],
                        experiment_name: str, pack_type: str, username: str,
-                       cluster_registry_port: int, pack_params: List[Tuple[str, str]],
-                       env_variables: List[str]):
+                       cluster_registry_port: int, pack_params: List[Tuple[str, str]] = None,
+                       env_variables: List[str] = None):
     log.debug("Modify values.yaml - start")
+    pack_params = pack_params if pack_params else []
+    
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
     
@@ -159,7 +161,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                     raise AttributeError(Texts.CANT_PARSE_VALUE.format(value=value, error=e))
             # Handle boolean params
             elif value in {"true", "false"}:
-                value = _parse_yaml_boolean(value)
+                value = str(_parse_yaml_boolean(value))
             if key == WORK_CNT_PARAM:
                 workersCount = value
             if key == P_SERV_CNT_PARAM:

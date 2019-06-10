@@ -16,7 +16,7 @@
 
 from functools import partial
 import time
-from typing import List, Callable, Generator
+from typing import List, Callable, Generator, Dict
 
 import elasticsearch
 import elasticsearch.helpers
@@ -44,7 +44,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                  use_ssl=True, verify_certs=True, with_admin_privledges=False, **kwargs):
         hosts = [{'host': host,
                   'port': port}]
-        headers = {}
+        headers: Dict[str, str] = {}
         if with_admin_privledges:
             secret = get_secret(
                 K8sElasticSearchClient.ES_PROXY_SECRET_NAME, "nauta")
@@ -122,7 +122,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         if end_date:
             timestamp_range_filter = {"range": {"@timestamp":{"gte": start_date, "lte": end_date}}}
 
-        filters = []
+        filters: List[Callable] = []
         if min_severity:
             filters.append(partial(filter_log_by_severity, min_severity=min_severity))
         if pod_status:
@@ -133,7 +133,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
         log_generator = self.get_stream_log_generator if follow else self.get_log_generator
 
-        experiment_logs_generator = log_generator(query_body={
+        experiment_logs_generator = log_generator(query_body={  #type: ignore
             "query": {"bool": {"must":
                                    [{'term': {'kubernetes.labels.runName.keyword': run.name}},
                                     {'term': {'kubernetes.namespace_name.keyword': namespace}}
@@ -164,11 +164,9 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
         if end_date:
             timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date, "lte": end_date}}}
 
-        filters = []
-
         log_generator = self.get_stream_log_generator if follow else self.get_log_generator
 
-        workflow_logs_generator = log_generator(query_body={
+        workflow_logs_generator = log_generator(query_body={  #type: ignore
             "query": {"bool": {"must":
                                    [{'term':
                                          {'kubernetes.labels.workflows_argoproj_io/workflow.keyword': workflow.name}},
@@ -177,7 +175,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
                                "filter": timestamp_range_filter
                                }},
             "sort": {"@timestamp": {"order": "asc"}}},
-            index=index, filters=filters)
+            index=index)
 
         return workflow_logs_generator
 

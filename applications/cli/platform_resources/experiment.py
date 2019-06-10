@@ -148,8 +148,7 @@ class Experiment(PlatformResource):
         return updated_exp
 
     @classmethod
-    def list(cls, namespace: str = None, state: ExperimentStatus = None, run_kinds_filter : List[RunKinds] = None,
-             name_filter: str = None, custom_objects_api: CustomObjectsApi = None, label_selector: str = ""):
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs):
         """
         Return list of experiments.
         :param namespace: If provided, only experiments from this namespace will be returned
@@ -162,6 +161,11 @@ class Experiment(PlatformResource):
         :return: List of Experiment objects
         """
         logger.debug('Listing experiments.')
+        state = kwargs.pop('state', None)
+        run_kinds_filter = kwargs.pop('run_kinds_filter', None)
+        name_filter = kwargs.pop('name_filter', None)
+        label_selector = kwargs.pop('label_selector', None)
+
         raw_experiments = cls.list_raw_experiments(namespace=namespace, label_selector=label_selector)
         try:
             name_regex = re.compile(name_filter) if name_filter else None

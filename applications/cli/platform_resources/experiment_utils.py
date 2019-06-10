@@ -17,7 +17,7 @@
 import re
 from pathlib import Path
 from random import randrange
-from typing import List, Dict
+from typing import List, Dict, Tuple, Optional
 
 import time
 
@@ -48,14 +48,14 @@ def list_k8s_experiments_by_label(namespace: str = None, label_selector: str = "
 
 
 def generate_exp_name_and_labels(script_name: str, namespace: str, name: str = None,
-                                 run_kind: RunKinds = RunKinds.TRAINING) -> (str, Dict[str, str]):
+                                 run_kind: RunKinds = RunKinds.TRAINING) -> Tuple[str, Dict[str, str]]:
     if script_name:
         script_name = Path(script_name).name
 
     if name:
         # CASE 1: If user pass name as param, then use it. If experiment with this name exists - return error
         experiment = Experiment.get(namespace=namespace, name=name)
-        experiment_runs = experiment.get_runs() if experiment else []
+        experiment_runs: List[Run] = experiment.get_runs() if experiment else []
         if experiment and experiment_runs:
             raise SubmitExperimentError(Texts.EXPERIMENT_ALREADY_EXISTS_ERROR_MSG.format(name=name))
         # subcase when experiment has no associated runs.
@@ -108,7 +108,7 @@ def prepare_label(script_name, calculated_name: str, name: str=None,
 
 
 def generate_name_for_existing_exps(script_name: str, namespace: str,
-                                    run_kind: RunKinds = RunKinds.TRAINING) -> (str or None, Dict[str, str]):
+                                    run_kind: RunKinds = RunKinds.TRAINING) -> Tuple[Optional[str], Dict[str, str]]:
     exp_list = list_k8s_experiments_by_label(namespace=namespace,
                                              label_selector=f"script_name={script_name},name_origin")
     if not exp_list or len(exp_list) == 0:

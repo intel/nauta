@@ -57,6 +57,8 @@ def container_status_to_msg(state) -> str:
     if state.waiting is not None:
         return Texts.CONTAINER_WAITING_MSG + str(state.waiting.reason)
 
+    raise ValueError(f'Container state: {state} not recognized.')
+
 
 def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
     # convert read only bool flag to string:
@@ -82,11 +84,11 @@ def container_volume_mounts_to_msg(volume_mounts, spaces=7) -> str:
 def unify_units(name: str, value: str) -> str:
     if name == "cpu":
         if not value.endswith("m"):
-            value: float = float(value) * 1000
-            if value.is_integer():
-                value = str(int(value)) + "m"
+            value_float = float(value) * 1000
+            if value_float.is_integer():
+                value = str(int(value_float)) + "m"
             else:
-                value = str(value) + "m"
+                value = str(value_float) + "m"
     elif name == "memory":
         value = add_bytes_to_unit(value)
     return f'{name}: {value}\n'
@@ -172,7 +174,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
             if pod.status.phase.upper() == PodStatus.PENDING.value:
                 pending_pods.append(pod.metadata.name)
 
-            container_statuses = defaultdict(lambda: None)
+            container_statuses = defaultdict(lambda: None)  # type: ignore
             if pod.status.container_statuses:
                 for container_status in pod.status.container_statuses:
                     container_statuses[container_status.name] = container_status.state
@@ -191,12 +193,16 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
                 container_details.append(container_description)
                 containers_resources.append(container.resources)
 
-            container_details = ''.join(container_details)
+            container_details_string = ''.join(container_details)
 
-            tabular_output.append([pod.metadata.name,
-                                   wrap_text(pod.metadata.uid, width=UID_MAX_WIDTH, spaces=0),
-                                   status_string, container_details])
-        click.echo(tabulate(tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
+            tabular_output.append([
+                pod.metadata.name,
+                wrap_text(pod.metadata.uid, width=UID_MAX_WIDTH, spaces=0),
+                status_string, container_details_string
+            ])
+        click.echo(
+            tabulate(
+                tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
 
         try:
             cpu_requests_sum = sum_cpu_resources(

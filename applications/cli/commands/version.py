@@ -16,6 +16,7 @@
 
 import click
 from tabulate import tabulate
+from typing import Optional, List
 
 from util.aliascmd import AliasCmd
 from util.cli_state import common_options, pass_state, State
@@ -38,11 +39,14 @@ PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 @pass_state
 def version(state: State):
     """ Returns the version of the installed nctl application. """
-    platform_version = Texts.INITIAL_PLATFORM_VERSION
+    platform_version: Optional[str] = Texts.INITIAL_PLATFORM_VERSION
     error_msg = ""
     platform_version_fail = False
     try:
         platform_version = NAUTAConfigMap(config_map_request_timeout=PLATFORM_VERSION_REQUEST_TIMEOUT).platform_version
+        if not platform_version:
+            platform_version_fail = True
+            raise ValueError(Texts.KUBECTL_INT_ERROR_MSG)
     except KubernetesError:
         error_msg = Texts.KUBECTL_INT_ERROR_MSG
         platform_version_fail = True
@@ -50,8 +54,8 @@ def version(state: State):
         error_msg = Texts.OTHER_ERROR_MSG
         platform_version_fail = True
 
-    version_table = [[Texts.TABLE_APP_ROW_NAME, VERSION],
-                     [Texts.TABLE_PLATFORM_ROW_NAME, platform_version]]
+    version_table: List[list] = [[Texts.TABLE_APP_ROW_NAME, VERSION],
+                                 [Texts.TABLE_PLATFORM_ROW_NAME, platform_version]]
 
     click.echo(tabulate(version_table,
                         headers=Texts.TABLE_HEADERS,
