@@ -20,6 +20,7 @@ import base64
 from sys import exit
 
 import click
+from retry import retry
 
 from git_repo_manager.client import GitRepoManagerClient
 from util.app_names import NAUTAAppNames
@@ -149,14 +150,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
                              add_verbosity_msg=state.verbosity == 0)
                 cert = ""
 
-            try:
-                with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=60) as proxy:
-                    grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
-                    grm_client.add_nauta_user(username=username)
-            except Exception:
-                handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG,
-                             add_verbosity_msg=state.verbosity == 0)
-                sys.exit(1)
+            add_user_to_git_repo_manager(username=username, state=state)
 
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
@@ -208,3 +202,15 @@ def generate_kubeconfig(username: str, namespace: str, address: str, token: str,
                                       context_username=username,
                                       username=username,
                                       token=token)
+
+
+@retry(tries=5, delay=1)
+def add_user_to_git_repo_manager(username: str, state):
+    try:
+        with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=30) as proxy:
+            grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
+            grm_client.add_nauta_user(username=username)
+    except Exception:
+        handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG,
+                     add_verbosity_msg=state.verbosity == 0)
+        raise
