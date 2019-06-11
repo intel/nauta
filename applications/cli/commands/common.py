@@ -24,6 +24,7 @@ import click
 from tabulate import tabulate
 
 from util.app_names import NAUTAAppNames
+from util.config import TBLT_TABLE_FORMAT
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
@@ -93,7 +94,7 @@ def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
         displayed_items_count = count if count else len(uninitialized_experiments)
         click.echo(tabulate([uninitialized_experiment_cli_representation(experiment)
                              for experiment in uninitialized_experiments][-displayed_items_count:],
-                            headers=headers, tablefmt="orgtbl"))
+                            headers=headers, tablefmt=TBLT_TABLE_FORMAT))
     except InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)
@@ -146,7 +147,7 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str,
                 for run_representation in runs_representations
             ]
         click.echo(tabulate(runs_table_data if not count else runs_table_data[-count:],
-                            headers=runs_list_headers, tablefmt="orgtbl"))
+                            headers=runs_list_headers, tablefmt=TBLT_TABLE_FORMAT))
     except InvalidRegularExpressionError:
         handle_error(logger, Texts.INVALID_REGEX_ERROR_MSG, Texts.INVALID_REGEX_ERROR_MSG,
                      add_verbosity_msg=verbosity_lvl == 0)

@@ -40,9 +40,10 @@ from platform_resources.experiment_utils import generate_exp_name_and_labels
 from packs.tf_training import update_configuration, get_pod_count
 import platform_resources.experiment as experiments_model
 from platform_resources.run import Run, RunStatus, RunKinds
+
 from platform_resources.workflow import ExperimentImageBuildWorkflow, ArgoWorkflow
-from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config
 from util.filesystem import get_total_directory_size_in_bytes
+from util.config import EXPERIMENTS_DIR_NAME, FOLDER_DIR_NAME, Config, TBLT_TABLE_FORMAT
 from util.helm import delete_helm_release
 from util.k8s.kubectl import delete_k8s_object
 from util.logger import initialize_logger
@@ -348,7 +349,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
             click.echo(tabulate({RUN_NAME: [run.name for run in runs_list],
                                  RUN_PARAMETERS: ["\n".join(run.parameters) if run.parameters
                                                   else "" for run in runs_list]},
-                                headers=[RUN_NAME, RUN_PARAMETERS], tablefmt="orgtbl"))
+                                headers=[RUN_NAME, RUN_PARAMETERS], tablefmt=TBLT_TABLE_FORMAT))
             if not click.confirm(Texts.CONFIRM_SUBMIT_QUESTION_MSG, default=True):
                 for experiment_run_folder in experiment_run_folders:
                     delete_environment(experiment_run_folder)
@@ -397,6 +398,7 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
 
                 if image_build_workflow.name:
                     error_msg += f' Run nctl workflow logs {image_build_workflow.name} command for more details.'
+
                 try:
                     experiment.state = experiments_model.ExperimentStatus.FAILED
                     experiment.update()

@@ -28,6 +28,8 @@ export_images:
     value: "{{ image_local_url['nauta/pytorch'] }}"
   - name: tfjob-multinode-sidecar
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
+  - name: openvino-mo
+    value: "{{ image_local_url['nauta/openvino-mo'] }}"
 
 local_images:
   nauta/centos:
@@ -238,6 +240,11 @@ local_images:
     version: "v2.2.1"
     image: "argoproj/argoexec:v2.2.1"
     method: pull
+  nauta/openvino-mo:
+    version: "1.0.0"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/openvino-mo"
 
 
 # WARNING

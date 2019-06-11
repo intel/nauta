@@ -20,6 +20,7 @@ import click
 from tabulate import tabulate
 
 from util.cli_state import common_options, pass_state, State
+from util.config import TBLT_TABLE_FORMAT
 from cli_text_consts import WorkflowSubmitTexts as Texts
 from util.logger import initialize_logger
 from commands.workflow.common import HEADERS
@@ -43,7 +44,7 @@ def submit(state: State, workflow_path: str):
         with spinner(text=Texts.PROGRESS_MSG):
             workflow.create(namespace=namespace)
             workflow.namespace = namespace  # Set namespace, to properly display owner in CLI
-        click.echo(tabulate([workflow.cli_representation], headers=HEADERS, tablefmt="orgtbl"))
+        click.echo(tabulate([workflow.cli_representation], headers=HEADERS, tablefmt=TBLT_TABLE_FORMAT))
     except IOError as e:
         handle_error(logger, Texts.LOAD_SPEC_ERROR_MSG.format(msg=str(e)),
                      Texts.LOAD_SPEC_ERROR_MSG.format(msg=str(e)))

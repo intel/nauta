@@ -25,6 +25,7 @@ from cli_text_consts import WorkflowViewTexts as Texts
 from commands.workflow.common import HEADERS
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
+from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -43,7 +44,8 @@ def view(state: State, workflow_name: str):
         if not workflow:
             click.echo(Texts.NOT_FOUND_MSG.format(workflow_name=workflow_name))
             exit(0)
-        click.echo(tabulate([workflow.cli_representation], headers=HEADERS, tablefmt="orgtbl"))
+
+        click.echo(tabulate([workflow.cli_representation], headers=HEADERS, tablefmt=TBLT_TABLE_FORMAT))
         click.echo('\nWorkflow status:\n')
         click.echo(yaml.dump(workflow.status))
     except Exception:

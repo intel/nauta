@@ -25,6 +25,7 @@ from tabulate import tabulate
 from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds, \
     validate_env_paramater
 from util.cli_state import common_options, pass_state, State
+from util.config import TBLT_TABLE_FORMAT
 from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
 from util.aliascmd import AliasCmd
@@ -164,7 +165,7 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
     click.echo(tabulate([(run.cli_representation.name, run.cli_representation.parameters,
                           run.cli_representation.status, format_run_message(runs_errors.get(run.name, "")))
                          for run in runs_list],
-                        headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
+                        headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt=TBLT_TABLE_FORMAT))
 
     # if there is at least one FAILED experiment - application has to return exit code != 0
     if any(run.state == RunStatus.FAILED for run in runs_list):

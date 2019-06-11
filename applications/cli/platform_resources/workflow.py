@@ -16,6 +16,7 @@
 
 import time
 from collections import namedtuple
+from typing import List
 
 from kubernetes.client import CustomObjectsApi
 from typing import Optional
@@ -25,6 +26,24 @@ from util.logger import initialize_logger
 from util.config import NAUTA_NAMESPACE, NAUTAConfigMap
 
 logger = initialize_logger(__name__)
+
+
+class ArgoWorkflowStep:
+
+    ArgoWorkflowStepCliModel = namedtuple('ArgoWorkflowStepModel', ['name', 'started_at', 'finished_at', 'phase'])
+
+    def __init__(self, name: str = None, phase: str = None, started_at: str = None, finished_at: str = None):
+        self.name = name
+        self.phase = phase
+        self.started_at = started_at
+        self.finished_at = finished_at
+
+    @property
+    def cli_representation(self):
+        return ArgoWorkflowStep.ArgoWorkflowStepCliModel(name=self.name,
+                                                         started_at=self.started_at,
+                                                         finished_at=self.finished_at,
+                                                         phase=self.phase)
 
 
 class ArgoWorkflow(PlatformResource):
@@ -37,12 +56,13 @@ class ArgoWorkflow(PlatformResource):
     def __init__(self, name: str = None, namespace: str = None,
                  started_at: str = None, finished_at: str = None,
                  status: dict = None, phase: str = None, body: dict = None,
-                 k8s_custom_object_api: CustomObjectsApi = None):
+                 k8s_custom_object_api: CustomObjectsApi = None, steps: List[ArgoWorkflowStep] = None):
         super().__init__(k8s_custom_object_api=k8s_custom_object_api, name=name, namespace=namespace, body=body)
         self.started_at = started_at
         self.finished_at = finished_at
         self.status = status
         self.phase = phase
+        self.steps = steps
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -52,7 +72,8 @@ class ArgoWorkflow(PlatformResource):
                    finished_at=object_dict.get('status', {}).get('finishedAt'),
                    status=object_dict.get('status', {}),
                    phase=object_dict.get('status', {}).get('phase'),
-                   body=object_dict)
+                   body=object_dict,
+                   steps=ArgoWorkflow.generate_step_group_list(object_dict))
 
     @property
     def cli_representation(self):
@@ -61,6 +82,18 @@ class ArgoWorkflow(PlatformResource):
                                                  finished_at=self.finished_at,
                                                  submitter=self.namespace,
                                                  phase=self.phase)
+
+    @classmethod
+    def generate_step_group_list(cls, object_dict: dict):
+        status = object_dict.get('status')
+        if status:
+            nodes = status.get('nodes', {})
+            return [ArgoWorkflowStep(name=nodes[item].get("displayName"),
+                                     phase=nodes[item].get("phase"),
+                                     started_at=nodes[item].get("startedAt"),
+                                     finished_at=nodes[item].get("finishedAt"))
+                    for item in nodes if "Pod" == nodes[item].get("type")]
+        return None
 
     @property
     def parameters(self):
@@ -77,7 +110,7 @@ class ArgoWorkflow(PlatformResource):
         for param in self.body['spec']['arguments']['parameters']:
             if parameters_to_set.get(param['name']):
                 param['value'] = str(parameters_to_set.get(param['name']))
-            elif not param.get('value'):
+            elif param.get('value') is None:
                 raise KeyError(f'Required parameter: {param["name"]} is not set.'
                                f' Parameters to update: {parameters_to_set}'
                                f' Current parameters: {self.body["spec"]["arguments"]["parameters"]}')
@@ -124,8 +157,10 @@ class ExperimentImageBuildWorkflow(ArgoWorkflow):
                  name: str = None, namespace: str = None,
                  started_at: str = None, finished_at: str = None,
                  status: dict = None, phase: str = None, body: dict = None,
-                 k8s_custom_object_api: CustomObjectsApi = None, failure_message: str = None):
-        super().__init__(k8s_custom_object_api=k8s_custom_object_api, name=name, namespace=namespace, body=body)
+                 k8s_custom_object_api: CustomObjectsApi = None, failure_message: str = None,
+                 steps: List[ArgoWorkflowStep] = None):
+        super().__init__(k8s_custom_object_api=k8s_custom_object_api, name=name, namespace=namespace, body=body,
+                         steps=steps)
         self.started_at = started_at
         self.finished_at = finished_at
         self.status = status

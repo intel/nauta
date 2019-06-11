@@ -24,6 +24,7 @@ from tabulate import tabulate
 
 from util.logger import initialize_logger
 from util.cli_state import common_options, pass_state, State, verify_user_privileges
+from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
     get_kubectl_host
 from util.aliascmd import AliasGroup, AliasCmd
@@ -183,7 +184,7 @@ def get_mounts_linux_osx(username: str = "", is_admin: bool = False, osx: bool =
     ret_list.sort(key=lambda x: x.username, reverse=False)
 
     click.echo(tabulate([x.linux_osx_tabular_format() for x in ret_list], headers=ShareData.LINUX_MOUNTS_LIST_HEADERS,
-                        tablefmt="orgtbl"))
+                        tablefmt=TBLT_TABLE_FORMAT))
 
 
 def get_mounts_windows():
@@ -235,7 +236,7 @@ def get_mounts_windows():
     ret_list.sort(key=lambda x: x.remote_share, reverse=False)
 
     click.echo(tabulate([x.windows_tabular_format() for x in ret_list], headers=ShareData.WIN_MOUNTS_LIST_HEADERS,
-                        tablefmt="orgtbl"))
+                        tablefmt=TBLT_TABLE_FORMAT))
 
 
 @mount.command(help=Texts.HELP_L, short_help=Texts.HELP_L, cls=AliasCmd, alias='ls', options_metavar='[options]')

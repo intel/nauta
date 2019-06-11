@@ -52,6 +52,7 @@ def logs(state: State, experiment_name: str, min_severity: str, start_date: str,
     # check whether we have runs with a given name
     min_severity = SeverityLevel[min_severity] if min_severity else None
     pod_status = PodStatus[pod_status] if pod_status else None
+
     get_logs(experiment_name=experiment_name, min_severity=min_severity, start_date=start_date, end_date=end_date,
              pod_ids=pod_ids, pod_status=pod_status, match=match, output=output, pager=pager, follow=follow,
              runs_kinds=LOG_RUNS_KINDS, instance_type="experiment")

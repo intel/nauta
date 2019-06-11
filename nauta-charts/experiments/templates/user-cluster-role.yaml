@@ -16,6 +16,7 @@ rules:
       - experiments
       - runs
       - tfjobs
+      - workflows
     verbs:
       - get
       - list

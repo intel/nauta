@@ -20,6 +20,7 @@ import click
 from tabulate import tabulate
 
 from util.cli_state import common_options, pass_state, State
+from util.config import TBLT_TABLE_FORMAT
 from platform_resources.user import User
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
@@ -42,7 +43,7 @@ def list_users(state: State, count: int):
         displayed_items_count = count if count else len(users)
         click.echo(tabulate([user.cli_representation for user in users[-displayed_items_count:]],
                             headers=Texts.TABLE_HEADERS,
-                            tablefmt="orgtbl"))
+                            tablefmt=TBLT_TABLE_FORMAT))
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
         exit(1)

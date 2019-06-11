@@ -26,6 +26,7 @@ from util.cli_state import common_options, pass_state, State
 from platform_resources.run import Run
 from platform_resources.experiment import Experiment
 from util.aliascmd import AliasCmd
+from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
     sum_cpu_resources, PodStatus, get_pod_events, add_bytes_to_unit
 from util.k8s.k8s_statistics import get_highest_usage
@@ -175,7 +176,9 @@ def view(context, state: State, experiment_name: str, tensorboard: bool,
             tabulate(
                 [run.cli_representation],
                 headers=EXPERIMENTS_LIST_HEADERS,
-                tablefmt="orgtbl"))
+                tablefmt=TBLT_TABLE_FORMAT
+            )
+        )
 
         click.echo(Texts.PODS_PARTICIPATING_LIST_HEADER)
 
@@ -241,7 +244,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool,
             ])
         click.echo(
             tabulate(
-                tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt="orgtbl"))
+                tabular_output, Texts.PODS_TABLE_HEADERS, tablefmt=TBLT_TABLE_FORMAT))
 
         try:
             cpu_requests_sum = sum_cpu_resources([
@@ -285,7 +288,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool,
                         mem_limits_sum
                     ])),
                 Texts.RESOURCES_SUM_TABLE_HEADERS,
-                tablefmt="orgtbl"))
+                tablefmt=TBLT_TABLE_FORMAT))
 
         if tensorboard:
             click.echo()

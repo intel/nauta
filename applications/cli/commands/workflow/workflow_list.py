@@ -25,6 +25,7 @@ from cli_text_consts import WorkflowListTexts as Texts
 from commands.workflow.common import HEADERS
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
+from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -41,7 +42,7 @@ def workflow_list(state: State):
         namespace = get_kubectl_current_context_namespace()
         workflows: List[ArgoWorkflow] = ArgoWorkflow.list(namespace=namespace)
         click.echo(tabulate([workflow.cli_representation for workflow in workflows], headers=HEADERS,
-                            tablefmt="orgtbl"))
+                            tablefmt=TBLT_TABLE_FORMAT))
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=True)
         exit(1)

@@ -112,6 +112,26 @@ class VerifyCmdTexts:
                             "align those settings with resources available on a cluster."
 
 
+class ModelCmdTexts:
+    HELP = "Commands used to manage processing, conversion and packaging of models."
+
+
+class ModelStatusCmdTexts:
+    HELP = "Command displays status of a chosen operation."
+    MODEL_NOT_FOUND = "Model {model_name} hasn't been found. Please check the name passed to the command."
+    OTHER_ERROR_MSG = "Failed to get operation's status."
+    HELP_S = "Displays steps with a given status."
+    HELP_U = "Name of a user to whom viewed operation belongs. If not given - only operations of a current " \
+             "user are taken into account."
+    LACK_OF_STEPS = "There are no steps associated with a given operation."
+    LOAD_DATA_MSG = "Loading operation's data. Please wait..."
+
+
+class ModelExportListCmdTexts:
+    HELP = "Displays a list of available export's templates."
+    EXPORT_LIST_ERROR_MSG = "Error during getting list of export's workflows."
+
+
 class UserCmdTexts:
     HELP = "Create, delete, or list users of the platform. Can only be run by a platform administrator."
 
@@ -908,3 +928,15 @@ class TemplateInstallCmdTexts(TemplateListCmdTexts):
     DOWNLOADING_TEMPLATE = "Installing template..."
     LOCAL_VERSION_ALREADY_INSTALLED = "Local version '{local_version}' of a '{template_name}' template is already " \
                                       "installed. Continue with replacing it with remote version '{remote_version}'?"
+
+
+class ModelExportCmdTexts:
+    HELP = """Export the model using one of defined formats.
+
+    PATH - indicates the location of the model on the Input or Output network shares
+    
+    FORMAT - one of the supported formats (see nctl model export list command)
+    
+    operation-options - options specific to a chosen format
+    """
+    SHORT_HELP = "Export the model using one of defined formats."

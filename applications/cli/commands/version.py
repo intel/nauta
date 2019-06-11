@@ -20,6 +20,7 @@ from typing import Optional, List
 
 from util.aliascmd import AliasCmd
 from util.cli_state import common_options, pass_state, State
+from util.config import TBLT_TABLE_FORMAT
 from version import VERSION
 from util.config import NAUTAConfigMap
 from util.exceptions import KubernetesError
@@ -59,7 +60,7 @@ def version(state: State):
 
     click.echo(tabulate(version_table,
                         headers=Texts.TABLE_HEADERS,
-                        tablefmt="orgtbl"))
+                        tablefmt=TBLT_TABLE_FORMAT))
 
     if platform_version_fail:
         handle_error(logger, error_msg, error_msg, add_verbosity_msg=state.verbosity == 0)

@@ -44,6 +44,7 @@ ifeq (Windows,$(OS))
 
 	cp zoo-repository.config dist/config/
 
+
 	# download and prepare Helm
 	curl -o helm-v2.11.0-windows-amd64.zip https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-windows-amd64.zip
 

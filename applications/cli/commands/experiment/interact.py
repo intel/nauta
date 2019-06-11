@@ -24,6 +24,7 @@ from tabulate import tabulate
 
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
+from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
 from util.app_names import NAUTAAppNames
@@ -131,7 +132,8 @@ def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str,
                                  RUN_PARAMETERS: [run.cli_representation.parameters for run in runs],
                                  RUN_STATUS: [run.cli_representation.status for run in runs],
                                  RUN_MESSAGE: [runs_errors.get(run.name, "") for run in runs]},
-                                headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE], tablefmt="orgtbl"))
+                                headers=[RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE],
+                                tablefmt=TBLT_TABLE_FORMAT))
             if runs:
                 name = runs[0].name
             else:
