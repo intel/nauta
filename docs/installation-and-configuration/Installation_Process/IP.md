@@ -58,7 +58,7 @@ Invoke `./installer.sh` with one of the following options:
 * **platform-install:** Use this option to install **Kubernetes only**
 * **nauta-install:** Use this option to install **Nauta only**
     - **Note:** If you select this option, it is _assumed_ that Kubernetes is already installed. In addition, this requires the same procedure for Nauta upgrades (see below). 
-* **nauta-upgrade:** Nauta installation upgrade (see [Nauta Installation Process](../Installation_Process/IP.md) for Nauta upgrade  procedures). 
+* **nauta-upgrade:** Nauta installation upgrade (see [Upgrading Nauta](#upgrading-nauta) for Nauta upgrade  procedures). 
 
 ### Installation Output 
 
@@ -103,12 +103,6 @@ To upgrade Nauta, do the following:
 `./installer.sh nauta-upgrade`
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
-
-After successful execution of platform upgrade you need to also upgrade users by running:
-
-`nctl user upgrade`
-
-This command can be run only by an administrator.
 
 This completes the Nauta Upgrade Process.
 

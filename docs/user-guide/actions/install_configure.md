@@ -26,6 +26,7 @@ This release of the Nauta client software has been validated on the following op
 The following software _must_ be installed on the client system before installing Nauta client:
 
 * kubectl version 1.10 or later, refer to: [Install Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
+* git version 1.8.3.1 or later
 
 ## Installation
 
