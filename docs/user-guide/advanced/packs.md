@@ -10,7 +10,7 @@ This section discusses the following main topics:
 
 The packs are located in the _nctl_config_ folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs.
 
-The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consist of the parts:
+The default pack used by  `nctl_ client is _tf-training-tfjob`. The pack consist of the parts:
 
 * Docker image specification _Dockerfile_
 
@@ -144,6 +144,4 @@ To change these defaults, following parameters should be adjusted (using methods
 * [README](../README.md)
 
 ----------------------
-**IMPORTANT:** Where you see * for example TensorBoard* this indicates other names and brands may be claimed as the property of others. It _**does not**_ indicate a special character, command, variable, or parameter unless otherwise indicated. 
-
 

@@ -9,7 +9,7 @@ This section provides instructions for installing and configuring Nauta to run o
 - [Setting Variables Permanently](#setting-variables-permanently)
 
 For instructions to install and configure Nauta to run on the host server, refer to the 
-[Nauta Installation, Configuration, and Administration Guide](../installation-and-configuration). 
+[Nauta Installation, Configuration, and Administration Guide](/docs/installation-and-configuration). 
 
 
 ## Supported Operating Systems
@@ -17,7 +17,7 @@ For instructions to install and configure Nauta to run on the host server, refer
 This release of the Nauta client software has been validated on the following operating systems and versions:
 
 * Ubuntu (16.04, 18.04)
-* RedHat* 7.5
+* RedHat 7.5
 * macOS High Sierra (10.13)
 * Windows 10 
 
@@ -26,7 +26,7 @@ This release of the Nauta client software has been validated on the following op
 The following software _must_ be installed on the client system before installing Nauta client:
 
 * kubectl version 1.10 or later, refer to: [Install Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
-* git version 2.7.4 or later
+* git version 1.8.3.1 or later
 
 ## Installation
 

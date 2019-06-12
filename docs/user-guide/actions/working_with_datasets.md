@@ -41,7 +41,7 @@ Additionally, each experiment has a special folder that can be accessed
 as /mnt/output/experiment from training script. This folder is shared by Samba
 as output/<EXPERIMENT_NAME>.
 --------------------------------------------------------------------
-mount_smbfs //'jane:UX9ucv2uphw3iFgmDgivAo5p7PYYwP34'@10.91.120.167.lab.nervana.sclab.intel.com/<NAUTA_FOLDER> <MOUNTPOINT>
+mount_smbfs //'jane:UX9ucv2uphw3iFgmDgivAo5p7PYYwP34'@1@10.10.110.110.lab.xxxxx.xxxx.xxxx.com.com/<NAUTA_FOLDER> <MOUNTPOINT>
  
 Use following command to unmount previously mounted folder:
 umount <MOUNTPOINT> [-f]

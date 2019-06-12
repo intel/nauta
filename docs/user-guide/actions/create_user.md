@@ -13,7 +13,7 @@ This section discusses the following main topics:
 
 ## Experiments and User Access 
 
-The user has full control (`list/read/create/terminate`) over their own experiments as well as read access (`list/read`) to experiments belonging to other users on this cluster. 
+The user has full control (`list/read/create/terminate`) over their own experiments, as well as read access (`list/read`) to experiments belonging to other users on this cluster. 
 
 **Note:** Only an Administrator can create a user account. 
 

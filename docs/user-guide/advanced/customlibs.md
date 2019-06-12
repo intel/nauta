@@ -8,9 +8,9 @@ This section discusses the following main topics:
  - [Proxy Settings](#proxy)
  - [Example Dockerfile Modification](#example-dockerfile-modification) 
 
-## Installing an Operating System library
+## Installing an Operating System Library
 
-To install an Operating System library or dependency that _is not_ included in standard NAUTA docker image it is required to modify draft pack definition. To install a pip dependency (like NumPy* Python or pandas Python), refer to `experiment submit` command documentation.
+To install an Operating System library or dependency that _is not_ included in standard NAUTA docker image it is required to modify draft pack definition. To install a pip dependency (like NumPy Python or pandas Python), refer to `experiment submit` command documentation.
 
 **Note:** For NumPy Python information, refer to: [NumPy.org](http://www.numpy.org). For pandas Python information, refer to: [Pandas Information](https://pandas.pydata.org/)
 
@@ -31,7 +31,7 @@ Example _Dockerfile_:
     ENV PYTHONUNBUFFERED 1
 ```
 
-### Installing OS Packages
+## Installing Operating System Packages
 
 The images in Nauta are based on CentOS. To install system package add the following lines to _Dockerfile_:
 
@@ -40,7 +40,7 @@ The images in Nauta are based on CentOS. To install system package add the follo
     RUN yum install package1 package2
 ```
 
-### Proxy
+### Proxy Settings
 
 Depending on the network configuration it may be required to setup proxy servers.
 
@@ -72,4 +72,3 @@ Below is an example _Dockerfile_ showing installation of additional packages.
 * [README](../README.md)
  
 ----------------------
-**IMPORTANT:** Where you see * for example TensorBoard* this indicates other names and brands may be claimed as the property of others. It _**does not**_ indicate a special character, command, variable, or parameter unless otherwise indicated. 

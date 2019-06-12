@@ -47,12 +47,12 @@ Currently, there _is no_ workaround.
 ## Docker Error 
 
 
-The Docker* installation on the client machine takes up significant space and contains a large amount of container images.
+The Docker installation on the client machine takes up significant space and contains a large amount of container images.
 Refer to [Official Docker Documentation](https://docs.docker.com) for more information. 
 
 ### Docker Error Workaround
 
-Docker takes a conservative approach to cleaning up unused objects (often referred to as _garbage collection), such as images, containers, volumes, and networks: these objects are generally not removed unless you explicitly ask Docker to do so.
+Docker takes a conservative approach to cleaning up unused objects (often referred to as garbage collection), such as images, containers, volumes, and networks: these objects are generally not removed unless you explicitly ask Docker to do so.
 
 **Note:** Refer to the following information for detailed instructions on how to prune unused Docker images: [Prune unused Docker objects](https://docs.docker.com/config/pruning). 
 
@@ -64,13 +64,13 @@ Due to known errors in Docker Garbage Collector making automatic removal of Dock
 
 Before running the Docker Garbage Collector, the administrator should remove images that are no longer needed, perform Docker's registry cleanup periodically.
 
-If there is too many images in registry it may negatively impact the submission of experiments: submitting of experiments works much slower than usual and eventually a user _is not_ able to submit an experiment. To prevent this, administrators should perform this cleanup periodically. 
+If there are too many images in registry it may negatively impact the submission of experiments: submitting of experiments works much slower than usual and eventually a user _is not_ able to submit an experiment. To prevent this, administrators should perform this cleanup periodically. 
 
 ### Removal of Docker Images Procedure and Workaround
 
 1) Expose the internal Docker registry's API by exposing locally port 5000, exposed by `nauta-docker-registry service_ located` in the nauta namespace. This can be done, for example by issuing the following command on a machine that has access to Nauta:`kubectl port-forward svc/nauta-docker-registry 5000 -n nauta`
      
-2) Get a list of images stored in the internal registry by issuing the following command (it is assumed that port 5000 is exposed locally): `curl http://localhost:5000/v2/_catalog` 
+2) Get a list of images stored in the internal registry by issuing the following command (it is assumed that port 5000 is exposed locally): curl http://localhost:5000/v2/_catalog 
      
  - For more information on Docker Images, refer to: [docker image ls](https://docs.docker.com/engine/reference/commandline/image_ls/)
 
@@ -119,7 +119,7 @@ To view the draft logs, use the following command:
 
 ## Nauta Connection Error 
 
-**Launching a TensorBoard\* instance and launching a Web UI _does not_ work.**
+**Launching a TensorBoard instance and launching a Web UI _does not_ work.**
  
 After running Nauta to launch the Web UI (`nctl launch webui`) or the nctl launch tb **<experiment_name>** commands, a connection error message may be visible (for example: `Error during creation of a proxy for a tensorboard`). During the usage of these commands, a proxy tunnel to the cluster is created. 
 
@@ -131,7 +131,7 @@ To prevent this, ensure that a valid user-config is used and check the proxy set
 
 ## Platform Client for Microsoft Windows 
 
-Using standard Microsoft* Windows* terminals (`cmd.exe`, `power shell`) is enough to interact with platform, but there is a sporadic issue with the output. Some lines can be surrounded with incomprehensible characters, for example:
+Using standard Microsoft Windows terminals (`cmd.exe`, `power shell`) is enough to interact with platform, but there is a sporadic issue with the output. Some lines can be surrounded with incomprehensible characters, for example:
 
 ```
 [K[?25hCannot connect to K8S cluster: Unable to connect to the server: d...
@@ -153,7 +153,7 @@ To change DNS settings in the installation, make the changes on the master node:
 
 **An experiment fails just after submission, even if the script itself is correct.**  
 
-If a Kubernetes* cluster does not have enough resources, the pods used in experiments are evicted. This results in failure of the whole experiment, even if there are no other reasons for this failure, such as those caused by users (such as, lack of access to data, errors in scripts and so on).
+If a Kubernetes cluster does not have enough resources, the pods used in experiments are evicted. This results in failure of the whole experiment, even if there are no other reasons for this failure, such as those caused by users (such as, lack of access to data, errors in scripts and so on).
 
 ###  Insufficient Resources Causes Experiments Failures Workaround
 
@@ -213,3 +213,5 @@ Until a resolution of the problem on library's side is found, monitor the status
 * [README](../README.md)
 
 ----------------------
+
+

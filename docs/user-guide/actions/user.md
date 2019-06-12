@@ -10,7 +10,7 @@ Use this command to create, delete, and manage users. The following main topics 
 
 ### Synopsis
 
-Creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
+The `create` subcommand creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
 
 ### Syntax
 
@@ -30,7 +30,6 @@ Creates and initializes a new Nauta user. This command _must be_ executed when `
 |`-f, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given, the configuration is stored in the `config.<username>` file.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
-
 
 ### Additional Remarks
 
@@ -68,7 +67,8 @@ In this case, the operation of a creation of a new user should be postponed for 
 
 `nctl user create jdoe`
 
-Outcome 
+### Outcome 
+
 This creates the user `jdoe`, as shown in the example.
 
 ## delete Subcommand
@@ -116,6 +116,7 @@ A message regarding the command's completion. If an issue occurs, a short descri
 Removes `jdoe` user with all a user's artifacts.
 
 ### Outcome 
+
 This removes the created jdoe user along with all their artifacts.
 
 
@@ -124,7 +125,6 @@ This removes the created jdoe user along with all their artifacts.
 ### Synopsis
 
 The `list` subcommand lists  all currently configured users.
-
 
 ### Syntax
 

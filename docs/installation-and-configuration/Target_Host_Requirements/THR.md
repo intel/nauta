@@ -2,7 +2,7 @@
 
 # Target Host Requirements
 
-For the _Target host_, install Nauta on bare metal only with Red Hat Enterprise Linux 7.5 (can be preinstalled).
+For the _Target host_, install Nauta **on bare metal only** with Red Hat Enterprise Linux 7.5 (this can be preinstalled).
 
 - Configured access to the master host over SSH.
   - This is configured access from your _Installer Machine to your Target Host (master)._
@@ -79,25 +79,6 @@ A list of **required** enabled repositories for Centos 7.5, is:
 - CentOS-7 - Extras
 - CentOS-7 - Updates
 - Extra Packages for Enterprise (epel) 
-
-## Repositories List
-
-Use the following command to check your repository list: `yum repolist all`
-
-A list of **required** enabled repositories for RHEL 7.5, is:
-
-- Extra Packages for Enterprise Linux 7 - x86_64
-- Red Hat Enterprise Linux 7 Server - x86_64
-- Red Hat Enterprise Linux 7 Server (High Availability) - x86_64
-- Red Hat Enterprise Linux 7 Server (Optional) - x86_64
-- Red Hat Enterprise Linux 7 Server (Supplementary) - x86_64
-
-A list of **required** enabled repositories for Centos 7.5, is:
-
-- CentOS-7 - Base
-- CentOS-7 - Extras
-- CentOS-7 - Updates
-- Extra Packages for Enterprise (epel)
 
 ## Next Steps: Preparing for the Nauta Installation
 

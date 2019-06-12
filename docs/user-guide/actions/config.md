@@ -1,6 +1,6 @@
 # config Command
 
- Use the config command to adjust a packs' settings to resources available on a cluster. 
+ Use the `config` command to adjust a packs' settings to resources available on a cluster. 
 
 - [Synopsis](#synopsis)  
 - [Syntax](#syntax)
@@ -12,7 +12,7 @@
 
 ### Synopsis
 
-Allows a user to change the current system's settings concerning maximum and requested resources used by training jobs initiated by Nauta. The command takes CPU number and memory amount provided by a user and calculates new values preserving the same coefficient between available resources and resources defined in every template, as it was before execution of this command.     
+Allows you to change the current system's settings concerning maximum and requested resources used by training jobs initiated by Nauta. The command takes CPU number and memory amount provided (by you) and calculates new values preserving the same coefficient between available resources and resources defined in every template, as it was before execution of this command.     
 
 ### Syntax
 
@@ -43,7 +43,6 @@ In case of any problems, a message describing the cause/causes of the issue disp
 
 Calculates resources' settings for all packs installed together with `nctl` application. It assumes, that 
 the maximal available number of CPU on a node is 10 and that this node provides 1Gb of RAM. Furthermore, limited and requested resources are calculated using those maximal values.
-
 
 ----------------------
 

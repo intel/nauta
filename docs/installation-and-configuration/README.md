@@ -1,24 +1,24 @@
 # Nauta Installation, Configuration, and Administration Guide
 
-This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing,   configuring, updgrading, and removing Nauta. This guide also provides an overview of Nauta requirements, configuration options, and administration tasks.
+This Nauta Installation, Configuration, and Administration guide provides step-by-step instructions for installing,   configuring and upgrading. This guide also provides an overview of Nauta requirements, configuration options, and administration tasks.
  
 This section discusses the following main topics: 
 
 - [Nauta Hardware Requirement Overview](#nauta-hardware-requirement-overview): Provides an overview of Nauta Hardware requirements.   
-- [Nauta Installation Procedures](#nauta-installation-procedures): Provides the Installation Instructions. 
+- [Nauta Installation Procedures](#nauta-installation-procedures): Provides the Installation Instructions.  
 - [Document Flow](#document-flow): This is your gateway to the Nauta installation documentation instructions; start here. 
 
 **Note:** For instructions on configuring the Nauta client, refer to the [Nauta User Guide](../user-guide/).
 
-Nauta is a software suite that provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments can be viewed and monitored using a command line interface (CLI), Web UI and/or TensorBoard*. You can use existing data sets, your own data, or downloaded data from online sources, as well as create public or private folders to make collaboration among teams easier. 
+Nauta is a software suite that provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments can be viewed and monitored using a Command Line Interface (CLI), Web UI and/or TensorBoard. You can use existing data sets, your own data, or downloaded data from online sources, as well as create public or private folders to make collaboration among teams easier. 
 
-Nauta runs on Kubernetes* and Docker* for scalability and ease of management. Nauta uses customizable templates to remove the complexities of creating and running single and multi-node deep learning training experiments without all the system's complexity and scripting needed with standard container environments.
+Nauta runs on Kubernetes and Docker for scalability and ease of management. Nauta uses customizable templates to remove the complexities of creating and running single and multi-node deep learning training experiments without all the system's complexity and scripting needed with standard container environments.
 
 # Nauta Hardware Requirement Overview
 
 Nauta is intended to run on a multi-server Kubernetes cluster. To run Nauta, you will need at least one Master node, and one or more Worker nodes. Nauta is a platform for performing Deep Learning training, and requires robust hardware specifications to run with optimal performance. 
 
-# Nauta Installation Overview
+# Nauta Installation Procedures
 
 To install Nauta in a 'bare metal' (for example, non-cloud) server environment, you will need to:
 
@@ -40,7 +40,7 @@ To install Nauta in a 'bare metal' (for example, non-cloud) server environment, 
 
 This process does the following:
 
-- Creates a Kubernetes cluster, all the Docker files you need to run Tensorflow*, Jupyter*, Tensorboard, and Horovod*.
+- Creates a Kubernetes cluster, all the Docker files you need to run TensorFlow, Jupyter, TensorBoard, and Horovod.
 
 - Installs the Nauta server-side application on your new Kubernetes cluster, and starts the system running.
 
@@ -48,7 +48,7 @@ Completing all of the above takes some time. We are working on streamlining the 
 
 # Document Flow
 
-This guide consists of the following main topics, in order:
+This guide consists of the following main topics, in order. Start here to move through the correct sequence of events.
 
 * [System Software Components Requisites](System_Software_Components_Requisites/SSCR.md)
 * [Installer System Requirements](Installer_System_Requirements/ISR.md)
@@ -59,3 +59,9 @@ This guide consists of the following main topics, in order:
 * [Installating and Starting Nauta](Installation_Process/IP.md)
 * [User Management](User_Management/UM.md)
 * [Troubleshooting](Troubleshooting/T.md)
+
+# Terms and Conditions
+
+To read Intel Terms and Conditions check [this](TaC.md) document.
+
+This installation guide is subject to [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).

@@ -3,14 +3,14 @@
 This section discusses the following main topics: 
 
  - [Viewing All Experiments Using the CLI](#viewing-all-experiments-using-the-cli)
- - [Viewing a Single Experiment's Details](#viewing-a-single-experiments-details)
- - [Useful References](#useful-references)  
+ - [Viewing a Single Experiment's Details](#viewing-a-single-experiment-details)
+ - [Useful References](#useful-references)
  
 ## Viewing All Experiments Using the CLI
 
 To list all experiments you have submitted, run the next command. The possible returned statuses are:
 
-* QUEUED - Experiment has been scheduled, but is not yet running. 
+* QUEUED - Experiment has been scheduled, but is not yet running
 * RUNNING - Experiment is running
 * COMPLETE - Experiment completed successfully
 * CANCELLED - Experiment has been cancelled by a user

@@ -4,7 +4,7 @@ This section discusses the following main topics:
 
 - [User Account Creation](#user-account-creation)  
 - [Delete a User Account](#delete-a-user-account)
-- [Delete a User Account](#delete-a-user-account)
+- [Purging](#purging)
 - [Launching the Web UI](#launching-the-web-ui)
 
 ## User Account Creation
@@ -21,9 +21,11 @@ Before creating user accounts, you need to complete the following steps:
 
 - An Administrator will need the `nauta-admin.config` file on their machine (the machine where nctl resides) and it needs to be set in the `kube.config' file.
 
-1. Set up `KUBECONFIG` variable to point to the full path of `nauta-admin.config` to where you copied the file in step 2. Follow the instructions below (_Creating a User_) to create users.
+3. Set up `KUBECONFIG` variable to point to the full path of `nauta-admin.config` to where you copied the file in step 2. 
 
-`export KUBECONFIG=<PATH>/nauta-admin.config`
+4. Follow the instructions below (_Creating a User Account_) to create users.
+
+   `export KUBECONFIG=<PATH>/nauta-admin.config`
 
 ## Creating a User Account
 
@@ -31,11 +33,11 @@ The following is used to create a Nauta user, not an Administrator. Only the per
 
 ### Administrator Tasks
 
-1. The Nauta user create command sets up a namespace and associated roles for the named user on the cluster. It sets up home directories, named after the username, on the input and output network shares with file-system level access privileges. To create a user:
+1. The Nauta `user create` command sets up a namespace and associated roles for the named user on the cluster. It sets up home directories, named after the username, on the input and output network shares with file-system level access privileges. To create a user, execute the following command:
  
    `nctl user create <username>`
 
-2. This command also creates a configuration file named: '<username>.config' and places this file in the user's home directory. To verify that your new user has been created:
+2. This command also creates a configuration file named: '<username>.config' and places this file in the user's home directory. To verify that your new user has been created, execute the following command:
 
    `nctl user list`
 
@@ -54,11 +56,11 @@ The above command lists all users, including any new user just added.
 
 ### User Tasks
 
-4. As an Administrator, you need to provide '<username>.config' file to the Nauta user. The user _must save_ this file to an appropriate location of their choosing on the machine that is running Nauta; for example, their `home directory` using the following command:
+1. As an Administrator, you need to provide '<username>.config' file to the Nauta user. The user _must save_ this file to an appropriate location of their choosing on the machine that is running Nauta; for example, their `home directory` using the following command:
    
    `cp <username>.config ~/`
 
-5. Use the export command to set this variable for the user:
+2. Use the export command to set this variable for the user:
 
    `export KUBECONFIG=~/<username>.config`
 
@@ -71,7 +73,7 @@ Users with the same name _cannot_ be created directly after being removed. In ad
 
 Only an Administrator can delete user accounts and deleting a user removes that user's account from the Nauta software; therefore, that user _will not_ be able to log in to the system. This will halt and remove all experiments and pods; however, all artifacts related to that user's account, such as the users input and output folders and all data related to past experiments they have submitted remains. 
 
-To remove a user:
+To remove a user, execute the following command:
 
  `nctl user delete <user_name>`
 
@@ -83,7 +85,7 @@ The command may take up to 30 seconds to delete the user and you may receive the
 
 ## Purging
 
-To permanently remove (_Purge_) all artifacts associated with the user and all data related to past experiments submitted by that user (but excluding the contents of the user’s input and output folders): 
+To permanently remove (_Purge_) all artifacts associated with the user and all data related to past experiments submitted by that user (but, _**excluding**_ the contents of the user’s input and output folders): 
 
 `nctl user delete <user_name> -p/--purge`
 
@@ -103,11 +105,11 @@ Do the following to launch the Web UI:
 
 1. Use the following command:
 
-`nctl launch webui` 
+   `nctl launch webui` 
     
 2. Your default Web browser opens and displays the Web UI. For Administrators, the Web UI displays a list experiments and shows the following message:
 
-`No data for currently signed user. Click here to load all users data.`
+   `No data for currently signed user. Click here to load all users data.`
 
 The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates. Refer to the [Nauta User Guide](/docs/user-guide) for detailed Nauta Web UI information.  
 

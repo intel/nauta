@@ -12,9 +12,9 @@ This section discusses the following main topics:
 
 ## Inventory Configuration File Example
 
-Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. 
+Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. However, you can copy and modify the information to create your own Ansible inventory file.
 
-**Note:** Ansible uses the YAML* format. Refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML) for more information (scroll right to see full contents).
+**Note:** Ansible uses the YAML format. Refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML) for more information (scroll right to see full contents).
 
 ```yaml
 [master] 
@@ -35,7 +35,7 @@ The file contains two sections, master and worker:
 
 1. `[worker]` Contains descriptions of worker. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
 
-Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into it, and so on. 
+Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the Inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into it, and so on. 
 
 The format for each row is as follows: 
 
@@ -55,16 +55,16 @@ The table below lists all the variables understood by Nauta's inventory system. 
 
 Variable Name | Description | Req? | Type | Default | Used When | Value |
 --- | ---  | --- | --- | --- | --- | --- 
-ansible_ssh_user | The user name _must be_ the same for master and worker nodes. <br><br> **Note:** If an Administrator decides to choose something other than root for Ansible SSH user, the user _must be_ configured in sudoers file with NOPASSWD option. <br><br> Refer to [Ansible Inventory documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information. | Yes | string | none | always | username
+ansible_ssh_user | The user name _must be_ the same for master and worker nodes. <br><br> **Note:** If an Administrator decides to choose something other than root for Ansible SSH user, the user _must be_ configured in sudoers file with NOPASSWD option. <br><br> Refer to the official [Ansible Inventory documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information. | Yes | string | none | always | username
 ansible_ssh_pass | The SSH password to use. | Yes | string | none | always | Password
 ansible_ssh_host | The name (DNS name) or IP Address of the host to connect to. | Yes | IPaddr | none | always | IP Address
 ansible_ssh_port | The SSH port number, if not defined 22 is used. | No | int | 22 | not using 22 | Port Address
 ansible_ssh_private_key_file | This is a Private Key file used by SSH. | No | string | none | using a keyfile | filename
-internal_interface | This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always for both for master and worker nodes |  Interface name
+internal_interface | This is used for internal communication between Kubernetes processes and pods. All interfaces (both external and internal) are Ethernet interfaces. | Yes | string | none |  always used for both for master and worker nodes |  Interface name
 local_data_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_data_path | This is used as the mountpoint for `local_data_device` | No | string | none | used with master nodes |  Absolute path where data is located in file system
-external_interface | This is used for external network communication. | Yes | string | none | always for both for master and worker nodes | Interface name
+external_interface | This is used for external network communication. | Yes | string | none | always used for both for master and worker nodes | Interface name
 
 ## Next Steps: Configuration Tasks
 

@@ -161,7 +161,7 @@ The description of a problem; if, any problem occurs. Otherwise, the displays in
 
 ### Example
 
-`$ nctl experiment cancel t20180423121021851`
+`nctl experiment cancel t20180423121021851`
 
 ### Outcome
 
@@ -286,7 +286,7 @@ Launches in a default browser a Jupyter notebook with `training_script.py` scrip
 
 ### Synopsis
 
-The template_list subcommand returns a list of templates installed on a client machine. A template contains all details needed to deploy a training job on a cluster correctly.
+The `template_list` subcommand returns a list of templates installed on a client machine. A template contains all details needed to deploy a training job on a cluster correctly.
 
 ### Syntax
 

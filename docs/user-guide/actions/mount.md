@@ -6,6 +6,7 @@ This section discusses the following main topics:
 
  - [mount Command](#mount-command)
  - [list Subcommand](#list-subcommand-synopsis)  
+ - [Additional Remarks](#additional-remarks)
 
 ## mount Command 
 
@@ -39,7 +40,7 @@ Displays a list of Nauta related folders mounted on a user's machine. If run usi
 
 List of mounted folders. Each row contains additional information (for example: remote and local location) concerning those mounts. Set of data displayed by this command depends on operating system.
 
-### Additional Remarks
+## Additional Remarks
 
 This command displays only those mounts that exposing Nauta shares. Other mounted folders _are not_ taken into account.
 

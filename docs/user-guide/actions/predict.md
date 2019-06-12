@@ -1,6 +1,6 @@
 # predict Command
 
-Use this command to start, stop, and manage prediction jobs. This section discusses the following main topics:
+Use the `predict` command to start, stop, and manage prediction jobs. This section discusses the following main topics:
 
  - [batch Subcommand](#batch-subcommand)
  - [cancel Subcommand](#cancel-subcommand)
@@ -98,7 +98,7 @@ Prediction instance URL and authorization token, as well as information about th
 ### Example
 
 ```
-    $ nctl predict l -n test -m /mnt/input/home/experiment1
+    nctl predict l -n test -m /mnt/input/home/experiment1
     
     | Prediction instance   | Model Location               | Status   |
     |-----------------------+------------------------------+----------|

@@ -8,7 +8,7 @@ To access Kubernetes:
 
 1. Click the **Hamburger Menu** ![Image](images/hamburger_menu.png) at the far left of the UI to open a left frame.
 
-2. Click **Resources Dashboard** to open the Kubernetes resources dashboard in a new browser window/tab.
+2. Click the **Resources Dashboard** to open the Kubernetes resources dashboard in a new browser window/tab.
 
 An example Kubernetes Dashboard is shown below.
 

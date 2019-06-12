@@ -247,10 +247,10 @@ As shown in the example, an example experiment list is shown (scroll right to se
 
 To add metrics to an experiment, you need to edit the experiment script to use the `experiment_metrics.api` and then publish the metric that you wish to display.  The following steps should be performed in the script to publish a metric: 
 
-1. 1.	Add the metrics library API with the following entry in your experiment script:
+1. Add the metrics library API with the following entry in your experiment script:
    `from experiment_metrics.api import publish`
 
-2.	2.	To add a metric, publish `dict key` and string value.  Using the validation accuracy metric as an example, the metric is published in the `mnist_single_node.py` example
+2.	To add a metric, publish `dict key` and string value.  Using the validation accuracy metric as an example, the metric is published in the `mnist_single_node.py` example
 
    ```
   publish({"validation_accuracy": str(validation_accuracy_val)})
@@ -539,3 +539,4 @@ Enter this command, substituting your experiment name:
 
 * [README](../README.md)
 ----------------------
+

@@ -41,7 +41,7 @@ Proxy connection created.
 Press Ctrl-C key to close a port forwarding process...
 ```
 
-This command will launch a local browser. If the command was run with the --no-launch option, then you need to copy the returned URL into a web browser. TensorBoard is launched with graphs showing the experiment’s results (as shown above).
+This command will launch a local browser. If the command was run with the `--no-launch` option, then you need to copy the returned URL into a web browser. TensorBoard is launched with graphs showing the experiment’s results (as shown above).
 
 You can also launch TensorBoard and with the `nctl experiment view` command:
 

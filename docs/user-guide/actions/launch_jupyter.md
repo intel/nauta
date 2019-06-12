@@ -65,13 +65,13 @@ In Nauta, running a Jupyter notebook is done through an interact session. The se
  
 ### Steps to Manage and Cancel Interacts
 
-1. Too see all running jobs, execute: `nctl experiment list --status RUNNING`
+1. To see all running jobs, execute: `nctl experiment list --status RUNNING`
 
 2. To cancel a running interact, execute: `nctl experiment cancel [options] [EXPERIMENT-NAME]`
 
    * EXPERIMENT-NAME is the interact name.
    
-   * The --purge option should be used if the user wishes to remove the session from the experiment list. For _purge_ information, refer to: [Getting Started, Remove Experiment Section](../actions/getting_started.md). 
+   * Use the `--purge` option if you need to remove session from experiment list. For _purge_ information, refer to: [Getting Started, Remove Experiment Section](../actions/getting_started.md). 
    
 To verify that cancellation has completed, execute: `nctl experiment list --status RUNNING` 
  

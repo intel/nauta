@@ -16,7 +16,7 @@ This section discusses the following main topics:
 
 A basic task flow is used in this example.
 
-1. The user has saved a trained TensorFlow* Serving compatible model.
+1. The user has saved a trained TensorFlow Serving compatible model.
 
 1. The user will be sending data for inference in JSON format, or in binary format using gRPC API.
 
@@ -41,7 +41,7 @@ To use that model for streaming inference, perform following steps:
 3. Run the following command: 
 
     ```
-    $ nctl predict launch --local-model-location <directory where you have cloned Tensorflow
+    nctl predict launch --local-model-location <directory where you have cloned Tensorflow
     Serving>/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu 
     ```
 4. Alternatively to step 3, you may want to save a trained model on input shared folder, so it can be reused by other experiments/prediction instances. To do this, run these commands:
@@ -60,7 +60,7 @@ To use that model for streaming inference, perform following steps:
    d. Run the following command:
    
     ```
-    $ nctl predict launch --model-location /mnt/input/saved_model_half_plus_two_cpu
+    nctl predict launch --model-location /mnt/input/saved_model_half_plus_two_cpu
     ```
 
 **Note:**`--model-name` can be passed optionally to `nctl predict launch` command. If not provided, it assumes that model name is equal to the last directory in model location:
@@ -79,10 +79,12 @@ The `nctl predict stream` command allows performing inference on input data stor
 {"instances": [1.0, 2.0, 5.0]}
 ```
 
-The model named `saved_model_half_plus_two_cpu` is a quite simple model: for given `x` input value it predicts result of `x/2 +2` operations. Having passed the following inputs to the model: `1.0`, `2.0`, and `5.0`, and so expected predictions results are `2.5`, `3.0`, and `4.5`. In order to use that data for prediction, check the name of running prediction instance with `saved_model_half_plus_two_cpu` model (the name will be displayed after `nctl predict launch` command executes; you can also use `nctl predict list` command for listing running prediction instances). Then run following command:
+The model named `saved_model_half_plus_two_cpu` is a quite simple model: for given `x` input value it predicts result of `x/2 +2` operations. Having passed the following inputs to the model: `1.0`, `2.0`, and `5.0`, and so expected predictions results are `2.5`, `3.0`, and `4.5`. 
+
+To use that data for prediction, check the name of running prediction instance with `saved_model_half_plus_two_cpu` model (the name will be displayed after `nctl predict launch` command executes; you can also use `nctl predict list` command for listing running prediction instances). Then run following command:
 
 ```
-$ nctl predict stream --name <prediction instance name> --data inference-data.json
+nctl predict stream --name <prediction instance name> --data inference-data.json
 ```
 The following results will be produced:
 
