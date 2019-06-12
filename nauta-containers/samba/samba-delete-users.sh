@@ -51,11 +51,11 @@ function delete_user() {
     fi
 }
 
-USERS_TO_BE_DELETED=`kubectl get cm nauta-user-del -n nauta -o=json | jq -r '.data'`
+USERS_TO_BE_DELETED=`kubectl get cm nauta-user-del -n nauta -o=json | python -c "import sys, json; k = json.load(sys.stdin); k = json.dumps(k['data'].keys()) if 'data' in k else ''; print(k)"`
 
 if [[ $USERS_TO_BE_DELETED != 'null' ]];
 then
-    for USER in `echo $USERS_TO_BE_DELETED | jq 'keys[]'`
+    for USER in `echo $USERS_TO_BE_DELETED`
     do
         echo "Deleting $USER"
         delete_user "$USER" || echo " An error occured during removal!"

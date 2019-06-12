@@ -19,6 +19,6 @@ RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm
 COPY --from=k8s /build-output/kubernetes/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
-RUN yum update -y && yum install -y curl jq procps git tar mime-support
+RUN yum update -y && yum install -y curl procps git tar mime-support
 
 COPY --from=argo-build /build/work/src/github.com/argoproj/argo/dist/argoexec /usr/local/bin/

@@ -28,17 +28,15 @@ function create_user() {
     /bin/samba-create-user.sh $1 && /bin/samba-create-pv.sh $1 || echo "Unable to create user $1"
 }
 
-ALL_USERS_JSON=`kubectl get u -o=json`
-ALL_USERS_COUNT=`echo "${ALL_USERS_JSON}" | jq '.items | length'`
+ALL_USERS_COUNT=`kubectl get u -o=jsonpath={.items..metadata.name} | wc -w`
+ALL_USERS=`kubectl get u -o=jsonpath={.items..metadata.name}`
 
 date
 echo "Current user count: $ALL_USERS_COUNT"
 
-for (( n = 0 ; n < $ALL_USERS_COUNT ; n++ )) ; do
-    CURRENT_USER=`echo "$ALL_USERS_JSON" | jq ".items[$n]"`
-    CURRENT_USER_NAME=`echo "$CURRENT_USER" | jq -r '.metadata.name'`
-    CURRENT_USER_UID=`echo "$CURRENT_USER" | jq -r '.spec.uid'`
-    CURRENT_USER_STATE=`echo "$CURRENT_USER" | jq -r '.spec.state'`
+for CURRENT_USER_NAME in $ALL_USERS ; do
+    CURRENT_USER_UID=`kubectl get u $CURRENT_USER_NAME -o=jsonpath={.spec..uid}`
+    CURRENT_USER_STATE=`kubectl get u $CURRENT_USER_NAME -o=jsonpath={.spec..state}`
     echo "Found user: $CURRENT_USER_NAME, uid: $CURRENT_USER_UID, state: $CURRENT_USER_STATE"
 
     if [[ "x$1" == "x--init" ]] ; then
