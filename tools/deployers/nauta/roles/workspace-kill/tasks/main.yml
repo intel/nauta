@@ -1,0 +1,5 @@
+---
+
+- name: "{{ message_label }} Kill workspace pods inside cluster"
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta delete deployment nauta-workspace-pod"
