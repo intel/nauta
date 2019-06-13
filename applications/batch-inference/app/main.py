@@ -157,7 +157,7 @@ def make_prediction(input: bytes, stub: prediction_service_pb2_grpc.PredictionSe
 
     # actual call without retry:
     # result = stub.Predict(request, timeout=30.0)  # timeout 30 seconds
-    result = retry_call(stub.Predict, fargs=[request], fkwargs={"timeout": 30.0}, tries=5)
+    result = retry_call(stub.Predict, fargs=[request], fkwargs={"timeout": 30.0}, tries=5, delay=30)
 
     result_pb_serialized: bytes = result.SerializeToString()
 
