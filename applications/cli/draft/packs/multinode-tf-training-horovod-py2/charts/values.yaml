@@ -74,10 +74,10 @@ podCount: 1
 resources:
   requests:
     cpu: 38 # Minimal number of logical processors requested
-    memory: 189.4Gi
+    memory: 187208842179
   limits:
     cpu: 38 # Maximal number of logical processors requested
-    memory: 189.4Gi
+    memory: 187208842179
 
 cpu: null
 memory: null
