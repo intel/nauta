@@ -93,6 +93,12 @@ def convert_to_session(session):
         session = session._sess
     return session
 
+def convert_to_session(session):
+    while type(session).__name__ != 'Session':
+        session = session._sess
+    return session
+
+
 def main(_):
     cluster, job_name, task_index = parse_tf_config()
 
@@ -167,9 +173,8 @@ def main(_):
                 print("Done step %d" % step)
                 print("Accuracy {}".format(accuracy_val))
 
-            # Save model by chief at the end.
-
         session = convert_to_session(mon_sess)
+        # Save model by chief at the end.
         if is_chief:
             saver.save(session, os.path.join(EXPERIMENT_OUTPUT_PATH, "checkpoints", "model"), global_step=step)
 
