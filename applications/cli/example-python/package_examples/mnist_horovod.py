@@ -83,7 +83,6 @@ def main(_):
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='/tensorflow/mnist/',
         help='Directory which contains dataset')
     parser.add_argument(
         '--steps',
@@ -98,18 +97,16 @@ def main(_):
         if not os.path.isdir(FLAGS.data_dir):
             print("Provided data_dir path: {} does not exist!".format(FLAGS.data_dir))
             sys.exit(1)
-        else:
-            dir_content = os.listdir(FLAGS.data_dir)
-            for file in FILENAMES:
-                if file not in dir_content:
-                    print("Directory provided by user does not contains proper dataset")
-                    FLAGS.data_dir = os.path.join(FLAGS.data_dir, "input_data_{}".format(hvd.rank()))
-                    break
-            # Read/download local dataset. Different copy for each process.
-            mnist = learn.datasets.mnist.read_data_sets(FLAGS.data_dir)
+
+        for filename in FILENAMES:
+            if not os.path.isfile(os.path.join(FLAGS.data_dir, filename)):
+                print("Required file: {} does not exist!".format(filename))
+                sys.exit(1)
+        data_dir = FLAGS.data_dir
     else:
-        # Read/download local dataset. Different copy for each process.
-        mnist = learn.datasets.mnist.read_data_sets()
+        data_dir = os.path.join('/tensorflow/test', 'input_data_{}'.format(hvd.rank()))
+
+    mnist = learn.datasets.mnist.read_data_sets(data_dir)
 
     # Name images placeholder to be able to retrieve it from saved meta graph.
     images_placeholder = tf.placeholder(tf.float32, [None, 784], name=INPUT_NAME)
