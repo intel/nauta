@@ -1,6 +1,15 @@
-# Launching Jupyter* Interactive Notebook
+# Launching Jupyter Interactive Notebook
 
-You can use Jupyter* Notebook to run and display the results of your experiments. This release of Nauta supports Python 3 and 2.7 for scripts. 
+You can use Jupyter Notebook to run and display the results of your experiments. This section discusses the following main topics:
+
+ - [Launching Jupyter Interactive Notebook](#launching-jupyter-interactive-notebook)
+ - [Storage and Session Data](#storage-and-session-data)  
+ - [Tunneling](#tunneling)
+ - [Canceling a Jupyter Notebook](#canceling-a-jupyter-notebook)
+
+## Launching Jupyter Interactive Notebook
+
+This release of Nauta supports Python 3 and 2.7 for scripts. 
 
 **Syntax:** `nctl experiment interact [options]`
 
@@ -8,7 +17,7 @@ Options, include:
 
 * `name` - The name of this Jupyter Notebook session. 
 
-* `filename` - The file with a notebook that should be opened in Jupyter notebook.
+* `filename` - File with a notebook that should be opened in Jupyter notebook.
 
 For detailed command syntax information, refer to: [experiment interact Subcommand](experiment.md#interact-Subcommand). 
 
@@ -28,8 +37,18 @@ If you are using CLI through remote access, you will need to setup a X server fo
 
 The following result displays.
 
- ![](images/submit_interactive_exp.png)
-  
+```
+Submitting experiments.
+| Experiment                  | Parameters | State  | Message   |
+|-----------------------------+------------+--------+-----------|
+| jup-936-18-09-17-20-14-58   |            | QUEUED |           | 
+
+Browser will start in a few seconds. Please wait...
+Go to http://locahost:28113
+Proxy connection created.
+Press Ctrl-C key to close a port forwarding process...
+```
+ 
 Jupyter Notebook will launch in your default web browser. The following displays. 
 
  ![](images/jupyter_dashbd.png)
@@ -43,14 +62,22 @@ An example active Jupyter Notebook, shows a simple experiment plot.
 
 In Nauta, running a Jupyter notebook is done through an interact session. The session will remain open such that the Jupyter notebook that is running will continue when the browser is closed. Therefore, a user _must_ manually cancel the interact session, or it will continue to allocate resources.
  
-### Steps to Manage and Cancel Interacts:
+### Steps to Manage and Cancel Interacts
 
-1. See all running jobs, execute: nctl experiment list --status RUNNING
+1. To see all running jobs, execute: `nctl experiment list --status RUNNING`
 
-2. To cancel a running interact, execute: nctl experiment cancel [options] [EXPERIMENT_NAME]
+2. To cancel a running interact, execute: `nctl experiment cancel [options] [EXPERIMENT-NAME]`
 
-   * EXPERIMENT_NAME is the interact name
-   * The --purge option should be used if user wishes to remove session from experiment list
+   * EXPERIMENT-NAME is the interact name.
    
-To verify that cancellation has completed, execute: nctl experiment list --status RUNNING 
- 
+   * Use the `--purge` option if you need to remove session from experiment list. For _purge_ information, refer to: [Getting Started, Remove Experiment Section](../actions/getting_started.md).  
+   
+To verify that cancellation has completed, execute: `nctl experiment list --status RUNNING` 
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------

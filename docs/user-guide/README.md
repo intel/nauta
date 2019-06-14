@@ -10,10 +10,10 @@ Templates are available (and customizable) on the platform to take the complexit
 
 The Nauta client software has been validated on the following operating systems and versions:
 
-* Ubuntu* (16.04, 18.04)
-* RedHat* 7.5
-* macOS* High Sierra (10.13)
-* Windows* 10
+* Ubuntu (16.04, 18.04)
+* Red Hat 7.5
+* macOS High Sierra (10.13)
+* Windows 10
 
 # Nauta User Guide
 
@@ -45,10 +45,12 @@ This guide describes how to use Nauta, and the following topics:
 * [Installing Additional Libraries and Dependencies](advanced/customlibs.md)
 * [Controlling Packs Parameters](advanced/packs.md)
 
-- - - -
+----------------------
 
-#### Terms and Conditions
+# Terms and Conditions
+
 To read Intel Terms and Conditions check [this](TaC.md) document.
 
 This user guide is subject to [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).
+
 

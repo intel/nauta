@@ -1,16 +1,26 @@
 # Controlling Packs Parameters
 
-### Pack Definition 
+This section discusses the following main topics: 
 
-The packs are located in the _nctl_config_ folder. Navigate to _.draft/packs/https-github.com-Azure-draft/packs_ folder to list existing packs. The default pack used by _nctl_ client is _tf-training-tfjob_. The pack consists of:
+ - [Pack Definition](#pack-definition)
+ - [Modifying Values](#modifying-values)  
+ - [Experiment Resources](#experiment-resources)
 
-* docker image specification _Dockerfile_ 
-* helm deployment _charts_ folder
+## Pack Definition 
 
-All the pack parameters that can be controlled by _nctl_ are defined in _charts/values.yml_ file.
+The packs are located in the `nctl_config` folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs. 
 
-Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
+The default pack used by `nctl_ client is _tf-training-tfjob`. The pack consists of:
 
+* Docker image specification _Dockerfile_ 
+
+* Helm deployment _charts_ folder
+
+All the pack parameters that can be controlled by _nctl_ are defined in the `charts/values.yml` file.
+
+The example `values.yaml` file (shown below) is taken from `multinode-tf-training-tfjob` pack:
+
+```
 	# Default values for charts.
 	# This is a YAML-formatted file.
 	# Declare variables to be passed into your templates.
@@ -61,37 +71,40 @@ Example values.yaml file taken from _multinode-tf-training-tfjob_ pack:
 	sidecar_cpu: null
 	sidecar_memory: null
 	
-	
 	experimentName: {{ NAUTA.ExperimentName }} 
 	registryPort: {{ NAUTA.RegistryPort }}
 	
 	workersCount: 3
 	psSidecarLoggingLevel: "WARNING"
 	pServersCount: 1
+```
 
-### Modifying Values
+## Modifying Values
 
-The values can be modified directly by editing the _values.yml_ file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
+The values can be modified directly by editing the `values.yml` file or by providing _-p_, _--pack_param_ parameter to the selected _nctl_ commands:
 
  * _nctl experiment submit_
+ 
  * _nctl experiment interact_
  
 The _-p_ parameter can be provided multiple times.
 Format specification:
 
  * 'key value' or 'key.subkey.subkey2 value'
+ 
  * for lists: 'key "['val1', 'val2']"'
+ 
  * for maps: 'key "{'a': 'b'}"'
  
-#### Example
+### Example
 
-    nctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
+`nctl experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1`
 
-### Experiment Resources
+## Experiment Resources
 
-_nctl_ is using by default following resource limits and requests for each built-in template:
+_nctl_, by default uses the following resource limits and requests for each built-in template:
 
-| Template      | CPU   request | CPU limit | Memory request | Memory limit | Physical CPU cores request
+| Template      | CPU   Request | CPU Limit | Memory Request | Memory Limit | Physical CPU Cores Request
 | --- | --- | --- | --- | --- | --- |
 | jupyter       | 38 | 38 | 120Gi | 120Gi | - |
 | jupyter-py2   | 38 | 38 | 120Gi | 120Gi | - |
@@ -104,9 +117,10 @@ _nctl_ is using by default following resource limits and requests for each built
 | tf-training-tfjob | 38 | 38 | 120Gi | 120Gi | - |
 | tf-training-tfjob-py2 | 38 | 38 | 120Gi | 120Gi | - |
 
-It is recommended to keep requests and limits on the same values. Also requested limits never should be bigger than resources available on node.
+It is recommended to keep requests and limits on the same values. In addition, the requested limits never should be larger than resources available on node.
 
 **Note:** You can use `cpu` and `memory` pack parameters when you want to change both requests and limits, for example, by using the following command:
+
 ```
 nctl experiment submit multinode.py -p cpu 2 -p memory 4Gi
 ```
@@ -126,3 +140,13 @@ To change these defaults, following parameters should be adjusted (using methods
 | tf-inference-stream | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+
+----------------------
+
+

@@ -11,7 +11,7 @@ Returns the version of Nauta software.
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
-|`-h, --help` | No | Show help message and exit. |
+|`-h, --help` | No | Displays help messaging information. |
  
 
 ## Returns
@@ -20,5 +20,17 @@ The version command returns the currently installed `nctl` application version o
 
 ## Example
 
-`$ nctl version`
+```
+| Component        | Version                  |
+|------------------+--------------------------|
+| nctl application | 1.0.0-ent-20190403020148 |
+| nauta platform   | 1.0.0-ent-20190403020148 |
 
+```
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------

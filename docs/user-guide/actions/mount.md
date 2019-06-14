@@ -2,28 +2,32 @@
 
 The `nctl mount` command displays another command that can be used to either mount or unmount a client's folders on/from a users local machine. See also, [list Subcommand](#list-subcommand).
 
-## Synopsis
+This section discusses the following main topics: 
+
+ - [mount Command Synopsis](#mount-command)
+ - [list Subcommand Synopsis](#list-subcommand-synopsis)  
+ - [Additional Remarks](#additional-remarks)
+
+## mount Command 
 
 The mount command by itself displays another command that can be used to mount/unmount a client's folders on or from a users local machine. 
 
-## Syntax
+### Syntax
 
 `nctl mount [options]`
 
-## Options
+### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
-|`-h, --help` | No | Show help message and exit. |
+|`-h, --help` | No | Displays help messaging information. |
 
-## Returns 
+### Returns 
 
 This command returns another command that can be used to mount a client's folders on a users local machine. It also shows what command should be used to unmount client's folder after it is no longer needed. 
 
-## list Subcommand
-
-### Synopsis
+## list Subcommand Synopsis
 
 Displays a list of Nauta related folders mounted on a user's machine. If run using admin credentials, it displays mounts of all users.
 
@@ -37,13 +41,15 @@ List of mounted folders. Each row contains additional information (for example, 
 
 **Note:** The data sets displayed by this command depends on operating system used.
 
-### Additional Remarks
+## Additional Remarks
 
 This command displays only those mounts that expose Nauta shares. Other mounted folders _are not_ taken into account.
 
 
+----------------------
 
+## Return to Start of Document
 
+* [README](../README.md)
 
-
-
+----------------------
