@@ -1,5 +1,5 @@
-cpu_number: 80
-memory_amount: 266Gi
+cpu_number: 40
+memory_amount: 197061939136
 cpu_system_required_min: 0.5
 cpu_system_required_percent: 5
 memory_system_required_min: 1Gi
