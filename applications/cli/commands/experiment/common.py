@@ -389,8 +389,6 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
                 # Try to get workflow logs
                 _debug_workflow_logs(workflow=image_build_workflow, namespace=namespace)
 
-                if image_build_workflow.name:
-                    error_msg += f' Run nctl workflow logs {image_build_workflow.name} command for more details.'
                 try:
                     experiment.state = experiments_model.ExperimentStatus.FAILED
                     experiment.update()

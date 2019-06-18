@@ -51,7 +51,7 @@ def test_set_up_proxy_open_failure(mocker):
         with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
             pass
 
-    assert spf_mock.call_count == 1
+    assert spf_mock.call_count == 5
     assert spc_mock.call_count == 0
     # noinspection PyProtectedMember,PyUnresolvedReferences
     assert K8sProxy._wait_for_connection_readiness.call_count == 0
@@ -96,7 +96,7 @@ def test_set_up_proxy_open_readiness_failure(mocker):
             pass
 
     # noinspection PyUnresolvedReferences
-    assert subprocess.Popen.kill.call_count == 1 or subprocess.Popen.terminate.call_count == 1
+    assert subprocess.Popen.kill.call_count == 1 or subprocess.Popen.terminate.call_count == 5
 
 
 def test_wait_for_connection_readiness(mocker):

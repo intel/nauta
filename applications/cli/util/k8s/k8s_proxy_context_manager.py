@@ -22,6 +22,7 @@ import time
 
 import psutil
 from urllib3.exceptions import NewConnectionError
+from retry import retry
 
 from util.k8s import kubectl
 from util.app_names import NAUTAAppNames
@@ -49,6 +50,22 @@ class K8sProxy:
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
+        self._setup_tunnel()
+        return self
+
+    def __exit__(self, *args):
+        logger.debug("k8s_proxy - exiting")
+        try:
+            self._close_tunnel()
+        except psutil.NoSuchProcess:
+            logger.debug(Texts.TUNNEL_ALREADY_CLOSED)
+        except Exception as exe:
+            error_message = Texts.PROXY_EXIT_ERROR_MSG
+            logger.exception(error_message)
+            raise K8sProxyCloseError(error_message) from exe
+
+    @retry(tries=5, delay=1)
+    def _setup_tunnel(self):
         try:
             self.process, self.tunnel_port, self.container_port \
                 = kubectl.start_port_forwarding(k8s_app_name=self.nauta_app_name,
@@ -69,28 +86,15 @@ class K8sProxy:
             logger.exception(error_message)
             raise K8sProxyOpenError(error_message) from exe
 
-        return self
-
-    def __exit__(self, *args):
-        logger.debug("k8s_proxy - exiting")
-        try:
-            self._close_tunnel()
-        except psutil.NoSuchProcess:
-            logger.debug(Texts.TUNNEL_ALREADY_CLOSED)
-        except Exception as exe:
-            error_message = Texts.PROXY_EXIT_ERROR_MSG
-            logger.exception(error_message)
-            raise K8sProxyCloseError(error_message) from exe
-
     @staticmethod
     def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
-        for retry in range(tries):
+        for retry_i in range(tries):
             try:
                 requests.get(f'http://{address}:{port}')
                 return
             except (ConnectionError, NewConnectionError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
-                logger.exception(error_msg) if retry == tries-1 else logger.debug(error_msg)  # type: ignore
+                logger.exception(error_msg) if retry_i == tries-1 else logger.debug(error_msg)  # type: ignore
                 time.sleep(1)
         raise TunnelSetupError(Texts.TUNNEL_NOT_READY_ERROR_MSG.format(address=address, port=port))
 
@@ -113,13 +117,13 @@ class TcpK8sProxy(K8sProxy):
     @staticmethod
     def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
         sock = None
-        for retry in range(tries):
+        for retry_i in range(tries):
             try:
                 sock = socket.create_connection((address, port))
                 break
             except (ConnectionError, ConnectionRefusedError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
-                logger.exception(error_msg) if retry == tries - 1 else logger.debug(error_msg)  # type: ignore
+                logger.exception(error_msg) if retry_i == tries - 1 else logger.debug(error_msg)  # type: ignore
                 time.sleep(1)
             finally:
                 if sock:
