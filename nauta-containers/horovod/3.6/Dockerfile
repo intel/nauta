@@ -17,10 +17,11 @@ RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-r
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python
-RUN yum clean all && \
-    yum update -y && \
+RUN yum update -y && \
     yum install -y gcc-c++ gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make \
-                   git wget hdf5-devel
+                   git wget hdf5-devel && \
+    yum clean all
+
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 
@@ -62,6 +63,7 @@ RUN source /opt/rh/rh-python36/enable && ${PIP} install -r /horovod/requirements
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN yum install -y openssh-clients openssh-server && \
+    yum clean all && \
     sshd-keygen && \
     mkdir -p /var/run/sshd /app /root/.ssh
 

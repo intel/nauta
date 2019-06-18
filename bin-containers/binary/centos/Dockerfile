@@ -3,7 +3,7 @@ ARG BASE_IMAGE
 FROM ${PIP_IMAGE} as pip
 FROM ${BASE_IMAGE}
 
-RUN yum update -y && yum install -y devtoolset-8-gcc* libffi-devel openssl-devel
+RUN yum update -y && yum install -y devtoolset-8-gcc* libffi-devel openssl-devel && yum clean all
 
 COPY --from=pip /out/requirements.txt /requirements.txt
 

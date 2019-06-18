@@ -34,9 +34,9 @@ RUN mkdir -p ${GOPATH}/src/code.gitea.io/gitea/conf && \
     cp -r ${GOPATH}/src/code.gitea.io/gitea/options/* ${GOPATH}/src/code.gitea.io/gitea/conf
 RUN cp -r ${GOPATH}/src/code.gitea.io/gitea/docker/* /
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y util-linux su-exec openssh-server
+RUN yum update -y && \
+    yum install -y util-linux su-exec openssh-server && \
+    yum clean all
 
 RUN mkdir -p /app/gitea && cp ${GOPATH}/src/code.gitea.io/gitea/gitea /app/gitea/gitea
 

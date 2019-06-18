@@ -3,9 +3,9 @@ FROM ${BASE_IMAGE}
 
 COPY kubernetes.tar.gz ./
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y which
+RUN yum update -y && \
+    yum install -y which && \
+    yum clean all
 
 RUN mkdir ${GOPATH}/src/k8s.io/kubernetes -p && \
     tar -zxf kubernetes.tar.gz -C ${GOPATH}/src/k8s.io/kubernetes --strip-components=1 && \

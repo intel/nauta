@@ -373,17 +373,6 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/dumb-init/dumb-init-1.2.1.tar.gz
         dest: dumb-init-1.2.1.tar.gz
         checksum: 56858088d9d6c911c227d196fcbfca06aff31fbe83e1519f9cabe5cf6f11b242
-  shared/build/draft:
-    version: "v0.13.0"
-    required:
-      BASE_IMAGE: "shared/centos/build-go"
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/draft"
-    push: False
-    fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/draft/draft-0.13.0.tar.gz
-        dest: draft-0.13.0.tar.gz
-        checksum: f9b2d7fcb5259506b60eb212af3be82f6e05f585548de2b0a1f891042e1ceb4a
   shared/build/metrics:
     version: "0.0.1"
     required:

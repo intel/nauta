@@ -5,10 +5,9 @@ ARG PYTHON_VERSION=2.7
 ENV PYTHON=python${PYTHON_VERSION} PIP=pip${PYTHON_VERSION}
 
 COPY jupyter_notebook_config.py /root/.jupyter/
-
 COPY notebooks /notebooks
-
 COPY run_jupyter.sh /
+
 RUN chmod +x /run_jupyter.sh
 
 # TensorBoard

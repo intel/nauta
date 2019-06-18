@@ -4,9 +4,9 @@ FROM ${DATA_IMAGE} as dataimage
 FROM ${BASE_IMAGE}
 
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y iptables
+RUN yum update -y && \
+    yum install -y iptables && \
+    yum clean all
 
 COPY --from=dataimage /build-output/kubernetes/kube-proxy /
 RUN chmod +x /kube-proxy

@@ -5,9 +5,10 @@ FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 FROM ${KUBERNETES_DATA_IMAGE} as kubectldata
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y samba
+RUN yum update -y && \
+    yum install -y samba && \
+    yum clean all
+
 RUN pip install --no-binary :all: --no-clean pysmb
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init

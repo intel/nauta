@@ -5,11 +5,11 @@ COPY cni-plugins.tar.gz ./
 
 ENV CNI_PLUGINS_GO_PATH=${GOPATH}/src/github.com/containernetworking/plugins
 
-RUN mkdir ${CNI_PLUGINS_GO_PATH} -p && \
+RUN mkdir -p ${CNI_PLUGINS_GO_PATH} \
+             /build-output/cni-plugins && \
     tar -zxf cni-plugins.tar.gz -C ${CNI_PLUGINS_GO_PATH} --strip-components=1 && \
-    (cd ${CNI_PLUGINS_GO_PATH} && ./build.sh)
-
-RUN mkdir -p /build-output/cni-plugins && \
+    (cd ${CNI_PLUGINS_GO_PATH} && ./build.sh) && \
     cp ${CNI_PLUGINS_GO_PATH}/bin/* /build-output/cni-plugins/ && \
     cd /build-output && \
-    tar -I pigz -cf cni-plugins.tar.gz cni-plugins/
+    tar -I pigz -cf cni-plugins.tar.gz cni-plugins/ && \
+    rm -rf ${CNI_PLUGINS_GO_PATH}

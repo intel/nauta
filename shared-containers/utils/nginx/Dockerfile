@@ -4,7 +4,7 @@ FROM ${NGINX_BUILD_IMAGE} as data
 FROM ${BASE_IMAGE}
 
 COPY --from=data /build-output/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm /tmp/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm
-RUN yum update -y && yum install -y /tmp/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm && rm -rf /tmp/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm
+RUN yum update -y && yum install -y /tmp/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm && rm -rf /tmp/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm && yum clean all
 
 
 EXPOSE 80

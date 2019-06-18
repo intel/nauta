@@ -14,7 +14,7 @@ ARG ROOTLESS_BASE_MODE=external
 COPY buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz /
 COPY runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz /
 
-RUN yum update -y && yum install -y git file
+RUN yum update -y && yum install -y git file && yum clean all
 
 ARG RUNC_VERSION
 RUN mkdir -vp $GOPATH/src/github.com/opencontainers/

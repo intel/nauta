@@ -2,7 +2,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
 ARG ARGO_VERSION="v2.2.1"
 
-RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2
+RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2 && yum clean all
 
 
 RUN mkdir -p ${GOPATH}/src/github.com/argoproj

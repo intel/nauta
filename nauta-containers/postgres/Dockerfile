@@ -14,7 +14,7 @@ RUN chmod +x /bin/dumb-init
 # ADD postgres user with fixed id
 RUN useradd postgres -u 1234
 
-RUN yum -y install postgresql postgresql-server postgresql-contrib; yum clean all
+RUN yum -y install postgresql postgresql-server postgresql-contrib && yum clean all
 
 ENV PGDATA /var/lib/pgsql/data
 

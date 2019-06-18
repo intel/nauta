@@ -2,10 +2,10 @@ ARG BASE_IMAGE
 ARG BUILD_IMAGE
 FROM ${BUILD_IMAGE}
 
-RUN yum clean all && yum install -y which git
+RUN yum install -y which git && yum clean all
 
-RUN mkdir /build-output/registry
-RUN mkdir -vp /build/gopath/src/
+RUN mkdir -vp /build-output/registry \
+              /build/gopath/src/
 
 WORKDIR /build
 ENV GOPATH=/build/gopath

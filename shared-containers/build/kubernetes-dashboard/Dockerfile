@@ -1,12 +1,13 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && \ 
-    yum update -y && \
+RUN yum update -y && \
     yum -y install rh-nodejs8 bzip2 gcc which git \
                                     java-1.8.0-openjdk-devel java-1.8.0-openjdk \
                                     zip rsync curl pkg-config make libtool \
-                                    libcurl patch automake patch gcc-c++
+                                    libcurl patch automake patch gcc-c++ && \
+    yum clean all
+
 ENV NODE_TLS_REJECT_UNAUTHORIZED 0
 
 # go section ####################################

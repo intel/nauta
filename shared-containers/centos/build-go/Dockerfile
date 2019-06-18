@@ -1,9 +1,11 @@
-ARG BASE_IMAGE=centos:7.6.1810
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 # GO Section
 
-RUN mkdir -p /build/work
+RUN mkdir -p /build/work \
+             /build/dep \
+             /build/glide
 
 ENV GO_VERSION=1.12.1
 ENV GO_ARCH=amd64
@@ -19,8 +21,6 @@ ENV PATH=${PATH}:${GOROOT}/bin
 
 # GODEP Section
 
-RUN mkdir -p /build/dep
-
 ENV DEP_VERSION=v0.4.1
 ENV DEP_ARCH=amd64
 ENV DEP_OS=linux
@@ -33,8 +33,6 @@ RUN chmod 0777 /build/dep/dep
 ENV PATH=${PATH}:/build/dep/
 
 # GLIDE Section
-
-RUN mkdir -p /build/glide
 
 ENV GLIDE_VERSION=0.13.1
 ENV GLIDE_ARCH=amd64

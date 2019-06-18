@@ -8,14 +8,18 @@ FROM ${BASE_IMAGE}
 
 EXPOSE 9200 9300
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y util-linux su-exec
+RUN yum update -y && \
+    yum install -y util-linux su-exec && \
+    yum clean all
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
+
 RUN chmod +x /bin/dumb-init
 
-RUN mkdir -vp /elasticsearch 
+RUN mkdir -vp /elasticsearch  \
+              /elasticsearch/config/scripts \
+              /elasticsearch/plugin
+
 COPY --from=build /build-output/archives/oss-tar/build/distributions/elasticsearch-*.tar.gz /
 
 RUN printf '%s\t%s  %s\t%s\n%s\t%s  %s\t%s\n' 'elasticsearch' 'hard' 'nproc' '65536' 'elasticsearch' 'soft' 'nproc' '16384' >> /etc/security/limits.d/20-nproc.conf
@@ -27,13 +31,10 @@ ENV PATH /elasticsearch/bin:$PATH
 
 RUN adduser --system -u 5000 elasticsearch
 
-RUN mkdir -vp /elasticsearch/config
-RUN mkdir -vp /elasticsearch/config/scripts
-RUN mkdir -vp /elasticsearch/plugin
+RUN mkdir -vp /elasticsearch/config/scripts \
+              /elasticsearch/plugin
 
-RUN chown -R elasticsearch:elasticsearch /elasticsearch/config
-RUN chown -R elasticsearch:elasticsearch /elasticsearch/config/scripts
-RUN chown -R elasticsearch:elasticsearch /elasticsearch/plugin
+RUN chown -R elasticsearch:elasticsearch /elasticsearch/config /elasticsearch/plugin
 
 COPY run.sh /
 RUN chmod +x /run.sh

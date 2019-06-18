@@ -1,11 +1,13 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && \
-    yum install -y which iproute2 net-tools iptables  make curl wget unzip vim \ 
-    rpm-build createrepo pigz libtool-ltdl-devel cmake glibc-static selinux-policy-devel
+RUN yum install -y which iproute2 net-tools iptables  make curl wget unzip vim \ 
+    rpm-build createrepo pigz libtool-ltdl-devel cmake glibc-static selinux-policy-devel && \
+    yum clean all
 
-RUN mkdir -vp /build-output/rpm/
+RUN mkdir -vp /build-output/rpm/ \
+              /go/src/github.com/docker/
+
 env GOPATH=/go
 env PATH=$PATH:$GOPATH/bin
 ADD docker-ce-18.06.3.ce-3.el7.src.rpm /

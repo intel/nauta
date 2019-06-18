@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=centos:7.6.1810
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 # GO Section

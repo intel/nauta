@@ -6,13 +6,11 @@ RUN mkdir -vp /build-output/ /build
 COPY dumb-init-1.2.1.tar.gz /build
 
 WORKDIR /build
-RUN tar -xvf /build/dumb-init-1.2.1.tar.gz
-WORKDIR /build/dumb-init-1.2.1/
 
+RUN tar -xvf /build/dumb-init-1.2.1.tar.gz && \
+    cd /build/dumb-init-1.2.1/ && \
 # centos does not provide static libraries:
-RUN sed -i 's/-static//g' Makefile
-RUN make build
-
-RUN cp dumb-init /build-output/dumb-init
-
-
+    sed -i 's/-static//g' Makefile && \
+    make build && \
+    cp dumb-init /build-output/dumb-init && \
+    rm -rf /build

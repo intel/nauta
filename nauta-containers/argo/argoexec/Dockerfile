@@ -11,14 +11,12 @@ FROM ${KUBERNETES_DATA_IMAGE} as k8s
 FROM ${ARGO_IMAGE} as argo-build
 FROM ${BASE_IMAGE}
 
-RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2
+RUN yum update -y && yum install -y git make wget syum-utils device-mapper-persistent-data lvm2 curl jq procps git tar mime-support && yum clean all
 
 COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.el7.x86_64.rpm /
 RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm
 
 COPY --from=k8s /build-output/kubernetes/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
-
-RUN yum update -y && yum install -y curl procps git tar mime-support
 
 COPY --from=argo-build /build/work/src/github.com/argoproj/argo/dist/argoexec /usr/local/bin/

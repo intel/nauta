@@ -24,10 +24,10 @@ RUN ls -lah /
 
 RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz
-RUN yum clean all && \
-    yum update -y && \
+RUN yum update -y && \
     yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
-    python2-devel openblas-devel lapack-devel Cython cmake3 make git
+    python2-devel openblas-devel lapack-devel Cython cmake3 make git && \
+    yum clean all
 RUN cp /usr/bin/cmake3 /usr/bin/cmake
 RUN git config --global url."https://".insteadOf git://
 
@@ -58,7 +58,8 @@ RUN echo "hwloc_base_binding_policy = none" >> /etc/openmpi-x86_64/openmpi-mca-p
 
 RUN yum install -y openssh-clients openssh-server && \
     sshd-keygen && \
-    mkdir -p /var/run/sshd /app /root/.ssh
+    mkdir -p /var/run/sshd /app /root/.ssh && \
+    yum clean all
 
  # Allow OpenSSH to talk to containers without asking for confirmation
 RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \

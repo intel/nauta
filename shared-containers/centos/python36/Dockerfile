@@ -1,9 +1,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install rh-python36 -y
+RUN yum update -y && \
+    yum install -y rh-python36 && \
+    yum clean all
 
 ENV PATH=$PATH:/opt/rh/rh-python36/root/usr/bin
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/rh/rh-python36/root/usr/lib64

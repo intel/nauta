@@ -3,12 +3,12 @@ ARG DOCKER_RPM_IMAGE
 FROM ${DOCKER_RPM_IMAGE} as dockerrpm
 FROM ${BASE_IMAGE}
 
-RUN yum clean all && \
-    yum update -y && \
-    yum install -y syum-utils device-mapper-persistent-data lvm2
+RUN yum update -y && \
+    yum install -y syum-utils device-mapper-persistent-data lvm2 && \
+    yum clean all
 
 COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.el7.x86_64.rpm /
-RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm
+RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm && yum clean all
 
 ADD push.sh /push.sh
 

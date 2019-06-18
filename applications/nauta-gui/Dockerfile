@@ -2,7 +2,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as nauta_gui_nodejs
 
-RUN yum update -y && yum -y install rh-nodejs8 bzip2 gcc
+RUN yum update -y && yum -y install rh-nodejs8 bzip2 gcc && yum clean all
 ADD . /app
 WORKDIR /app
 
