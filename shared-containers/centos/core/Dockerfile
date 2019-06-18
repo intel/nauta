@@ -3,7 +3,6 @@ ADD centos-docker.tar.xz /
 ADD os.repo /etc/yum.repos.d/
 RUN yum-config-manager --disable "CentOS-7 - Updates" "CentOS-7 - Extras" "CentOS-7 - Base"
 RUN yum update -y && yum -y upgrade && yum clean all
-RUN rm /usr/lib64/libicui18n.so.50*
 FROM centos as build
 RUN mkdir -vp /build
 ADD icu4c-63_1-src.tgz /build

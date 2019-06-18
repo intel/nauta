@@ -1,34 +1,29 @@
 [offlinebase]
 name=OfflineBase
-baseurl=http://os.mirror/7.6/os/$basearch/
+baseurl=http://os.mirror/7.6.1810-up-to-date/centos/7/os/$basearch/
 gpgcheck=0
 
 [offlineupdates]
 name=OfflineUpdates
-baseurl=http://os.mirror/7.6/updates/$basearch/
+baseurl=http://os.mirror/7.6.1810-up-to-date/centos/7/updates/$basearch/
 gpgcheck=0
 
 [offlineextras]
 name=OfflineExtras
-baseurl=http://os.mirror/7.6/extras/$basearch/
+baseurl=http://os.mirror/7.6.1810-up-to-date/centos/7/extras/$basearch/
 gpgcheck=0
 
 [offlinesclo]
 name=OfflineSCLo
-baseurl=http://os.mirror/7.6/sclo/$basearch/sclo/
+baseurl=http://os.mirror/7.6.1810-up-to-date/centos/7/sclo/$basearch/sclo/
 gpgcheck=0
 
 [offlinesclo-rh]
 name=OfflineSCLo-rh
-baseurl=http://os.mirror/7.6/sclo/$basearch/rh/
+baseurl=http://os.mirror/7.6.1810-up-to-date/centos/7/sclo/$basearch/rh/
 gpgcheck=0
 
 [offlineepel]
 name=OfflineEPEL
-baseurl=http://os.mirror/7.6/epel/$basearch/
-gpgcheck=0
-
-[offlinecity]
-name=OfflineCity
-baseurl=http://os.mirror/7.6/city/$basearch/
+baseurl=http://os.mirror/7.6.1810-up-to-date/epel/7/$basearch/
 gpgcheck=0
