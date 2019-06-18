@@ -26,11 +26,13 @@ def setup_mocks(mocker):
                  return_value=mocker.MagicMock())
     mocker.patch('os.listdir', return_value=['openvino.yaml', 'tensorflow.yaml', 'some_other_file'])
     mocker.patch('commands.model.export.NAUTAConfigMap', return_value=mocker.MagicMock(registry='fake-addr'))
+    mocker.patch('commands.model.export.Config')
+    mocker.patch('os.path.isdir', return_value=True)
 
 
 def test_export(mocker):
     setup_mocks(mocker)
-    result = CliRunner().invoke(export, ["/fake/path", "Openvino"])
+    result = CliRunner().invoke(export, ["/fake/path", "openvino"])
 
     assert result.exit_code == 0
     assert "Successfully created export workflow" in result.output

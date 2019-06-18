@@ -132,6 +132,11 @@ class ModelExportListCmdTexts:
     EXPORT_LIST_ERROR_MSG = "Error during getting list of export's workflows."
 
 
+class ModelExportListCmdTexts:
+    HELP = "Displays a list of available export's templates."
+    EXPORT_LIST_ERROR_MSG = "Error during getting list of export's workflows."
+
+
 class UserCmdTexts:
     HELP = "Create, delete, or list users of the platform. Can only be run by a platform administrator."
 
@@ -935,8 +940,24 @@ class ModelExportCmdTexts:
 
     PATH - indicates the location of the model on the Input or Output network shares
     
-    FORMAT - one of the supported formats (see nctl model export list command)
+    FORMAT - one of the supported formats (see nctl model export-list command)
     
     operation-options - options specific to a chosen format
     """
     SHORT_HELP = "Export the model using one of defined formats."
+    HELP_P = "Post-processing workflow used to process exported model (see nctl process-list command)."
+    WRONG_EXPORT_FORMAT = "Format: {format} does not exist. Choose from: {formats}."
+    WRONG_PROCESS_KIND = "Post-processing kind: {process} does not exist. Choose from: {kinds}."
+
+
+class ModelProcessCmdTexts:
+    HELP = """Process the model using one of defined formats.
+
+    PATH - indicates the location of the model of the Input or Output network shares
+
+    FORMAT - one of the supported formats (see nctl model process-list command)
+
+    OPTIONS - options specific to argo workflow 
+    """
+    SHORT_HELP = "Process the model using one of defined formats."
+    WRONG_PROCESS_KIND = "Processing kind: {process} does not exist. Choose from: {kinds}."

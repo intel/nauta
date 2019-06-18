@@ -16,10 +16,9 @@
 
 import os
 import sys
-from typing import Tuple
+from typing import Tuple, List
 
 import click
-
 from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from cli_text_consts import ModelExportCmdTexts as Texts
@@ -36,17 +35,31 @@ logger = initialize_logger(__name__)
 @click.argument("path", required=True)
 @click.argument("format", required=True, type=str)
 @click.argument("operation-options", nargs=-1, metavar="[-- operation-options]")
+@click.option("-p", "--process", type=str, required=False, help=Texts.HELP_P)
 @common_options(admin_command=False)
-def export(path: str, format: str, operation_options: Tuple[str, ...]):
+def export(path: str, format: str, operation_options: Tuple[str, ...], process: str):
     additional_params_str = " ".join(operation_options)
     format = format.lower()
-
-    workflow_exports_files = os.listdir(f'{Config().config_path}/workflows/exports')
-    formats = [file.rstrip('.yaml') for file in workflow_exports_files if file.endswith('.yaml')]
+    config_path = Config().config_path
+    formats: List[str] = []  # noqa: E701
+    if os.path.isdir(config_path):
+        workflow_exports_files = os.listdir(f'{config_path}/workflows/exports')
+        formats = [os.path.splitext(file)[0] for file in workflow_exports_files if file.endswith('.yaml')]
 
     if format not in formats:
-        click.echo(f'Format: {format} does not exist. Choose from: {formats}')
+        click.echo(Texts.WRONG_EXPORT_FORMAT.format(format=format, formats=formats))
         sys.exit(2)
+
+    if process:
+        process_path = f'{config_path}/workflows/processes'
+        kinds: List[str] = []
+        if os.path.isdir(process_path):
+            process_kinds = os.listdir(f'{config_path}/workflows/processes')
+            kinds = [os.path.splitext(file)[0] for file in process_kinds if file.endswith('.yaml')]
+
+        if process not in kinds:
+            click.echo(Texts.WRONG_PROCESS_KIND.format(process=process, kinds=kinds))
+            sys.exit(2)
 
     try:
         current_namespace = get_kubectl_current_context_namespace()
@@ -58,6 +71,10 @@ def export(path: str, format: str, operation_options: Tuple[str, ...]):
             'saved-model-dir-path': path,
             'additional-params': additional_params_str
         }
+
+        if process:
+            process_workflow = ArgoWorkflow.from_yaml(f'{Config().config_path}/workflows/processes/{process}.yaml')
+            export_workflow.add_process(process_workflow)
 
         export_workflow.create(namespace=current_namespace)
     except Exception:

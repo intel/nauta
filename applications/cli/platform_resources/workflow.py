@@ -99,6 +99,52 @@ class ArgoWorkflow(PlatformResource):
     def parameters(self):
         return {param['name']: param.get('value') for param in self.body['spec']['arguments']['parameters']}
 
+    def add_process(self, process_workflow):
+        # 1) get list of templates from process workflow
+        process_templates = process_workflow.body['spec']['templates']
+        # 2) extend process templates with paramaters from main workflow
+        main_parameters = self.body['spec']['arguments']['parameters']
+        for process_template in process_templates:
+            process_template['inputs'] = {'parameters': [{"name":item["name"]} for item in main_parameters]}
+        # 3) extend/create a list of steps
+        entrypoint = self.body['spec']['entrypoint']
+        if process_workflow.get_flow_steps():
+            process_steps = process_workflow.get_flow_steps()
+        else:
+            process_steps = process_workflow.create_step_from_workflow(main_parameters)
+        for main_template in self.body['spec']['templates']:
+            if (main_template['name'] == entrypoint) and main_template.get('steps'):
+                main_template['steps'].append(process_steps)
+                break
+        else:
+            flow_template_name = '-'.join([self.body['spec']['entrypoint'], process_workflow.body['spec']['entrypoint']])
+            flow_template = {'name': flow_template_name,
+                             'steps': [self.create_step_from_workflow(), process_steps]}
+            self.body['spec']['entrypoint'] = flow_template_name
+            self.body['spec']['templates'].append(flow_template)
+        # 4) add process templates to main process
+        self.body['spec']['templates'].extend(process_templates)
+
+    def get_flow_steps(self):
+        entrypoint = self.body['spec']['entrypoint']
+        for template in self.body['spec']['templates']:
+            if template['name'] == entrypoint and template.get('steps'):
+                return template['steps']
+        return None
+
+    def create_step_from_workflow(self, parameters_with_values: List[dict] = None):
+        template_definition = self.body['spec']['templates'][0]
+
+        if parameters_with_values:
+            arguments = {"parameters": parameters_with_values}
+        else:
+            arguments = self.body['spec']['arguments']
+        step_definition = [{'name': template_definition['name'],
+                            'template': template_definition['name'],
+                            'arguments': arguments}]
+
+        return step_definition
+
     @parameters.setter
     def parameters(self, parameters_to_set: dict):
         """
