@@ -71,8 +71,10 @@ data:
      if [ $# -eq 0 ]; then
           sleep infinity
         else
+          set +e
           bash -c "$*"
           RETURN_CODE=$?
+          set -e
      fi
      touch /horovod/init/done
      exit $RETURN_CODE
