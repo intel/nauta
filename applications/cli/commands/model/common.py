@@ -18,6 +18,7 @@ import os
 
 from collections import namedtuple
 from enum import Enum
+
 from typing import List
 import yaml
 
@@ -28,6 +29,7 @@ MODEL_HEADERS = ['Operation', 'Start date', 'End date', 'Owner', 'State']
 STEP_HEADERS = ['Name', 'Start date', 'End date', 'State']
 
 EXPORT_LIST_HEADERS = ['Name']
+PROCESS_LIST_HEADERS = ['Name']
 
 PROCESS_WORKFLOWS_LOCATION = 'workflows/processes'
 EXPORT_WORKFLOWS_LOCATION = 'workflows/exports'

@@ -6,6 +6,7 @@ The overall purpose of this command/subcommands is to manage model export relate
  - [export Subcommand](#export-subcommand)
  - [export-list Subcommand](#export-list-subcommand)
  - [process Subcommand](#process-subcommand)
+ - [process-list Subcommand](#process-list-subcommand)
  
 ## status Subcommand
 
@@ -16,7 +17,7 @@ Displays a status of an export with a given name.
 ### Syntax
  
  `nctl model status [options] MODEL_NAME`
-
+ 
 ### Arguments
 
  | Name | Required | Description |
@@ -130,8 +131,6 @@ List of available export formats.
 
 Displays a list of available export formats.
 
-|`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow* training is used (tf-training). A list of available templates can be obtained by executing the `nctl template list command` command. |
-
 
 ## process Subcommand
 
@@ -169,3 +168,31 @@ Successfully created export workflow: copy-modelabc3
 ```
 
 Processes an existing model located in the `pretrained_model` folder in `input` shared folder.
+
+## process-list Subcommand
+
+### Synopsis
+ 
+Displays a list of available kinds of post-processing operations.   
+ 
+### Syntax
+ 
+ `nctl model process-list` 
+ 
+
+### Returns
+ 
+List of available kinds of post-processing operations.
+     
+### Example
+ 
+ `nctl model process-list`  
+ 
+ 
+```
+| Name     |
+|----------|
+| copy     |
+```
+
+Displays a list of available kinds of post-processing operations.

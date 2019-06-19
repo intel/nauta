@@ -132,9 +132,9 @@ class ModelExportListCmdTexts:
     EXPORT_LIST_ERROR_MSG = "Error during getting list of export's workflows."
 
 
-class ModelExportListCmdTexts:
-    HELP = "Displays a list of available export's templates."
-    EXPORT_LIST_ERROR_MSG = "Error during getting list of export's workflows."
+class ModelProcessListCmdTexts:
+    HELP = "Displays a list of available processing templates."
+    PROCESS_LIST_ERROR_MSG = "Error during getting list of processing workflows."
 
 
 class UserCmdTexts:

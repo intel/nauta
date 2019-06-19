@@ -16,10 +16,12 @@
 
 import click
 
-from commands.model import status
-from commands.model import export
 from commands.model import process
-from commands.model import export_list
+from commands.model.status import status
+
+from commands.model import export
+from commands.model.export_list import export_list
+from commands.model.process_list import process_list
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
 from cli_text_consts import ModelCmdTexts as Texts
@@ -34,7 +36,8 @@ def model():
     pass
 
 
-model.add_command(status.status)
 model.add_command(export.export)
-model.add_command(export_list.export_list)
 model.add_command(process.process)
+model.add_command(status)
+model.add_command(export_list)
+model.add_command(process_list)
