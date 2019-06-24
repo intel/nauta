@@ -16,15 +16,28 @@
 const logger = require('../../utils/logger');
 const errHandler = require('../../utils/error-handler');
 const errMessages = require('../../utils/error-messages');
-const jwt = require('jsonwebtoken');
 const Q = require('q');
 const HttpStatus = require('http-status-codes');
 
 const K8S_TOKEN_USER_KEY = 'kubernetes.io/serviceaccount/namespace';
 
+const parseJwtToken = function (token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(Buffer.from(base64, 'base64').toString());
+  } catch (err) {
+    logger.debug('Cannot parse provided token');
+    return null;
+  }
+};
+
 const decodeToken = function (token) {
   return Q.Promise(function (resolve, reject) {
-    const decoded = jwt.decode(token);
+    if (!token) {
+      reject(errHandler(HttpStatus.UNAUTHORIZED, errMessages.AUTH.INVALID_TOKEN));
+    }
+    const decoded = parseJwtToken(token);
     if (decoded && decoded[K8S_TOKEN_USER_KEY]) {
       logger.debug('Provided token is valid');
       resolve(decoded);
@@ -54,5 +67,6 @@ const getUserAuthority = function (req, res) {
 
 module.exports = {
   getUserAuthority: getUserAuthority,
-  decodeToken: decodeToken
+  decodeToken: decodeToken,
+  parseJwtToken: parseJwtToken
 };
