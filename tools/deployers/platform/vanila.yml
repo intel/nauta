@@ -1,0 +1,7 @@
+---
+
+- import_playbook: verification.yml
+- import_playbook: verify.yml
+- import_playbook: cluster.yml
+- import_playbook: master.yml
+- import_playbook: worker.yml

@@ -101,6 +101,24 @@ platform_ansible_run() {
     return $ret_val
 }
 
+vanila_ansible_run() {
+    export KIND=platform
+    if [ X"${ENV_INVENTORY}" = X"" ]; then
+        >&2 echo "Inventory file should be provided for vanila k8s installation"
+        exit 1
+    fi
+    if [ X"${ENV_CONFIG}" = X"" ]; then
+        >&2 echo "Config file should be provided for vanila k8s installation"
+        exit 1
+    fi
+    set +e
+    ansible_run ${CURDIR}/platform/vanila.yml
+    ret_val=$?
+    set -e
+    show_error_message $ret_val
+    return $ret_val
+}
+
 nauta_ansible_run() {
     export KIND=nauta
     set +e
@@ -179,6 +197,8 @@ case "${COMMAND}" in
   install) platform_ansible_run && nauta_ansible_run
      ;;
   platform-install) platform_ansible_run
+     ;;
+  vanila-install) vanila_ansible_run
      ;;
   nauta-install) nauta_ansible_run
      ;;
