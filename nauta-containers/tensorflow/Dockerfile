@@ -20,8 +20,8 @@ COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 RUN chmod +x /bin/tensorflow_model_server
 
 RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
-    ${PIP} install /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl && \
-    ${PIP} install --ignore-installed /experiment_metrics-*.tar.gz && \
+    ${PIP} install --no-cache-dir /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl && \
+    ${PIP} install --no-cache-dir --ignore-installed /experiment_metrics-*.tar.gz && \
     rm -rf /tensorflow-${TENSORFLOW_VERSION}-*.whl /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl /experiment_metrics-*.tar.gz
 
 ENV KMP_BLOCKTIME 0

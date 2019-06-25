@@ -6,12 +6,12 @@ FROM ${BUILD_IMAGE} as build
 RUN mkdir -p ${GOPATH}/src/github.com/NervanaSystems/carbon/applications/loader
 WORKDIR ${GOPATH}/src/github.com/NervanaSystems/carbon/applications/loader
 
-ADD glide.yaml glide.yaml
-ADD requirements.go requirements.go
+COPY glide.yaml glide.yaml
+COPY requirements.go requirements.go
 
 RUN glide update --strip-vendor requirements.go
 
-ADD ./ ./
+COPY ./ ./
 
 RUN glide update --strip-vendor
 

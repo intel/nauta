@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED 1
 # setting PASSWORD env variable to an empty string turns off authetication
 ENV PASSWORD ""
 
-ADD training.py
+COPY training.py
 
-ADD init_jupyter.sh /bin/init_jupyter
+COPY init_jupyter.sh /bin/init_jupyter
 RUN chmod +x /bin/init_jupyter
 
 # create dummy file to inform user about /mnt/input not being persistent volume

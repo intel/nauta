@@ -1,17 +1,21 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-COPY kubernetes.tar.gz ./
+RUN mkdir -p ${GOPATH}/src/k8s.io/kubernetes \
+             /build-output/kubernetes
+
+ADD kubernetes.tar.gz ${GOPATH}/src/k8s.io/
 
 RUN yum update -y && \
     yum install -y which && \
     yum clean all
 
-RUN mkdir ${GOPATH}/src/k8s.io/kubernetes -p && \
-    tar -zxf kubernetes.tar.gz -C ${GOPATH}/src/k8s.io/kubernetes --strip-components=1 && \
-    (cd ${GOPATH}/src/k8s.io/kubernetes && make)
+RUN mv /build/work/src/k8s.io/kubernetes-1.11.7/* /build/work/src/k8s.io/kubernetes/
 
-RUN mkdir -p /build-output/kubernetes && \
+WORKDIR ${GOPATH}/src/k8s.io/kubernetes
+
+RUN make && \
     cp ${GOPATH}/src/k8s.io/kubernetes/_output/local/go/bin/* /build-output/kubernetes/ && \
     cd /build-output && \
-    tar -I pigz -cf kubernetes.tar.gz kubernetes/
+    tar -I pigz -cf kubernetes.tar.gz kubernetes/ && \
+    rm -rf ${GOPATH}/src/k8s.io/kubernetes

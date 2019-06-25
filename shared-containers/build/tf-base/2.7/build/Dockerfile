@@ -15,13 +15,13 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python2.7
 ENV PIP=pip2.7
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary :all: --no-clean -U setuptools==40.6.*
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary :all: --no-clean -U pip==19.0.*
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean --ignore-installed scikit-build ptyprocess==0.5.2 MarkupSafe==1.1.1 numpy==1.16.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary=:all: -U setuptools==40.6.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --force-reinstall --no-binary=:all: -U pip==19.0.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build ptyprocess==0.5.2 MarkupSafe==1.1.1 numpy==1.16.*
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --ignore-installed nbconvert entrypoints
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-cache-dir --ignore-installed nbconvert entrypoints
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary :all: --no-clean \
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: --no-cache-dir \
         Pillow==5.4.* \
         h5py==2.9.* \
         ipykernel==4.10.* \

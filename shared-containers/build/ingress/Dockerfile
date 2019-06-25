@@ -17,10 +17,10 @@ RUN git clone https://github.com/kubernetes/ingress-nginx.git /build/gopath/src/
     cd /build/gopath/src/k8s.io/ingress-nginx/images/404-server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-w -s' -o /build-output/ingress/server && \
     rm -rf /build/gopath/src/k8s.io 
     
+ADD authbind_2.1.2.tar.gz /build/
+
 WORKDIR /build/authbind
 
-COPY authbind_2.1.2.tar.gz /build/authbind/
-
-RUN tar -xf authbind_2.1.2.tar.gz && cd /build/authbind/authbind && make && \
+RUN make && \
     cp authbind /build-output/ && cd /build-output && \
     tar -I pigz -cvf addons.tar.gz ingress authbind && rm -rf /build/authbind

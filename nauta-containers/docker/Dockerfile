@@ -10,7 +10,7 @@ RUN yum update -y && \
 COPY --from=dockerrpm /root/rpmbuild/RPMS/x86_64/docker-ce-18.06.3-nauta.el7.x86_64.rpm /
 RUN yum install -y /docker-ce-18.06.3-nauta.el7.x86_64.rpm && yum clean all
 
-ADD push.sh /push.sh
+COPY push.sh /push.sh
 
 RUN chmod +x /push.sh
  

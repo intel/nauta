@@ -3,11 +3,11 @@ FROM ${BASE_IMAGE}
 
 WORKDIR /app
 
-ADD requirements.txt .
+COPY requirements.txt .
 
-RUN pip install --no-binary :all: --no-clean --force-reinstall -U pip
-RUN pip install --no-binary :all: --no-clean -r requirements.txt
+RUN pip install --no-binary :all: --force-reinstall -U pip
+RUN pip install --no-binary :all: --no-cache-dir -r requirements.txt
 
-ADD main.py .
+COPY main.py .
 
 ENTRYPOINT python3.6 -u main.py

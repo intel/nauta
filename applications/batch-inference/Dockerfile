@@ -23,11 +23,11 @@ RUN pip3 install /experiment_metrics-*.tar.gz && \
 WORKDIR /app
 
 ADD requirements.txt .
-RUN pip install --no-binary :all: --no-clean --force-reinstall -U pip
-RUN pip install --no-binary :all: --no-clean -r requirements.txt
+RUN pip install --no-binary=:all: --force-reinstall -U pip
+RUN pip install --no-binary=:all: --no-cache-dir -r requirements.txt
 
 RUN pip3 install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
-    pip3 install /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl && \
+    pip3 install --no-cache-dir /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl && \
     rm -rf /tensorflow-${TENSORFLOW_VERSION}-*.whl /tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl
 
 ADD app/ .

@@ -3,9 +3,7 @@ ARG BUILD_IMAGE
 FROM ${BUILD_IMAGE} as build
 
 RUN mkdir /build
-COPY redsocks-0.5.tar.gz /build
-WORKDIR /build
-RUN tar -xvf /build/redsocks-0.5.tar.gz
+ADD redsocks-0.5.tar.gz /build
 WORKDIR /build/redsocks-release-0.5/
 RUN make
 
@@ -15,9 +13,9 @@ RUN yum install -y iptables libevent openssl pkgconfig && yum clean all
 
 COPY --from=build /build/redsocks-release-0.5/redsocks /usr/sbin/redsocks
 RUN chmod +x /usr/sbin/redsocks
-ADD down.sh /down.sh
-ADD up.sh /up.sh
-ADD redsocks.conf /redsocks.conf
+COPY down.sh /down.sh
+COPY up.sh /up.sh
+COPY redsocks.conf /redsocks.conf
 
 ENV PORT 12345
 ENV IP 127.0.0.1

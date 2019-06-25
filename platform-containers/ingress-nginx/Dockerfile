@@ -21,9 +21,9 @@ COPY --from=nginxdataimage /build-output/nginx-1.15.9-1.el7_4.ngx.x86_64.rpm /ng
 RUN yum update -y && yum install -y /nginx-1.15.9-1.el7_4.ngx.x86_64.rpm && yum clean all
 
 RUN mkdir -vp /etc/nginx/template /etc/nginx/geoip /ingress-controller
-ADD rootfs/etc/nginx/template/nginx.tmpl /etc/nginx/template/
-ADD rootfs/ingress-controller/* /ingress-controller/
-ADD rootfs/etc/nginx/nginx.conf /etc/nginx/
+COPY rootfs/etc/nginx/template/nginx.tmpl /etc/nginx/template/
+COPY rootfs/ingress-controller/* /ingress-controller/
+COPY rootfs/etc/nginx/nginx.conf /etc/nginx/
 
 ENTRYPOINT ["/dumb-init"]
 CMD ["/nginx-ingress-controller"]

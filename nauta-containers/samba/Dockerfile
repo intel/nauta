@@ -9,7 +9,7 @@ RUN yum update -y && \
     yum install -y samba && \
     yum clean all
 
-RUN pip install --no-binary :all: --no-clean pysmb
+RUN pip install --no-binary=:all: --no-cache-dir pysmb
 
 COPY --from=dumbinitdata /build-output/dumb-init /bin/dumb-init
 RUN chmod +x /bin/dumb-init

@@ -8,9 +8,7 @@ ENV APISERVER_BUILDER_FILE=apiserver-builder-${APISERVER_BUILDER_VERSION}-${APIS
 
 RUN mkdir -p /apiserver-builder
 
-COPY ${APISERVER_BUILDER_FILE} /tmp/${APISERVER_BUILDER_FILE}
-
-RUN tar -zvxf /tmp/${APISERVER_BUILDER_FILE} -C /apiserver-builder && rm -rf /tmp/${APISERVER_BUILDER_FILE}
+ADD ${APISERVER_BUILDER_FILE} /apiserver-builder
 
 ENV APISERVER_BUILDER_PATH=/apiserver-builder/bin
 ENV PATH=${PATH}:${APISERVER_BUILDER_PATH}

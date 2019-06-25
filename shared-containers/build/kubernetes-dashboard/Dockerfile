@@ -49,4 +49,3 @@ RUN cp backend /dashboard
 
 EXPOSE 9090 8443
 ENTRYPOINT ["/dashboard", "--insecure-bind-address=0.0.0.0", "--bind-address=0.0.0.0"]
-

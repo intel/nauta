@@ -2,7 +2,7 @@ FROM nauta/horovod-py3
 
 WORKDIR /app
 
-ADD training.py .
+COPY training.py .
 
 ENV PYTHONUNBUFFERED 1
 

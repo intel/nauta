@@ -1,9 +1,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ADD elasticsearch_proxy.py /elasticsearch_proxy.py
-ADD requirements.txt /requirements.txt
-RUN pip install --no-binary :all: --no-clean -r /requirements.txt
+COPY elasticsearch_proxy.py /elasticsearch_proxy.py
+COPY requirements.txt /requirements.txt
+RUN pip install --no-binary=:all: --no-cache-dir -r /requirements.txt
 
 WORKDIR /
 

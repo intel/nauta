@@ -3,7 +3,7 @@ FROM nauta/tensorflow-py2
 
 WORKDIR /app
 
-ADD training.py .
+COPY training.py .
 
 ENV PYTHONUNBUFFERED 1
 

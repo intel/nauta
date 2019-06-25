@@ -2,8 +2,6 @@ ARG BUILD_IMAGE=golang:1.11.2
 ARG BASE_IMAGE=centos:7.6.1810
 FROM ${BUILD_IMAGE} as build
 
-RUN ls
-
 RUN mkdir -p ${GOPATH}/src/github.com/kubernetes-sigs
 WORKDIR ${GOPATH}/src/github.com/kubernetes-sigs
 
