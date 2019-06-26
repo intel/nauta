@@ -198,7 +198,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                 v["env"] = env_list
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
-        yaml.dump(v, values_yaml_file)
+        yaml.safe_dump(v, values_yaml_file)
 
     shutil.move(values_yaml_temp_filename, values_yaml_filename)
     log.debug("Modify values.yaml - end")

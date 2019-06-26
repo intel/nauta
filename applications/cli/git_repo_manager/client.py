@@ -25,7 +25,9 @@ import uuid
 
 import requests
 
-from Crypto.PublicKey import RSA  # nosec - it is actually an import from secure pycryptodome library
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from kubernetes.client import V1Secret, V1ObjectMeta
 
 from util.k8s.k8s_info import get_secret, update_secret, create_secret
@@ -245,9 +247,12 @@ class GitRepoManagerClient:
         return f'token {admin_token}'
 
     def _generate_ssh_key(self, key_bits=4096) -> Tuple[str, str]:
-        key = RSA.generate(key_bits)
-        private_key = key.export_key().decode(_encoding)
-        public_key = key.publickey().export_key(format='OpenSSH').decode(_encoding)
+        key = rsa.generate_private_key(public_exponent=65537, key_size=key_bits, backend=default_backend())
+        private_key = key.private_bytes(encoding=serialization.Encoding.PEM,
+                                        format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                        encryption_algorithm=serialization.NoEncryption()).decode(_encoding)
+        public_key = key.public_key().public_bytes(encoding=serialization.Encoding.OpenSSH,
+                                                   format=serialization.PublicFormat.OpenSSH).decode(_encoding)
         return private_key, public_key
 
     def _save_private_ssh_key_in_k8s_secret(self, private_key: str, namespace: str):

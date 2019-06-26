@@ -109,7 +109,7 @@ EXAMPLE_PACK_TYPE = "example-pack-type"
 def test_modify_values_yaml(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
     sh_move_mock = mocker.patch("shutil.move")
-    yaml_dump_mock = mocker.patch("yaml.dump")
+    yaml_dump_mock = mocker.patch("yaml.safe_dump")
 
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
@@ -138,7 +138,7 @@ def test_modify_values_yaml(mocker):
 def test_modify_values_yaml_without_pod_count(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE_WITHOUT_POD_COUNT)
     sh_move_mock = mocker.patch("shutil.move")
-    yaml_dump_mock = mocker.patch("yaml.dump")
+    yaml_dump_mock = mocker.patch("yaml.safe_dump")
 
     tf_training.modify_values_yaml(experiment_folder=EXPERIMENT_FOLDER, script_location=SCRIPT_LOCATION,
                                    script_parameters=SCRIPT_PARAMETERS, pack_params=PACK_PARAMETERS,
@@ -164,7 +164,7 @@ def test_modify_values_yaml_without_pod_count(mocker):
 def test_modify_values_yaml_raise_error_if_bad_argument(mocker):
     open_mock = mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE)
     sh_move_mock = mocker.patch("shutil.move")
-    yaml_dump_mock = mocker.patch("yaml.dump")
+    yaml_dump_mock = mocker.patch("yaml.safe_dump")
 
     wrong_pack_params = [("key1", "{ bad list")]
 

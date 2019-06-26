@@ -112,6 +112,6 @@ def config(state: State, cpu: str, memory: str):
         config_file.truncate()
         config_file_content[CPU_NUMBER_FIELDNAME] = cpu
         config_file_content[MEMORY_AMOUNT_FIELDNAME] = memory
-        yaml.dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
+        yaml.safe_dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
 
     click.echo(Texts.SUCCESS_MESSAGE)
