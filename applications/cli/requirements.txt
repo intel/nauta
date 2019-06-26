@@ -18,3 +18,4 @@ ruamel.yaml.jinja2==0.2.2
 jinja2==2.10.1
 pycryptodome==3.7.3
 retry==0.9.2
+cryptography==2.7

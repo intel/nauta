@@ -280,10 +280,11 @@ def save_dependency_versions(dependency_versions: Dict[str, LooseVersion]):
     """
     dependency_versions_file_path = get_dependency_versions_file_path()
     log.info(f'Saving dependency versions to {dependency_versions_file_path}')
+    dependency_versions_obj = {k: str(v) for k, v in dependency_versions.items()}
     with open(
             dependency_versions_file_path, 'w',
             encoding='utf-8') as dependency_versions_file:
-        yaml.dump(dependency_versions, dependency_versions_file)
+        yaml.safe_dump(dependency_versions_obj, dependency_versions_file)
 
 
 def load_dependency_versions() -> Optional[Dict[str, LooseVersion]]:
@@ -300,8 +301,9 @@ def load_dependency_versions() -> Optional[Dict[str, LooseVersion]]:
             log.info(
                 f'Loaded dependency versions from {dependency_versions_file_path}'
             )
-            dependency_versions = yaml.load(dependency_versions_file)
-            return dependency_versions
+            dependency_versions = yaml.safe_load(dependency_versions_file)
+            dependency_versions_obj = {k: LooseVersion(v) for k, v in dependency_versions.items()}
+            return dependency_versions_obj
     else:
         log.info(
             f'{dependency_versions_file_path} dependency versions file not found'

@@ -85,7 +85,7 @@ def config(state: State, cpu: str, memory: str):
 
     with open(config_file_location, 'r+', encoding='utf-8') as config_file, \
             spinner(text=Texts.CONFIG_UPDATE):
-        config_file_content = yaml.load(config_file)
+        config_file_content = yaml.safe_load(config_file)
         cpu_number = str(config_file_content.get(CPU_NUMBER_FIELDNAME))
         memory_amount = str(config_file_content.get(MEMORY_AMOUNT_FIELDNAME))
         cpu_system_required_min = str(config_file_content.get(CPU_SYSTEM_REQUIRED_MIN_FIELDNAME))
@@ -112,6 +112,6 @@ def config(state: State, cpu: str, memory: str):
         config_file.truncate()
         config_file_content[CPU_NUMBER_FIELDNAME] = cpu
         config_file_content[MEMORY_AMOUNT_FIELDNAME] = memory
-        yaml.dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
+        yaml.safe_dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
 
     click.echo(Texts.SUCCESS_MESSAGE)

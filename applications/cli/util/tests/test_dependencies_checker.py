@@ -352,25 +352,25 @@ def test_save_dependency_versions(mocker, tmpdir):
         'util.dependencies_checker.get_dependency_versions_file_path',
         return_value=fake_dependency_versions_file_path)
     fake_dependency_versions = {
-        'bla': LooseVersion('1.0.0'),
-        'ble': LooseVersion('0.0.1-alpha')
+        'bla': '1.0.0',
+        'ble': '0.0.1-alpha'
     }
     save_dependency_versions(fake_dependency_versions)
 
     with open(
             fake_dependency_versions_file_path, mode='r',
             encoding='utf-8') as dep_versions_file:
-        assert yaml.load(dep_versions_file) == fake_dependency_versions
+        assert yaml.safe_load(dep_versions_file) == fake_dependency_versions
 
 
 def test_load_dependency_versions(mocker, tmpdir):
     fake_dependency_versions = {
-        'bla': LooseVersion('1.0.0'),
-        'ble': LooseVersion('0.0.1-alpha')
+        'bla': '1.0.0',
+        'ble': '0.0.1-alpha'
     }
     fake_dependency_versions_file = tmpdir.mkdir("/nctl_config").join(
         "1.0.0.saved-versions.yaml")
-    fake_dependency_versions_file.write(yaml.dump(fake_dependency_versions))
+    fake_dependency_versions_file.write(yaml.safe_dump(fake_dependency_versions))
 
     mocker.patch(
         'util.dependencies_checker.get_dependency_versions_file_path',

@@ -147,7 +147,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             'ImageRepository': f'127.0.0.1:{cluster_registry_port}/{username}/{experiment_name}:latest'
         })
     
-        v = yaml.load(rendered_values)
+        v = yaml.safe_load(rendered_values)
 
         workersCount = None
         pServersCount = None
@@ -190,7 +190,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                 v["env"] = env_list
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
-        yaml.dump(v, values_yaml_file)
+        yaml.safe_dump(v, values_yaml_file)
 
     shutil.move(values_yaml_temp_filename, values_yaml_filename)
     log.debug("Modify values.yaml - end")
@@ -201,7 +201,7 @@ def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:
     values_yaml_filename = os.path.join(run_folder, f"charts/{pack_type}/values.yaml")
 
     with open(values_yaml_filename, "r") as values_yaml_file:
-        values = yaml.load(values_yaml_file)
+        values = yaml.safe_load(values_yaml_file)
 
     pod_count = values.get(POD_COUNT_PARAM)
 

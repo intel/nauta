@@ -799,7 +799,7 @@ def validate_pack(name: str):
         exit(2)
 
     with open(chart_location, 'r', encoding='utf-8') as chart_file:
-            chart_content = yaml.load(chart_file)
+            chart_content = yaml.safe_load(chart_file)
             if chart_content.get("name") != name:
                 handle_error(user_msg=Texts.INCORRECT_PACK_DEFINITION.format(pack_name=name))
                 exit(2)

@@ -1,6 +1,9 @@
 # PyCharm
 .idea
 
+# Pytest
+.mypy_cache/
+
 # Python things
 .venv
 *.pyc

@@ -45,7 +45,7 @@ def view(state: State, workflow_name: str):
             exit(0)
         click.echo(tabulate([workflow.cli_representation], headers=HEADERS, tablefmt="orgtbl"))
         click.echo('\nWorkflow status:\n')
-        click.echo(yaml.dump(workflow.status))
+        click.echo(yaml.safe_dump(workflow.status))
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=True)
         exit(1)
