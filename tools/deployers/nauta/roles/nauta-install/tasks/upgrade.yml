@@ -11,6 +11,7 @@
     nauta_version_match: "{{ nauta_version == nauta_version_remote.stdout }}"
 
 - name: Check if platform has gitea's nauta-db secret
+  environment: "{{ local_envs }}"
   shell: "{{ runtime_kubectl }} -n nauta get secret nauta-db"
   register: gitea_db_secret
   ignore_errors: True
