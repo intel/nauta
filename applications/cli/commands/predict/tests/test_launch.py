@@ -16,8 +16,17 @@
 
 from click.testing import CliRunner
 import pytest
+from unittest.mock import MagicMock
+from kubernetes.client import V1Pod, V1PodStatus, V1ContainerStatus
 
 from commands.predict import launch
+
+
+mocked_test_pod = MagicMock(spec=V1Pod)
+mocked_test_pod.status = V1PodStatus(container_statuses=[V1ContainerStatus(ready=True, image="image",
+                                                                           image_id="image_id", name="name",
+                                                                           restart_count=0)])
+TEST_PODS = [mocked_test_pod]
 
 
 class LaunchPredictMocks:
@@ -29,6 +38,8 @@ class LaunchPredictMocks:
         self.get_namespace_mock = mocker.patch('commands.predict.launch.get_kubectl_current_context_namespace')
         self.validate_local_model_location = mocker.patch(
             'commands.predict.launch.validate_local_model_location')
+        self.get_namespaced_pods = mocker.patch('commands.predict.launch.get_namespaced_pods')
+        self.get_namespaced_pods.return_value = TEST_PODS
 
 
 @pytest.fixture
