@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED 1
 # setting PASSWORD env variable to an empty string turns off authetication
 ENV PASSWORD ""
 
-COPY training.py
+COPY training.py .
 
 COPY init_jupyter.sh /bin/init_jupyter
 RUN chmod +x /bin/init_jupyter

@@ -89,7 +89,7 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
 
     with open(dockerfile_name, "r") as dockerfile:
         for line in dockerfile:
-            if line.startswith("ADD training.py"):
+            if line.startswith("COPY training.py") or line.startswith("ADD training.py"):
                 if script_location or script_folder_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM nauta/tensorflow-py"):
