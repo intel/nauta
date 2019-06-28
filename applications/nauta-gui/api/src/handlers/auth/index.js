@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 const express = require('express');
-const logger = require('../../utils/logger');
-const jwt = require('jsonwebtoken');
 const authApi = require('./auth');
 
 const router = express.Router();
