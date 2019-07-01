@@ -957,7 +957,7 @@ class ModelProcessCmdTexts:
 
     PATH - indicates the location of the model of the Input or Output network shares
 
-    FORMAT - one of the supported formats (see nctl model process-list command)
+    KIND - one of the supported formats (see nctl model process-list command)
 
     OPTIONS - options specific to argo workflow 
     """

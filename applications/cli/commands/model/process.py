@@ -32,7 +32,7 @@ from util.config import NAUTAConfigMap
 logger = initialize_logger(__name__)
 
 
-@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='e')
+@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='p')
 @click.argument("path", required=True)
 @click.argument("kind", required=True, type=str)
 @click.argument("options", nargs=-1, metavar="[-- options]")
@@ -69,4 +69,4 @@ def process(path: str, kind: str, options: Tuple[str, ...]):
         logger.exception(error_msg)
         sys.exit(1)
 
-    click.echo(f'Successfully created export workflow: {process_workflow.name}')
+    click.echo(f'Successfully created process workflow: {process_workflow.name}')
