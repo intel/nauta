@@ -34,7 +34,7 @@ _encoding = 'utf-8'  # Encoding used for bytes <-> str conversions
 
 def compute_hash_of_k8s_env_address():
     nauta_hostname = get_kubectl_host()
-    nauta_hostname_hash = hashlib.md5(nauta_hostname.encode('utf-8')).hexdigest()
+    nauta_hostname_hash = hashlib.md5(nauta_hostname.encode('utf-8')).hexdigest()  # nosec
     return nauta_hostname_hash
 
 

@@ -3,8 +3,7 @@ dpath==1.4.2
 pyyaml==4.2b1
 tabulate==0.8.2
 elasticsearch==5.5.0
-kubernetes==6.0.0
-docker==3.3.0
+kubernetes==7.0.1
 toml==0.9.4
 marshmallow==2.15.2
 marshmallow-enum==1.4
@@ -17,5 +16,5 @@ yaspin==0.14.0
 ruamel.yaml.jinja2==0.2.2
 jinja2==2.10.1
 pycryptodome==3.7.3
-retry==0.9.2
 cryptography==2.7
+retry==0.9.2

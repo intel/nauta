@@ -78,7 +78,8 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
         api_key = get_api_key()
         headers = {'Authorization': api_key, 'Accept': 'application/json', 'Content-Type': 'application/json'}
         with spinner(text=Texts.WAITING_FOR_RESPONSE_MSG):
-            stream_response = requests.post(stream_url, data=json.dumps(stream_data), verify=False, headers=headers)
+            stream_response = requests.post(stream_url, data=json.dumps(stream_data),  # nosec - request to k8s cluster
+                                            verify=False, headers=headers)
         stream_response.raise_for_status()
         click.echo(stream_response.text)
     except Exception as e:

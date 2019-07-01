@@ -19,7 +19,7 @@ from enum import Enum
 import os
 import subprocess
 import sys
-from typing import List, Tuple, Union
+from typing import List, Tuple
 import errno
 import socket
 import dateutil.tz
@@ -145,13 +145,12 @@ class ExternalCliClient:
         return ExternalCliCommand(env=self.env, cwd=self.cwd, cmd=[self.executable, name], timeout=self.timeout)
 
 
-def execute_system_command(command: Union[List[str], str],
+def execute_system_command(command: List[str],
                            timeout: int = None,
                            stdin=None,
                            env=None,
                            cwd=None,
-                           logs_size: int = 0,
-                           shell=False) -> Tuple[str, int, str]:
+                           logs_size: int = 0) -> Tuple[str, int, str]:
     """
     Executes system's command
     :param command: command to be exeucted
@@ -175,8 +174,7 @@ def execute_system_command(command: Union[List[str], str],
             stdin=stdin,
             env=env,
             cwd=cwd,
-            encoding='utf-8',
-            shell=shell)
+            encoding='utf-8')
         encoded_output = output[-logs_size:].encode('utf-8')
         log.debug(f'COMMAND: {command} RESULT: {encoded_output}'.replace('\n', '\\n'))
     except subprocess.CalledProcessError as ex:
@@ -190,17 +188,11 @@ def execute_subprocess_command(command: List[str],
                                stdin=None,
                                env=None,
                                cwd=None,
-                               shell=False,
-                               join=False) -> subprocess.Popen:
+                               shell=False) -> subprocess.Popen:
 
-    if join:
-        final_command: Union[str, List[str]] = ' '.join(command)
-    else:
-        final_command = command
-
-    log.debug(f'executing COMMAND in subprocess: {str(final_command)}')
+    log.debug(f'executing COMMAND in subprocess: {str(command)}')
     process = subprocess.Popen(
-        args=final_command,
+        args=command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
@@ -211,10 +203,10 @@ def execute_subprocess_command(command: List[str],
         shell=shell)
 
     if process.poll() is not None:
-        log.error(f'{final_command} execution FAIL: {command}')
+        log.error(f'{command} execution FAIL: {command}')
         out, err = process.communicate()
-        log.error(f'{final_command} stdout: {out}')
-        log.error(f'{final_command} stderr: {err}')
+        log.error(f'{command} stdout: {out}')
+        log.error(f'{command} stderr: {err}')
         raise RuntimeError(
             Texts.COMMAND_EXE_FAIL_ERROR_MSG.format(command=command))
     return process

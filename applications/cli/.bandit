@@ -1,0 +1,3 @@
+[bandit]
+target: .
+exclude: */tests/*,*/.venv/*,.pytest_cache/*,.mypy_cache/*,vendor/*,build/*,*/dist/*,*/example-python/*

@@ -179,7 +179,7 @@ def create_environment(experiment_name: str, file_location: str = None, folder_l
         try:
             shutil.copy2(file_location, folder_path)
             if get_current_os() == OS.WINDOWS:
-                os.chmod(os.path.join(folder_path, os.path.basename(file_location)), 0o666)
+                os.chmod(os.path.join(folder_path, os.path.basename(file_location)), 0o666)  # nosec
         except Exception:
             log.exception("Create environment - copying training script error.")
             raise SubmitExperimentError(message_prefix.format(reason=Texts.TRAINING_SCRIPT_CANT_BE_CREATED))

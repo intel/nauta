@@ -124,7 +124,24 @@ style: $(DEV_VIRTUALENV_MARK)
 
 test: $(DEV_VIRTUALENV_MARK)
 	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 py.test
+	echo '=== mypy check start ==='
 	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 python scripts/mypy_check.py || true
+	echo '=== mypy check end ==='
+	echo '=== bandit check start ==='
+	@. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 bandit -r . -ll
+	echo '=== bandit check end ==='
+	echo '=== safety check start ==='
+ifeq (Darwin,$(OS))
+	    @. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 safety check -r requirements.txt --full-report
+endif
+ifeq (Linux,$(OS))
+	    @. $(ACTIVATE); LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 safety check -r requirements.txt --full-report
+endif
+# Safety check will not work on all windows terminals due to encoding issues
+ifeq (Windows,$(OS))
+	    echo 'Safety check is not supported on Windows'
+endif
+	echo '=== safety check end ==='
 
 cli-check: venv-dev test style
 
