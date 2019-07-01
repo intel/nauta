@@ -109,8 +109,8 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
-    # wait till pod is ready - no more than 20 seconds
-    for i in range(20):
+    # wait till pod is ready - no more than 40 seconds
+    for i in range(40):
         pods = get_namespaced_pods(label_selector=f'runName={name}', namespace=namespace)
         if pods:
             for pod in pods:
