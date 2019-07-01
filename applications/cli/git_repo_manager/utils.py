@@ -81,7 +81,6 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
             # do not copy LD_LIBRARY_PATH to git exec env - it points to libraries packed by PyInstaller
             # and they can be incompatible with system's git (e.g. libssl)
             del env['LD_LIBRARY_PATH']
-        logger.debug(f'Git client env: {env}')
         git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
         # ls-remote command must be created manually due to hyphen
         git.ls_remote = git._make_command(name='ls-remote')  #type: ignore
@@ -139,7 +138,6 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
             # do not copy LD_LIBRARY_PATH to git exec env - it points to libraries packed by PyInstaller
             # and they can be incompatible with system's git (e.g. libssl)
             del env['LD_LIBRARY_PATH']
-        logger.debug(f'Git client env: {env}')
         git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
             if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
