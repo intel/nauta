@@ -63,7 +63,7 @@ def launch_app(k8s_app_name: NAUTAAppNames, no_launch: bool = False, port: int =
                 if is_gui_browser_available():
                     wait_for_connection(url)
                     webbrowser.open_new(url)
-                    proxy_spinner.hide()
+                    proxy_spinner.stop()
                 else:
                     click.echo(Texts.NO_WEB_BROWSER_ERROR_MSG)
 
@@ -73,7 +73,7 @@ def launch_app(k8s_app_name: NAUTAAppNames, no_launch: bool = False, port: int =
                     random_port=proxy.tunnel_port
                 ))
 
-            proxy_spinner.hide()
+            proxy_spinner.stop()
             click.echo(Texts.GO_TO_MSG.format(url=url))
             click.echo(Texts.PROXY_CREATED_MSG)
             wait_for_ctrl_c()

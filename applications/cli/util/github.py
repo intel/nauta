@@ -58,10 +58,11 @@ class Github:
 
         except Exception as exe:
             logger.exception(Texts.GET_OTHER_ERROR)
-            raise GithubException(HTTPStatus.SEE_OTHER) from exe
+            raise GithubException(str(HTTPStatus.SEE_OTHER)) from exe
 
         if output.status_code == HTTPStatus.NOT_FOUND:
             logger.debug(Texts.GET_MISSING_FILE.format(url=url))
+            raise GithubException(output.status_code)
         elif output.status_code != HTTPStatus.OK:
             logger.error(Texts.GET_REQUEST_ERROR.format(url=url, http_code=output.status_code))
             raise GithubException(output.status_code)
@@ -95,18 +96,20 @@ class Github:
                 return file.text if file else None
             return None
         except Exception:
-            logger.exception(Texts.MISSING_CHART_FILE)
-
-        return None
+            logger.exception(Texts.MISSING_CHART_FILE.format(request_url=request_url))
+            raise
 
     def download_whole_directory(self, dirpath: str, output_dir_path: str):
         os.makedirs(output_dir_path)
 
         request_url = "/".join([self.GITHUB_API_URL, 'repos', self.repository_name, 'contents', dirpath])
 
-        output = self.make_get_request(request_url)
-
-        repo_item_list = json.loads(output)
+        try:
+            output = self.make_get_request(request_url)
+            repo_item_list = json.loads(output)
+        except Exception:
+            logger.exception(f'Failed to get repository {self.repository_name} content list.')
+            raise
 
         for item in repo_item_list:
             if item['type'] == 'file':

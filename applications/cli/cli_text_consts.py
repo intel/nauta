@@ -925,7 +925,7 @@ class TemplateCopyCmdTexts:
 class GithubMessages:
     GET_REQUEST_ERROR = "Error during accessing github repository {url} : {http_code}"
     GET_OTHER_ERROR = "Other error during connecting github."
-    MISSING_CHART_FILE = "Chart file doesn't exist in the checked folder."
+    MISSING_CHART_FILE = "Chart file doesn't exist in the checked folder ({request_url})."
     GET_MISSING_FILE = "File {url} doesn't exist."
 
 
@@ -935,6 +935,8 @@ class TemplateInstallCmdTexts(TemplateListCmdTexts):
     DOWNLOADING_TEMPLATE = "Installing template..."
     LOCAL_VERSION_ALREADY_INSTALLED = "Local version '{local_version}' of a '{template_name}' template is already " \
                                       "installed. Continue with replacing it with remote version '{remote_version}'?"
+    FAILED_TO_LOAD_TEMPLATE = "Failed to load template {template_name}."
+    FAILED_TO_INSTALL_TEMPLATE = "Failed to install template {template_name} from repository {repository_name}."
 
 
 class ModelExportCmdTexts:

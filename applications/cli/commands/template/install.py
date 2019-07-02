@@ -26,6 +26,7 @@ from commands.template.common import load_chart, get_repository_configuration, g
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.spinner import spinner
+from util.system import handle_error
 from util.github import Github
 from util.config import Config
 
@@ -40,13 +41,22 @@ logger = initialize_logger(__name__)
 def install(state: State, template_name: str):
     chart_file_location = os.path.join(Config.get_config_path(), "packs", template_name)
 
-    with spinner(text=Texts.GETTING_LIST_OF_TEMPLATES_MSG):
-        repository_name, access_token = get_repository_configuration()
-
-        remote_template = load_chart(template_name, Github(repository_name=repository_name, token=access_token))
+    with spinner(text=Texts.GETTING_LIST_OF_TEMPLATES_MSG) as templates_spinner:
+        try:
+            repository_name, access_token = get_repository_configuration()
+            remote_template = load_chart(template_name, Github(repository_name=repository_name, token=access_token))
+        except Exception:
+            templates_spinner.stop()
+            handle_error(logger, user_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
+                         log_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
+                         add_verbosity_msg=state.verbosity == 0)
+            sys.exit(1)
 
         if not remote_template:
-            click.echo(Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name))
+            templates_spinner.stop()
+            handle_error(logger, user_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name),
+                         log_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name),
+                         add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
 
     local_templates = get_local_templates()
@@ -65,11 +75,18 @@ def install(state: State, template_name: str):
         except Exception:
             logger.exception("failed to remove local copy of template!")
 
-    with spinner(text=Texts.DOWNLOADING_TEMPLATE):
-        repository_name, access_token = get_repository_configuration()
-
-        g = Github(repository_name, access_token)
-
-        g.download_whole_directory(template_name, chart_file_location)
+    with spinner(text=Texts.DOWNLOADING_TEMPLATE) as download_spinner:
+        try:
+            repository_name, access_token = get_repository_configuration()
+            g = Github(repository_name, access_token)
+            g.download_whole_directory(template_name, chart_file_location)
+        except Exception:
+            download_spinner.stop()
+            handle_error(logger, user_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
+                                                                                  repository_name=repository_name),
+                         log_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
+                                                                         repository_name=repository_name),
+                         add_verbosity_msg=state.verbosity == 0)
+            sys.exit(1)
 
     click.echo("successfully installed!")

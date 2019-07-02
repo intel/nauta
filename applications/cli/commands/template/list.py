@@ -15,6 +15,7 @@
 #
 
 import click
+import sys
 import tabulate
 
 from util.cli_state import common_options, pass_state, State
@@ -42,6 +43,6 @@ def list_templates(state: State):
     click.echo(tabulate.tabulate(list_of_templates, headers=TEMPLATE_LIST_HEADERS, tablefmt="orgtbl"))
 
     if error_messages:
-        exit(1)
+        sys.exit(1)
     else:
-        exit(0)
+        sys.exit(0)

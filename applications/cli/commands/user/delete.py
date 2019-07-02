@@ -99,7 +99,7 @@ def delete(state: State, username: str, purge: bool):
                         break
                     time.sleep(1)
             else:
-                user_del_spinner.hide()
+                user_del_spinner.stop()
                 click.echo()
                 click.echo(Texts.DELETE_IN_PROGRESS_MSG)
                 exit(0)
