@@ -89,7 +89,7 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
 
     with open(dockerfile_name, "r") as dockerfile:
         for line in dockerfile:
-            if line.startswith("ADD training.py"):
+            if line.startswith("COPY training.py") or line.startswith("ADD training.py"):
                 if script_location or script_folder_location:
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM nauta/tensorflow-py"):
@@ -136,12 +136,12 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
                        env_variables: List[str] = None):
     log.debug("Modify values.yaml - start")
     pack_params = pack_params if pack_params else []
-    
+
     values_yaml_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values.yaml")
     values_yaml_temp_filename = os.path.join(experiment_folder, f"charts/{pack_type}/values_temp.yaml")
-    
+
     with open(values_yaml_filename, "r") as values_yaml_file:
-        
+
         template = jinja2.Template(values_yaml_file.read())
 
         rendered_values = template.render(NAUTA = {
@@ -151,7 +151,7 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             'ExperimentImage': f'127.0.0.1:{cluster_registry_port}/{username}/{experiment_name}:latest',
             'ImageRepository': f'127.0.0.1:{cluster_registry_port}/{username}/{experiment_name}:latest'
         })
-    
+
         v = yaml.safe_load(rendered_values)
 
         workersCount = None
