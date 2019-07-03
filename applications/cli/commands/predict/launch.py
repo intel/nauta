@@ -17,9 +17,12 @@
 import base64
 import os
 from sys import exit
+import time
 from typing import Tuple, List
 
+
 import click
+from kubernetes.client import V1Pod
 from tabulate import tabulate
 
 from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX
@@ -31,7 +34,8 @@ from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.system import handle_error
 from cli_text_consts import PredictLaunchCmdTexts as Texts
-from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace, get_service_account
+from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace, get_service_account, \
+    get_namespaced_pods
 
 
 INFERENCE_TEMPLATE = 'tf-inference-stream'
@@ -104,6 +108,21 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
                      add_verbosity_msg=state.verbosity == 0)
         exit(1)
 
+    # wait till pod is ready - no more than 40 seconds
+    for i in range(40):
+        pods = get_namespaced_pods(label_selector=f'runName={name}', namespace=namespace)
+        if pods:
+            for pod in pods:
+                if not check_pod_readiness(pod):
+                    break
+            else:
+                break
+            time.sleep(1)
+    else:
+        handle_error(logger, Texts.PREDICTION_INSTANCE_NOT_READY, Texts.PREDICTION_INSTANCE_NOT_READY,
+                     add_verbosity_msg=state.verbosity == 0)
+        exit(1)
+
 
 def get_authorization_header(service_account_name: str, namespace: str):
     service_account = get_service_account(service_account_name=service_account_name, namespace=namespace)
@@ -111,3 +130,14 @@ def get_authorization_header(service_account_name: str, namespace: str):
     authorization_token = get_secret(secret_name=secret_name, namespace=namespace).data['token']
     authorization_token = base64.b64decode(authorization_token).decode('utf-8')
     return f'Authorization: Bearer {authorization_token}'
+
+
+def check_pod_readiness(pod: V1Pod):
+    container_statuses_list = pod.status.container_statuses
+    if container_statuses_list:
+        for status in container_statuses_list:
+            if not status.ready:
+                break
+        else:
+            return True
+    return False
