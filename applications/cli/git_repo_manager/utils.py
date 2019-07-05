@@ -106,7 +106,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                 git.checkout('-b', 'master')
             if 'master' in remote_branches:
                 try:
-                    git.pull('--rebase', '--strategy=recursive', '-X theirs')
+                    git.pull('--rebase', '--strategy=recursive', '-Xtheirs')
                 except Exception:
                     git.rebase('--abort')
                     raise
