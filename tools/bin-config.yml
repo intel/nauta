@@ -57,3 +57,14 @@ local_images:
       - src: /out/*
         dest: Linux/amd64/REDHAT/7.5
     push: False
+  bin/pip-source:
+    version: "3.6"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../bin-containers/pip-source"
+    artifacts:
+      - src: /out/*
+        dest: pip-source
+    push: False
+

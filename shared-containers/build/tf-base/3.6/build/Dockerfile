@@ -15,7 +15,7 @@ RUN mkdir /tensorflow /build-output -p
 ENV PYTHON=python3.6
 ENV PIP=pip3.6
 
-RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: -U pip==18.0.* setuptools==40.6.*
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: -U pip==18.1 setuptools==40.6.*
 RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build ptyprocess==0.5.2
 
 RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-cache-dir --ignore-installed entrypoints

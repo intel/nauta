@@ -5,4 +5,4 @@ RUN yum update -y && \
     yum install -y python-devel python-pip libffi-devel openssl-devel gcc gcc-c++ bison flex && \
     yum clean all
 
-RUN pip install --no-binary :all: -U pip==19.0.3
+RUN pip install --no-binary :all: -U pip==18.1

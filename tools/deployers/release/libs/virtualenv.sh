@@ -87,20 +87,31 @@ else
     fi
 fi
 
+PIP_VERSION=`${PIP} --version | awk '{print $2}' | cut -f1 -d'.' `
+echo $PIP_VERSION
+
 if [ ! -f "${NAUTA_VIRTUALENV}/.done" ]; then
-    mkdir -p "${NAUTA_VIRTUALENV}"
+mkdir -p "${NAUTA_VIRTUALENV}"
 
-    if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
-        ${PIP} install --upgrade pip>=19.0.3 --no-index --isolated --no-cache-dir
-        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --isolated --ignore-installed --no-cache-dir
-    else
-        ${PIP} install --upgrade pip>=19.0.3 --no-index --user --isolated --no-cache-dir
-        ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --user --isolated --ignore-installed --no-cache-dir
-    fi
+if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
+  if [ $PIP_VERSION -ge 19 ]; then
+    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --isolated --no-cache-dir --no-use-pep517
+  else
+    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --user --isolated --no-cache-dir
+  fi  
+  ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --isolated --ignore-installed --no-cache-dir 
+else
+  if [ $PIP_VERSION -ge 19 ]; then
+    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --isolated --no-cache-dir --no-use-pep517 --user
+  else
+    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --user --isolated --no-cache-dir
+  fi
+  ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --user --isolated --ignore-installed --no-cache-dir --no-index
+fi  
 
-    touch "${NAUTA_VIRTUALENV}/.done"
+touch "${NAUTA_VIRTUALENV}/.done"
 
-    echo "Local python packages ready"
+echo "Local python packages ready"
 fi
 ANSIBLE_PATH="${NAUTA_VIRTUALENV}/bin/ansible-playbook"
 PATH=${NAUTA_VIRTUALENV}/bin:${PATH}
