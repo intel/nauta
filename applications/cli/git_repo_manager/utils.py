@@ -17,6 +17,7 @@
 import base64
 import hashlib
 import os
+import stat
 
 from retry import retry
 
@@ -37,12 +38,14 @@ def compute_hash_of_k8s_env_address():
     return nauta_hostname_hash
 
 
-def get_git_private_key_path(config_dir: str, username: str) -> str:
+def get_fake_ssh_path(config_dir: str, username: str) -> str:
     k8s_secret_name = 'git-secret'
-    key_path = os.path.join(config_dir, f'.ssh-key-{username}-{compute_hash_of_k8s_env_address()}')
+    hash_of_address = compute_hash_of_k8s_env_address()
+    fake_ssh_path = os.path.join(config_dir, f'ssh-{username}-{hash_of_address}')
     # If private key is already saved in config, return it
-    if not os.path.isfile(key_path):
-        # If not, get key from k8s secret, save it with proper permissions
+    if not os.path.isfile(fake_ssh_path):
+        # If not, get key from k8s secret, save it and create fake ssh with a gathered key
+        key_path = os.path.join(config_dir, f'.ssh-key-{username}-{hash_of_address}')
         private_key_secret = get_secret(namespace=username, secret_name=k8s_secret_name)
         private_key = bytes(private_key_secret.data['private_key'], encoding=_encoding)
         private_key = base64.decodebytes(private_key).decode(_encoding)
@@ -50,7 +53,12 @@ def get_git_private_key_path(config_dir: str, username: str) -> str:
             private_key_file.write(private_key)
         os.chmod(key_path, 0o600)
 
-    return key_path
+        fake_ssh_content = f'ssh -i {key_path} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $*'
+        with open(fake_ssh_path, mode='w', encoding=_encoding) as fake_ssh_file:
+            fake_ssh_file.write(fake_ssh_content)
+        os.chmod(fake_ssh_path, 0o500)
+
+    return fake_ssh_path
 
 
 def create_gitignore_file_for_experiments(git_workdir):
@@ -69,8 +77,8 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
 
     try:
         create_gitignore_file_for_experiments(git_work_dir)
-        private_key_path = get_git_private_key_path(username=username, config_dir=Config().config_path)
-        git_env = {'GIT_SSH_COMMAND': f'ssh -o StrictHostKeyChecking=no -i "{private_key_path}"',
+        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=Config().config_path)
+        git_env = {'GIT_SSH': fake_ssh_path,
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_WORK_TREE': git_work_dir,
                    'GIT_TERMINAL_PROMPT': '0',
@@ -90,7 +98,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                           bare=True)
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
             _initialize_git_client_config(git, username=username)
-            git.add('.')
+            git.add('.', '--all')
             git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
             remote_branches, _, _ = git.ls_remote()
             local_branches, _, _ = git.branch()
@@ -100,7 +108,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                 git.checkout('-b', 'master')
             if 'master' in remote_branches:
                 try:
-                    git.pull('--rebase', '--strategy=recursive', '--strategy-option=theirs')
+                    git.pull('--rebase', '--strategy=recursive', '-Xtheirs')
                 except Exception:
                     git.rebase('--abort')
                     raise
@@ -127,8 +135,8 @@ def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, ex
     git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
 
     try:
-        private_key_path = get_git_private_key_path(username=username, config_dir=Config().config_path)
-        git_env = {'GIT_SSH_COMMAND': f'ssh -o StrictHostKeyChecking=no -i "{private_key_path}"',
+        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=Config().config_path)
+        git_env = {'GIT_SSH': fake_ssh_path,
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_TERMINAL_PROMPT': '0',
                    'SSH_AUTH_SOCK': '',  # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
