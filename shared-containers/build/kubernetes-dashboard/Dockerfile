@@ -42,6 +42,10 @@ WORKDIR ${GOPATH}/src/github.com/kubernetes/dashboard
 RUN tar --strip-components=1 -xf /kubernetes-dashboard-v1.8.3.tar.gz
 RUN source /opt/rh/rh-nodejs8/enable && npm install --unsafe-perm
 RUN source /opt/rh/rh-nodejs8/enable && ./node_modules/gulp/bin/gulp.js build-frontend
+
+ENV BLACKLISTED "ansicolors ansistyles archy capture-stack-trace console-control-strings cyclist decode-uri-component fs.realpath genfun iferr imurmurhash isexe meant os-tmpdir promise-inflight qw read-cmd-shim sorted-union-stream umask wide_align yallist bin-links cacache gentle-fs init-package-json jsonparse json-parse-better-errors make-fetch-happen node-fetch-npm npm-pick-manifest npm-registry-client read-package-json ssri"
+RUN cd /opt/rh/rh-nodejs8/root/usr/lib/node_modules/npm/node_modules/ && rm -rf $BLACKLISTED && cd /opt/rh/rh-nodejs8/root/usr/lib/node_modules/npm/node_modules.bundled/ && rm -rf $BLACKLISTED
+
 RUN cp -Rv /build/work/src/github.com/kubernetes/dashboard/dist/amd64/* /
 
 RUN go build github.com/kubernetes/dashboard/src/app/backend
