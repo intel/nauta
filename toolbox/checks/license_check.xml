@@ -31,6 +31,7 @@
                     <exclude>**/package_examples/mnist_multinode.py</exclude>
                     <exclude>**/package_examples/mnist_single_node.py</exclude>
                     <exclude>**/package_examples/mnist_tensorboard.py</exclude>
+                    <exclude>**/package_examples/mnist_saved_model.py</exclude>
                     <exclude>**/package_examples/imdb_lstm.py</exclude>
                     <exclude>**/package_examples/pytorch_mnist.py</exclude>
                     <exclude>**/package_examples/alexnet/</exclude>
