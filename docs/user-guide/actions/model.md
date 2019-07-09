@@ -5,8 +5,6 @@ The overall purpose of this command/subcommands is to manage model export relate
  - [status Subcommand](#status-subcommand)
  - [export Subcommand](#export-subcommand)
  - [export-list Subcommand](#export-list-subcommand)
- - [process Subcommand](#process-subcommand)
- - [process-list Subcommand](#process-list-subcommand)
  
 ## status Subcommand
 
@@ -67,7 +65,7 @@ Exports an existing model located in the PATH folder to a given FORMAT with give
  
 ### Syntax
  
- `nctl model [options] export PATH FORMAT [-- workflow options]`
+ `nctl model export PATH FORMAT [-- workflow options]`
  
  
 ### Arguments
@@ -77,13 +75,6 @@ Exports an existing model located in the PATH folder to a given FORMAT with give
  |`PATH` | Yes | Location of a model that is going to be exported. Models can be stored only in shared folders - this command doesn't handle models located in local folders. |
  |`FORMAT` | Yes | Format of an exported model. List of available formats can be obtained by executing `export-list` command. |
  |`workflow options` | No | String with a list of parameters that are passed to a workflow responsible for exporting a model. All such parameters should be added at the end of the command after `--` string. |
- 
-
-### Options
- 
- | Name | Required | Description | 
- |:--- |:--- |:--- |
- |`-p, --process [kind]` | No | Kind of a postprocessing workflow template that should be used to process output from an export operation. |
  
 
 ### Returns
@@ -130,69 +121,3 @@ List of available export formats.
 ```
 
 Displays a list of available export formats.
-
-
-## process Subcommand
-
-### Synopsis
- 
-Post-processes an existing model located in the PATH folder using a post-processing workflow named KIND.   
- 
-### Syntax
- 
- `nctl model process PATH FORMAT [-- workflow options]`
- 
- 
-### Arguments
- 
- | Name | Required | Description |
- |:--- |:--- |:--- |
- |`PATH` | Yes | Location of a model that is going to be processed. Models can be stored only in shared folders - this command doesn't handle models located in local folders. |
- |`KIND` | Yes | Kind of a postprocessing workflow template that should be used to process a given model. List of available post-processing kinds can be obtained by executing `process-list` command. |
- |`workflow options` | No | String with a list of parameters that are passed to a workflow responsible for post-processing a model. All such parameters should be added at the end of the command after `--` string. |
-
-
-### Returns
- 
-If a post-processing operation has started successfuly - information about that and a name of an operation. In case of problems - short description of their causes.
-
-     
-### Example
- 
- `nctl model process /mnt/input/home/pretrained_model copy-model`  
- 
- 
-```
-Successfully created export workflow: copy-modelabc3 
-
-```
-
-Processes an existing model located in the `pretrained_model` folder in `input` shared folder.
-
-## process-list Subcommand
-
-### Synopsis
- 
-Displays a list of available kinds of post-processing operations.   
- 
-### Syntax
- 
- `nctl model process-list` 
- 
-
-### Returns
- 
-List of available kinds of post-processing operations.
-     
-### Example
- 
- `nctl model process-list`  
- 
- 
-```
-| Name     |
-|----------|
-| copy     |
-```
-
-Displays a list of available kinds of post-processing operations.

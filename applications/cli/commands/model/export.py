@@ -36,9 +36,8 @@ logger = initialize_logger(__name__)
 @click.argument("path", required=True)
 @click.argument("format", required=True, type=str)
 @click.argument("operation-options", nargs=-1, metavar="[-- operation-options]")
-@click.option("-p", "--process", type=str, required=False, help=Texts.HELP_P)
 @common_options(admin_command=False)
-def export(path: str, format: str, operation_options: Tuple[str, ...], process: str):
+def export(path: str, format: str, operation_options: Tuple[str, ...]):
     additional_params_str = " ".join(operation_options)
     format = format.lower()
     config_path = Config().config_path
@@ -51,17 +50,6 @@ def export(path: str, format: str, operation_options: Tuple[str, ...], process: 
         click.echo(Texts.WRONG_EXPORT_FORMAT.format(format=format, formats=formats))
         sys.exit(2)
 
-    if process:
-        process_path = f'{config_path}/workflows/processes'
-        kinds: List[str] = []
-        if os.path.isdir(process_path):
-            process_kinds = os.listdir(f'{config_path}/workflows/processes')
-            kinds = [os.path.splitext(file)[0] for file in process_kinds if file.endswith('.yaml')]
-
-        if process not in kinds:
-            click.echo(Texts.WRONG_PROCESS_KIND.format(process=process, kinds=kinds))
-            sys.exit(2)
-
     try:
         current_namespace = get_kubectl_current_context_namespace()
 
@@ -72,10 +60,6 @@ def export(path: str, format: str, operation_options: Tuple[str, ...], process: 
             'saved-model-dir-path': path,
             'additional-params': additional_params_str
         }
-
-        if process:
-            process_workflow = ArgoWorkflow.from_yaml(f'{Config().config_path}/workflows/processes/{process}.yaml')
-            export_workflow.add_process(process_workflow)
 
         export_workflow.create(namespace=current_namespace)
     except Exception:
