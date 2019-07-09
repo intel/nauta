@@ -133,7 +133,7 @@ inPodPostgres:
 
     ## Use Existing secret instead of creating one
     ## It must have a postgres-password key containing the desired password
-    # existingSecret: 'secret'
+    #existingSecret: ''   # use global.gitea.inPodPostgres.existingSecret instead of this param
 
     ## Create a database
     ## Default: the postgres user
