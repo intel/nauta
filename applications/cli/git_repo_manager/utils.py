@@ -53,7 +53,8 @@ def get_fake_ssh_path(config_dir: str, username: str) -> str:
             private_key_file.write(private_key)
         os.chmod(key_path, 0o600)
 
-        fake_ssh_content = f'ssh -i {key_path} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $*'
+        fake_ssh_content = f'#!/bin/bash\n' \
+                           f'ssh -i {key_path} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $*'
         with open(fake_ssh_path, mode='w', encoding=_encoding) as fake_ssh_file:
             fake_ssh_file.write(fake_ssh_content)
         os.chmod(fake_ssh_path, 0o500)
