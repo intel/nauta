@@ -4,6 +4,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   generateName: openvino
+  paramDescription: --input_shape [x,y,....] - shape of an input\n--input [name] - names of input layers\n--output [name] - names of output layers\nRest of parameters can be found in a description of OpenVino model optimizer
 spec:
   entrypoint: openvino
   arguments:

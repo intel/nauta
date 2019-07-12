@@ -28,13 +28,13 @@ from util.logger import initialize_logger
 MODEL_HEADERS = ['Operation', 'Start date', 'End date', 'Owner', 'State']
 STEP_HEADERS = ['Name', 'Start date', 'End date', 'State']
 
-EXPORT_LIST_HEADERS = ['Name']
+EXPORT_LIST_HEADERS = ['Name', 'Parameters description']
 PROCESS_LIST_HEADERS = ['Name']
 
 PROCESS_WORKFLOWS_LOCATION = 'workflows/processes'
 EXPORT_WORKFLOWS_LOCATION = 'workflows/exports'
 
-workflow_description = namedtuple('Description', ['name'])
+workflow_description = namedtuple('Description', ['name', 'parameters'])
 
 logger = initialize_logger(__name__)
 
@@ -61,7 +61,6 @@ def get_list_of_workflows(location: str) -> List[workflow_description]:
 def format_workflow_description(filename: str) -> workflow_description:
     with open(filename, mode='r', encoding='utf-8') as workflow_content_file:
         workflow_content = yaml.safe_load(workflow_content_file) or {}
-
         name = workflow_content.get('metadata', {}).get('generateName')
-
-        return workflow_description(name=name)
+        description = workflow_content.get('metadata', {}).get('paramDescription')
+        return workflow_description(name=name, parameters=description.replace("\\n", "\n") if description else "---")

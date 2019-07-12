@@ -41,5 +41,4 @@ def export_list(state: State):
         handle_error(log, Texts.EXPORT_LIST_ERROR_MSG, Texts.EXPORT_LIST_ERROR_MSG)
         sys.exit(1)
 
-    click.echo(tabulate(list_of_workflows, headers=EXPORT_LIST_HEADERS,
-                        tablefmt=TBLT_TABLE_FORMAT))
+    click.echo(tabulate(list_of_workflows, headers=EXPORT_LIST_HEADERS, tablefmt=TBLT_TABLE_FORMAT))

@@ -23,10 +23,11 @@ from cli_text_consts import ModelExportListCmdTexts as Texts
 
 FEM_NAME = "EXPORT_1"
 SEM_NAME = "EXPORT_2"
+FEM_PARAMETERS = "parameters 1"
+SEM_PARAMETERS = None
 
-
-TWO_MODEL_OUTPUT = [workflow_description(name=FEM_NAME),
-                    workflow_description(name=SEM_NAME)]
+TWO_MODEL_OUTPUT = [workflow_description(name=FEM_NAME, parameters=FEM_PARAMETERS),
+                    workflow_description(name=SEM_NAME, parameters=SEM_PARAMETERS)]
 
 
 def test_export_list(mocker):
@@ -36,6 +37,8 @@ def test_export_list(mocker):
 
     assert FEM_NAME in result.output
     assert SEM_NAME in result.output
+    assert FEM_PARAMETERS in result.output
+    assert "---" in result.output
 
 
 def test_export_list_error(mocker):
