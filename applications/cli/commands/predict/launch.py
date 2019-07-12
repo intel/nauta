@@ -25,7 +25,8 @@ import click
 from kubernetes.client import V1Pod
 from tabulate import tabulate
 
-from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX
+from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX, \
+    InferenceRuntime
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from platform_resources.experiment_utils import generate_name
 from util.cli_state import common_options, pass_state, State
@@ -38,7 +39,8 @@ from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace,
     get_namespaced_pods
 
 
-INFERENCE_TEMPLATE = 'tf-inference-stream'
+INFERENCE_TEMPLATE_TFSERVING = 'tf-inference-stream'
+INFERENCE_TEMPLATE_OVMS = 'ovms-inference-stream'
 
 logger = initialize_logger(__name__)
 
@@ -59,10 +61,12 @@ def validate_local_model_location(local_model_location: str):
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
+@click.option('-rt', '--runtime', required=False, type=click.Choice([runtime.value for runtime in InferenceRuntime]),
+              default=InferenceRuntime.TFSERVING.value, help=Texts.HELP_RT)
 @common_options(admin_command=False)
 @pass_state
 def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str,
-           pack_param: List[Tuple[str, str]], requirements: str):
+           pack_param: List[Tuple[str, str]], requirements: str, runtime: InferenceRuntime):
     """
     Starts a new prediction instance that can be used for performing prediction, classification and
     regression tasks on trained model.
@@ -78,11 +82,13 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
 
     click.echo('Submitting prediction instance.')
     try:
+        template = INFERENCE_TEMPLATE_OVMS if InferenceRuntime(runtime) == InferenceRuntime.OVMS else \
+            INFERENCE_TEMPLATE_TFSERVING
         model_path = model_location.rstrip('/') if model_location else local_model_location.rstrip('/')
         model_name = model_name if model_name else os.path.basename(model_path)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location, model_name=model_name,
-                                                      local_model_location=local_model_location,
+                                                      local_model_location=local_model_location, template=template,
                                                       requirements=requirements, pack_params=pack_param)
         if inference_instance.state == RunStatus.FAILED:
             raise RuntimeError('Inference instance submission failed.')

@@ -22,7 +22,7 @@ import click
 from tabulate import tabulate
 
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
-from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX
+from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX, InferenceRuntime
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
@@ -31,7 +31,8 @@ from util.system import handle_error
 from cli_text_consts import PredictBatchCmdTexts as Texts
 
 
-BATCH_INFERENCE_TEMPLATE = 'tf-inference-batch'
+BATCH_INFERENCE_TEMPLATE_TFSERVING = 'tf-inference-batch'
+BATCH_INFERENCE_TEMPLATE_OVMS = 'ovms-inference-batch'
 
 logger = initialize_logger(__name__)
 
@@ -58,10 +59,13 @@ def validate_local_model_location(local_model_location: str):
               callback=validate_pack_params_names)
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False,
               help=Texts.HELP_REQUIREMENTS)
+@click.option('-rt', '--runtime', required=False, type=click.Choice([runtime.value for runtime in InferenceRuntime]),
+              default=InferenceRuntime.TFSERVING.value, help=Texts.HELP_RT)
 @common_options(admin_command=False)
 @pass_state
 def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
-          model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]], requirements: str):
+          model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]], requirements: str,
+          runtime: InferenceRuntime):
     """
     Starts a new batch instance that will perform prediction on provided data.
     """
@@ -76,11 +80,13 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
 
     # noinspection PyBroadException
     try:
+        template = BATCH_INFERENCE_TEMPLATE_OVMS if InferenceRuntime(runtime) == InferenceRuntime.OVMS else \
+            BATCH_INFERENCE_TEMPLATE_TFSERVING
         model_name = model_name if model_name else os.path.basename(model_location)
         name = name if name else generate_name(name=model_name, prefix=INFERENCE_INSTANCE_PREFIX)
         inference_instance = start_inference_instance(name=name, model_location=model_location,
                                                       local_model_location=local_model_location, model_name=model_name,
-                                                      template=BATCH_INFERENCE_TEMPLATE, data_location=data,
+                                                      template=template, data_location=data,
                                                       output_location=output,
                                                       tf_record=tf_record,
                                                       pack_params=pack_param,

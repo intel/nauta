@@ -260,6 +260,8 @@ class PredictLaunchCmdTexts:
                       "location."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'Open Vino Model " \
+              "Server'. Default option is 'tfserving'."
     PREDICTION_INSTANCE_NOT_READY = "Prediction instance is not ready. Please check its readiness again in a few " \
                                     "minutes."
 
@@ -323,6 +325,8 @@ class PredictBatchCmdTexts:
                      "delivered in protobuf format."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
+    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'Open Vino Model " \
+              "Server'. Default option is 'tfserving'."
 
 
 class ExperimentCmdTexts:
@@ -692,8 +696,8 @@ class UtilDependenciesCheckerTexts:
 class UtilConfigTexts:
     USER_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {user_path} directory from {config_env_name} env!"
     NCTL_CONFIG_DIR_NOT_FOUND_ERROR_MSG = "Cannot find {config_dir_name} directory in {binary_config_dir_path} " \
-                                             "and {user_local_config_dir_path}. Use {config_env_name} env to point " \
-                                             "{config_dir_name} directory location"
+                                          "and {user_local_config_dir_path}. Use {config_env_name} env to point " \
+                                          "{config_dir_name} directory location"
 
 
 class PlatformResourcesCustomModelTexts:
@@ -777,8 +781,8 @@ class CliStateTexts:
     NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
     USER_NOT_ADMIN_MSG = "Only nauta administrators can run '{command_name}' command."
     USER_IS_ADMIN_MSG = "You cannot run command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \
-                            "environment variable to point to a valid nauta user config. If you don't have one you " \
-                            "can create it with command 'nctl user create'."
+                        "environment variable to point to a valid nauta user config. If you don't have one you " \
+                        "can create it with command 'nctl user create'."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying current user privileges."
 
 

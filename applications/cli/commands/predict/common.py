@@ -25,6 +25,11 @@ INFERENCE_TEMPLATE = 'tf-inference-stream'
 INFERENCE_INSTANCE_PREFIX = 'pred'
 
 
+class InferenceRuntime(Enum):
+    TFSERVING = 'tfserving'
+    OVMS = 'ovms'
+
+
 class InferenceVerb(Enum):
     CLASSIFY = 'classify'
     REGRESS = 'regress'
@@ -34,7 +39,7 @@ class InferenceVerb(Enum):
 def start_inference_instance(name: str,
                              model_location: str,
                              model_name: str,
-                             template: str = INFERENCE_TEMPLATE,
+                             template: str,
                              local_model_location: str = None,
                              data_location: str = None,
                              output_location: str = None,
