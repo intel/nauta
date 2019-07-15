@@ -14,16 +14,16 @@
 # limitations under the License.
 #
 
-from http import HTTPStatus
 import os
 import shutil
+from http import HTTPStatus
 from typing import Dict, List, Optional
 
+import requests
 import yaml
 
 from cli_text_consts import TemplateListCmdTexts as Texts
 from util.config import Config
-from util.github import Github, GithubException
 from util.logger import initialize_logger
 from util.exceptions import ExceptionWithMessage
 import commands.experiment.common
@@ -53,11 +53,13 @@ class Template:
 
     DESCRIPTION_MAX_WIDTH = 50
 
-    def __init__(self, name: str, description: str, local_version: str = None, remote_version: str = None):
+    def __init__(self, name: str, description: str, local_version: str = None, remote_version: str = None,
+                 url: str = None):
         self.name = name
         self.description = description
         self.local_version = local_version
         self.remote_version = remote_version
+        self.url = url  # Url of remote template's package
 
     def representation(self):
         return str(self.name), commands.experiment.common.wrap_text(str(self.description),
@@ -88,30 +90,30 @@ class Template:
             raise
 
 
-def get_remote_templates(repository_name: str, access_token: str = None) -> Dict[str, Template]:
-    remote_model_list = {}
-
+def get_remote_templates(repository_address: str) -> Dict[str, Template]:
     try:
-        g = Github(repository_name=repository_name, token=access_token)
-        contents = g.get_repository_content()
-        for content in contents:
-            remote_template = load_chart(content.name, g)
-
-            if remote_template:
-                remote_model_list[remote_template.name] = remote_template
-
-        return remote_model_list
-    except GithubException as gexe:
-        logger.exception(Texts.OTHER_GITHUB_ERROR)
-        message = Texts.OTHER_GITHUB_ERROR
-        if gexe.status == HTTPStatus.NOT_FOUND:
-            message = Texts.MISSING_REPOSITORY.format(repository_name=repository_name)
-        elif gexe.status == HTTPStatus.UNAUTHORIZED:
-            message = Texts.UNAUTHORIZED
-        raise ExceptionWithMessage(message)
+        remote_manifest = requests.get(f'{repository_address}/index.json')
+        remote_manifest.raise_for_status()
+        templates_metadata = remote_manifest.json()['templates']
+    except requests.exceptions.HTTPError as exe:
+        if exe.response.status_code == HTTPStatus.NOT_FOUND:
+            logger.exception(ExceptionWithMessage(Texts.MISSING_REPOSITORY.format(
+                repository_address=repository_address)))
+            raise ExceptionWithMessage(Texts.MISSING_REPOSITORY.format(repository_address=repository_address)) from exe
+        else:
+            logger.exception(ExceptionWithMessage(Texts.OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY))
+            raise ExceptionWithMessage(Texts.OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY) from exe
     except Exception as exe:
-        logger.exception(Texts.OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY)
+        logger.exception(ExceptionWithMessage(Texts.OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY))
         raise ExceptionWithMessage(Texts.OTHER_ERROR_DURING_ACCESSING_REMOTE_REPOSITORY) from exe
+
+    remote_templates = {template['name']: Template(name=template['name'],
+                                                   remote_version=template['version'],
+                                                   description=template['description'],
+                                                   url=template['url'],
+                                                   local_version=None) for template in templates_metadata}
+
+    return remote_templates
 
 
 def extract_chart_description(chart_content: str, local: bool) -> Optional[Template]:
@@ -129,15 +131,24 @@ def extract_chart_description(chart_content: str, local: bool) -> Optional[Templ
         return None
 
 
-def load_chart(name: str, g: Github) -> Optional[Template]:
-    file_path = "/".join([name, Template.CHART_FILE_LOCATION, Template.CHART_FILE_NAME])
-    file = g.get_file_content(file_path=file_path)
+def load_remote_template(name: str, repository_address: str) -> Optional[Template]:
+    remote_templates = get_remote_templates(repository_address)
 
-    if file:
-        remote_template = extract_chart_description(file, local=False)
-        return remote_template
+    if not remote_templates.get(name):
+        logger.debug(f'Template {name} not found in repository {repository_address}')
+        return None
 
-    return None
+    return remote_templates[name]
+
+
+def download_remote_template(template: Template, repository_address: str, output_dir_path: str):
+    pack_filename = f'{output_dir_path}/{template.name}-{template.remote_version}.tar.bz2'
+
+    template_pack_tar = requests.get(f'{repository_address}/{template.url}', stream=True)
+    with open(pack_filename, 'wb') as f:
+        f.write(template_pack_tar.raw.read())
+
+    shutil.unpack_archive(pack_filename, output_dir_path)
 
 
 def get_template_version(template_name: str) -> Optional[str]:
@@ -169,47 +180,44 @@ def get_local_templates() -> Dict[str, Template]:
 
 
 def prepare_list_of_templates() -> (List[Template], List[str]):
-    repository_name, access_token = get_repository_configuration()
     error_messages = []
-    remote_template_list = {}
+    remote_templates = {}
     try:
-        remote_template_list = get_remote_templates(repository_name=repository_name, access_token=access_token)
+        repository_address = get_repository_address()
+        remote_templates = get_remote_templates(repository_address)
     except ExceptionWithMessage as exe:
         error_messages.append(exe.message)
 
-    local_template_list = {}
+    local_templates = {}
     try:
-        local_template_list = get_local_templates()
+        local_templates = get_local_templates()
     except Exception:
         logger.exception(Texts.ERROR_DURING_LOADING_LOCAL_TEMPLATES)
         error_messages.append(Texts.ERROR_DURING_LOADING_LOCAL_TEMPLATES)
-    for key, value in remote_template_list.items():
-        if key in local_template_list:
-            value.local_version = local_template_list[key].local_version
+    for key, remote_template in remote_templates.items():
+        if key in local_templates:
+            remote_template.local_version = local_templates[key].local_version
 
-    remote_template_list.update({key: value for (key, value) in local_template_list.items()
-                                 if key not in remote_template_list})
+    remote_templates.update({key: local_template for (key, local_template) in local_templates.items()
+                            if key not in remote_templates})
 
     ret_list = []
-    for key in sorted(remote_template_list.keys()):
-        ret_list.append(remote_template_list[key].representation())
+    for key in sorted(remote_templates.keys()):
+        ret_list.append(remote_templates[key].representation())
 
     return ret_list, error_messages
 
 
-def get_repository_configuration() -> (Optional[str], Optional[str]):
+def get_repository_address() -> Optional[str]:
     model_zoo_conf_file = os.path.join(Config().config_path, MODEL_ZOO_CONF_FILE)
     if not os.path.isfile(model_zoo_conf_file):
-        return None, None
+        return None
 
     with open(model_zoo_conf_file, "r") as file:
         content = file.read()
         configuration = yaml.safe_load(content)
-
         model_zoo_address = configuration.get(MODEL_ZOO_ADDRESS_KEY)
-        model_zoo_access_token = configuration.get(MODEL_ZOO_TOKEN_KEY)
-
         if model_zoo_address:
-            return model_zoo_address, model_zoo_access_token
+            return model_zoo_address
 
-    return None, None
+    return None

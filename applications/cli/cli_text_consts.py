@@ -892,7 +892,7 @@ class TemplateCmdTexts:
 
 class TemplateListCmdTexts:
     HELP = "Displays list of available templates - both local and remote."
-    MISSING_REPOSITORY = "Repository {repository_name} doesn't exist or you don't have access to it. List below " \
+    MISSING_REPOSITORY = "Repository {repository_address} doesn't exist or you don't have access to it. List below " \
                          "doesn't contain then any data of remote templates."
     UNAUTHORIZED = "GitHub credentials are incorrect."
     OTHER_GITHUB_ERROR = "Error during accessing github."

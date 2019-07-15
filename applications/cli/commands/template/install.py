@@ -22,12 +22,12 @@ import click
 
 from util.cli_state import common_options, pass_state, State
 from cli_text_consts import TemplateInstallCmdTexts as Texts
-from commands.template.common import load_chart, get_repository_configuration, get_local_templates
+from commands.template.common import load_remote_template, get_repository_address, get_local_templates, \
+    download_remote_template
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.spinner import spinner
 from util.system import handle_error
-from util.github import Github
 from util.config import Config
 
 
@@ -39,12 +39,13 @@ logger = initialize_logger(__name__)
 @common_options()
 @pass_state
 def install(state: State, template_name: str):
-    chart_file_location = os.path.join(Config.get_config_path(), "packs", template_name)
+    packs_location = os.path.join(Config.get_config_path(), "packs")
+    chart_file_location = os.path.join(packs_location, template_name)
+    repository_address = get_repository_address()
 
     with spinner(text=Texts.GETTING_LIST_OF_TEMPLATES_MSG) as templates_spinner:
         try:
-            repository_name, access_token = get_repository_configuration()
-            remote_template = load_chart(template_name, Github(repository_name=repository_name, token=access_token))
+            remote_template = load_remote_template(template_name, repository_address=repository_address)
         except Exception:
             templates_spinner.stop()
             handle_error(logger, user_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
@@ -77,15 +78,14 @@ def install(state: State, template_name: str):
 
     with spinner(text=Texts.DOWNLOADING_TEMPLATE) as download_spinner:
         try:
-            repository_name, access_token = get_repository_configuration()
-            g = Github(repository_name, access_token)
-            g.download_whole_directory(template_name, chart_file_location)
+            download_remote_template(template=remote_template, repository_address=repository_address,
+                                     output_dir_path=packs_location)
         except Exception:
             download_spinner.stop()
             handle_error(logger, user_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
-                                                                                  repository_name=repository_name),
+                                                                                  repository_name=repository_address),
                          log_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
-                                                                         repository_name=repository_name),
+                                                                         repository_name=repository_address),
                          add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
 

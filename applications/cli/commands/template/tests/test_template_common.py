@@ -14,18 +14,18 @@
 # limitations under the License.
 #
 
-from http import HTTPStatus
 import os
+from unittest import mock
 from unittest.mock import patch, mock_open
 
 import pytest
+import requests.exceptions
 import yaml
 
 import util.config
 from util.exceptions import ExceptionWithMessage
-from util.github import GithubRepository, GithubException
 from commands.template.common import extract_chart_description, Template, get_remote_templates, get_local_templates, \
-    prepare_list_of_templates, get_repository_configuration
+    prepare_list_of_templates, get_repository_address
 from cli_text_consts import TemplateListCmdTexts as Texts
 
 CHART_NAME = "test"
@@ -37,10 +37,10 @@ CORRECT_CHART_FILE = f"name: {CHART_NAME}\nversion: {CHART_VERSION}\ndescription
 
 INCORRECT_CHART_FILE = "aname: test\n"
 
-REPOSITORY_NAME = "repository/name"
+REPOSITORY_ADDRESS = "http://test-repo.zoo"
 ACCESS_TOKEN = "access-token"
 
-CORRECT_CONF_FILE = f"model-zoo-address: {REPOSITORY_NAME}\naccess-token: {ACCESS_TOKEN}"
+CORRECT_CONF_FILE = f"model-zoo-address: {REPOSITORY_ADDRESS}\naccess-token: {ACCESS_TOKEN}"
 INCORRECT_CONF_FILE = f"access-token: {ACCESS_TOKEN}"
 
 REMOTE_TEMPLATE_NAME = "Remote template"
@@ -92,65 +92,27 @@ def test_extract_chart_description_failure():
 
 
 def test_get_remote_templates_success(mocker):
-    get_repo_mock = mocker.patch("commands.template.common.Github.get_repository_content")
-    get_repo_mock.return_value = [GithubRepository(name=CHART_NAME)]
+    get_manifest_mock = mocker.patch("commands.template.common.requests.get").return_value
+    get_manifest_mock.json.return_value = {'templates': [{'name': CHART_NAME, 'version': '1.0.1',
+                                                          'url': f'{CHART_NAME}.tar.gz',
+                                                          'description': CHART_DESCRIPTION}]}
 
-    req_get_mock = mocker.patch("commands.template.common.Github.get_file_content")
-    req_get_mock.return_value = CORRECT_CHART_FILE
+    result = get_remote_templates(REPOSITORY_ADDRESS)
 
-    list = get_remote_templates(REPOSITORY_NAME)
-
-    assert len(list) == 1
-    assert_template(list[CHART_NAME], remote_version="1.0.1")
-    assert get_repo_mock.call_count == 1
-    assert req_get_mock.call_count == 1
+    assert len(result) == 1
+    assert_template(result[CHART_NAME], name=CHART_NAME,  remote_version="1.0.1", description=CHART_DESCRIPTION)
 
 
-def test_get_remote_model_missing_repo(mocker):
-    get_repo_mock = mocker.patch("commands.template.common.Github.get_repository_content")
-    get_repo_mock.side_effect = GithubException(status=HTTPStatus.NOT_FOUND)
+def test_get_remote_templates_error(mocker):
+    get_manifest_mock = mocker.patch("commands.template.common.requests.get")
+    mock_response = mock.Mock()
+    mock_response.status_code = 503
+    get_manifest_mock.side_effect = requests.exceptions.HTTPError(response=mock_response)
+    get_manifest_mock.json.return_value = {'templates': [{'name': CHART_NAME, 'version': '1.0.1',
+                                                          'description': CHART_DESCRIPTION}]}
 
-    with pytest.raises(ExceptionWithMessage) as exe_info:
-        get_remote_templates(REPOSITORY_NAME)
-
-    assert Texts.MISSING_REPOSITORY.format(repository_name=REPOSITORY_NAME) in str(exe_info)
-    assert get_repo_mock.call_count == 1
-
-
-def test_get_remote_model_unauthorized(mocker):
-    get_repo_mock = mocker.patch("commands.template.common.Github.get_repository_content")
-    get_repo_mock.side_effect = GithubException(status=HTTPStatus.UNAUTHORIZED)
-
-    with pytest.raises(ExceptionWithMessage) as exe_info:
-        get_remote_templates(REPOSITORY_NAME)
-
-    assert Texts.UNAUTHORIZED in str(exe_info)
-    assert get_repo_mock.call_count == 1
-
-
-def test_get_remote_model_other_github_error(mocker):
-    get_repo_mock = mocker.patch("commands.template.common.Github.get_repository_content")
-    get_repo_mock.side_effect = GithubException(status=HTTPStatus.BAD_GATEWAY)
-
-    with pytest.raises(ExceptionWithMessage) as exe_info:
-        get_remote_templates(REPOSITORY_NAME)
-
-    assert Texts.OTHER_GITHUB_ERROR in str(exe_info)
-    assert get_repo_mock.call_count == 1
-
-
-def test_get_remote_model_other_error(mocker):
-    get_repo_mock = mocker.patch("commands.template.common.Github.get_repository_content")
-    get_repo_mock.return_value = [GithubRepository(name=CHART_NAME)]
-
-    req_get_mock = mocker.patch("commands.template.common.Github.get_file_content")
-    req_get_mock.side_effect = RuntimeError
-
-    with(pytest.raises(ExceptionWithMessage)):
-        get_remote_templates(REPOSITORY_NAME)
-
-    assert get_repo_mock.call_count == 1
-    assert req_get_mock.call_count == 1
+    with pytest.raises(ExceptionWithMessage):
+        get_remote_templates(REPOSITORY_ADDRESS)
 
 
 def test_get_local_templates_success(mocker, monkeypatch):
@@ -173,8 +135,8 @@ def test_get_local_templates_success(mocker, monkeypatch):
 
 
 def test_prepare_list_of_templates(mocker):
-    get_repo_configuration_mock = mocker.patch("commands.template.common.get_repository_configuration")
-    get_repo_configuration_mock.return_value = "location", "access token"
+    get_repository_address_mock = mocker.patch("commands.template.common.get_repository_address")
+    get_repository_address_mock.return_value = "location"
     get_remote_templates_mock = mocker.patch("commands.template.common.get_remote_templates")
     get_remote_templates_mock.return_value = {REMOTE_TEMPLATE_NAME: REMOTE_TEMPLATE}
     get_local_templates = mocker.patch("commands.template.common.get_local_templates")
@@ -187,12 +149,12 @@ def test_prepare_list_of_templates(mocker):
     assert REMOTE_TEMPLATE.representation() in list
     assert LOCAL_TEMPLATE_2.representation() in list
 
-    assert get_repo_configuration_mock.call_count == 1
+    assert get_repository_address_mock.call_count == 1
 
 
 def test_prepare_list_of_templates_only_remote(mocker):
-    get_repo_configuration_mock = mocker.patch("commands.template.common.get_repository_configuration")
-    get_repo_configuration_mock.return_value = "location", "access token"
+    get_repository_address_mock = mocker.patch("commands.template.common.get_repository_address")
+    get_repository_address_mock.return_value = "location"
     get_remote_templates_mock = mocker.patch("commands.template.common.get_remote_templates")
     get_remote_templates_mock.return_value = {REMOTE_TEMPLATE_NAME: REMOTE_TEMPLATE}
     get_local_templates = mocker.patch("commands.template.common.get_local_templates")
@@ -206,12 +168,12 @@ def test_prepare_list_of_templates_only_remote(mocker):
 
     assert get_local_templates.call_count == 1
     assert get_remote_templates_mock.call_count == 1
-    assert get_repo_configuration_mock.call_count == 1
+    assert get_repository_address_mock.call_count == 1
 
 
 def test_prepare_list_of_templates_only_local(mocker):
-    get_repo_configuration_mock = mocker.patch("commands.template.common.get_repository_configuration")
-    get_repo_configuration_mock.return_value = "location", "access token"
+    get_repository_address_mock = mocker.patch("commands.template.common.get_repository_address")
+    get_repository_address_mock.return_value = "location"
     get_remote_templates_mock = mocker.patch("commands.template.common.get_remote_templates")
     get_remote_templates_mock.return_value = {}
     get_local_templates = mocker.patch("commands.template.common.get_local_templates")
@@ -226,12 +188,12 @@ def test_prepare_list_of_templates_only_local(mocker):
 
     assert get_remote_templates_mock.call_count == 1
     assert get_local_templates.call_count == 1
-    assert get_repo_configuration_mock.call_count == 1
+    assert get_repository_address_mock.call_count == 1
 
 
 def test_prepare_list_of_templates_remote_failure(mocker):
-    get_repo_configuration_mock = mocker.patch("commands.template.common.get_repository_configuration")
-    get_repo_configuration_mock.return_value = "location", "access token"
+    get_repository_address_mock = mocker.patch("commands.template.common.get_repository_address")
+    get_repository_address_mock.return_value = "location"
     get_remote_templates_mock = mocker.patch("commands.template.common.get_remote_templates")
     get_remote_templates_mock.side_effect = ExceptionWithMessage(EXCEPTION_MESSAGE)
     get_local_templates = mocker.patch("commands.template.common.get_local_templates")
@@ -248,12 +210,12 @@ def test_prepare_list_of_templates_remote_failure(mocker):
 
     assert get_remote_templates_mock.call_count == 1
     assert get_local_templates.call_count == 1
-    assert get_repo_configuration_mock.call_count == 1
+    assert get_repository_address_mock.call_count == 1
 
 
 def test_prepare_list_of_templates_local_failure(mocker):
-    get_repo_configuration_mock = mocker.patch("commands.template.common.get_repository_configuration")
-    get_repo_configuration_mock.return_value = "location", "access token"
+    get_repository_address_mock = mocker.patch("commands.template.common.get_repository_address")
+    get_repository_address_mock.return_value = "location"
     get_remote_templates_mock = mocker.patch("commands.template.common.get_remote_templates")
     get_remote_templates_mock.return_value = {REMOTE_TEMPLATE_NAME: REMOTE_TEMPLATE}
     get_local_templates = mocker.patch("commands.template.common.get_local_templates")
@@ -270,39 +232,36 @@ def test_prepare_list_of_templates_local_failure(mocker):
 
     assert get_local_templates.call_count == 1
     assert get_remote_templates_mock.call_count == 1
-    assert get_repo_configuration_mock.call_count == 1
+    assert get_repository_address_mock.call_count == 1
 
 
-def test_get_repository_configuration_success(mocker):
+def test_get_repository_address_success(mocker):
     mocker.patch("util.config.Config.get_config_path", return_value="")
     mocker.patch("os.path.isfile").return_value = True
 
     with patch("builtins.open", mock_open(read_data=CORRECT_CONF_FILE)):
-        repository_location, access_token = get_repository_configuration()
+        repository_location = get_repository_address()
 
-    assert repository_location == REPOSITORY_NAME
-    assert access_token == ACCESS_TOKEN
+    assert repository_location == REPOSITORY_ADDRESS
 
 
-def test_get_repository_configuration_lack_of_conf_file(mocker):
+def test_get_repository_address_lack_of_conf_file(mocker):
     mocker.patch("util.config.Config.get_config_path", return_value="")
     mocker.patch("os.path.isfile").return_value = False
 
-    repository_location, access_token = get_repository_configuration()
+    repository_location = get_repository_address()
 
     assert not repository_location
-    assert not access_token
 
 
-def test_get_repository_configuration_incorrect_file(mocker):
+def test_get_repository_address_incorrect_file(mocker):
     mocker.patch("util.config.Config.get_config_path", return_value="")
     mocker.patch("os.path.isfile").return_value = True
 
     with patch("builtins.open", mock_open(read_data=INCORRECT_CONF_FILE)):
-        repository_location, access_token = get_repository_configuration()
+        repository_location = get_repository_address()
 
     assert not repository_location
-    assert not access_token
 
 
 def test_update_chart_yaml(tmpdir):
