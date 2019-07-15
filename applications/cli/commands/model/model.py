@@ -19,7 +19,6 @@ import click
 from commands.model.status import status
 
 from commands.model import export
-from commands.model.export_list import export_list
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
 from cli_text_consts import ModelCmdTexts as Texts
@@ -36,4 +35,3 @@ def model():
 
 model.add_command(export.export)
 model.add_command(status)
-model.add_command(export_list)

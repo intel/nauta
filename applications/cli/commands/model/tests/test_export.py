@@ -16,7 +16,19 @@
 
 from click.testing import CliRunner
 
+from cli_text_consts import ModelExportCmdTexts as Texts
+from commands.model.common import workflow_description
 from commands.model.export import export
+
+
+FEM_NAME = "EXPORT_1"
+SEM_NAME = "EXPORT_2"
+FEM_PARAMETERS = "PARAMS_1"
+SEM_PARAMETERS = "PARAMS_2"
+
+
+TWO_MODEL_OUTPUT = [workflow_description(name=FEM_NAME, parameters=FEM_PARAMETERS),
+                    workflow_description(name=SEM_NAME, parameters=SEM_PARAMETERS)]
 
 
 def setup_mocks(mocker):
@@ -56,3 +68,29 @@ def test_export_failure(mocker):
 
     assert result.exit_code == 1
     assert "Failed to create export workflow" in result.output
+
+
+def test_export_list(mocker):
+    mocker.patch("commands.model.export.get_list_of_workflows", return_value=TWO_MODEL_OUTPUT)
+
+    result = CliRunner().invoke(export, ["formats"])
+
+    assert FEM_NAME in result.output
+    assert SEM_NAME in result.output
+    assert FEM_PARAMETERS in result.output
+    assert SEM_PARAMETERS in result.output
+
+
+def test_export_list_error(mocker):
+    mocker.patch("commands.model.export.get_list_of_workflows", side_effect=RuntimeError)
+
+    result = CliRunner().invoke(export, ["formats"])
+
+    assert Texts.EXPORT_LIST_ERROR_MSG in result.output
+
+
+def test_export_missing_format(mocker):
+    setup_mocks(mocker)
+    result = CliRunner().invoke(export, ["wrong-option"])
+
+    assert Texts.MISSING_EXPORT_FORMAT.format(formats=["openvino", "tensorflow"]) in result.output
