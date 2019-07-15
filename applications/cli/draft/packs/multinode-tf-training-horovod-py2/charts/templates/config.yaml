@@ -66,7 +66,7 @@ data:
      echo "StrictHostKeyChecking no" >> /root/.ssh/config
      /usr/sbin/sshd
     
-     retry 90 ssh -o ConnectTimeout=2 -q {{ $name }}-master exit
+     retry 180 ssh -o ConnectTimeout=2 -q {{ $name }}-master exit
 
      if [ $# -eq 0 ]; then
           sleep infinity
@@ -106,7 +106,7 @@ data:
 
       for i in `cat $1 | awk '{print $(1)}'`;do
         if [[ "$i" != *"master" ]];then
-          retry 90 ssh -o ConnectTimeout=2 -q $i exit
+          retry 180 ssh -o ConnectTimeout=2 -q $i exit
           {{- if .Values.useHostNetwork }}
           real=`ssh -q $i hostname`
           if [ $? -eq 0 ]; then
