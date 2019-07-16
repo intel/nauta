@@ -118,12 +118,10 @@ class ModelCmdTexts:
 
 class ModelStatusCmdTexts:
     HELP = "Command displays status of a chosen operation."
-    MODEL_NOT_FOUND = "Model {model_name} hasn't been found. Please check the name passed to the command."
-    OTHER_ERROR_MSG = "Failed to get operation's status."
-    HELP_S = "Displays steps with a given status."
+    MODEL_NOT_FOUND = "Lack of models to be displayed."
+    OTHER_ERROR_MSG = "Failed to get statuses of operations."
     HELP_U = "Name of a user to whom viewed operation belongs. If not given - only operations of a current " \
              "user are taken into account."
-    LACK_OF_STEPS = "There are no steps associated with a given operation."
     LOAD_DATA_MSG = "Loading operation's data. Please wait..."
 
 

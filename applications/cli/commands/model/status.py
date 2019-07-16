@@ -18,10 +18,11 @@ from sys import exit
 
 import click
 from tabulate import tabulate
+from typing import List
 
 from util.config import TBLT_TABLE_FORMAT
 from cli_text_consts import ModelStatusCmdTexts as Texts
-from commands.model.common import MODEL_HEADERS, STEP_HEADERS, PodPhase
+from commands.model.common import MODEL_HEADERS
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
 from util.cli_state import common_options, pass_state, State
@@ -35,17 +36,13 @@ logger = initialize_logger(__name__)
 
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
-@click.argument("model_name", nargs=1)
-@click.option("-s", "--status", type=click.Choice([status.name for status in PodPhase]), help=Texts.HELP_S)
 @click.option('-u', '--username', help=Texts.HELP_U)
 @common_options(admin_command=False)
 @pass_state
-def status(state: State, model_name: str, status: PodPhase, username: str):
+def status(state: State, username: str):
     """
     Returns status of a model
 
-    :param model_name: name of a model data of which should be displayed
-    :param status: status of a model step that should be displayed
     :param username; if checked - searches for model for a certain user
     """
     try:
@@ -54,20 +51,16 @@ def status(state: State, model_name: str, status: PodPhase, username: str):
         else:
             namespace = username
         with spinner(text=Texts.LOAD_DATA_MSG):
-            workflow: ArgoWorkflow = ArgoWorkflow.get(namespace=namespace, name=model_name)
+            # filtering out workflows used to build images with training jobs
+            workflows: List[ArgoWorkflow.ArgoWorkflowCliModel] = [workflow.cli_representation for workflow in
+                                                                  ArgoWorkflow.list(namespace=namespace,
+                                                                                    label_selector="type!=build-workflow")]  # noqa: E501
 
-        if not workflow:
-            click.echo(Texts.MODEL_NOT_FOUND.format(model_name=model_name))
+        if not workflows:
+            click.echo(Texts.MODEL_NOT_FOUND)
             exit(0)
-        click.echo('\nOperation details:\n')
-        click.echo(tabulate([workflow.cli_representation], headers=MODEL_HEADERS, tablefmt=TBLT_TABLE_FORMAT))
-        click.echo('\nOperation steps:\n')
-        if workflow.steps:
-            click.echo(tabulate([step.cli_representation for step in workflow.steps
-                                 if status is None or status == step.phase], headers=STEP_HEADERS,
-                                tablefmt=TBLT_TABLE_FORMAT))
-        else:
-            click.echo(Texts.LACK_OF_STEPS)
+
+        click.echo(tabulate(workflows, headers=MODEL_HEADERS, tablefmt=TBLT_TABLE_FORMAT))
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=True)
         exit(1)

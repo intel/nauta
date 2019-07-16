@@ -116,18 +116,21 @@ class PlatformResource:
         return cls(body=resource_body, *args, **kwargs)  #type: ignore
 
     @classmethod
-    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs) -> List[PlatformResourceTypeVar]:
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, label_selector: str = None,
+             **kwargs) -> List[PlatformResourceTypeVar]:
         logger.debug(f'Getting list of {cls.__name__}s.')
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
             raw_resources = k8s_custom_object_api.list_namespaced_custom_object(group=cls.api_group_name,
                                                                                 namespace=namespace,
                                                                                 plural=cls.crd_plural_name,
-                                                                                version=cls.crd_version)
+                                                                                version=cls.crd_version,
+                                                                                label_selector=label_selector)
         else:
             raw_resources = k8s_custom_object_api.list_cluster_custom_object(group=cls.api_group_name,
                                                                              plural=cls.crd_plural_name,
-                                                                             version=cls.crd_version)
+                                                                             version=cls.crd_version,
+                                                                             label_selector=label_selector)
 
         return [cls.from_k8s_response_dict(raw_resource) for raw_resource in raw_resources['items']]
 

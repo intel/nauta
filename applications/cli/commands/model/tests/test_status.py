@@ -31,15 +31,23 @@ MODEL_STEPS = [ArgoWorkflowStep(name="model1", phase="Running"),
 MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',
                      k8s_custom_object_api=MagicMock(spec=CustomObjectsApi),
                      phase='Succeeded',
-                     steps=MODEL_STEPS)
+                     steps=MODEL_STEPS,
+                     body={'spec': {'templates': [{'container': {'command': ['other command']}}]}})
+
+
+BUILD_MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',
+                           k8s_custom_object_api=MagicMock(spec=CustomObjectsApi),
+                           phase='Succeeded',
+                           steps=MODEL_STEPS,
+                           body={'spec': {'templates': [{'container': {'command': ['buildctl']}}]}})
 
 
 class ModelStatusMocks:
     def __init__(self, mocker):
         self.get_namespace = mocker.patch('commands.model.status.get_kubectl_current_context_namespace',
                                           return_value='fake-namespace')
-        self.get_workflow = mocker.patch('commands.model.status.ArgoWorkflow.get',
-                                         return_value=MODEL)
+        self.list_workflow = mocker.patch('commands.model.status.ArgoWorkflow.list',
+                                          return_value=[MODEL])
 
 
 @pytest.fixture()
@@ -48,28 +56,23 @@ def status_mocks(mocker) -> ModelStatusMocks:
 
 
 def test_status(status_mocks: ModelStatusMocks):
-    result = CliRunner().invoke(status, [MODEL.name], catch_exceptions=False)
+    result = CliRunner().invoke(status, catch_exceptions=False)
 
     assert result.exit_code == 0
     assert MODEL.name in result.output
     assert MODEL.phase in result.output
-    assert MODEL_STEPS[0].name in result.output
-    assert MODEL_STEPS[1].name in result.output
 
 
-def test_status_with_filter(status_mocks: ModelStatusMocks):
-    result = CliRunner().invoke(status, [MODEL.name, "-s", MODEL_STEPS[0].phase], catch_exceptions=False)
-
+def test_status_without_workflows(status_mocks: ModelStatusMocks):
+    status_mocks.list_workflow.return_value = []
+    result = CliRunner().invoke(status, catch_exceptions=False)
     assert result.exit_code == 0
-    assert MODEL.name in result.output
-    assert MODEL.phase in result.output
-    assert MODEL_STEPS[0].name in result.output
-    assert MODEL_STEPS[1].name not in result.output
+    assert Texts.MODEL_NOT_FOUND in result.output
 
 
 def test_status_other_error(status_mocks: ModelStatusMocks):
-    status_mocks.get_workflow.side_effect = RuntimeError
-    result = CliRunner().invoke(status, [MODEL.name])
+    status_mocks.list_workflow.side_effect = RuntimeError
+    result = CliRunner().invoke(status)
 
     assert result.exit_code == 1
     assert Texts.OTHER_ERROR_MSG in result.output
