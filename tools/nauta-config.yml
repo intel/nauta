@@ -30,6 +30,9 @@ export_images:
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
   - name: openvino-mo
     value: "{{ image_local_url['nauta/openvino-mo'] }}"
+  - name: openvino-ms
+    value: "{{ image_local_url['nauta/openvino-ms'] }}"
+
 
 local_images:
   nauta/centos:
@@ -240,11 +243,15 @@ local_images:
     version: "v2.2.1"
     image: "argoproj/argoexec:v2.2.1"
     method: pull
-  nauta/openvino-mo:
+  nauta/openvino-mo:  #openvino model optimizer
     version: "1.0.0"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/openvino-mo"
+  nauta/openvino-ms:  #openvino model server
+    version: "2019.1.1"
+    image: "intelaipg/openvino-model-server:2019.1.1"
+    method: pull
 
 
 # WARNING
