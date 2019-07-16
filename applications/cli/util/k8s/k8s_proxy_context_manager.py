@@ -15,6 +15,7 @@
 #
 
 import socket
+import threading
 
 import requests
 from requests.exceptions import ConnectionError
@@ -47,6 +48,7 @@ class K8sProxy:
         self.number_of_retries = number_of_retries
         self.namespace = namespace
         self.number_of_retries_wait_for_readiness = number_of_retries_wait_for_readiness
+        self.tunnel_monitor_thread = None
 
     def __enter__(self):
         logger.debug("k8s_proxy - entering")
@@ -73,6 +75,8 @@ class K8sProxy:
                                                 app_name=self.app_name,
                                                 number_of_retries=self.number_of_retries,
                                                 namespace=self.namespace)
+            self.tunnel_monitor_thread = threading.Thread(target=self._log_tunnel_output, args=(self.process,))
+            self.tunnel_monitor_thread.start()
             try:
                 self._wait_for_connection_readiness('127.0.0.1', self.tunnel_port,
                                                     tries=self.number_of_retries_wait_for_readiness)
@@ -106,6 +110,14 @@ class K8sProxy:
         gone, alive = psutil.wait_procs(children, timeout=3)
         for survivor in alive:
             survivor.kill()
+
+        if self.tunnel_monitor_thread:
+            self.tunnel_monitor_thread.join(timeout=10)
+
+    @staticmethod
+    def _log_tunnel_output(tunnel_process):
+        for stdout_line in iter(tunnel_process.stdout.readline, ''):
+            logger.debug('Tunnel({pid}) STDOUT: {line}'.format(line=stdout_line, pid=tunnel_process.pid))
 
 
 class TcpK8sProxy(K8sProxy):

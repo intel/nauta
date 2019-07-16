@@ -194,7 +194,7 @@ def execute_subprocess_command(command: List[str],
     process = subprocess.Popen(
         args=command,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         universal_newlines=True,
         stdin=stdin,
         env=env,

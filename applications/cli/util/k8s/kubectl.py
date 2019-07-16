@@ -105,7 +105,7 @@ def start_port_forwarding(k8s_app_name: NAUTAAppNames, port: int = None, app_nam
             tunnel_port = find_random_available_port()
 
         port_forward_command = ['kubectl', 'port-forward', f'--namespace={namespace}',
-                                f'service/{service_name}', f'{tunnel_port}:{service_container_port}']
+                                f'service/{service_name}', f'{tunnel_port}:{service_container_port}', '-v=4']
 
         logger.debug(port_forward_command)
 

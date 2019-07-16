@@ -31,6 +31,7 @@ def test_set_up_proxy(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             return_value=(spo_mock, "1000", "1001"))
+    thread_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.threading.Thread")
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
     mocker.patch("psutil.Process")
 
@@ -38,6 +39,7 @@ def test_set_up_proxy(mocker):
         pass
 
     assert spf_mock.call_count == 1
+    assert thread_mock.call_count == 1
     # noinspection PyProtectedMember,PyUnresolvedReferences
     assert K8sProxy._wait_for_connection_readiness.call_count == 1
 
@@ -46,6 +48,7 @@ def test_set_up_proxy_open_failure(mocker):
     spf_mock = mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
                             side_effect=RuntimeError())
     spc_mock = mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError())
+    mocker.patch("util.k8s.k8s_proxy_context_manager.threading.Thread")
     mocker.patch("util.k8s.k8s_proxy_context_manager.K8sProxy._wait_for_connection_readiness")
     with pytest.raises(K8sProxyOpenError):
         with K8sProxy(NAUTAAppNames.ELASTICSEARCH):
@@ -59,6 +62,7 @@ def test_set_up_proxy_open_failure(mocker):
 
 def test_set_up_proxy_close_failure(mocker):
     spo_mock = mocker.patch("subprocess.Popen")
+    mocker.patch("util.k8s.k8s_proxy_context_manager.threading.Thread")
     mocker.patch("subprocess.Popen.kill", side_effect=RuntimeError)
     mocker.patch("subprocess.Popen.terminate", side_effect=RuntimeError)
     mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
@@ -82,6 +86,7 @@ def test_set_up_proxy_close_failure(mocker):
 
 def test_set_up_proxy_open_readiness_failure(mocker):
     popen_mock = mocker.patch("subprocess.Popen")
+    mocker.patch("util.k8s.k8s_proxy_context_manager.threading.Thread")
     mocker.patch("subprocess.Popen.kill")
     mocker.patch("subprocess.Popen.terminate")
     mocker.patch("util.k8s.k8s_proxy_context_manager.kubectl.start_port_forwarding",
