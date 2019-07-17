@@ -49,6 +49,11 @@ spec:
               name: grpc-port
             - containerPort: {{ .Values.restContainerPort }}
               name: rest-port
+          readinessProbe:
+            tcpSocket:
+              port: rest-port
+            initialDelaySeconds: 10
+            timeoutSeconds: 300
           volumeMounts:
             - name: input-home
               mountPath: /mnt/input/home
