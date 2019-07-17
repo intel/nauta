@@ -10,18 +10,27 @@
   set_fact:
     nauta_version_match: "{{ nauta_version == nauta_version_remote.stdout }}"
 
-- name: Check if platform has gitea's nauta-db secret
-  shell: "{{ runtime_kubectl }} -n nauta get secret nauta-db"
+- name: Get gitea's nauta-db secret
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get secret nauta-db -o 'jsonpath={.data.dbPassword}' | base64 --decode"
   register: gitea_db_secret
+  ignore_errors: True
+
+- name: Get gitea's admin password
+  environment: "{{ local_envs }}"
+  shell: "{{ runtime_kubectl }} -n nauta get secret nauta-gitea-admin-secret -o 'jsonpath={.data.password}' | base64 --decode"
+  register: gitea_admin_password
   ignore_errors: True
 
 - name: Set upgrade values for gitea
   set_fact:
     nauta_upgrade_values:
       global:
-        giteaExistingSecret: nauta-db
+        giteaPostgresPassword: "{{ gitea_db_secret.stdout }}"
+        giteaAdminPassword: "{{ gitea_admin_password.stdout }}"
   when:
     - gitea_db_secret.rc == 0
+    - gitea_admin_password.rc == 0
 
 - name: "Render upgrade values"
   vars:
