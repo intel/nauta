@@ -114,6 +114,11 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
                 pytorch_image_name = nauta_config_map.pytorch_image_name
                 image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{pytorch_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
+            elif line.startswith("FROM nauta/openvino-ms"):
+                nauta_config_map = NAUTAConfigMap()
+                openvinoms_image_name = nauta_config_map.openvinoms_image_name
+                image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{openvinoms_image_name}'
+                dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
