@@ -59,7 +59,7 @@ An example active Jupyter Notebook, shows a simple experiment plot.
  
  ![](images/jupyter_plot.png)
  
- ## Canceling a Jupyter Notebook
+## Canceling a Jupyter Notebook
 
 In Nauta, running a Jupyter notebook is done through an interact session. The session will remain open such that the Jupyter notebook that is running will continue when the browser is closed. Therefore, a user _must_ manually cancel the interact session, or it will continue to allocate resources.
  
