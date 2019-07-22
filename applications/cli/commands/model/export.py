@@ -24,7 +24,7 @@ from tabulate import tabulate
 from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from cli_text_consts import ModelExportCmdTexts as Texts
-from commands.model.common import get_list_of_workflows, EXPORT_WORKFLOWS_LOCATION, EXPORT_LIST_HEADERS
+from commands.model.common import get_list_of_workflows, EXPORT_WORKFLOWS_LOCATION, EXPORT_LIST_HEADERS, MODEL_HEADERS
 from platform_resources.workflow import ArgoWorkflow
 from util.config import Config
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
@@ -84,10 +84,13 @@ def export(path: str, format: str, operation_options: Tuple[str, ...]):
         }
 
         export_workflow.create(namespace=current_namespace)
+
+        workflow: ArgoWorkflow = ArgoWorkflow.get(namespace=current_namespace, name=export_workflow.name)
     except Exception:
         error_msg = 'Failed to create export workflow.'
         click.echo(error_msg)
         logger.exception(error_msg)
         sys.exit(1)
 
-    click.echo(f'Successfully created export workflow: {export_workflow.name}')
+    click.echo(tabulate([workflow.cli_representation], headers=MODEL_HEADERS, tablefmt=TBLT_TABLE_FORMAT))
+    click.echo(f'\nSuccessfully created export workflow')

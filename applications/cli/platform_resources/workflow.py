@@ -33,6 +33,7 @@ from util.logger import initialize_logger
 
 logger = initialize_logger(__name__)
 
+QUEUED_PHASE = 'Queued'
 
 class ArgoWorkflowStep:
 
@@ -74,7 +75,7 @@ class ArgoWorkflow(PlatformResource):
     def from_k8s_response_dict(cls, object_dict: dict):
         return cls(name=object_dict['metadata'].get('name'),
                    namespace=object_dict['metadata'].get('namespace'),
-                   started_at=object_dict.get('status', {}).get('startedAt'),
+                   started_at=object_dict['metadata'].get('creationTimestamp'),
                    finished_at=object_dict.get('status', {}).get('finishedAt'),
                    status=object_dict.get('status', {}),
                    phase=object_dict.get('status', {}).get('phase'),
@@ -87,7 +88,7 @@ class ArgoWorkflow(PlatformResource):
                                                  started_at=self.started_at,
                                                  finished_at=self.finished_at,
                                                  submitter=self.namespace,
-                                                 phase=self.phase)
+                                                 phase=self.phase if self.phase else QUEUED_PHASE)
 
     @classmethod
     def generate_step_group_list(cls, object_dict: dict):

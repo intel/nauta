@@ -19,13 +19,18 @@ from click.testing import CliRunner
 from cli_text_consts import ModelExportCmdTexts as Texts
 from commands.model.common import workflow_description
 from commands.model.export import export
-
+from platform_resources.workflow import ArgoWorkflow, QUEUED_PHASE
 
 FEM_NAME = "EXPORT_1"
 SEM_NAME = "EXPORT_2"
 FEM_PARAMETERS = "PARAMS_1"
 SEM_PARAMETERS = "PARAMS_2"
 
+FEM_START_DATE = '2000-01-01'
+FEM_NAMESPACE = 'test-namespace'
+
+TEST_AGROWORKFLOW = ArgoWorkflow(name=FEM_NAME, started_at=FEM_START_DATE, finished_at=None,
+                                 namespace=FEM_NAMESPACE, phase=None)
 
 TWO_MODEL_OUTPUT = [workflow_description(name=FEM_NAME, parameters=FEM_PARAMETERS),
                     workflow_description(name=SEM_NAME, parameters=SEM_PARAMETERS)]
@@ -36,6 +41,8 @@ def setup_mocks(mocker):
                  return_value='fake-namespace')
     mocker.patch('platform_resources.workflow.ArgoWorkflow.from_yaml',
                  return_value=mocker.MagicMock())
+    mocker.patch('platform_resources.workflow.ArgoWorkflow.get',
+                 return_value=TEST_AGROWORKFLOW)
     mocker.patch('os.listdir', return_value=['openvino.yaml', 'tensorflow.yaml', 'some_other_file'])
     mocker.patch('commands.model.export.NAUTAConfigMap', return_value=mocker.MagicMock(registry='fake-addr'))
     mocker.patch('commands.model.export.Config')
@@ -48,6 +55,10 @@ def test_export(mocker):
 
     assert result.exit_code == 0
     assert "Successfully created export workflow" in result.output
+    assert QUEUED_PHASE in result.output
+    assert FEM_NAME in result.output
+    assert FEM_START_DATE in result.output
+    assert FEM_NAMESPACE in result.output
 
 
 def test_export_inexistent_format(mocker):
