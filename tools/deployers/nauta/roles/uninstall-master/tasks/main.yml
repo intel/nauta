@@ -76,3 +76,5 @@
     - /root/kubernetes
     - /root/.kube
     - /data/local/etcd
+    - /data/nauta/postgres
+    - /data/nauta/main
