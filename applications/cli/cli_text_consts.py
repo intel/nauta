@@ -73,11 +73,11 @@ class CmdsCommonTexts:
                                  "yes - close it manually."
     NAME_M_BOTH_GIVEN_ERROR_MSG = "Both {instance_type} name and -m option cannot be given. Please choose one of them."
     NAME_M_NONE_GIVEN_ERROR_MSG = "Error: {instance_type} name or -m option must be given. Please pass one of them."
-    LOGS_STORING_CONFIRMATION = "Logs from the {experiment_name} {instance_type} will be stored in " \
-                                "the {filename} file. Should the app proceed?"
-    LOGS_STORING_CONFIRMATION_FILE_EXISTS = "Logs from the {experiment_name} {instance_type} will be stored in the " \
-                                            "{filename} file. The file with this name already exists. Should the app " \
-                                            "proceed?"
+    LOGS_STORING_CONF = "Logs from the {instance_name} {instance_type} will be stored in " \
+                        "the {filename} file. Should the app proceed?"
+    LOGS_STORING_CONF_FILE_EXISTS = "Logs from the {instance_name} {instance_type} will be stored in the " \
+                                    "{filename} file. The file with this name already exists. Should the app " \
+                                    "proceed?"
     LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs."
     LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
     LOGS_STORING_CANCEL_MESSAGE = "Logs have not been written to the file mentioned above - cancelled by user."
@@ -961,3 +961,30 @@ class ModelProcessCmdTexts:
     """
     SHORT_HELP = "Process the model using one of defined formats."
     WRONG_PROCESS_KIND = "Processing kind: {process} does not exist. Choose from: {kinds}."
+
+
+class ModelExportLogsCmdTexts:
+    SHORT_HELP = "Displays logs of a 'model export' operation."
+    HELP = """
+    Displays logs of an 'model export' operation.
+
+    operation_name - name of a 'model export' operation. The operation_name argument value can be empty when 'match' 
+    option is used.
+    """
+    HELP_SD = "Retrieves logs produced on or after this date (ISO 8601 date format)."
+    HELP_ED = "Retrieves logs produced on or before this date ( ISO 8601 date format)."
+    HELP_M = "Searches for operation logs from matching values. Cannot be used with the operation_name argument."
+    HELP_O = "Stores file-named operation logs."
+    HELP_F = "Specifies if logs should be streamed. Streams only logs from a single operation."
+    HELP_PAGER = "Display logs in interactive pager."
+
+
+class ModelExportCommonTexts:
+    PROXY_CREATION_ERROR_MSG = "Error during creation of a proxy for elasticsearch."
+    LOGS_GET_OTHER_ERROR_MSG = "Failed to get operation logs."
+    LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error during creation of a proxy for elasticsearch. {exe.message}"
+    PROXY_CLOSE_LOG_ERROR_MSG = "Error during closing of a proxy for elasticsearch."
+    NAME_M_BOTH_GIVEN_ERROR_MSG = "Both name and -m option cannot be given. Please choose one of them."
+    NAME_M_NONE_GIVEN_ERROR_MSG = "Error: name or -m option must be given. Please pass one of them."
+    MORE_EXP_LOGS_MESSAGE = "There is more than one log to be stored. Each log will be stored in a separate file."
+    OPERATION_NOT_EXISTS_ERROR_MSG = "Operation with name {operation_name} does not exist."

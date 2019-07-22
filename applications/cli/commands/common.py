@@ -236,7 +236,9 @@ def get_logs(experiment_name: str, min_severity: SeverityLevel, start_date: str,
                                                                              follow=follow_logs)
 
                 if output:
-                    save_logs_to_file(run=run, run_logs_generator=run_logs_generator, instance_type=instance_type)
+                    save_logs_to_file(logs_generator=run_logs_generator,
+                                      instance_name=run.name,
+                                      instance_type=instance_type)
                 else:
                     if len(runs) > 1:
                         click.echo(f'Experiment : {run.name}')
@@ -287,26 +289,27 @@ def print_logs(run_logs_generator: Generator[LogEntry, None, None], pager=False)
             click.echo(formatted_log, nl=False)
 
 
-def save_logs_to_file(run: Run, run_logs_generator: Generator[LogEntry, None, None], instance_type: str):
-    filename = run.name + '.log'
-    confirmation_message = Texts.LOGS_STORING_CONFIRMATION.format(filename=filename,
-                                                                  experiment_name=run.name,
-                                                                  instance_type=instance_type)
+def save_logs_to_file(logs_generator: Generator[LogEntry, None, None], instance_name: str,
+                      instance_type: str):
+    filename = instance_name + ".log"
+    confirmation_message = Texts.LOGS_STORING_CONF.format(filename=filename,
+                                                          instance_name=instance_name,
+                                                          instance_type=instance_type)
     if os.path.isfile(filename):
-        confirmation_message = Texts.LOGS_STORING_CONFIRMATION_FILE_EXISTS.format(filename=filename,
-                                                                                  experiment_name=run.name,
-                                                                                  instance_type=instance_type)
+        confirmation_message = Texts.LOGS_STORING_CONF_FILE_EXISTS.format(filename=filename,
+                                                                          instance_name=instance_name,
+                                                                          instance_type=instance_type)
 
     if click.confirm(confirmation_message, default=True):
         try:
             with open(filename, 'w') as file, spinner(spinner=NctlSpinner,
                                                       text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):
-                for log_entry in run_logs_generator:
+                for log_entry in logs_generator:
                     if not log_entry.content.isspace():
                         formatted_date = format_log_date(log_entry.date)
                         file.write(f'{formatted_date} {log_entry.pod_name} {log_entry.content}')
             click.echo(Texts.LOGS_STORING_FINAL_MESSAGE)
-        except Exception as exe:
+        except Exception:
             handle_error(logger,
                          Texts.LOGS_STORING_ERROR,
                          Texts.LOGS_STORING_ERROR)

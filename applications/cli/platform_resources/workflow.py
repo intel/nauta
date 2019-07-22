@@ -14,16 +14,22 @@
 # limitations under the License.
 #
 
-import time
 from collections import namedtuple
+from functools import partial
+import re
+import sre_constants
+import time
 from typing import List
 
 from kubernetes.client import CustomObjectsApi
 from typing import Optional
 
-from platform_resources.platform_resource import PlatformResource
-from util.logger import initialize_logger
+from cli_text_consts import PlatformResourcesExperimentsTexts as Texts
+from platform_resources.platform_resource import PlatformResource, PlatformResourceApiClient
+from platform_resources.resource_filters import filter_by_name_regex
+from util.exceptions import InvalidRegularExpressionError
 from util.config import NAUTA_NAMESPACE, NAUTAConfigMap
+from util.logger import initialize_logger
 
 logger = initialize_logger(__name__)
 
@@ -192,6 +198,42 @@ class ArgoWorkflow(PlatformResource):
                 time.sleep(poll_interval)
         raise RuntimeError(f'Workflow {self.name} has not entered one of statuses {success_phases}'
                            f' in {timeout} seconds.')
+
+    @classmethod
+    def list(cls, namespace: str = None, custom_objects_api: CustomObjectsApi = None, **kwargs):
+        """
+        Return list of experiment runs.
+        :param namespace: If provided, only workflows from this namespace will be returned
+        :param name_filter: If provided, only workflows matching name_filter regular expression will be returned
+        :return: List of AgroWorkflow objects
+        In case of problems during getting a list of workflows - throws an error
+        """
+        name_filter = kwargs.pop('name_filter', None)
+
+        k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
+        if namespace:
+            raw_runs = k8s_custom_object_api.list_namespaced_custom_object(group=ArgoWorkflow.api_group_name,
+                                                                           namespace=namespace,
+                                                                           plural=ArgoWorkflow.crd_plural_name,
+                                                                           version=ArgoWorkflow.crd_version)
+        else:
+            raw_runs = k8s_custom_object_api.list_cluster_custom_object(group=ArgoWorkflow.api_group_name,
+                                                                        plural=ArgoWorkflow.crd_plural_name,
+                                                                        version=ArgoWorkflow.crd_version)
+
+        try:
+            name_regex = re.compile(name_filter) if name_filter else None
+        except sre_constants.error as e:
+            error_msg = Texts.REGEX_COMPILATION_FAIL_MSG.format(name_filter=name_filter)
+            logger.exception(error_msg)
+            raise InvalidRegularExpressionError(error_msg) from e
+
+        run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False)]
+
+        runs = [ArgoWorkflow.from_k8s_response_dict(run_dict)
+                for run_dict in raw_runs['items']
+                if all(f(run_dict) for f in run_filters)]
+        return runs
 
 
 class ExperimentImageBuildWorkflow(ArgoWorkflow):
