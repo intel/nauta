@@ -26,6 +26,22 @@ describe('Handlers | Auth', function () {
 
   let resMock, reqMock, deferred;
 
+  const validToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3Vi' +
+    'ZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291b' +
+    'nQvc2VjcmV0Lm5hbWUiOiJuYXV0YS1rOHMtcGxhdGZvcm0tYWRtaW4tdG9rZW4tYzdyMjQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2Nv' +
+    'dW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoibmF1dGEtazhzLXBsYXRmb3JtLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3V' +
+    'udC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMDk4ZTZhY2MtOTJiYS0xMWU5LWFkNjEtNTI1ODE2MDYwMDAwIiwic3ViIjoic3lzdGVtOnNlcn' +
+    'ZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOm5hdXRhLWs4cy1wbGF0Zm9ybS1hZG1pbiJ9.M9IAoNIewWDuKn2b3F0pynPGIPdNU-s0eXA4u' +
+    'GwRfoaucAuZqsQNxD66f41nyHxhlrUaAqJQXh0XMR3iBVpQRuutKvgJ_j6gQCFiPc2QWwDlI8qLc332_Z7VNezKpBh73iMIlkFhBPsHL' +
+    'TvoFQgCj-gdtPyfy9XTSs99-4-evfrXyCmHHCw4wh-W7GF7Kb9wTg5sKOw8PgDzNVO-ThT7SUT0s86YWHAdSD4bhVbIGV2hIXpQH71oVU' +
+    '9RfomW6-pmMRoOSP35LbhOhLpLTuIyb9SxHjpWEyDbRvZrDdFWXqc1y_69zNmc_sytYEfPLJWgq-qz7UOtRyNqIRQCh4Xylf9ydburJ' +
+    'CqdW16z5pYsjd3RMRqkPbamhIYWKvpeAzBaZy9i2Q_jJn2lgNaJkjYt1NnRbX_EulkPCMRKp8gUSa-AI_o229_DVNG-QjI1evZfhIZB' +
+    'Im2xKlhNlEwqhf37QGLdQsWUr3eEQo3-P6XjjPlD8_NGfD3G2mkpiQg3LfqvXnA3o19g2v0l50KeL3IvoyZp8UQOakyMWIH7GS4nlFH' +
+    '4NehM1jXeXYOaitM1AneQ2uy46ScpzjEKNhWpisHU8noDYnl4tfqHVwFI7OdcFth575piB2ydmnlkuIk_AmWkHpK27fLM_hlqg48b0' +
+    '6G_rDvxtYtehvVBHo7Zw-pteZ8';
+
+  const fakeToken = 'fake_token';
+
   beforeEach(function () {
     resMock = {
       status: sinon.stub().returns({
@@ -35,38 +51,52 @@ describe('Handlers | Auth', function () {
     };
     reqMock = {
       body: {
-        token: 'fake_token'
+        token: validToken
       }
     };
   });
 
+  describe('parseJwtToken', function () {
+
+    it('should return null if cannot decode token', function () {
+      const expectedResult = null;
+      const result = authApi.parseJwtToken(fakeToken);
+      expect(result).to.equal(expectedResult);
+    });
+
+    it('should return payload if token correctly decoded', function () {
+      const expectedResult = {
+        'iss': 'kubernetes/serviceaccount',
+        'kubernetes.io/serviceaccount/namespace': 'kube-system',
+        'kubernetes.io/serviceaccount/secret.name': 'nauta-k8s-platform-admin-token-c7r24',
+        'kubernetes.io/serviceaccount/service-account.name': 'nauta-k8s-platform-admin',
+        'kubernetes.io/serviceaccount/service-account.uid': '098e6acc-92ba-11e9-ad61-525816060000',
+        'sub': 'system:serviceaccount:kube-system:nauta-k8s-platform-admin'
+      };
+      const result = authApi.parseJwtToken(validToken);
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+  });
+
   describe('decodeToken', function () {
-    let jwtMock, decoded, token;
+    let decoded;
     beforeEach(function () {
       decoded = {
-        'kubernetes.io/serviceaccount/namespace': 'username'
+        'kubernetes.io/serviceaccount/namespace': 'kube-system'
       };
-      jwtMock = {
-        decode: sinon.stub()
-      };
-      token = 'fake_token';
     });
 
     it('should return error if cannot decode token', function () {
-      jwtMock.decode = sinon.stub().returns(null);
-      authApi.__set__('jwt', jwtMock);
-      return authApi.decodeToken(token)
-        .catch(function () {
-          expect(jwtMock.decode.calledOnce).to.equal(true);
+      return authApi.decodeToken(fakeToken)
+        .catch(function (err) {
+          expect(err.message).to.equal(errMessages.AUTH.INVALID_TOKEN);
         });
     });
 
     it('should return decoded data if token valid', function () {
-      jwtMock.decode = sinon.stub().returns(decoded);
-      authApi.__set__('jwt', jwtMock);
-      return authApi.decodeToken(token)
+      return authApi.decodeToken(validToken)
         .then(function (data) {
-          expect(jwtMock.decode.calledOnce).to.equal(true);
           expect(data['kubernetes.io/serviceaccount/namespace']).to.equal(decoded['kubernetes.io/serviceaccount/namespace'])
         });
     });

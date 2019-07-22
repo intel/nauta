@@ -6,7 +6,7 @@ RUN yum clean all
 ADD kubernetes.repo .
 RUN cat kubernetes.repo >> /etc/yum.repos.d/kubernetes.repo
 
-RUN yum update -y && yum install -y samba kubectl jq
+RUN yum update -y && yum install -y samba kubectl
 RUN pip install dumb-init pysmb
 
 COPY samba-init.sh /bin
