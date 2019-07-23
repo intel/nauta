@@ -1,0 +1,4 @@
+name: pytorch
+apiVersion: v1
+description: Pytorch training chart for Kubernetes
+version: 0.0.1

@@ -1,0 +1,158 @@
+apiVersion: kubeflow.org/v1beta1
+kind: PyTorchJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart_version" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    runName: {{ .Release.Name }}
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
+            buildID: {{ .Values.buildID }}
+          labels:
+            app: {{ template "name" . }}
+            release: {{ .Release.Name }}
+            runName: {{ .Release.Name }}
+        spec:
+          containers:
+            - name: pytorch
+              image: {{ .Values.image.clusterRepository }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["python3"]
+              args: [
+                "-u",
+              {{ range .Values.commandline.args }}
+                "{{.}}",
+              {{ end }}
+              ]
+              resources:
+                requests:
+                  cpu: {{ default .Values.master_resources.requests.cpu .Values.master_cpu}}
+                  memory: {{ default .Values.master_resources.requests.memory .Values.master_memory }}
+                limits:
+                  cpu: {{ default .Values.master_resources.limits.cpu .Values.worker_cpu }}
+                  memory: {{ default .Values.master_resources.limits.memory .Values.worker_memory }}
+              volumeMounts:
+                - name: input-home
+                  mountPath: /mnt/input/home
+                  readOnly: True
+                - name: input-public
+                  mountPath: /mnt/input/root
+                  readOnly: True
+                - name: output-home
+                  mountPath: /mnt/output/home
+                - name: output-public
+                  mountPath: /mnt/output/root
+                  readOnly: True
+                - name: output-public
+                  mountPath: /mnt/output/root/public
+                  subPath: public
+                - name: input-public
+                  mountPath: /mnt/input/root/public
+                  subPath: public
+                - name: output-home
+                  mountPath: /mnt/output/experiment
+                  subPath: {{ .Values.experimentName }}
+          schedulerName: kube-batch
+          volumes:
+            - name: input-home
+              persistentVolumeClaim:
+                claimName: input-home
+            - name: input-public
+              persistentVolumeClaim:
+                claimName: input-public
+            - name: output-home
+              persistentVolumeClaim:
+                claimName: output-home
+            - name: output-public
+              persistentVolumeClaim:
+                claimName: output-public
+          initContainers:
+            - name: init-experiment-pod
+              image: "{{ .Values.image.clusterRepository }}"
+              command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+              volumeMounts:
+                - name: output-home
+                  mountPath: /mnt/output/home
+    Worker:
+      replicas: {{ .Values.workersCount }}
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            scheduling.k8s.io/group-name: {{ .Release.Name }}-podgroup
+            buildID: {{ .Values.buildID }}
+          labels:
+            app: {{ template "name" . }}
+            release: {{ .Release.Name }}
+            runName: {{ .Release.Name }}
+        spec:
+          containers:
+            - name: pytorch
+              image: {{ .Values.image.clusterRepository }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["python3"]
+              args: [
+                "-u",
+                {{ range .Values.commandline.args }}
+                "{{.}}",
+                {{ end }}
+              ]
+              resources:
+                requests:
+                  cpu: {{ default .Values.worker_resources.requests.cpu .Values.worker_cpu}}
+                  memory: {{ default .Values.worker_resources.requests.memory .Values.worker_memory }}
+                limits:
+                  cpu: {{ default .Values.worker_resources.limits.cpu .Values.worker_cpu }}
+                  memory: {{ default .Values.worker_resources.limits.memory .Values.worker_memory }}
+              volumeMounts:
+                - name: input-home
+                  mountPath: /mnt/input/home
+                  readOnly: True
+                - name: input-public
+                  mountPath: /mnt/input/root
+                  readOnly: True
+                - name: output-home
+                  mountPath: /mnt/output/home
+                - name: output-public
+                  mountPath: /mnt/output/root
+                  readOnly: True
+                - name: output-public
+                  mountPath: /mnt/output/root/public
+                  subPath: public
+                - name: input-public
+                  mountPath: /mnt/input/root/public
+                  subPath: public
+                - name: output-home
+                  mountPath: /mnt/output/experiment
+                  subPath: {{ .Values.experimentName }}
+          schedulerName: kube-batch
+          volumes:
+            - name: input-home
+              persistentVolumeClaim:
+                claimName: input-home
+            - name: input-public
+              persistentVolumeClaim:
+                claimName: input-public
+            - name: output-home
+              persistentVolumeClaim:
+                claimName: output-home
+            - name: output-public
+              persistentVolumeClaim:
+                claimName: output-public
+          initContainers:
+            - name: init-experiment-pod
+              image: "{{ .Values.image.clusterRepository }}"
+              command: ['mkdir', '-p', '/mnt/output/home/{{ .Values.experimentName }}']
+              volumeMounts:
+                - name: output-home
+                  mountPath: /mnt/output/home

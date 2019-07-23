@@ -109,6 +109,11 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
                     horovod_image_name = nauta_config_map.py3_horovod_image_name
                 image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{horovod_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
+            elif line.startswith("FROM nauta/pytorch"):
+                nauta_config_map = NAUTAConfigMap()
+                pytorch_image_name = nauta_config_map.pytorch_image_name
+                image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{pytorch_image_name}'
+                dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
             else:
                 dockerfile_temp_content = dockerfile_temp_content + line
 
@@ -175,6 +180,9 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
             number_of_replicas += int(v.get(P_SERV_CNT_PARAM)) if not pServersCount else int(pServersCount)
             v[POD_COUNT_PARAM] = number_of_replicas
+        elif (WORK_CNT_PARAM in v or workersCount) and (POD_COUNT_PARAM not in v):
+            number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
+            v[POD_COUNT_PARAM] = number_of_replicas + 1
 
         if env_variables:
             env_list = []

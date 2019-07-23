@@ -26,6 +26,8 @@ export_images:
     value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
   - name: tfjob-multinode-sidecar
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
+  - name: pytorch
+    value: "{{ image_local_url['nauta/pytorch'] }}"
 
 local_images:
   nauta/centos:
@@ -329,6 +331,20 @@ local_images:
       DOCKER_RPM_IMAGE: "shared/build/docker"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/argo/argoexec"
+  nauta/pytorch:
+    version: "1.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      PYTORCH_IMAGE: "shared/build/pytorch"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base"
+  nauta/pytorch-operator:
+    version: "v0.4.0"
+    required:
+      BASE_IMAGE: "shared/centos"
+      BUILD_IMAGE: "shared/centos/build-go"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-operator"
 
 # WARNING
 # setting chart_values will work only if chart does not contain values.yaml file
@@ -450,3 +466,8 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/buildkit"
       chart_values:
         image: "{{ image_local_url['nauta/buildkit'] }}"
+    pytorch-operator:
+      version: 0.4.0
+      path: "{{ playbook_dir }}/../../nauta-charts/pytorch-operator"
+      chart_values:
+        image: "{{ image_local_url['nauta/pytorch-operator'] }}"

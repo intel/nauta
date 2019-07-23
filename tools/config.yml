@@ -397,3 +397,17 @@ shared_images:
     push: False
     args:
       ARGO_VERSION: "v2.2.1"
+  shared/build/pytorch:
+    version: "v1.2.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+    method: build
+    directory: "{{ playbook_dir }}/../../shared-containers/build/pytorch"
+    push: False
+    fetch_files:
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/pytorch/pytorch_sources_v1.2.0.tar.gz
+        dest: pytorch_sources_v1.2.0.tar.gz
+        checksum: 73fdbe7759e51ad4509e296b89510de34b9049f6cd8d6df93f5a178302a10d70
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/pytorch/torchvision_sources_v0.3.0.tar.gz
+        dest: torchvision_sources_v0.3.0.tar.gz
+        checksum: 22ceed4111ba320c8f03b787001dc71358a8555fb1e4bdd2dd06a13a719c3cbc
