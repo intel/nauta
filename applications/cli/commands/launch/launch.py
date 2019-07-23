@@ -97,6 +97,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             # tb.id is str
             tb = tensorboard_service_client.get_tensorboard(tb.id)
             if not tb:
+                sleep(TENSORBOARD_CHECK_BACKOFF_SECONDS)
                 continue
             if tb.status == TensorboardStatus.RUNNING:
                 proxy_spinner.hide()
