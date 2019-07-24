@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE} as nauta_gui_nodejs_prod
 RUN yum update -y && yum -y install rh-nodejs8 bzip2 gcc && yum clean all
 
 ENV BLACKLISTED "ansicolors ansistyles archy buffer-equal-constant-time call-limit capture-stack-strace console-control-strings cyclist decode-uri-component fs.realpath genfun iferr imurmurhash isexe meant os-tmpdir promise-inflight qw read-cmd-shim sorted-union-stream umask wide_align yallist bin-links cacache gentle-fs hosted-git-info init-package-json jsonparse json-parse-better-errors make-fetch-happen node-fetch-npm npm-pick-manifest npm-registry-client read-package-json ssri"
-RUN cd /opt/rh/rh-nodejs8/root/usr/lib/node_modules/npm/node_modules/ && rm -rf $BLACKLISTED && cd /opt/rh/rh-nodejs8/root/usr/lib/node_modules/npm/node_modules.bundled/ && rm -rf $BLACKLISTED
+RUN for i in $BLACKLISTED; do echo "Removing: $i" && find /opt/rh/rh-nodejs8/root/usr/lib -name $i | xargs rm -rf; done
 
 ADD . /app
 WORKDIR /app
