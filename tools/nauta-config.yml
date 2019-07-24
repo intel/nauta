@@ -28,6 +28,8 @@ export_images:
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
   - name: pytorch
     value: "{{ image_local_url['nauta/pytorch'] }}"
+  - name: openvino-ms
+    value: "{{ image_local_url['nauta/openvino-ms'] }}"
 
 local_images:
   nauta/centos:
@@ -345,6 +347,10 @@ local_images:
       BUILD_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-operator"
+  nauta/openvino-ms:  #openvino model server
+    version: "2019.1.1"
+    image: "intelaipg/openvino-model-server:2019.1.1"
+    method: pull
 
 # WARNING
 # setting chart_values will work only if chart does not contain values.yaml file
