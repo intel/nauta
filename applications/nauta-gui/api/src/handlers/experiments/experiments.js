@@ -22,11 +22,20 @@ const k8s = require('../../utils/k8s');
 const elasticsearchUtils = require('../../utils/nauta-elasticsearch');
 const datetimeUtils = require('../../utils/datetime-utils');
 
-const generateExperimentEntities = function (data) {
-  if (!Array.isArray(data)) {
+const generateExperimentEntities = function (runsData, expsData) {
+  if (!Array.isArray(runsData) || !Array.isArray(expsData)) {
     return [];
   }
-  return data.map(function (item) {
+  const runsExtendedInfo = {};
+  expsData.forEach(function (exp) {
+    const name = exp.metadata.name;
+    runsExtendedInfo[name] = {
+      'template-name': exp.spec['template-name'],
+      'template-namespace': exp.spec['template-namespace'],
+      'template-version': exp.spec['template-version']
+    }
+  });
+  return runsData.map(function (item) {
     let entity = {
       attributes: {
         name: item.metadata.name,
@@ -42,7 +51,10 @@ const generateExperimentEntities = function (data) {
         namespace: item.metadata.namespace,
         podSelector: item.spec['pod-selector']['matchLabels'],
         podCount: item.spec['pod-count'],
-        parameters: item.spec['parameters']
+        parameters: item.spec['parameters'],
+        'template-name': runsExtendedInfo[item.metadata.name]['template-name'],
+        'template-namespace': runsExtendedInfo[item.metadata.name]['template-namespace'],
+        'template-version': runsExtendedInfo[item.metadata.name]['template-version']
       }
     };
     if (item.spec['metrics']) {
@@ -162,8 +174,8 @@ const extractAttrsNames = function (data) {
   return Array.from(attrsSet);
 };
 
-const parseExperiments = function (experiments, queryParams) {
-  const entities = generateExperimentEntities(experiments);
+const parseExperiments = function (runs, experiments, queryParams) {
+  const entities = generateExperimentEntities(runs, experiments);
   const preparedData = prepareDataUsingFilters(entities, {
     name: queryParams.names,
     namespace: queryParams.namespaces,
@@ -195,6 +207,7 @@ const parseExperiments = function (experiments, queryParams) {
 
 const getUserExperiments = function (req, res) {
   const runsResourceName = 'runs';
+  const expsResourceName = 'experiments';
   if (!req.headers.authorization) {
     logger.debug('Missing authorization token');
     res.status(HttpStatus.UNAUTHORIZED).send({message: errMessages.AUTH.MISSING_TOKEN});
@@ -206,11 +219,19 @@ const getUserExperiments = function (req, res) {
     timezoneOffset: req.headers['timezone-offset']
   };
   logger.debug(queryParams);
+  let expCustomObjects = null, runCustomObjects = null;
   k8s.listClusterCustomObject(token, runsResourceName)
-    .then(function (data) {
+    .then(function (runsData) {
+      logger.info('Runs retrieved');
+      runCustomObjects = runsData.items;
+      const API_GROUP_NAME = 'aipg.intel.com';
+      return k8s.listClusterCustomObject(token, expsResourceName, API_GROUP_NAME);
+    })
+    .then(function (expsData) {
       logger.info('Experiments retrieved');
+      expCustomObjects = expsData.items;
       logger.debug('Preparation data');
-      const experiments = parseExperiments(data.items, queryParams);
+      const experiments = parseExperiments(runCustomObjects, expCustomObjects, queryParams);
       res.send(experiments);
     })
     .catch(function (err) {

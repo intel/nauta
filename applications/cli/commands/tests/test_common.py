@@ -50,7 +50,8 @@ TEST_RUNS_CREATING = [Run(name='test-experiment-1', parameters=['a 1', 'b 2'], m
 
 TEST_EXPERIMENT = Experiment(name="test-experiment", parameters_spec=["param1"],
                              namespace="submitter", creation_timestamp="2018-05-08T13:05:04Z",
-                             template_name="template_name", template_namespace="template_namespace")
+                             template_name="template_name", template_namespace="template_namespace",
+                             template_version="1.0.1")
 
 TEST_NONINITIALIZED_EXPERIMENTS = [Experiment(name="noninit-test-experiment", parameters_spec=["param1"],
                                               namespace="submitter", creation_timestamp="2018-05-08T13:05:04Z",
@@ -62,7 +63,7 @@ TEST_NONINITIALIZED_EXPERIMENTS = [Experiment(name="noninit-test-experiment", pa
 TEST_RUN = Run(name="test-experiment", experiment_name="test-experiment", metrics={},
                parameters=["param1"], pod_count=0, pod_selector={}, state=RunStatus.CREATING,
                namespace="submitter", creation_timestamp="2018-05-08T13:05:04Z",
-               template_name="template_name")
+               template_name="template_name", template_version="1.0.1")
 
 TEST_LIST_HEADERS = ["Name", "Parameters", "Metrics", "Submission date", "Owner", "Status", "Template name"]
 
@@ -114,7 +115,7 @@ def test_list_unitialized_experiments_in_cli_one_row(mocker, capsys):
 def test_list_experiments_success(mocker):
     api_list_runs_mock = mocker.patch("commands.common.Run.list")
     api_list_runs_mock.return_value = TEST_RUNS
-
+    mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=False, name="", status=None, listed_runs_kinds=[],
@@ -127,6 +128,8 @@ def test_list_experiments_success(mocker):
 def test_list_experiments_all_users_success(mocker):
     api_list_runs_mock = mocker.patch("commands.common.Run.list")
     api_list_runs_mock.return_value = TEST_RUNS
+
+    mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
@@ -156,6 +159,7 @@ def test_list_experiments_one_user_success(mocker, capsys):
     api_list_runs_mock = mocker.patch("commands.common.Run.list")
     mocker.patch("dateutil.tz.tzlocal").return_value = dateutil.tz.UTC
     api_list_runs_mock.return_value = TEST_RUNS
+    mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
 
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
@@ -178,6 +182,8 @@ def test_list_experiments_brief_success(mocker, capsys):
     api_list_runs_mock = mocker.patch("commands.common.Run.list")
     api_list_runs_mock.return_value = TEST_RUNS
 
+    mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
+
     get_namespace_mock = mocker.patch("commands.common.get_kubectl_current_context_namespace")
 
     common.list_runs_in_cli(verbosity_lvl=0, all_users=True, name="", status=None, listed_runs_kinds=[],
@@ -195,11 +201,12 @@ def test_create_fake_run():
     assert TEST_RUN == common.create_fake_run(TEST_EXPERIMENT)
 
 
-def test_replace_initalizing_runs_no_changes():
+def test_replace_initalizing_runs_no_changes(mocker):
+    mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
     assert len(common.replace_initializing_runs(TEST_RUNS)) == 2
 
 
 def test_replace_initializing_runs_two_not_ready(mocker):
     get_experiment_mock = mocker.patch("commands.common.Experiment.get", return_value=TEST_EXPERIMENT)
     assert len(common.replace_initializing_runs(TEST_RUNS_CREATING)) == 5
-    assert get_experiment_mock.call_count == 2
+    assert get_experiment_mock.call_count == 6

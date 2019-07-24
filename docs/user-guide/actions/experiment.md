@@ -10,8 +10,8 @@ This section discuss the following main topics:
  - [view Subcommand](#view-subcommand)
  - [logs Subcommand](#logs-subcommand)
  - [interact Subcommand](#interact-subcommand)
- - [template_list Subcommand](#template_list-subcommand)
-
+ 
+ 
 ## submit Subcommand
 
 ### Synopsis
@@ -281,38 +281,3 @@ Should issues arise, a message provides a description of possible causes. Otherw
 `nctl experiment interact --filename training_script.py`
 
 Launches in a default browser a Jupyter notebook with `training_script.py` script.
-
-## template_list Subcommand
-
-### Synopsis
-
-The `template_list` subcommand returns a list of templates installed on a client machine. A template contains all details needed to deploy a training job on a cluster correctly.
-
-### Syntax
-
-`nctl experiment template_list [options]`
-
-### Options
-
-| Name | Required | Description | 
-|:--- |:--- |:--- |
-|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
-|`-h, --help` | No | Displays help messaging information. |
-
-
-### Returns
-
-The command returns a list of existing templates, or a _Lack of installed packs_ message, if there _are no_ templates installed.
-
-
-### Example
-
-`nctl experiment template_list`
-
-
-----------------------
-
-## Return to Start of Document
-
-* [README](../README.md)
-----------------------

@@ -26,13 +26,13 @@ const K8S_API_URL = process.env.NODE_ENV === 'dev' ? 'http://localhost:9090' : '
 const API_GROUP_NAME = 'aggregator.aipg.intel.com';
 const EXPERIMENTS_VERSION = 'v1';
 
-module.exports.listNamespacedCustomObject = function (token, resourceName) {
+module.exports.listNamespacedCustomObject = function (token, resourceName, customApiGroupName) {
   return Q.Promise(function (resolve, reject) {
     authApi.decodeToken(token)
       .then(function (decoded) {
         const namespace = decoded[K8S_TOKEN_USER_KEY];
         const options = {
-          url: `${K8S_API_URL}/apis/${API_GROUP_NAME}/${EXPERIMENTS_VERSION}/namespaces/${namespace}/${resourceName}`,
+          url: `${K8S_API_URL}/apis/${customApiGroupName || API_GROUP_NAME}/${EXPERIMENTS_VERSION}/namespaces/${namespace}/${resourceName}`,
           headers: {
             authorization: `Bearer ${token}`
           }
@@ -52,12 +52,12 @@ module.exports.listNamespacedCustomObject = function (token, resourceName) {
   });
 };
 
-module.exports.listClusterCustomObject = function (token, resourceName) {
+module.exports.listClusterCustomObject = function (token, resourceName, customApiGroupName) {
   return Q.Promise(function (resolve, reject) {
     authApi.decodeToken(token)
       .then(function () {
         const options = {
-          url: `${K8S_API_URL}/apis/${API_GROUP_NAME}/${EXPERIMENTS_VERSION}/${resourceName}`,
+          url: `${K8S_API_URL}/apis/${customApiGroupName || API_GROUP_NAME}/${EXPERIMENTS_VERSION}/${resourceName}`,
           headers: {
             authorization: `Bearer ${token}`
           }

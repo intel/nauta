@@ -62,14 +62,15 @@ class Run(PlatformResource):
     crd_plural_name = 'runs'
     crd_version = 'v1'
 
-    RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics', 'submission_date', 'start_date',
-                                             'duration', 'submitter', 'status', 'template_name'])
+    RunCliModel = namedtuple('RunCliModel', ['name', 'parameters', 'metrics',
+                                             'submission_date', 'start_date', 'duration', 'submitter', 'status',
+                                             'template_name', 'template_version'])
 
     def __init__(self, name: str, experiment_name: str, metrics: dict = None, parameters: Tuple[str, ...] = None,
                  pod_count: int = None, pod_selector: dict = None,
                  state: RunStatus = None, namespace: str = None,
                  creation_timestamp: str = None, template_name: str = None, metadata: dict = None,
-                 start_timestamp: str = None, end_timestamp: str = None):
+                 start_timestamp: str = None, end_timestamp: str = None, template_version: str = None):
         super().__init__()
         self.name = name
         self.parameters = parameters
@@ -90,6 +91,7 @@ class Run(PlatformResource):
             self.duration = datetime.now(timezone.utc) - parser.parse(start_timestamp)
         else:
             self.duration = None
+        self.template_version = template_version
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -169,7 +171,8 @@ class Run(PlatformResource):
                                status=self.state.value if self.state else "",
                                template_name=self.template_name,
                                start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",
-                               duration=format_duration_for_cli(self.duration) if self.duration else "")
+                               duration=format_duration_for_cli(self.duration) if self.duration else "",
+                               template_version=self.template_version)
 
     def create(self, namespace: str, labels: Dict[str, str] = None, annotations: Dict[str, str] = None):
         run_kubernetes = KubernetesObject(self, client.V1ObjectMeta(name=self.name, namespace=namespace, labels=labels,

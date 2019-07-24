@@ -24,8 +24,8 @@ const HttpStatus = require('http-status-codes');
 
 describe('Handlers | Experiments', function () {
 
-  let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sRunsResponse, generatedEntities, error, deferred,
-    currentTime, clock, elasticsearchUtilsMock;
+  let resMock, reqMock, k8sMock, podsList, k8sRunEntities, k8sExpsEntities, k8sRunsResponse, generatedEntities, error,
+    deferred, currentTime, clock, elasticsearchUtilsMock;
 
   beforeEach(function () {
     currentTime = '2018-06-11T011:35:06Z';
@@ -110,6 +110,42 @@ describe('Handlers | Experiments', function () {
         }
       }
     ];
+    k8sExpsEntities = [
+      {
+        metadata: {
+          creationTimestamp: '2018-06-11T07:35:06Z',
+          name: 'exp-mnist-sing-18-06-11-09-34-45-41',
+          namespace: 'andrzej',
+          clusterName: '',
+          generation: 1,
+          labels: {
+            'runKind': 'training'
+          }
+        },
+        spec: {
+          'template-name': 'tf-training-tfjob',
+          'template-namespace': 'template-namespace',
+          'template-version': '0.1.0'
+        }
+      },
+      {
+        metadata: {
+          creationTimestamp: '2018-06-11T07:35:06Z',
+          name: 'exp-mnist-sing-18-06-11-09-34-45-42',
+          namespace: 'andrzej',
+          clusterName: '',
+          generation: 1,
+          labels: {
+            'runKind': 'training'
+          }
+        },
+        spec: {
+          'template-name': 'tf-training-tfjob',
+          'template-namespace': 'template-namespace',
+          'template-version': '0.1.0'
+        }
+      }
+    ];
     k8sRunsResponse = {
       items: k8sRunEntities
     };
@@ -130,7 +166,10 @@ describe('Handlers | Experiments', function () {
           trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
             k8sRunEntities[0].spec['start-time'], k8sRunEntities[0].spec['end-time']),
           trainingTimeInQueue: datetimeUtils.calculateTimeDifferenceFromDateString(
-            k8sRunEntities[0].metadata.creationTimestamp, k8sRunEntities[0].spec['start-time'])
+            k8sRunEntities[0].metadata.creationTimestamp, k8sRunEntities[0].spec['start-time']),
+          'template-name': k8sExpsEntities[0].spec['template-name'],
+          'template-namespace': k8sExpsEntities[0].spec['template-namespace'],
+          'template-version': k8sExpsEntities[0].spec['template-version']
         }
       },
       {
@@ -149,7 +188,10 @@ describe('Handlers | Experiments', function () {
           trainingDurationTime: datetimeUtils.calculateTimeDifferenceFromDateString(
             k8sRunEntities[1].spec['start-time'], k8sRunEntities[1].spec['end-time']),
           trainingTimeInQueue: datetimeUtils.calculateTimeDifferenceFromDateString(
-            k8sRunEntities[1].metadata.creationTimestamp, k8sRunEntities[1].spec['start-time'])
+            k8sRunEntities[1].metadata.creationTimestamp, k8sRunEntities[1].spec['start-time']),
+          'template-name': k8sExpsEntities[1].spec['template-name'],
+          'template-namespace': k8sExpsEntities[1].spec['template-namespace'],
+          'template-version': k8sExpsEntities[1].spec['template-version']
         }
       }
     ];
@@ -260,7 +302,7 @@ describe('Handlers | Experiments', function () {
       process.nextTick(function () {
         expect(resMock.send.calledOnce).to.equal(true);
         expect(resMock.send.calledWith(k8sRunsResponse.items)).to.equal(true);
-        expect(k8sMock.listClusterCustomObject.calledOnce).to.equal(true);
+        expect(k8sMock.listClusterCustomObject.calledTwice).to.equal(true);
         expect(parseExpMock.calledOnce).to.equal(true);
         done();
       });
@@ -412,7 +454,7 @@ describe('Handlers | Experiments', function () {
 
     it('should return generated entities if data provided', function () {
       const expectedResult = generatedEntities;
-      const result = expApi.generateExperimentEntities(k8sRunEntities);
+      const result = expApi.generateExperimentEntities(k8sRunEntities, k8sExpsEntities);
       expect(result).to.deep.equal(expectedResult);
     });
 
@@ -420,7 +462,7 @@ describe('Handlers | Experiments', function () {
       delete k8sRunEntities[0].spec.metrics;
       delete generatedEntities[0].attributes.accuracy;
       const expectedResult = generatedEntities;
-      const result = expApi.generateExperimentEntities(k8sRunEntities);
+      const result = expApi.generateExperimentEntities(k8sRunEntities, k8sExpsEntities);
       expect(result).to.deep.equal(expectedResult);
     });
   });
@@ -486,7 +528,8 @@ describe('Handlers | Experiments', function () {
 
     it('should return all params', function () {
       const expectedResult = ['creationTimestamp', 'name', 'namespace', 'state', 'type', 'accuracy', 'podSelector',
-        'podCount', 'parameters', 'trainingStartTime', 'trainingEndTime', 'trainingDurationTime', 'trainingTimeInQueue'];
+        'podCount', 'parameters', 'trainingStartTime', 'trainingEndTime', 'trainingDurationTime', 'trainingTimeInQueue',
+        'template-name', 'template-namespace', 'template-version'];
       const result = expApi.extractAttrsNames(generatedEntities);
       expect(result).to.deep.equal(expectedResult);
     });
@@ -559,7 +602,7 @@ describe('Handlers | Experiments', function () {
         params: ['creationTimestamp', 'name', 'namespace', 'podSelector', 'podCount', 'state', 'parameters', 'accuracy'],
         data: generatedEntities
       };
-      const result = expApi.parseExperiments(k8sRunEntities, queryParams);
+      const result = expApi.parseExperiments(k8sRunEntities, k8sExpsEntities, queryParams);
       expect(result).to.deep.equal(expectedResult);
       expect(generateExperimentEntitiesMock.calledOnce).to.equal(true);
       expect(prepareDataUsingFiltersMock.calledOnce).to.equal(true);

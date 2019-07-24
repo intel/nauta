@@ -99,7 +99,9 @@ In general, the single node packs are configured to take roughly half of the ava
 
 While these defaults are intended to guarantee the best possible experience when training on Nauta, it is possible to adjust the compute resource requirements either on per-experiemnt basis or permanently (see [Customizing the Provided Packs](#customizing-the-provided-packs)).
 
-The template packs provided with Nauta are listed below:
+The Nauta software should contain at least the following template packs (list of template packs delivered
+together with the Nauta software depends on a content of the Template zoo repository at the moment
+of building a certain version of the Nauta nctl client):  
 
 * **multinode-tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
 
@@ -155,7 +157,8 @@ Once a *working* Helm chart is available, the process of adapting it for use as 
 
 1. Pick the pack's name.
 
-   The name should be unique and not conflict with any other packs available in the local packs folder. After naming the        pack, create a corresponding directory in the packs folder and populate its charts subfolder with the contents of the        chart. Do not forget to set this pack name also in the chart.yaml file. Otherwise the new template will not work.
+The name should be unique and not conflict with any other packs available in the local [packs](#packs) folder. After naming the pack, create a corresponding directory in the [packs](#packs) folder and populate its [charts](#charts) subfolder with the contents of the chart. Do not forget to set this pack name also in the chart.yaml file. Otherwise the new template won’t work.
+Instead of creating a completely new folder from scratch - you can also copy an existing one using `nctl template copy` command and the modify its content according to your needs. 
    
 2. Create a Dockerfile. 
 
@@ -260,6 +263,20 @@ Below is a sample definition of a parameter within `values.yaml`, followed by a 
       image: "{{ .Values.image }}"
 ```
 
+## Template pack management
+
+The Nauta `nctl` client is shipped with an initial set of template packs. This initial set is created 
+from template packs that are stored in so called "Template zoo" at the moment of build of a certain
+version of a `nctl` application.
+"Template zoo" is a github repository with template packs created by Intel and community members for different
+purposes. This repository is located under the following url ... and is publicyly available.
+
+The `nctl` command provides a special command - [`nctl template`](template.md) that makes interaction with this "Template zoo" much easier.
+This command provides the following options:
+- `list` - lists templates available locally and remotely.
+- `install` - installs locally a template that is remotely available. If a template pack with the same name exists locally but in a version older than the one available remotely - local version will be upgraded to the remote one.
+- `copy` - makes a copy of a locally existing template pack. Such a copy might be then freely extended by a user. 
+ 
 
 ----------------------
 

@@ -16,24 +16,22 @@
 
 import click
 
-from commands.experiment import list, cancel, logs, view, submit, interact
+from commands.template import list, copy, install
+
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
-from cli_text_consts import ExperimentCmdTexts as Texts
+from cli_text_consts import TemplateCmdTexts as Texts
 
 
 logger = initialize_logger(__name__)
 
 
-@click.group(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasGroup, alias='exp',
+@click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='tmp',
              subcommand_metavar="COMMAND [options] [args]...")
-def experiment():
+def template():
     pass
 
 
-experiment.add_command(cancel.cancel)
-experiment.add_command(submit.submit)
-experiment.add_command(list.list_experiments)
-experiment.add_command(logs.logs)
-experiment.add_command(interact.interact)
-experiment.add_command(view.view)
+template.add_command(list.list_templates)
+template.add_command(copy.copy)
+template.add_command(install.install)

@@ -39,6 +39,7 @@ from util.system import format_timestamp_for_cli
 
 logger = initialize_logger(__name__)
 
+
 class ExperimentStatus(Enum):
     CREATING = 'CREATING'
     SUBMITTED = 'SUBMITTED'
@@ -53,6 +54,8 @@ class ExperimentSchema(Schema):
                                   dump_to='parameters-spec', load_from='parameters-spec')
     state = EnumField(ExperimentStatus, required=True, allow_none=False, by_value=True)
     template_name = fields.String(required=True, allow_none=False, dump_to='template-name', load_from='template-name')
+    template_version = fields.String(required=False, allow_none=False, dump_to='template-version',
+                                     load_from='template-version')
     template_namespace = fields.String(required=True, allow_none=False, dump_to='template-namespace',
                                        load_from='template-namespace')
 
@@ -75,11 +78,11 @@ class Experiment(PlatformResource):
     crd_version = 'v1'
 
     ExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec', 'creation_timestamp', 'submitter',
-                                                   'status', 'template_name'])
+                                                   'status', 'template_name', 'template_version'])
 
     def __init__(self, name: str, template_name: str, template_namespace: str, parameters_spec: List[str]=None,
                  state: ExperimentStatus=ExperimentStatus.CREATING, creation_timestamp: str = None,
-                 namespace: str = None, metadata: dict = None):
+                 namespace: str = None, metadata: dict = None, template_version: str = None):
         super().__init__()
         self.name = name
         self.parameters_spec = parameters_spec
@@ -89,6 +92,7 @@ class Experiment(PlatformResource):
         self.creation_timestamp = creation_timestamp
         self.namespace = namespace
         self.metadata = metadata
+        self.template_version = template_version
 
     @classmethod
     def from_k8s_response_dict(cls, object_dict: dict):
@@ -99,14 +103,16 @@ class Experiment(PlatformResource):
                    state=ExperimentStatus[object_dict['spec']['state']],
                    template_name=object_dict['spec']['template-name'],
                    template_namespace=object_dict['spec']['template-namespace'],
-                   metadata=object_dict['metadata'])
+                   metadata=object_dict['metadata'],
+                   template_version=object_dict.get('spec').get('template-version') if object_dict.get('spec')
+                   else None)
 
     @property
     def cli_representation(self):
         return Experiment.ExperimentCliModel(name=self.name, parameters_spec=' '.join(self.parameters_spec),
                                              creation_timestamp=format_timestamp_for_cli(self.creation_timestamp),
                                              submitter=self.namespace, status=self.state.value,
-                                             template_name=self.template_name)
+                                             template_name=self.template_name, template_version=self.template_version)
 
 
     def get_runs(self) -> List[Run]:

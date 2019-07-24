@@ -45,7 +45,7 @@ A namedtuple representing uninitialized experiments in CLI.
 """
 UninitializedExperimentCliModel = namedtuple('Experiment', ['name', 'parameters_spec', 'metrics',
                                                             'creation_timestamp', 'start_date', 'end_date', 'duration',
-                                                            'submitter', 'status', 'template_name'])
+                                                            'submitter', 'status', 'template_name', 'template_version'])
 
 
 def uninitialized_experiment_cli_representation(experiment: Experiment):
@@ -53,7 +53,8 @@ def uninitialized_experiment_cli_representation(experiment: Experiment):
                                            metrics='', start_date='', end_date='', duration='',
                                            creation_timestamp=format_timestamp_for_cli(experiment.creation_timestamp),
                                            submitter=experiment.namespace, status=experiment.state.value,
-                                           template_name=experiment.template_name)
+                                           template_name=experiment.template_name,
+                                           template_version=experiment.template_version)
 
 
 def list_unitialized_experiments_in_cli(verbosity_lvl: int, all_users: bool,
@@ -141,7 +142,8 @@ def list_runs_in_cli(verbosity_lvl: int, all_users: bool, name: str,
                 (run_representation.name, run_representation.parameters,  # type: ignore
                  run_representation.submission_date,
                  run_representation.start_date, run_representation.duration,
-                 run_representation.submitter, run_representation.status, run_representation.template_name)
+                 run_representation.submitter, run_representation.status, run_representation.template_name,
+                 run_representation.template_version)
                 for run_representation in runs_representations
             ]
         click.echo(tabulate(runs_table_data if not count else runs_table_data[-count:],
@@ -167,11 +169,15 @@ def replace_initializing_runs(run_list: List[Run]):
     ret_list = []
     for run in run_list:
         exp_name = run.experiment_name
+        experiment = Experiment.get(name=exp_name, namespace=run.namespace)
         if (run.state is None or run.state == '') and exp_name not in initializing_experiments:
-            experiment = Experiment.get(name=exp_name, namespace=run.namespace)
             ret_list.append(create_fake_run(experiment))
             initializing_experiments.add(exp_name)
         elif exp_name not in initializing_experiments:
+            if experiment:
+                run.template_version = experiment.template_version
+            else:
+                run.template_version = None
             ret_list.append(run)
 
     return ret_list
@@ -182,7 +188,8 @@ def create_fake_run(experiment: Experiment) -> Run:
                parameters=experiment.parameters_spec, pod_count=0,
                pod_selector={}, state=RunStatus.CREATING, namespace=experiment.namespace,
                creation_timestamp=experiment.creation_timestamp,
-               template_name=experiment.template_name)
+               template_name=experiment.template_name,
+               template_version=experiment.template_version)
 
 
 def get_logs(experiment_name: str, min_severity: SeverityLevel, start_date: str,

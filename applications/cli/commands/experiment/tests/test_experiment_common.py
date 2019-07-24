@@ -205,6 +205,8 @@ class SubmitExperimentMocks:
         self.delete_k8s_object_mock = mocker.patch('commands.experiment.common.delete_k8s_object')
         self.get_pod_count_mock = mocker.patch('commands.experiment.common.get_pod_count', return_value=1)
         self.remove_files = mocker.patch('os.remove')
+        self.get_template_version = mocker.patch('commands.experiment.common.get_template_version',
+                                                 return_value='1.0.1')
 
 
 @pytest.fixture
