@@ -21,7 +21,7 @@ from marshmallow import ValidationError
 from git_repo_manager.client import GitRepoManagerClient
 from platform_resources.user import User
 import platform_resources.user as model
-from util.k8s.k8s_info import find_namespace, NamespaceStatus
+from util.k8s.k8s_info import find_namespace, NamespaceStatus, get_api_key, get_kubectl_host
 from util.k8s.kubectl import UserState, logger
 
 from util.logger import initialize_logger
@@ -58,10 +58,11 @@ def purge_user(username: str):
     """
     try:
         # remove data from elasticsearch
-        with k8s_proxy_context_manager.K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy,\
-            spinner(text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS):
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                               verify_certs=False, use_ssl=False)
+        with spinner(text=TextsDel.DELETION_DELETING_USERS_EXPERIMENTS):
+            es_client = K8sElasticSearchClient(host=f'{get_kubectl_host(with_port=True)}'
+                                               f'/api/v1/namespaces/nauta/services/nauta-elasticsearch:nauta/proxy',
+                                               verify_certs=False, use_ssl=True,
+                                               headers={'Authorization': get_api_key()})
             es_client.delete_logs_for_namespace(username)
 
         # remove data from git repo manager
@@ -86,7 +87,7 @@ def validate_user_name(username: str) -> None:
     :return: throws a ValueError in case when username cannot be accepted by
     the NAUTA system. Message in error describes a detected problem
     """
-    # name cannot be longer than 32 and shorter than 1 character - due to lmitations
+    # name cannot be longer than 32 and shorter than 1 character - due to limitations
     # of a mechanism responsible for creating user/public shares
     if not username:
         raise ValueError(Texts.USERNAME_CANNOT_BE_EMPTY_ERROR_MSG)

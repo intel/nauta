@@ -45,7 +45,8 @@ class WorkflowLogsMocks:
                                           return_value='fake-namespace')
         self.get_workflow = mocker.patch('commands.workflow.logs.ArgoWorkflow.get',
                                          return_value=FAKE_WORKFLOW)
-        self.k8s_proxy = mocker.patch('commands.workflow.logs.K8sProxy')
+        self.get_k8s_host = mocker.patch('commands.workflow.logs.get_kubectl_host')
+        self.get_k8s_api_key = mocker.patch('commands.workflow.logs.get_api_key')
         self.es_client = mocker.patch('commands.workflow.logs.K8sElasticSearchClient')
         self.workflow_logs_generator = mocker.patch.object(self.es_client.return_value,
                                                            'get_argo_workflow_logs_generator')

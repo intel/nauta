@@ -103,7 +103,8 @@ class CancelMocks:
         self.cancel_experiment = mocker.patch("commands.experiment.cancel.cancel_experiment",
                                               return_value=([([RUN_COMPLETE], []), ([RUN_COMPLETE], [])]))
         self.k8s_es_client = mocker.patch('commands.experiment.cancel.K8sElasticSearchClient')
-        self.k8s_proxy = mocker.patch('commands.experiment.cancel.K8sProxy')
+        self.get_k8s_host = mocker.patch('commands.experiment.cancel.get_kubectl_host')
+        self.get_k8s_api_key = mocker.patch('commands.experiment.cancel.get_api_key')
         self.get_experiment = mocker.patch('commands.experiment.cancel.Experiment.get',
                                            return_value=None)
 

@@ -23,10 +23,7 @@ from cli_text_consts import WorkflowLogsTexts as Texts
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
-from util.app_names import NAUTAAppNames
-from util.exceptions import K8sProxyCloseError, LocalPortOccupiedError, K8sProxyOpenError
-from util.k8s.k8s_info import get_kubectl_current_context_namespace
-from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key, get_kubectl_host
 from util.logger import initialize_logger
 from util.system import handle_error
 
@@ -45,26 +42,17 @@ def logs(state: State, workflow_name: str):
             click.echo(Texts.NOT_FOUND_MSG.format(workflow_name=workflow_name))
             exit(0)
 
-        with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                               verify_certs=False, use_ssl=False)
-            start_date = workflow.started_at
-            workflow_logs_generator = es_client.get_argo_workflow_logs_generator(workflow=workflow,
-                                                                                 namespace=namespace,
-                                                                                 start_date=start_date)
-            for log_entry in workflow_logs_generator:
-                if not log_entry.content.isspace():
-                    click.echo(f'{log_entry.date} {log_entry.pod_name} {log_entry.content}')
-    except K8sProxyCloseError:
-        handle_error(logger, Texts.PROXY_CLOSE_LOG_ERROR_MSG, Texts.PROXY_CLOSE_USER_ERROR_MSG)
-        exit(1)
-    except LocalPortOccupiedError as exe:
-        handle_error(logger, Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message),
-                     Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message))
-        exit(1)
-    except K8sProxyOpenError:
-        handle_error(logger, Texts.PROXY_CREATION_ERROR_MSG, Texts.PROXY_CREATION_ERROR_MSG)
-        exit(1)
+        es_client = K8sElasticSearchClient(host=f'{get_kubectl_host(with_port=True)}'
+                                           f'/api/v1/namespaces/nauta/services/nauta-elasticsearch:nauta/proxy',
+                                           verify_certs=False, use_ssl=True,
+                                           headers={'Authorization': get_api_key()})
+        start_date = workflow.started_at
+        workflow_logs_generator = es_client.get_argo_workflow_logs_generator(workflow=workflow,
+                                                                             namespace=namespace,
+                                                                             start_date=start_date)
+        for log_entry in workflow_logs_generator:
+            if not log_entry.content.isspace():
+                click.echo(f'{log_entry.date} {log_entry.pod_name} {log_entry.content}')
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=True)
         exit(1)

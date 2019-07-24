@@ -64,8 +64,8 @@ def redirect(url=""):
     if (
         not is_gui_search_scroll_request(url, request)
         and request.method != "GET"
-        and ("Authorization" not in headers
-             or headers["Authorization"] != f"Basic {ADMIN_KEY}")
+        and (headers.get("ES-Authorization") != f"Basic {ADMIN_KEY}"
+             and headers.get("Authorization") != f"Basic {ADMIN_KEY}")
     ):
         return "", 403
 

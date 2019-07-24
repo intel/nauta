@@ -29,14 +29,11 @@ from git_repo_manager.utils import delete_exp_tag_from_git_repo_manager
 from platform_resources.workflow import ArgoWorkflow
 from util.cli_state import common_options, pass_state, State
 from util.aliascmd import AliasCmd
-from util.k8s.k8s_info import get_current_namespace, is_current_user_administrator
+from util.k8s.k8s_info import get_current_namespace, is_current_user_administrator, get_api_key, get_kubectl_host
 from platform_resources.run import Run, RunStatus
 from platform_resources.experiment import ExperimentStatus, Experiment
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
-from util.app_names import NAUTAAppNames
-from util.exceptions import K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
 from util.helm import delete_helm_release
-from util.k8s.k8s_proxy_context_manager import K8sProxy
 from util.k8s import pods as k8s_pods
 from util.logger import initialize_logger
 from util.spinner import spinner
@@ -214,32 +211,21 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     if purge:
         # Connect to elasticsearch in order to purge run logs
-        try:
-            with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
-                es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                                   verify_certs=False, use_ssl=False,
-                                                   with_admin_privledges=is_current_user_administrator())
-                for exp_name, run_list in exp_with_runs.items():
-                    try:
-                        exp_del_runs, exp_not_del_runs = purge_experiment(exp_name=exp_name,
-                                                                          runs_to_purge=run_list,
-                                                                          namespace=current_namespace,
-                                                                          k8s_es_client=es_client)
-                        deleted_runs.extend(exp_del_runs)
-                        not_deleted_runs.extend(exp_not_del_runs)
-                    except Exception:
-                        handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
-                        not_deleted_runs.extend(run_list)
-        except K8sProxyCloseError:
-            handle_error(logger, Texts.PROXY_CLOSING_ERROR_LOG_MSG, Texts.PROXY_CLOSING_ERROR_USER_MSG)
-            exit(1)
-        except LocalPortOccupiedError as exe:
-            handle_error(logger, Texts.PORT_OCCUPIED_ERROR_LOG_MSG,
-                         Texts.PORT_OCCUPIED_ERROR_USER_MSG.format(exception_message=exe.message))
-            exit(1)
-        except K8sProxyOpenError:
-            handle_error(logger, Texts.PROXY_OPEN_ERROR_MSG, Texts.PROXY_OPEN_ERROR_MSG)
-            exit(1)
+        es_client = K8sElasticSearchClient(host=f'{get_kubectl_host(with_port=True)}'
+                                           f'/api/v1/namespaces/nauta/services/nauta-elasticsearch:nauta/proxy',
+                                           verify_certs=False, use_ssl=True,
+                                           headers={'Authorization': get_api_key()})
+        for exp_name, run_list in exp_with_runs.items():
+            try:
+                exp_del_runs, exp_not_del_runs = purge_experiment(exp_name=exp_name,
+                                                                  runs_to_purge=run_list,
+                                                                  namespace=current_namespace,
+                                                                  k8s_es_client=es_client)
+                deleted_runs.extend(exp_del_runs)
+                not_deleted_runs.extend(exp_not_del_runs)
+            except Exception:
+                handle_error(logger, Texts.OTHER_CANCELLING_ERROR_MSG)
+                not_deleted_runs.extend(run_list)
     else:
         for exp_name, run_list in exp_with_runs.items():
             try:
