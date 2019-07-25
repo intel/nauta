@@ -22,8 +22,8 @@ import pytest
 from util import system
 from util.config import NCTL_CONFIG_DIR_NAME, NCTL_CONFIG_ENV_NAME, Config, ConfigInitError
 
-APP_DIR_PATH = '/my/App'
-APP_BINARY_PATH = os.path.join(APP_DIR_PATH, 'binary')
+APP_DIR_PATH = '/my/App/'
+APP_BINARY_PATH = os.path.join(APP_DIR_PATH, os.path.join('nctl', 'binary'))
 USER_HOME_PATH = '/User/Fake/home'
 USER_CUSTOM_PATH = '/custom/path'
 FAKE_PATH = '/fake/path'
@@ -87,7 +87,9 @@ def test_validate_config_path_success_with_user_local_dir(os_env_get, exists_moc
 
     result = Config.get_config_path()
 
-    assert result == os.path.join(USER_HOME_PATH, NCTL_CONFIG_DIR_NAME)
+    # Silly windows path replace
+    assert result.replace('\\\\', '/').replace('\\', '/') \
+        == os.path.join(USER_HOME_PATH, NCTL_CONFIG_DIR_NAME).replace('\\\\', '/').replace('\\', '/')
     assert exists_mock.call_count == 1
 
 

@@ -33,7 +33,8 @@ ifeq (Windows,$(OS))
 
 	git config --system core.longpaths true
 	# build nctl
-	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:.\nbformat\v4" -F --exclude-module readline -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
+	. $(ACTIVATE); pyinstaller main.py --add-data "util/nbformat.v4.schema.json:./nbformat/v4" --exclude-module readline -D -n nctl-cli --hidden-import ruamel.yaml.jinja2.__plug_in__
+	ln -s nctl-cli/nctl-cli dist/nctl
 
 	mkdir -vp dist/config/packs
 
@@ -67,7 +68,8 @@ ifeq (Linux,$(OS))
 	. $(ACTIVATE); pip install pyinstaller==3.4
 	rm -rf dist/
 
-	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
+	. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -D -n nctl-cli --hidden-import ruamel.yaml.jinja2.__plug_in__
+	ln -s nctl-cli/nctl-cli dist/nctl
 
 	cp set-autocomplete-linux.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
@@ -94,7 +96,8 @@ ifeq (Darwin,$(OS))
 	. $(ACTIVATE); pip install pyinstaller==3.4
 
 	rm -rf dist/
-	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -F -n nctl --hidden-import ruamel.yaml.jinja2.__plug_in__
+	@. $(ACTIVATE); pyinstaller main.py --add-data util/nbformat.v4.schema.json:./nbformat/v4 --exclude-module readline -D -n nctl-cli --hidden-import ruamel.yaml.jinja2.__plug_in__
+	ln -s nctl-cli/nctl-cli dist/nctl
 
 	cp set-autocomplete-macos.sh dist/set-autocomplete.sh
 	chmod +x dist/set-autocomplete.sh
