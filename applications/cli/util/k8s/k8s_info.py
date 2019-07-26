@@ -58,7 +58,8 @@ def get_kubectl_host(replace_https=True, with_port=True) -> str:
     if replace_https:
         kubectl_host = kubectl_host.replace('https://', '').replace('http://', '')
     if not with_port:
-        kubectl_host = kubectl_host.split(':')[0]
+        port = ':' + kubectl_host.split(':')[-1]
+        kubectl_host = kubectl_host.replace(port, '')
 
     return kubectl_host
 

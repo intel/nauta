@@ -40,18 +40,17 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
     ES_PROXY_SECRET_NAME = "es-proxy-secret"
 
-    def __init__(self, host: str, port: int,
-                 use_ssl=True, verify_certs=True, with_admin_privledges=False, **kwargs):
-        hosts = [{'host': host,
-                  'port': port}]
-        headers: Dict[str, str] = {}
+    def __init__(self, host: str, use_ssl=True, verify_certs=True,
+                 with_admin_privledges=False, headers: Dict[str, str] = None,
+                 **kwargs):
+        hosts = host
         if with_admin_privledges:
             secret = get_secret(
                 K8sElasticSearchClient.ES_PROXY_SECRET_NAME, "nauta")
             admin_token = secret.data["token"]
-            headers = {"Authorization": f"Basic ${admin_token}"}
-        super().__init__(
-            hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, headers=headers, **kwargs)
+            headers = headers or {}
+            headers["ES-Authorization"] = f"Basic ${admin_token}"
+        super().__init__(hosts=hosts, use_ssl=use_ssl, verify_certs=verify_certs, headers=headers, **kwargs)
 
     def get_log_generator(self, query_body: dict = None, index='_all', scroll='1m',
                           filters: List[Callable[[LogEntry], bool]] = None) -> Generator[LogEntry, None, None]:
@@ -120,7 +119,7 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
 
         timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date}}}
         if end_date:
-            timestamp_range_filter = {"range": {"@timestamp":{"gte": start_date, "lte": end_date}}}
+            timestamp_range_filter = {"range": {"@timestamp": {"gte": start_date, "lte": end_date}}}
 
         filters: List[Callable] = []
         if min_severity:
@@ -129,7 +128,6 @@ class K8sElasticSearchClient(elasticsearch.Elasticsearch):
             filters.append(partial(filter_log_by_pod_status, pod_status=pod_status))
         if pod_ids:
             filters.append(partial(filter_log_by_pod_ids, pod_ids=set(pod_ids)))
-
 
         log_generator = self.get_stream_log_generator if follow else self.get_log_generator
 

@@ -23,15 +23,14 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-from util.app_names import NAUTAAppNames
+
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from logs_aggregator.k8s_log_entry import LogEntry
 from logs_aggregator.log_filters import SeverityLevel
 from platform_resources.run import RunStatus, Run, RunKinds
-from util.exceptions import InvalidRegularExpressionError, K8sProxyOpenError, K8sProxyCloseError, LocalPortOccupiedError
+from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
-from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace
-from util.k8s.k8s_proxy_context_manager import K8sProxy
+from util.k8s.k8s_info import PodStatus, get_kubectl_current_context_namespace, get_kubectl_host, get_api_key
 from util.spinner import spinner, NctlSpinner
 from platform_resources.experiment import Experiment, ExperimentStatus
 from util.system import handle_error, format_timestamp_for_cli
@@ -207,51 +206,36 @@ def get_logs(experiment_name: str, min_severity: SeverityLevel, start_date: str,
         exit(1)
 
     try:
-        with K8sProxy(NAUTAAppNames.ELASTICSEARCH) as proxy:
-            es_client = K8sElasticSearchClient(host="127.0.0.1", port=proxy.tunnel_port,
-                                               verify_certs=False, use_ssl=False)
-            namespace = get_kubectl_current_context_namespace()
-            if match:
-                experiment_name = match
-                name_filter = match
+        es_client = K8sElasticSearchClient(host=f'{get_kubectl_host(with_port=True)}'
+                                           f'/api/v1/namespaces/nauta/services/nauta-elasticsearch:nauta/proxy',
+                                           verify_certs=False, use_ssl=True,
+                                           headers={'Authorization': get_api_key()})
+        namespace = get_kubectl_current_context_namespace()
+        if match:
+            experiment_name = match
+            name_filter = match
+        else:
+            name_filter = f'^{experiment_name}$'
+        runs = Run.list(namespace=namespace, name_filter=name_filter, run_kinds_filter=runs_kinds)
+        if not runs:
+            raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
+        pod_ids = pod_ids.split(',') if pod_ids else None  # type: ignore
+        follow_logs = True if follow and not output else False
+        if output and len(runs) > 1:
+            click.echo(Texts.MORE_EXP_LOGS_MESSAGE)
+        for run in runs:
+            start_date = start_date if start_date else run.creation_timestamp
+            run_logs_generator = es_client.get_experiment_logs_generator(run=run, namespace=namespace,
+                                                                         min_severity=min_severity,
+                                                                         start_date=start_date, end_date=end_date,
+                                                                         pod_ids=pod_ids, pod_status=pod_status,
+                                                                         follow=follow_logs)
+            if output:
+                save_logs_to_file(run=run, run_logs_generator=run_logs_generator, instance_type=instance_type)
             else:
-                name_filter = f'^{experiment_name}$'
-            runs = Run.list(namespace=namespace, name_filter=name_filter, run_kinds_filter=runs_kinds)
-            if not runs:
-                raise ValueError(f'Run with given name: {experiment_name} does not exists in namespace {namespace}.')
-
-            pod_ids = pod_ids.split(',') if pod_ids else None  # type: ignore
-            follow_logs = True if follow and not output else False
-
-            if output and len(runs) > 1:
-                click.echo(Texts.MORE_EXP_LOGS_MESSAGE)
-
-            for run in runs:
-                start_date = start_date if start_date else run.creation_timestamp
-
-                run_logs_generator = es_client.get_experiment_logs_generator(run=run, namespace=namespace,
-                                                                             min_severity=min_severity,
-                                                                             start_date=start_date, end_date=end_date,
-                                                                             pod_ids=pod_ids, pod_status=pod_status,
-                                                                             follow=follow_logs)
-
-                if output:
-                    save_logs_to_file(run=run, run_logs_generator=run_logs_generator, instance_type=instance_type)
-                else:
-                    if len(runs) > 1:
-                        click.echo(f'Experiment : {run.name}')
-                    print_logs(run_logs_generator=run_logs_generator, pager=pager)
-
-    except K8sProxyCloseError:
-        handle_error(logger, Texts.PROXY_CLOSE_LOG_ERROR_MSG, Texts.PROXY_CLOSE_USER_ERROR_MSG)
-        exit(1)
-    except LocalPortOccupiedError as exe:
-        handle_error(logger, Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message),
-                     Texts.LOCAL_PORT_OCCUPIED_ERROR_MSG.format(exception_message=exe.message))
-        exit(1)
-    except K8sProxyOpenError:
-        handle_error(logger, Texts.PROXY_CREATION_ERROR_MSG, Texts.PROXY_CREATION_ERROR_MSG)
-        exit(1)
+                if len(runs) > 1:
+                    click.echo(f'Experiment : {run.name}')
+                print_logs(run_logs_generator=run_logs_generator, pager=pager)
     except ValueError:
         handle_error(logger, Texts.EXPERIMENT_NOT_EXISTS_ERROR_MSG.format(experiment_name=experiment_name,
                                                                           instance_type=instance_type.capitalize()),
