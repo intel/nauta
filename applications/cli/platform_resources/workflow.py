@@ -159,35 +159,27 @@ class ArgoWorkflow(PlatformResource):
         """
         Return list of experiment runs.
         :param namespace: If provided, only workflows from this namespace will be returned
-        :param name_filter: If provided, only workflows matching name_filter regular expression will be returned
+        :param label_selector: If provided, only workflows matching label_selector expression will be returned
         :return: List of AgroWorkflow objects
         In case of problems during getting a list of workflows - throws an error
         """
-        name_filter = kwargs.pop('name_filter', None)
+        label_selector = kwargs.pop('label_selector', None)
 
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
             raw_runs = k8s_custom_object_api.list_namespaced_custom_object(group=ArgoWorkflow.api_group_name,
                                                                            namespace=namespace,
                                                                            plural=ArgoWorkflow.crd_plural_name,
-                                                                           version=ArgoWorkflow.crd_version)
+                                                                           version=ArgoWorkflow.crd_version,
+                                                                           label_selector=label_selector)
         else:
             raw_runs = k8s_custom_object_api.list_cluster_custom_object(group=ArgoWorkflow.api_group_name,
                                                                         plural=ArgoWorkflow.crd_plural_name,
-                                                                        version=ArgoWorkflow.crd_version)
+                                                                        version=ArgoWorkflow.crd_version,
+                                                                        label_selector=label_selector)
 
-        try:
-            name_regex = re.compile(name_filter) if name_filter else None
-        except sre_constants.error as e:
-            error_msg = Texts.REGEX_COMPILATION_FAIL_MSG.format(name_filter=name_filter)
-            logger.exception(error_msg)
-            raise InvalidRegularExpressionError(error_msg) from e
+        runs = [ArgoWorkflow.from_k8s_response_dict(run_dict) for run_dict in raw_runs['items']]
 
-        run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False)]
-
-        runs = [ArgoWorkflow.from_k8s_response_dict(run_dict)
-                for run_dict in raw_runs['items']
-                if all(f(run_dict) for f in run_filters)]
         return runs
 
 
