@@ -38,6 +38,7 @@ DOCKER_REGISTRY_CONFIG_FILE = 'docker_registry.yaml'
 NAUTA_NAMESPACE = "nauta"
 NAUTA_CONFIGURATION_CM = "nauta"
 
+TBLT_TABLE_FORMAT = "orgtbl"
 
 log = initialize_logger(__name__)
 

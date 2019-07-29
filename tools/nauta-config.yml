@@ -30,6 +30,8 @@ export_images:
     value: "{{ image_local_url['nauta/pytorch'] }}"
   - name: openvino-ms
     value: "{{ image_local_url['nauta/openvino-ms'] }}"
+  - name: openvino-mo
+    value: "{{ image_local_url['nauta/openvino-mo'] }}"
 
 local_images:
   nauta/centos:
@@ -357,6 +359,13 @@ local_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/openvino/openvino-model-server-00494373591e6b5a37664dc0e82abb491f8c9207.tar.gz
         dest: openvino-model-server.tar.gz
         checksum: cfc8260bf881ebb47579916feeb754201f8c97baf4158b031430c415c1790143
+  nauta/openvino-mo:
+    version: "1.0.0"
+    required:
+      BASE_IMAGE: "shared/centos/python36"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/openvino-mo"
 
 # WARNING
 # setting chart_values will work only if chart does not contain values.yaml file

@@ -32,7 +32,9 @@ from commands.verify import verify
 from commands.mount import mount
 from commands.version import version
 from commands.config import config
+
 from commands.template import template
+from commands.model import model
 
 from util.aliascmd import AliasGroup
 from util.logger import initialize_logger, setup_log_file, configure_logger_for_external_packages
@@ -126,6 +128,7 @@ entry_point.add_command(version)
 entry_point.add_command(mount)
 entry_point.add_command(config)
 entry_point.add_command(template.template)
+entry_point.add_command(model.model)
 
 if __name__ == '__main__':
     # Register signal handler

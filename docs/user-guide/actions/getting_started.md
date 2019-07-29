@@ -90,6 +90,19 @@ Commands:
 
 ```
 
+## Example Experiments
+
+The Nauta installation includes sample training scripts and utility scripts, contained in the `examples` folder, that can be run to demonstrate how to use Nauta. This section describes how to use these scripts. 
+
+### Examples Folder Content
+
+The examples folder in the nctl installation contains these following experiment scripts:
+
+* `mnist_single_node.py` - Training of digit classifier in single node setting
+* `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting
+* `mnist_horovod.py` - Training of digit classifier in Horovod
+* `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires mnist_input_data.py file)
+
 ### Utility Scripts
 
 There are two utility scripts, these are:

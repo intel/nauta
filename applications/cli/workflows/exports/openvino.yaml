@@ -1,0 +1,70 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: openvino
+  paramDescription: --input_shape [x,y,....] - shape of an input\n--input [name] - names of input layers\n--output [name] - names of output layers\nRest of parameters can be found in a description of OpenVino model optimizer
+spec:
+  entrypoint: openvino
+  arguments:
+    parameters:
+      - name: cluster-registry-address
+      - name: saved-model-dir-path
+      - name: additional-params
+        value: ''
+  volumes:
+    - name: input-home
+      persistentVolumeClaim:
+        claimName: input-home
+    - name: input-public
+      persistentVolumeClaim:
+        claimName: input-public
+    - name: output-home
+      persistentVolumeClaim:
+        claimName: output-home
+    - name: output-public
+      persistentVolumeClaim:
+        claimName: output-public
+  templates:
+    - name: openvino
+      inputs:
+        parameters:
+          - name: cluster-registry-address
+          - name: saved-model-dir-path
+          - name: additional-params
+      container:
+        image: "{{inputs.parameters.cluster-registry-address}}/nauta/openvino-mo:1.0.0"
+        command: [bash]
+        args: ["-c", "python3 mo.py --saved_model_dir {{inputs.parameters.saved-model-dir-path}} --output_dir /mnt/output/home/{{workflow.name}} {{inputs.parameters.additional-params}}"]
+        volumeMounts:
+          - name: input-home
+            mountPath: /mnt/input/home
+            readOnly: True
+          - name: input-public
+            mountPath: /mnt/input/root
+            readOnly: True
+          - name: output-home
+            mountPath: /mnt/output/home
+          - name: output-public
+            mountPath: /mnt/output/root
+            readOnly: True
+          - name: output-public
+            mountPath: /mnt/output/root/public
+            subPath: public
+          - name: input-public
+            mountPath: /mnt/input/root/public
+            subPath: public
+  tolerations:
+    - key: "master"
+      operator: "Exists"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: master
+                operator: In
+                values:
+                  - "True"

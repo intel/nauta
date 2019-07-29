@@ -32,6 +32,7 @@ from platform_resources.experiment_utils import generate_name
 from util.cli_state import common_options, pass_state, State
 from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
+from util.config import TBLT_TABLE_FORMAT
 from util.logger import initialize_logger
 from util.system import handle_error
 from cli_text_consts import PredictLaunchCmdTexts as Texts
@@ -100,7 +101,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
     click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
                           inference_instance.cli_representation.status]],
                         headers=Texts.TABLE_HEADERS,
-                        tablefmt="orgtbl"))
+                        tablefmt=TBLT_TABLE_FORMAT))
 
     try:
         namespace = get_kubectl_current_context_namespace()
