@@ -72,7 +72,9 @@ def test_validate_config_path_success_with_app_dir(os_env_get, exists_mock, expa
 
     result = Config.get_config_path()
 
-    assert result == os.path.join(APP_DIR_PATH, NCTL_CONFIG_DIR_NAME)
+    # Silly windows path replace
+    assert result.replace('\\\\', '/').replace('\\', '/') \
+        == os.path.join(APP_DIR_PATH, NCTL_CONFIG_DIR_NAME).replace('\\\\', '/').replace('\\', '/')
     assert exists_mock.call_count == 2
 
 
