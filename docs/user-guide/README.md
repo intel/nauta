@@ -44,6 +44,7 @@ This guide describes how to use Nauta, and the following topics:
 
 * [Installing Additional Libraries and Dependencies](advanced/customlibs.md)
 * [Controlling Packs Parameters](advanced/packs.md)
+* [Administrator access to Gitea console](advanced/gitea_console.md)
 
 ----------------------
 
