@@ -67,7 +67,8 @@ class Config:
 
     @staticmethod
     def get_config_path() -> str:
-        binary_config_dir_path = os.path.join(os.path.dirname(sys.executable), NCTL_CONFIG_DIR_NAME)
+        nctl_cli_dir = os.path.dirname(sys.executable)
+        binary_config_dir_path = os.path.join(os.path.split(nctl_cli_dir)[0], NCTL_CONFIG_DIR_NAME)
         user_local_config_dir_path = os.path.join(os.path.expanduser('~'), NCTL_CONFIG_DIR_NAME)
 
         log.debug(f"{NCTL_CONFIG_DIR_NAME} binary executable path:  {binary_config_dir_path}")
