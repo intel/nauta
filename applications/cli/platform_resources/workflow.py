@@ -15,21 +15,17 @@
 #
 
 from collections import namedtuple
-from functools import partial
-import re
-import sre_constants
 import time
 from typing import List
 
 from kubernetes.client import CustomObjectsApi
 from typing import Optional
 
-from cli_text_consts import PlatformResourcesExperimentsTexts as Texts
 from platform_resources.platform_resource import PlatformResource, PlatformResourceApiClient
-from platform_resources.resource_filters import filter_by_name_regex
-from util.exceptions import InvalidRegularExpressionError
 from util.config import NAUTA_NAMESPACE, NAUTAConfigMap
 from util.logger import initialize_logger
+from util.system import format_timestamp_for_cli
+
 
 logger = initialize_logger(__name__)
 
@@ -85,8 +81,10 @@ class ArgoWorkflow(PlatformResource):
     @property
     def cli_representation(self):
         return ArgoWorkflow.ArgoWorkflowCliModel(name=self.name,
-                                                 started_at=self.started_at,
-                                                 finished_at=self.finished_at,
+                                                 started_at=format_timestamp_for_cli(self.started_at) if self.started_at
+                                                 else '',
+                                                 finished_at=format_timestamp_for_cli(self.finished_at) if self.finished_at
+                                                 else '',
                                                  submitter=self.namespace,
                                                  phase=self.phase if self.phase else QUEUED_PHASE)
 

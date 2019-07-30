@@ -117,12 +117,11 @@ class ModelCmdTexts:
 
 
 class ModelStatusCmdTexts:
-    HELP = "Command displays status of a chosen operation."
-    MODEL_NOT_FOUND = "Lack of models to be displayed."
+    HELP = "Command displays a list of operations with their statuses."
     OTHER_ERROR_MSG = "Failed to get statuses of operations."
-    HELP_U = "Name of a user to whom viewed operation belongs. If not given - only operations of a current " \
+    HELP_U = "Name of a user to whom viewed operations belong. If not given - only operations of a current " \
              "user are taken into account."
-    LOAD_DATA_MSG = "Loading operation's data. Please wait..."
+    LOAD_DATA_MSG = "Loading operations' data. Please wait..."
 
 
 class ModelProcessListCmdTexts:
