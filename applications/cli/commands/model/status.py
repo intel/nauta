@@ -45,19 +45,16 @@ def status(state: State, username: str):
     :param username; if checked - searches for model for a certain user
     """
     try:
+        workflows: List[ArgoWorkflow.ArgoWorkflowCliModel] = []
         if not username:
             namespace = get_kubectl_current_context_namespace()
         else:
             namespace = username
         with spinner(text=Texts.LOAD_DATA_MSG):
             # filtering out workflows used to build images with training jobs
-            workflows: List[ArgoWorkflow.ArgoWorkflowCliModel] = [workflow.cli_representation for workflow in
-                                                                  ArgoWorkflow.list(namespace=namespace,
-                                                                                    label_selector="type!=build-workflow")]  # noqa: E501
-
-        if not workflows:
-            click.echo(Texts.MODEL_NOT_FOUND)
-            exit(0)
+            workflows = [workflow.cli_representation for workflow in
+                         ArgoWorkflow.list(namespace=namespace,
+                                           label_selector="type!=build-workflow")]
 
         click.echo(tabulate(workflows, headers=MODEL_HEADERS, tablefmt=TBLT_TABLE_FORMAT))
     except Exception:

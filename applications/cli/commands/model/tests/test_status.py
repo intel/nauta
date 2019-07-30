@@ -31,15 +31,14 @@ MODEL_STEPS = [ArgoWorkflowStep(name="model1", phase="Running"),
 MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',
                      k8s_custom_object_api=MagicMock(spec=CustomObjectsApi),
                      phase='Succeeded',
-                     steps=MODEL_STEPS,
-                     body={'spec': {'templates': [{'container': {'command': ['other command']}}]}})
+                     steps=MODEL_STEPS)
 
 
 BUILD_MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',
                            k8s_custom_object_api=MagicMock(spec=CustomObjectsApi),
                            phase='Succeeded',
                            steps=MODEL_STEPS,
-                           body={'spec': {'templates': [{'container': {'command': ['buildctl']}}]}})
+                           body={'spec': {'meta-data': [{'labels': {'type': ['buildctl']}}]}})
 
 
 class ModelStatusMocks:
@@ -67,7 +66,9 @@ def test_status_without_workflows(status_mocks: ModelStatusMocks):
     status_mocks.list_workflow.return_value = []
     result = CliRunner().invoke(status, catch_exceptions=False)
     assert result.exit_code == 0
-    assert Texts.MODEL_NOT_FOUND in result.output
+    assert result.output.count('\n') == 3
+    assert result.output.count('+') == 4
+    assert 'Operation' in result.output
 
 
 def test_status_other_error(status_mocks: ModelStatusMocks):
