@@ -80,6 +80,7 @@ def test_upload_experiment_to_git_repo_manager(mocker, tmpdir, git_client_mock):
                                              return_value='/fake-config/ssh')
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
+    config_mock.return_value.config_path = 'test_path'
     fake_hash = 'a12b34c'
     env_hash_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value=fake_hash)
 
@@ -114,6 +115,7 @@ def test_upload_experiment_to_git_repo_manager_already_cloned(mocker, tmpdir, gi
                                              return_value='/fake-config/ssh')
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
+    config_mock.return_value.config_path = 'test_path'
     fake_hash = 'a12b34c'
     env_hash_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value=fake_hash)
 
@@ -150,6 +152,7 @@ def test_upload_experiment_to_git_repo_manager_error(mocker, tmpdir, git_client_
     git_client_mock.push.side_effect = RuntimeError
     proxy_mock = mocker.patch('git_repo_manager.utils.TcpK8sProxy')
     config_mock = mocker.patch('git_repo_manager.utils.Config')
+    config_mock.return_value.config_path = 'test_path'
     fake_hash = 'a12b34c'
     env_hash_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value=fake_hash)
 
@@ -188,6 +191,7 @@ def test_compute_hash_of_k8s_env_address(mocker):
 
 def test_delete_exp_tag_from_git_repo_manager_experiments_dir_not_exist(mocker):
     config_mock = mocker.patch('git_repo_manager.utils.Config')
+    config_mock.return_value.config_path = 'test_path'
     compute_hash_of_k8s_env_address_mock = mocker.patch('git_repo_manager.utils.compute_hash_of_k8s_env_address', return_value='some_hash')
     get_private_key_path_mock = mocker.patch('git_repo_manager.utils.get_fake_ssh_path')
     external_cli_mock = mocker.patch('git_repo_manager.utils.ExternalCliClient')

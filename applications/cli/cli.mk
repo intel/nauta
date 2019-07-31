@@ -87,6 +87,12 @@ ifeq (Linux,$(OS))
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.11.0-linux-amd64.tar.gz
 	rm -rf helm_tmp
+
+	mkdir -vp dist/config/git
+	curl -o git-v2.22.0-linux-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/git/git-v2.22.0-linux-amd64.tar.gz
+	cd dist/config/git/
+	tar -xvf git-v2.22.0-linux-amd64.tar.gz -C dist/config/git
+	rm -f git-v2.22.0-linux-amd64.tar.gz
 endif
 ifeq (Darwin,$(OS))
 	. $(ACTIVATE); pip install --upgrade pip==18.1
@@ -113,6 +119,12 @@ ifeq (Darwin,$(OS))
 	mv helm_tmp/LICENSE dist/config/LICENSE_helm
 	rm -f helm-v2.11.0-darwin-amd64.tar.gz
 	rm -rf helm_tmp
+
+	mkdir -vp dist/config/git
+	curl -o git-v2.22.0-darwin-amd64.tar.gz http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/git/git-v2.22.0-darwin-amd64.tar.gz
+	cd dist/config/git/
+	tar -xvf git-v2.22.0-darwin-amd64.tar.gz -C dist/config/git
+	rm -f git-v2.22.0-darwin-amd64.tar.gz
 endif
 
 	cp -Rf ../../nauta-user dist/config/

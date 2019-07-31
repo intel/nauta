@@ -31,6 +31,7 @@ from util.system import ExternalCliClient
 logger = initialize_logger(__name__)
 _encoding = 'utf-8'  # Encoding used for bytes <-> str conversions
 
+GIT_LOCATION='git'
 
 def compute_hash_of_k8s_env_address():
     nauta_hostname = get_kubectl_host()
@@ -75,22 +76,27 @@ def create_gitignore_file_for_experiments(git_workdir):
 def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str, run_name: str):
     git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
     git_work_dir = os.path.join(experiments_workdir, run_name)
-
+    config_path = Config().config_path
+    git_location = os.path.join(config_path, GIT_LOCATION)
+    git_exec_location = os.path.join(git_location, 'git')
     try:
         create_gitignore_file_for_experiments(git_work_dir)
-        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=Config().config_path)
+        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=config_path)
         git_env = {'GIT_SSH': fake_ssh_path,
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_WORK_TREE': git_work_dir,
                    'GIT_TERMINAL_PROMPT': '0',
                    'SSH_AUTH_SOCK': '',  # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
+                   'GIT_EXEC_PATH': git_location,
                    }
         env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
+
         if 'LD_LIBRARY_PATH' in env:
             # do not copy LD_LIBRARY_PATH to git exec env - it points to libraries packed by PyInstaller
             # and they can be incompatible with system's git (e.g. libssl)
             del env['LD_LIBRARY_PATH']
-        git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
+        git = ExternalCliClient(executable=git_exec_location, env=env, cwd=experiments_workdir,
+                                timeout=60)
         # ls-remote command must be created manually due to hyphen
         git.ls_remote = git._make_command(name='ls-remote')  #type: ignore
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
@@ -99,7 +105,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                           bare=True)
             git.remote('set-url', 'origin', f'ssh://git@localhost:{proxy.tunnel_port}/{username}/experiments.git')
             _initialize_git_client_config(git, username=username)
-
+            print(git.version())
             git.add('.', '--all')
             git.commit(message=f'experiment: {experiment_name}', allow_empty=True)
             remote_branches, _, _ = git.ls_remote()
@@ -124,9 +130,10 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                        'GIT_WORK_TREE': git_work_dir,
                        'GIT_TERMINAL_PROMPT': '0',
                        'SSH_AUTH_SOCK': '',
+                       'GIT_EXEC_PATH': git_location,
                        }
             env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
-            git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
+            git = ExternalCliClient(executable='git_exec_location', env=env, cwd=experiments_workdir, timeout=60)
             git.reset('--hard', 'master', _cwd=experiments_workdir)
         except Exception:
             logger.exception(f'Failed to rollback {experiment_name} experiment upload to git repo manager.')
@@ -135,20 +142,24 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
 
 def delete_exp_tag_from_git_repo_manager(username: str, experiment_name: str, experiments_workdir: str):
     git_repo_dir = f'.nauta-git-{username}-{compute_hash_of_k8s_env_address()}'
-
+    config_path = Config().config_path
+    git_location = os.path.join(config_path, GIT_LOCATION)
+    git_exec_location = os.path.join(git_location, 'git')
     try:
-        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=Config().config_path)
+
+        fake_ssh_path = get_fake_ssh_path(username=username, config_dir=config_path)
         git_env = {'GIT_SSH': fake_ssh_path,
                    'GIT_DIR': os.path.join(experiments_workdir, git_repo_dir),
                    'GIT_TERMINAL_PROMPT': '0',
                    'SSH_AUTH_SOCK': '',  # Unset SSH_AUTH_SOCK to prevent issues when multiple users are using same nctl
+                   'GIT_EXEC_PATH': git_location,
                    }
         env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
         if 'LD_LIBRARY_PATH' in env:
             # do not copy LD_LIBRARY_PATH to git exec env - it points to libraries packed by PyInstaller
             # and they can be incompatible with system's git (e.g. libssl)
             del env['LD_LIBRARY_PATH']
-        git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
+        git = ExternalCliClient(executable=git_exec_location, env=env, cwd=experiments_workdir, timeout=60)
         with TcpK8sProxy(NAUTAAppNames.GIT_REPO_MANAGER_SSH) as proxy:
             if not os.path.isdir(f'{experiments_workdir}/{git_repo_dir}'):
                 if not os.path.isdir(experiments_workdir):

@@ -93,7 +93,7 @@ def get_local_dependency_map() -> Dict[str, DependencySpec]:
             expected_version=GIT_VERSION,
             version_command=execute_system_command,
             version_command_args=[
-                'git', '--version'
+                os.path.join(Config().config_path, 'git', 'git'), '--version'
             ],
             version_field='git version',
             match_exact_version=False
