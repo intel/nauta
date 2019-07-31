@@ -19,4 +19,3 @@ RUN pip install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSIO
     rm -rf /experiment_metrics-*.tar.gz
 
 ENV KMP_BLOCKTIME 0
-ENV OMP_NUM_THREADS 8
