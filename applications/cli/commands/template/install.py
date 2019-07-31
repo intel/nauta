@@ -24,6 +24,7 @@ from util.cli_state import common_options, pass_state, State
 from cli_text_consts import TemplateInstallCmdTexts as Texts
 from commands.template.common import load_remote_template, get_repository_address, get_local_templates, \
     download_remote_template
+from commands.config import update_resources_in_packs
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 from util.spinner import spinner
@@ -48,14 +49,16 @@ def install(state: State, template_name: str):
             remote_template = load_remote_template(template_name, repository_address=repository_address)
         except Exception:
             templates_spinner.stop()
-            handle_error(logger, user_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
+            handle_error(logger, user_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(
+                template_name=template_name),
                          log_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
                          add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
 
         if not remote_template:
             templates_spinner.stop()
-            handle_error(logger, user_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name),
+            handle_error(logger, user_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(
+                template_name=template_name),
                          log_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name),
                          add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
@@ -82,11 +85,15 @@ def install(state: State, template_name: str):
                                      output_dir_path=packs_location)
         except Exception:
             download_spinner.stop()
-            handle_error(logger, user_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
-                                                                                  repository_name=repository_address),
-                         log_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(template_name=template_name,
-                                                                         repository_name=repository_address),
+            handle_error(logger,
+                         user_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(
+                             template_name=template_name,
+                             repository_name=repository_address),
+                         log_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(
+                             template_name=template_name, repository_name=repository_address),
                          add_verbosity_msg=state.verbosity == 0)
             sys.exit(1)
+
+    update_resources_in_packs()
 
     click.echo("successfully installed!")

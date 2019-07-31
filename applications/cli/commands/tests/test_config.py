@@ -18,7 +18,7 @@ from click.testing import CliRunner
 from unittest.mock import patch, mock_open
 
 from cli_text_consts import ConfigCmdTexts as Texts
-from commands.config import config
+from commands.config import config, update_resources_in_packs
 import util.config
 
 WRONG_CONFIGURATION_FILE = "cpu_number: 10"
@@ -101,20 +101,6 @@ def test_config_non_existing_config_file(mocker):
     assert Texts.MISSING_CONFIG_FILE in result.output
 
 
-def test_incorrect_config_file(mocker):
-    mocker.patch("os.path.join", return_value="config")
-    mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch("commands.config.spinner")
-    test_nauta_config(mocker)
-    runner = CliRunner()
-
-    with patch("builtins.open", mock_open(read_data=WRONG_CONFIGURATION_FILE)), \
-         patch.object(util.config.Config, "get_config_path", return_value=""):  # noqa
-        result = runner.invoke(config, ["--cpu", "10", "--memory", "10G"])
-
-    assert Texts.CONFIG_FILE_INCORRECT in result.output
-
-
 def test_error_during_changing_configuration(mocker):
     mocker.patch("os.path.join", return_value="config")
     mocker.patch("os.path.isfile", return_value=True)
@@ -146,3 +132,17 @@ def test_change_configuration_success(mocker):
 
     assert Texts.SUCCESS_MESSAGE in result.output
     assert ovvp_mock.call_count == 1
+
+
+def test_incorrect_config_file(mocker):
+    mocker.patch("os.path.join", return_value="config")
+    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("commands.config.spinner")
+    mocker.patch("commands.config.NAUTAConfigMap")
+    sys_exit_mock = mocker.patch("sys.exit")
+
+    with patch("builtins.open", mock_open(read_data=WRONG_CONFIGURATION_FILE)), \
+         patch.object(util.config.Config, "get_config_path", return_value=""):  # noqa
+        update_resources_in_packs()
+
+    assert sys_exit_mock.call_count == 1, "program didn't exit"
