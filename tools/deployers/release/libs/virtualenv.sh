@@ -97,7 +97,7 @@ if [ X"${VIRTUALENV_ENABLED}" = X"1" ]; then
   if [ $PIP_VERSION -ge 19 ]; then
     ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --isolated --no-cache-dir --no-use-pep517
   else
-    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --user --isolated --no-cache-dir
+    ${PIP} install --upgrade pip==18.1 -f ${BINDIR}/pip-source --no-index --isolated --no-cache-dir
   fi  
   ${PIP} install -U -r ${BINDIR}/pip/requirements.txt -f ${BINDIR}/pip --no-index --isolated --ignore-installed --no-cache-dir 
 else
