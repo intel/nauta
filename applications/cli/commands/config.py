@@ -44,6 +44,50 @@ MEMORY_SYSTEM_REQUIRED_PERCENT_FIELDNAME = "memory_system_required_percent"
 logger = initialize_logger(__name__)
 
 
+def update_resources_in_packs(cpu: str = None, memory: str = None):
+    config_file_location = os.path.join(Config().config_path, NODE_CONFIG_FILENAME)
+
+    if not os.path.isfile(config_file_location):
+        handle_error(logger, Texts.MISSING_CONFIG_FILE, Texts.MISSING_CONFIG_FILE)
+        sys.exit(1)
+
+    with open(config_file_location, 'r+', encoding='utf-8') as config_file, \
+            spinner(text=Texts.CONFIG_UPDATE):
+        config_file_content = yaml.safe_load(config_file)
+        cpu_number = str(config_file_content.get(CPU_NUMBER_FIELDNAME))
+        memory_amount = str(config_file_content.get(MEMORY_AMOUNT_FIELDNAME))
+        cpu_system_required_min = str(config_file_content.get(CPU_SYSTEM_REQUIRED_MIN_FIELDNAME))
+        cpu_system_required_percent = str(config_file_content.get(CPU_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
+        memory_system_required_min = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_MIN_FIELDNAME))
+        memory_system_required_percent = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
+
+        if not cpu_number or cpu_number == "None" or not memory_amount or memory_amount == "None":
+            handle_error(logger, Texts.CONFIG_FILE_INCORRECT, Texts.CONFIG_FILE_INCORRECT)
+            sys.exit(1)
+
+        new_cpu = cpu if cpu else cpu_number
+        new_memory = memory if memory else memory_amount
+
+        try:
+            override_values_in_packs(new_cpu_number=new_cpu, new_memory_amount=new_memory,
+                                     current_cpu_number=cpu_number,
+                                     current_mem_amount=memory_amount, cpu_system_required_min=cpu_system_required_min,
+                                     cpu_system_required_percent=cpu_system_required_percent,
+                                     mem_system_required_min=memory_system_required_min,
+                                     mem_system_required_percent=memory_system_required_percent)
+        except Exception:
+            logger.exception(Texts.ERROR_DURING_UPDATE)
+            handle_error(logger, Texts.ERROR_DURING_UPDATE, Texts.ERROR_DURING_UPDATE)
+            sys.exit(1)
+
+        if cpu != cpu_number and memory != memory_amount:
+            config_file.seek(0)
+            config_file.truncate()
+            config_file_content[CPU_NUMBER_FIELDNAME] = cpu
+            config_file_content[MEMORY_AMOUNT_FIELDNAME] = memory
+            yaml.safe_dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
+
+
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='cfg', options_metavar='[options]')
 @click.option("-c", "--cpu", default=None, help=Texts.HELP_C)
 @click.option("-m", "--memory", default=None, help=Texts.HELP_M)
@@ -77,41 +121,6 @@ def config(state: State, cpu: str, memory: str):
         handle_error(logger, error_message, error_message)
         sys.exit(1)
 
-    config_file_location = os.path.join(Config().config_path, NODE_CONFIG_FILENAME)
-
-    if not os.path.isfile(config_file_location):
-        handle_error(logger, Texts.MISSING_CONFIG_FILE, Texts.MISSING_CONFIG_FILE)
-        sys.exit(1)
-
-    with open(config_file_location, 'r+', encoding='utf-8') as config_file, \
-            spinner(text=Texts.CONFIG_UPDATE):
-        config_file_content = yaml.safe_load(config_file)
-        cpu_number = str(config_file_content.get(CPU_NUMBER_FIELDNAME))
-        memory_amount = str(config_file_content.get(MEMORY_AMOUNT_FIELDNAME))
-        cpu_system_required_min = str(config_file_content.get(CPU_SYSTEM_REQUIRED_MIN_FIELDNAME))
-        cpu_system_required_percent = str(config_file_content.get(CPU_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
-        memory_system_required_min = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_MIN_FIELDNAME))
-        memory_system_required_percent = str(config_file_content.get(MEMORY_SYSTEM_REQUIRED_PERCENT_FIELDNAME))
-
-        if not cpu_number or cpu_number == "None" or not memory_amount or memory_amount == "None":
-            handle_error(logger, Texts.CONFIG_FILE_INCORRECT, Texts.CONFIG_FILE_INCORRECT)
-            sys.exit(1)
-
-        try:
-            override_values_in_packs(new_cpu_number=cpu, new_memory_amount=memory, current_cpu_number=cpu_number,
-                                     current_mem_amount=memory_amount, cpu_system_required_min=cpu_system_required_min,
-                                     cpu_system_required_percent=cpu_system_required_percent,
-                                     mem_system_required_min=memory_system_required_min,
-                                     mem_system_required_percent=memory_system_required_percent)
-        except Exception:
-            logger.exception(Texts.ERROR_DURING_UPDATE)
-            handle_error(logger, Texts.ERROR_DURING_UPDATE, Texts.ERROR_DURING_UPDATE)
-            sys.exit(1)
-
-        config_file.seek(0)
-        config_file.truncate()
-        config_file_content[CPU_NUMBER_FIELDNAME] = cpu
-        config_file_content[MEMORY_AMOUNT_FIELDNAME] = memory
-        yaml.safe_dump(config_file_content, config_file, default_flow_style=False, explicit_start=True)
+    update_resources_in_packs(cpu, memory)
 
     click.echo(Texts.SUCCESS_MESSAGE)
