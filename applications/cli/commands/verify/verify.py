@@ -43,11 +43,8 @@ def verify(state: State):
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
-    except InvalidOsVersionError as exception:
+    except (InvalidOsError, InvalidOsVersionError) as exception:
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
-    except InvalidOsError as exception:
-        handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
-        exit(1)
 
     dependencies = get_dependency_map()
     kubectl_dependency_name = 'kubectl'
