@@ -160,16 +160,28 @@ def mocked_k8s_RbacAuthorizationV1Api(mocker):
     rbacAuthorizationV1_instance.list_cluster_role.return_value = v1_cluster_role_list
 
 
-def test_get_k8s_host_w_port(mocked_k8s_config):
-    k8s_host = get_kubectl_host()
+def test_get_k8s_host_w_port_replace_https(mocked_k8s_config):
+    k8s_host = get_kubectl_host(replace_https=True, with_port=True)
 
     assert k8s_host == '127.0.0.1:8080'
 
 
-def test_get_k8s_host_wo_port(mocked_k8s_config):
-    k8s_host = get_kubectl_host(with_port=False)
+def test_get_k8s_host_wo_port_replace_https(mocked_k8s_config):
+    k8s_host = get_kubectl_host(replace_https=True, with_port=False)
 
     assert k8s_host == '127.0.0.1'
+
+
+def test_get_k8s_host_w_port(mocked_k8s_config):
+    k8s_host = get_kubectl_host(replace_https=False, with_port=True)
+
+    assert k8s_host == 'https://127.0.0.1:8080'
+
+
+def test_get_k8s_host_wo_port(mocked_k8s_config):
+    k8s_host = get_kubectl_host(replace_https=False, with_port=False)
+
+    assert k8s_host == 'https://127.0.0.1'
 
 
 def test_get_app_services(mocked_k8s_config, mocked_k8s_CoreV1Api):
