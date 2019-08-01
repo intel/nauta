@@ -1,4 +1,4 @@
-ansible==2.7.9
+ansible==2.7.12
 docker==3.3.0
 jmespath==0.9.3
 netaddr==0.7.19
