@@ -18,6 +18,7 @@ import base64
 from enum import Enum
 from http import HTTPStatus
 from typing import List, Dict
+from urllib.parse import urlparse
 
 from kubernetes.client.rest import ApiException
 from kubernetes import config, client
@@ -55,13 +56,26 @@ class NamespaceStatus(Enum):
 def get_kubectl_host(replace_https=True, with_port=True) -> str:
     config.load_kube_config()
     kubectl_host = configuration.Configuration().host
-    if replace_https:
-        kubectl_host = kubectl_host.replace('https://', '').replace('http://', '')
-    if not with_port:
-        port = ':' + kubectl_host.split(':')[-1]
-        kubectl_host = kubectl_host.replace(port, '')
+    parsed_kubectl_host = urlparse(kubectl_host)
+    scheme = parsed_kubectl_host.scheme
+    hostname = parsed_kubectl_host.hostname
+    port = parsed_kubectl_host.port
+    if not port:
+        if scheme == 'http':
+            port = 80
+        else:
+            port = 443
 
-    return kubectl_host
+    if replace_https:
+        if with_port:
+            return f'{hostname}:{port}'
+        else:
+            return f'{hostname}'
+    else:
+        if with_port:
+            return f'{scheme}://{hostname}:{port}'
+        else:
+            return f'{scheme}://{hostname}'
 
 
 def get_api_key() -> str:
