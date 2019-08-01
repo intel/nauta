@@ -30,7 +30,6 @@ function delete_pv() {
 
 function delete_user() {
     USER=$1
-    USER="${USER:1:${#USER}-2}"
     # check whether a user still exists in the system - at this moment this user
     # no longer exists in k8s cluster
     `id $USER >/dev/null 2>&1`
@@ -51,7 +50,7 @@ function delete_user() {
     fi
 }
 
-USERS_TO_BE_DELETED=`kubectl get cm nauta-user-del -n nauta -o=json | python -c "import sys, json; k = json.load(sys.stdin); k = json.dumps(k['data'].keys()) if 'data' in k else ''; print(k)"`
+USERS_TO_BE_DELETED=`kubectl get cm nauta-user-del -n nauta -o=json | python -c "import sys, json; k = json.load(sys.stdin); k = k['data'].keys() if 'data' in k else ''; print(' '.join(k))"`
 
 if [[ $USERS_TO_BE_DELETED != 'null' ]];
 then

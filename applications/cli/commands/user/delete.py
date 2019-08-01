@@ -89,7 +89,7 @@ def delete(state: State, username: str, purge: bool):
 
         # CAN-616 - wait until user has been really deleted
         with spinner(text=Texts.DELETION_VERIFICATION_OF_DELETING) as user_del_spinner:
-            for i in range(60):
+            for i in range(120):
                     user_state = check_users_presence(username)
 
                     user_del_cm_content = get_config_map_data(name=USER_DEL_CM, namespace=NAUTA_NAMESPACE,
