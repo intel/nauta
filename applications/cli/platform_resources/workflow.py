@@ -15,14 +15,20 @@
 #
 
 from collections import namedtuple
+from functools import partial
+import re
+import sre_constants
 import time
 from typing import List
 
 from kubernetes.client import CustomObjectsApi
 from typing import Optional
 
+from cli_text_consts import PlatformResourcesExperimentsTexts as Texts
 from platform_resources.platform_resource import PlatformResource, PlatformResourceApiClient
+from platform_resources.resource_filters import filter_by_name_regex
 from util.config import NAUTA_NAMESPACE, NAUTAConfigMap
+from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
 from util.system import format_timestamp_for_cli
 
@@ -207,7 +213,8 @@ class ArgoWorkflow(PlatformResource):
         :return: List of AgroWorkflow objects
         In case of problems during getting a list of workflows - throws an error
         """
-        label_selector = kwargs.pop('label_selector', None)
+        label_selector = kwargs.pop('label_selector', '')
+        name_filter = kwargs.pop('name_filter', None)
 
         k8s_custom_object_api = custom_objects_api if custom_objects_api else PlatformResourceApiClient.get()
         if namespace:
@@ -222,8 +229,21 @@ class ArgoWorkflow(PlatformResource):
                                                                         version=ArgoWorkflow.crd_version,
                                                                         label_selector=label_selector)
 
-        runs = [ArgoWorkflow.from_k8s_response_dict(run_dict) for run_dict in raw_runs['items']]
+        if name_filter:
+            try:
+                name_regex = re.compile(name_filter) if name_filter else None
+            except sre_constants.error as e:
+                error_msg = Texts.REGEX_COMPILATION_FAIL_MSG.format(name_filter=name_filter)
+                logger.exception(error_msg)
+                raise InvalidRegularExpressionError(error_msg) from e
 
+            run_filters = [partial(filter_by_name_regex, name_regex=name_regex, spec_location=False)]
+
+            runs = [ArgoWorkflow.from_k8s_response_dict(run_dict)
+                    for run_dict in raw_runs['items']
+                    if all(f(run_dict) for f in run_filters)]
+        else:
+            runs = [ArgoWorkflow.from_k8s_response_dict(run_dict) for run_dict in raw_runs['items']]
         return runs
 
 
