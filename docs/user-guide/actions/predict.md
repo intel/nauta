@@ -30,6 +30,7 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 |`-o, --output TEXT`| No | Location of a folder where outputs from inferences will be stored. Value should point out the location from one of the system's shared folder.|
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of the directory in model's location.|
 |`-tr, --tf-record`| No |If given, the batch prediction accepts files in `TFRecord` formats. Otherwise files should be delivered in `protobuf` format.|
+|`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -88,6 +89,7 @@ The `launch` subcommand starts  a new prediction instance that can be used for p
 |`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/home/saved_model).|
 |`-l, --local_model_location`<br> `PATH`| No | Local path to saved model that will be used for inference. Model content will be copied into an image. 
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of directory in model's location. |
+|`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
