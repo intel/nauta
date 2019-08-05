@@ -39,7 +39,7 @@ logger = initialize_logger('commands.launch')
 
 FORWARDED_URL = 'http://localhost:{}'
 
-TENSORBOARD_TRIES_COUNT = 20
+TENSORBOARD_TRIES_COUNT = 60
 TENSORBOARD_CHECK_BACKOFF_SECONDS = 5
 
 
