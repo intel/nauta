@@ -26,6 +26,7 @@ This guide describes how to use Nauta, and discusses the following topics:
 * [Working with Template Packs](actions/template_packs.md)
 * [Evaluating Experiments](actions/view_exp.md)
 * [Evaluating Experiments with Inference Testing](actions/inference_testing.md)
+* [Exporting models](actions/model_export.md)
 * [Managing Users and Resources](actions/managing_users_resources.md)
 * [CLI Commands](actions/view_cli_help.md)
     * [config](actions/config.md) - adjusts packs' configuration to resources available on a cluster
