@@ -17,7 +17,7 @@
 import os
 import shutil
 from http import HTTPStatus
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import requests
 import yaml
@@ -179,16 +179,16 @@ def get_local_templates() -> Dict[str, Template]:
     return local_model_list
 
 
-def prepare_list_of_templates() -> (List[Template], List[str]):
+def prepare_list_of_templates() -> Tuple[List[Template], List[str]]:
     error_messages = []
-    remote_templates = {}
+    remote_templates: Dict[str, Template] = {}
     try:
         repository_address = get_repository_address()
         remote_templates = get_remote_templates(repository_address)
     except ExceptionWithMessage as exe:
         error_messages.append(exe.message)
 
-    local_templates = {}
+    local_templates: Dict[str, Template] = {}
     try:
         local_templates = get_local_templates()
     except Exception:
