@@ -1,6 +1,6 @@
 # model Command
 
-The overall purpose of this command/subcommands is to manage model export related tasks. Following are the subcommands for the nctl model command.
+Use the `model` command to manage model export related tasks. Following are the subcommands for the `nctl model` command. This main command also includes the following subcommands:
 
  - [status Subcommand](#status-subcommand)
  - [export Subcommand](#export-subcommand)
@@ -10,7 +10,7 @@ The overall purpose of this command/subcommands is to manage model export relate
 
 ### Synopsis
  
-Displays a list of model export operations with their statuses, dates of start and finish and users that submitted those operations.
+Displays a list of model export operations with their statuses, dates of start and finish, and the users who submitted those operations.
  
 ### Syntax
  
@@ -21,12 +21,12 @@ Displays a list of model export operations with their statuses, dates of start a
 
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given - only models of a current user are taken into account |
+ |`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account |
  
 
 ### Returns
  
-Command displays a list of operations with their statuses, dates of start and finish and users that submitted those operations.
+Command displays a list of operations with their statuses, dates of start and finish and the users who submitted those operations.
 
      
 ### Example
@@ -49,7 +49,7 @@ Displays details of 3 model export operations - two of them finished with succes
 
 ### Synopsis
  
-Exports an existing model located in the PATH folder to a given FORMAT with given options. If `formats` option is given - it displays a list of available export formats.    
+Exports an existing model located in the PATH folder to a given FORMAT with given options. If `formats` option is given, it displays a list of available export formats.    
  
 ### Syntax
  
@@ -60,15 +60,15 @@ Exports an existing model located in the PATH folder to a given FORMAT with give
  
  | Name | Required | Description |
  |:--- |:--- |:--- |
- |`PATH/formats` | Yes | `PATH` - Location of a model that is going to be exported. Models can be stored only in shared folders - this command doesn't handle models located in local folders. `formats` - if given, command displays a list of available formats.|
+ |`PATH/formats` | Yes | `PATH` - Location of a model that is going to be exported. Models can be stored `only` in shared folders. Furthermore, this command `does not` handle models located in local folders. `formats` - if given, command displays a list of available formats.|
  |`FORMAT` | No | Format of an exported model. List of available formats can be obtained by executing `export-list` command. Required if `PATH` has been given.|
  |`operation options` | No | String with a list of parameters that are passed to a workflow responsible for exporting a model. All such parameters should be added at the end of the command after `--` string. |
  
 
 ### Returns
  
-If an export's operation has started successfuly - information about that and details export's operation. In case of problems - short description of their causes.
-If `formats` option is given - a list of available export formats with a short description of parameters accepted by those formats.
+Should issues arise, a message (or messages) with a description of their cause (or causes) displays. If an export's operation starts, then the information about that operation and its details displays.
+If `formats` option is given - a list of available export formats with a short description of parameters accepted by those formats displays.
 
      
 ### Example
