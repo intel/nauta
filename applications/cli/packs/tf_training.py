@@ -30,7 +30,7 @@ from util.config import NAUTAConfigMap, NAUTA_NAMESPACE
 import packs.common as common
 import dpath.util as dutil
 from cli_text_consts import PacksTfTrainingTexts as Texts
-
+from util.template import convert_k8s_cpu_resource
 
 log = initialize_logger(__name__)
 
@@ -189,18 +189,26 @@ def modify_values_yaml(experiment_folder: str, script_location: str, script_para
             number_of_replicas = int(v.get(WORK_CNT_PARAM)) if not workersCount else int(workersCount)
             v[POD_COUNT_PARAM] = number_of_replicas + 1
 
-        if env_variables:
-            env_list = []
-            for variable in env_variables:
-                key, value = variable.split("=")
+        env_variables = env_variables if env_variables else []
+        parsed_envs = []
+        for variable in env_variables:
+            key, value = variable.split("=")
+            one_env_map = {"name": key, "value": value}
+            parsed_envs.append(one_env_map)
 
-                one_env_map = {"name": key, "value": value}
+        # Set OMP_NUM_THREADS to be equal to cpu limit if it was not explicitly passed
+        if "OMP_NUM_THREADS" not in (env["name"] for env in parsed_envs):
+            try:
+                cpu_limit = calculate_omp_num_threads(v)
+                if cpu_limit:
+                    parsed_envs.append({"name": "OMP_NUM_THREADS", "value": str(cpu_limit)})
+            except (ValueError, TypeError, KeyError):
+                log.exception("Failed to infer OMP_NUM_THREADS value.")
 
-                env_list.append(one_env_map)
-            if v.get("env"):
-                v["env"].extend(env_list)
-            else:
-                v["env"] = env_list
+        envs_to_set = {'env', 'worker.env', 'master.env'}  # Env placeholders in values.yaml that we expect
+        for env in envs_to_set:
+            if dutil.search(v, env, separator='.'):
+                dutil.get(v, env, separator='.').extend(parsed_envs)
 
     with open(values_yaml_temp_filename, "w") as values_yaml_file:
         yaml.safe_dump(v, values_yaml_file)
@@ -221,6 +229,28 @@ def get_pod_count(run_folder: str, pack_type: str) -> Optional[int]:
     log.debug(f"Pod count for Run: {run_folder} = {pod_count}")
 
     return int(pod_count) if pod_count else None
+
+
+def calculate_omp_num_threads(values_dict: dict) -> int:
+    """
+    Calculates correct value of OMP_NUM_THREADS according to CPU resources requested in template's values.yaml.
+    :param values_dict: Dictionary containing template's values,yaml file
+    :return: Calculated OMP_NUM_THREADS value
+    :raises ValueError, TypeError, KeyError
+    """
+    if values_dict.get("cpu") and values_dict.get("cpu") != "null":
+        cpu_limit = values_dict.get("cpu")
+    elif values_dict.get("resources"):
+        cpu_limit = dutil.get(values_dict, "resources.limits.cpu", separator='.')
+    elif values_dict.get("worker_resources"):
+        cpu_limit = dutil.get(values_dict, "worker_resources.limits.cpu", separator='.')
+    else:
+        raise ValueError('Unable to find requested CPUs count.')
+
+    # We need to handle cases when CPU is provided either as absolute value, or in millicpu format.
+    # Convert_k8s_cpu_resource returns cpu request in millicpus, so we divide it by 1000 to get absolute
+    # value of cpus, and we make sure that there will be at least one thread.
+    return int(max(convert_k8s_cpu_resource(cpu_limit) // 1000, 1))
 
 
 def _parse_yaml_boolean(value: str) -> bool:

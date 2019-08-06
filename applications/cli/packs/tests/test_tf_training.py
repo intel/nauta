@@ -26,7 +26,8 @@ SCRIPT_LOCATION = "training_script.py"
 EXPERIMENT_FOLDER = "\HOME\FOLDER"
 ENV_VARIABLES = ("A=B", "C=D")
 
-ENV_VARIABLES_OUTPUT = [{'name': 'A', 'value': 'B'}, {'name': 'C', 'value': 'D'}]
+ENV_VARIABLES_OUTPUT = [{'name': 'A', 'value': 'B'}, {'name': 'C', 'value': 'D'},
+                        {'name': 'OMP_NUM_THREADS', 'value': '1'}]
 TEST_POD_COUNT = 4
 TEST_YAML_FILE = r'''replicaCount: 2
 image:
@@ -50,6 +51,7 @@ ingress:
 podCount: {TEST_POD_COUNT}
 workersCount: 3
 pServersCount: 1
+env: []
 '''
 TEST_YAML_FILE_WITHOUT_POD_COUNT = f'''replicaCount: 2
 image:
@@ -250,3 +252,21 @@ def test_get_pod_count(mocker):
     mocker.patch("builtins.open", new_callable=mock.mock_open, read_data=TEST_YAML_FILE_WITH_POD_COUNT)
     pod_count = tf_training.get_pod_count(run_folder=EXPERIMENT_FOLDER, pack_type=EXAMPLE_PACK_TYPE)
     assert pod_count == TEST_POD_COUNT
+
+
+@pytest.mark.parametrize('cpus,omp_num_threads', [(4, 4), ('2750m', 2), ('500m', 1)])
+def test_calculate_omp_num_threads(cpus, omp_num_threads):
+    values = {'resources': {'limits': {'cpu': cpus}}}
+    assert tf_training.calculate_omp_num_threads(values) == omp_num_threads
+
+
+@pytest.mark.parametrize('cpus,omp_num_threads', [(4, 4), ('2750m', 2), ('500m', 1)])
+def test_calculate_omp_num_threads_worker_resources(cpus, omp_num_threads):
+    values = {'worker_resources': {'limits': {'cpu': cpus}}}
+    assert tf_training.calculate_omp_num_threads(values) == omp_num_threads
+
+
+def test_calculate_omp_num_threads_error():
+    values = {'unknown_resources': {'limits': {'cpu': 4}}}
+    with pytest.raises(ValueError):
+        tf_training.calculate_omp_num_threads(values)
