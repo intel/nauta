@@ -21,8 +21,9 @@ import numpy as np
 from tensorflow_serving.apis import predict_pb2
 
 
-tf.app.flags.DEFINE_string("work_dir", "/tmp/mnist_test", "Working directory.")
-tf.app.flags.DEFINE_integer("num_tests", 100, "Number of examples to convert.")
+tf.app.flags.DEFINE_string("work_dir", "/tmp/mnist_test", "Working directory. Default: /tmp/mnist_test")
+tf.app.flags.DEFINE_integer("num_tests", 100, "Number of examples to convert. Default: 100")
+tf.app.flags.DEFINE_string("model_input_name", "images", "Determine model input name for served model. Default: images")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -30,7 +31,7 @@ FLAGS = tf.app.flags.FLAGS
 # Look into example training scripts to see how these constants are used in model saving.
 MODEL_NAME = "mnist"
 MODEL_SIGNATURE_NAME = "predict_images"
-MODEL_INPUT_NAME = "images"
+MODEL_INPUT_NAME = FLAGS.model_input_name
 # MODEL_OUTPUT_NAME = "scores" - not needed here as we only specify requests
 
 

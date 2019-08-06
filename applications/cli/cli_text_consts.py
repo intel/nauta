@@ -260,7 +260,7 @@ class PredictLaunchCmdTexts:
                       "location."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
-    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'Open Vino Model " \
+    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'OpenVINO Model " \
               "Server'. Default option is 'tfserving'."
     PREDICTION_INSTANCE_NOT_READY = "Prediction instance is not ready. Please check its readiness again in a few " \
                                     "minutes."
@@ -325,7 +325,7 @@ class PredictBatchCmdTexts:
                      "delivered in protobuf format."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
-    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'Open Vino Model " \
+    HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'OpenVINO Model " \
               "Server'. Default option is 'tfserving'."
 
 

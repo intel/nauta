@@ -10,6 +10,8 @@ For guidance on using inference testing to evaluate an experiment, refer to the 
 
 
 
+* For running prediction on OpenVINO Model Server, refer to [Inference Example on OpenVINO Model Server](openvino_inf.md)
+
 ----------------------
 
 ## Return to Start of Document
