@@ -3,12 +3,13 @@ FROM ${BASE_IMAGE}
 
 RUN yum update -y && yum install -y which devtoolset-8-gcc* && yum clean all
 RUN source /opt/rh/devtoolset-8/enable && gcc --version
-RUN yum install -y --nogpgcheck curl git rsync unzip zip which \
+RUN yum install -y --nogpgcheck curl git rsync unzip zip which openssl openssl-devel libffi-devel \
                                 java-1.8.0-openjdk-devel java-1.8.0-openjdk libpng-devel \
                                 pkg-config freetype-devel hdf5-devel libcurl patch \
                                 make libtool automake gcc-gfortran gcc-gfortran python3-devel python2-devel \
                                 openblas-devel lapack-devel Cython libjpeg-devel pkgconfig freetype-devel && \
     yum clean all
+
 
 RUN mkdir /tensorflow /build-output -p
 

@@ -400,7 +400,7 @@ shared_images:
   shared/build/pytorch:
     version: "v1.2.0"
     required:
-      BASE_IMAGE: "shared/centos/python36"
+      BASE_IMAGE: "shared/build/tensorflow/py3.6"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/pytorch"
     push: False

@@ -53,7 +53,7 @@ RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-r
 
 COPY requirements.txt /horovod/
 RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build setuptools
-RUN source /opt/rh/rh-python36/enable && ${PIP} install -r /horovod/requirements.txt --no-binary=:all: --no-cache-dir --ignore-installed ipaddress
+RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && ${PIP} install -r /horovod/requirements.txt --no-binary=:all: --no-cache-dir --ignore-installed ipaddress
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python && \
     yum install -y openssh-clients openssh-server && \

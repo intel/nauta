@@ -14,6 +14,13 @@ COPY --from=pytorch-build /pytorch_build/pytorch/dist/torch-1.2.0a0*-cp36-cp36m-
 
 ADD requirements.txt .
 
+COPY --from=pytorch-build /pytorch_build/pytorch/third_party/ideep/mkl-dnn/external/mklml_lnx_2019.0.3.20190220/lib/* /opt/rh/rh-python36/root/usr/lib/
+
+COPY --from=pytorch-build /usr/lib64/libopenblas* /opt/rh/rh-python36/root/usr/lib/
+COPY --from=pytorch-build /usr/lib64/libgf* /opt/rh/rh-python36/root/usr/lib/
+COPY --from=pytorch-build /usr/lib64/libquadmath* /opt/rh/rh-python36/root/usr/lib/
+
+
+
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/rh/rh-python36/root/usr/lib/
-RUN pip install --no-cache-dir mkl-include==2019.0 mkl==2019.0
-RUN pip install --no-cache-dir --force-reinstall /bin/torch-1.2.0a0*-cp36-cp36m-linux_x86_64.whl /bin/torchvision-0.3.0a0*-cp36-cp36m-linux_x86_64.whl && pip install --no-binary=:all: --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir mkl-include==2019.0 mkl==2019.0 && pip install --no-cache-dir --force-reinstall /bin/torch-1.2.0a0*-cp36-cp36m-linux_x86_64.whl /bin/torchvision-0.3.0a0*-cp36-cp36m-linux_x86_64.whl && pip install --no-binary=:all: --no-cache-dir -r requirements.txt
