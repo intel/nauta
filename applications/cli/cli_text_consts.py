@@ -31,32 +31,53 @@ class VersionCmdTexts:
 
 
 class MountCmdTexts:
-    HELP = "Displays a command to mount folders on a local machine."
-    MAIN_MSG = """Use the following command to mount those folders:
- - replace <MOUNTPOINT> with a proper location on your local machine)
- - replace <NAUTA_FOLDER> with one of the following:
-        - input - User's private input folder (read/write)
-          (can be accessed as /mnt/input/home from training script).
-        - output - User's private output folder (read/write)
-          (can be accessed as /mnt/output/home from training script).
-        - input-shared - Shared input folder (read/write)
-          (can be accessed as /mnt/input/root/public from training script).
-        - output-shared - Shared output folder (read/write)
-          (can be accessed as /mnt/output/root/public from training script).
-        - input-output-ro - Full input and output directories, read only.
-Additionally, each experiment has a special folder that can be accessed
-as /mnt/output/experiment from training script. This folder is shared by Samba
-as output/<EXPERIMENT_NAME>.
---------------------------------------------------------------------"""
+    HELP = "Displays a command that can be used to mount a client's folder on their local machine."
+    MAIN_MSG = """
+|=======================================================================================================|
+|   <NAUTA_FOLDER>  |   Code Reference Path     |   User Access     |   Shared Access                   |
+|-------------------------------------------------------------------------------------------------------|
+|   input           |   /mnt/input/home         |   read/write      |   -                               |
+|   output          |   /mnt/output/home        |   read/write      |   -                               |
+|   input-shared    |   /mnt/input/root/public  |   read/write      |   read/write                      |
+|   output-shared   |   /mnt/output/root/public |   read/write      |   read/write                      |
+|   input-output-ro |                           |   read            |   read                            |
+|=======================================================================================================|
+|   Each experiment has a special folder that can be accessed                                           |
+|   as /mnt/output/experiment from training script. This folder is shared by Samba                      |
+|   as output/<EXPERIMENT_NAME>.                                                                        |
+|=======================================================================================================|
+|   <MOUNTPOINT>    |   folder/drive location on your local machine                                     |
+|=======================================================================================================|
+    """
+
+    MOUNT_CMD = "Mount command for this operating system:\n{command}"
 
     HELP_L = "Displays a list of nauta folders mounted on a local machine. If run using admin credentials, displays " \
              "mounts of all users."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
-    UNMOUNT_COMMAND_MSG = "Use following command to unmount previously mounted folder:"
+    UNMOUNT_CMD = "Command to unmount previously mounted folder:\n{command}"
     UNMOUNT_OPTIONS_MSG = "In case of problems with unmounting (disconnected disk etc.) try out -f (force) or -l " \
                           "(lazy) options. For more info about these options refer to man umount."
     UNMOUNT_OPTIONS_OSX_MSG = "In case of problems with unmounting (disconnected disk etc.) try out -f (force) " \
                               "option. For more info about these options refer to man umount."
+    UNMOUNT_MSG_UNIX = """
+Example usage:
+    - Mounting a local folder (mylocalfolder) to the user's Nauta input folder:
+        sudo mount.cifs -o username=JANEDOE,password=lqS9P5kQ0TFzMmscCY21ZklDDKZtdBeH,rw,uid=10001 //10.91.120.152/input mylocalfolder
+    - Code reference path:
+        data_dir=/mnt/input/home/<Uploaded-DataFolder>
+    - Unmount the folder:
+        umount mylocalfolder
+    """
+    UNMOUNT_MSG_WIN = """
+Example usage:
+    - Mounting a local folder (mylocalfolder) to the user's Nauta input folder:
+        net use mylocalfolder \\10.91.120.152\\input /user:JANEDOE lqS9P5kQ0TFzMmscCY21ZklDDKZtdBeH
+    - Code reference path:
+        data_dir=/mnt/input/home/<Uploaded-DataFolder>
+    - Unmount the folder:
+        net use mylocalfolder /d
+    """
     MOUNTS_LIST_COMMAND_ERROR_MSG = "Error detected while gathering list of mounted shares."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying current user privileges."
 
