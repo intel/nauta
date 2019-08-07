@@ -67,13 +67,17 @@ def is_admin(state: State):
 
 def print_unmount():
     click.echo()
-    click.echo(Texts.UNMOUNT_COMMAND_MSG)
-    click.echo(get_unmount_command())
+    unmount_command = get_unmount_command()
+    click.echo(Texts.UNMOUNT_CMD.format(command=unmount_command))
 
     if platform.system() == "Linux":
         click.echo(Texts.UNMOUNT_OPTIONS_MSG)
+        click.echo(Texts.UNMOUNT_MSG_UNIX)
     elif platform.system() == "Darwin":
         click.echo(Texts.UNMOUNT_OPTIONS_OSX_MSG)
+        click.echo(Texts.UNMOUNT_MSG_UNIX)
+    elif platform.system() == 'Windows':
+        click.echo(Texts.UNMOUNT_MSG_WIN)
 
 
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='m', invoke_without_command=True,
@@ -84,14 +88,16 @@ def print_unmount():
 def mount(context, state: State):
     if context.invoked_subcommand is None:
         verify_user_privileges(False, "mount")
-        click.echo(Texts.MAIN_MSG)
 
         try:
-            click.echo(get_mount_command())
+            mount_command = get_mount_command()
+            click.echo(Texts.MOUNT_CMD.format(command=mount_command))
         except Exception:
             handle_error(logger, Texts.GET_MOUNT_COMMAND_ERROR_MSG, Texts.GET_MOUNT_COMMAND_ERROR_MSG,
                          add_verbosity_msg=state.verbosity == 0)
             exit(1)
+
+        click.echo(Texts.MAIN_MSG)
 
         print_unmount()
 
