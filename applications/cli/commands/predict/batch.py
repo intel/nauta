@@ -37,20 +37,13 @@ BATCH_INFERENCE_TEMPLATE_OVMS = 'ovms-inference-batch'
 logger = initialize_logger(__name__)
 
 
-def validate_local_model_location(local_model_location: str):
-    if not os.path.isdir(local_model_location):
-        handle_error(
-            user_msg=Texts.MODEL_DIR_NOT_FOUND_ERROR_MSG.format(local_model_location=local_model_location)
-        )
-        exit(2)
-
-
 # noinspection PyUnusedLocal
 
 @click.command(short_help=Texts.HELP, cls=AliasCmd, alias='b', options_metavar='[options]')
 @click.option('-n', '--name', help=Texts.HELP_NAME, callback=validate_experiment_name)
 @click.option('-m', '--model-location', help=Texts.HELP_MODEL_LOCATION)
-@click.option("-l", "--local-model-location", type=click.Path(), help=Texts.HELP_LOCAL_MODEL_LOCATION)
+@click.option("-l", "--local-model-location", type=click.Path(exists=True, file_okay=False),
+              help=Texts.HELP_LOCAL_MODEL_LOCATION)
 @click.option('-d', '--data', required=True, help=Texts.HELP_DATA)
 @click.option('-o', '--output', help=Texts.HELP_OUTPUT)
 @click.option('-mn', '--model-name', help=Texts.HELP_MODEL_NAME)
@@ -74,9 +67,6 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
             user_msg=Texts.MISSING_MODEL_LOCATION_ERROR_MSG.format(local_model_location=local_model_location)
         )
         exit(1)
-
-    if local_model_location:
-        validate_local_model_location(local_model_location)
 
     # noinspection PyBroadException
     try:

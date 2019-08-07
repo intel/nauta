@@ -69,14 +69,6 @@ def get_default_requirements_location(script_directory: str) -> Optional[str]:
         return None
 
 
-def validate_script_folder_location(script_folder_location: str):
-    if not os.path.isdir(script_folder_location):
-        handle_error(
-            user_msg=Texts.SCRIPT_DIR_NOT_FOUND_ERROR_MSG.format(script_folder_location=script_folder_location)
-        )
-        exit(2)
-
-
 def check_duplicated_params(pack_params: List[Tuple[str, str]]):
     provided_keys: List[str] = []
     for key, val in pack_params:
@@ -108,8 +100,8 @@ def format_run_message(run_message: Optional[str]) -> str:
 
 
 @click.command(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
-@click.argument("script_location", type=click.Path(), required=True)
-@click.option("-sfl", "--script-folder-location", type=click.Path(), help=Texts.HELP_SFL)
+@click.argument("script_location", type=click.Path(exists=True), required=True)
+@click.option("-sfl", "--script-folder-location", type=click.Path(exists=True, file_okay=False), help=Texts.HELP_SFL)
 @click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob", callback=validate_template_name)
 @click.option("-n", "--name", help=Texts.HELP_N, callback=validate_experiment_name)
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
@@ -133,9 +125,6 @@ def submit(state: State, script_location: str, script_folder_location: str, temp
         if not requirements:
             requirements = get_default_requirements_location(script_directory=script_location)
         script_location = get_default_script_location(script_directory=script_location)
-
-    if script_folder_location:
-        validate_script_folder_location(script_folder_location)
 
     click.echo(Texts.SUBMIT_START_USER_MSG)
     runs_list = None

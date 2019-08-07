@@ -27,3 +27,11 @@ def mock_cli_validation(mocker):
 @pytest.fixture(autouse=True)
 def mock_k8s_client(mocker):
     mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')
+
+
+@pytest.fixture()
+def mock_exp_script_file(tmpdir):
+    test_dir = tmpdir.mkdir('test-dir')
+    test_file = test_dir.join('training_script.py')
+    test_file.write('script code')
+    return test_file.strpath

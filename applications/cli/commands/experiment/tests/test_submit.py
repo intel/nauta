@@ -20,7 +20,7 @@ from click.testing import CliRunner
 import pytest
 
 from commands.experiment.submit import submit, DEFAULT_SCRIPT_NAME, validate_script_location, \
-    validate_script_folder_location, get_default_script_location, clean_script_parameters, validate_pack_params, \
+    get_default_script_location, clean_script_parameters, validate_pack_params, \
     check_duplicated_params
 from commands.experiment.common import RunStatus
 from platform_resources.run import Run
@@ -28,9 +28,6 @@ from util.exceptions import SubmitExperimentError
 from cli_text_consts import ExperimentSubmitCmdTexts as Texts
 from cli_text_consts import ExperimentCommonTexts as CommonTexts
 
-
-SCRIPT_LOCATION = "training_script.py"
-SCRIPT_FOLDER = "/a/b/c"
 
 SUBMITTED_RUNS = [Run(name="exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training",
                       experiment_name='test-experiment',
@@ -55,8 +52,6 @@ class SubmitMocks:
         self.validate_pack_params = mocker.patch("commands.experiment.submit.validate_pack_params")
         self.validate_experiment_name = mocker.patch("commands.experiment.submit.validate_experiment_name")
         self.validate_script_location = mocker.patch("commands.experiment.submit.validate_script_location")
-        self.validate_script_folder_location = mocker.patch(
-            "commands.experiment.submit.validate_script_folder_location")
         self.get_default_script_location = mocker.patch(
             "commands.experiment.submit.get_default_script_location")
         self.clean_script_parameters = mocker.patch("commands.experiment.submit.clean_script_parameters")
@@ -73,55 +68,56 @@ def prepare_mocks(mocker) -> SubmitMocks:
 def test_missing_file(prepare_mocks: SubmitMocks):
     prepare_mocks.validate_script_location.side_effect = SystemExit(2)
 
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
+    result = CliRunner().invoke(submit, ['missing.py'])
     assert result.exit_code == 2
 
 
-def test_missing_folder(prepare_mocks: SubmitMocks):
-    prepare_mocks.validate_script_folder_location.side_effect = SystemExit(2)
-
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-sfl", SCRIPT_FOLDER])
+def test_missing_sfl_folder(prepare_mocks: SubmitMocks, mock_exp_script_file):
+    result = CliRunner().invoke(submit, [mock_exp_script_file, "-sfl", 'missing'])
     assert result.exit_code == 2
 
 
-def test_invalid_pack_param_arguments(prepare_mocks: SubmitMocks):
+def test_invalid_pack_param_arguments(prepare_mocks: SubmitMocks, mock_exp_script_file):
     prepare_mocks.validate_pack_params.side_effect = SystemExit(2)
 
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "--pack-param", "arg1", "val1", "--pack-param", "arg1",
-                                         "val2", "-sfl", SCRIPT_FOLDER])
+    result = CliRunner().invoke(submit, [mock_exp_script_file, "--pack-param", "arg1", "val1", "--pack-param", "arg1",
+                                         "val2", "-sfl", os.path.dirname(os.path.abspath(mock_exp_script_file))])
     assert result.exit_code == 2
 
 
-def test_submit_experiment_failure(prepare_mocks: SubmitMocks):
+def test_submit_experiment_failure(prepare_mocks: SubmitMocks, mock_exp_script_file):
     exe_message = "error message"
     prepare_mocks.submit_experiment.side_effect = SubmitExperimentError(exe_message)
 
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
+    result = CliRunner().invoke(submit, [mock_exp_script_file])
 
     assert Texts.SUBMIT_ERROR_MSG.format(exception_message=exe_message) in result.output
     assert result.exit_code == 1
 
 
-def test_submit_experiment_success(prepare_mocks: SubmitMocks):
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
+def test_submit_experiment_success(prepare_mocks: SubmitMocks, mock_exp_script_file):
+    result = CliRunner().invoke(submit, [mock_exp_script_file])
 
     assert SUBMITTED_RUNS[0].name in result.output
     assert SUBMITTED_RUNS[0].state.value in result.output
 
 
-def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks):
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '-n', 'Wrong_&name'])
+def test_submit_with_incorrect_name_fail(prepare_mocks: SubmitMocks, mock_exp_script_file):
+    result = CliRunner().invoke(submit, [mock_exp_script_file, '-n', 'Wrong_&name'])
     assert 'name must consist of lower case alphanumeric characters' in result.output
     assert result.exit_code == 2
 
 
-def test_submit_default_script_name(prepare_mocks: SubmitMocks):
+def test_submit_default_script_name(prepare_mocks: SubmitMocks, tmpdir):
     script_location = 'some-dir/'
     prepare_mocks.get_default_script_location.return_value = os.path.join(script_location,
                                                                           DEFAULT_SCRIPT_NAME)
+    test_dir = tmpdir.mkdir(script_location)
+    test_file = test_dir.join(DEFAULT_SCRIPT_NAME)
+    test_file.write('pass')
 
     runner = CliRunner()
-    parameters = [script_location]
+    parameters = [test_dir.strpath]
 
     result = runner.invoke(submit, parameters, input="y")
 
@@ -154,14 +150,13 @@ def test_validate_pack_params(prepare_mocks: SubmitMocks):
         validate_pack_params([('arg1', 'val1'), ('arg1', 'val2')])
 
 
-def test_submit_invalid_script_folder_location(prepare_mocks: SubmitMocks):
+def test_submit_invalid_script_folder_location(prepare_mocks: SubmitMocks, mock_exp_script_file):
     prepare_mocks.isdir.return_value = True
-    prepare_mocks.validate_script_folder_location.side_effect = SystemExit(2)
 
     script_folder_location = '/wrong-directory'
 
     runner = CliRunner()
-    parameters = [SCRIPT_LOCATION, '--script-folder-location', script_folder_location]
+    parameters = [mock_exp_script_file, '--script-folder-location', script_folder_location]
 
     result = runner.invoke(submit, parameters, input="y")
     assert result.exit_code == 2
@@ -173,13 +168,6 @@ def test_validate_script_location(prepare_mocks: SubmitMocks):
 
     with pytest.raises(SystemExit):
         validate_script_location('bla.py')
-
-
-def test_validate_script_folder_location(prepare_mocks: SubmitMocks):
-    prepare_mocks.isdir.return_value = False
-
-    with pytest.raises(SystemExit):
-        validate_script_folder_location('/bla')
 
 
 def test_get_default_script_location_missing_file(prepare_mocks: SubmitMocks):
@@ -196,9 +184,9 @@ def test_get_default_script_location(prepare_mocks: SubmitMocks):
     assert get_default_script_location(test_dir) == os.path.join(test_dir, DEFAULT_SCRIPT_NAME)
 
 
-def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks):
+def test_submit_experiment_one_failed(prepare_mocks: SubmitMocks, mock_exp_script_file):
     prepare_mocks.submit_experiment.return_value = (FAILED_RUNS, {}, "")
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION])
+    result = CliRunner().invoke(submit, [mock_exp_script_file])
 
     assert FAILED_RUNS[0].name in result.output
     assert FAILED_RUNS[0].state.value in result.output
@@ -216,29 +204,29 @@ def test_clean_script_parameters_with_backslash(prepare_mocks: SubmitMocks):
     assert ("aaa", "bbb", "ccc") == clean_script_parameters(None, None, ("\\aaa", "bbb", "ccc"))
 
 
-def test_submit_experiment_wrong_template():
+def test_submit_experiment_wrong_template(mock_exp_script_file):
     """Checks the operation of 'validate_template_name' Click's callback to template option """
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, "-t", "wrong_template"])
+    result = CliRunner().invoke(submit, [mock_exp_script_file, "-t", "wrong_template"])
 
     assert CommonTexts.INCORRECT_TEMPLATE_NAME in result.output
 
 
-def test_submit_requirements(prepare_mocks: SubmitMocks, tmpdir):
+def test_submit_requirements(prepare_mocks: SubmitMocks, tmpdir, mock_exp_script_file):
     experiment_dir = tmpdir.mkdir("text-exp")
     fake_requirements_file = experiment_dir.join("requirements.txt")
     fake_requirements_file.write('fake-dependency==0.0.1')
 
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '--requirements', fake_requirements_file.strpath])
+    result = CliRunner().invoke(submit, [mock_exp_script_file, '--requirements', fake_requirements_file.strpath])
 
     _, submit_experiment_kwargs = prepare_mocks.submit_experiment.call_args
     assert submit_experiment_kwargs.get('requirements_file') == fake_requirements_file.strpath
     assert result.exit_code == 0
 
 
-def test_submit_requirements_wrong_path(prepare_mocks: SubmitMocks, tmpdir):
+def test_submit_requirements_wrong_path(prepare_mocks: SubmitMocks, tmpdir, mock_exp_script_file):
     empty_dir = tmpdir.mkdir("text-exp")
     wrong_requirements_file_path = os.path.join(empty_dir.strpath, 'requirements.txt')
-    result = CliRunner().invoke(submit, [SCRIPT_LOCATION, '--requirements', wrong_requirements_file_path])
+    result = CliRunner().invoke(submit, [mock_exp_script_file, '--requirements', wrong_requirements_file_path])
 
     assert wrong_requirements_file_path in result.output
     assert result.exit_code == 2
