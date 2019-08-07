@@ -125,7 +125,7 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                        }
             env = {**os.environ, **git_env}  # Add git_env defined above to currently set environment variables
             git = ExternalCliClient(executable='git', env=env, cwd=experiments_workdir, timeout=60)
-            git.reset('--hard', 'master', _cwd=experiments_workdir)
+            git.reset('master')
         except Exception:
             logger.exception(f'Failed to rollback {experiment_name} experiment upload to git repo manager.')
         raise
