@@ -25,7 +25,9 @@ export_images:
   - name: tf-serving-sidecar
     value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
   - name: pytorch
-    value: "{{ image_local_url['nauta/pytorch'] }}"
+    value: "{{ image_local_url['nauta/pytorch/py3'] }}"
+  - name: pytorch_py2
+    value: "{{ image_local_url['nauta/pytorch/py2'] }}"
   - name: tfjob-multinode-sidecar
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
   - name: openvino-mo
@@ -226,11 +228,16 @@ local_images:
     version: "master"
     image: "moby/buildkit:master"
     method: pull
-  nauta/pytorch:
+  nauta/pytorch/py3:
     version: "1.0"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base"
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/3.7"
+  nauta/pytorch/py2:
+    version: "1.0"
+    required: {}
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/2.7"
   nauta/pytorch-operator:
     version: "v0.4.0"
     image: "gcr.io/kubeflow-images-public/pytorch-operator:v0.4.0"
