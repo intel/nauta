@@ -112,7 +112,8 @@ class NAUTAConfigMap:
     PY3_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
     MINIMAL_NODE_MEMORY_AMOUNT = 'minimal.node.memory.amount'
     MINIMAL_NODE_CPU_NUMBER = 'minimal.node.cpu.number'
-    PYTORCH_IMAGE_CONFIG_KEY = 'image.pytorch'
+    PY3_PYTORCH_IMAGE_CONFIG_KEY = 'image.pytorch'
+    PY2_PYTORCH_IMAGE_CONFIG_KEY = 'image.pytorch_py2'
     OPENVINOMS_IMAGE_CONFIG_KEY = 'image.openvino-ms'
 
     __shared_state: dict = {}
@@ -135,5 +136,6 @@ class NAUTAConfigMap:
             self.py3_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)
             self.minimal_node_memory_amount = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_MEMORY_AMOUNT)
             self.minimal_node_cpu_number = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_CPU_NUMBER)
-            self.pytorch_image_name = config_map_data.get(NAUTAConfigMap.PYTORCH_IMAGE_CONFIG_KEY)
+            self.py2_pytorch_image_name = config_map_data.get(NAUTAConfigMap.PY2_PYTORCH_IMAGE_CONFIG_KEY)
+            self.py3_pytorch_image_name = config_map_data.get(NAUTAConfigMap.PY3_PYTORCH_IMAGE_CONFIG_KEY)
             self.openvinoms_image_name = config_map_data.get(NAUTAConfigMap.OPENVINOMS_IMAGE_CONFIG_KEY)

@@ -27,7 +27,9 @@ export_images:
   - name: tfjob-multinode-sidecar
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
   - name: pytorch
-    value: "{{ image_local_url['nauta/pytorch'] }}"
+    value: "{{ image_local_url['nauta/pytorch/py3'] }}"
+  - name: pytorch_py2
+    value: "{{ image_local_url['nauta/pytorch/py2'] }}"
   - name: openvino-ms
     value: "{{ image_local_url['nauta/openvino-ms'] }}"
   - name: openvino-mo
@@ -335,13 +337,20 @@ local_images:
       DOCKER_RPM_IMAGE: "shared/build/docker"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/argo/argoexec"
-  nauta/pytorch:
+  nauta/pytorch/py3:
     version: "1.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
-      PYTORCH_IMAGE: "shared/build/pytorch"
+      PYTORCH_IMAGE: "shared/build/pytorch36"
     method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base"
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/3.6"
+  nauta/pytorch/py2:
+    version: "1.0"
+    required:
+      BASE_IMAGE: "shared/centos/python27"
+      PYTORCH_IMAGE: "shared/build/pytorch27"
+    method: build
+    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/2.7"
   nauta/pytorch-operator:
     version: "v0.4.0"
     required:
