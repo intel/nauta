@@ -161,8 +161,8 @@ def replace_single_value(data: Dict, new_value: str, current_value: str, key: st
             conv_value = convert_k8s_cpu_resource(value)
             coefficient = conv_value / conv_current_value
 
-        final_value = int((conv_new_value * coefficient)/1000) if round_to_int else (conv_new_value * coefficient)/1000
-        final_value = final_value/2 if divide_by_two else final_value
+        final_value = (conv_new_value * coefficient) / 2000 if divide_by_two else (conv_new_value * coefficient) / 1000
+        final_value = int(final_value) if round_to_int else final_value
         final_value = 1 if final_value == 0 else final_value
     else:
         conv_new_value = convert_k8s_memory_resource(new_value)
