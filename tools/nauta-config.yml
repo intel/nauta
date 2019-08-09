@@ -7,17 +7,17 @@ export_images:
     value: "{{ image_local_url['nauta/tensorboard-service'] }}"
 # tensorflow part
   - name: tensorflow
-    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
+    value: "{{ image_local_url['nauta/tensorflow/1.14.0py3/base'] }}"
   - name: horovod
     value: "{{ image_local_url['nauta/horovod/py3'] }}"
   - name: horovod_py2
     value: "{{ image_local_url['nauta/horovod/py2'] }}"
-  - name: tensorflow_1.13
-    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
-  - name: tensorflow_1.13_py3
-    value: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
-  - name: tensorflow_1.13_py2
-    value: "{{ image_local_url['nauta/tensorflow/1.13.1py2/base'] }}"
+  - name: tensorflow_1.14
+    value: "{{ image_local_url['nauta/tensorflow/1.14.0py3/base'] }}"
+  - name: tensorflow_1.14_py3
+    value: "{{ image_local_url['nauta/tensorflow/1.14.0py3/base'] }}"
+  - name: tensorflow_1.14_py2
+    value: "{{ image_local_url['nauta/tensorflow/1.14.0py2/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['nauta/activity-proxy'] }}"
   - name: batch-inference
@@ -137,45 +137,45 @@ local_images:
       BUILD_IMAGE: "shared/centos/go-apiserver-builder"
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-service"
-  nauta/tensorflow/1.13.1py2/base:
-    version: "1.13.1-py2"
+  nauta/tensorflow/1.14.0py2/base:
+    version: "1.14.0-py2"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.13.1"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.13.0"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.14.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.14.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
-  nauta/tensorflow/1.13.1py3/base:
-    version: "1.13.1-py3"
+  nauta/tensorflow/1.14.0py3/base:
+    version: "1.14.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.13.0"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.14.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/tensorflow:
-    version: "1.13.1-py3"
+    version: "1.14.0-py3"
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.13.0"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py3.6/1.14.0"
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow"
   nauta/horovod/py3:
-    version: "1.9.0-py3"
+    version: "0.16.4-py3"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.2.tar.gz
-        dest: horovod-v0.15.2.tar.gz
-        checksum: fc2373acec83e5f231697590fbf8570653432f816ed2427a9f5ffb8f3550ea89
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.tar.gz
+        dest: horovod-v0.16.4.tar.gz
+        checksum: 1f7b7a3926c4b169ecbd20a4eb97d15d6720c7593689476e3fd67371937122b5
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
       METRICS_IMAGE: "shared/build/metrics"
@@ -183,14 +183,14 @@ local_images:
     squash: True
     directory: "{{ playbook_dir }}/../../nauta-containers/horovod/3.6"
   nauta/horovod/py2:
-    version: "1.9.0-py2"
+    version: "0.16.4-py2"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/horovod-v0.15.2.tar.gz
-        dest: horovod-v0.15.2.tar.gz
-        checksum: fc2373acec83e5f231697590fbf8570653432f816ed2427a9f5ffb8f3550ea89
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.tar.gz
+        dest: horovod-v0.16.4.tar.gz
+        checksum: 1f7b7a3926c4b169ecbd20a4eb97d15d6720c7593689476e3fd67371937122b5
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.13.1"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.14.0"
       METRICS_IMAGE: "shared/build/metrics"
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
@@ -267,8 +267,8 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos/python36"
       METRICS_IMAGE: "shared/build/metrics"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
-      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.13.0"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
+      TENSORFLOW_SERVING_BUILD_IMAGE: "shared/build/tensorflow-serving/py2.7/1.14.0"
     method: build
     directory: "{{ playbook_dir }}/../../applications/batch-inference"
   nauta/tf-serving-sidecar:
@@ -372,7 +372,7 @@ local_images:
     version: "1.0.0"
     required:
       BASE_IMAGE: "shared/centos/python36"
-      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.13.1"
+      TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/openvino-mo"
 
@@ -463,7 +463,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/tf"
       chart_values:
         image: "{{ image_local_url['nauta/tf/operator'] }}"
-        tfimage: "{{ image_local_url['nauta/tensorflow/1.13.1py3/base'] }}"
+        tfimage: "{{ image_local_url['nauta/tensorflow/1.14.0py3/base'] }}"
     ingress:
       version: 1.0.0
       path: "{{ playbook_dir }}/../../nauta-charts/ingress"

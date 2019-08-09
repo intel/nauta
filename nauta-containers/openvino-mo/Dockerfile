@@ -35,7 +35,7 @@ RUN source /opt/rh/devtoolset-7/enable && pip3.6 install setuptools==40.8.0 whee
 
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_VERSION=1.13.1
+ENV TENSORFLOW_VERSION=1.14.0
 
 WORKDIR /root
 

@@ -7,11 +7,11 @@ FROM ${TENSORFLOW_SERVING_BUILD_IMAGE} as serving
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_SERVING_VERSION=1.13.0
+ENV TENSORFLOW_SERVING_VERSION=1.14.0
 
 COPY --from=serving /build-output/tensorflow_serving_api-${TENSORFLOW_SERVING_VERSION}-*.whl /
 
-ENV TENSORFLOW_VERSION=1.13.1
+ENV TENSORFLOW_VERSION=1.14.0
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
 
 COPY --from=serving /build-output/tensorflow_model_server /bin/

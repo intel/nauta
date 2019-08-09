@@ -7,26 +7,24 @@ FROM ${METRICS_IMAGE} as metrics
 FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_VERSION=1.13.1
+ENV TENSORFLOW_VERSION=1.14.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
 
 COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
 
 RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl
-RUN ${PIP} install --ignore-installed --no-cache-dir /experiment_metrics-*.tar.gz && \
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --ignore-installed --no-cache-dir /experiment_metrics-*.tar.gz && \
     ln -sf /usr/bin/python2 /usr/bin/python && \
     yum update -y && \
-    yum install -y gcc-c++ gcc-gfortran python3-devel python2-devel openblas-devel lapack-devel Cython cmake3 make \
-                   git wget hdf5-devel && \
+    yum install -y wget && \
     yum clean all && \
-    ln -s /usr/bin/cmake3 /usr/bin/cmake && \
     git config --global url."https://".insteadOf git:// && \
     mkdir /tmp/openmpi && \
     cd /tmp/openmpi && \
-    wget https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.gz && \
-    tar zxf openmpi-3.1.2.tar.gz && \
-    cd openmpi-3.1.2 && \
+    wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.gz && \
+    tar zxf openmpi-4.0.1.tar.gz && \
+    cd openmpi-4.0.1 && \
     ./configure --enable-orterun-prefix-by-default && \
     make -j $(nproc) all && \
     make install && \
@@ -45,14 +43,16 @@ RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params
     echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf
 
 RUN mkdir /horovod
-ADD horovod-v0.15.2.tar.gz /horovod/
-WORKDIR /horovod/horovod-0.15.2
-RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build setuptools rsa==3.4.2 
-RUN source /opt/rh/rh-python36/enable && HOROVOD_WITHOUT_PYTORCH=1 python3 setup.py bdist_wheel 
-RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-reinstall /horovod/horovod-0.15.2/dist/horovod-0.15.2-cp36-cp36m-linux_x86_64.whl
+ADD horovod-v0.16.4.tar.gz /horovod/
+WORKDIR /horovod/horovod
+RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build setuptools rsa==3.4.2 
+RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && HOROVOD_WITHOUT_PYTORCH=1 python3 setup.py bdist_wheel 
+RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && ${PIP} install --no-cache-dir --force-reinstall /horovod/horovod/dist/horovod-0.16.4-cp36-cp36m-linux_x86_64.whl
 
 COPY requirements.txt /horovod/
-RUN source /opt/rh/rh-python36/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build setuptools
+
+RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build setuptools
+
 RUN source /opt/rh/devtoolset-8/enable && source /opt/rh/rh-python36/enable && ${PIP} install -r /horovod/requirements.txt --no-binary=:all: --no-cache-dir --ignore-installed ipaddress
 
 RUN ln -sf /usr/bin/python2 /usr/bin/python && \

@@ -39,7 +39,8 @@ RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-binary=:all: --no-
         terminado==0.6 \
         notebook==4.4.1 \
         keras-applications==1.0.7 \
-        keras-preprocessing==1.0.9
+        keras-preprocessing==1.0.9 \
+        future==0.17.1
 
 
 RUN source /opt/rh/devtoolset-8/enable && ${PYTHON} -m ipykernel.kernelspec

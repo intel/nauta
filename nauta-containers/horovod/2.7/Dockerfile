@@ -9,7 +9,7 @@ FROM ${KUBERNETES_DATA_IMAGE} as kubectl_data
 FROM ${METRICS_IMAGE} as metrics
 FROM ${BASE_IMAGE}
 
-ENV TENSORFLOW_VERSION=1.13.1
+ENV TENSORFLOW_VERSION=1.14.0
 
 COPY --from=data /build-output/tensorflow-${TENSORFLOW_VERSION}-*.whl /
 COPY --from=metrics /build-output/experiment_metrics-*.tar.gz /
@@ -19,33 +19,42 @@ COPY --from=dumbinitdata /build-output/dumb-init /dumb-init
 
 RUN chmod +x /bin/dumb-init /usr/bin/dumb-init /dumb-init
 
-RUN ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
+RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed --no-cache-dir /experiment_metrics-*.tar.gz && \
     yum update -y && \
-    yum install -y openmpi openmpi-devel gcc-c++ hdf5-devel gcc-gfortran python3-devel \
-    python2-devel openblas-devel lapack-devel Cython cmake3 make git && \
+    yum install -y wget && \
     yum clean all && \
-    ln -s /usr/bin/cmake3 /usr/bin/cmake && \
     git config --global url."https://".insteadOf git:// && \
-    mkdir /horovod
+    mkdir /horovod && \
+    mkdir /tmp/openmpi && \
+    cd /tmp/openmpi && \
+    wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.gz && \
+    tar zxf openmpi-4.0.1.tar.gz && \
+    cd openmpi-4.0.1 && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/openmpi
 
-ENV PATH=${PATH}:/usr/lib64/openmpi/bin
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib64/openmpi/lib
-ENV MPIRUN_BIN /usr/lib64/openmpi/bin/mpirun
+# Create a wrapper for OpenMPI to allow running as root by default
+RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real && \
+    echo '#!/bin/bash' > /usr/local/bin/mpirun && \
+    echo 'mpirun.real --allow-run-as-root "$@"' >> /usr/local/bin/mpirun && \
+    chmod a+x /usr/local/bin/mpirun
+# Create a wrapper for OpenMPI to allow running as root by default
+RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real && \
+    echo '#!/bin/bash' > /usr/local/bin/mpirun && \
+    echo 'mpirun.real --allow-run-as-root "$@"' >> /usr/local/bin/mpirun && \
+    chmod a+x /usr/local/bin/mpirun
 
-ADD horovod-v0.15.2.tar.gz /horovod/
+ADD horovod-v0.16.4.tar.gz /horovod/
 COPY requirements.txt /horovod/
-WORKDIR /horovod/horovod-0.15.2
-RUN HOROVOD_WITHOUT_PYTORCH=1 python setup.py bdist_wheel && \
-    ${PIP} install --no-cache-dir --force-reinstall /horovod/horovod-0.15.2/dist/horovod-0.15.2-cp27-cp27mu-linux_x86_64.whl && \
+WORKDIR /horovod/horovod
+RUN source /opt/rh/devtoolset-8/enable && HOROVOD_WITHOUT_PYTORCH=1 python setup.py bdist_wheel && \
+    ${PIP} install --no-cache-dir --force-reinstall /horovod/horovod/dist/horovod-0.16.4-cp27-cp27mu-linux_x86_64.whl && \
     ${PIP} install --no-binary=:all: --no-cache-dir --ignore-installed scikit-build && \
     ${PIP} install -r /horovod/requirements.txt --no-binary=:all: --no-cache-dir --ignore-installed ipaddress && \
-    mv ${MPIRUN_BIN} ${MPIRUN_BIN}.real && \
-    echo '#!/bin/bash' > ${MPIRUN_BIN} && \
-    echo '${MPIRUN_BIN}.real --allow-run-as-root "$@"' >> ${MPIRUN_BIN} && \
-    chmod a+x ${MPIRUN_BIN} && \
-    echo "hwloc_base_binding_policy = none" >> /etc/openmpi-x86_64/openmpi-mca-params.conf && \
-    echo "rmaps_base_mapping_policy = slot" >> /etc/openmpi-x86_64/openmpi-mca-params.conf && \
     yum install -y openssh-clients openssh-server && \
     sshd-keygen && \
     mkdir -p /var/run/sshd /app /root/.ssh && \
