@@ -18,7 +18,7 @@ from sys import exit
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from commands.template.common import get_local_templates, Template
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
@@ -36,8 +36,8 @@ MAX_TEMPLATE_DESCRIPTION_LENGTH = 255
 @click.option("-d", "--description", type=str, required=False, help=Texts.HELP_DESCRIPTION)
 @click.option("-ve", "--version", type=str, default='0.1.0', required=False, help=Texts.HELP_VERSION)
 @common_options()
-@pass_state
-def copy(state: State, src_template_name: str, dest_template_name: str, description: str, version: str):
+@click.pass_context
+def copy(ctx: click.Context, src_template_name: str, dest_template_name: str, description: str, version: str):
     local_templates = get_local_templates()
     if not local_templates.get(src_template_name):
         click.echo(Texts.SRC_TEMPLATE_NOT_FOUND.format(src_template_name=src_template_name))

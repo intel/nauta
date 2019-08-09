@@ -19,7 +19,7 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.config import TBLT_TABLE_FORMAT
 from cli_text_consts import WorkflowSubmitTexts as Texts
 from util.logger import initialize_logger
@@ -36,8 +36,8 @@ logger = initialize_logger(__name__)
 @click.command(cls=AliasCmd, alias='s', options_metavar='[options]', help=Texts.HELP, short_help=Texts.SHORT_HELP)
 @click.argument("workflow-path", type=click.Path(exists=True, dir_okay=False), required=True)
 @common_options(admin_command=False)
-@pass_state
-def submit(state: State, workflow_path: str):
+@click.pass_context
+def submit(ctx: click.Context, workflow_path: str):
     try:
         workflow: ArgoWorkflow = ArgoWorkflow.from_yaml(workflow_path)
         namespace = get_kubectl_current_context_namespace()

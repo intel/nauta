@@ -20,7 +20,7 @@ import click
 import yaml
 from tabulate import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import WorkflowViewTexts as Texts
 from commands.workflow.common import HEADERS
 from platform_resources.workflow import ArgoWorkflow
@@ -36,8 +36,8 @@ logger = initialize_logger(__name__)
 @click.command(cls=AliasCmd, alias='v', options_metavar='[options]', help=Texts.HELP, short_help=Texts.SHORT_HELP)
 @click.argument("workflow-name", type=str, required=True)
 @common_options(admin_command=False)
-@pass_state
-def view(state: State, workflow_name: str):
+@click.pass_context
+def view(ctx: click.Context, workflow_name: str):
     try:
         namespace = get_kubectl_current_context_namespace()
         workflow: ArgoWorkflow = ArgoWorkflow.get(namespace=namespace, name=workflow_name)

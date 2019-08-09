@@ -19,7 +19,6 @@ from typing import Dict, List, Optional, NamedTuple, TypeVar
 
 import yaml
 from kubernetes import client, config
-from collections import namedtuple
 
 from kubernetes.client import CustomObjectsApi
 from kubernetes.client.rest import ApiException

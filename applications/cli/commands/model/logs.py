@@ -18,7 +18,7 @@ import click
 
 from cli_text_consts import ModelExportLogsCmdTexts as Texts
 from commands.model.common import get_logs
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
 
@@ -32,10 +32,10 @@ logger = initialize_logger(__name__)
 @click.option('-m', '--match', help=Texts.HELP_M)
 @click.option('-o', '--output', help=Texts.HELP_O, is_flag=True)
 @click.option('-pa', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
-@click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
+@click.option('-fl', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options(admin_command=False)
-@pass_state
-def logs(state: State, operation_name: str, start_date: str,
+@click.pass_context
+def logs(ctx: click.Context, operation_name: str, start_date: str,
          end_date: str, match: str, output: bool, pager: bool, follow: bool):
     """
     Show logs for a given model export operation.

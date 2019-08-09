@@ -29,6 +29,13 @@ def mock_k8s_client(mocker):
     mocker.patch('platform_resources.platform_resource.PlatformResourceApiClient.get')
 
 
+@pytest.fixture(autouse=True)
+def mock_get_click_context(mocker):
+    click_context = mocker.patch('click.get_current_context')
+    click_context.return_value.obj.force = False
+    return click_context
+
+
 @pytest.fixture()
 def mock_exp_script_file(tmpdir):
     test_dir = tmpdir.mkdir('test-dir')

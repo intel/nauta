@@ -19,7 +19,7 @@ import click
 from cli_text_consts import PredictLogsCmdTexts as Texts
 from commands.common import get_logs
 from logs_aggregator.log_filters import SeverityLevel
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.logger import initialize_logger
 from util.k8s.k8s_info import PodStatus
 from util.aliascmd import AliasCmd
@@ -41,10 +41,10 @@ LOG_RUNS_KINDS = [RunKinds.INFERENCE]
 @click.option('-m', '--match', help=Texts.HELP_M)
 @click.option('-o', '--output', help=Texts.HELP_O, is_flag=True)
 @click.option('-pa', '--pager', help=Texts.HELP_PAGER, is_flag=True, default=False)
-@click.option('-f', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
+@click.option('-fl', '--follow', help=Texts.HELP_F, is_flag=True, default=False)
 @common_options(admin_command=False)
-@pass_state
-def logs(state: State, name: str, min_severity: str, start_date: str,
+@click.pass_context
+def logs(ctx: click.Context, name: str, min_severity: str, start_date: str,
          end_date: str, pod_ids: str, pod_status: str, match: str, output: bool, pager: bool, follow: bool):
     """
     Show logs for a given experiment.

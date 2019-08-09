@@ -27,7 +27,7 @@ from commands.experiment.common import RunKinds, get_run_environment_path
 import util.k8s.kubectl as kubectl
 from git_repo_manager.utils import delete_exp_tag_from_git_repo_manager
 from platform_resources.workflow import ArgoWorkflow
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_current_namespace, is_current_user_administrator, get_api_key, get_kubectl_host
 from platform_resources.run import Run, RunStatus
@@ -55,8 +55,8 @@ experiment_name_plural = 'experiments'
 @click.option('-i', '--pod-ids', help=Texts.HELP_I)
 @click.option('-s', '--pod-status', help=Texts.HELP_S.format(available_statuses=PodStatus.all_members()))
 @common_options(admin_command=False)
-@pass_state
-def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
+@click.pass_context
+def cancel(ctx: click.Context, name: str, match: str, purge: bool, pod_ids: str, pod_status: str,
            listed_runs_kinds: List[RunKinds] = None):
     """
     Cancels chosen experiments based on a name provided as a parameter.
@@ -119,8 +119,7 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
 
     # Handle cancellation of experiments with no associated Runs
     if exp_to_be_cancelled and not list_of_all_runs:
-        cancel_uninitialized_experiment(experiment=exp_to_be_cancelled, namespace=current_namespace,
-                                        purge=purge)
+        cancel_uninitialized_experiment(experiment=exp_to_be_cancelled, purge=purge)
 
     if not list_of_all_runs:
         handle_error(user_msg=Texts.LACK_OF_EXPERIMENTS_ERROR_MSG.format(
@@ -186,11 +185,12 @@ def cancel(state: State, name: str, match: str, purge: bool, pod_ids: str, pod_s
         for run in list_of_runs_to_be_deleted:
             click.echo(f"     - {run.name}")
 
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural,
-                                                         operation_word=Texts.DELETE_OPERATION[
-                                                             "deletion"] if experiment_name_plural == 'pods'
-                                                         else Texts.CANCEL_OPERATION["cancellation"]
-                                                         )):
+    if (not ctx.obj.force) and (not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(
+                                               experiment_name_plural=experiment_name_plural,
+                                               operation_word=Texts.DELETE_OPERATION[
+                                                   "deletion"] if experiment_name_plural == 'pods'
+                                               else Texts.CANCEL_OPERATION["cancellation"]
+                                               ))):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural=experiment_name_plural,
@@ -436,7 +436,8 @@ def cancel_experiment_runs(runs_to_cancel: List[Run], namespace: str) -> Tuple[L
     return deleted_runs, not_deleted_runs
 
 
-def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, pod_status: str = None):
+def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None,
+                     pod_status: str = None):
     namespace_pods = k8s_pods.list_pods(namespace=namespace)
 
     runs_only_pods = [pod for pod in namespace_pods if 'runName' in pod.labels]
@@ -489,8 +490,9 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
     for pod in filtered_pods:
         click.echo(f"     - {pod.name}")
 
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural='pods',
-                                                         operation_word=Texts.DELETE_OPERATION["deletion"])):
+    if (not click.get_current_context().obj.force) and (not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(
+                                                                  experiment_name_plural='pods',
+                                                                  operation_word=Texts.DELETE_OPERATION["deletion"]))):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural='pods',
@@ -525,13 +527,14 @@ def cancel_pods_mode(namespace: str, run_name: str = None, pod_ids: str = None, 
         sys.exit(1)
 
 
-def cancel_uninitialized_experiment(experiment: Experiment, namespace: str, purge: bool):
+def cancel_uninitialized_experiment(experiment: Experiment, purge: bool):
     click.echo(Texts.UNINITIALIZED_EXPERIMENT_CANCEL_MSG.format(experiment_name=experiment.name))
-    if not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(experiment_name_plural=experiment_name_plural,
-                                                         operation_word=Texts.DELETE_OPERATION[
-                                                             "deletion"] if experiment_name_plural == 'pods'
-                                                         else Texts.CANCEL_OPERATION["cancellation"]
-                                                         )):
+    if (not click.get_current_context().obj.force) and (not click.confirm(Texts.CONFIRM_CANCEL_MSG.format(
+                                                    experiment_name_plural=experiment_name_plural,
+                                                    operation_word=Texts.DELETE_OPERATION[
+                                                        "deletion"] if experiment_name_plural == 'pods'
+                                                    else Texts.CANCEL_OPERATION["cancellation"]
+                                                    ))):
         handle_error(
             user_msg=Texts.CANCELLATION_ABORTED_MSG.format(
                 experiment_name_plural=experiment_name_plural,

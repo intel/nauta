@@ -19,7 +19,7 @@ from tabulate import tabulate
 from typing import Optional, List
 
 from util.aliascmd import AliasCmd
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.config import TBLT_TABLE_FORMAT
 from version import VERSION
 from util.config import NAUTAConfigMap
@@ -37,8 +37,8 @@ PLATFORM_VERSION_REQUEST_TIMEOUT = 10
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='v', options_metavar='[options]')
 @common_options(verify_dependencies=False, verify_config_path=False)
-@pass_state
-def version(state: State):
+@click.pass_context
+def version(ctx: click.Context):
     """ Returns the version of the installed nctl application. """
     platform_version: Optional[str] = Texts.INITIAL_PLATFORM_VERSION
     error_msg = ""
@@ -63,4 +63,4 @@ def version(state: State):
                         tablefmt=TBLT_TABLE_FORMAT))
 
     if platform_version_fail:
-        handle_error(logger, error_msg, error_msg, add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, error_msg, error_msg, add_verbosity_msg=ctx.obj.verbosity == 0)

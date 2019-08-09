@@ -467,3 +467,28 @@ def test_cancel_pods(mocker):
     cancel.cancel_pods_mode(fake_user_namespace_name, 'fake-name', 'podid1,podid2', pod_status='running')
 
     assert fake_k8s_pods[0].delete.call_count == 1
+
+
+def test_cancel_pods_force(mocker, mock_get_click_context):
+    fake_user_namespace_name = 'shawn'
+    fake_k8s_pods = [
+        K8SPod(
+            namespace=fake_user_namespace_name,
+            name='podid1',
+            status=PodStatus.RUNNING,
+            labels={
+                'runName': 'fake-name'
+            }
+        )
+    ]
+    mocker.patch.object(cancel, 'k8s_pods').list_pods.return_value = fake_k8s_pods
+    for fake_pod in fake_k8s_pods:
+        mocker.patch.object(fake_pod, 'delete')
+
+    mock_get_click_context.return_value.obj.force = True
+    confirm_mock = mocker.patch.object(cancel.click, 'confirm')
+
+    cancel.cancel_pods_mode(fake_user_namespace_name, 'fake-name', 'podid1,podid2', pod_status='running')
+
+    assert fake_k8s_pods[0].delete.call_count == 1
+    assert confirm_mock.call_count == 0

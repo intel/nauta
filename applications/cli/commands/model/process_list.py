@@ -22,7 +22,7 @@ from tabulate import tabulate
 from cli_text_consts import ModelProcessListCmdTexts as Texts
 from commands.model.common import get_list_of_workflows, PROCESS_WORKFLOWS_LOCATION, PROCESS_LIST_HEADERS
 from util.aliascmd import AliasCmd
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.config import TBLT_TABLE_FORMAT
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -32,8 +32,8 @@ log = initialize_logger(__name__)
 
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='ps')
 @common_options()
-@pass_state
-def process_list(state: State):
+@click.pass_context
+def process_list(ctx: click.Context):
 
     try:
         list_of_workflows = get_list_of_workflows(PROCESS_WORKFLOWS_LOCATION)

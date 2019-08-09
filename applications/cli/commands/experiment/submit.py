@@ -24,7 +24,7 @@ from tabulate import tabulate
 
 from commands.experiment.common import RUN_NAME, RUN_PARAMETERS, RUN_STATUS, RUN_MESSAGE, RunKinds, \
     validate_env_paramater
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.config import TBLT_TABLE_FORMAT
 from util.logger import initialize_logger
 from commands.experiment.common import submit_experiment
@@ -113,8 +113,8 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), required=False, help=Texts.HELP_R)
 @click.argument("script-parameters", nargs=-1, metavar='[-- script-parameters]', callback=clean_script_parameters)
 @common_options(admin_command=False)
-@pass_state
-def submit(state: State, script_location: str, script_folder_location: str, template: str, name: str,
+@click.pass_context
+def submit(ctx: click.Context, script_location: str, script_folder_location: str, template: str, name: str,
            pack_param: List[Tuple[str, str]], parameter_range: List[Tuple[str, str]], parameter_set: Tuple[str, ...],
            env: List[str], script_parameters: Tuple[str, ...], requirements: Optional[str]):
     logger.debug(Texts.SUBMIT_START_LOG_MSG)

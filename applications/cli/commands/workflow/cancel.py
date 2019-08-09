@@ -18,7 +18,7 @@ from sys import exit
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import WorkflowDeleteTexts as Texts
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
@@ -33,8 +33,8 @@ logger = initialize_logger(__name__)
 @click.command(cls=AliasCmd, alias='c', options_metavar='[options]', help=Texts.HELP, short_help=Texts.SHORT_HELP)
 @click.argument("workflow-name", type=str, required=True)
 @common_options(admin_command=False)
-@pass_state
-def cancel(state: State, workflow_name: str):
+@click.pass_context
+def cancel(ctx: click.Context, workflow_name: str):
     try:
         namespace = get_kubectl_current_context_namespace()
         workflow: ArgoWorkflow = ArgoWorkflow.get(name=workflow_name, namespace=namespace)

@@ -17,7 +17,6 @@
 import base64
 import hashlib
 import os
-import stat
 
 from retry import retry
 

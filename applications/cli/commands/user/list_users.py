@@ -19,7 +19,7 @@ from sys import exit
 import click
 from tabulate import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.config import TBLT_TABLE_FORMAT
 from platform_resources.user import User
 from util.aliascmd import AliasCmd
@@ -35,8 +35,8 @@ logger = initialize_logger(__name__)
                options_metavar='[options]')
 @click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @common_options()
-@pass_state
-def list_users(state: State, count: int):
+@click.pass_context
+def list_users(ctx: click.Context, count: int):
     """ List users. """
     try:
         users = User.list()
@@ -45,5 +45,5 @@ def list_users(state: State, count: int):
                             headers=Texts.TABLE_HEADERS,
                             tablefmt=TBLT_TABLE_FORMAT))
     except Exception:
-        handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, Texts.OTHER_ERROR_MSG, Texts.OTHER_ERROR_MSG, add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)

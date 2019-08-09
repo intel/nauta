@@ -20,7 +20,7 @@ import sys
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import TemplateInstallCmdTexts as Texts
 from commands.template.common import load_remote_template, get_repository_address, get_local_templates, \
     download_remote_template
@@ -38,8 +38,8 @@ logger = initialize_logger(__name__)
 @click.command(short_help=Texts.HELP, cls=AliasCmd, alias='i', options_metavar='[options]')
 @click.argument("template-name", type=str, required=True)
 @common_options()
-@pass_state
-def install(state: State, template_name: str):
+@click.pass_context
+def install(ctx: click.Context, template_name: str):
     packs_location = os.path.join(Config.get_config_path(), "packs")
     chart_file_location = os.path.join(packs_location, template_name)
     repository_address = get_repository_address()
@@ -52,7 +52,7 @@ def install(state: State, template_name: str):
             handle_error(logger, user_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(
                 template_name=template_name),
                          log_msg=Texts.FAILED_TO_LOAD_TEMPLATE.format(template_name=template_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             sys.exit(1)
 
         if not remote_template:
@@ -60,18 +60,18 @@ def install(state: State, template_name: str):
             handle_error(logger, user_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(
                 template_name=template_name),
                          log_msg=Texts.REMOTE_TEMPLATE_NOT_FOUND.format(template_name=template_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             sys.exit(1)
 
     local_templates = get_local_templates()
     local_template_counterpart = local_templates.get(template_name)
 
     if local_template_counterpart:
-        if not click.confirm(
+        if (not click.get_current_context().obj.force) and (not click.confirm(
                 Texts.LOCAL_VERSION_ALREADY_INSTALLED.format(
                     local_version=local_template_counterpart.local_version,
                     template_name=local_template_counterpart.name,
-                    remote_version=remote_template.remote_version)):
+                    remote_version=remote_template.remote_version))):
             sys.exit(0)
         # noinspection PyBroadException
         try:
@@ -91,7 +91,7 @@ def install(state: State, template_name: str):
                              repository_name=repository_address),
                          log_msg=Texts.FAILED_TO_INSTALL_TEMPLATE.format(
                              template_name=template_name, repository_name=repository_address),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             sys.exit(1)
 
     update_resources_in_packs()

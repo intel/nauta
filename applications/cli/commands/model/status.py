@@ -25,7 +25,7 @@ from cli_text_consts import ModelStatusCmdTexts as Texts
 from commands.model.common import MODEL_HEADERS
 from platform_resources.workflow import ArgoWorkflow
 from util.aliascmd import AliasCmd
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.k8s.k8s_info import get_kubectl_current_context_namespace
 from util.logger import initialize_logger
 from util.system import handle_error
@@ -38,8 +38,8 @@ logger = initialize_logger(__name__)
 @click.command(help=Texts.HELP, short_help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.option('-u', '--username', help=Texts.HELP_U)
 @common_options(admin_command=False)
-@pass_state
-def status(state: State, username: str):
+@click.pass_context
+def status(ctx: click.Context, username: str):
     """
     Returns status of a model
 

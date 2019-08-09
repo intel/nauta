@@ -31,7 +31,7 @@ from util.spinner import spinner
 from util.system import execute_system_command, handle_error
 from util.k8s.k8s_info import get_users_token, get_kubectl_host, get_certificate
 from util.config import NAUTAConfigMap
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.helm import delete_user
 from util.k8s.kubectl import UserState
@@ -71,11 +71,11 @@ DEFAULT_FILENAME = "{}.config"
 
 @click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='c', options_metavar='[options]')
 @click.argument('username', required=True)
-@click.option("-l", "--list-only", is_flag=True, help=Texts.HELP_L)
-@click.option("-f", "--filename", help=Texts.HELP_F)
+@click.option("-lo", "--list-only", is_flag=True, help=Texts.HELP_L)
+@click.option("-fl", "--filename", help=Texts.HELP_F)
 @common_options(admin_command=True)
-@pass_state
-def create(state: State, username: str, list_only: bool, filename: str):
+@click.pass_context
+def create(ctx: click.Context, username: str, list_only: bool, filename: str):
     """
     Adds a new user with a name given as a parameter.
 
@@ -91,7 +91,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
             validate_user_name(username)
         except ValueError as exe:
             handle_error(logger, Texts.NAME_VALIDATION_ERROR_MSG.format(username=username), str(exe),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
 
         user_state = check_users_presence(username)
@@ -109,7 +109,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
     except Exception:
         handle_error(logger, Texts.USER_VERIFICATION_ERROR_MSG.format(username=username),
                      Texts.USER_VERIFICATION_ERROR_MSG.format(username=username),
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     try:
@@ -130,7 +130,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
             _, err_code, log_output = execute_system_command(add_user_command, env=env)
 
             if err_code:
-                handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
+                handle_error(logger, log_output, Texts.USER_ADD_ERROR_MSG, add_verbosity_msg=ctx.obj.verbosity == 0)
 
                 if not delete_user(username):
                     handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
@@ -140,22 +140,22 @@ def create(state: State, username: str, list_only: bool, filename: str):
                 users_password = get_users_token(username)
             except Exception:
                 handle_error(logger, Texts.PASSWORD_GATHER_ERROR_MSG, Texts.PASSWORD_GATHER_ERROR_MSG,
-                             add_verbosity_msg=state.verbosity == 0)
+                             add_verbosity_msg=ctx.obj.verbosity == 0)
                 users_password = ""
 
             try:
                 cert = get_certificate(username)
             except Exception:
                 handle_error(logger, Texts.CERT_GATHER_ERROR_MSG, Texts.CERT_GATHER_ERROR_MSG,
-                             add_verbosity_msg=state.verbosity == 0)
+                             add_verbosity_msg=ctx.obj.verbosity == 0)
                 cert = ""
 
-            add_user_to_git_repo_manager(username=username, state=state)
+            add_user_to_git_repo_manager(username=username)
 
     except Exception:
         handle_error(logger, Texts.USER_ADD_ERROR_MSG.format(username=username),
                      Texts.USER_ADD_ERROR_MSG.format(username=username),
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         if not delete_user(username):
             handle_error(user_msg=Texts.REMOVE_USER_ERROR_MSG.format(username=username))
         sys.exit(1)
@@ -173,7 +173,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
                                          users_password, cert)
     except Exception:
         handle_error(logger, Texts.CONFIG_CREATION_ERROR_MSG, Texts.CONFIG_CREATION_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     if list_only:
@@ -189,7 +189,7 @@ def create(state: State, username: str, list_only: bool, filename: str):
             click.echo(Texts.CONFIG_SAVE_SUCCESS_MSG.format(filename=filename))
         except Exception:
             handle_error(logger, Texts.CONFIG_SAVE_FAIL_MSG, Texts.CONFIG_SAVE_FAIL_MSG,
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             click.echo(Texts.CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG)
             click.echo(kubeconfig)
             sys.exit(1)
@@ -205,12 +205,12 @@ def generate_kubeconfig(username: str, namespace: str, address: str, token: str,
 
 
 @retry(tries=5, delay=1)
-def add_user_to_git_repo_manager(username: str, state):
+def add_user_to_git_repo_manager(username: str):
     try:
         with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=30) as proxy:
             grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
             grm_client.add_nauta_user(username=username)
     except Exception:
         handle_error(logger, Texts.GIT_REPO_MANAGER_ERROR_MSG, Texts.GIT_REPO_MANAGER_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=click.get_current_context().obj.verbosity == 0)
         raise

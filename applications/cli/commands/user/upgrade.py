@@ -19,7 +19,7 @@ from typing import List
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import UserUpgradeCmdTexts as Texts
 from util.aliascmd import AliasCmd
 from platform_resources.user import User
@@ -35,8 +35,8 @@ logger = initialize_logger(__name__)
 
 @click.command(help=Texts.SHORT_HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='u')
 @common_options(admin_command=True)
-@pass_state
-def upgrade(state: State):
+@click.pass_context
+def upgrade(ctx: click.Context):
     """
     Upgrade users after Nauta upgrade.
     """
@@ -56,7 +56,7 @@ def upgrade(state: State):
                         grm_client.add_nauta_user(user.name)
         except Exception:
             handle_error(logger, Texts.UPGRADE_FAILED, Texts.UPGRADE_FAILED,
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             sys.exit(1)
 
     click.echo(Texts.UPGRADE_SUCCEEDED)

@@ -18,7 +18,7 @@ import click
 import sys
 import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import TemplateListCmdTexts as Texts
 from commands.template.common import prepare_list_of_templates, TEMPLATE_LIST_HEADERS
 from util.aliascmd import AliasCmd
@@ -31,8 +31,8 @@ logger = initialize_logger(__name__)
 
 @click.command(name='list', short_help=Texts.HELP, cls=AliasCmd, alias='ls', options_metavar='[options]')
 @common_options()
-@pass_state
-def list_templates(state: State):
+@click.pass_context
+def list_templates(ctx: click.Context):
     """ List experiments. """
     with spinner(text=Texts.GETTING_LIST_OF_TEMPLATES_MSG):
         list_of_templates, error_messages = prepare_list_of_templates()

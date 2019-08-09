@@ -190,7 +190,8 @@ def test_interact_reconnect_to_session_with_filename(prepare_mocks: InteractMock
     test_dir = tmpdir.mkdir('test-dir')
     test_file = test_dir.join('file.py')
     test_file.write('pass')
-    result = CliRunner().invoke(interact.interact, ["-n", JUPYTER_EXPERIMENT.name, "-f", test_file.strpath], input="y")
+    result = CliRunner().invoke(interact.interact, ["-n", JUPYTER_EXPERIMENT.name, "--filename", test_file.strpath],
+                                input="y")
 
     assert Texts.FILENAME_BUT_SESSION_EXISTS in result.output
     check_asserts(prepare_mocks, get_namespace_count=1, get_experiment_count=1, submit_experiment_count=0,

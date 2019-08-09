@@ -22,7 +22,7 @@ from git_repo_manager.client import GitRepoManagerClient
 from platform_resources.user import User
 import platform_resources.user as model
 from util.k8s.k8s_info import find_namespace, NamespaceStatus, get_api_key, get_kubectl_host
-from util.k8s.kubectl import UserState, logger
+from util.k8s.kubectl import UserState
 
 from util.logger import initialize_logger
 from util.k8s import k8s_proxy_context_manager

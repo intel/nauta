@@ -288,7 +288,7 @@ def test_create_user_success_display_config(prepare_mocks: CreateUserMock):  # n
     runner = CliRunner()
     m = mock_open()
     with patch("builtins.open", m):
-        result = runner.invoke(create, [test_username, "-l"])
+        result = runner.invoke(create, [test_username, "-lo"])
 
     assert Texts.LIST_ONLY_HEADER in result.output
 
@@ -301,7 +301,7 @@ def test_create_user_success_with_filename(prepare_mocks: CreateUserMock):  # no
     filename = "test-filename"
     m = mock_open()
     with patch("builtins.open", m):
-        result = runner.invoke(create, [test_username, "-f", filename])
+        result = runner.invoke(create, [test_username, "--filename", filename])
 
     assert Texts.CONFIG_SAVE_SUCCESS_MSG.format(
         filename=filename) in result.output
@@ -316,7 +316,7 @@ def test_create_user_success_with_error_saving_file(prepare_mocks: CreateUserMoc
     m = mock_open()
     with patch("builtins.open", m) as mocked_file:
         mocked_file.return_value.__enter__.side_effect = RuntimeError()
-        result = runner.invoke(create, [test_username, "-f", filename])
+        result = runner.invoke(create, [test_username, "--filename", filename])
 
     assert Texts.CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG in result.output
 
@@ -360,7 +360,7 @@ def test_create_user_with_l_and_f(prepare_mocks: CreateUserMock):  # noqa: F811
     m = mock_open()
     with patch("builtins.open", m):
         result = runner.invoke(create,
-                               [test_username, "-l", "-f", "test-filename"])
+                               [test_username, "-lo", "-fl", "test-filename"])
 
     assert Texts.F_L_OPTIONS_EXCLUSION_ERROR_MSG in result.output
     assert result.exit_code == 1

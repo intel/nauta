@@ -18,7 +18,7 @@ from sys import exit
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.dependencies_checker import check_dependency, get_dependency_map, check_os, save_dependency_versions
 from util.logger import initialize_logger
 from util.aliascmd import AliasCmd
@@ -37,8 +37,8 @@ logger = initialize_logger(__name__)
 
 @click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='ver', options_metavar='[options]')
 @common_options(verify_dependencies=False, verify_config_path=True)
-@pass_state
-def verify(state: State):
+@click.pass_context
+def verify(ctx: click.Context):
     try:
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
@@ -56,7 +56,7 @@ def verify(state: State):
                                                         dependency_spec=kubectl_dependency_spec)
     except FileNotFoundError:
         handle_error(logger, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     supported_versions_sign = '>='
@@ -80,7 +80,7 @@ def verify(state: State):
                                                                     supported_versions_sign=supported_versions_sign,
                                                                     expected_version=  # noqa
                                                                     kubectl_dependency_spec.expected_version),
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     del dependencies[kubectl_dependency_name]
@@ -91,14 +91,14 @@ def verify(state: State):
         with spinner(text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG):
             check_port_forwarding()
     except KubectlConnectionError as e:
-        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, str(e), str(e), add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     try:
         namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
     except Exception:
         handle_error(logger, Texts.GET_K8S_NAMESPACE_ERROR_MSG, Texts.GET_K8S_NAMESPACE_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     dependency_versions = {}
@@ -134,13 +134,13 @@ def verify(state: State):
         except (RuntimeError, ValueError, TypeError):
             handle_error(logger, Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
                          Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
         except Exception:
             handle_error(logger,
                          Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
                          Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
     else:
         # This block is entered if all dependencies were validated successfully
@@ -159,5 +159,5 @@ def verify(state: State):
         else:
             click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name="packs resources' correctness"))
     except Exception as e:
-        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, str(e), str(e), add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)

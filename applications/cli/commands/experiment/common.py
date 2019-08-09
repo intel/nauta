@@ -136,7 +136,8 @@ def check_run_environment(run_environment_path: str):
             handle_error(user_msg=Texts.THE_SAME_EXP_IS_SUBMITTED)
             exit(1)
 
-        if click.confirm(Texts.CONFIRM_EXP_DIR_DELETION_MSG.format(run_environment_path=run_environment_path)):
+        if click.get_current_context().obj.force or \
+                click.confirm(Texts.CONFIRM_EXP_DIR_DELETION_MSG.format(run_environment_path=run_environment_path)):
             delete_environment(run_environment_path)
         else:
             handle_error(user_msg=Texts.UNABLE_TO_CONTINUE_EXP_SUBMISSION_ERROR_MSG
@@ -195,10 +196,11 @@ def create_environment(experiment_name: str, file_location: str = None, folder_l
         if show_folder_size_warning and folder_size >= max_folder_size_in_bytes:
             if spinner_to_hide:
                 spinner_to_hide.hide()
-            if not click.confirm(f'Experiment\'s script folder location size ({folder_size/1024/1024:.2f} MB) '
-                                 f'exceeds {max_folder_size_in_bytes/1024/1024:.2f} MB. '
-                                 f'It is highly recommended to use input/output shares for large amounts of data '
-                                 f'instead of submitting them along with experiment. Do you want to continue?'):
+            if (not click.get_current_context().obj.force) and not (click.confirm(
+                    f'Experiment\'s script folder location size ({folder_size / 1024 / 1024:.2f} MB) '
+                    f'exceeds {max_folder_size_in_bytes / 1024 / 1024:.2f} MB. '
+                    f'It is highly recommended to use input/output shares for large amounts of data '
+                    f'instead of submitting them along with experiment. Do you want to continue?')):
                 exit(2)
             if spinner_to_hide:
                 spinner_to_hide.show()
@@ -350,7 +352,8 @@ def submit_experiment(template: str, name: str = None, run_kind: RunKinds = RunK
                                  RUN_PARAMETERS: ["\n".join(run.parameters) if run.parameters
                                                   else "" for run in runs_list]},
                                 headers=[RUN_NAME, RUN_PARAMETERS], tablefmt=TBLT_TABLE_FORMAT))
-            if not click.confirm(Texts.CONFIRM_SUBMIT_QUESTION_MSG, default=True):
+            if ((not click.get_current_context().obj.force) and
+                    (not click.confirm(Texts.CONFIRM_SUBMIT_QUESTION_MSG, default=True))):
                 for experiment_run_folder in experiment_run_folders:
                     delete_environment(experiment_run_folder)
                 exit()
@@ -591,7 +594,6 @@ def submit_draft_pack(run_folder: str, run_name: str, namespace: str = None):
     Submits one run using draft's environment located in a folder given as a parameter.
     :param run_folder: location of a folder with a description of an environment
     :param run_name: run's name
-    :param local_registry_port: port of destination local registry where pack should be submitted
     :param namespace: namespace where tiller used during deployment is located
     In case of any problems it throws an exception with a description of a problem
     """
