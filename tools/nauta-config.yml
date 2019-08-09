@@ -213,8 +213,8 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kube-batch"
   nauta/gitea:
-    version: "1.6.1"
-    image: "gitea/gitea:1.6.1"
+    version: "1.9.0"
+    image: "gitea/gitea:1.9.0"
     method: pull
   nauta/postgres:
     version: "11"

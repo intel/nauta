@@ -34,12 +34,13 @@ Create helm partial for gitea server
           - '/bin/bash'
           - '-c'
           - >
+            set +e;
             initial_wait=20;
             retries=10;
             interval=3;
             sleep ${initial_wait};
             for i in {1..$retries}; do
-              admin_creation_result=$(gitea admin create-user --name ${ADMIN_USERNAME} --password ${ADMIN_PASSWORD} --email ${ADMIN_EMAIL} --admin || true);
+              admin_creation_result=$(su - git -c "/usr/local/bin/gitea admin create-user --name ${ADMIN_USERNAME} --password ${ADMIN_PASSWORD} --email ${ADMIN_EMAIL} --admin --config /data/gitea/conf/app.ini");
               if [[ $? -ne 0 ]] && [[ "${admin_creation_result}" != *"exists"* ]]; then
                 sleep ${interval};
               else
