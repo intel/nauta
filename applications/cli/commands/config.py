@@ -80,7 +80,7 @@ def update_resources_in_packs(cpu: str = None, memory: str = None):
             handle_error(logger, Texts.ERROR_DURING_UPDATE, Texts.ERROR_DURING_UPDATE)
             sys.exit(1)
 
-        if cpu != cpu_number and memory != memory_amount:
+        if new_cpu != cpu_number and new_memory != memory_amount:
             config_file.seek(0)
             config_file.truncate()
             config_file_content[CPU_NUMBER_FIELDNAME] = cpu
