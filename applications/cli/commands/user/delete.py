@@ -20,7 +20,7 @@ import time
 import click
 
 from util.logger import initialize_logger
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.k8s.kubectl import UserState
 from util.helm import delete_user
 from util.exceptions import K8sProxyCloseError
@@ -41,8 +41,8 @@ NAUTA_NAMESPACE = "nauta"
 @click.argument("username", nargs=1)
 @click.option("-p", "--purge", is_flag=True, help=Texts.HELP_PR)
 @common_options(admin_command=True)
-@pass_state
-def delete(state: State, username: str, purge: bool):
+@click.pass_context
+def delete(ctx: click.Context, username: str, purge: bool):
     """
     Deletes a user with a name given as a parameter.
 
@@ -63,11 +63,12 @@ def delete(state: State, username: str, purge: bool):
 
     except Exception:
         handle_error(logger, Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG,
-                     Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG, add_verbosity_msg=state.verbosity == 0)
+                     Texts.USER_PRESENCE_VERIFICATION_ERROR_MSG, add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     click.echo()
-    if not click.confirm(Texts.DELETE_CONFIRM_MSG.format(username=username)):
+    if ((not click.get_current_context().obj.force) and
+            (not click.confirm(Texts.DELETE_CONFIRM_MSG.format(username=username)))):
         click.echo(Texts.DELETE_ABORT_MSG)
         exit(0)
 
@@ -108,9 +109,9 @@ def delete(state: State, username: str, purge: bool):
         click.echo(Texts.DELETE_SUCCESS_MSG.format(username=username))
     except K8sProxyCloseError:
         handle_error(logger, Texts.PROXY_ERROR_LOG_MSG, Texts.PROXY_ERROR_USER_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
     except Exception:
         handle_error(logger, Texts.OTHER_ERROR_LOG_MSG, Texts.OTHER_ERROR_USER_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)

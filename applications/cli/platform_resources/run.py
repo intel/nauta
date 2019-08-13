@@ -161,18 +161,18 @@ class Run(PlatformResource):
 
     @property
     def cli_representation(self):
-        return Run.RunCliModel(name=self.name,
-                               parameters=textwrap.fill(' '.join(self.parameters), width=30,
-                                                        drop_whitespace=False) if self.parameters else "",
-                               metrics='\n'.join(textwrap.fill(f'{key}: {value}', width=30)
-                                                 for key, value in self.metrics.items()) if self.metrics else "",
-                               submission_date=format_timestamp_for_cli(self.creation_timestamp) if self.creation_timestamp else "",
-                               submitter=self.namespace if self.namespace else "",
-                               status=self.state.value if self.state else "",
-                               template_name=self.template_name,
-                               start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",
-                               duration=format_duration_for_cli(self.duration) if self.duration else "",
-                               template_version=self.template_version)
+        return self.RunCliModel(name=self.name,
+                                parameters=textwrap.fill(' '.join(self.parameters), width=30,
+                                                         drop_whitespace=False) if self.parameters else "",
+                                metrics='\n'.join(textwrap.fill(f'{key}: {value}', width=30)
+                                                  for key, value in self.metrics.items()) if self.metrics else "",
+                                submission_date=format_timestamp_for_cli(self.creation_timestamp) if self.creation_timestamp else "",
+                                submitter=self.namespace if self.namespace else "",
+                                status=self.state.value if self.state else "",
+                                template_name=self.template_name,
+                                start_date=format_timestamp_for_cli(self.start_timestamp) if self.start_timestamp else "",
+                                duration=format_duration_for_cli(self.duration) if self.duration else "",
+                                template_version=self.template_version)
 
     def create(self, namespace: str, labels: Dict[str, str] = None, annotations: Dict[str, str] = None):
         run_kubernetes = KubernetesObject(self, client.V1ObjectMeta(name=self.name, namespace=namespace, labels=labels,

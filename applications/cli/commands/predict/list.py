@@ -19,7 +19,7 @@ import click
 from commands.experiment.common import RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_START_DATE, RUN_DURATION, \
     RUN_SUBMISSION_DATE, RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RUN_TEMPLATE_VERSION, RunKinds
 from commands.common import list_runs_in_cli, list_unitialized_experiments_in_cli
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
 from cli_text_consts import PredictListCmdTexts as Texts
@@ -37,8 +37,8 @@ LISTED_RUNS_KINDS = [RunKinds.INFERENCE]
 @click.option('-c', '--count', type=click.IntRange(min=1), help=Texts.HELP_C)
 @click.option('-b', '--brief', is_flag=True, help=Texts.HELP_B)
 @common_options()
-@pass_state
-def list_inference_instances(state: State, all_users: bool, name: str, status: str, uninitialized: bool,
+@click.pass_context
+def list_inference_instances(ctx: click.Context, all_users: bool, name: str, status: str, uninitialized: bool,
                              count: int, brief: bool):
     """ List inference instances. """
     status = RunStatus[status] if status else None
@@ -48,9 +48,9 @@ def list_inference_instances(state: State, all_users: bool, name: str, status: s
         table_headers = [RUN_INFERENCE_NAME, RUN_PARAMETERS, RUN_SUBMISSION_DATE, RUN_START_DATE, RUN_DURATION,
                          RUN_SUBMITTER, RUN_STATUS, RUN_TEMPLATE_NAME, RUN_TEMPLATE_VERSION]
     if uninitialized:
-        list_unitialized_experiments_in_cli(verbosity_lvl=state.verbosity, all_users=all_users, name=name,
+        list_unitialized_experiments_in_cli(verbosity_lvl=ctx.obj.verbosity, all_users=all_users, name=name,
                                             headers=table_headers,
                                             listed_runs_kinds=LISTED_RUNS_KINDS, count=count, brief=brief)
     else:
-        list_runs_in_cli(state.verbosity, all_users, name, LISTED_RUNS_KINDS, table_headers,
+        list_runs_in_cli(ctx.obj.verbosity, all_users, name, LISTED_RUNS_KINDS, table_headers,
                          status=status, with_metrics=False, count=count, brief=brief)

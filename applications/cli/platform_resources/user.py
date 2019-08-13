@@ -107,7 +107,7 @@ class User(PlatformResource):
 
     @property
     def cli_representation(self):
-        return User.UserCliModel(name=self.name, created=format_timestamp_for_cli(self.creation_timestamp),
+        return self.UserCliModel(name=self.name, created=format_timestamp_for_cli(self.creation_timestamp),
                                  running_jobs=self.running_jobs_count, queued_jobs=self.queued_jobs_count,
                                  date_of_last_submitted_job=format_timestamp_for_cli(self.date_of_last_submitted_job)
                                                             if self.date_of_last_submitted_job is not None else None)

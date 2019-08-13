@@ -18,7 +18,7 @@ from sys import exit
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import WorkflowLogsTexts as Texts
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.workflow import ArgoWorkflow
@@ -33,8 +33,8 @@ logger = initialize_logger(__name__)
 @click.command(cls=AliasCmd, alias='lg', options_metavar='[options]', help=Texts.HELP, short_help=Texts.SHORT_HELP)
 @click.argument("workflow-name", type=str, required=True)
 @common_options(admin_command=False)
-@pass_state
-def logs(state: State, workflow_name: str):
+@click.pass_context
+def logs(ctx: click.Context, workflow_name: str):
     try:
         namespace = get_kubectl_current_context_namespace()
         workflow: ArgoWorkflow = ArgoWorkflow.get(namespace=namespace, name=workflow_name)

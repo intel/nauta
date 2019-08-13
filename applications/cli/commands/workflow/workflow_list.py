@@ -20,7 +20,7 @@ from typing import List
 import click
 from tabulate import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import WorkflowListTexts as Texts
 from commands.workflow.common import HEADERS
 from platform_resources.workflow import ArgoWorkflow
@@ -35,8 +35,8 @@ logger = initialize_logger(__name__)
 @click.command(name='list', cls=AliasCmd, alias='ls', options_metavar='[options]',  # type: ignore
                short_help=Texts.SHORT_HELP)
 @common_options(admin_command=False)
-@pass_state
-def workflow_list(state: State):
+@click.pass_context
+def workflow_list(ctx: click.Context):
     try:
         namespace = get_kubectl_current_context_namespace()
         workflows: List[ArgoWorkflow] = ArgoWorkflow.list(namespace=namespace)

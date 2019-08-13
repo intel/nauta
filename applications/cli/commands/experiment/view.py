@@ -22,7 +22,7 @@ import click
 
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from platform_resources.run import Run
 from platform_resources.experiment import Experiment
 from util.aliascmd import AliasCmd
@@ -118,9 +118,8 @@ def container_resources_to_msg(resources, spaces=9) -> str:
 @click.option('-tb', '--tensorboard', default=None, help=Texts.HELP_T, is_flag=True)
 @click.option('-u', '--username', help=Texts.HELP_U)
 @common_options()
-@pass_state
 @click.pass_context
-def view(context, state: State, experiment_name: str, tensorboard: bool, username: str):
+def view(ctx: click.Context, experiment_name: str, tensorboard: bool, username: str):
     """
     Displays details of an experiment.
     """
@@ -244,7 +243,7 @@ def view(context, state: State, experiment_name: str, tensorboard: bool, usernam
 
         if tensorboard:
             click.echo()
-            context.invoke(tensorboard_command, experiment_name=[experiment_name])
+            ctx.invoke(tensorboard_command, experiment_name=[experiment_name])
 
         if pending_pods:
             click.echo()

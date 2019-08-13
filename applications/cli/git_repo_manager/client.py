@@ -45,8 +45,8 @@ class GitRepoManagerClient:
     def __init__(self, host: str, namespace: str = NAUTA_NAMESPACE, port: int = None):
         self.namespace = namespace
         self.base_url = f'http://{host}:{port}' if port else f'http://{host}'
-        self._token: str = None
-        self._session: requests.Session = None
+        self._token: Optional[str] = None
+        self._session: Optional[requests.Session] = None
         self.timeout = 60
 
 

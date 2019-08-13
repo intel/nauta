@@ -23,7 +23,7 @@ import click
 from tabulate import tabulate
 
 from util.logger import initialize_logger
-from util.cli_state import common_options, pass_state, State, verify_user_privileges
+from util.cli_state import common_options, verify_user_privileges
 from util.config import TBLT_TABLE_FORMAT
 from util.k8s.k8s_info import get_current_user, get_users_samba_password, is_current_user_administrator, \
     get_kubectl_host
@@ -56,12 +56,12 @@ class ShareData():
         return [self.status, self.local_share, self.remote_share, self.network]
 
 
-def is_admin(state: State):
+def is_admin():
     try:
         return is_current_user_administrator()
     except Exception:
         handle_error(logger, Texts.ADMIN_CHECK_ERROR_MSG, Texts.ADMIN_CHECK_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=click.get_current_context().obj.verbosity == 0)
         exit(1)
 
 
@@ -83,10 +83,9 @@ def print_unmount():
 @click.group(short_help=Texts.HELP, help=Texts.HELP, cls=AliasGroup, alias='m', invoke_without_command=True,
              subcommand_metavar='command [options]')
 @common_options()
-@pass_state
 @click.pass_context
-def mount(context, state: State):
-    if context.invoked_subcommand is None:
+def mount(ctx: click.Context):
+    if ctx.invoked_subcommand is None:
         verify_user_privileges(False, "mount")
 
         try:
@@ -94,7 +93,7 @@ def mount(context, state: State):
             click.echo(Texts.MOUNT_CMD.format(command=mount_command))
         except Exception:
             handle_error(logger, Texts.GET_MOUNT_COMMAND_ERROR_MSG, Texts.GET_MOUNT_COMMAND_ERROR_MSG,
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
 
         click.echo(Texts.MAIN_MSG)
@@ -247,15 +246,15 @@ def get_mounts_windows():
 
 @mount.command(help=Texts.HELP_L, short_help=Texts.HELP_L, cls=AliasCmd, alias='ls', options_metavar='[options]')
 @common_options()
-@pass_state
-def list(state: State):
+@click.pass_context
+def list(ctx: click.Context):
     username = get_current_user()
 
     if platform.system() == 'Linux':
-        get_mounts_linux_osx(username=username, is_admin=is_admin(state))
+        get_mounts_linux_osx(username=username, is_admin=is_admin())
     elif platform.system() == 'Windows':
         get_mounts_windows()
     else:  # OSX
-        get_mounts_linux_osx(username=username, is_admin=is_admin(state), osx=True)
+        get_mounts_linux_osx(username=username, is_admin=is_admin(), osx=True)
 
     print_unmount()

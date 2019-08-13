@@ -22,7 +22,7 @@ from typing import List, Tuple
 import click
 from tabulate import tabulate
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, check_pods_status, PodStatus
 from util.launcher import launch_app
@@ -47,7 +47,7 @@ logger = initialize_logger(__name__)
 
 @click.command(short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='i', options_metavar='[options]')
 @click.option('-n', '--name', default=None, help=Texts.HELP_N)
-@click.option('-f', '--filename', default=None, type=click.Path(exists=True), help=Texts.HELP_F)
+@click.option('-fl', '--filename', default=None, type=click.Path(exists=True), help=Texts.HELP_F)
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)
 @click.option('--no-launch', is_flag=True, help=Texts.HELP_NO_LAUNCH)
@@ -56,8 +56,8 @@ logger = initialize_logger(__name__)
 @click.option("-t", "--template", help=Texts.HELP_T, default=JUPYTER_NOTEBOOK_TEMPLATES_NAMES[0],
               type=click.Choice(JUPYTER_NOTEBOOK_TEMPLATES_NAMES))
 @common_options(admin_command=False)
-@pass_state
-def interact(state: State, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
+@click.pass_context
+def interact(ctx: click.Context, name: str, filename: str, pack_param: List[Tuple[str, str]], no_launch: bool,
              port_number: int, env: List[str], template: str):
     """
     Starts an interactive session with Jupyter Notebook.

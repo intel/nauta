@@ -34,22 +34,39 @@ logger = initialize_logger(__name__)
 VERIFY_REQUEST_TIMEOUT = 10
 
 
-class State:
+class NctlState:
+    """
+    Class holding Nctl global state. Intended to be stored as obj attribute of click's Context.
+    """
     def __init__(self):
         self.verbosity = 0
-
-
-pass_state = click.make_pass_decorator(State, ensure=True)
+        self.force = False
 
 
 def verbosity_option(f):
     def callback(ctx, param, value):
         set_verbosity_level(value)
+        if not ctx.obj:
+            ctx.obj = NctlState()
+        ctx.obj.verbosity = value
         return value
 
     return click.option('-v', '--verbose', count=True,
                         expose_value=False,
                         help='Set verbosity level: \n -v for INFO \n -vv for DEBUG',
+                        callback=callback)(f)
+
+
+def force_option(f):
+    def callback(ctx, param, value):
+        if not ctx.obj:
+            ctx.obj = NctlState()
+        ctx.obj.force = value
+        return value
+
+    return click.option('-f', '--force', is_flag=True, default=False,
+                        expose_value=False,
+                        help='Force command execution by ignoring (most) confirmation prompts',
                         callback=callback)(f)
 
 
@@ -126,6 +143,7 @@ def common_options(verify_dependencies=True, verify_config_path=True, admin_comm
                 verify_user_privileges(admin_command, command_name=func.__name__)
 
             return func(*args, **kwargs)
-        wrapper = verbosity_option(wrapper)
-        return wrapper
+        wrapped_cmd = verbosity_option(wrapper)
+        wrapped_cmd = force_option(wrapped_cmd)
+        return wrapped_cmd
     return decorator

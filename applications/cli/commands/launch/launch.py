@@ -21,7 +21,7 @@ from http import HTTPStatus
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from tensorboard.client import TensorboardServiceClient, TensorboardStatus, build_tensorboard_run_list
 from util.spinner import spinner
 from util.aliascmd import AliasCmd, AliasGroup
@@ -47,10 +47,10 @@ TENSORBOARD_CHECK_BACKOFF_SECONDS = 5
 @click.command(cls=AliasCmd, alias='ui', short_help=Texts.WEBUI_HELP, help=Texts.WEBUI_HELP,
                options_metavar='[options]')
 @common_options()
-@pass_state
+@click.pass_context
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
 @click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
-def webui(state: State, no_launch: bool, port_number: int):
+def webui(ctx: click.Context, no_launch: bool, port_number: int):
     """ Subcommand for launching webUI with credentials """
     launch_app_with_proxy(NAUTAAppNames.INGRESS, no_launch, port_number)
 
@@ -59,13 +59,13 @@ def webui(state: State, no_launch: bool, port_number: int):
 @click.command(cls=AliasCmd, alias='tb', help=Texts.TB_HELP, short_help=Texts.SHORT_TB_HELP,
                options_metavar='[options]')
 @common_options(admin_command=False)
-@pass_state
+@click.pass_context
 @click.option('-n', '--no-launch', is_flag=True, help=Texts.HELP_N)
 @click.option('-tscp', '--tensorboard-service-client-port', type=click.IntRange(1024, 65535),
               help=Texts.TB_HELP_TSCP)
 @click.option('-pn', '--port-number', type=click.IntRange(1024, 65535), help=Texts.HELP_P)
 @click.argument("experiment-name", type=str, required=True, nargs=-1)
-def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: Optional[int],
+def tensorboard(ctx: click.Context, no_launch: bool, tensorboard_service_client_port: Optional[int],
                 port_number: Optional[int], experiment_name: List[str]):
     """ Subcommand for launching tensorboard with credentials """
     current_namespace = get_kubectl_current_context_namespace()
@@ -89,7 +89,7 @@ def tensorboard(state: State, no_launch: bool, tensorboard_service_client_port: 
             err_message = Texts.TB_CREATE_ERROR_MSG
             if hasattr(exe, 'error_code') and exe.error_code == HTTPStatus.UNPROCESSABLE_ENTITY:  # type: ignore
                 err_message = str(exe)
-            handle_error(logger, err_message, err_message, add_verbosity_msg=state.verbosity == 0)
+            handle_error(logger, err_message, err_message, add_verbosity_msg=ctx.obj.verbosity == 0)
             sys.exit(1)
 
         for i in range(TENSORBOARD_TRIES_COUNT):

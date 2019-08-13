@@ -20,7 +20,7 @@ from sys import exit
 import click
 import requests
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_api_key
@@ -39,8 +39,8 @@ logger = initialize_logger(__name__)
 @click.option('-m', '--method-verb', default=InferenceVerb.PREDICT.value,
               type=click.Choice([verb.value for verb in InferenceVerb]), help=Texts.HELP_M)
 @common_options(admin_command=False)
-@pass_state
-def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
+@click.pass_context
+def stream(ctx: click.Context, name: str, data: str, method_verb: InferenceVerb):
     """
     Perform stream inference task on launched prediction instance.
     """
@@ -63,7 +63,7 @@ def stream(state: State, name: str, data: str, method_verb: InferenceVerb):
     except Exception:
         handle_error(logger, Texts.INSTANCE_GET_FAIL_ERROR_MSG.format(name=name),
                      Texts.INSTANCE_GET_FAIL_ERROR_MSG.format(name=name),
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     try:

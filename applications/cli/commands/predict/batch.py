@@ -23,7 +23,7 @@ from tabulate import tabulate
 
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from commands.predict.common import start_inference_instance, INFERENCE_INSTANCE_PREFIX, InferenceRuntime
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 from util.logger import initialize_logger
 from platform_resources.experiment_utils import generate_name
@@ -55,8 +55,8 @@ logger = initialize_logger(__name__)
 @click.option('-rt', '--runtime', required=False, type=click.Choice([runtime.value for runtime in InferenceRuntime]),
               default=InferenceRuntime.TFSERVING.value, help=Texts.HELP_RT)
 @common_options(admin_command=False)
-@pass_state
-def batch(state: State, name: str, model_location: str, local_model_location: str, data: str, output: str,
+@click.pass_context
+def batch(ctx: click.Context, name: str, model_location: str, local_model_location: str, data: str, output: str,
           model_name: str, tf_record: bool, pack_param: List[Tuple[str, str]], requirements: str,
           runtime: InferenceRuntime):
     """
@@ -83,7 +83,7 @@ def batch(state: State, name: str, model_location: str, local_model_location: st
                                                       requirements=requirements)
     except Exception:
         handle_error(logger, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG, Texts.OTHER_INSTANCE_CREATION_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     click.echo(tabulate({Texts.TABLE_NAME_HEADER: [inference_instance.cli_representation.name],

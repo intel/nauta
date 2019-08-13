@@ -16,7 +16,7 @@
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.aliascmd import AliasCmd
 import commands.experiment.cancel
 from util.logger import initialize_logger
@@ -31,12 +31,11 @@ logger = initialize_logger(__name__)
 @click.option('-m', '--match', default=None, help=Texts.HELP_M)
 @click.option('-p', '--purge', default=None, help=Texts.HELP_P, is_flag=True)
 @common_options(admin_command=False)
-@pass_state
 @click.pass_context
-def cancel(context, state: State, name: str, match: str, purge: bool):
+def cancel(ctx: click.Context, name: str, match: str, purge: bool):
     """
     Cancels chosen prediction instances based on a name provided as a parameter.
     """
     commands.experiment.cancel.experiment_name = Texts.EXPERIMENT_NAME
     commands.experiment.cancel.experiment_name_plural = Texts.EXPERIMENT_NAME_PLURAL
-    context.forward(commands.experiment.cancel.cancel, listed_runs_kinds=[RunKinds.INFERENCE])
+    ctx.forward(commands.experiment.cancel.cancel, listed_runs_kinds=[RunKinds.INFERENCE])

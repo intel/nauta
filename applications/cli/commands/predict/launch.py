@@ -29,7 +29,7 @@ from commands.predict.common import start_inference_instance, get_inference_inst
     InferenceRuntime
 from commands.experiment.common import validate_experiment_name, validate_pack_params_names
 from platform_resources.experiment_utils import generate_name
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from platform_resources.run import RunStatus
 from util.aliascmd import AliasCmd
 from util.config import TBLT_TABLE_FORMAT
@@ -65,8 +65,8 @@ def validate_local_model_location(local_model_location: str):
 @click.option('-rt', '--runtime', required=False, type=click.Choice([runtime.value for runtime in InferenceRuntime]),
               default=InferenceRuntime.TFSERVING.value, help=Texts.HELP_RT)
 @common_options(admin_command=False)
-@pass_state
-def launch(state: State, name: str, model_location: str, local_model_location: str, model_name: str,
+@click.pass_context
+def launch(ctx: click.Context, name: str, model_location: str, local_model_location: str, model_name: str,
            pack_param: List[Tuple[str, str]], requirements: str, runtime: InferenceRuntime):
     """
     Starts a new prediction instance that can be used for performing prediction, classification and
@@ -95,7 +95,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
             raise RuntimeError('Inference instance submission failed.')
     except Exception:
         handle_error(logger, Texts.INSTANCE_START_ERROR_MSG, Texts.INSTANCE_START_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     click.echo(tabulate([[inference_instance.cli_representation.name, model_location,
@@ -112,7 +112,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
                                                   authorization_header=authorization_header))
     except Exception:
         handle_error(logger, Texts.INSTANCE_URL_ERROR_MSG, Texts.INSTANCE_URL_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     # wait till pod is ready - no more than 40 seconds
@@ -127,7 +127,7 @@ def launch(state: State, name: str, model_location: str, local_model_location: s
             time.sleep(1)
     else:
         handle_error(logger, Texts.PREDICTION_INSTANCE_NOT_READY, Texts.PREDICTION_INSTANCE_NOT_READY,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
 

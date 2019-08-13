@@ -19,7 +19,7 @@ from typing import Dict
 
 import click
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from util.dependencies_checker import check_dependency, get_local_dependency_map, check_os, \
    save_dependency_versions, get_remote_dependency_map, DependencySpec
 from util.logger import initialize_logger
@@ -39,8 +39,8 @@ logger = initialize_logger(__name__)
 
 @click.command(short_help=Texts.HELP, help=Texts.HELP, cls=AliasCmd, alias='ver', options_metavar='[options]')
 @common_options(verify_dependencies=False, verify_config_path=True)
-@pass_state
-def verify(state: State):
+@click.pass_context
+def verify(ctx: click.Context):
     try:
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
@@ -49,7 +49,7 @@ def verify(state: State):
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
 
     local_dependencies = get_local_dependency_map()
-    _check_dependencies(local_dependencies, state=state)
+    _check_dependencies(local_dependencies, ctx=ctx)
 
     try:
         with spinner(text=Texts.CHECKING_CONNECTION_TO_CLUSTER_MSG):
@@ -57,22 +57,22 @@ def verify(state: State):
         with spinner(text=Texts.CHECKING_PORT_FORWARDING_FROM_CLUSTER_MSG):
             check_port_forwarding()
     except KubectlConnectionError as e:
-        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, str(e), str(e), add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
     except FileNotFoundError:
         handle_error(logger, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG, Texts.KUBECTL_NOT_INSTALLED_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     try:
         namespace = 'kube-system' if is_current_user_administrator() else get_kubectl_current_context_namespace()
     except Exception:
         handle_error(logger, Texts.GET_K8S_NAMESPACE_ERROR_MSG, Texts.GET_K8S_NAMESPACE_ERROR_MSG,
-                     add_verbosity_msg=state.verbosity == 0)
+                     add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
     remote_dependencies = get_remote_dependency_map()
-    _check_dependencies(remote_dependencies, state=state, namespace=namespace)
+    _check_dependencies(remote_dependencies, ctx=ctx, namespace=namespace)
 
     try:
         list_of_incorrect_packs = None
@@ -86,11 +86,11 @@ def verify(state: State):
         else:
             click.echo(Texts.DEPENDENCY_VERIFICATION_SUCCESS_MSG.format(dependency_name="packs resources' correctness"))
     except Exception as e:
-        handle_error(logger, str(e), str(e), add_verbosity_msg=state.verbosity == 0)
+        handle_error(logger, str(e), str(e), add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(1)
 
 
-def _check_dependencies(dependencies: Dict[str, DependencySpec], state: State, namespace: str = None):
+def _check_dependencies(dependencies: Dict[str, DependencySpec], ctx: click.Context, namespace: str = None):
     """
     Checks if dependencies provided in dependencies dict are installed and have correct versions.
     In case of error, a proper message will be displayed and cli will return non zero exit code.
@@ -128,13 +128,13 @@ def _check_dependencies(dependencies: Dict[str, DependencySpec], state: State, n
         except (RuntimeError, ValueError, TypeError):
             handle_error(logger, Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
                          Texts.DEPENDENCY_VERSION_CHECK_ERROR_MSG.format(dependency_name=dependency_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
         except Exception:
             handle_error(logger,
                          Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
                          Texts.DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG.format(dependency_name=dependency_name),
-                         add_verbosity_msg=state.verbosity == 0)
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
             exit(1)
     else:
         # This block is entered if all dependencies were validated successfully

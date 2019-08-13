@@ -284,7 +284,7 @@ def save_logs_to_file(logs_generator: Generator[LogEntry, None, None], instance_
                                                                           instance_name=instance_name,
                                                                           instance_type=instance_type)
 
-    if click.confirm(confirmation_message, default=True):
+    if click.get_current_context().obj.force or click.confirm(confirmation_message, default=True):
         try:
             with open(filename, 'w') as file, spinner(spinner=NctlSpinner,
                                                       text=Texts.SAVING_LOGS_TO_FILE_PROGRESS_MSG, color=SPINNER_COLOR):

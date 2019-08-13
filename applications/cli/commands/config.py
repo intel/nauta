@@ -21,7 +21,7 @@ import click
 import yaml
 
 
-from util.cli_state import common_options, pass_state, State
+from util.cli_state import common_options
 from cli_text_consts import ConfigCmdTexts as Texts
 from util.aliascmd import AliasCmd
 from util.config import Config, NAUTAConfigMap
@@ -92,8 +92,8 @@ def update_resources_in_packs(cpu: str = None, memory: str = None):
 @click.option("-c", "--cpu", default=None, help=Texts.HELP_C)
 @click.option("-m", "--memory", default=None, help=Texts.HELP_M)
 @common_options(verify_dependencies=False)
-@pass_state
-def config(state: State, cpu: str, memory: str):
+@click.pass_context
+def config(ctx: click.Context, cpu: str, memory: str):
 
     if not cpu or not memory:
         handle_error(logger, Texts.MISSING_ARGUMENTS, Texts.MISSING_ARGUMENTS)

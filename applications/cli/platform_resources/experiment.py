@@ -32,7 +32,7 @@ from platform_resources.custom_object_meta_model import validate_kubernetes_name
 from platform_resources.platform_resource import PlatformResource, KubernetesObjectSchema, KubernetesObject, \
     PlatformResourceApiClient
 from platform_resources.resource_filters import filter_by_name_regex, filter_by_state
-from platform_resources.run import Run, RunKinds, filter_by_run_kinds
+from platform_resources.run import Run, filter_by_run_kinds
 from util.exceptions import InvalidRegularExpressionError
 from util.logger import initialize_logger
 from util.system import format_timestamp_for_cli
@@ -109,10 +109,10 @@ class Experiment(PlatformResource):
 
     @property
     def cli_representation(self):
-        return Experiment.ExperimentCliModel(name=self.name, parameters_spec=' '.join(self.parameters_spec),
-                                             creation_timestamp=format_timestamp_for_cli(self.creation_timestamp),
-                                             submitter=self.namespace, status=self.state.value,
-                                             template_name=self.template_name, template_version=self.template_version)
+        return self.ExperimentCliModel(name=self.name, parameters_spec=' '.join(self.parameters_spec),
+                                       creation_timestamp=format_timestamp_for_cli(self.creation_timestamp),
+                                       submitter=self.namespace, status=self.state.value,
+                                       template_name=self.template_name, template_version=self.template_version)
 
 
     def get_runs(self) -> List[Run]:
