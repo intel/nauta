@@ -22,7 +22,6 @@ from typing import Tuple, List
 
 
 import click
-from kubernetes.client import V1Pod
 from tabulate import tabulate
 
 from commands.predict.common import start_inference_instance, get_inference_instance_url, INFERENCE_INSTANCE_PREFIX, \
@@ -116,19 +115,20 @@ def launch(ctx: click.Context, name: str, model_location: str, local_model_locat
         exit(1)
 
     # wait till pod is ready - no more than 40 seconds
-    for i in range(40):
+    for _ in range(40):
         pods = get_namespaced_pods(label_selector=f'runName={name}', namespace=namespace)
-        if pods:
-            for pod in pods:
-                if not check_pod_readiness(pod):
-                    break
-            else:
-                break
-            time.sleep(1)
+        if pods and all(pod.status.phase == 'Running' for pod in pods):
+            break
+        if pods and any(pod.status.phase == 'Failed' for pod in pods):
+            handle_error(logger, Texts.INSTANCE_START_ERROR_MSG, Texts.INSTANCE_START_ERROR_MSG,
+                         add_verbosity_msg=ctx.obj.verbosity == 0)
+            exit(1)
+
+        time.sleep(1)
     else:
         handle_error(logger, Texts.PREDICTION_INSTANCE_NOT_READY, Texts.PREDICTION_INSTANCE_NOT_READY,
                      add_verbosity_msg=ctx.obj.verbosity == 0)
-        exit(1)
+        exit(0)
 
 
 def get_authorization_header(service_account_name: str, namespace: str):
@@ -137,14 +137,3 @@ def get_authorization_header(service_account_name: str, namespace: str):
     authorization_token = get_secret(secret_name=secret_name, namespace=namespace).data['token']
     authorization_token = base64.b64decode(authorization_token).decode('utf-8')
     return f'Authorization: Bearer {authorization_token}'
-
-
-def check_pod_readiness(pod: V1Pod):
-    container_statuses_list = pod.status.container_statuses
-    if container_statuses_list:
-        for status in container_statuses_list:
-            if not status.ready:
-                break
-        else:
-            return True
-    return False
