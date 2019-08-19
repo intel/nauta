@@ -41,6 +41,7 @@ The `submit` subcommand submits training jobs. Use this command to submit single
  |`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` will launch an experiment with a set of parameters defined in the `[definition]` argument. Optional. Format of the `[definition]` argument is as follows: `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br>  <br> All parameters given in the `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once, `nctl` will start as many experiments as there is occurrences of this parameter in a call. |
  |`-e, --env TEXT` | No | Environment variable passed to training. You can pass as many environmental variables, as desired. Each variable should be in such case passed as a separate -e parameter.|
  |`-r, --requirements PATH` | No | Path to file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
+ |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO <br>`-vv` for DEBUG |
  |`-h, --help` | No | Show help message and exit. |
 
@@ -99,6 +100,7 @@ The `list` subcommand displays a list of all experiments with some basic informa
 |`-u, --uninitialized` | No | List uninitialized experiments, that is, experiments without resources submitted for creation.|
 |`-c, --count` <br> `INTEGER RANGE` | No | An integer, command displays c last rows.|
 |`-b, --brief` | No | Print short version of the result table. Only 'name', 'submission date', 'owner' and 'state' columns will be printed.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
 
@@ -152,6 +154,7 @@ The `cancel` subcommand cancels training chosen based on provided parameters.
 |`-p, --purge`| No | If given, then all information concerning for identified experiments, completed and currently running, is removed from the system.|
 |`-i, --pod-ids` <br> `TEXT`| No | Comma-separated pods IDs. If given, command matches pods by their IDs and deletes them.|
 |` -s, --pod-status` <br> `TEXT`| No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN'. If given, the command searches pods by their status and deletes them.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -189,6 +192,7 @@ The `view` subcommand displays  basic details of an experiment, such as the name
 |:--- |:--- |:--- |
 |`-tb, --tensorboard` | No | If given, the command exposes a TensorBoard instance with an experiment's data. |
 |`-u, --username`<br> `TEXT` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -233,6 +237,7 @@ The `logs` subcommand displays logs from experiments. Logs to be displayed are c
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
 |`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -269,6 +274,7 @@ The interact subcommand launches a local browser with Jupyter notebook. If scrip
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
 |` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
 |` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a Jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -296,6 +302,7 @@ The `template-list` subcommand returns a list of templates installed on a client
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

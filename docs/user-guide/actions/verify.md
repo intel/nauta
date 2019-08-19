@@ -12,6 +12,7 @@ Checks whether all prerequisites required by `nctl` are installed and have prope
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

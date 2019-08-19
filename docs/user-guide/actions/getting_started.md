@@ -50,12 +50,13 @@ helm server verified successfully.
 
 ## Overview of nctl Commands
 
-Each `nctl` command has at least two options:
+Each `nctl` command has at least three options:
 
 1. `-v, --verbose` - Set verbosity level:
     * `-v` for INFO - Basic logs on INFO/EXCEPTION/ERROR levels are displayed.
     * `-vv` for DEBUG - Detailed logs on INFO/DEBUG/EXCEPTION/ERROR levels are displayed.
 2. `-h, --help` - The application displays the usage and options available for a specific command or subcommand.
+3. `-f, --force` - Force command execution by ignoring (most) confirmation prompts.
  
 ### Accessing Help
 
