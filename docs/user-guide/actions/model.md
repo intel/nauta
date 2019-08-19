@@ -126,7 +126,7 @@ The `logs` subcommand displays logs from a model export operation. Logs to be di
 |`-m, --match TEXT` | No |  If given, command searches for logs from operations matching the value of this option. This option cannot be used along with the OPERATION-NAME argument.|
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
-|`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
+|`-fl, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |

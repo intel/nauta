@@ -26,8 +26,8 @@ Creates and initializes a new Nauta user. This command _must be_ executed when `
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-l, --list-only` | No | If given, the content of the generated user's config file is displayed on the screen only. <br> If not given, the file with configuration is saved on disk.|
-|`-f, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given, the <br> configuration is stored in the `config.<username>` file.|
+|`-lo, --list-only` | No | If given, the content of the generated user's config file is displayed on the screen only. <br> If not given, the file with configuration is saved on disk.|
+|`-fl, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given, the <br> configuration is stored in the `config.<username>` file.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |

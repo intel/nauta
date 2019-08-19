@@ -236,7 +236,7 @@ The `logs` subcommand displays logs from experiments. Logs to be displayed are c
 |`-m, --match TEXT` | No |  If given, command searches for logs from experiments matching the value of this option. This option cannot be used along with the NAME argument.|
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
-|`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
+|`-fl, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
@@ -268,7 +268,7 @@ The interact subcommand launches a local browser with Jupyter notebook. If scrip
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT` | No | Name of a Jupyter notebook's session. If session with a given name already exists, then a user is connected to this session. |
-|`-f, --filename TEXT` | No | File with a notebook that should be opened in Jupyter notebook. |
+|`-fl, --filename TEXT` | No | File with a notebook that should be opened in Jupyter notebook. |
 |`-p, --pack-param <TEXT TEXT>...`| No | Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br>For maps use: 'key "{'a': 'b'}"' |
 |`--no-launch`| No | Run command without a web browser starting, only proxy tunnel is created.|
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
