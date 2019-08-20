@@ -961,16 +961,16 @@ class ModelStatusCmdTexts:
 
 
 class ModelExportCmdTexts:
-    HELP = """Export the model using one of defined formats/list of available export formats 
-    PATH - indicates the location of the model on the Input or Output network shares. If 'formats' value is given
+    HELP = """Export the model using one of defined formats/list the available export formats 
+    PATH - indicates the location of the model on the Input or Output network shares. If 'list' value is given
            - the command displays a list of available export's formats.
 
-    FORMAT - one of the supported formats (see nctl model export-list command). Required if export of a model is 
+    FORMAT - one of the supported formats (see nctl model export list command). Required if export of a model is 
             executed
 
     operation-options - options specific to a chosen format
     """
-    SHORT_HELP = "Export the model using one of defined formats/list of available export formats."
+    SHORT_HELP = "Export the model using one of defined formats/list available export formats."
     HELP_P = "Post-processing workflow used to process exported model (see nctl process-list command)."
     WRONG_EXPORT_FORMAT = "Format: {format} does not exist. Choose from: {formats}."
     WRONG_PROCESS_KIND = "Post-processing kind: {process} does not exist. Choose from: {kinds}."

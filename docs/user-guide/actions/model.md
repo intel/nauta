@@ -49,26 +49,26 @@ Displays details of 3 model export operations - two of them finished with succes
 
 ### Synopsis
  
-Exports an existing model located in the PATH folder to a given FORMAT with given options. If `formats` option is given, it displays a list of available export formats.    
+Exports an existing model located in the PATH folder to a given FORMAT with given options. If `list` option is given, it displays a list of available export formats.    
  
 ### Syntax
  
- `nctl model export PATH/formats FORMAT [-- operation options]`
+ `nctl model export PATH/list FORMAT [-- operation options]`
  
  
 ### Arguments
  
  | Name | Required | Description |
  |:--- |:--- |:--- |
- |`PATH/formats` | Yes | `PATH` - Location of a model that is going to be exported. Models can be stored `only` in shared folders. Furthermore, this command `does not` handle models located in local folders. `formats` - if given, command displays a list of available formats.|
- |`FORMAT` | No | Format of an exported model. List of available formats can be obtained by executing `export-list` command. Required if `PATH` has been given.|
+ |`PATH/list` | Yes | `PATH` - Location of a model that is going to be exported. Models can be stored `only` in shared folders. Furthermore, this command `does not` handle models located in local folders. `list` - if given, command displays a list of available formats.|
+ |`FORMAT` | No | Format of an exported model. List of available formats can be obtained by executing `export list` command. Required if `PATH` has been given.|
  |`operation options` | No | String with a list of parameters that are passed to a workflow responsible for exporting a model. All such parameters should be added at the end of the command after `--` string. |
  
 
 ### Returns
  
 Should issues arise, a message (or messages) with a description of their cause (or causes) displays. If an export's operation starts, then the information about that operation and its details displays.
-If `formats` option is given - a list of available export formats with a short description of parameters accepted by those formats displays.
+If `list` option is given - a list of available export formats with a short description of parameters accepted by those formats displays.
 
      
 ### Example
