@@ -31,6 +31,7 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of the directory in model's location.|
 |`-tr, --tf-record`| No |If given, the batch prediction accepts files in `TFRecord` formats. Otherwise files should be delivered in `protobuf` format.|
 |`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -63,6 +64,7 @@ This command `cancels` prediction instance(s) chosen based on criteria given as 
 |:--- |:--- |:--- |
 |`-m, --match TEXT`| No | If given, the command searches for prediction instances matching the value of this option.|
 |`-p, --purge`| No | If given, then all information concerning all prediction instances, completed and currently running, is removed from the system.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -90,6 +92,7 @@ The `launch` subcommand starts  a new prediction instance that can be used for p
 |`-l, --local_model_location`<br> `PATH`| No | Local path to saved model that will be used for inference. Model content will be copied into an image. 
 |`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of directory in model's location. |
 |`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -135,6 +138,7 @@ sorted using a date of creation starting with the most recent, and filtered by o
 |`-u, --uninitialized`| No | List uninitialized prediction instances: for example, prediction instances without resources submitted for creation.|
 |`-c/--count` <br> `INTEGER RANGE`| No | If given, command displays c most-recent rows.|
 |`-b, --brief`| No | Print short version of the result table. Only 'name', 'submission date', 'owner' and 'state' columns will be printed.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -159,6 +163,7 @@ The `stream` subcommand performs stream inference task on launched prediction in
 |`-n, --name TEXT`| Yes | Name of prediction session.|
 |`-d, --data PATH`| Yes | Path to JSON data file that will be streamed to prediction instance. Data must be formatted such that it is compatible with the SignatureDef specified within the model deployed in the selected prediction instance.|
 |`-m, --method-verb [classify, regress, predict]`| No | Method verb that will be used when performing inference. Predict verb is used by default.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
