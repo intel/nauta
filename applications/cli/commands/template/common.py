@@ -179,7 +179,7 @@ def get_local_templates() -> Dict[str, Template]:
     return local_model_list
 
 
-def prepare_list_of_templates() -> Tuple[List[Template], List[str]]:
+def prepare_list_of_templates() -> Tuple[List[Tuple], List[str]]:
     error_messages = []
     remote_templates: Dict[str, Template] = {}
     try:

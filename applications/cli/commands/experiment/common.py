@@ -393,9 +393,7 @@ def submit_experiment(template: str, name: str, run_kind: RunKinds = RunKinds.TR
             except Exception:
                 error_msg = 'Failed to build experiment image.'
                 log.exception(error_msg)
-                # Try to get workflow logs
-                _debug_workflow_logs(workflow=image_build_workflow, namespace=namespace)
-
+                _show_workflow_logs(workflow=image_build_workflow, namespace=namespace)
                 try:
                     experiment.state = experiments_model.ExperimentStatus.FAILED
                     experiment.update()
@@ -811,9 +809,13 @@ def validate_pack(name: str):
                 exit(2)
 
 
-def _debug_workflow_logs(workflow: ArgoWorkflow, namespace: str):
+def _show_workflow_logs(workflow: ArgoWorkflow, namespace: str):
     try:
+        log.debug(f'Worklfow {workflow.name} main container logs:')
         output, _, _ = execute_system_command(command=['kubectl', 'logs', '-n', namespace, workflow.name, 'main'])
+        log.debug(output)
+        log.debug(f'Worklfow {workflow.name} wait container logs:')
+        output, _, _ = execute_system_command(command=['kubectl', 'logs', '-n', namespace, workflow.name, 'wait'])
         log.debug(output)
     except Exception:
         log.debug(f'Failed to get {workflow.name} worklfow logs.')
