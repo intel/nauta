@@ -3,8 +3,8 @@ ARG BASE_IMAGE=golang:1.12.1
 FROM ${DUMBINIT_DATA_IMAGE} as dumbinitdata
 FROM ${BASE_IMAGE}
 
-ADD gitea-v1.6.1.tar.gz ${GOPATH}/src/code.gitea.io/
-RUN mv ${GOPATH}/src/code.gitea.io/gitea-1.6.1 ${GOPATH}/src/code.gitea.io/gitea
+ADD gitea-v1.9.0.tar.gz ${GOPATH}/src/code.gitea.io/
+RUN mv ${GOPATH}/src/code.gitea.io/gitea-1.9.0 ${GOPATH}/src/code.gitea.io/gitea
 
 WORKDIR ${GOPATH}/src/code.gitea.io/gitea
 

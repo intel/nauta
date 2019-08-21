@@ -228,7 +228,7 @@ data:
     ; default is the path where Gitea is executed
     STATIC_ROOT_PATH =
     ; Default path for App data
-    APP_DATA_PATH = data
+    APP_DATA_PATH = /data/gitea
     ; Application level GZIP support
     ENABLE_GZIP = false
     ; Application profiling (memory and cpu)
@@ -285,7 +285,6 @@ data:
     LOG_SQL = true
 
     [indexer]
-    ISSUE_INDEXER_PATH = indexers/issues.bleve
     ; repo indexer by default disabled, since it uses a lot of disk space
     REPO_INDEXER_ENABLED = false
     REPO_INDEXER_PATH = indexers/repos.bleve

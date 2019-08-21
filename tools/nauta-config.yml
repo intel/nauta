@@ -285,11 +285,11 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kube-batch"
   nauta/gitea:
-    version: "1.6.1"
+    version: "1.9.0"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/gitea/v1.6.1.tar.gz
-        dest: gitea-v1.6.1.tar.gz
-        checksum: cf4e283df164841f1b302e26ae1cbcdea68539de41f2086533c095b264df9a7c
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/gitea/gitea-1.9.0.tar.gz
+        dest: gitea-v1.9.0.tar.gz
+        checksum: e648227ebe6716fd53095cade7881fc547a76b2655cac4631ac254992a95b207
     required:
       BASE_IMAGE: "shared/centos/build-go-1-12"
       DUMBINIT_DATA_IMAGE: "shared/build/dumb-init"
@@ -487,7 +487,7 @@ subcharts:
         image: "{{ image_local_url['nauta/argo-controller'] }}"
         image2: "{{ image_local_url['nauta/argoexec'] }}"
     gitea:
-      version: 1.6.1
+      version: 1.9.0
       path: "{{ playbook_dir }}/../../nauta-charts/gitea"
       chart_values:
         image: "{{ image_local_url['nauta/gitea'] }}"

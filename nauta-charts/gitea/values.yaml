@@ -3,7 +3,7 @@
 ##
 
 images:
-  gitea: "nauta/gitea:1.6.1"
+  gitea: "nauta/gitea:1.9.0"
   postgres: "nauta/postgres:9.2.24"
   memcached: "nauta/memcached:1.5.6"
   imagePullPolicy: IfNotPresent
