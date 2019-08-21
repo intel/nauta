@@ -117,7 +117,8 @@ def launch(ctx: click.Context, name: str, model_location: str, local_model_locat
     # wait till pod is ready - no more than 40 seconds
     for _ in range(40):
         pods = get_namespaced_pods(label_selector=f'runName={name}', namespace=namespace)
-        if pods and all(pod.status.phase == 'Running' for pod in pods):
+        if pods and all(pod.status.phase == 'Running' for pod in pods) \
+                and all(container.ready for pod in pods for container in pod.status.container_statuses):
             break
         if pods and any(pod.status.phase == 'Failed' for pod in pods):
             handle_error(logger, Texts.INSTANCE_START_ERROR_MSG, Texts.INSTANCE_START_ERROR_MSG,
