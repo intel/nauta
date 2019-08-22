@@ -25,11 +25,11 @@ models/
         ├── ir_model.xml
         └── mapping_config.json
 ```
-In case of MNIST converted with `model export`, there will be only one model with only one version, so
-it's enough when your file structure looks like: 
+In case of MNIST model converted with `model export` command, there will be created a directory storing one version of the model. Due to 
+prediction prerequisite, model directory structure has to meet the following structure:
 ```
 models/
-└── mnist
+└── <directory from model export output>
     └── 1
         ├── saved_model.bin
         ├── saved_model.mapping
@@ -53,7 +53,7 @@ Stream inference can be performed with command:
 ```
 nctl predict stream --name ovmsexample --data input.json
 ```
-Example content of input.json file can be found in examples of nctl (<nctl_directory>/example-python/ovms_inference).
+Example content of input.json file can be found in examples of nctl (<nctl_directory>/examples/ovms_inference).
 
 For input.json delivered in example result of stream inference will be:
 ```
@@ -61,9 +61,9 @@ For input.json delivered in example result of stream inference will be:
 ```
 Output of the prediction, in case of MNIST digit recognition model, is a vector of 10 elements. Index at which this vector has highest value, represents predicted class. In our case, highest value was reported at index 5, which corresponds to class of 'five' digits.
 
-Similar JSON files can be generated with python script in <nctl_directory>/example-python/ovms_inference:
+Similar JSON files can be generated with python script in <nctl_directory>/examples/ovms_inference:
 ```
-cd <nctl_directory>/example-python/ovms_inference
+cd <nctl_directory>/examples/ovms_inference
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
