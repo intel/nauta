@@ -25,7 +25,7 @@ from commands.predict import launch
 mocked_test_pod = MagicMock(spec=V1Pod)
 mocked_test_pod.status = V1PodStatus(container_statuses=[V1ContainerStatus(ready=True, image="image",
                                                                            image_id="image_id", name="name",
-                                                                           restart_count=0)])
+                                                                           restart_count=0)], phase='Running')
 TEST_PODS = [mocked_test_pod]
 
 
@@ -90,6 +90,27 @@ def test_launch_fail(launch_mocks: LaunchPredictMocks):
     assert launch_mocks.get_namespace_mock.call_count == 0
     assert launch_mocks.get_inference_instance_url_mock.call_count == 0
     assert launch_mocks.get_authorization_header_mock.call_count == 0
+    assert result.exit_code == 1
+
+
+def test_launch_pod_fail(launch_mocks: LaunchPredictMocks):
+    failed_pod_mock = MagicMock(spec=V1Pod)
+    failed_pod_mock.status = V1PodStatus(container_statuses=[V1ContainerStatus(ready=True, image="image",
+                                                                               image_id="image_id", name="name",
+                                                                               restart_count=0)], phase='Failed')
+    launch_mocks.get_namespaced_pods.return_value = [failed_pod_mock]
+
+    model_location = '/fake/model/location'
+
+    runner = CliRunner()
+    result = runner.invoke(launch.launch, ['--model-location', model_location])
+
+    assert launch_mocks.generate_name_mock.call_count == 1
+    assert launch_mocks.start_inference_instance_mock.call_count == 1
+    assert launch_mocks.get_namespace_mock.call_count == 1
+    assert launch_mocks.get_inference_instance_url_mock.call_count == 1
+    assert launch_mocks.get_authorization_header_mock.call_count == 1
+    assert launch_mocks.get_namespaced_pods.call_count == 1
     assert result.exit_code == 1
 
 
