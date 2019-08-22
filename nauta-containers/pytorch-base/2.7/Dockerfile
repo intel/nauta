@@ -22,4 +22,4 @@ COPY --from=pytorch-build /usr/lib64/libquadmath* /opt/rh/rh-python36/root/usr/l
 
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/rh/rh-python36/root/usr/lib/
-RUN pip install --no-cache-dir mkl-include==2019.0 mkl==2019.0 && pip install --no-cache-dir --force-reinstall /bin/torch-1.2.0a0*-cp27-cp27mu-linux_x86_64.whl /bin/torchvision-0.3.0a0*-cp27-cp27mu-linux_x86_64.whl && pip install --no-binary=:all: --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir mkl-include==2019.0 mkl==2019.0 && pip install --no-binary=:all: --no-cache-dir -r requirements.txt && pip install --no-cache-dir --force-reinstall /bin/torch-1.2.0a0*-cp27-cp27mu-linux_x86_64.whl /bin/torchvision-0.3.0a0*-cp27-cp27mu-linux_x86_64.whl 
