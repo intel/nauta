@@ -78,6 +78,7 @@ def nauta_log_rotator(source, dest):
 
 def configure_logger_for_external_packages(pack_name: str, initial_log_level: int,
                                            handlers: List[logging.Handler] = None):
+    logging.captureWarnings(True)  # capture warnings printed by elasticsearch
     loggers_keys_list = [key for key in logging.Logger.manager.loggerDict if key.startswith(pack_name)]  # type: ignore
     for key in loggers_keys_list:
         logger = logging.getLogger(key)
