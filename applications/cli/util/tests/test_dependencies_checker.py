@@ -50,7 +50,7 @@ def test_is_version_valid(installed_version, expected_version):
 @pytest.mark.parametrize(
     'installed_version,expected_version',
     [(LooseVersion('v0.0.2'), LooseVersion('v0.0.3')),
-     (LooseVersion('v0.0.1'), LooseVersion('v1.0.0')),
+     (LooseVersion('v0.0.1'), LooseVersion('v1.1.0')),
      (LooseVersion('12.0.0-ce'), LooseVersion('12.0.2-ce'))])
 def test_is_version_valid_wrong_versions(installed_version, expected_version):
     assert not _is_version_valid(
@@ -332,7 +332,7 @@ def test_check_os_version_supported(mocker):
 
 
 def test_get_dependency_version_file_path(mocker):
-    fake_nctl_version = '1.0.0-alpha'
+    fake_nctl_version = '1.1.0-alpha'
     fake_config_path = '/usr/ogorek/nctl_config'
     mocker.patch('util.dependencies_checker.VERSION', fake_nctl_version)
     fake_config = mocker.patch('util.dependencies_checker.Config')
@@ -347,12 +347,12 @@ def test_get_dependency_version_file_path(mocker):
 
 def test_save_dependency_versions(mocker, tmpdir):
     fake_config_dir = tmpdir.mkdir("/nctl_config")
-    fake_dependency_versions_file_path = f'{fake_config_dir}1.0.0.saved-versions.yaml'
+    fake_dependency_versions_file_path = f'{fake_config_dir}1.1.0.saved-versions.yaml'
     mocker.patch(
         'util.dependencies_checker.get_dependency_versions_file_path',
         return_value=fake_dependency_versions_file_path)
     fake_dependency_versions = {
-        'bla': '1.0.0',
+        'bla': '1.1.0',
         'ble': '0.0.1-alpha'
     }
     save_dependency_versions(fake_dependency_versions)
@@ -365,11 +365,11 @@ def test_save_dependency_versions(mocker, tmpdir):
 
 def test_load_dependency_versions(mocker, tmpdir):
     fake_dependency_versions = {
-        'bla': '1.0.0',
+        'bla': '1.1.0',
         'ble': '0.0.1-alpha'
     }
     fake_dependency_versions_file = tmpdir.mkdir("/nctl_config").join(
-        "1.0.0.saved-versions.yaml")
+        "1.1.0.saved-versions.yaml")
     fake_dependency_versions_file.write(yaml.safe_dump(fake_dependency_versions))
 
     mocker.patch(
