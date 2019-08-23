@@ -1,5 +1,6 @@
 # Please don't add tensorflow here since it's being installed by the Docker
 setuptools
+numpy==1.16.4
 h5py
 keras
 horovod

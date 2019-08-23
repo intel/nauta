@@ -20,21 +20,19 @@ RUN mkdir -vp /elasticsearch  \
               /elasticsearch/config/scripts \
               /elasticsearch/plugin
 
-COPY --from=build /build-output/archives/oss-tar/build/distributions/elasticsearch-*.tar.gz /
+COPY --from=build /build-output/archives/oss-no-jdk-linux-tar/build/distributions/elasticsearch-*.tar.gz /
 
 RUN printf '%s\t%s  %s\t%s\n%s\t%s  %s\t%s\n' 'elasticsearch' 'hard' 'nproc' '65536' 'elasticsearch' 'soft' 'nproc' '16384' >> /etc/security/limits.d/20-nproc.conf
 
 WORKDIR /elasticsearch
-RUN tar --strip-components=1 -xf ../elasticsearch-*.tar.gz
+
+RUN tar --strip-components=1 -xf ../elasticsearch-*.tar.gz && rm ../elasticsearch-*.tar.gz
 
 ENV PATH /elasticsearch/bin:$PATH
 
-RUN adduser --system -u 5000 elasticsearch
-
-RUN mkdir -vp /elasticsearch/config/scripts \
-              /elasticsearch/plugin
-
-RUN chown -R elasticsearch:elasticsearch /elasticsearch/config /elasticsearch/plugin
+RUN adduser --system -u 5000 elasticsearch && \
+    mkdir -vp /elasticsearch/config/scripts /elasticsearch/plugin && \
+    chown -R elasticsearch:elasticsearch /elasticsearch/config /elasticsearch/plugin
 
 COPY run.sh /
 RUN chmod +x /run.sh
@@ -42,23 +40,22 @@ RUN chmod +x /run.sh
 COPY config /elasticsearch/config
 RUN chown -R elasticsearch:elasticsearch /elasticsearch/config
 
-ENV ES_JAVA_OPTS "-Xms512m -Xmx512m"
-ENV CLUSTER_NAME elasticsearch-default
-ENV NODE_MASTER true
-ENV NODE_DATA true
-ENV NODE_INGEST true
-ENV HTTP_ENABLE true
-ENV NETWORK_HOST _site_
-ENV HTTP_CORS_ENABLE true
-ENV HTTP_CORS_ALLOW_ORIGIN *
-ENV NUMBER_OF_MASTERS 1
-ENV MAX_LOCAL_STORAGE_NODES 1
-ENV SHARD_ALLOCATION_AWARENESS ""
-ENV SHARD_ALLOCATION_AWARENESS_ATTR ""
-ENV REPO_LOCATIONS ""
-
-ENV DISCOVERY_SERVICE elasticsearch-discovery
-ENV MEMORY_LOCK false
+ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk \
+    ES_JAVA_OPTS="-Xms512m -Xmx512m" \
+    CLUSTER_NAME=elasticsearch-default \
+    NODE_MASTER=true \
+    NODE_DATA=true \
+    NODE_INGEST=true \
+    NETWORK_HOST=_site_ \
+    HTTP_CORS_ENABLE=true \
+    HTTP_CORS_ALLOW_ORIGIN=* \
+    NUMBER_OF_MASTERS=1 \
+    MAX_LOCAL_STORAGE_NODES=1 \
+    SHARD_ALLOCATION_AWARENESS="" \
+    SHARD_ALLOCATION_AWARENESS_ATTR="" \
+    REPO_LOCATIONS="" \
+    DISCOVERY_SERVICE=elasticsearch-discovery \
+    MEMORY_LOCK=false
 
 ENTRYPOINT ["/bin/dumb-init", "--"]
 CMD ["/run.sh"]
