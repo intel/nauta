@@ -25,7 +25,7 @@ from util.dependencies_checker import _is_version_valid, LooseVersion, \
     NAMESPACE_PLACEHOLDER, check_os, SUPPORTED_OS_MAP, \
     get_dependency_versions_file_path, save_dependency_versions, \
     load_dependency_versions, DEPENDENCY_VERSIONS_FILE_SUFFIX, get_remote_dependency_map
-from util.exceptions import InvalidDependencyError, InvalidOsError, InvalidOsVersionError
+from util.exceptions import InvalidDependencyError, InvalidOsError
 from cli_text_consts import UtilDependenciesCheckerTexts as Texts
 
 
@@ -311,7 +311,7 @@ def test_check_os_version_not_supported(mocker):
         'util.dependencies_checker.get_os_version')
     get_os_version_mock.return_value = ("ubuntu", LooseVersion("14.04"))
 
-    with pytest.raises(InvalidOsVersionError) as os_error:
+    with pytest.raises(InvalidOsError) as os_error:
         check_os()
 
     assert Texts.INVALID_OS_VERSION_ERROR_MSG.format(
