@@ -34,7 +34,7 @@
 set -e
 
 echo_help() {
-  echo "Sets version for Carbon CLI. Usage: ./set-version.sh <VERSION>"
+  echo "Sets version for Nauta CLI. Usage: ./set-version.sh <VERSION>"
 }
 
 version_file='version.py'

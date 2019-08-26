@@ -26,6 +26,13 @@ ifeq (Darwin,$(OS))
 	@rm -rf vendor
 endif
 
+VERSION_CLIENT_MAJOR ?= 1
+VERSION_CLIENT_MINOR ?= 1
+VERSION_CLIENT_NO ?= 0
+VERSION_SUFFIX ?= ent
+BUILD_ID ?= dev
+VERSION_CLIENT_BUMP_PART ?= patch
+
 build: $(ACTIVATE) set-version metrics-lib
 ifeq (Windows,$(OS))
 
@@ -258,14 +265,6 @@ ifeq (Windows,$(OS))
 	@aws --endpoint-url $(ENV_S3_URL) s3 cp "$(CLI_ARTIFACT_DIRECTORY)/$(CLI_ARTIFACT_NAME).sha256sum" "s3://repository/releases/nctl/$(CLI_ARTIFACT_PLATFORM)/$(CLI_ARTIFACT_NAME).sha256sum"
 endif
 endif
-
-
-VERSION_CLIENT_MAJOR ?= 1
-VERSION_CLIENT_MINOR ?= 0
-VERSION_CLIENT_NO ?= 0
-VERSION_SUFFIX ?= oss
-BUILD_ID ?= dev
-VERSION_CLIENT_BUMP_PART ?= patch
 
 set-version:
 	./set-version.sh "$(VERSION_CLIENT_MAJOR).$(VERSION_CLIENT_MINOR).$(VERSION_CLIENT_NO)-$(VERSION_SUFFIX)-$(BUILD_ID)"
