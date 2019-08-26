@@ -17,27 +17,50 @@
 code{white-space: pre;}
 
 .docs-header {
-     width:100%;
-     height:100px;
-     top:0;
-     left:0;
-     background-color:#0071c5;
+    width: 100%;
+    height: 100px;
+    top: 0;
+    left: 0;
+    background-color: #0071c5;
+    table-layout: fixed;
 }
 
-.docs-header .menu-icon {
-    color: #fff;
-    background-color: transparent;
-    float: right;
-    margin-top: 30px;
+.docs-header .left-container {
+    width: 25%;
+    height: 90px;
+    float: left;
+    text-align: right;
+    margin-right: 50px;
+}
+
+.docs-header .center-container {
+    width: 40%;
+    height: 90px;
+    float: left;
+    text-align: left;
+}
+
+.docs-header .right-container {
+    width: 25%;
+    height: 90px;
+    float: left;
+    text-align: center;
 }
 
 .docs-header .nav-icon {
     color: #fff;
     background-color: transparent;
-    margin-top: 30px;
+    padding-left: 5px;
 }
 
-.material-icons.md-36 { font-size: 36px; }
+.docs-header .logo {
+    padding-top: 20px;
+}
+
+.material-icons.md-36 {
+    font-size: 36px;
+    padding-top: 30px;
+}
 
 #docs-index-container {
     display: none;
