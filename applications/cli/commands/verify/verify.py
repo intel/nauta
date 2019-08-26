@@ -29,7 +29,7 @@ from util.spinner import spinner
 from util.system import handle_error
 from util.template import verify_values_in_packs
 from cli_text_consts import VerifyCmdTexts as Texts
-from util.exceptions import KubectlConnectionError, InvalidOsError, InvalidOsVersionError
+from util.exceptions import KubectlConnectionError, InvalidOsError
 
 
 logger = initialize_logger(__name__)
@@ -43,7 +43,7 @@ def verify(ctx: click.Context):
         with spinner(text=Texts.CHECKING_OS_MSG):
             check_os()
         click.echo(Texts.OS_SUPPORTED_MSG)
-    except (InvalidOsError, InvalidOsVersionError) as exception:
+    except InvalidOsError as exception:
         handle_error(logger, str(exception), str(exception), add_verbosity_msg=True)
 
     dependencies = get_dependency_map()
