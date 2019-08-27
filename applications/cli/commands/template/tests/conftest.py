@@ -21,3 +21,8 @@ import pytest
 def mock_cli_validation(mocker):
     mocker.patch('util.cli_state.verify_cli_dependencies')
     mocker.patch('util.cli_state.verify_cli_config_path')
+
+
+@pytest.fixture(autouse=True)
+def mock_check_nauta_pods(mocker):
+    mocker.patch('util.system.check_nauta_pods')

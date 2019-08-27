@@ -19,7 +19,6 @@ import sys
 
 from util.k8s.k8s_info import get_config_map_data
 from util.logger import initialize_logger
-from util import system
 from cli_text_consts import UtilConfigTexts as Texts
 
 
@@ -60,8 +59,7 @@ class Config:
     def validate_config_path(path: str) -> bool:
         if os.path.isdir(path):
             directory_content = os.listdir(path)
-            expected_content = {'helm.exe'} if system.get_current_os() == system.OS.WINDOWS \
-                else {'helm'}
+            expected_content = {'helm'}
             return expected_content.issubset(directory_content)
         return False
 

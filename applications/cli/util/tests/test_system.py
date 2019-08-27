@@ -18,13 +18,14 @@ import subprocess
 import errno
 import datetime
 from distutils.version import LooseVersion
+from unittest.mock import Mock, MagicMock
 
 import pytest
 
 
 from util.system import execute_system_command, check_port_availability, format_timestamp_for_cli, handle_error, \
     get_os_version, get_windows_edition, WINDOWS_EDITIONS, ExternalCliClient, ExternalCliCommand, \
-    format_duration_for_cli
+    format_duration_for_cli, check_nauta_pods, get_pod_logs
 
 
 def test_execute_system_command(mocker):
@@ -100,6 +101,8 @@ def test_format_duration_for_cli():
 
 
 def test_handle_error_no_logger(mocker):
+    check_nauta_pods_mock = mocker.patch('util.system.check_nauta_pods')
+    check_nauta_pods_mock.return_value = None
     click_echo_mock = mocker.patch("click.echo")
 
     try:
@@ -111,6 +114,8 @@ def test_handle_error_no_logger(mocker):
 
 
 def test_handle_error_no_log_msg(mocker):
+    check_nauta_pods_mock = mocker.patch('util.system.check_nauta_pods')
+    check_nauta_pods_mock.return_value = None
     click_echo_mock = mocker.patch("click.echo")
     logger = mocker.MagicMock(exception=lambda msg: None)
     mocker.spy(logger, "exception")
@@ -122,6 +127,8 @@ def test_handle_error_no_log_msg(mocker):
 
 
 def test_handle_error_no_user_msg(mocker):
+    check_nauta_pods_mock = mocker.patch('util.system.check_nauta_pods')
+    check_nauta_pods_mock.return_value = None
     click_echo_mock = mocker.patch("click.echo")
     logger = mocker.MagicMock(exception=lambda msg: None)
     mocker.spy(logger, "exception")
@@ -133,6 +140,8 @@ def test_handle_error_no_user_msg(mocker):
 
 
 def test_handle_error_no_exit(mocker):
+    check_nauta_pods_mock = mocker.patch('util.system.check_nauta_pods')
+    check_nauta_pods_mock.return_value = None
     click_echo_mock = mocker.patch("click.echo")
     logger = mocker.MagicMock(exception=lambda msg: None)
     mocker.spy(logger, "exception")
@@ -245,3 +254,89 @@ def test_external_cli_command_flags(mocker):
     cmd('arg-1', flag=True, unset_flag=False)
 
     assert exec_mock.called_with(cmd=['foo', 'bar', 'arg-1', '--flag'])
+
+
+def test_check_failed_pods(mocker, tmpdir):
+    get_pods_mock = mocker.patch('util.system.get_namespaced_pods')
+    get_logs_mock = mocker.patch('util.system.get_pod_logs')
+    failed_pod = Mock()
+    failed_pod.status.phase = 'Failed'
+    failed_pod.metadata.name = 'podzik'
+
+    get_pods_mock.return_value = [failed_pod]
+
+    config_dir = tmpdir.mkdir('config-dir')
+    config_dir.mkdir('logs')
+
+    config_class_object_mock = mocker.patch('util.system.Config').return_value
+    config_class_object_mock.config_path = config_dir.strpath
+    check_nauta_pods()
+    assert get_logs_mock.call_count == 1
+
+
+def test_check_no_failed_pods(mocker, tmpdir):
+    get_pods_mock = mocker.patch('util.system.get_namespaced_pods')
+    get_logs_mock = mocker.patch('util.system.get_pod_logs')
+    running_pod = Mock()
+    running_pod.status.phase = "Running"
+    running_pod.metadata.name = 'working pod'
+
+    get_pods_mock.return_value = [running_pod]
+
+    config_dir = tmpdir.mkdir('config-dir')
+    config_dir.mkdir('logs')
+
+    config_class_object_mock = mocker.patch('util.system.Config').return_value
+    config_class_object_mock.config_path = config_dir.strpath
+    check_nauta_pods()
+    assert get_logs_mock.call_count == 0
+
+
+def test_check_nauta_pods_logs(mocker, tmpdir):
+    get_pods_mock = mocker.patch('util.system.get_namespaced_pods')
+    get_logs_mock = mocker.patch('util.system.get_pod_logs')
+    get_logs_mock.return_value = [["blahblahblahblah"]]
+    failed_pod = MagicMock()
+    failed_pod.status.phase = "Failed"
+    failed_pod.metadata.name = 'podzik'
+    failed_pod.status.container_statuses[0].name = 'kontener'
+
+    get_pods_mock.return_value = [failed_pod]
+
+    config_dir = tmpdir.mkdir('config-dir')
+    config_dir.mkdir('logs')
+
+    config_class_object_mock = mocker.patch('util.system.Config').return_value
+    config_class_object_mock.config_path = config_dir.strpath
+    check_nauta_pods()
+    assert len(tmpdir.listdir()) == 1
+    with open(f'{config_class_object_mock.config_path}/logs/podzik_kontener.log', "r") as f:
+        logs = f.read()
+    assert logs == "blahblahblahblah"
+
+
+def test_get_pod_logs_with_tail(mocker):
+    pod_mock = MagicMock()
+    pod_mock.metadata.name = 'failed pod'
+    container_status_mock = Mock()
+    container_status_mock.name = 'kontener'
+    pod_mock.status.container_statuses = [container_status_mock]
+    execute_system_command_mock = mocker.patch('util.system.execute_system_command')
+    execute_system_command_mock.return_value = ('', None, None)
+    get_pod_logs(pod=pod_mock, namespace='nauta', tail=1000)
+    execute_system_command_mock.assert_called_with(
+        command=['kubectl', 'logs', '-n', 'nauta', 'failed pod', '-c', 'kontener', 'tail=1000'])
+
+
+def test_get_pod_logs_no_tail(mocker):
+    pod_mock = MagicMock()
+    pod_mock.metadata.name = 'failed pod'
+    container_status_mock = Mock()
+    container_status_mock.name = 'kontener'
+    pod_mock.status.container_statuses = [container_status_mock]
+    execute_system_command_mock = mocker.patch('util.system.execute_system_command')
+    execute_system_command_mock.return_value = ('', None, None)
+    get_pod_logs(pod=pod_mock, namespace='nauta')
+
+    execute_system_command_mock.assert_called_with(
+        command=['kubectl', 'logs', '-n', 'nauta', 'failed pod', '-c', 'kontener'])
