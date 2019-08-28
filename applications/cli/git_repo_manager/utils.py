@@ -109,8 +109,11 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                 try:
                     git.pull('--rebase', '--strategy=recursive', '-Xtheirs')
                 except Exception:
-                    git.rebase('--abort')
-                    raise
+                    logger.exception('Rebase failed.')
+                    try:
+                        git.rebase('--abort')
+                    except Exception:
+                        logger.exception('Failed to abort the rebase.')
             git.push('--set-upstream', 'origin', 'master')
             git.tag(experiment_name)
             git.push('--tags')
