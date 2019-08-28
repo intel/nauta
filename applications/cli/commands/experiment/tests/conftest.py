@@ -30,6 +30,11 @@ def mock_k8s_client(mocker):
 
 
 @pytest.fixture(autouse=True)
+def mock_check_nauta_pods(mocker):
+    mocker.patch('util.system.check_nauta_pods')
+
+
+@pytest.fixture(autouse=True)
 def mock_get_click_context(mocker):
     click_context = mocker.patch('click.get_current_context')
     click_context.return_value.obj.force = False

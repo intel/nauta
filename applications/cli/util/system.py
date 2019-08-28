@@ -30,6 +30,11 @@ import platform
 from distutils.version import LooseVersion
 import click
 import distro
+from kubernetes.client import V1Pod
+from tabulate import tabulate
+
+from util.config import Config
+from util.k8s.k8s_info import get_namespaced_pods
 
 from util.logger import initialize_logger
 from cli_text_consts import UtilSystemTexts as Texts, VERBOSE_RERUN_MSG
@@ -319,6 +324,10 @@ def handle_error(logger=None,
     if user_msg is not None:
         click.echo(user_msg +
                    (" " + VERBOSE_RERUN_MSG if add_verbosity_msg else ""))
+    try:
+        check_nauta_pods()
+    except Exception:
+        logger.exception("Failed to get logs of pods in nauta namespace.")
 
 
 def get_windows_edition():
@@ -343,3 +352,49 @@ def get_os_version() -> Tuple[str, LooseVersion]:
         os_info = distro.info()
         return os_info["id"], LooseVersion(os_info["version"])
     return "", LooseVersion("0")
+
+
+def get_pod_logs(pod: V1Pod, namespace: str, tail: int = None):
+    """
+    Get logs of all the containers of a given pod.
+    :param pod:
+    :param namespace:
+    :param tail:
+    :return: list of container logs of a given pod - List[List[str]]
+    """
+    log = initialize_logger(__name__)
+    outputs = []
+    for container in pod.status.container_statuses:
+        try:
+            command = ['kubectl', 'logs', '-n', namespace, pod.metadata.name, '-c', container.name]
+            if tail:
+                command.append(f'tail={tail}')
+            output, _, _ = execute_system_command(command=command)
+            log.debug(output)
+            outputs.append[output]
+
+        except Exception:
+            log.exception(f'Failed to get {pod.metadata.name} pod logs.')
+    return outputs
+
+
+def check_nauta_pods():
+    """
+    Check if there are failed pods. If there are any, display a list of their names and
+    save logs in logs directory.
+    """
+    pods = get_namespaced_pods(label_selector=None, namespace='nauta')
+    failed_pods = [pod for pod in pods if pod.status.phase == 'Failed']
+    if failed_pods:
+        click.echo("Following nauta components have failed:")
+        tabulate([pod.metadata.name for pod in failed_pods], headers=["Pod name"])
+        conf_path = Config().config_path
+        for pod in failed_pods:
+            logs = get_pod_logs(pod=pod, namespace='nauta', tail=1000)
+            for i, log in enumerate(logs):
+                pod_name = pod.metadata.name
+                container_name = pod.status.container_statuses[i].name
+                with open(f'{conf_path}/logs/{pod_name}_{container_name}.log', mode='w') as log_file:
+                    log_file.writelines(log)
+        click.echo('Contact Nauta administrator.')
+        click.echo(f'Check logs folder in your config directory({conf_path}) to get more information.')
