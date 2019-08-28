@@ -342,6 +342,7 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos/python36"
       PYTORCH_IMAGE: "shared/build/pytorch36"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/3.6"
   nauta/pytorch/py2:
@@ -349,6 +350,7 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos/python27"
       PYTORCH_IMAGE: "shared/build/pytorch27"
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/2.7"
   nauta/pytorch-operator:
