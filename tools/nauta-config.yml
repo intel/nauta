@@ -230,12 +230,14 @@ local_images:
     method: pull
   nauta/pytorch/py3:
     version: "1.0"
-    required: {}
+    required:
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/3.7"
   nauta/pytorch/py2:
     version: "1.0"
-    required: {}
+    required:
+      METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/2.7"
   nauta/pytorch-operator:

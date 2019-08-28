@@ -23,6 +23,6 @@ setuptools.setup(
     packages=['experiment_metrics'],
     keywords=['experiment', 'library', 'metrics'],
     install_requires=[
-        'kubernetes==6.0.0',
+        'kubernetes==9.0.0',
     ],
 )
