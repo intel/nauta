@@ -13,7 +13,7 @@ be found in the [configuration](#configuration) section.
 1. Build new package: `python setup.py sdist`
 1. Install prepared packages (use proper `pip`/`pip3` version according to your python version): `pip install ./dist/experiment_metrics-0.0.1.tar.gz`
 
-### Installation from nauta pack
+### Installation from nctl pack
 1. Go to directory with the library (its delivered with `nctl` pack under `nauta/applications/cli/dist/lib`)
 1. Install prepared packages (use proper `pip`/`pip3` version according to your python version): `pip install experiment_metrics-0.0.1.tar.gz`
 
