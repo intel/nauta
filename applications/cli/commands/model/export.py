@@ -34,7 +34,7 @@ from util.system import handle_error
 
 logger = initialize_logger(__name__)
 
-FORMATS_OPTION = "list"
+FORMATS_OPTION = "formats"
 
 
 @click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='e')

@@ -84,7 +84,7 @@ def test_export_failure(mocker):
 def test_export_list(mocker):
     mocker.patch("commands.model.export.get_list_of_workflows", return_value=TWO_MODEL_OUTPUT)
 
-    result = CliRunner().invoke(export, ["list"])
+    result = CliRunner().invoke(export, ["formats"])
 
     assert FEM_NAME in result.output
     assert SEM_NAME in result.output
@@ -95,7 +95,7 @@ def test_export_list(mocker):
 def test_export_list_error(mocker):
     mocker.patch("commands.model.export.get_list_of_workflows", side_effect=RuntimeError)
 
-    result = CliRunner().invoke(export, ["list"])
+    result = CliRunner().invoke(export, ["formats"])
 
     assert Texts.EXPORT_LIST_ERROR_MSG in result.output
 

@@ -26,7 +26,7 @@ of this model).
 
 To check what are the available exports' formats use the following command:
 
- `nctl model export list`
+ `nctl model export formats`
 
 This command displays a list of formats, for example:
 
