@@ -114,9 +114,9 @@ def upload_experiment_to_git_repo_manager(username: str, experiment_name: str, e
                         git.rebase('--abort')
                     except Exception:
                         logger.exception('Failed to abort the rebase.')
-            git.push('--set-upstream', 'origin', 'master')
-            git.tag(experiment_name)
-            git.push('--tags')
+            git.push('--set-upstream', 'origin', 'master', force=True)
+            git.tag(experiment_name, force=True)
+            git.push('--tags', force=True)
     except Exception:
         logger.exception(f'Failed to upload experiment {experiment_name} to git repo manager.')
         try:
