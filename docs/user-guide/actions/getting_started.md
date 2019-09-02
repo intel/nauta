@@ -46,6 +46,7 @@ kubectl verified successfully.
 kubectl server verified successfully.
 helm client verified successfully.
 helm server verified successfully.
+git verified successfully.
 ```
 
 ## Overview of nctl Commands
@@ -149,7 +150,7 @@ For Horovod training:
 
 `nctl experiment submit -t multinode-tf-training-horovod examples/mnist_horovod.py --name horovod `
 
-The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing nctl experiment `template_list` command.
+The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing `nctl template list` command.
 
 **Note:** To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts _must_ meet the same requirement.
 

@@ -9,7 +9,7 @@ This sections discusses the following main topics:
 
 ## nctl Help Commands Overview
 
-Entering `nctl --help` or `nctl -h` provides a listing of all nctl commands (without subcommands), as shown next.
+Access help for any command with the --help or -h parameter. The help option provides a list of options available and brief descriptions for each nctl command.
 
      nctl -h
 ```
