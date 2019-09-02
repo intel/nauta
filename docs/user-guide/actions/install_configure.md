@@ -57,7 +57,6 @@ Should you want to permanently set the variables, you can add the variables to y
 * or Windows system PATH
 
 Alternatively, you may want to set the PATH and KUBECONFIG variables in the  _Environment Variables_ window. This is accessed by opening the Control Panel > System and Security > System > Advanced system settings, and accessing Environment variables. This is an administrator function only.
- 
 
 ----------------------
 
