@@ -7,7 +7,7 @@ RUN mkdir -p /build/work \
              /build/dep \
              /build/glide
 
-ENV GO_VERSION=1.12.1
+ENV GO_VERSION=1.12.9
 ENV GO_ARCH=amd64
 ENV GO_OS=linux
 ENV GO_FILE=go${GO_VERSION}.${GO_OS}-${GO_ARCH}.tar.gz
@@ -20,7 +20,7 @@ ENV PATH=${PATH}:${GOROOT}/bin
 
 # GODEP Section
 
-ENV DEP_VERSION=v0.4.1
+ENV DEP_VERSION=v0.5.4
 ENV DEP_ARCH=amd64
 ENV DEP_OS=linux
 ENV DEP_FILE=dep-${DEP_OS}-${DEP_ARCH}

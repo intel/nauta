@@ -77,8 +77,9 @@ spec:
       hostNetwork: True
       serviceAccountName: tiller
       tolerations:
+      - effect: NoSchedule
+        operator: Exists
       - effect: NoExecute
-        key: node.kubernetes.io/network-unavailable
         operator: Exists
       - effect: NoSchedule
         key: master
@@ -145,8 +146,7 @@ spec:
       hostNetwork: True
       serviceAccountName: tiller
       tolerations:
-      - effect: NoExecute
-        key: node.kubernetes.io/network-unavailable
+      - effect: NoSchedule
         operator: Exists
       affinity:
         nodeAffinity:

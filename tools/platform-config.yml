@@ -2,14 +2,14 @@
 
 local_images:
   core/flannel:
-    version: "v0.9.1"
+    version: "v0.11.0"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/flannel"
     method: build
     directory: "{{ playbook_dir }}/../../platform-containers/flannel"
   core/kube-proxy:
-    version: "v1.10.11"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/kubernetes"
@@ -80,7 +80,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../platform-containers/dns-sidecar"
     method: build
   core/etcd:
-    version: "3.3.9"
+    version: "3.3.13"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/etcd"

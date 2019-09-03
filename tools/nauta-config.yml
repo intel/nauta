@@ -106,7 +106,7 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/elasticsearch-curator"
   nauta/etcd:
-    version: "3.3.9"
+    version: "3.3.13"
     required:
       BASE_IMAGE: "shared/centos"
       DATA_IMAGE: "shared/build/etcd"

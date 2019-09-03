@@ -34,9 +34,8 @@ spec:
       - key: "master"
         operator: "Exists"
         effect: "NoSchedule"
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
+      - operator: "Exists"
+        effect: "NoSchedule"
       hostNetwork: true
       nodeSelector:
         beta.kubernetes.io/arch: amd64

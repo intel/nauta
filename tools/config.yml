@@ -75,16 +75,16 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/python36"
     push: False
   shared/centos/build-go:
-    version: "1.10.2"
+    version: "1.12.9"
     required:
       BASE_IMAGE: "shared/centos/build"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.12.1.linux-amd64.tar.gz
-        dest: go1.12.1.linux-amd64.tar.gz
-        checksum: 2a3fdabf665496a0db5f41ec6af7a9b15a49fbe71a85a50ca38b1f13a103aeec
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.12.9.linux-amd64.tar.gz
+        dest: go1.12.9.linux-amd64.tar.gz
+        checksum: ac2a6efcc1f5ec8bdc0db0a988bb1d301d64b6d61b7e8d9e42f662fbb75a2b9b
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/godep/dep-linux-amd64
         dest: dep-linux-amd64
         checksum: 31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315
@@ -121,16 +121,16 @@ shared_images:
         dest: apiserver-builder-v1.9-alpha.4-linux-amd64.tar.gz
         checksum: 6f82bb4d063b46a920f2952debd9ade19e712e7472d43e97ff09a2bf2f705ca6
   shared/build/kubernetes:
-    version: "v1.11.7"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes/v1.11.7.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes/v1.13.10.tar.gz
         dest: kubernetes.tar.gz
-        checksum: e82b9de591dcc57403962c72290a9fd4e3690a3db488c9746abd740d3524077b
+        checksum: 96df95844fbe5263fc8c943abd7f7f5185674f049ed72f53d0d8aa0f4d44afc9
   shared/build/heapster:
     version: "v1.4.3"
     required:
@@ -169,9 +169,9 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/kubernetes-dashboard"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.10.2.linux-amd64.tar.gz
-        dest: go1.10.2.linux-amd64.tar.gz
-        checksum: 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.12.9.linux-amd64.tar.gz
+        dest: go1.12.9.linux-amd64.tar.gz
+        checksum: ac2a6efcc1f5ec8bdc0db0a988bb1d301d64b6d61b7e8d9e42f662fbb75a2b9b
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3-patch.tar.gz
         dest: kubernetes-dashboard-v1.8.3.tar.gz
         checksum: ac1db88a1c0a5f3570f0cb49e408e041c00b6011bd49d9b9f6f6e7c7f8c37b0f
@@ -316,16 +316,16 @@ shared_images:
         dest: cni-plugins.tar.gz
         checksum: 6939d7fe0340879223cd3675b2cd1a13a41170781740cf5f856a4b06e379ffcb
   shared/build/flannel:
-    version: "0.9.1"
+    version: "0.11.0"
     required:
       BASE_IMAGE: "shared/centos/build-go"
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/flannel"
     push: False
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/flannel/flannel-0.9.1.tar.gz
-        dest: flannel-0.9.1.tar.gz
-        checksum: 9e1ba3d52895f98b8fcc6157725735e4c446e3f3addf4971b0edb1d296f098e3
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/flannel/flannel-0.11.0.tar.gz
+        dest: flannel-0.11.0.tar.gz
+        checksum: 476c886ddc06a8afcf54e181ac55579224c6be424089567a0b8d9e93dd08a053
   shared/build/etcd:
     version: "3.3.13"
     required:

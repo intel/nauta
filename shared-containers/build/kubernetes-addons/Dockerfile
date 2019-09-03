@@ -11,8 +11,8 @@ ENV GOPATH=/build/gopath
 WORKDIR /build/gopath
 
 RUN git clone https://github.com/kubernetes/dns /build/gopath/src/k8s.io/dns && \
-    git clone -b release-1.11 https://github.com/kubernetes/kubernetes /build/gopath/src/k8s.io/kubernetes && \
-    git clone -b cluster-autoscaler-release-1.12 https://github.com/kubernetes/autoscaler /build/gopath/src/k8s.io/autoscaler && \
+    git clone -b v1.13.10 https://github.com/kubernetes/kubernetes /build/gopath/src/k8s.io/kubernetes && \
+    git clone -b cluster-autoscaler-1.13.6 https://github.com/kubernetes/autoscaler /build/gopath/src/k8s.io/autoscaler && \
     go get -v ./... || true && \
     go get -v ./... || true && \
     go get -v ./... || true && \

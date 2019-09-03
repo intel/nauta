@@ -30,7 +30,7 @@ ExecStart=/opt/nauta/kubernetes/kube-apiserver \
             --requestheader-username-headers=X-Remote-User \
             --proxy-client-cert-file /etc/nauta-cluster/master/kubernetes/crt/apiservice-fullchain.crt \
             --proxy-client-key-file /etc/nauta-cluster/master/kubernetes/key/apiservice.key \
-            --admission-control "{{ kubernetes_calculated_admission_control | join(',') }}" \
+            --enable-admission-plugins "{{ kubernetes_calculated_admission_control | join(',') }}" \
             {{ feature_gates }} \
             {{ runtime_config }} \
             --service-account-key-file /etc/nauta-cluster/master/kubernetes/key/service.key \
@@ -41,7 +41,6 @@ ExecStart=/opt/nauta/kubernetes/kube-apiserver \
             --audit-log-maxage={{ apiserver_audit_log_maxage }} \
             --audit-log-maxbackup={{ apiserver_audit_log_maxbackup }} \
             --audit-log-maxsize={{ apiserver_audit_log_maxsize }} \
-            --insecure-port=0
 
 [Install]
 WantedBy=multi-user.target

@@ -143,7 +143,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/kubernetes:
-    version: "v1.10.11"
+    version: "v1.13.10"
     required:
       KUBERNETES_DATA_IMAGE: "shared/build/kubernetes"
       BASE_IMAGE: "shared/centos/rpm-packer"
@@ -151,7 +151,7 @@ local_images:
     directory: "{{ playbook_dir }}/../../rpm-containers/kubernetes/prepare"
     push: False
   rpm/kubernetes/rpm/server:
-    version: "v1.10.3"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "rpm/kubernetes"
     method: build
@@ -161,7 +161,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/kubernetes/rpm/worker:
-    version: "v1.10.3"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "rpm/kubernetes"
     method: build
@@ -171,7 +171,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/kubernetes/rpm/client:
-    version: "v1.10.3"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "rpm/kubernetes"
     method: build
@@ -181,7 +181,7 @@ local_images:
       - src: /out/*
         dest: rpms
   rpm/kubernetes/rpm/all:
-    version: "v1.10.3"
+    version: "v1.13.10"
     required:
       BASE_IMAGE: "rpm/kubernetes"
     method: build
