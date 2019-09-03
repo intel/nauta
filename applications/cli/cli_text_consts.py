@@ -961,12 +961,12 @@ class ModelStatusCmdTexts:
 
 
 class ModelExportCmdTexts:
-    HELP = """Export the model using one of defined formats/list the available export formats 
-    PATH - indicates the location of the model on the Input or Output network shares. If 'list' value is given
-           - the command displays a list of available export's formats.
+    HELP = """\b
+    Export the model using one of defined formats/list the available export formats
+    PATH - indicates the location of the model on the Input or Output network shares. If 'formats' value is given
+         the command displays a list of available export's formats.
 
-    FORMAT - one of the supported formats (see nctl model export formats command). Required if export of a model is 
-            executed
+    FORMAT - one of the supported formats(see nctl model export list command). Required if export of a model is executed
 
     operation-options - options specific to a chosen format
     """
