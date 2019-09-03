@@ -313,9 +313,9 @@ local_images:
     required:
       BASE_IMAGE: "shared/centos/build-go-1-12"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/buildkit/buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz
-        dest: buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz
-        checksum: 7d37ac5769781acfa73bdf4ec1906ff2817c474b97a9c5e0cd86c07973741647
+      - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/buildkit/v0.6.1.tar.gz
+        dest: v0.6.1.tar.gz
+        checksum: 39e7ada633037f95df3b94387b19420fe325c73e423465f5dc97457612c9f47c
       - src: http://repository.toolbox.nervana.sclab.intel.com/DLS4E/downloads/buildkit/runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz
         dest: runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz
         checksum: dc0a26cb7a14837c86abfdde71e9d29e12008298660d77d4de1de162726c8ddd

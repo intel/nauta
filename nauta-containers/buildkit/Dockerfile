@@ -11,7 +11,7 @@ ARG REGISTRY_VERSION=v2.7.0-rc.0
 ARG ROOTLESSKIT_VERSION=4f7ae4607d626f0a22fb495056d55b17cce8c01b
 ARG ROOTLESS_BASE_MODE=external
 
-COPY buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz /
+COPY v0.6.1.tar.gz /
 COPY runc-2019-04-08--6635b4f0c6af3810594d2770f662f34ddc15b40d.tgz /
 
 RUN yum update -y && yum install -y git file && yum clean all
@@ -33,7 +33,7 @@ WORKDIR /src
 ENV GOFLAGS=-mod=vendor
 
 WORKDIR $GOPATH/src/github.com/moby/
-RUN tar -xf /buildkit-2019-04-08--cbfb5c476a09189272279495897993f5387781e1---v0.4.0-120-gcbfb5c47.tgz
+RUN tar -xzf /v0.6.1.tar.gz
 #RUN git clone https://github.com/moby/buildkit
 WORKDIR $GOPATH/src/github.com/moby/buildkit
 
@@ -45,7 +45,7 @@ WORKDIR $GOPATH/src/github.com/moby/buildkit
 #  echo "-X ${PKG}/version.Version=${VERSION} -X ${PKG}/version.Revision=${REVISION} -X ${PKG}/version.Package=${PKG}" | tee /tmp/.ldflags; \
 #  echo -n "${VERSION}" | tee /tmp/.version;
 
-RUN PKG=github.com/moby/buildkit VERSION="v0.4.0-120-gcbfb5c47" REVISION="cbfb5c476a09189272279495897993f5387781e1" \
+RUN PKG=github.com/moby/buildkit VERSION="v0.6.1-be0d75f" REVISION="be0d75f074e7a4b0f5b5877c719213a3f5057e60" \
   echo "-X ${PKG}/version.Version=${VERSION} -X ${PKG}/version.Revision=${REVISION} -X ${PKG}/version.Package=${PKG}" | tee /tmp/.ldflags; \
   echo -n "${VERSION}" | tee /tmp/.version;
 
