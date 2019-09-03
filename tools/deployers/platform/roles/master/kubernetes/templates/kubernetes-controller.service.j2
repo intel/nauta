@@ -10,7 +10,6 @@ LimitNOFILE=65536
 ExecStart=/opt/nauta/kubernetes/kube-controller-manager \
       --service-account-private-key-file /etc/nauta-cluster/master/kubernetes/key/service.key \
       --use-service-account-credentials \
-      --node-sync-period 2m \
       --v 0 --leader-elect \
       --cluster-cidr {{ kubernetes_network.pod }} \
       --root-ca-file=/etc/nauta-cluster/master/kubernetes/ca/CA.crt \

@@ -34,7 +34,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/centos/python36"
     push: False
   shared/centos/build-go:
-    version: "1.10.2"
+    version: "1.11.13"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"

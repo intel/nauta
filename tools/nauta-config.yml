@@ -43,7 +43,7 @@ local_images:
     image: "centos:7.6.1810"
     push: True
   nauta/kubectl:
-    version: "1.10.11"
+    version: "1.13.10"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kubectl"
@@ -82,7 +82,7 @@ local_images:
     method: pull
   nauta/etcd:
     version: "3.3.10"
-    image: "gcr.io/google-containers/etcd-amd64:3.3.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.3.10-1"
     method: pull
   nauta/tiller:
     version: "v2.11.0"

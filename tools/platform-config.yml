@@ -2,12 +2,12 @@
 
 local_images:
   core/flannel:
-    version: "v0.9.1"
-    image: "quay.io/coreos/flannel:v0.9.1-amd64"
+    version: "v0.11.0"
+    image: "quay.io/coreos/flannel:v0.11.0-amd64"
     method: pull
   core/kube-proxy:
-    version: "v1.10.11"
-    image: "gcr.io/google-containers/kube-proxy-amd64:v1.10.11"
+    version: "v1.13.10"
+    image: "gcr.io/google-containers/kube-proxy-amd64:v1.13.10"
     method: pull
   core/pause:
     version: "3.1"
@@ -47,7 +47,7 @@ local_images:
     method: pull
   core/etcd:
     version: "3.3.10"
-    image: "gcr.io/google-containers/etcd-amd64:3.3.10"
+    image: "gcr.io/google-containers/etcd-amd64:3.3.10-1"
     method: pull
   core/dashboard:
     version: "v1.8.3"

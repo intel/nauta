@@ -4,4 +4,4 @@
   include_tasks: yum_nauta_install.yml
   vars:
     packages:
-      - nauta-kubernetes-worker-1.10.13
+      - nauta-kubernetes-worker-1.13.10

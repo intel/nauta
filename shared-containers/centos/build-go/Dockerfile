@@ -15,7 +15,7 @@ WORKDIR /build-process
 
 RUN mkdir -p /build/work
 
-ENV GO_VERSION=1.10.2
+ENV GO_VERSION=1.11.13
 ENV GO_ARCH=amd64
 ENV GO_OS=linux
 ENV GO_FILE=go${GO_VERSION}.${GO_OS}-${GO_ARCH}.tar.gz
@@ -32,7 +32,7 @@ ENV PATH=${PATH}:${GOROOT}/bin
 
 RUN mkdir -p /build/dep
 
-ENV DEP_VERSION=v0.4.1
+ENV DEP_VERSION=v0.5.4
 ENV DEP_ARCH=amd64
 ENV DEP_OS=linux
 ENV DEP_FILE=dep-${DEP_OS}-${DEP_ARCH}
@@ -47,7 +47,7 @@ ENV PATH=${PATH}:/build/dep/
 
 RUN mkdir -p /build/glide
 
-ENV GLIDE_VERSION=v0.13.1
+ENV GLIDE_VERSION=v0.13.3
 ENV GLIDE_ARCH=amd64
 ENV GLIDE_OS=linux
 ENV GLIDE_FILE=glide-${GLIDE_VERSION}-${GLIDE_OS}-${GLIDE_ARCH}.tar.gz
