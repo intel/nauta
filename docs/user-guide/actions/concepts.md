@@ -1,6 +1,6 @@
 # Nauta Basic Concepts
 
-Within this user guide, the following concepts and terms are relevant to using this software: user, administrator, resources, data, experiments, and predictions, all of which are described below. 
+The following concepts and terms are relevant to using this software: user, administrator, resources, data, experiments, and predictions. 
 
 This section discusses the following main topics:
 
@@ -13,7 +13,7 @@ This section discusses the following main topics:
 
 ## User
 
-In this context, the _User_ is a _Data Scientist_ who wants to perform deep learning experiments to train models that will, after training and testing, be deployed in production. Using Nauta, the user can define and schedule containerized deep learning experiments using Kubernetes on single or multiple worker nodes, and check the status and results of those experiments to further adjust and run additional experiments, or prepare the trained model for deployment.
+In this context, the _User_ is a _Data Scientist_  who performs deep learning experiments to train models that will, after training and testing, be deployed in production. Using Nauta, the user can define and schedule containerized deep learning experiments using Kubernetes on single or multiple worker nodes. The user also checks the status and results of those experiments to further adjust and runs additional experiments, or prepares the trained model for deployment.
 
 ## Administrator
 
@@ -21,7 +21,7 @@ In this context, the _Administrator_ or _Admin_ creates and monitors users and r
 
 ## Resources
 
-In this context, _Resources_ are the system compute and memory resources the user will assign to a model training experiment. The user can specify the number of processing nodes and the amount of memory in the system that will be reserved for a given experiment or job. The job will not be allowed to exceed the specified memory limit. In a multi-user environment, care should be taken _to not_ dedicate too many resources to a given job, because other applications and services may be impacted.
+In this context, _Resources_ are the system compute and memory resources the user will assign to a model training experiment. The user can specify the number of processing nodes and the amount of memory in the system that will be reserved for a given experiment or job. The job _will not_ be allowed to exceed the specified memory limit. In a multi-user environment, care should be taken _to not_ dedicate too many resources to a given job, because other applications and services may be impacted.
 
 ## Data
 

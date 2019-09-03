@@ -1,8 +1,6 @@
 # Creating a User Account
 
-The user is the data scientist who wants to perform deep learning experiments to train models that will, after training and testing, be deployed in the field. Creating a new user account creates a user account configuration file compliant in format with `kubectl` configuration files.
-
-To delete a User Account, refer to [Deleting a User Account](../actions/delete_user.md). 
+The user is the _Data Scientist_ who performs deep learning experiments to train models that will, after training and testing, be deployed in the field. Creating a new user account creates a user account configuration file compliant in format with `kubectl` configuration files. Refer to [Deleting a User Account](../actions/delete_user.md) to delete a User Account. 
 
 This section discusses the following main topics:
 
@@ -25,13 +23,13 @@ In addition, user names are limited to a 32-character maximum and there are no s
 
 ### Create the User
 
-To create a user, execute the following steps:
+Execute the following steps to create a user:
 
-1. The `nctl user create <username>`  command sets up a namespace and associated roles for the named user on the cluster. It sets up _home_ directories, named after the username, on the _input_ and _output_ network shares with file-system level access privileges. Create the user:
+1. The `nctl user create <username>` command sets up a namespace and associated roles for the named user on the cluster. Furtermore, this command sets up home directories named after the username, on the input and output network shares with the file-system level access privileges. Create the user:
  
     `nctl user create <username>`
 
-2. The above command also creates a configuration file named `<username>.config` that the Admin provides to the user. The user then copies that file into a local folder. 
+2. The command above also creates a configuration file named `<username>.config` that the Admin provides to the user. The user then copies that file into a local folder. 
   
 3. Use the export command to set this variable for the user:
  
@@ -41,7 +39,7 @@ To create a user, execute the following steps:
 
    `nctl user list`
 
-The above command lists all users, including the new user just added. An example is shown below (scroll right to see full contents). 
+The command  lists all users, including the new user just added. An example is shown below (scroll right to see full contents). 
 
 ```
 | Name    | Creation date          | Date of last submitted job   |   Number of running jobs |   Number of queued jobs|

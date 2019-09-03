@@ -1,6 +1,6 @@
 # Cancelling Experiments
 
-The `nctl experiment cancel` command stops and cancels any experiment queued or in progress. Furthermore, the command also cancels any experiment based on the name of an _experiment/pod/status_ of a pod. If any such an object is found, the command queries if these objects (one or more) should be cancelled.
+The `nctl experiment cancel` command stops and cancels any experiment queued or in progress. Furthermore, the command also cancels any experiment based on the name of an _experiment/pod/status_ of a pod. If any such object is found, the command queries these objects (one or more) and should be cancelled.
 
 This section discusses the following main topics: 
 
@@ -10,7 +10,7 @@ This section discusses the following main topics:
 
 ## Cancelling One or More Experiments
 
-The `nctl experiment cancel` command stops and cancels any experiment queued or in progress. Furthermore, the command also cancels any experiment based on the name of an _experiment/pod/status_ of a pod. If any such an object is found, the command queries if these objects (one or more) should be cancelled. 
+The `nctl experiment cancel` command stops and cancels any experiment queued or in progress. Furthermore, the command also cancels any experiment based on the name of an _experiment/pod/status_ of a pod. If any such object is found, the command queries if these objects (one or more) and should be cancelled. 
 
 To cancel one or more experiments, execute the following command:
  
@@ -33,9 +33,9 @@ The following command will cancel all experiments with a matching pod-status, us
 
 `nctl experiment cancel --pod-status [PENDING, RUNNING, SUCCEEDED, FAILED, UNKNOWN] EXPERIMENT-NAME`
 
-Any of the above criteria can be combined. 
+**Note:** Any of the above criteria can be combined. 
 
-You can also purge all information concerning any experiment using the `-p` or `--purge` option. For _purge_ information, refer to [Purging](../actions/delete_user.md).
+You can also purge all experiment-related information using the `-p` or `--purge` option. For _purge_ information, refer to [Purging](../actions/delete_user.md).
 
 ----------------------
 

@@ -1,4 +1,4 @@
-# Nauta Installation, Configuration, and Administration Guide, ENTERPRISE Edition, Engineering Drop
+# Nauta Installation, Configuration, and Administration Guide, ENTERPRISE Edition
 <br>
 <br>
 <br>
@@ -12,7 +12,7 @@
 
 
 
-**Document Revision 1.0, May 2019** 
+**Document Revision 1.0, September 2019** 
 
 <br>
 <br>

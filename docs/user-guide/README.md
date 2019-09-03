@@ -12,7 +12,6 @@ The Nauta client software has been validated on the following operating systems 
 * Ubuntu (16.04, 18.04)
 * Red Hat 7.5
 * macOS High Sierra (10.13)
-* Windows 10
 
 # Nauta User Guide
 
@@ -33,7 +32,7 @@ This guide describes how to use Nauta, and discusses the following topics:
     * [experiment](actions/experiment.md) - training and managing training jobs 
     * [launch](actions/launch.md) - launching browser for Web UI and Tensorboard
     * [mount](actions/mount.md) - displaying details concerning how to mount user's folders
-    * [template](actions/template.md)
+    * [template](actions/template.md)  - manage template packs used by nctl application
     * [predict](actions/predict.md) - deploy and manage inference on trained model
     * [model](actions/model.md) - export model
     * [user](actions/user.md) - adding/deleting/listing users of the system 

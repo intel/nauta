@@ -1,8 +1,8 @@
-# Inventory Configuration
+# Inventory File Configuration Tasks
 
-Nauta uses Ansible (refer to [Ansible Overview](https://en.wikipedia.org/wiki/Ansible_(software))) for certain provisioning tasks during installation. You _must_ create (or modify) an Ansible inventory file to match your hardware configuration. Nauta will look for your inventory file at the location defined in the `ENV_INVENTORY` environment variable (see [Installation Process](../Installation_Process/IP.md) for more information).
+Nauta uses Ansible (refer to [Ansible Overview](https://en.wikipedia.org/wiki/Ansible_(software))) for certain provisioning tasks during installation. You _must_ create (or modify) an Ansible inventory file to match your hardware configuration. Nauta looks for your inventory file at the location defined in the `ENV_INVENTORY` environment variable (refer to the [Installation Process](../Installation_Process/IP.md) for more information).
 
-Your Nauta cluster will contain one Master node and one or more Worker nodes. Each of these nodes _must be_ specified in the Inventory file. For Configuration file information, see [Configuration File](../Configuration_Tasks_Variables/CTV.md) for more information.
+Your Nauta cluster will contain one Master node and one or more Worker nodes. Each of these nodes _must be_ specified in the Inventory file. Refer to the [Configuration File](../Configuration_Tasks_Variables/CTV.md) for Configuration file information.
 
 This section discusses the following main topics: 
 
@@ -12,7 +12,7 @@ This section discusses the following main topics:
 
 ## Inventory Configuration File Example
 
-Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. However, you can copy and modify the information to create your own Ansible inventory file.
+Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. However, you can copy and modify the information to create your own Ansible Inventory file.
 
 **Note:** Ansible uses the YAML format. Refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML) for more information (scroll right to see full contents).
 
@@ -33,9 +33,9 @@ The file contains two sections, master and worker:
 
 1. `[master]` Contains a description of a master node. This section _must_ contain **exactly one row**.
 
-1. `[worker]` Contains descriptions of worker. Each worker is described in one row. In this section, it can have one or many rows depending on a structure of a cluster.
+1. `[worker]` Contains descriptions of worker. Each worker is described in one row. In this section, it can have one or many rows depending on the structure of the cluster.
 
-Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the Inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into it, and so on. 
+Each row describes a server (playing either the role of _Master_ or _Worker_ depending on which section the row is in). For each server, the Inventory file _must_ define a series of values that tells Nauta where to find the server, how to log into the server, and so on. 
 
 The format for each row is as follows: 
 
@@ -45,13 +45,13 @@ The format for each row is as follows:
 
 ### Standard Hosting Name Rules
 
-`SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname must be from 1 to 63 characters long. The entire hostname, including the dots _must not_ exceed 253 characters long. 
+The `SERVER_NAME` _must_ conform to standard host naming rules and each element of the hostname _must_ be from 1 to 63 characters long. The entire hostname, including the dots _must not_ exceed 253 characters long. 
 
-Valid characters for hostnames are ASCII(7) letters from a to z (lowercase), the digits from 0 to 9, and a hyphen. However, **do not**  start a hostname with a **hyphen**. 
+Valid characters for hostnames are ASCII(7) letters from a to z (lowercase), the digits from 0 to 9, and a hyphen. However, **_do not_**  start a hostname with a **_hyphen_**. 
 
 ## Per-node Inventory Variables
 
-The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory, some are only required for some, and some variables are entirely optional.
+The table below lists all the variables understood by Nauta's inventory system. Some variables are required for all servers in the inventory and some variables are optional.
 
 Variable Name | Description | Req? | Type | Default | Used When | Value |
 --- | ---  | --- | --- | --- | --- | --- 

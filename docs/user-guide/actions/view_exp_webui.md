@@ -10,7 +10,7 @@ This section discusses the following main topics:
 
 ## Nauta Web UI
 
-The web UI lets you explore the experiments you have submitted. To view your experiments contained the web UI, execute the following command:
+The web UI lets you explore the experiments you have submitted. To view your experiments contained in the web UI, execute the following command:
 
 `nctl launch webui`
 
@@ -25,13 +25,13 @@ The following screen displays (this is an example only).
 * **Duration:** This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
 * **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (inference) with this model.
 
-You can perform the tasks discussed below at the Nauta web UI.
+You can perform the tasks discussed below in the Nauta web UI.
 
 ## Expanding Experiment Details
 
 Click _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
 
-This screen is divided into two frames: left and right side frames.  
+This screen is divided into left and right side frames.  
 
 ### Left-side Frame
 
@@ -57,7 +57,7 @@ The right-side frame of the experiment details window shows Start Date, End Date
 
 ## Searching on Experiments
 
-In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
+In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the you search the fields in the entire list, _not_ just the experiment's name or parameters. 
 
 ## Adding and Deleting Columns
 
@@ -68,7 +68,7 @@ their check box checked. Scroll down to see more, available columns listed next,
 
 ### Check/Uncheck Column Headings
 
-Click to check and uncheck and select the column headings you prefer. Optional column headings include parameters such as Pods, End Date, Owner, Template, Time in Queue, and so on.
+Click to check and uncheck and select the column headings you prefer. Optional column headings include parameters, such as Pods, End Date, Owner, Template, Time in Queue, and so on.
 
 ### Column Heading Metrics
 

@@ -20,7 +20,7 @@ Nauta is intended to run on a multi-server Kubernetes cluster. To run Nauta, you
 
 # Nauta Installation Procedures
 
-To install Nauta in a 'bare metal' (for example, non-cloud) server environment, you will need to:
+To install Nauta in a _bare metal_ (for example, non-cloud) server environment, you will need to:
 
 1. Acquire Nauta Binary file. 
 
@@ -62,6 +62,6 @@ This guide consists of the following main topics, in order. Start here to move t
 
 # Terms and Conditions
 
-To read Intel Terms and Conditions check [this](TaC.md) document.
+To read Intel Terms and Conditions refer to [this](TaC.md) document.
 
 This installation guide is subject to [CC-BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).

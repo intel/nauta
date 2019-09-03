@@ -139,9 +139,11 @@ To change these defaults, following parameters should be adjusted (using methods
 | tf-training-tfjob | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 
+
+----------------------
 ## Return to Start of Document
 
 * [README](../README.md)
-
+ 
 ----------------------
 

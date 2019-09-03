@@ -1,10 +1,10 @@
 # Run an Experiment on Multiple Nodes
 
-This section describes how to submit an experiment to run on multiple processing nodes, to accelerate the job. Storage locations for your input and output folders are determined by the mount command. See [Working with Datasets](working_with_datasets.md).
+This section describes how to submit an experiment to run on multiple processing nodes, to accelerate the job. Storage locations for your input and output folders are determined by the mount command. Refer to [Working with Datasets](working_with_datasets.md) for more information.
 
 This experiment uses a template. For more information, refer to [Working with Template Packs](template_packs.md)
 
-To run a multi-node experiment, the script must support it. The following is the generic syntax (scroll right to see full contents).
+To run a multi-node experiment, the script must support it. The following is the generic syntax (scroll right to see the full contents).
 
 **Syntax:** 
 
@@ -12,7 +12,7 @@ To run a multi-node experiment, the script must support it. The following is the
 nctl experiment submit [options]  SCRIPT-LOCATION --template [MULTINODE-TEMPLATE_NAME] SCRIPT-LOCATION [-- script-parameters]`
 ```
 
-The template `multinode-tf-training-tfjob` is included with Nauta software. The following is an example command using this template (scroll right to see full contents):
+The template `multinode-tf-training-tfjob` is included with the Nauta software. The following is an example command using this template (scroll right to see the full contents):
 
 **Example:** 
 
@@ -29,7 +29,7 @@ Submitting experiments.
 | multinodes   |                        | QUEUED  |         |
 ```
 
-In the above command, to optionally set the number of workers and servers, set these as parameters below. The default values are 3 worker nodes and 1 parameter server. The following parameters are set to 2 worker nodes and 1 parameter server.
+In the previous command, to optionally set the number of workers and servers, set these as parameters below. The default values are 3 worker nodes and 1 parameter server. The following parameters are set to 2 worker nodes and 1 parameter server.
 ```
 -p workersCount 2
 -p pServersCount 1

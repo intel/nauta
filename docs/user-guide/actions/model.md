@@ -1,6 +1,6 @@
 # model Command
 
-Use the `model` command to manage model export related tasks. Following are the subcommands for the `nctl model` command. This main command also includes the following subcommands:
+Use the `model` command to manage model export related tasks. The Following are the subcommands for the `nctl model` command. This main command also includes the following subcommands:
 
  - [status Subcommand](#status-subcommand)
  - [export Subcommand](#export-subcommand)
@@ -21,12 +21,12 @@ Displays a list of model export operations with their statuses, dates of start a
 
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account |
+ |`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account. |
  
 
 ### Returns
  
-Command displays a list of operations with their statuses, dates of start and finish and the users who submitted those operations.
+This command displays a list of operations with their statuses, dates of start and finish, and displays the users who submitted those operations.
 
      
 ### Example
@@ -43,18 +43,17 @@ Command displays a list of operations with their statuses, dates of start and fi
 
 ```
 
-Displays details of 3 model export operations - two of them finished with success, one failed.
+Displays details of 3 model export operations: two of them finished with success, one failed.
 
 ## export Subcommand
 
 ### Synopsis
  
-Exports an existing model located in the PATH folder to a given FORMAT with given options. If `formats` option is given, it displays a list of available export formats.    
- 
+Exports an existing model located in the `PATH` folder to a given `FORMAT` with given options. If the`formats` option is given, it displays a list of available export formats.    
+
 ### Syntax
  
  `nctl model export PATH/formats FORMAT [-- operation options]`
- 
  
 ### Arguments
  
@@ -69,11 +68,10 @@ Exports an existing model located in the PATH folder to a given FORMAT with give
  
 Should issues arise, a message (or messages) with a description of their cause (or causes) displays. If an export's operation starts, then the information about that operation and its details displays.
 If `formats` option is given - a list of available export formats with a short description of parameters accepted by those formats displays.
-
      
 ### Example
  
- `nctl model export /mnt/input/home/pretrained_model openvino -- --output ArgMax`  Please wait for Tensorboard to run
+ `nctl model export /mnt/input/home/pretrained_model openvino -- --output ArgMax`  Wait for Tensorboard to run.
  
  
 ```
@@ -135,10 +133,18 @@ The `logs` subcommand displays logs from a model export operation. Logs to be di
 
 ### Returns
 
-Should issues arise, a message (or messages) with a description of their cause (or causes) displays. Otherwise, the logs are filtered based on command's parameters.
+Should issues occur, a message (or messages) containing a description of their cause (or causes) displays. Otherwise, the logs are filtered based on command's parameters.
 
 ### Example
 
 `nctl model logs openvino_2`
 
 Displays logs from `openvino_2` model export operation.
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------
+

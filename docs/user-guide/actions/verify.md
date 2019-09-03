@@ -1,8 +1,10 @@
 # verify Command
 
+Use the `verify` command to verify that the proper Nauta version is installed. 
+
 ## Synopsis
 
-Checks whether all prerequisites required by `nctl` are installed and have proper versions.  
+Checks whether all prerequisites required by `nctl` are installed and have proper versions. Also refer to the [nctl Version Command ](../actions/version.md) for Nauta Version information. 
 
 ## Syntax
 

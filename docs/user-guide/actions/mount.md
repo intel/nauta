@@ -1,14 +1,14 @@
 # mount Command
 
-The `nctl mount` command displays another command that can be used to either mount or unmount a client's folders on/from a user's local machine. See also, [list Subcommand](#list-subcommand).
-
-This section discusses the following main topics: 
+Use the `mount` command to display the operating system commands for mounting and unmounting Nauta folders. This main command also includes the following subcommand:
 
  - [mount Command](#mount-command)
- - [list Subcommand](#list-subcommand-synopsis)  
+ - [list Subcommand](#list-subcommand)  
  - [Additional Remarks](#additional-remarks)
 
-## mount Command 
+**Note:** _mount_ is a operating system command so it might be better to continue using nctl mount here. The command displays both the mount and unmount commands.
+
+## Synopsis
 
 The mount command by itself displays another command that can be used to mount/unmount a client's folders on or from a user's local machine. 
 
@@ -29,9 +29,9 @@ The mount command by itself displays another command that can be used to mount/u
 
 This command returns another command that can be used to mount a client's folders on a user's local machine. It also shows what command should be used to unmount client's folder after it is no longer needed. 
 
-## list Subcommand Synopsis
+## list Subcommand 
 
-Displays a list of Nauta related folders mounted on a user's machine. If run using admin credentials, displays mounts of all users.
+The`list`displays a list of Nauta related folders mounted on a user's machine. If run using administrator credentials, it displays the mounts of all users.
 
 ### Syntax
 
@@ -39,11 +39,11 @@ Displays a list of Nauta related folders mounted on a user's machine. If run usi
 
 ### Returns
 
-List of mounted folders. Each row contains additional information (for example: remote and local location) concerning those mounts. Set of data displayed by this command depends on operating system.
+List of mounted folders. Each row contains additional information (for example: remote and local location) concerning those mounts. Set of data displayed by this command depends on the operating system.
 
 ## Additional Remarks
 
-This command displays only those mounts that exposing Nauta shares. Other mounted folders _are not_ taken into account.
+This command displays only those mounts that expose Nauta shares. Other mounted folders _are not_ taken into account.
 
 
 ----------------------

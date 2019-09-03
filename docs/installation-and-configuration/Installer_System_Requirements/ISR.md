@@ -11,7 +11,7 @@ Nauta supports the following Operating Systems:
 ### Red Hat Enterprise Linux 7.5
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
@@ -19,7 +19,7 @@ Required on system, software requirements:
 ### CentOS 7.5
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
@@ -27,7 +27,7 @@ Required on system, software requirements:
 ### Ubuntu 16.04
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * apt packages installed:
     - python3-pip
@@ -38,9 +38,8 @@ Required on system, software requirements:
   * Upgrade pip to pip==18.1
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
 
-**Note:** If during installation any issues related to pip version occur, please create a virtual environment (using
-virtualenv tool), activate it, install pip there in the desired version (19.0.3) and rerun installation
- from within virtualenv.
+**Note:** If during installation any issues related to pip version occur, create a virtual environment (using
+virtualenv tool), activate it, then install pip in the virtual environment with the desired version (19.0.3), and rerun the installation from within the virtualenv.
 
 ## Next Steps: Target Host Requirements
 
@@ -53,7 +52,4 @@ virtualenv tool), activate it, install pip there in the desired version (19.0.3)
 * [README](../README.md)
 
 ----------------------
-
-
-
 

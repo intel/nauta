@@ -10,7 +10,7 @@ Use this command to create, delete, and manage users. The following main topics 
 
 ### Synopsis
 
-The `create` subcommand creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default this command saves a configuration of a newly created user to a file. The format of this file is compliant with a format of `kubectl`  configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
+The `create` subcommand creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by the `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default, this command saves a configuration of a newly created user to a file. The format of this file is compliant with the `kubectl`  format configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
 
 ### Syntax
 
@@ -20,7 +20,7 @@ The `create` subcommand creates and initializes a new Nauta user. This command _
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`USERNAME` | Yes | Name of a user that will be created. This value must a valid OS level user. |
+|`USERNAME` | Yes | Name of a user that will be created. This value _must be_ a valid OS level user. |
 
 ### Options
 
@@ -34,16 +34,15 @@ The `create` subcommand creates and initializes a new Nauta user. This command _
 
 ### Additional Remarks
 
-In case of any errors during saving of a file with a configuration, the command displays a content of the configuration file on the screen, even if `-l` option _was not_ used.  
+In case of any errors during saving of a file with a configuration, the command displays the content of the configuration file on the screen, even if `-l` option _was not_ used.  
 
-If an admin tries to create a user with a name that was used previously by a deleted user, it may happen that 
+If an administrator creates a user with a name that was used previously by a deleted user, it may happen that 
 the `create` command displays information that the previous user is still being deleted, even if the previous
-user is not listed on a list of existing users. In this case the operation of a creation of a new user should be
-postponed for 10 minutes, until all user's objects are removed.
+user _is not_ listed on a list of existing users. In this case, before creating a new user, postpone the operation for 10 minutes, until all the user's objects are removed.
 
 ### Returns
 
-If any issues occur, a message is displayed describing their cause/causes. Otherwise a message is returned indicating success. If `--list-only` option was given, the command displays also a content of a configuration file. 
+If any issues occur, a message is displayed describing their cause/causes. Otherwise, a message is returned indicating success. If `--list-only` option was given, the command displays also a content of a configuration file. 
 
 ### User Name Requirements
 
@@ -58,11 +57,9 @@ characters and "-" and "."
 
 ### User Name Limitations
 
-If an admin tries to create a user with a name that was used previously by a deleted user, it may happen that 
-the `create` command displays information that the previous user is still being deleted, even if the previous
-user _is not_ listed on a list of existing users. 
+If an administrator creates a user with a name that was used previously by a deleted user, the `create`command displays the previous user is still being deleted, even if the previous user _is not_ listed on a list of existing users
 
-In this case, the operation of a creation of a new user should be postponed for a short period (3 minutes), until all user's objects are removed. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md).
+In this case, before creating a new user, postpone the operation for a short period (3 minutes) until all the user's objects are removed. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md).
 
 ### Example
 
@@ -76,7 +73,7 @@ This creates the user `jdoe`, as shown in the example.
 
 ### Synopsis
 
-The `delete` subcommand deletes a user with a given name. If option `-p`, `--purge` was used, it also removes all artifacts related to that removed user, such as the content of user's folders and data of experiments and runs.
+The `delete` subcommand deletes a user with a given name. If the option `-p`, `--purge` was used, it also removes all artifacts related to that removed user, such as the content of user's folders and data of experiments and runs.
 
 Before removing a user, the commands requires a final confirmation. If user chooses `Yes`, the chosen user is deleted.  
 Deletion of a user may take a while to be fully completed. The command requires up to 60 seconds for a complete

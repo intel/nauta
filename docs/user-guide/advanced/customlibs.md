@@ -67,6 +67,7 @@ Below is an example _Dockerfile_ showing installation of additional packages.
     ENV PYTHONUNBUFFERED 1
 ```
 
+----------------------
 ## Return to Start of Document
 
 * [README](../README.md)

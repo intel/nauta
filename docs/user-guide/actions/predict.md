@@ -1,6 +1,6 @@
 # predict Command
 
-Use the `predict` command to start, stop, and manage prediction jobs. This section discusses the following main topics:
+Use the `predict` command to start, stop, and manage prediction jobs. This main command also includes the following subcommands:
 
  - [batch Subcommand](#batch-subcommand)
  - [cancel Subcommand](#cancel-subcommand)
@@ -12,7 +12,7 @@ Use the `predict` command to start, stop, and manage prediction jobs. This secti
  
 ### Synopsis
 
-Starts a new batch instance that will perform prediction on provided data. Uses a specified dataset to perform inference. Results are stored in an output file.
+The batch Subcommand starts a new batch instance that performs a prediction on provided data. This command uses a specified dataset to perform inference. The results are stored in an output file.
 
 
 ### Syntax
@@ -23,13 +23,13 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-n, --name TEXT`| No | Name of predict session.|
-|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/saved_model). Model content will be copied into an image. |
-|`-l, --local_model_location PATH`| Yes | Local path to saved model that will be used for inference. Model content will be copied into an image. |
-|`-d, --data TEXT`| Yes | Location of a folder with data that will be used to perform the batch inference. Value should point out the location from one the system's shared folder.|
-|`-o, --output TEXT`| No | Location of a folder where outputs from inferences will be stored. Value should point out the location from one of the system's shared folder.|
-|`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of the directory in model's location.|
-|`-tr, --tf-record`| No |If given, the batch prediction accepts files in `TFRecord` formats. Otherwise files should be delivered in `protobuf` format.|
+|`-n, --name TEXT`| No | Name of the predict session.|
+|`-m, --model-location` <br> `TEXT`| Yes | The path to the saved model that will be used for inference. The model _must be_ located on one of the input or output system shares (for example: `/mnt/input/saved_model`). The model content will be copied into an image. |
+|`-l, --local_model_location PATH`| Yes | The local path to the saved model that will be used for inference. The model content will be copied into an image. |
+|`-d, --data TEXT`| Yes | The location of a folder with data that will be used to perform the batch inference. The value should point out the location from one of the system's shared folders.|
+|`-o, --output TEXT`| No | The location of a folder where outputs from inferences will be stored. The value should point out the location from one of the system's shared folder.|
+|`-mn, --model-name TEXT`| No | The name of a model passed as a servable name. By default, it is the name of the directory in model's location.|
+|`-tr, --tf-record`| No |If given, the batch prediction accepts files in the `TFRecord` formats. Otherwise, the files should be delivered in the `protobuf` format.|
 |`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
@@ -38,7 +38,7 @@ Starts a new batch instance that will perform prediction on provided data. Uses 
 
 ### Returns
 
-Description of a problem, if any occurs. Otherwise information that the predict job was submitted. 
+Description of a problem, if any occurs. Otherwise, displays the information that the predict job was submitted. 
 
 **Note**: Refer to [Batch Inference Example](batch_inf_example.md) for a detailed example of this command.
 
@@ -56,7 +56,7 @@ This command `cancels` prediction instance(s) chosen based on criteria given as 
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`NAME` | No | Name of predict instance to be cancelled. The [name] argument value can be empty when `match` option is used.|
+|`NAME` | No | The name of predict instance to be cancelled. The [name] argument value can be empty when the`match` option is used.|
 
 ### Options
 
@@ -71,7 +71,7 @@ This command `cancels` prediction instance(s) chosen based on criteria given as 
 
 ### Returns
 
-The description of a problem; if, any problem occurs. Otherwise information that training job/jobs was/were cancelled successfully. 
+The description of a problem; if any problem occurs. Otherwise, displays the information that training job/jobs was/were cancelled successfully. 
 
 ## launch Subcommand
 
@@ -88,9 +88,9 @@ The `launch` subcommand starts  a new prediction instance that can be used for p
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT`| No | The name of this prediction instance.|
-|`-m, --model-location` <br> `TEXT`| Yes | Path to saved model that will be used for inference. Model must be located on one of the input or output system shares (e.g. /mnt/input/home/saved_model).|
-|`-l, --local_model_location`<br> `PATH`| No | Local path to saved model that will be used for inference. Model content will be copied into an image. 
-|`-mn, --model-name TEXT`| No | Name of a model passed as a servable name. By default it is the name of directory in model's location. |
+|`-m, --model-location` <br> `TEXT`| Yes | The path to saved model that will be used for inference. The model _must be_ located on one of the input or output system shares (for example: `/mnt/input/home/saved_model`).|
+|`-l, --local_model_location`<br> `PATH`| No | The local path to the saved model that will be used for inference. The model content will be copied into an image. 
+|`-mn, --model-name TEXT`| No | The name of a model passed as a servable name. By default, it is the name of the directory in model's location. |
 |`-rt, --runtime`| No | Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' (tfserving) and 'OpenVINO Model Server (ovms). Default runtime is 'tfserving'.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
@@ -121,8 +121,7 @@ Prediction instance URL and authorization token, as well as information about th
 
 ### Synopsis
 
-The `list` subcommand displays a list of inference instances with some basic information regarding each of them. Results are
-sorted using a date of creation starting with the most recent, and filtered by optional criteria.
+The `list` subcommand displays a list of inference instances with some basic information regarding each of them. The results are sorted using a date of creation starting with the most recent, and filtered by optional criteria.
 
 ### Syntax
 
@@ -160,8 +159,8 @@ The `stream` subcommand performs stream inference task on launched prediction in
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-n, --name TEXT`| Yes | Name of prediction session.|
-|`-d, --data PATH`| Yes | Path to JSON data file that will be streamed to prediction instance. Data must be formatted such that it is compatible with the SignatureDef specified within the model deployed in the selected prediction instance.|
+|`-n, --name TEXT`| Yes | The name of prediction session.|
+|`-d, --data PATH`| Yes | The path to the JSON data file that will be streamed to prediction instance. The data _must be_ formatted so that it is compatible with the _SignatureDef_ specified within the model deployed in the selected prediction instance.|
 |`-m, --method-verb [classify, regress, predict]`| No | Method verb that will be used when performing inference. Predict verb is used by default.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |

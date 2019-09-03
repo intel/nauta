@@ -1,6 +1,6 @@
-# Nauta System Software Components
+# Nauta System Software Components Requisite
 
-Nauta relies on the external software components listed in the table below. Links to each of the component's descriptions are included should you need detailed information. These components are included in Nauta, and are  automatically installed as part of the Nauta installation process. 
+Nauta relies on the external software components listed in the table below. Links to each of the component's descriptions are included should you need detailed information. These components are included in Nauta and are  automatically installed as part of the Nauta installation process. 
 
 ## List of External Software Components
 
@@ -51,6 +51,4 @@ Nauta software components are optimized for AI containers containing Nauta-optim
 * [README](../README.md)
 
 ----------------------
-
-
 

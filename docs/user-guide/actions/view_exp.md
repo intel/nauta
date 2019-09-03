@@ -8,18 +8,18 @@ This section discusses the following main topics:
  
 ## Viewing All Experiments Using the CLI
 
-To list all experiments you have submitted, run the next command. The possible returned statuses are:
+To list all experiments you have submitted, run the `nctl experiment`command and desired option. The possible returned statuses are:
 
-* QUEUED - Experiment has been scheduled, but is not yet running
-* RUNNING - Experiment is running
-* COMPLETE - Experiment completed successfully
-* CANCELLED - Experiment has been cancelled by a user
-* FAILED - Experiment has failed
-* CREATING - Experiment is being created
+* **QUEUED:** Experiment has been scheduled, but _is not yet_ running
+* **RUNNING:** Experiment is running
+* **COMPLETE:** Experiment completed successfully
+* **CANCELLED:** Experiment has been cancelled by a user
+* **FAILED:** Experiment has failed
+* **CREATING:** Experiment is being created
 
 **Syntax:** `nctl experiment list [options]`
 
-**Example:** An example experiment list is shown below.  
+**Example:** An example experiment list is shown below using the list option.  
 
 `nctl experiment list`
 
@@ -95,7 +95,7 @@ Resources used by pods:
 
 ```
 
-Volumes list include mount mode for each volume (in `<>` brackets), which can be either `ro` (read-only) or `rw` (read-write).
+The volumes list include the mount mode for each volume (in `<>` brackets), which can be either `ro` (read-only) or `rw` (read-write).
 
 ## Useful References 
 * [Viewing Experiment Logs and Results Data](view_exp_logs.md)

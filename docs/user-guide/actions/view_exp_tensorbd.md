@@ -12,7 +12,7 @@ folder in the directory `/mnt/output/experiment.`
 
 To launch TensorBoard from the web UI and view results for individual experiments, execute these steps:
 
-1. Open the web ui by executing this command:
+1. Open the web UI by executing this command:
 
    `nctl launch webui`
 
@@ -20,7 +20,7 @@ To launch TensorBoard from the web UI and view results for individual experiment
 left of the experiment name.
 
 3. With an experiment selected (checked), the **LAUNCH TENSORBOARD** button becomes active. Click **LAUNCH TENSORBOARD**. 
-TensorBoard is launched with graphs showing the experiment’s results. 
+TensorBoard launches with graphs showing the experiment’s results. 
 
 The following screen displays (this is an example only).
 
@@ -47,7 +47,7 @@ You can also launch TensorBoard and with the `nctl experiment view` command:
 
 `nctl experiment view -tensorboard <experiment-name>`
 
-This command exposes a TensorBoard instance with data from the named experiment as above.
+This command exposes a TensorBoard instance with data from the named experiment shown above.
 
 
 ----------------------

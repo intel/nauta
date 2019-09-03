@@ -1,6 +1,6 @@
 # launch Command
 
-The `launch` command launches a browser for Web UI or TensorBoard. The following main topics are discussed in this section:
+Use the `launch` command to launch a browser for Web UI or TensorBoard. This main command also includes the following subcommands:
 
 - [webui Subcommand](#webui-subcommand)  
 - [tensorboard Subcommand](#tensorboard-subcommand)

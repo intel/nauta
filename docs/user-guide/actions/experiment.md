@@ -1,8 +1,6 @@
 # experiment Command
 
-The overall purpose of the command and subcommands is to submit and manage experiments. The following are the subcommands for the nctl experiment command.
-
-This section discuss the following main topics:
+Use the `experiment` command to submit and manage experiments. This main command also includes the following subcommands:
 
  - [submit Subcommand](#submit-subcommand)
  - [list Subcommand](#list-subcommand)  
@@ -11,12 +9,11 @@ This section discuss the following main topics:
  - [logs Subcommand](#logs-subcommand)
  - [interact Subcommand](#interact-subcommand)
  
- 
 ## submit Subcommand
 
 ### Synopsis
  
-The `submit` subcommand submits training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
+Use the `submit` subcommand to submit training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
  
 ### Syntax
  
@@ -33,7 +30,7 @@ The `submit` subcommand submits training jobs. Use this command to submit single
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files, data, etc. If not given, then its content _will not_ be copied into a the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
+ |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files, data, etc. If not given, then its content _will not_ be copied into the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
  |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). List of available templates can be obtained by issuing the `nctl experiment template_list` command. |
  |`-n, --name TEXT`| No | Name for this experiment.|
  |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack parameter in format: `key value` or `key.subkey.subkey2 value`. For lists use: `'key "['val1', 'val2']"'` For maps use: `'key "{'a': 'b'}"'`|
@@ -43,12 +40,12 @@ The `submit` subcommand submits training jobs. Use this command to submit single
  |`-r, --requirements PATH` | No | Path to file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
  |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO <br>`-vv` for DEBUG |
- |`-h, --help` | No | Show help message and exit. |
+ |`-h, --help` | No | Displays help messaging information. |
 
 #### Additional Remarks
  
- For both types of parameters - `-ps` and `-pr` - if parameter stated in their definitions
- is also given in a `[script_parameters]` argument of the `nctl` command, then values taken from `-ps`
+ For both types of parameters, `-ps` and `-pr` if parameter stated in their definitions
+ is also given in a `[script_parameters]`argument of the `nctl` command, then values taken from `-ps`
  and `-pr` are passed to a script.   
  
  If a combination of both parameters is given, then `nctl` launches a number of experiments
@@ -84,7 +81,7 @@ Starts a single node training job using `mnist_cnn.py` script located in a folde
 
 ### Synopsis
 
-The `list` subcommand displays a list of all experiments with some basic information for each, regardless of the owner. Results are sorted using the date-of-creation of the experiment, starting with the most recent experiment.  
+Use the `list` subcommand to display a list of all experiments with some basic information for each, regardless of the owner. Results are sorted using the _date-of-creation_ of the experiment, starting with the most recent experiment.  
 
 ### Syntax
 
@@ -106,7 +103,7 @@ The `list` subcommand displays a list of all experiments with some basic informa
 
 ### Returns
 
-List of experiments matching criteria given in command's options. Each row contains the experiment name and additional data of each experiment, such parameters used for this certain training, time and date when it was submitted, name of a user which submitted this training and current status of an experiment. The example table below shows the results returned by this command (brief option is shown). 
+Displays the list of experiments matching a criteria given in the command's options. Each row contains the experiment name and additional data of each experiment, such parameters used for this certain training, time and date when it was submitted, name of a user which submitted this training and current status of an experiment. The example table below shows the results returned by this command (the brief option is shown). 
 
 ```
  
@@ -134,7 +131,7 @@ The following command displays all experiments submitted by a current user and w
 
 ### Synopsis
 
-The `cancel` subcommand cancels training chosen based on provided parameters. 
+Use the `cancel` subcommand to cancel any training chosen based on the provided parameters. 
 
 ### Syntax
 
@@ -144,7 +141,7 @@ The `cancel` subcommand cancels training chosen based on provided parameters.
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`NAME` | Yes | The name of an experiment/pod/status of a pod to be cancelled. If any such object is found, the command displays a question whether this object should be cancelled. |
+|`NAME` | Yes | The name of an _experiment/pod/status_ of a pod to be cancelled. If any such object is found, the command displays a question whether this object should be cancelled. |
 
 ### Options
 
@@ -160,7 +157,7 @@ The `cancel` subcommand cancels training chosen based on provided parameters.
 
 ### Returns
 
-The description of a problem; if, any problem occurs. Otherwise, the displays information that training job/jobs was/were cancelled successfully.
+The description of a problem; if any problem occurs. Otherwise, displays the information that training job/jobs was/were cancelled successfully.
 
 ### Example
 
@@ -174,7 +171,7 @@ This cancels the experiment with `t20180423121021851` name, as shown in the exam
 
 ### Synopsis
 
-The `view` subcommand displays  basic details of an experiment, such as the name of an experiment, parameters, submission date, and so on. 
+Use the `view` subcommand to display basic details of an experiment, such as the name of an experiment, parameters, submission date, and so on. 
 
 ### Syntax
 
@@ -212,7 +209,7 @@ Displays details of an `experiment-name-2` experiment and exposes `tensorboard` 
 
 ### Synopsis
 
-The `logs` subcommand displays logs from experiments. Logs to be displayed are chosen based on parameters given in the command's call.
+Use the `logs` subcommand to display the logs from experiments. Logs to be displayed are chosen based on parameters given in the command's call.
 
 ### Syntax
 
@@ -228,7 +225,7 @@ The `logs` subcommand displays logs from experiments. Logs to be displayed are c
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-s, --min-severity` | No | Minimal severity of logs. Available choices are:<br> - CRITICAL - Displays only CRITICAL logs.<br> - ERROR - displays ERROR and CRITICAL logs.<br> - WARNING - Displays ERROR, CRITICAL and WARNING logs. <br> - INFO - displays ERROR, CRITICAL, WARNING and INFO.<br> - DEBUG - Displays ERROR, CRITICAL, WARNING, INFO and DEBUG. |
+|`-s, --min-severity` | No | Minimal severity of logs. Available choices are:<br> **CRITICAL:** Displays only CRITICAL logs.<br> **ERROR:** Displays ERROR and CRITICAL logs.<br> **WARNING:** Displays ERROR, CRITICAL and WARNING logs. <br> **INFO:** Displays ERROR, CRITICAL, WARNING and INFO.<br> **DEBUG:** - Displays ERROR, CRITICAL, WARNING, INFO and DEBUG. |
 |`-sd, --start-date` | No | Retrieve logs produced from this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
 |`-ed, --end-date` | No | retrieve logs produced until this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
 |`-i, --pod-ids TEXT` | No |Comma-separated pods IDs. If given, then matches pods by their IDs and only logs from these pods from an experiment with `EXPERIMENT-NAME` name will be returned.|
@@ -257,7 +254,7 @@ Displays logs from `experiment-name-2` experiment with severity DEBUG and higher
 
 ### Synopsis
 
-The interact subcommand launches a local browser with Jupyter notebook. If script's name is given as a parameter of a command, then this script is displayed in a notebook. 
+Use the `interact` subcommand to launch a local browser with a Jupyter notebook. If a script's name is given as a parameter of the command, then this script is displayed in a notebook. 
 
 ### Syntax
 
@@ -267,10 +264,10 @@ The interact subcommand launches a local browser with Jupyter notebook. If scrip
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-n, --name TEXT` | No | Name of a Jupyter notebook's session. If session with a given name already exists, then a user is connected to this session. |
-|`-f, --filename TEXT` | No | File with a notebook that should be opened in Jupyter notebook. |
-|`-p, --pack-param <TEXT TEXT>...`| No | Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br>For maps use: 'key "{'a': 'b'}"' |
-|`--no-launch`| No | Run command without a web browser starting, only proxy tunnel is created.|
+|`-n, --name TEXT` | No | The name of a Jupyter notebook's session. If a session with a given name already exists, then you are connected to this session. |
+|`-f, --filename TEXT` | No | The file with a notebook that should be opened in Jupyter notebook. |
+|`-p, --pack-param <TEXT TEXT>...`| No | Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br> For maps use: 'key "{'a': 'b'}"' |
+|`--no-launch`| No | Run this command without a web browser starting, only proxy tunnel is created.|
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
 |` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
 |` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a Jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
@@ -280,10 +277,18 @@ The interact subcommand launches a local browser with Jupyter notebook. If scrip
 
 ### Returns
 
-Should issues arise, a message provides a description of possible causes. Otherwise, the command launches a default web browser with Jupyter notebook, and displays the address under which this session is provided.
+Should issues arise, a message (or messages) with a description of their cause (or causes) displays. Otherwise, the command launches a default web browser with a Jupyter notebook, and displays the address under which this session is provided.
 
 ### Example
 
 `nctl experiment interact --filename training_script.py`
 
 Launches in a default browser a Jupyter notebook with `training_script.py` script.
+
+
+----------------------
+
+## Return to Start of Document
+
+* [README](../README.md)
+----------------------

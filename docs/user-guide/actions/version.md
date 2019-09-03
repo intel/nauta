@@ -1,8 +1,10 @@
 # version Command
 
+Use the ` version` command to review the Nauta software version, as desired. 
+
 ## Synopsis
 
-Returns the version of Nauta software.  
+Returns the version of Nauta software. Also refer to the [nctl Verify Command ](../actions/verify.md) for Nauta installation verification information. 
 
 `nctl version`
 
@@ -28,7 +30,6 @@ The version command returns the currently installed `nctl` application version o
 | nauta platform   | 1.0.0-ent-20190403020148 |
 
 ```
-
 
 ----------------------
 
