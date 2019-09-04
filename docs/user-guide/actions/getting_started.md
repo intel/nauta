@@ -105,6 +105,7 @@ The examples folder in the nctl installation contains these following experiment
 * `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting
 * `mnist_horovod.py` - Training of digit classifier in Horovod
 * `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires mnist_input_data.py file)
+* `mnist_tensorboard.py` - Training of digit classifier which displays summaries in TensorBoard (requires at least 2Gi of memory)
 
 ### Utility Scripts
 

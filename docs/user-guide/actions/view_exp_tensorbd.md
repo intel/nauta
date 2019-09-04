@@ -49,6 +49,15 @@ You can also launch TensorBoard and with the `nctl experiment view` command:
 
 This command exposes a TensorBoard instance with data from the named experiment as above.
 
+# MNIST Example
+
+You can try out TensorBoard with MNIST classifier `mnist_tensorboard.py` from python examples. You can find it in `examples' folder. Run:
+```
+nctl experiment submit -p cpu 1 -p memory 2Gi examples/mnist_tensorboard.py -n tb-example
+nctl exp view -tb tb-example
+```
+Note that `mnist_tensorboard.py` requires at least 2Gi of memory. 
+
 ----------------------
 
 ## Return to Start of Document
