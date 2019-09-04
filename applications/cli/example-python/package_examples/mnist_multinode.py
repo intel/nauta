@@ -13,7 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 import json
 import argparse
 import os

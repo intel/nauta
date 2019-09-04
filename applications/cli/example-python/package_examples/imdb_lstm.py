@@ -24,13 +24,12 @@
 Simple LSTM for sentiment analysis on IMDB reviews dataset originally posted on:
 https://github.com/adeshpande3/LSTM-Sentiment-Analysis
 '''
-
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 import argparse
 import datetime
 from random import randint
 import os
-import sys
-
 import numpy as np
 import tensorflow as tf
 
