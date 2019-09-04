@@ -13,11 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 import sys
 import threading
 import os
-
 import numpy as np
 import tensorflow as tf
 
@@ -28,7 +28,7 @@ tf.app.flags.DEFINE_integer("concurrency", 1,
                             "maximum number of concurrent inference requests")
 tf.app.flags.DEFINE_integer("num_tests", 100, "Number of test images")
 tf.app.flags.DEFINE_string("work_dir", "/tmp/mnist_test", "Working directory.")
-tf.app.flags.DEFINE_string("input_dir", "/tmp/mnist_test",
+tf.app.flags.DEFINE_string("input_dir", "/tmp/mnist_test/conversion_out",
                            "Directory which contains results of inference - files 0.pb etc.")
 
 FLAGS = tf.app.flags.FLAGS

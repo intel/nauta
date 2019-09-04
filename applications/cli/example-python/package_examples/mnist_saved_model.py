@@ -26,6 +26,8 @@ Usage: mnist_saved_model.py [--training_iteration=x] [--model_version=y] \
 """
 
 from __future__ import print_function
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 import os
 import sys

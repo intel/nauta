@@ -16,12 +16,12 @@
 #!/usr/bin/env python2.7
 
 """Functions for downloading and reading MNIST data."""
-
 from __future__ import print_function
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 import gzip
 import os
-
 import numpy
 from six.moves import urllib
 

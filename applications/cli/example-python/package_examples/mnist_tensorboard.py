@@ -24,21 +24,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+
 import argparse
 import os
 import sys
 
 import tensorflow as tf
 
-from tensorflow.examples.tutorials.mnist import input_data
-
 FLAGS = None
 
 
 def train():
   # Import data
-  mnist = input_data.read_data_sets(FLAGS.data_dir,
-                                    fake_data=FLAGS.fake_data)
+  mnist = tf.keras.datasets.mnist.load_data()
+  # Data from Keras comes in undesired shape (n, 28,28), so it needs to be adjusted
+  mnist = ((mnist[0][0].reshape(60000, 784), mnist[0][1]), (mnist[1][0].reshape(10000, 784), mnist[1][1]))
 
   sess = tf.InteractiveSession()
   # Create a multilayer model.
@@ -55,7 +57,7 @@ def train():
   # We can't initialize these variables to 0 - the network will get stuck.
   def weight_variable(shape):
     """Create a weight variable with appropriate initialization."""
-    initial = tf.truncated_normal(shape, stddev=0.1)
+    initial = tf.random.truncated_normal(shape, stddev=0.1)
     return tf.Variable(initial)
 
   def bias_variable(shape):
@@ -146,13 +148,13 @@ def train():
   # Every 10th step, measure test-set accuracy, and write test summaries
   # All other steps, run train_step on training data, & add training summaries
 
-  def feed_dict(train):
+  def feed_dict(train, num=0):
     """Make a TensorFlow feed_dict: maps data onto Tensor placeholders."""
-    if train or FLAGS.fake_data:
-      xs, ys = mnist.train.next_batch(100, fake_data=FLAGS.fake_data)
+    if train:
+      xs, ys = mnist[0][0][num:num+100], mnist[0][1][num:num+100],
       k = FLAGS.dropout
     else:
-      xs, ys = mnist.test.images, mnist.test.labels
+      xs, ys = mnist[1][0], mnist[1][1]
       k = 1.0
     return {x: xs, y_: ys, keep_prob: k}
 
@@ -166,14 +168,14 @@ def train():
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
         run_metadata = tf.RunMetadata()
         summary, _ = sess.run([merged, train_step],
-                              feed_dict=feed_dict(True),
+                              feed_dict=feed_dict(True, num =(i - (i//10))*100),#Adjusting index to track only training
                               options=run_options,
                               run_metadata=run_metadata)
         train_writer.add_run_metadata(run_metadata, 'step%03d' % i)
         train_writer.add_summary(summary, i)
         print('Adding run metadata for', i)
       else:  # Record a summary
-        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True))
+        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True, num =(i - (i//10))*100))
         train_writer.add_summary(summary, i)
   train_writer.close()
   test_writer.close()
@@ -206,8 +208,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--log_dir',
       type=str,
-      default=os.path.join(os.getenv('TEST_TMPDIR', '/tmp'),
-                           'tensorflow/mnist/logs/mnist_with_summaries'),
+      default=os.getenv('TEST_TMPDIR', '/mnt/output/experiment/logs'),
       help='Summaries log directory')
   FLAGS, unparsed = parser.parse_known_args()
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
