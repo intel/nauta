@@ -31,7 +31,8 @@ MODEL_STEPS = [ArgoWorkflowStep(name="model1", phase="Running"),
 MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',
                      k8s_custom_object_api=MagicMock(spec=CustomObjectsApi),
                      phase='Succeeded',
-                     steps=MODEL_STEPS)
+                     steps=MODEL_STEPS,
+                     body={'spec': {'templates': [{'container': {'command': ['other command']}}]}})
 
 
 BUILD_MODEL = ArgoWorkflow(name='fake-workflow', namespace='fake-namespace',

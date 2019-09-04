@@ -133,6 +133,24 @@ class VerifyCmdTexts:
                             "align those settings with resources available on a cluster."
 
 
+class ModelCmdTexts:
+    HELP = "Commands used to manage processing, conversion and packaging of models."
+
+
+class ModelStatusCmdTexts:
+    HELP = "Command displays status of a chosen operation."
+    MODEL_NOT_FOUND = "Lack of models to be displayed."
+    OTHER_ERROR_MSG = "Failed to get statuses of operations."
+    HELP_U = "Name of a user to whom viewed operation belongs. If not given - only operations of a current " \
+             "user are taken into account."
+    LOAD_DATA_MSG = "Loading operation's data. Please wait..."
+
+
+class ModelProcessListCmdTexts:
+    HELP = "Displays a list of available processing templates."
+    PROCESS_LIST_ERROR_MSG = "Error during getting list of processing workflows."
+
+
 class UserCmdTexts:
     HELP = "Create, delete, or list users of the platform. Can only be run by a platform administrator."
 
@@ -946,18 +964,6 @@ class TemplateInstallCmdTexts(TemplateListCmdTexts):
                                       "installed. Continue with replacing it with remote version '{remote_version}'?"
     FAILED_TO_LOAD_TEMPLATE = "Failed to load template {template_name}."
     FAILED_TO_INSTALL_TEMPLATE = "Failed to install template {template_name} from repository {repository_name}."
-
-
-class ModelCmdTexts:
-    HELP = "Commands used to manage processing, conversion and packaging of models."
-
-
-class ModelStatusCmdTexts:
-    HELP = "Command displays a list of operations with their statuses."
-    OTHER_ERROR_MSG = "Failed to get statuses of operations."
-    HELP_U = "Name of a user to whom viewed operations belong. If not given - only operations of a current " \
-             "user are taken into account."
-    LOAD_DATA_MSG = "Loading operations' data. Please wait..."
 
 
 class ModelExportCmdTexts:

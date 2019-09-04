@@ -42,6 +42,7 @@ logger = initialize_logger(__name__)
 def status(ctx: click.Context, username: str):
     """
     Returns status of a model
+
     :param username; if checked - searches for model for a certain user
     """
     try:
