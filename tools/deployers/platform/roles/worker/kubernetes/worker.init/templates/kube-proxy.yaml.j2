@@ -14,7 +14,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: kube-proxy
-    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-proxy:v1.13.10"
+    image: "registry.service.{{ nodes_domain }}.{{ domain }}:5000/core/kube-proxy:v1.15.3"
     resources:
       requests:
         cpu: 100m

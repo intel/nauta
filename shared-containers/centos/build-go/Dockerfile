@@ -15,7 +15,7 @@ WORKDIR /build-process
 
 RUN mkdir -p /build/work
 
-ENV GO_VERSION=1.11.13
+ENV GO_VERSION=1.12.9
 ENV GO_ARCH=amd64
 ENV GO_OS=linux
 ENV GO_FILE=go${GO_VERSION}.${GO_OS}-${GO_ARCH}.tar.gz

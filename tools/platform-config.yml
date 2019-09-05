@@ -6,8 +6,8 @@ local_images:
     image: "quay.io/coreos/flannel:v0.11.0-amd64"
     method: pull
   core/kube-proxy:
-    version: "v1.13.10"
-    image: "gcr.io/google-containers/kube-proxy-amd64:v1.13.10"
+    version: "v1.15.3"
+    image: "gcr.io/google-containers/kube-proxy-amd64:v1.15.3"
     method: pull
   core/pause:
     version: "3.1"

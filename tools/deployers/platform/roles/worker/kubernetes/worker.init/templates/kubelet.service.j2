@@ -13,7 +13,7 @@ ExecStart=/opt/nauta/kubernetes/kubelet \
                   --network-plugin cni --cloud-provider "" --node-ip {{ nauta_configuration.internal_interface.ipv4_address }} \
                   --cluster-dns {{ kubernetes_network.svc_list.dns.ip }} --cluster-domain {{ k8s_domain }}.{{ domain }} \
                   --node-labels {{ labels }} --pod-manifest-path=/etc/kubelet/static \
-                  --allow-privileged=True --kubeconfig /etc/kubelet/kubelet \
+                  --kubeconfig /etc/kubelet/kubelet \
                   {{ feature_gates }} \
                   --cert-dir /etc/kubelet/ssl --system-reserved cpu={{ host_reserved.cpus }},memory={{ host_reserved.memory }}M \
                   --fail-swap-on=false \

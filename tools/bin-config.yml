@@ -2,7 +2,7 @@
 
 local_images:
   bin/kubectl:
-    version: "1.13.10"
+    version: "1.15.3"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../bin-containers/kubectl"
