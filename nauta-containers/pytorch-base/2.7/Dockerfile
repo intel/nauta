@@ -17,6 +17,7 @@ COPY --from=pytorch-build /pytorch_build/pytorch/dist/torch-1.2.0a0*-cp27-cp27mu
 ADD requirements.txt .
 
 COPY --from=pytorch-build /usr/lib/libmkl* /opt/rh/rh-python36/root/usr/lib/
+COPY --from=pytorch-build /usr/lib/* /opt/rh/rh-python36/root/usr/lib/
 
 COPY --from=pytorch-build /usr/lib64/libopenblas* /opt/rh/rh-python36/root/usr/lib/
 COPY --from=pytorch-build /usr/lib64/libgf* /opt/rh/rh-python36/root/usr/lib/

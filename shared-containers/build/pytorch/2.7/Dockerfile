@@ -29,19 +29,12 @@ ENV PYTHONUNBUFFERED 1
 RUN source /opt/rh/devtoolset-8/enable && cd pytorch && \
            pip install --no-binary=:all: --no-cache-dir -r requirements.txt && python setup.py bdist_wheel
 
-RUN ls /pytorch_build/pytorch/dist/
-
 RUN source /opt/rh/devtoolset-8/enable && pip install --no-cache-dir --force-reinstall /pytorch_build/pytorch/dist/torch-1.2.0a0*-cp27-cp27mu-linux_x86_64.whl
 
 ADD torchvision_sources_v0.3.0.tar.gz .
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/
 
-RUN find / -name libmkl_intel_lp64.so
-
-
 RUN source /opt/rh/devtoolset-8/enable && cd vision && python setup.py bdist_wheel
-
-RUN ls /pytorch_build/vision/dist/
 
 RUN cp /pytorch_build/vision/dist/torchvision-0.3.0a0*-cp27-cp27mu-linux_x86_64.whl /root
