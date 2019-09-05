@@ -1,3 +1,4 @@
+---
 package: github.com/NervanaSystems/carbon/applications/loader
 import:
   - package: k8s.io/client-go

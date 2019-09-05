@@ -10,7 +10,8 @@ RUN yum update -y && \
     yum install -y which && \
     yum clean all
 
-RUN mv /build/work/src/k8s.io/kubernetes-1.13.10/* /build/work/src/k8s.io/kubernetes/
+RUN mv /build/work/src/k8s.io/kubernetes-1.15.3/* /build/work/src/k8s.io/kubernetes/
+
 
 WORKDIR ${GOPATH}/src/k8s.io/kubernetes
 

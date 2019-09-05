@@ -1,3 +1,4 @@
+---
 apiVersion: "aggregator.aipg.intel.com/v1"
 kind: Run
 metadata:
