@@ -127,11 +127,11 @@ class TcpK8sProxy(K8sProxy):
                          number_of_retries=number_of_retries, namespace=namespace)
 
     @staticmethod
-    def _wait_for_connection_readiness(address: str, port: int, tries: int = 30):
+    def _wait_for_connection_readiness(address: str, port: int, tries: int = 60):
         sock = None
         for retry_i in range(tries):
             try:
-                sock = socket.create_connection((address, port))
+                sock = socket.create_connection(address=(address, port), timeout=25)
                 break
             except (ConnectionError, ConnectionRefusedError) as e:
                 error_msg = f'can not connect to {address}:{port}. Error: {e}'
