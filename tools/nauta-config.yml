@@ -226,7 +226,7 @@ local_images:
     method: pull
   nauta/buildkit:
     version: "master"
-    image: "moby/buildkit:master"
+    image: "moby/buildkit:v0.6.1"
     method: pull
   nauta/pytorch/py3:
     version: "1.0"
