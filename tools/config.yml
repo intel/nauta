@@ -172,9 +172,9 @@ shared_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/go/go1.12.9.linux-amd64.tar.gz
         dest: go1.12.9.linux-amd64.tar.gz
         checksum: ac2a6efcc1f5ec8bdc0db0a988bb1d301d64b6d61b7e8d9e42f662fbb75a2b9b
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3-patch.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/kubernetes-dashboard/kubernetes-dashboard-v1.8.3-patch-v2.tar.gz
         dest: kubernetes-dashboard-v1.8.3.tar.gz
-        checksum: ac1db88a1c0a5f3570f0cb49e408e041c00b6011bd49d9b9f6f6e7c7f8c37b0f
+        checksum: 2e252d8e0426ff02a1d8d9f318cbea6873dc2938410dde64429d0f2a436a30cc
   shared/build/kubernetes-addons:
     version: "v1.10.11"
     required:
