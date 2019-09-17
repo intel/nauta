@@ -170,9 +170,9 @@ local_images:
   nauta/horovod/py3:
     version: "0.16.4-py3"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.2.tar.gz
         dest: horovod-v0.16.4.tar.gz
-        checksum: 1f7b7a3926c4b169ecbd20a4eb97d15d6720c7593689476e3fd67371937122b5
+        checksum: c9aaaef7214598a05e6fe4442e423de54d7a7fcfb2f8dcd85043e1665281eff7
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
@@ -185,9 +185,9 @@ local_images:
   nauta/horovod/py2:
     version: "0.16.4-py2"
     fetch_files:
-      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.tar.gz
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.2.tar.gz
         dest: horovod-v0.16.4.tar.gz
-        checksum: 1f7b7a3926c4b169ecbd20a4eb97d15d6720c7593689476e3fd67371937122b5
+        checksum: c9aaaef7214598a05e6fe4442e423de54d7a7fcfb2f8dcd85043e1665281eff7
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.14.0"
