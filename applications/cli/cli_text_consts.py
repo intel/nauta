@@ -445,7 +445,7 @@ class ExperimentSubmitCmdTexts:
                "given - its content won't be copied into an image."
     HELP_T = "Name of a template used to create a deployment. By default, this is a single-node tensorflow training." \
              " Template is chosen. List of available templates might be obtained by" \
-             " Issuing dlsctl template list command."
+             " Issuing nctl template list command."
     HELP_P = " Additional pack param in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
     HELP_PR = "Values (set or range) of a single parameter."
@@ -932,7 +932,7 @@ class TemplateListCmdTexts:
     ERROR_DURING_LOADING_LOCAL_TEMPLATES = "Errors during loading local templates. List below doesn't contain then " \
                                            "any data of local templates."
     MISSING_CONFIGURATION_FILE = "Lack or incorrect file with configuration of model-zoo repository. Please " \
-                                 "check, whether file zoo-repository.config exists in folder with dlsctl folder."
+                                 "check, whether file zoo-repository.config exists in folder with nctl folder."
     GETTING_LIST_OF_TEMPLATES_MSG = "Getting templates list ..."
     CHECKING_PRESENCE_OF_TEMPLATE_MSG = "Checking presence of a template ..."
 
