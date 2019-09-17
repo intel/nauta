@@ -35,7 +35,6 @@ Required on system, software requirements:
     - libffi-dev
     - libssl-dev
     - sshpass
-  * Upgrade pip to pip==18.1
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
 
 ## Next Steps: Target Host Requirements
