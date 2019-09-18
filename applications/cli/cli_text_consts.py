@@ -958,13 +958,14 @@ class TemplateInstallCmdTexts(TemplateListCmdTexts):
 
 class ModelExportCmdTexts:
     HELP = """\b
-    Export the model using one of defined formats/list the available export formats
-    PATH - indicates the location of the model on the Input or Output network shares. If 'formats' value is given
-           the command displays a list of available export's formats.
+    Export the model using one of defined formats/list the available export formats.
+    PATH - indicates the location of the model on the Input or Output network shares.
+           If 'formats' value is given the command displays a list of available export's formats.
+    \b
+    FORMAT - one of the supported formats(try nctl model export format command to see the available 
+             export formats). Required if export of a model is executed.
 
-    FORMAT - one of the supported formats(see nctl model export list command). Required if export of a model is executed
-
-    operation-options - options specific to a chosen format
+    operation-options - options specific to a chosen format.
     """
     SHORT_HELP = "Export the model using one of defined formats/list the available export formats."
     HELP_P = "Post-processing workflow used to process exported model (see nctl process-list command)."
