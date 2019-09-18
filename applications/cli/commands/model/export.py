@@ -37,7 +37,7 @@ logger = initialize_logger(__name__)
 FORMATS_OPTION = "formats"
 
 
-@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='e')
+@click.command(help=Texts.HELP, short_help=Texts.SHORT_HELP, cls=AliasCmd, alias='e', options_metavar='[options]')
 @click.argument("path", required=True, metavar="PATH/formats")
 @click.argument("format", required=False, type=str, metavar="[FORMAT]")
 @click.argument("operation-options", required=False, nargs=-1, metavar="[-- operation-options]")
