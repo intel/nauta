@@ -38,6 +38,8 @@ local_images:
         dest: Linux/amd64/CENTOS/7
       - src: /out/*
         dest: Linux/amd64/REDHAT/7.5
+      - src: /out/*
+        dest: Linux/amd64/REDHAT/7.6
       - src: /requirements.txt
         dest: pip
     push: False

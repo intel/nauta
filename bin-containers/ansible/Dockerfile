@@ -31,6 +31,7 @@ RUN source /opt/rh/devtoolset-7/enable && /venv/bin/pip3.6 install -U pyinstalle
     --specpath "/venv" \
     --clean \
     --distpath "/out/" \
+    --hidden-import "distutils" \
     --hidden-import "jmespath" \
     --hidden-import "ansible" \
     --hidden-import "docker" \
