@@ -85,7 +85,7 @@ TEMPL_FOLDER_NAME = "templates"
 
 EXP_IMAGE_BUILD_WORKFLOW_SPEC = "exp-image-build.yaml"
 
-log = initialize_logger('commands.common')
+log = initialize_logger(__name__)
 
 
 PrepareExperimentResult = namedtuple('PrepareExperimentResult', ['folder_name', 'script_name', 'pod_count'])

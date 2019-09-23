@@ -23,7 +23,7 @@ import click
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
 from util.cli_state import common_options
-from platform_resources.run import Run
+from platform_resources.run import Run, RunKinds
 from platform_resources.experiment import Experiment
 from util.aliascmd import AliasCmd
 from util.config import TBLT_TABLE_FORMAT
@@ -150,7 +150,7 @@ def container_resources_to_msg(resources, spaces=9) -> str:
 @common_options()
 @click.pass_context
 def view(ctx: click.Context, experiment_name: str, tensorboard: bool,
-         username: str):
+         username: str, accepted_run_kinds=(RunKinds.TRAINING.value, RunKinds.JUPYTER.value)):
     """
     Displays details of an experiment.
     """
@@ -161,9 +161,9 @@ def view(ctx: click.Context, experiment_name: str, tensorboard: bool,
             namespace = get_kubectl_current_context_namespace()
 
         run = Run.get(name=experiment_name, namespace=namespace)
-        if not run:
+        if not run or run.metadata.get('labels', {}).get('runKind') not in accepted_run_kinds:
             handle_error(
-                user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(
+                user_msg=Texts.NOT_FOUND_ERROR_MSG.format(
                     experiment_name=experiment_name))
             exit(2)
 
@@ -343,6 +343,6 @@ def view(ctx: click.Context, experiment_name: str, tensorboard: bool,
                     Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS)
 
     except Exception:
-        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG,
-                     Texts.VIEW_OTHER_ERROR_MSG)
+        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG.format(name=experiment_name),
+                     Texts.VIEW_OTHER_ERROR_MSG.format(name=experiment_name))
         exit(1)

@@ -362,8 +362,7 @@ def get_pod_logs(pod: V1Pod, namespace: str, tail: int = None):
     :param tail:
     :return: list of container logs of a given pod - List[List[str]]
     """
-    log = initialize_logger(__name__)
-    outputs = []
+    outputs: List[str] = []
     for container in pod.status.container_statuses:
         try:
             command = ['kubectl', 'logs', '-n', namespace, pod.metadata.name, '-c', container.name]
@@ -371,7 +370,7 @@ def get_pod_logs(pod: V1Pod, namespace: str, tail: int = None):
                 command.append(f'tail={tail}')
             output, _, _ = execute_system_command(command=command)
             log.debug(output)
-            outputs.append[output]
+            outputs.append(output)
 
         except Exception:
             log.exception(f'Failed to get {pod.metadata.name} pod logs.')

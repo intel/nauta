@@ -16,7 +16,7 @@
 
 import click
 
-from commands.predict import launch, list, cancel, stream, batch, logs
+from commands.predict import launch, list, cancel, stream, batch, logs, view
 from util.logger import initialize_logger
 from util.aliascmd import AliasGroup
 from cli_text_consts import PredictCmdTexts as Texts
@@ -37,3 +37,4 @@ predict.add_command(logs.logs)
 predict.add_command(list.list_inference_instances)
 predict.add_command(stream.stream)
 predict.add_command(batch.batch)
+predict.add_command(view.view)

@@ -301,7 +301,7 @@ class PredictLaunchCmdTexts:
     HELP_RT = "Determine runtime for prediction. Supported runtimes are 'Tensorflow serving' and 'OpenVINO Model " \
               "Server'. Default option is 'tfserving'."
     PREDICTION_INSTANCE_NOT_READY = "Prediction instance is not ready. Please check its readiness again in a few " \
-                                    "minutes."
+                                    "minutes, using \"nctl predict view {name}\" command."
 
 
 class PredictStreamCmdTexts:
@@ -419,6 +419,40 @@ class PredictLogsCmdTexts:
     HELP_O = "If given - logs are stored in a file with a name derived from a name of a prediction instance."
     HELP_F = "Specify if logs should be streamed. Only logs from a single prediction instance can be streamed."
     HELP_PAGER = "Display logs in interactive pager."
+
+
+class PredictViewCmdTexts:
+    SHORT_HELP = "Displays prediction instance's details."
+    HELP = """
+    Displays prediction instance’s details.
+
+    PREDICTION_INSTANCE_NAME - Prediction instance’s name.
+    """
+    CONTAINER_DETAILS_MSG = "\n- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:  {resources}"
+    NOT_FOUND_ERROR_MSG = "Prediction instance \"{experiment_name}\" not found."
+    PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
+    PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]
+    VIEW_OTHER_ERROR_MSG = "Failed to get details of prediction instance {name}."
+    CONTAINER_NOT_CREATED_MSG = "Not created"
+    CONTAINER_RUNNING_MSG = "Running, started at: "
+    CONTAINER_TERMINATED_MSG = "Terminated, "
+    CONTAINER_WAITING_MSG = "Waiting, "
+    CONTAINER_REQUESTS_LIST_HEADER = "- Requests:\n{}"
+    CONTAINER_LIMITS_LIST_HEADER = "- Limits:\n{}"
+    RESOURCES_SUM_LIST_HEADER = "\nResources used by pods:\n"
+    RESOURCES_SUM_PARSING_ERROR_MSG = "There was an error when trying to parse pods resources. Error msg: {error_msg}"
+    RESOURCES_SUM_TABLE_HEADERS = ["Resource type", "Total usage"]
+    RESOURCES_SUM_TABLE_ROWS_HEADERS = ["CPU requests:", "Memory requests:", "CPU limits:", "Memory limits:"]
+    INSUFFICIENT_RESOURCES_MESSAGE = "Prediction instance is in QUEUED state due to insufficient {resources}."
+    TOP_CPU_CONSUMERS = "Top CPU consumers: {consumers}"
+    TOP_MEMORY_CONSUMERS = "Top memory consumers: {consumers}"
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of QUEUED state and top consumers cannot be displayed due to " \
+                                          "errors."
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error when gathering consumers data."
+    HELP_U = "Name of a user to who belongs viewed prediction instance." \
+             " If not given - only prediction instances of a current " \
+             "user are taken into account."
+    REASON = "\n  Reason: "
 
 
 class ExperimentSubmitCmdTexts:
@@ -577,14 +611,14 @@ class ExperimentViewCmdTexts:
     HELP = """
     Displays experiment’s details.
 
-    EXPERIMENT_NAME - Experiment’s name and details.
+    EXPERIMENT_NAME - Experiment’s name.
     """
-    HELP_T = "Displays a TensorBoard's instance showing an experiment's data."
+    HELP_T = "Displays a TensorBoard showing an experiment's data."
     CONTAINER_DETAILS_MSG = "\n- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:  {resources}"
-    EXPERIMENT_NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
+    NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
     PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
     PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]
-    VIEW_OTHER_ERROR_MSG = "Failed to get experiment."
+    VIEW_OTHER_ERROR_MSG = "Failed to get details of experiment {name}."
     CONTAINER_NOT_CREATED_MSG = "Not created"
     CONTAINER_RUNNING_MSG = "Running, started at: "
     CONTAINER_TERMINATED_MSG = "Terminated, "

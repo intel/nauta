@@ -127,7 +127,8 @@ def launch(ctx: click.Context, name: str, model_location: str, local_model_locat
 
         time.sleep(1)
     else:
-        handle_error(logger, Texts.PREDICTION_INSTANCE_NOT_READY, Texts.PREDICTION_INSTANCE_NOT_READY,
+        handle_error(logger, Texts.PREDICTION_INSTANCE_NOT_READY.format(name=name),
+                     Texts.PREDICTION_INSTANCE_NOT_READY.format(name=name),
                      add_verbosity_msg=ctx.obj.verbosity == 0)
         exit(0)
 
