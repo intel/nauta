@@ -178,4 +178,4 @@ if __name__ == '__main__':
                         default='',
                         help='Directory which contains export data')
     FLAGS, _ = parser.parse_known_args()
-    tf.compat.v1.app.run()
+    tf.app.run()

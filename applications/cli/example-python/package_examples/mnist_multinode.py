@@ -218,4 +218,4 @@ if __name__ == "__main__":
                         default=100,
                         help="Training batch size")
     FLAGS, _ = parser.parse_known_args()
-    tf.compat.v1.app.run()
+    tf.app.run()

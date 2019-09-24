@@ -152,4 +152,4 @@ if __name__ == "__main__":
                         default=500,
                         help="Number of steps to run training")
     FLAGS, _ = parser.parse_known_args()
-    tf.compat.v1.app.run()
+    tf.app.run()
