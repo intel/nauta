@@ -195,7 +195,7 @@ def get_pods(label_selector: str = None) -> List[client.V1Pod]:
     return pods
 
 
-def get_namespaced_pods(label_selector: str, namespace: str) -> List[client.V1Pod]:
+def get_namespaced_pods(namespace: str, label_selector: str = None) -> List[client.V1Pod]:
     logger.debug(f'Getting namespaced pods with label selector: {label_selector}')
     api = get_k8s_api()
 

@@ -30,7 +30,8 @@ from util.k8s.k8s_info import PodStatus
 TEST_RUNS = [
     Run(
         name='test-experiment',
-        parameters=['a 1', 'b 2'],
+        parameters=('a 1', 'b 2'),
+        metadata={'labels': {'runKind': 'training'}},
         creation_timestamp='2018-04-26T13:43:01Z',
         namespace='namespace-1',
         state=RunStatus.RUNNING,
@@ -41,7 +42,8 @@ TEST_RUNS = [
         pod_selector={}),
     Run(
         name='test-experiment-2',
-        parameters=['a 1', 'b 2'],
+        metadata={'labels': {'runKind': 'training'}},
+        parameters=('a 1', 'b 2'),
         creation_timestamp='2018-05-08T13:05:04Z',
         namespace='namespace-2',
         state=RunStatus.COMPLETE,
@@ -55,7 +57,8 @@ TEST_RUNS = [
 QUEUED_RUN = [
     Run(
         name='test-experiment',
-        parameters=['a 1', 'b 2'],
+        parameters=('a 1', 'b 2'),
+        metadata={'labels': {'runKind': 'training'}},
         creation_timestamp='2018-04-26T13:43:01Z',
         namespace='namespace-1',
         state=RunStatus.QUEUED,
@@ -159,7 +162,7 @@ def test_view_experiments_not_found(prepare_mocks: ViewMocks):
 
     assert prepare_mocks.get_run.call_count == 1, "Run retrieval was not called"
     assert result.exit_code == 2
-    assert Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name="missing") in result.output, "Bad output."
+    assert Texts.NOT_FOUND_ERROR_MSG.format(experiment_name="missing") in result.output, "Bad output."
 
 
 def test_view_experiments_no_argument(prepare_mocks: ViewMocks):

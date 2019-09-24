@@ -25,7 +25,7 @@ from typing import List
 import yaml
 
 from cli_text_consts import ModelExportCommonTexts as Texts
-from commands.common import save_logs_to_file, print_logs
+from commands.common.logs_utils import save_logs_to_file, print_logs
 from logs_aggregator.k8s_es_client import K8sElasticSearchClient
 from platform_resources.workflow import ArgoWorkflow
 from util.config import Config

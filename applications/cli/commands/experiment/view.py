@@ -23,7 +23,7 @@ import click
 from commands.experiment.common import EXPERIMENTS_LIST_HEADERS, wrap_text
 from commands.launch.launch import tensorboard as tensorboard_command
 from util.cli_state import common_options
-from platform_resources.run import Run
+from platform_resources.run import Run, RunKinds
 from platform_resources.experiment import Experiment
 from util.aliascmd import AliasCmd
 from util.k8s.k8s_info import get_kubectl_current_context_namespace, get_namespaced_pods, sum_mem_resources,\
@@ -119,7 +119,8 @@ def container_resources_to_msg(resources, spaces=9) -> str:
 @click.option('-u', '--username', help=Texts.HELP_U)
 @common_options()
 @click.pass_context
-def view(ctx: click.Context, experiment_name: str, tensorboard: bool, username: str):
+def view(ctx: click.Context, experiment_name: str, tensorboard: bool,
+         username: str, accepted_run_kinds=(RunKinds.TRAINING.value, RunKinds.JUPYTER.value)):
     """
     Displays details of an experiment.
     """
@@ -130,8 +131,11 @@ def view(ctx: click.Context, experiment_name: str, tensorboard: bool, username: 
             namespace = get_kubectl_current_context_namespace()
 
         run = Run.get(name=experiment_name, namespace=namespace)
-        if not run:
-            handle_error(user_msg=Texts.EXPERIMENT_NOT_FOUND_ERROR_MSG.format(experiment_name=experiment_name))
+
+        if not run or run.metadata.get('labels', {}).get('runKind') not in accepted_run_kinds:
+            handle_error(
+                user_msg=Texts.NOT_FOUND_ERROR_MSG.format(
+                    experiment_name=experiment_name))
             exit(2)
 
         experiment = Experiment.get(name=experiment_name, namespace=namespace)
@@ -284,5 +288,6 @@ def view(ctx: click.Context, experiment_name: str, tensorboard: bool, username: 
                 logger.exception(Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS)
 
     except Exception:
-        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG, Texts.VIEW_OTHER_ERROR_MSG)
+        handle_error(logger, Texts.VIEW_OTHER_ERROR_MSG.format(name=experiment_name),
+                     Texts.VIEW_OTHER_ERROR_MSG.format(name=experiment_name))
         exit(1)

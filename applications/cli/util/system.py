@@ -353,6 +353,29 @@ def get_os_version() -> Tuple[str, LooseVersion]:
     return "", LooseVersion("0")
 
 
+def get_pod_logs(pod: V1Pod, namespace: str, tail: int = None):
+    """
+    Get logs of all the containers of a given pod.
+    :param pod:
+    :param namespace:
+    :param tail:
+    :return: list of container logs of a given pod - List[List[str]]
+    """
+    outputs: List[str] = []
+    for container in pod.status.container_statuses:
+        try:
+            command = ['kubectl', 'logs', '-n', namespace, pod.metadata.name, '-c', container.name]
+            if tail:
+                command.append(f'tail={tail}')
+            output, _, _ = execute_system_command(command=command)
+            log.debug(output)
+            outputs.append(output)
+
+        except Exception:
+            log.exception(f'Failed to get {pod.metadata.name} pod logs.')
+    return outputs
+
+
 def check_nauta_pods():
     """
     Check if there are failed pods. If there are any, display a list of their names and
@@ -373,27 +396,3 @@ def check_nauta_pods():
                     log_file.writelines(log)
         click.echo('Contact Nauta administrator.')
         click.echo(f'Check logs folder in your config directory({conf_path}) to get more information.')
-
-
-def get_pod_logs(pod: V1Pod, namespace: str, tail: int = None):
-    """
-        Get logs of all the containers of a given pod.
-        :param pod:
-        :param namespace:
-        :param tail:
-        :return: list of container logs of a given pod - List[List[str]]
-        """
-    log = initialize_logger(__name__)
-    outputs = []
-    for container in pod.status.container_statuses:
-        try:
-            command = ['kubectl', 'logs', '-n', namespace, pod.metadata.name, '-c', container.name]
-            if tail:
-                command.append(f'tail={tail}')
-            output, _, _ = execute_system_command(command=command)
-            log.debug(output)
-            outputs.append[output]
-
-        except Exception:
-            log.exception(f'Failed to get {pod.metadata.name} pod logs.')
-    return outputs

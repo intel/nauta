@@ -83,7 +83,7 @@ TEMPL_FOLDER_NAME = "templates"
 
 EXP_IMAGE_BUILD_WORKFLOW_SPEC = "exp-image-build.yaml"
 
-log = initialize_logger('commands.common')
+log = initialize_logger(__name__)
 
 
 submitted_runs: List[Run] = []

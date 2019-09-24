@@ -187,7 +187,7 @@ Use the `view` subcommand to display basic details of an experiment, such as the
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-tb, --tensorboard` | No | If given, the command exposes a TensorBoard instance with an experiment's data. |
+|`-tb, --tensorboard` | No | If given, the command displays a TensorBoard with an experiment's data. |
 |`-u, --username`<br> `TEXT` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |

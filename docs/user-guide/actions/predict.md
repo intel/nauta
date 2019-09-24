@@ -145,6 +145,41 @@ The `list` subcommand displays a list of inference instances with some basic inf
 
 List of inference instances.
 
+## view Subcommand
+
+### Synopsis
+
+The `view` subcommand displays basic details of an prediction instance, such as the name of an experiment, parameters, submission date, and so on. 
+
+### Syntax
+
+`nctl predict view [options] PREDICTION_INSTANCE_NAME`
+
+### Arguments
+
+| Name | Required | Description |
+|:--- |:--- |:--- |
+|`PREDICTION_INSTANCE_NAME` | Yes | Name of an predictions instance for which details will be displayed. |
+
+### Options
+
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-u, --username`<br> `TEXT` | No | Name of the user who submitted this prediction instance. If not given, then only prediction instances of a current user are shown. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
+
+
+### Returns
+
+Displays details of an prediction instance.
+### Example
+
+`nctl predict view prediction-instance-2`
+
+Displays details of an `prediction-instance-2` prediction instance.
+
 ## stream Subcommand
  
 ### Synopsis

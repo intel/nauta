@@ -17,7 +17,7 @@
 import click
 
 from cli_text_consts import PredictLogsCmdTexts as Texts
-from commands.common import get_logs
+from commands.common.logs_utils import get_logs
 from logs_aggregator.log_filters import SeverityLevel
 from util.cli_state import common_options
 from util.logger import initialize_logger
