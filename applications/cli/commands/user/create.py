@@ -207,7 +207,7 @@ def generate_kubeconfig(username: str, namespace: str, address: str, token: str,
 @retry(tries=5, delay=1)
 def add_user_to_git_repo_manager(username: str):
     try:
-        with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=60) as proxy:
+        with K8sProxy(NAUTAAppNames.GIT_REPO_MANAGER, number_of_retries_wait_for_readiness=100) as proxy:
             grm_client = GitRepoManagerClient(host='127.0.0.1', port=proxy.tunnel_port)
             grm_client.add_nauta_user(username=username)
     except Exception:
