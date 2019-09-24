@@ -51,16 +51,14 @@ def do_conversion(work_dir, num_tests):
     conversion_out_path = os.path.join(work_dir, "conversion_out")
     os.makedirs(conversion_out_path, exist_ok=True)
 
-    _, test_data_set = tf.keras.datasets.mnist.load_data()
-    # Data from Keras comes in undesired shape (n, 28,28), so it needs to be adjusted
-    test_data_set = (test_data_set[0].reshape(10000, 784), test_data_set[1])
+    test_data_set = tf.contrib.learn.datasets.mnist.read_data_sets(work_dir).test
     expected_labels = []
 
     for i in range(num_tests):
         request = predict_pb2.PredictRequest()
         request.model_spec.name = MODEL_NAME
         request.model_spec.signature_name = MODEL_SIGNATURE_NAME
-        image, label = test_data_set[0][i], test_data_set[1][i]
+        image, label = test_data_set.next_batch(1)
         request.inputs[MODEL_INPUT_NAME].CopyFrom(
             tf.contrib.util.make_tensor_proto(image[0], shape=[1, image[0].size])
         )
