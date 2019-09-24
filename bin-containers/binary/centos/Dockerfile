@@ -7,20 +7,19 @@ RUN yum update -y && yum install -y devtoolset-8-gcc* libffi-devel openssl-devel
 
 COPY --from=pip /out/requirements.txt /requirements.txt
 
-RUN source /opt/rh/devtoolset-8/enable && pip3.6 install -U virtualenv
+RUN source /opt/rh/devtoolset-8/enable
 
 # Red Hat compatibility
 RUN ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.so.rh-python36 /opt/rh/rh-python36/root/usr/lib64/libpython3.6mu.so.1.0 && \
     ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so.1.0 && \
     ln -fs /opt/rh/rh-python36/root/usr/lib64/libpython3.6m.so.rh-python36-1.0 /opt/rh/rh-python36/root/usr/lib64/libpython3.6.so.1.0
 
-RUN source /opt/rh/devtoolset-8/enable && mkdir -p /out && virtualenv -p python3.6 /venv && /venv/bin/pip3.6 install --no-binary=:all: -Ur /requirements.txt
-RUN source /opt/rh/devtoolset-8/enable && /venv/bin/pip3.6 install --no-cache-dir pip==18.1
-RUN source /opt/rh/devtoolset-8/enable && /venv/bin/pip3.6 install -U pyinstaller==3.4 && \
-    /venv/bin/pyinstaller \
-    -F "/venv/bin/ansible-playbook" \
+RUN source /opt/rh/devtoolset-8/enable && mkdir -p /out && pip3.6 install --no-binary=:all: -Ur /requirements.txt
+RUN source /opt/rh/devtoolset-8/enable && pip3.6 install --no-cache-dir pip==18.1
+RUN source /opt/rh/devtoolset-8/enable && pip3.6 install -U pyinstaller==3.4 && \
+    /opt/rh/rh-python36/root/usr/bin/pyinstaller \
+    -F "/opt/rh/rh-python36/root/usr/bin/ansible-playbook" \
     -n "ansible-playbook" \
-    --specpath "/venv" \
     --clean \
     --distpath "/out/" \
     --hidden-import "distutils" \
@@ -35,5 +34,5 @@ RUN source /opt/rh/devtoolset-8/enable && /venv/bin/pip3.6 install -U pyinstalle
     --hidden-import "crypt" \
     --hidden-import "xml.etree" \
     --hidden-import "xml.etree.ElementTree" \
-    --add-data /venv/lib/python3.6/site-packages/ansible:ansible \
+    --add-data /opt/rh/rh-python36/root/usr/lib/python3.6/site-packages/ansible:ansible \
     --exclude-module readline
