@@ -1007,7 +1007,7 @@ class ModelExportCmdTexts:
     PATH - indicates the location of the model on the Input or Output network shares.
            If 'formats' value is given the command displays a list of available export's formats.
     \b
-    FORMAT - one of the supported formats (see nctl model export formats command to see the available
+    FORMAT - one of the supported formats (try nctl model export formats command to see the available
              export formats). Required if export of a model is executed.
 
     operation-options - options specific to a chosen format.
