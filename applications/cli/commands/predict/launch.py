@@ -40,7 +40,7 @@ from util.k8s.k8s_info import get_secret, get_kubectl_current_context_namespace,
 
 
 INFERENCE_TEMPLATE_TFSERVING = 'tf-inference-stream'
-INFERENCE_TEMPLATE_OVMS = 'ovms-inference-stream'
+INFERENCE_TEMPLATE_OVMS = 'openvino-inference-stream'
 
 logger = initialize_logger(__name__)
 
