@@ -33,7 +33,7 @@ from cli_text_consts import PredictBatchCmdTexts as Texts
 
 
 BATCH_INFERENCE_TEMPLATE_TFSERVING = 'tf-inference-batch'
-BATCH_INFERENCE_TEMPLATE_OVMS = 'ovms-inference-batch'
+BATCH_INFERENCE_TEMPLATE_OVMS = 'openvino-inference-batch'
 
 logger = initialize_logger(__name__)
 
