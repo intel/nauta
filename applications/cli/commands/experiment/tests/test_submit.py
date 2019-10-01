@@ -56,7 +56,7 @@ class SubmitMocks:
             "commands.experiment.submit.get_default_script_location")
         self.clean_script_parameters = mocker.patch("commands.experiment.submit.clean_script_parameters")
         self.get_list_of_packs = mocker.patch("commands.experiment.common.get_list_of_packs",
-                                              return_value=["tf-training-tfjob"])
+                                              return_value=["tf-training-single"])
         self.validate_pack = mocker.patch("commands.experiment.submit.validate_pack")
 
 

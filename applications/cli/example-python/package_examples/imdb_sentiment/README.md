@@ -40,20 +40,20 @@ nctl exp submit imdb_cnn.py -n imdb-cnn-opt \
 In order to compare the results, let's use `experiment list` command:
 ```bash
 (.venv) mciesiel@dev:~/nauta/applications/cli$ python main.py exp list -n imdb-cnn-opt
-| Name             | Parameters                  | Metrics                      | Submission date        | Start date             | Duration      | Owner     | Status   | Template name     | Template version   |
-|------------------+-----------------------------+------------------------------+------------------------+------------------------+---------------+-----------+----------+-------------------+--------------------|
-| imdb-cnn-opt-1   | imdb_cnn.py --kernel-size=2 | accuracy: 0.80584            | 2019-03-29 01:36:38 PM | 2019-03-29 01:36:47 PM | 0d 0h 25m 16s | pomidorek | RUNNING  | tf-training-tfjob | 0.1.0              |
-|                  |                             | loss: 0.399                  |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_accuracy: 0.8606  |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_loss: 0.320       |                        |                        |               |           |          |                   |                    |
-| imdb-cnn-opt-2   | imdb_cnn.py --kernel-size=3 | accuracy: 0.79948            | 2019-03-29 01:36:43 PM | 2019-03-29 01:36:53 PM | 0d 0h 25m 10s | pomidorek | RUNNING  | tf-training-tfjob | 0.1.0              |
-|                  |                             | loss: 0.404                  |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_accuracy: 0.87264 |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_loss: 0.299       |                        |                        |               |           |          |                   |                    |
-| imdb-cnn-opt-3   | imdb_cnn.py --kernel-size=4 | accuracy: 0.8044             | 2019-03-29 01:36:47 PM | 2019-03-29 01:36:58 PM | 0d 0h 25m 5s  | pomidorek | RUNNING  | tf-training-tfjob | 0.1.0              |
-|                  |                             | loss: 0.400                  |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_accuracy: 0.87252 |                        |                        |               |           |          |                   |                    |
-|                  |                             | validation_loss: 0.299       |                        |                        |               |           |          |                   |                    |
+| Name             | Parameters                  | Metrics                      | Submission date        | Start date             | Duration      | Owner     | Status   | Template name      | Template version   |
+|------------------+-----------------------------+------------------------------+------------------------+------------------------+---------------+-----------+----------+--------------------+--------------------|
+| imdb-cnn-opt-1   | imdb_cnn.py --kernel-size=2 | accuracy: 0.80584            | 2019-03-29 01:36:38 PM | 2019-03-29 01:36:47 PM | 0d 0h 25m 16s | pomidorek | RUNNING  | tf-training-single | 0.1.0              |
+|                  |                             | loss: 0.399                  |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_accuracy: 0.8606  |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_loss: 0.320       |                        |                        |               |           |          |                    |                    |
+| imdb-cnn-opt-2   | imdb_cnn.py --kernel-size=3 | accuracy: 0.79948            | 2019-03-29 01:36:43 PM | 2019-03-29 01:36:53 PM | 0d 0h 25m 10s | pomidorek | RUNNING  | tf-training-single | 0.1.0              |
+|                  |                             | loss: 0.404                  |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_accuracy: 0.87264 |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_loss: 0.299       |                        |                        |               |           |          |                    |                    |
+| imdb-cnn-opt-3   | imdb_cnn.py --kernel-size=4 | accuracy: 0.8044             | 2019-03-29 01:36:47 PM | 2019-03-29 01:36:58 PM | 0d 0h 25m 5s  | pomidorek | RUNNING  | tf-training-single | 0.1.0              |
+|                  |                             | loss: 0.400                  |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_accuracy: 0.87252 |                        |                        |               |           |          |                    |                    |
+|                  |                             | validation_loss: 0.299       |                        |                        |               |           |          |                    |                    |
 
 ```
 

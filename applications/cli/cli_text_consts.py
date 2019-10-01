@@ -477,7 +477,7 @@ class ExperimentSubmitCmdTexts:
     HELP_N = "Name for this experiment."
 
     HELP_SFL = "Location and name folder with additional files used by a script, for example: other .py files, data, etc. If not given, then its contents will not be copied into a Docker image created by the nctl submit command.  nctl copies all content, preserving its structure including subfolder(s)."
-    HELP_T = "Name of a template used by nctl to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). A list of available templates can be obtained by issuing the nctl experiment template_list command."     
+    HELP_T = "Name of a template used by nctl to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training-single). A list of available templates can be obtained by issuing the nctl experiment template_list command."
     HELP_P = " Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "         
     HELP_PR = "Values (set or range) of a single parameter."
