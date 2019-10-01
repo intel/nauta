@@ -17,7 +17,7 @@
 import base64
 from enum import Enum
 from http import HTTPStatus
-from typing import List, Dict
+from typing import List, Dict, Optional
 from urllib.parse import urlparse
 
 from kubernetes.client.rest import ApiException
@@ -83,10 +83,10 @@ def get_api_key() -> str:
     return configuration.Configuration().api_key.get('authorization')
 
 
-def get_kubectl_current_context_namespace() -> str:
+def get_kubectl_current_context_namespace() -> Optional[str]:
     config.load_kube_config()
     context_list, current_context = config.list_kube_config_contexts()
-    return current_context['context']['namespace']
+    return current_context['context'].get('namespace')
 
 
 def get_k8s_api() -> client.CoreV1Api:
