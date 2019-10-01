@@ -103,7 +103,7 @@ def format_run_message(run_message: Optional[str]) -> str:
 @click.command(short_help=Texts.SHORT_HELP, help=Texts.HELP, cls=AliasCmd, alias='s', options_metavar='[options]')
 @click.argument("script_location", type=click.Path(exists=True), required=True)
 @click.option("-sfl", "--script-folder-location", type=click.Path(exists=True, file_okay=False), help=Texts.HELP_SFL)
-@click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-tfjob", callback=validate_template_name)
+@click.option("-t", "--template", help=Texts.HELP_T, default="tf-training-single", callback=validate_template_name)
 @click.option("-n", "--name", help=Texts.HELP_N, callback=validate_experiment_name)
 @click.option("-p", "--pack-param", type=(str, str), multiple=True, help=Texts.HELP_P,
               callback=validate_pack_params_names)

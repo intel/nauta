@@ -4,7 +4,7 @@
    training.py file
 1. Submit training:
 ```
-nctl exp s training.py -sfl data -t multinode-tf-training-tfjob -- --data_dir /app
+nctl exp s training.py -sfl data -t tf-training-multi -- --data_dir /app
 ```
 
 
