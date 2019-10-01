@@ -60,12 +60,6 @@ spec:
         ports:
         - containerPort: 9201
           protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: _cluster/health%3Fwait_for_status=yellow&wait_for_no_initializing_shards&timeout=60s
-            port: 9201
-          initialDelaySeconds: 20
-          timeoutSeconds: 60
         volumeMounts:
           - mountPath: "/var/es-proxy-auth"
             name: es-proxy-auth
@@ -88,9 +82,6 @@ spec:
           requests:
             memory: 2Gi
             cpu: 2
-#          limits:
-#            memory: 3Gi
-#            cpu: 4
         readinessProbe:
           httpGet:
             path: /_cluster/health?wait_for_status=yellow&wait_for_no_initializing_shards&timeout=60s
