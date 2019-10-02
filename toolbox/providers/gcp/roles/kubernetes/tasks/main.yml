@@ -8,9 +8,9 @@
 
 - name: Download kubectl
   get_url:
-    url: https://dl.k8s.io/v1.10.0/kubernetes-client-linux-amd64.tar.gz
+    url: https://dl.k8s.io/v1.14.3/kubernetes-client-linux-amd64.tar.gz
     dest: ./kubectl.tar.gz
-    checksum: "sha256:845668fe2f854b05aa6f0b133314df83bb41a486a6ba613dbb1374bf3fbe8720"
+    checksum: "sha512:dcb6eeebf618a01f274091998984f8afca567f7a20ffff810bef97e9654af5e4b912f83c97e6ed13dd1b93fcea2c14d7cde4fd55b174f32aa1f2f005baadf2d7"
 
 - name: Unarchive kubectl
   unarchive:

@@ -38,3 +38,7 @@ output "k8s_password" {
 output "k8s_username" {
   value = "${google_container_cluster.primary.master_auth.0.username}"
 }
+
+output "k8s_debug" {
+  value = "${google_container_cluster.primary.master_auth}"
+}
