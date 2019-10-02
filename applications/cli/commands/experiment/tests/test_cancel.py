@@ -137,7 +137,7 @@ def test_cancel_lack_of_experiments(prepare_command_mocks: CancelMocks):
     check_command_asserts(prepare_command_mocks, cne_count=0)
     assert f"Lack of {experiment_name_plural} fulfilling given criteria." \
            f" Name or match string parameters do not match any existing {experiment_name} in an appropriate " \
-           f"state for the command. Run 'nctl exp list' to find out what are the names and states of " \
+           f"state for the command. Run 'nctl exp list' to display the names and states of " \
            f"existing {experiment_name_plural}." in result.output
 
 
@@ -169,7 +169,7 @@ def test_cancel_all_exp_cancelled(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME], catch_exceptions=False)
 
     check_command_asserts(prepare_command_mocks, cne_count=0)
-    assert "However there are experiments that match given" in result.output
+    assert "However, there are experiments that match given" in result.output
 
 
 def test_cancel_lack_of_exp(prepare_command_mocks: CancelMocks):
@@ -225,7 +225,7 @@ def test_cancel_some_not_cancelled(prepare_command_mocks: CancelMocks):
     check_command_asserts(prepare_command_mocks, cne_count=2)
     assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
-    assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
+    assert f"The following {experiment_name_plural} were not cancelled correctly:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training" in result.output
 
 
@@ -245,7 +245,7 @@ def test_exception_during_exp_cancellation(prepare_command_mocks: CancelMocks):
     check_command_asserts(prepare_command_mocks, cne_count=2)
     assert f"The following {experiment_name_plural} were cancelled successfully:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-1-tf-training" in result.output
-    assert f"The following {experiment_name_plural} weren't cancelled properly:" in result.output
+    assert f"The following {experiment_name_plural} were not cancelled correctly:" in result.output
     assert "exp-mnist-single-node.py-18.05.17-16.05.45-3-tf-training" in result.output
 
 
@@ -253,7 +253,7 @@ def test_cancel_missing_parameters(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel)
     check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, gex_count=0)
 
-    assert "Name or -m option must be given. Please pass one of them." \
+    assert "Name or -m option must be given. Pass one of them." \
            in result.output
 
 
@@ -261,7 +261,7 @@ def test_cancel_pod_parameters_only(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, ["-i", "pod_id"])
     check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, gex_count=0)
 
-    assert "Name or -m option must be given. Please pass one of them." \
+    assert "Name or -m option must be given. Pass one of them." \
            in result.output
 
 
@@ -269,7 +269,7 @@ def test_cancel_too_many_parameters(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
     check_command_asserts(prepare_command_mocks, gcn_count=0, lor_count=0, cne_count=0, gex_count=0)
 
-    assert "Both name and -m option cannot be given. Please choose one of them." in result.output
+    assert "Both name and -m option cannot be given. Choose one of them." in result.output
 
 
 def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
@@ -277,7 +277,7 @@ def test_cancel_all_exp_cancelled_m_option(prepare_command_mocks: CancelMocks):
     result = CliRunner().invoke(cancel.cancel, ["-m", EXPERIMENT_NAME])
 
     check_command_asserts(prepare_command_mocks, cne_count=0, gex_count=0)
-    assert f"However there are experiments that match given" in result.output
+    assert f"However, there are experiments that match given" in result.output
 
 
 class CancelExperimentMocks:
@@ -443,7 +443,7 @@ def test_cancel_match_and_name(prepare_command_mocks: CancelMocks):
     prepare_command_mocks.list_runs.return_value = TEST_RUNS_CORRECT
     result = CliRunner().invoke(cancel.cancel, [EXPERIMENT_NAME, "-m", EXPERIMENT_NAME])
 
-    assert "Both name and -m option cannot be given. Please choose one of them." in result.output
+    assert "Both name and -m option cannot be given. Choose one of them." in result.output
 
 
 def test_cancel_pods(mocker):
