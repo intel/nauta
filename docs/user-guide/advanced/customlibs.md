@@ -17,7 +17,7 @@ To install an Operating System library or dependency that _is not_ included in s
 ## Modifying Existing Draft Packs
 
 The draft packs are located in the `nctl_config` folder. Navigate to `.draft/packs` folder to list existing packs.
-The default pack used by _nctl_ client is `tf-training-tfjob`. Edit the _Dockerfile_ located in selected pack to make necessary changes.
+The default pack used by _nctl_ client is `tf-training-single`. Edit the _Dockerfile_ located in selected pack to make necessary changes.
 
 Example _Dockerfile_:
 

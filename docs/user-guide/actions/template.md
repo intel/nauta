@@ -131,8 +131,8 @@ If an error occurs during execution of this command, then the cause of the issue
     |                                   | interactive sessions                            |                 |                  |
     | jupyter-py2                       | Pack with Jupyter Notebook for purpose of       | 0.1.0           | 0.1.0            |
     |                                   | interactive sessions                            |                 |                  |
-    | multinode-tf-training-horovod     | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
-    | multinode-tf-training-horovod-py2 | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
+    | tf-training-horovod               | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
+    | tf-training-horovod-py2           | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
 
 ----------------------
 

@@ -104,17 +104,17 @@ The Nauta software should contain at least the following template packs (list of
 together with the Nauta software depends on a content of the Template zoo repository at the moment
 of building a certain version of the Nauta nctl client):  
 
-* **multinode-tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
+* **tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
 
-* **multinode-tf-training-horovod-py2** - A TensorFlow multi-node training job based on Horovod using Python 2.
+* **tf-training-horovod-py2** - A TensorFlow multi-node training job based on Horovod using Python 2.
 
-* **multinode-tf-training-tfjob** - A TensorFlow multi-node training job based on TfJob using Python 3.
+* **tf-training-multi** - A TensorFlow multi-node training job based on TfJob using Python 3.
 
-* **multinode-tf-training-tfjob-py2** - A TensorFlow multi-node training job based on TfJob using Python 2.
+* **tf-training-multi-py2** - A TensorFlow multi-node training job based on TfJob using Python 2.
 
-* **tf-training-tfjob** - A TensorFlow single-node training job based on TfJob using Python 3.
+* **tf-training-single** - A TensorFlow single-node training job based on TfJob using Python 3.
 
-* **tf-training-tfjob-py2** - A TensorFlow single-node training job based on TfJob using Python 2.
+* **tf-training-single-py2** - A TensorFlow single-node training job based on TfJob using Python 2.
 
 ## Customizing the Provided Packs
 

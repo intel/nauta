@@ -137,19 +137,19 @@ To submit the example experiments, use the following:
 
 For single node training (template parameter in this case is optional)
 
-`nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
+`nctl experiment submit -t tf-training-single examples/mnist_single_node.py --name single`
 
 #### Multinode Training
 
 For multinode training:
 
-`nctl experiment submit -t multinode-tf-training-tfjob examples/mnist_multinode.py --name multinode`
+`nctl experiment submit -t tf-training-multi examples/mnist_multinode.py --name multinode`
 
 #### Horovod Training
 
 For Horovod training:
 
-`nctl experiment submit -t multinode-tf-training-horovod examples/mnist_horovod.py --name horovod `
+`nctl experiment submit -t tf-training-horovod examples/mnist_horovod.py --name horovod `
 
 The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing `nctl template list` command.
 
@@ -159,7 +159,7 @@ The following example shows how to submit a MNIST experiment and write the Tenso
 
 Enter the following command to run this example:
 
-`nctl experiment submit -t tf-training-tfjob examples/mnist_single_node.py --name single`
+`nctl experiment submit -t tf-training-single examples/mnist_single_node.py --name single`
 
 #### Result of this Command
 
@@ -249,17 +249,17 @@ As shown in the example, an example experiment list is shown (scroll right to se
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name     |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+-------------------|
-| mnist-tb     | mnist_single_node.py |                             | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM |                        | user1   | RUNNING  | tf-training-tfjob |
-| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-tfjob |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                   |
-|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                   |
-|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                   |
-| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-tfjob |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                   |
-|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                   |
-|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                   |
+| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
+|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
+| mnist-tb     | mnist_single_node.py |                             | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM |                        | user1   | RUNNING  | tf-training-single |
+| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-single |
+|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
+|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                    |
+|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                    |
+| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-single |
+|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
+|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                    |
+|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                    |
 
 ```
 ### Adding Experiment Metrics: Instructions
