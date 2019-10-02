@@ -12,12 +12,12 @@ To run a multi-node experiment, the script must support it. The following is the
 nctl experiment submit [options]  SCRIPT-LOCATION --template [MULTINODE-TEMPLATE_NAME] SCRIPT-LOCATION [-- script-parameters]`
 ```
 
-The template `multinode-tf-training-tfjob` is included with the Nauta software. The following is an example command using this template (scroll right to see the full contents):
+The template `tf-training-multi` is included with the Nauta software. The following is an example command using this template (scroll right to see the full contents):
 
 **Example:** 
 
 ```
-nctl experiment submit --name multinodes --template multinode-tf-training-tfjob /examples/mnist_multinode.py -- -- data_dir=/mnt/input/root/public/MNIST
+nctl experiment submit --name multinodes --template tf-training-multi /examples/mnist_multinode.py -- -- data_dir=/mnt/input/root/public/MNIST
 ```
 
 The following result displays showing the queued job.

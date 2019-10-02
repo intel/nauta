@@ -10,7 +10,7 @@ This section discusses the following main topics:
 
 The packs are located in the _nctl_config_ folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs.
 
-The default pack used by  `nctl_ client is _tf-training-tfjob`. The pack consist of the parts:
+The default pack used by  `nctl_ client is _tf-training-single`. The pack consist of the parts:
 
 * Docker image specification _Dockerfile_
 
@@ -18,7 +18,7 @@ The default pack used by  `nctl_ client is _tf-training-tfjob`. The pack consist
 
 All the pack parameters that can be controlled by _nctl_ are defined in `charts/values.yml` file.
 
-The example `values.yaml` file (shown below) is taken from `multinode-tf-training-tfjob` pack:
+The example `values.yaml` file (shown below) is taken from `tf-training-multi` pack:
 
 ```
 	# Default values for charts.
@@ -97,7 +97,7 @@ The _-p_ parameter can be provided multiple times. Format specification:
   
 #### Example
 
-_nctl_ experiment submit multinode.py -t multinode-tf-training-tfjob -p workersCount 12 -p pServersCount 1
+_nctl_ experiment submit multinode.py -t tf-training-multi -p workersCount 12 -p pServersCount 1
 
 ### Experiment Resources
 
@@ -107,14 +107,16 @@ _nctl_ is using by default following resource limits and requests for each built
 | --- | --- | --- | --- | --- | --- |
 | jupyter       | 38 | 38 | 120Gi | 120Gi | - |
 | jupyter-py2   | 38 | 38 | 120Gi | 120Gi | - |
-| multinode-tf-training-horovod | 76 | 76 | 240Gi | 240Gi | 20 |
-| multinode-tf-training-horovod-py2 | 76 | 76 | 240Gi | 240Gi | 20 |
-| multinode-tf-training-tfjob | 76 | 76 | 240Gi | 240Gi | - |
-| multinode-tf-training-tfjob-py2 | 76 | 76 | 240Gi | 240Gi | - |
+| tf-training-horovod | 76 | 76 | 240Gi | 240Gi | 20 |
+| tf-training-horovod-py2 | 76 | 76 | 240Gi | 240Gi | 20 |
+| tf-training-multi | 76 | 76 | 240Gi | 240Gi | - |
+| tf-training-multi-py2 | 76 | 76 | 240Gi | 240Gi | - |
+| openvino-inference-batch | 38 | 38 | 120Gi | 120Gi | - |
+| openvino-inference-stream | 38 | 38 | 120Gi | 120Gi | - |
 | tf-inference-batch | 38 | 38 | 120Gi | 120Gi | - |
 | tf-inference-stream | 38 | 38 | 120Gi | 120Gi | - |
-| tf-training-tfjob | 38 | 38 | 120Gi | 120Gi | - |
-| tf-training-tfjob-py2 | 38 | 38 | 120Gi | 120Gi | - |
+| tf-training-single | 38 | 38 | 120Gi | 120Gi | - |
+| tf-training-single-py2 | 38 | 38 | 120Gi | 120Gi | - |
 
 It is recommended to keep requests and limits on the same values. Also requested limits never should be bigger than resources available on node.
 
@@ -130,14 +132,16 @@ To change these defaults, following parameters should be adjusted (using methods
 | --- | --- | 
 | jupyter       | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | jupyter-py2       | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> -  resources.limits.memory |
-| multinode-tf-training-horovod | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory<br> - cpus<br> - processesPerNode |
-| multinode-tf-training-horovod-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory<br> - cpus<br> - processesPerNode |
-| multinode-tf-training-tfjob | - worker_resources.requests.cpu<br> - worker_resources.requests.memory<br> - worker_resources.limits.cpu<br> - worker_resources.limits.memory<br> - ps_resources.requests.cpu<br> - ps_resources.requests.memory<br> - ps_resources.limits.cpu<br> - ps_resources.limits.memory |
-| multinode-tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory <br> - ps_resources.requests.cpu<br> - ps_resources.requests.memory<br> - ps_resources.limits.cpu<br> - ps_resources.limits.memory |
+| tf-training-horovod | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory<br> - cpus<br> - processesPerNode |
+| tf-training-horovod-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory<br> - cpus<br> - processesPerNode |
+| tf-training-multi | - worker_resources.requests.cpu<br> - worker_resources.requests.memory<br> - worker_resources.limits.cpu<br> - worker_resources.limits.memory<br> - ps_resources.requests.cpu<br> - ps_resources.requests.memory<br> - ps_resources.limits.cpu<br> - ps_resources.limits.memory |
+| tf-training-multi-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory <br> - ps_resources.requests.cpu<br> - ps_resources.requests.memory<br> - ps_resources.limits.cpu<br> - ps_resources.limits.memory |
+| openvino-inference-batch | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
+| openvino-inference-stream | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-inference-batch | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 | tf-inference-stream | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
-| tf-training-tfjob | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
-| tf-training-tfjob-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
+| tf-training-single | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
+| tf-training-single-py2 | - resources.requests.cpu<br> - resources.requests.memory<br> - resources.limits.cpu<br> - resources.limits.memory |
 
 
 ----------------------

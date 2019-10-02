@@ -73,9 +73,9 @@ When `nctl predictl list` reports the prediction as running:
 
 
 ```
-| Prediction instance   | Parameters   | Submission date        | Start date             | Duration      | Owner    | Status   | Template name         | Template version   |
-|-----------------------+--------------+------------------------+------------------------+---------------+----------+----------+-----------------------+--------------------|
-| ovmsexample           |              | 2019-07-29 03:01:08 PM | 2019-07-29 03:01:12 PM | 0d 0h 26m 13s | mzylowsk | RUNNING  | ovms-inference-stream | 0.1.0              |
+| Prediction instance   | Parameters   | Submission date        | Start date             | Duration      | Owner    | Status   | Template name             | Template version   |
+|-----------------------+--------------+------------------------+------------------------+---------------+----------+----------+---------------------------+--------------------|
+| ovmsexample           |              | 2019-07-29 03:01:08 PM | 2019-07-29 03:01:12 PM | 0d 0h 26m 13s | mzylowsk | RUNNING  | openvino-inference-stream | 0.1.0              |
 ```
 
 Perform stream inference by executing the follwing command:
@@ -132,9 +132,9 @@ nctl predict batch -n ovmsbatch -rt ovms --model-location /mnt/input/home/models
 When a batch prediction reaches the `FINISHED` state (as shown in the example), it displays the results (scroll to the right to see the full details).
 
 ```
-| Prediction instance         | Parameters   | Submission date        | Start date             | Duration     | Owner    | Status   | Template name        | Template version   |
-|-----------------------------+--------------+------------------------+------------------------+--------------+----------+----------+----------------------+--------------------|
-| mnist-526-19-07-30-00-34-07 |              | 2019-07-30 12:34:35 AM | 2019-07-30 12:34:45 AM | 0d 0h 0m 17s | mzylowsk | COMPLETE | ovms-inference-batch | 0.1.0              |
+| Prediction instance         | Parameters   | Submission date        | Start date             | Duration     | Owner    | Status   | Template name            | Template version   |
+|-----------------------------+--------------+------------------------+------------------------+--------------+----------+----------+--------------------------+--------------------|
+| mnist-526-19-07-30-00-34-07 |              | 2019-07-30 12:34:35 AM | 2019-07-30 12:34:45 AM | 0d 0h 0m 17s | mzylowsk | COMPLETE | openvino-inference-batch | 0.1.0              |
 ```
 
 To understand these results of the `/output` mount point, refer to [Working with Datasets](working_with_datasets.md#mounting-and-accessing-folders).

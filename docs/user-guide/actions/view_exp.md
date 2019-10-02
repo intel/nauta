@@ -27,16 +27,16 @@ The following _example results_ are shown below (scroll right to see full conten
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name     |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+-------------------|
-| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-tfjob |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                   |
-|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                   |
-|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                   |
-| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-tfjob |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                   |
-|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                   |
-|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                   |
+| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
+|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
+| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-single |
+|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
+|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                    |
+|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                    |
+| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-single |
+|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
+|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                    |
+|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                    |
 ```
 
 ### Viewing a Single Experiment's Details
@@ -55,12 +55,12 @@ The following _example results_ are shown below (scroll right to see full conten
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name     |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+-------------------|
-| mnist-tb     | mnist_single_node.py | accuracy: 1.0               | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM | 2019-03-20 05:12:10 PM | user1   | COMPLETE | tf-training-tfjob |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                   |
-|              |                      | loss: 0.035771053           |                        |                        |                        |         |          |                   |
-|              |                      | validation_accuracy: 0.9804 |                        |                        |                        |         |          |                   |
+| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
+|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
+| mnist-tb     | mnist_single_node.py | accuracy: 1.0               | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM | 2019-03-20 05:12:10 PM | user1   | COMPLETE | tf-training-single |
+|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
+|              |                      | loss: 0.035771053           |                        |                        |                        |         |          |                    |
+|              |                      | validation_accuracy: 0.9804 |                        |                        |                        |         |          |                    |
 
 Pods participating in the execution:
 

@@ -119,8 +119,8 @@ _does not_ have this certain version.
     |                                   | interactive sessions                            |                 |                  |
     | jupyter-py2                       | Pack with Jupyter Notebook for purpose of       | 0.1.0           | 0.1.0            |
     |                                   | interactive sessions                            |                 |                  |
-    | multinode-tf-training-horovod     | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
-    | multinode-tf-training-horovod-py2 | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
+    | tf-training-horovod               | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
+    | tf-training-horovod-py2           | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
 
 
  If an error occurs during execution of this command, the cause of the issue displays.
