@@ -199,6 +199,7 @@ resource "google_compute_instance" "nfs" {
 
 resource "random_string" "password" {
   length = 16
+  special = false
 }
 
 resource "google_container_cluster" "primary" {
