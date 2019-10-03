@@ -95,14 +95,14 @@ shared_images:
       PACKAGE_NAME: "containerd.io"
       PACKAGE_VERSION: "1.2"
   shared/build/rpm/container-selinux:
-    version: "2.68"
+    version: "2.107"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/build/rpm-downloader"
     push: False
     args:
       PACKAGE_NAME: "container-selinux"
-      PACKAGE_VERSION: "2.68"
+      PACKAGE_VERSION: "2.107"
   shared/build/rpm/docker-distribution:
     version: "2.6.2"
     required: {}
