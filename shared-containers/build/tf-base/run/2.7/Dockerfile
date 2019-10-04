@@ -30,6 +30,7 @@ RUN pip install --no-cache-dir \
         scipy==1.2.* \
         scikit-learn==0.20.* \
         pandas==0.23.* \
-        wheel==0.32.*
+        wheel==0.32.* \
+        prompt-toolkit==1.0.15
 
 RUN python -m ipykernel.kernelspec
