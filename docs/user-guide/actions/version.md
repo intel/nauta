@@ -26,8 +26,8 @@ The version command returns the currently installed `nctl` application version o
 ```
 | Component        | Version                  |
 |------------------+--------------------------|
-| nctl application | 1.0.0-ent-20190403020148 |
-| nauta platform   | 1.0.0-ent-20190403020148 |
+| nctl application | 1.1.0-ent-20191010050128 |
+| nauta platform   | 1.1.0-ent-20191010050128 |
 
 ```
 

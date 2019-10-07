@@ -146,7 +146,7 @@ This command creates gke cluster, resources and installs nauta from local file.
 ```$xslt
 ./gcp.sh --k8s-cluster nauta-cluster --operation create \
                                      --gcp-config `pwd`/gcp-config.yml \
-                                     --install-file /opt/project-data/repository/releases/nauta/nauta-1.0.0-latest.tar.gz
+                                     --install-file /opt/project-data/repository/releases/nauta/nauta-1.1.0-ent-20191010050128.tar.gz
 ```
 
 - #### Create cluster and install platform

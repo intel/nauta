@@ -4,7 +4,7 @@
 
 Copy the package to the installer machine, then untar it using the following command:
 
-`nauta-1.0.0-ent-20190513065650.tar.gz -C <destination>`
+`nauta-1.1.0-ent-20191010050128.tar.gz -C <destination>`
 
 ### Nauta Structure
 

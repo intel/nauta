@@ -114,7 +114,7 @@ ssh nauta@<ip-gateway-from-nauta.info>
 
 Bastion node is accessible from the Internet. Please adjust authorized keys - add your own to the bastion host to `~/.ssh/authorized_keys`.
 
-When on Nauta Cluster Bastion Node, untar `~/artifacts/nctl-1.0.0-<timestamp>-linux.tar.gz` file which gives you a possibility to use `nctl` tool. Refer to [Nauta Getting Started document](../../../docs/user-guide/actions/getting_started.md) for further information on `nctl`. Your first step after veryfing that `nctl` works correctly should be a regular user creation and switching to it to perform other operations supported by Nauta.  
+When on Nauta Cluster Bastion Node, untar `~/artifacts/nctl-1.1.0-<timestamp>-linux.tar.gz` file which gives you a possibility to use `nctl` tool. Refer to [Nauta Getting Started document](../../../docs/user-guide/actions/getting_started.md) for further information on `nctl`. Your first step after veryfing that `nctl` works correctly should be a regular user creation and switching to it to perform other operations supported by Nauta.  
 
 ### Next Steps
 
