@@ -12,5 +12,6 @@
     docker_image:
       name: "nauta-repository:{{ VERSION_MAJOR }}.{{ VERSION_MINOR }}.{{ VERSION_NO }}-{{ VERSION_SUFFIX  }}-{{ VERSION_ID }}"
       state: absent
+      timeout: 300
   roles:
     - role: finalize
