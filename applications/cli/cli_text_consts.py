@@ -22,8 +22,8 @@ class VersionCmdTexts:
     HELP = "Displays the version of the installed nctl application."
     INITIAL_PLATFORM_VERSION = "Failed to acquire platform version."
     KUBECTL_INT_ERROR_MSG = "Falied to check platform version. This may occur for example due to invalid path to " \
-                            "kubectl config, invalid k8s credentials or k8s cluster being unavailable. Check your " \
-                            "KUBECONFIG environment variable and make sure that the k8s cluster is online."
+                            "kubectl config, invalid Kubernetes credentials or Kubernetes cluster being unavailable. Check your " \
+                            "KUBECONFIG environment variable and make sure that the Kubernetes cluster is online."
     OTHER_ERROR_MSG = "Unexpected error occurred during platform version check."
     TABLE_APP_ROW_NAME = "nctl application"
     TABLE_PLATFORM_ROW_NAME = "nauta platform"
@@ -52,7 +52,7 @@ class MountCmdTexts:
 
     MOUNT_CMD = "Mount command for this operating system:\n{command}" 
 
-    HELP_L = "Displays a list of nauta folders mounted on a local machine. If run using administrator credentials, displays " \
+    HELP_L = "Displays a list of nauta folders mounted on a local machine. If run using administrator credentials, then displays " \
              "mounts of all users."
     GET_MOUNT_COMMAND_ERROR_MSG = "Error detected while gathering data needed for mounting Samba share."
     UNMOUNT_CMD = "Unmount previously mounted folder using the command:\n{command}"
@@ -90,14 +90,14 @@ class CmdsCommonTexts:
     EXPERIMENT_NOT_EXISTS_ERROR_MSG = "{instance_type} with name {experiment_name} does not exist."
     LOCAL_PORT_OCCUPIED_ERROR_MSG = "Error occurred during creation of a proxy for elasticsearch. {exe.message}"
     PROXY_CLOSE_LOG_ERROR_MSG = "Error occurred during closing of a proxy for elasticsearch."
-    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy has not been closed properly. Check if it still exists, if " \
-                                 "yes - close it manually."
+    PROXY_CLOSE_USER_ERROR_MSG = "Elasticsearch proxy has not been closed correctly. Check if it still exists. If " \
+                                 "yes, close it manually."
     NAME_M_BOTH_GIVEN_ERROR_MSG = "Both {instance_type} name and -m option cannot be given. Choose one."
     NAME_M_NONE_GIVEN_ERROR_MSG = "Error: {instance_type} name or -m option must be given. Pass one."
     LOGS_STORING_CONF = "Logs from the {instance_name} {instance_type} will be stored in " \
-                        "the {filename} file. Should the app proceed?"
+                        "the {filename} file. Should the application proceed?"
     LOGS_STORING_CONF_FILE_EXISTS = "Logs from the {instance_name} {instance_type} will be stored in the " \
-                                    "{filename} file. The file with this name already exists. Should the app " \
+                                    "{filename} file. The file with this name already exists. Should the application " \
                                     "proceed?"
     LOGS_STORING_ERROR = "Some problems occurred during storing a file with logs."
     LOGS_STORING_FINAL_MESSAGE = "Logs have been written to the file mentioned above."
@@ -107,7 +107,7 @@ class CmdsCommonTexts:
 
 
 class VerifyCmdTexts:
-    HELP = "Verifies if all required external components contain the proper installed versions."
+    HELP = "Verifies if all required external components contain the correct installed versions."
     KUBECTL_NOT_INSTALLED_ERROR_MSG = "kubectl is not installed."
     KUBECTL_INVALID_VERSION_ERROR_MSG = "The installed version of kubectl ({installed_version}) is not " \
                                         "supported, supported version {supported_versions_sign} {expected_version}"
@@ -118,7 +118,7 @@ class VerifyCmdTexts:
     INVALID_VERSION_WARNING_MSG = "Warning: the installed version of {dependency_name} ({installed_version}) is " \
                                   "not supported, supported version {supported_versions_sign} " \
                                   "{expected_version}"
-    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed. Check installation manual for more " \
+    DEPENDENCY_NOT_INSTALLED_ERROR_MSG = "{dependency_name} is not installed. Check the installation manual for more " \
                                          "information."
     DEPENDENCY_VERSION_CHECK_ERROR_MSG = "Failed to get {dependency_name} version."
     DEPENDENCY_VERIFICATION_OTHER_ERROR_MSG = "{dependency_name} - exception during verification."
@@ -134,14 +134,14 @@ class VerifyCmdTexts:
 
 
 class ModelCmdTexts:
-    HELP = "Commands used to manage processing, conversion and packaging of models."
+    HELP = "Use these commands to manage processing, conversion, and packaging of models."
 
 
 class ModelStatusCmdTexts:
-    HELP = "Command displays status of a chosen operation."
-    MODEL_NOT_FOUND = "Lack of models to be displayed."
+    HELP = "Displays status of a chosen operation."
+    MODEL_NOT_FOUND = "No models models to display."
     OTHER_ERROR_MSG = "Failed to get statuses of operations."
-    HELP_U = "Name of a user to whom viewed operation belongs. If not given - only operations of a current " \
+    HELP_U = "Name of a user to whom viewed operation belongs. If not given, only operations of a current " \
              "user are taken into account."
     LOAD_DATA_MSG = "Loading operation's data. Please wait..."
 
@@ -152,21 +152,21 @@ class ModelProcessListCmdTexts:
 
 
 class UserCmdTexts:
-    HELP = "Create, delete, or list users of the platform. Can only be run by a platform administrator."
+    HELP = "Create, delete, or list users of the platform. This can only be run by a platform administrator."
 
 
 class UserListCmdTexts:
     HELP = "List users."
-    HELP_C = "If given - command displays c last rows."
+    HELP_C = "If given, command displays c last rows."
     TABLE_HEADERS = ["Name", "Creation date", "Date of last submitted job", "Number of running jobs",
                      "Number of queued jobs"]
     OTHER_ERROR_MSG = "Failed to get users list."
 
 
 class UserCreateCmdTexts:
-    SHORT_HELP = "Create a new user on the platform. Can only be run by a platform administrator."
+    SHORT_HELP = "Create a new user on the platform. This can only be run by a platform administrator."
     HELP = """
-   Create a new user on the platform. Can only be run by a platform administrator. 
+   Create a new user on the platform. This can only be run by a platform administrator. 
 
     USERNAME - is a name of user which should be created.
     """
@@ -182,16 +182,16 @@ class UserCreateCmdTexts:
     USER_ALREADY_EXISTS_ERROR_MSG = "User {username} already exists."
     USER_BEING_REMOVED_ERROR_MSG = "User {username} is still being removed."
     USER_VERIFICATION_ERROR_MSG = "Problems detected while verifying user with user name: {username}."
-    PASSWORD_GATHER_ERROR_MSG = "The app encountered problems while gathering user's password."
-    CERT_GATHER_ERROR_MSG = "The app encountered problems while gathering server's certifcate authority."
-    GIT_REPO_MANAGER_ERROR_MSG = "Error detected while adding the user to git repo manager."
-    USER_ADD_ERROR_MSG = "Error detected while adding of a user."
+    PASSWORD_GATHER_ERROR_MSG = "The application encountered problems while gathering user's password."
+    CERT_GATHER_ERROR_MSG = "The application encountered problems while gathering server's certifcate authority."
+    GIT_REPO_MANAGER_ERROR_MSG = "Error detected while adding the user to Git Repo Manager."
+    USER_ADD_ERROR_MSG = "Error detected while adding a user."
     USER_CREATION_SUCCESS_MSG = "User {username} has been added successfully."
     USER_NOT_READY_ERROR_MSG = "User {username} is still not ready."
     CONFIG_CREATION_ERROR_MSG = "Problems during creation of the kubeconfig with user's configuration."
     LIST_ONLY_HEADER = "Use the following kubectl config to connect to this user.\n" \
                        "----------------------------------------------------------------"
-    CONFIG_SAVE_SUCCESS_MSG = "Configuration has been saved to the {filename} file."
+    CONFIG_SAVE_SUCCESS_MSG = "Configuration saved to the {filename} file."
     CONFIG_SAVE_FAIL_MSG = "File with configuration was not saved."
     CONFIG_SAVE_FAIL_INSTRUCTIONS_MSG = "Content of the generated configuration file is as follows. Copy it " \
                                         "to a file manually."
@@ -199,62 +199,63 @@ class UserCreateCmdTexts:
 
 
 class UserDeleteCmdTexts:
-    SHORT_HELP = "Delete a user from the platform. Can be only run by a platform administrator."
+    SHORT_HELP = "Delete a user from the platform. This can be only run by a platform administrator."
     HELP = """
-    Delete a user from the platform. Can be only run by a platform administrator.
+    Delete a user from the platform. This can be only run by a platform administrator.
 
-    USERNAME - is a name of user which should be deleted.
+    USERNAME - The name of a user that should be deleted.
     """
-    HELP_PR = "If this option is added, the command removes all of client's artifacts."
+    HELP_PR = "If this option is added, the command removes all of the client's artifacts."
+
     USER_NOT_EXISTS_ERROR_MSG = "User {username} does not exist."
     USER_BEING_REMOVED_ERROR_MSG = "User is still being removed."
-    USER_PRESENCE_VERIFICATION_ERROR_MSG = "Problems during verifying users presence."
+    USER_PRESENCE_VERIFICATION_ERROR_MSG = "Problems occurred during verifying a users presence."
     DELETE_CONFIRM_MSG = "User {username} is about to be deleted. Do you want to continue?"
-    DELETE_ABORT_MSG = "Operation of deleting of a user was aborted."
+    DELETE_ABORT_MSG = "The operation of deleting a user was aborted."
     PURGE_ERROR_MSG = "Some artifacts belonging to a user were not removed."
-    DELETE_IN_PROGRESS_MSG = "User is still being deleted. Wait a few minutes, then check the user's status."
+    DELETE_IN_PROGRESS_MSG = "User is still being deleted. Wait a few minutes. Check the user's status."
     DELETE_SUCCESS_MSG = "User {username} has been deleted."
-    PROXY_ERROR_LOG_MSG = "Error occurred during closing of a proxy for elasticsearch."
+    PROXY_ERROR_LOG_MSG = "Error occurred during the closing of a proxy for elasticsearch."
     PROXY_ERROR_USER_MSG = "Elasticsearch proxy has not been closed correctly. Check if it still exists. If " \
                            "yes, close it manually."
-    OTHER_ERROR_LOG_MSG = "Error occurred during deleting a user of a user."
+    OTHER_ERROR_LOG_MSG = "Error occurred during deletion of user."
     OTHER_ERROR_USER_MSG = "User has not been deleted due to technical reasons."
-    DELETION_CHECK_PRESENCE = "Checking presence of a user that is going to be deleted..."
+    DELETION_CHECK_PRESENCE = "Checking for the presence of a user that is going to be deleted..."
     DELETION_START_DELETING = "Deleting of a user is starting now..."
     DELETION_START_PURGING = "Purging of a user is starting now..."
     DELETION_VERIFICATION_OF_DELETING = "Verifying, whether a user has been deleted correctly..."
-    DELETION_DELETING_NAMESPACE = "- Deleting user's namespace."
-    DELETION_DELETING_USERS_OBJECTS = "- Deleting user's objects."
-    DELETION_DELETING_USERS_EXPERIMENTS = "- Deleting user experiments' logs."
-    DELETION_DELETING_USERS_REPOSITORY = "- Deleting user's repository."
-
+    DELETION_DELETING_NAMESPACE = "- Deleting a user's namespace."
+    DELETION_DELETING_USERS_OBJECTS = "- Deleting a user's objects."
+    DELETION_DELETING_USERS_EXPERIMENTS = "- Deleting a user experiments' logs."
+    DELETION_DELETING_USERS_REPOSITORY = "- Deleting a user's repository."
 
 class UserUpgradeCmdTexts:
-    SHORT_HELP = "Upgrade users on the platform. Can only be run by a platform administrator."
+    SHORT_HELP = "Upgrade users on the platform. This can only be run by a platform administrator."
     UPGRADE_IN_PROGRESS = "Users upgrade in progress..."
     UPGRADE_SUCCEEDED = "Users upgrade succeeded."
     UPGRADE_FAILED = "Users upgrade failed."
 
 
 class LaunchCmdTexts:
-    HELP = "Launch the web user-interface or TensorBoard. Runs as a process in the system console until the " \
+    HELP = "Launch the web user-interface or TensorBoard. This runs as a process in the system console until the " \
            "user stops the process. To run in the background, add '&' at the end of the line."
     HELP_P = "Port on which service will be exposed locally."
-    HELP_N = "Run the command without a web browser starting. Only proxy tunnel is created"
-    WEBUI_HELP = "Subcommand for launching webUI with credentials."
+    HELP_N = "Run the command without starting a web browser. Only a proxy tunnel is created."
+    WEBUI_HELP = "Subcommand for launching the webUI with credentials."
     APP_PROXY_EXISTS_ERROR_MSG = "K8s proxy has not been closed correctly. Check if it still exists. If yes, " \
                                  "close it manually."
     APP_PROXY_OTHER_ERROR_MSG = "Other exception during launching web application."
-    SHORT_TB_HELP = "Subcommand for launching tensorboard with credentials."
+    SHORT_TB_HELP = "Subcommand for launching TensorBoard with credentials."
     TB_HELP = """
     Subcommand for launching TensorBoard with credentials.
 
-    EXPERIMENT_NAME - is a name of experiment for which TensorBoard instance should be launched.
+    EXPERIMENT_NAME - This is a name of an experiment for which a TensorBoard instance should be launched.
     """
     TB_HELP_TSCP = "Local port on which TensorBoard service client will be started."
     TB_INVALID_RUNS_MSG = "There is no data for the following experiments : {invalid_runs}\n" \
                           "TensorBoard will present information from the rest of given experiments."
-    TB_CREATE_ERROR_MSG = "Failed to create tensorboard!"
+
+    TB_CREATE_ERROR_MSG = "Failed to create TensorBoard!"
     TB_WAITING_MSG = "Wait for TensorBoard to run..."
     TB_WAITING_FOR_TB_MSG = "TensorBoard instance: {tb_id} still in {tb_status_value} status, waiting for " \
                             "RUNNING..."
@@ -271,21 +272,20 @@ class PredictListCmdTexts:
     HELP_N = "A regular expression to narrow down the list to prediction instances that match this expression."
     HELP_S = "List prediction instances with matching status."
     HELP_U = "List uninitialized prediction instances. For example, prediction instances" \
-             " without resources submitted for creation."
+             "submitted without available resources."
     HELP_C = "If given, this command displays c last rows."
-    HELP_B = "Use to print short version of the experiment result table."
-
+    HELP_B = "Displays last c row values of table."
 
 class PredictLaunchCmdTexts:
-    HELP = "Starts a new prediction instance that can be used for performing prediction, classification and " \
-           "regression tasks on trained model."
+    HELP = "Starts a new prediction instance that can be used for performing prediction, classification, and " \
+           "regression tasks on a trained model."
     HELP_N = "The name of this prediction instance."
     HELP_M = "Path to saved model that will be used for inference. Model must be located on one of the input or " \
              "output system shares (for example: /mnt/input/saved_model)."
     HELP_R = "Path to file with experiment's pip requirements." \
              " Dependencies listed in this file will be automatically installed using pip."
     INSTANCE_START_ERROR_MSG = "Failed to create prediction instance."
-    INSTANCE_INFO_MSG = "\nPrediction instance URL (append method verb manually. For example, :predict):\n" \
+    INSTANCE_INFO_MSG = "\nPrediction instance URL (append the method verb manually. For example, :predict):\n" \
                         "{inference_instance_url}\n\nAuthorize with following header:\n{authorization_header}"
     INSTANCE_URL_ERROR_MSG = "Failed to obtain prediction instance URL."
     TABLE_HEADERS = ["Prediction instance", "Model Location", "Status"]
@@ -313,41 +313,41 @@ class PredictStreamCmdTexts:
     HELP_M = "Method verb that will be used when performing inference. Predict verb is used by default."
     INSTANCE_NOT_EXISTS_ERROR_MSG = "Prediction instance {name} does not exist."
     INSTANCE_NOT_RUNNING_ERROR_MSG = "Prediction instance {name} is not in {running_code} state."
-    INSTANCE_GET_FAIL_ERROR_MSG = "Failed to get prediction instance {name} URL."
+    INSTANCE_GET_FAIL_ERROR_MSG = "Failed to get Prediction instance {name} URL."
     JSON_LOAD_ERROR_MSG = "Failed to load {data} data file. Make sure that provided file exists and is in a " \
                           "valid JSON format."
     INFERENCE_OTHER_ERROR_MSG = "Failed to perform inference. Reason: {exception}"
     INFERENCE_ERROR_RESPONSE_MSG = "\n Response: {response_text}"
-    WAITING_FOR_RESPONSE_MSG = "Waiting for prediction instance response..."
+    WAITING_FOR_RESPONSE_MSG = "Waiting for Prediction instance response..."
 
 
 class PredictCancelCmdTexts:
-    SHORT_HELP = "Cancels prediction instance/s chosen based on criteria given as a parameter."
+    SHORT_HELP = "Cancels Prediction instance/s chosen based on criteria given as a parameter."
     HELP = """
-    Cancels prediction instance/s chosen based on criteria given as a parameter.
+    Cancels Prediction instance/s chosen based on criteria given as a parameter.
 
-    name - is a name of prediction instance which should be cancelled, the name argument value can be empty when the 'match' option is used.
+    name - This is a name of a prediction instance which should be cancelled, and the name argument value can be empty when the 'match' option is used.
     """
     HELP_P = "If given, then all prediction instances-related information, completed and currently " \
              "running, is removed from the system."
     HELP_M = "If given, the command searches for prediction instances matching the value of this option."
-    EXPERIMENT_NAME = "prediction instance."
-    EXPERIMENT_NAME_PLURAL = "prediction instances."
+    EXPERIMENT_NAME = "Prediction instance."
+    EXPERIMENT_NAME_PLURAL = "Prediction instances."
 
 
 class PredictBatchCmdTexts:
     HELP = "Uses specified dataset to perform inference. Results are stored in the output file."
-    HELP_DATA = "Location of a folder with data that will be used to perform the batch inference. Value should " \
+    HELP_DATA = "Location of a folder with data that will be used to perform the batch inference. The value should " \
                 "point out the location from one of the system's shares."
-    HELP_MODEL_LOCATION = "Path to saved model that will be used for inference. Model must be located on one of the " \
+    HELP_MODEL_LOCATION = "Path to saved model that will be used for inference. The model must be located on one of the " \
                           "input or output system shares. For example: /mnt/input/home/saved_model (user only access path)." \
                           "or /mnt/input/root/public/saved_model (shared access path)." 
-    HELP_LOCAL_MODEL_LOCATION = "Local path to saved model that will be used for inference. Model content will be " \
+    HELP_LOCAL_MODEL_LOCATION = "Local path to saved model that will be used for inference. The model content will be " \
                                 "copied into an image."
-    HELP_MODEL_NAME = "Name of a model passed as a servable name. By default it is the name of directory in model's " \
+    HELP_MODEL_NAME = "Name of a model passed as a servable name. By default, it is the name of a directory in the model's " \
                       "location."
     HELP_NAME = "Name of a predict session."
-    HELP_OUTPUT = "Location of a folder where outputs from inferences will be stored. Value should point out the " \
+    HELP_OUTPUT = "Location of a folder where outputs from inferences will be stored. The value should point out the " \
                   "location from one of the system's shares."
     HELP_REQUIREMENTS = "Path to file with experiment's pip requirements." \
                         " Dependencies listed in this file will be automatically installed using pip."
@@ -381,11 +381,11 @@ class ExperimentListCmdTexts:
     HELP_U = "Displays a list of uninitialized experiments waiting for specified resources."
     HELP_C = "Displays the specified number of the most recent experiments."
     HELP_B = "Print short version of result table. Only 'name', 'submission date', 'owner' and 'state' columns will" \
-             " be print."
+             " be printed."
 
 
 class ExperimentTemplateListCmdTexts:
-    SHORT_HELP = "Show logs for a given experiment."
+    SHORT_HELP = "Shows logs for a given experiment."
     HELP = "Displays a list of available templates used to submit training jobs."
     LACK_OF_PACKS_ERROR_MSG = "Lack of installed packs."
 
@@ -395,16 +395,16 @@ class ExperimentLogsCmdTexts:
     HELP = """
     Displays experiment logs.
 
-    experiment_name - name of the experiment. The experiment_name argument value can be empty when 'match' 
+    experiment_name - The name of the experiment. The experiment name argument value can be empty when 'match' 
     option is used.
     """
     HELP_S = "Displays all minimal and greater severity events."
     HELP_SD = "Retrieve all logs produced on and after this date (use ISO 8601 date format)."
     HELP_ED = "Retrieve all logs produced on and before this date (use ISO 8601 date format)."
-    HELP_I = "Comma separated list of pod IDs. If provided, only logs from these pods will be returned."
-    HELP_P = "Get logs only for pods with given status."
-    HELP_M = "Searches for logs from experiments matching the value of this option. Cannot be used with the " \
-             "experiment_name argument. "
+    HELP_I = "Comma-separated list of pod IDs. If provided, only logs from these pods will be returned."
+    HELP_P = "Retrieve logs only for pods with a given status."
+    HELP_M = "Searches for logs from experiments matching the value of this option. This cannot be used with the " \
+             "experiment-name argument. "
     HELP_O = "Stores file-named experiment logs."
     HELP_F = "Specifies if logs should be streamed. Streams only logs from a single experiment."
     HELP_PAGER = "Display logs in interactive pager."
@@ -413,20 +413,20 @@ class ExperimentLogsCmdTexts:
 class PredictLogsCmdTexts:
     SHORT_HELP = "Show logs for a given prediction instance."
     HELP = """
-    Show logs for a given prediction instance.
+    Shows logs for a given prediction instance.
 
-    name - is a name of a prediction instance whose logs should be displayed. The name argument 
+    name - This is a name of a prediction instance whose logs should be displayed. The name argument 
     value can be empty when the 'match' option is used.
     """
-    HELP_S = "Show all events with this specified minimal and greater severity."
+    HELP_S = "Shows all events with this specified minimal and greater severity."
     HELP_SD = "Retrieves logs produced on or after this date (ISO 8601 date format)."
     HELP_ED = "Retrieves logs produced on or before this date ( ISO 8601 date format)."
     HELP_I = "Lists comma-separated pod ID logs only."
     HELP_P = "Retrieves pod status logs only."
-    HELP_M = "If given, command searches for logs from prediction instances matching the value of this option. " \
+    HELP_M = "If given, the command searches for logs from prediction instances matching the value of this option. " \
              "This option cannot be used along with the NAME argument."
-    HELP_O = "If given - logs are stored in a file with a name derived from a name of a prediction instance."
-    HELP_F = "Specify if logs should be streamed. Only logs from a single prediction instance can be streamed."
+    HELP_O = "If given, the logs are stored in a file with a name derived from a name of a prediction instance."
+    HELP_F = "Specify if the logs should be streamed. Only logs from a single prediction instance can be streamed."
     HELP_PAGER = "Display logs in interactive pager."
 
 
@@ -459,8 +459,8 @@ class PredictViewCmdTexts:
                                           "errors."
     PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error when gathering consumers data."
     HELP_U = "Name of a user to who belongs viewed prediction instance." \
-             " If not given - only prediction instances of a current " \
-             "user are taken into account."
+             " If not given, only Prediction instances of a current " \
+             "user are considered."
     REASON = "\n  Reason: "
 
 
@@ -474,16 +474,16 @@ class ExperimentSubmitCmdTexts:
     script-parameters - Used to pass parameters directly to the script. When used, parameters should be added at the 
     end of command after '--' a string.
     """
-    HELP_N = "Name for this experiment."
+    HELP_N = "Experiment name."
 
-    HELP_SFL = "Location and name folder with additional files used by a script, for example: other .py files, data, etc. If not given, then its contents will not be copied into a Docker image created by the nctl submit command.  nctl copies all content, preserving its structure including subfolder(s)."
-    HELP_T = "Name of a template used by nctl to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training-single). A list of available templates can be obtained by issuing the nctl experiment template_list command."
+    HELP_SFL = "Location and name folder with additional files used by a script, for example: other .py files, data, etc. If not given, then its contents will not be copied into a Docker image created by the nctl submit command. nctl copies all content, preserving its structure including subfolder(s)."
+    HELP_T = "Name of the template used to create a job to be submitted. By default, the single-node TensorFlow training template is used. Use the 'nctl template list' command to list available templates."     
     HELP_P = " Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "         
     HELP_PR = "Values (set or range) of a single parameter."
     HELP_PS = "Values for one or several parameters."
-    HELP_E = "Environment variables passed to training. You can pass as many environmental variables as desired. Each variable in such cases should be passed as a separate -e parameter."
-    HELP_R = "Path to file containing an experiment's pip requirements. Dependencies listed in this file are automatically installed using pip."
+    HELP_E = "Environment variables passed to training. You can pass as many environmental variables as desired. Each variable should be passed as a separate -e parameter."
+    HELP_R = "Path to the file containing an experiment's pip requirements. Dependencies listed in this file are automatically installed using pip."
     SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find: {script_location}. Make sure that provided path is correct."
     DEFAULT_SCRIPT_NOT_FOUND_ERROR_MSG = "Cannot find script: {default_script_name} in directory: " \
                                          "{script_directory}. If path to directory was passed as submit command " \
@@ -495,23 +495,23 @@ class ExperimentSubmitCmdTexts:
     SUBMIT_START_USER_MSG = "Submitting experiments."
     SUBMIT_ERROR_MSG = "Problems during submitting experiment: {exception_message}"
     SUBMIT_OTHER_ERROR_MSG = "Other problems during submitting experiment."
-    FAILED_RUNS_LOG_MSG = "There are failed runs"
+    FAILED_RUNS_LOG_MSG = "There are failed runs."
 
 
 class ExperimentInteractCmdTexts:
     SHORT_HELP = "Launches local browser with Jupyter Notebook."
-    HELP = "Launches local browser with Jupyter Notebook. If the script name argument is given, then script is put " \
+    HELP = "Launches local browser with Jupyter Notebook. If the script name argument is given, the script is put " \
            "into the opened notebook."
     HELP_N = "The name of this Jupyter Notebook session."
     HELP_F = "File with a notebook or a python script that should be opened in Jupyter Notebook."
     HELP_PN = "Port on which service will be exposed locally."
     HELP_P = " Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'. For lists use: " \
              "'key \"['val1', 'val2']\"' For maps use: 'key \"{'a': 'b'}\"' "
-    HELP_NO_LAUNCH = "Run command without a web browser starting. Only a proxy tunnel is created"
+    HELP_NO_LAUNCH = "Run the command without a web browser starting. Only a proxy tunnel is created"
     EXPERIMENT_GET_ERROR_MSG = "Problems during loading a list of experiments."
     NAME_ALREADY_USED = "The chosen name ({name}) is already used by an experiment other than Jupyter Notebook. " \
                         "Choose another one."
-    CONFIRM_EXPERIMENT_CREATION = "Experiment with a given name does not exist. Should the app continue and create a " \
+    CONFIRM_EXPERIMENT_CREATION = "Experiment with a given name does not exist. Should the application continue and create a " \
                                   "new one? "
     SUBMITTING_EXPERIMENT_USER_MSG = "Submitting interactive experiment."
     SUBMIT_ERROR_MSG = "Error occurred during starting Jupyter Notebook session: {exception_message}"
@@ -523,18 +523,18 @@ class ExperimentInteractCmdTexts:
     ATTACHING_SCRIPT_NOT_SUPPORTED_MSG = "Attaching script to existing Jupyter Notebook's session is not supported. " \
                                          "Create a new Jupyter Notebook's session to attach script."
     NOTEBOOK_NOT_READY_ERROR_MSG = "Jupyter Notebook is still not ready. Try to connect to the notebook by running " \
-                                   "interact command another time, passing a name of a current Jupyter Notebook " \
+                                   "the interact command another time, passing a name of a current Jupyter Notebook " \
                                    "session."
-    PROXY_CLOSING_ERROR_MSG = "K8s proxy has not been closed correctly. Check if it still exists. If yes, close " \
+    PROXY_CLOSING_ERROR_MSG = "Kubernetes proxy has not been closed correctly. Check if it still exists. If yes, close " \
                               "it manually."
-    SESSION_LAUNCH_OTHER_ERROR_MSG = "Other exception during launching interact session."
-    EXP_WITH_THE_SAME_NAME_MUST_BE_PURGED = "Notebook with the same name exists but is in state other than RUNNING. " \
-                                            "If you want to start another notebook using the same name, " \
+    SESSION_LAUNCH_OTHER_ERROR_MSG = "Other exception occurred during launching interact session."
+    EXP_WITH_THE_SAME_NAME_MUST_BE_PURGED = "Notebook with the same name exists, but is in a state other than RUNNING. " \
+                                            "To to start another notebook using the same name, " \
                                             "purge the previous one."
     HELP_E = "Environment variables passed to Jupyter instance. User can pass as many environmental variables as " \
              " desired. Each variable should be passed as a separate -e paramater."
     HELP_T = "Name of a Jupyter Notebook template used to create a deployment. " \
-             "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
+             "Supported templates for the interact command are: jupyter (python3) and jupyter-py2 (python2)"
     TOO_MANY_JUPYTERS = "You have {jupyter_number} opened Jupyter notebooks. Do you still want to open another one?"
     INTERACT_ABORT_MSG = "Operation of starting a new Jupyter Notebook was aborted."
 
@@ -544,12 +544,12 @@ class ExperimentCancelCmdTexts:
     HELP = """
     Cancels experiment/s or deletes selected pods.
 
-    name - is a name of experiment which should be cancelled, name argument value can be empty when 'match'
+    name - This is a name of the experiment which should be cancelled. The name argument value can be empty when 'match'
     option is used.
     """
-    HELP_P = "If given, then all information concerning all experiments, completed and currently running, is removed " \
+    HELP_P = "If given, then all related information for all experiments, completed and currently running, is removed " \
              "from the system."
-    HELP_M = "If given, command searches for experiments matching the value of this option. This option cannot be " \
+    HELP_M = "If given, the command searches for experiments matching the value of this option. This option cannot be " \
              "used along with the name argument."
     HELP_I = "Comma-separated pods IDs. If given, then matches pods by their IDs and deletes them."
     HELP_S = "One of: {available_statuses} - searches pods by their status and deletes them."
@@ -621,17 +621,17 @@ class ExperimentViewCmdTexts:
     EXPERIMENT_NAME - Experiment’s name.
     """
 
-    HELP_T = "If given, then exposes a TensorBoard's instance with experiment's data."
+    HELP_T = "Exposes a TensorBoard's instance with experiment's data."
 
     CONTAINER_DETAILS_MSG = "\n- Name: {name}\n- Status: {status}\n- Volumes:\n  {volumes}\n- Resources:  {resources}"
     NOT_FOUND_ERROR_MSG = "Experiment \"{experiment_name}\" not found."
     PODS_PARTICIPATING_LIST_HEADER = "\nPods participating in the execution:\n"
     PODS_TABLE_HEADERS = ["Name", "Uid", "Pod Conditions", "Container Details"]
     VIEW_OTHER_ERROR_MSG = "Failed to get details of experiment {name}."
-    CONTAINER_NOT_CREATED_MSG = "Not created"
+    CONTAINER_NOT_CREATED_MSG = "Not created."
     CONTAINER_RUNNING_MSG = "Running, started at: "
-    CONTAINER_TERMINATED_MSG = "Terminated, "
-    CONTAINER_WAITING_MSG = "Waiting, "
+    CONTAINER_TERMINATED_MSG = "Terminated. "
+    CONTAINER_WAITING_MSG = "Waiting. "
     CONTAINER_REQUESTS_LIST_HEADER = "- Requests:\n{}"
     CONTAINER_LIMITS_LIST_HEADER = "- Limits:\n{}"
     RESOURCES_SUM_LIST_HEADER = "\nResources used by pods:\n"
@@ -641,10 +641,10 @@ class ExperimentViewCmdTexts:
     INSUFFICIENT_RESOURCES_MESSAGE = "Experiment is in QUEUED state due to insufficient {resources}."
     TOP_CPU_CONSUMERS = "Top CPU consumers: {consumers}"
     TOP_MEMORY_CONSUMERS = "Top memory consumers: {consumers}"
-    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons of QUEUED state and top consumers cannot be displayed due to " \
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA = "Reasons for QUEUED state and top consumers cannot be displayed due to " \
                                           "errors."
-    PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error occurred when gathering consumer's data."
-    HELP_U = "Name of a user to who belongs viewed experiment. If not given, only experiments of a current " \
+    PROBLEMS_WHILE_GATHERING_USAGE_DATA_LOGS = "Error occurred when gathering a consumer's data."
+    HELP_U = "Name of a user to whom belongs a viewed experiment. If not given, only experiments of a current " \
              "user are considered."
     REASON = "\n  Reason: "
 
@@ -661,8 +661,8 @@ class ExperimentCommonTexts:
     TRAINING_SCRIPT_CANT_BE_CREATED = "Training script cannot be created."
     GET_NAMESPACE_ERROR_MSG = "Failed to get current Kubernetes namespace."
     SUBMIT_PREPARATION_ERROR_MSG = "Problem occurred during preparation of experiments' data."
-    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error occurred during creation of a local docker-host tunnel."
-    ENV_CREATION_ERROR_MSG = "Problems during creation of environments."
+    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error occurred during creation of a local Docker-host tunnel."
+    ENV_CREATION_ERROR_MSG = "Problems occurred during the creation of environments."
     CONFIRM_SUBMIT_MSG = "Confirm that the following experiments should be submitted."
     CONFIRM_SUBMIT_QUESTION_MSG = "Do you want to continue?"
     SUBMISSION_FAIL_ERROR_MSG = "Your Experiment submission failed. Use the verbose option to get more " \
@@ -670,7 +670,7 @@ class ExperimentCommonTexts:
     PROXY_CLOSE_ERROR_MSG = "Docker proxy has not been closed correctly. Check if it still exists. If yes, close " \
                             "it manually."
     PROXY_OPEN_ERROR_MSG = "Error occurred during opening of a proxy for a docker registry."
-    SUBMIT_OTHER_ERROR_MSG = "Other error during submitting experiments."
+    SUBMIT_OTHER_ERROR_MSG = "Other error occurred during the submission of experiments."
     DOCKER_TUNNEL_CLOSE_ERROR_MSG = "Local Docker-host tunnel has not been closed correctly. Check if it still " \
                                     "exists. If yes, close it manually."
     EXP_TEMPLATES_NOT_GENERATED_ERROR_MSG = "Experiment templates have not generated. Reason - {reason}"
@@ -682,7 +682,7 @@ class ExperimentCommonTexts:
                                           "Specify pack params in format 'key value' not as 'key=value'."
     EXPERIMENT_NAME_TOO_LONG_ERROR_MSG = "Name given by a user cannot be longer than 30 characters."
     ERROR_DURING_PATCHING_RUN = "Error occurred during patching a run occurred {}."
-    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error occurred during getting draft logs: {exception}"
+    PROBLEMS_DURING_GETTING_DRAFT_LOGS = "Error occurred during retrieval of draft logs: {exception}"
     THE_SAME_EXP_IS_SUBMITTED = "There is another experiment with the same name submitted. Resubmit with a new name" \
                                 "or choose to delete the existing experiment and submit the same name again."
     PREPARING_RESOURCE_DEFINITIONS_MSG = "Preparing resources' definitions..."
@@ -723,7 +723,7 @@ class UtilJupyterTexts:
 
 
 class UtilLauncherTexts:
-    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error occurred during creation of a local docker-host tunnel."
+    LOCAL_DOCKER_TUNNEL_ERROR_MSG = "Error occurred during creation of a local Docker-host tunnel."
     BROWSER_STARTING_MSG = "Browser will start in few seconds. Please wait..."
     CANNOT_USE_PORT = "Cannot use required port {required_port}. Port has been set automatically to {random_port}"
     NO_WEB_BROWSER_ERROR_MSG = "Cannot find a suitable web browser - running with --no-launch option."
@@ -774,19 +774,19 @@ class UtilConfigTexts:
 
 
 class PlatformResourcesCustomModelTexts:
-    INVALID_K8S_NAME = "name must consist of lower case alphanumeric characters, '-' or '.', and must start with " \
+    INVALID_K8S_NAME = "The name must consist of lower case alphanumeric characters, '-' or '.', and must start with " \
                        "alphabetic character and end with an alphanumeric character."
 
 
 class PlatformResourcesExperimentsTexts:
     REGEX_COMPILATION_FAIL_MSG = "Failed to compile regular expression: {name_filter}"
-    K8S_RESPONSE_LOAD_ERROR_MSG = "preparing load of ExperimentKubernetes response object error - {err}"
-    K8S_DUMP_PREPARATION_ERROR_MSG = "preparing dump of ExperimentKubernetes request object error - {err}"
-    EXPERIMENT_ALREADY_EXISTS_ERROR_MSG = " experiment with name: {name} already exist!"
-    EXPERIMENT_INVALID_STATE_MSG = " experiment with name: {name} already exist, " \
+    K8S_RESPONSE_LOAD_ERROR_MSG = "Preparing load of ExperimentKubernetes response object error - {err}"
+    K8S_DUMP_PREPARATION_ERROR_MSG = "Preparing dump of ExperimentKubernetes request object error - {err}"
+    EXPERIMENT_ALREADY_EXISTS_ERROR_MSG = " The experiment with name: {name} already exist!"
+    EXPERIMENT_INVALID_STATE_MSG = " The experiment with name: {name} already exist, " \
                                    "but it does not have any resources submitted for creation. " \
                                    "To create an experiment with the desired name," \
-                                   " purge the old experiment using following command: nctl experiment cancel --purge" \
+                                   " purge the old experiment using the following command: nctl experiment cancel --purge" \
                                    " {name}"
     EXPERIMENT_UPDATE_ERROR_MSG = "Error during patching an Experiment"
     EXPERIMENT_PREV_EXP_STILL_TERMINATING = "Artfiacts of the previous experiment with the same name still exist. " \
@@ -803,43 +803,43 @@ class PlatformResourcesRunsTexts:
 class PlatformResourcesUsersTexts:
     USERNAME_CANNOT_BE_EMPTY_ERROR_MSG = "Name of a user cannot be an empty string."
     USERNAME_TOO_LONG_ERROR_MSG = "Name of a user cannot be longer than 32 characters."
-    INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect k8s user name."
+    INCORRECT_K8S_USERNAME_ERROR_MSG = "Incorrect Kubernetes user name."
     USERNAME_IS_RESERVED_FOR_SYSTEM_USE = "Unable to create user: username is reserved or blacklisted."
     USER_PRESENCE_CHECK_ERROR_MSG = "Error occurred during checking user's presence."
 
 
 class UtilKubectlTexts:
     NO_AVAILABLE_PORT_ERROR_MSG = "Available port cannot be found."
-    PROXY_CREATION_OTHER_ERROR_MSG = "Other error during creation of port proxy."
+    PROXY_CREATION_OTHER_ERROR_MSG = "Other error occurred during creation of port proxy."
     PROXY_CREATION_MISSING_PORT_ERROR_MSG = "Missing port during creation of port proxy."
-    K8S_OBJECT_DELETE_ERROR_MSG = "Error occurs when deleting k8s object: {output}"
-    K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to K8S cluster: {output}"
+    K8S_OBJECT_DELETE_ERROR_MSG = "Error occurs when deleting Kubernetes object: {output}"
+    K8S_CLUSTER_NO_CONNECTION_ERROR_MSG = "Cannot connect to Kubernetes cluster: {output}"
     TOP_COMMAND_ERROR = "Problems during getting usage of resources."
-    TOP_COMMAND_ERROR_LOG = "Incorrect format of data returned by top command: {output}"
-    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from K8S cluster. Check cluster configuration and " \
+    TOP_COMMAND_ERROR_LOG = "Incorrect format of data returned by the top command: {output}"
+    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from Kubernetes cluster. Check cluster configuration and " \
                                     "proxy settings."
 
 
 class UtilK8sInfoTexts:
-    OTHER_FIND_NAMESPACE_ERROR_MSG = "Other find_namespace error."
+
+    OTHER_FIND_NAMESPACE_ERROR_MSG = "Other find_namespace error occurred."
     NAMESPACE_DELETE_ERROR_MSG = "Error occurred during deletion of namespace {namespace}"
     CONFIG_MAP_ACCESS_ERROR_MSG = "Problem during accessing ConfigMap : {name}."
     LACK_OF_DEFAULT_TOKEN_ERROR_MSG = "Lack of default-token on a list of tokens."
     EMPTY_LIST_OF_TOKENS_ERROR_MSG = "Empty list of tokens."
-    GATHERING_USERS_TOKEN_ERROR_MSG = "Problem during gathering users token."
-    GATHERING_USER_CERTIFICATE_ERROR_MSG = "Problem during gathering server certificate."
-    GATHERING_PASSWORD_ERROR_MSG = "Error occurred during gathering users password."
+    GATHERING_USERS_TOKEN_ERROR_MSG = "Problem occurred during gathering of a user's token."
+    GATHERING_USER_CERTIFICATE_ERROR_MSG = "Problem occurred during gathering of a server's certificate."
+    GATHERING_PASSWORD_ERROR_MSG = "Error occurred during gathering of a user's password."
     LACK_OF_PASSWORD_ERROR_MSG = "Lack of password."
-    GATHERING_EVENTS_ERROR_MSG = "Problem during gathering k8s events."
-    PATCHING_CM_ERROR_MSG = "Problem during patching configmap."
-
+    GATHERING_EVENTS_ERROR_MSG = "Problem occurred during gathering Kubernetes events."
+    PATCHING_CM_ERROR_MSG = "Problem occurred during patching configmap."
 
 class UtilK8sProxyTexts:
     PROXY_ENTER_ERROR_MSG = "k8s_proxy - enter - error"
     PROXY_EXIT_ERROR_MSG = "k8s_proxy - exit - error"
     TUNNEL_NOT_READY_ERROR_MSG = "connection on {address}:{port} NOT READY!"
     TUNNEL_ALREADY_CLOSED = "Proxy tunnel is already closed."
-    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from K8S cluster. Check cluster configuration and " \
+    K8S_PORT_FORWARDING_ERROR_MSG = "Cannot forward port from Kubernetes cluster. Check cluster configuration and " \
                                     "proxy settings."
 
 
@@ -848,12 +848,12 @@ class CliStateTexts:
     KUBECTL_NAMESPACE_ERROR_MSG = "Failed to determine kubectl namespace during verification. This may occur for " \
                                   "example, due to invalid path to kubectl config, invalid k8s credentials or k8s " \
                                   "cluster being unavailable. Check your KUBECONFIG environment variable and make " \
-                                  "sure that the k8s cluster is online."
+                                  "sure that the Kubernetes cluster is online."
     NCTL_CONFIG_NOT_SET_ERROR_MSG = "Configuration directory for nctl is not set or NCTL_CONFIG environment variable " \
                                     "points to invalid directory."
     NCTL_CONFIG_INIT_ERROR_MSG = "Config initialization failed. Reason: {exception_msg}"
     USER_NOT_ADMIN_MSG = "Only nauta administrators can run '{command_name}' command."
-    USER_IS_ADMIN_MSG = "You cannot run command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \
+    USER_IS_ADMIN_MSG = "You cannot run the command '{command_name}' as nauta administrator. Switch your KUBECONFIG " \
                         "environment variable to point to a valid nauta user config. If you do not have one, you " \
                         "can create it using the 'nctl user create' command."
     ADMIN_CHECK_ERROR_MSG = "Problems detected while verifying current user privileges."
@@ -866,15 +866,15 @@ class LicenseAcceptanceTexts:
                                       "THE PRE-RELEASE SOFTWARE, YOU AGREE TO BE LEGALLY BOUND BY THE TERMS AND " \
                                       "CONDITIONS OF THIS AGREEMENT. Agree?"
     CANNOT_ACCEPT_LICENSE_MSG = "Cannot save license agreement - \"config\" file or directory already exists in " \
-                                "{nctl_config_path}. This name is reserved for the nctl app. Remove it " \
+                                "{nctl_config_path}. This name is reserved for the nctl application. Remove it " \
                                 "and try again."
 
 
 class ConfigCmdTexts:
     HELP = "Set limits and requested resources in templates."
     HELP_C = "Number of CPUs available for training on one node. K8s format expected. Obligatory."
-    HELP_M = "Amount of memory available for training on one node. K8s format expected. Obligatory."
-    HELP_PN = "Name of a pack which resources' settings should be changed. If not given, command changes resources " \
+    HELP_M = "Amount of memory available for training on one node. Kubernetes format expected. Obligatory."
+    HELP_PN = "Name of a pack which resources' settings should be changed. If not given, the command changes resources " \
               "for all packs."
     MISSING_ARGUMENTS = """Usage: nctl config [options]
 Try \"nctl config -h\" for help. 
@@ -883,10 +883,10 @@ Both CPU number and memory amount have to be given."""
     MISSING_CONFIG_FILE = "File with a description of a configuration is missing."
     CONFIG_FILE_INCORRECT = "File with a description of a configuration is corrupt."
     CONFIG_UPDATE = "Updating templates file with a new configuration ..."
-    CPU_WRONG_FORMAT = "CPU number should be given in k8s format."
-    MEMORY_WRONG_FORMAT = "Memory amount should be given in k8s format."
-    ERROR_DURING_UPDATE = "Problems during updating resources."
-    SUCCESS_MESSAGE = "Resources' settings have been updated with a success."
+    CPU_WRONG_FORMAT = "CPU number should be given in Kubernetes format."
+    MEMORY_WRONG_FORMAT = "Memory amount should be given in Kubernetes format."
+    ERROR_DURING_UPDATE = "Problems occurred during updating of resources."
+    SUCCESS_MESSAGE = "Resources' settings have been updated successfully."
     MEMORY_SETTINGS_TOO_LOW = "Memory amount passed to the command should not be lower than {memory_value}."
     CPU_SETTINGS_TOO_LOW = "CPU number passed to the command should not be lower than {cpu_value}."
 
@@ -984,8 +984,8 @@ class TemplateCopyCmdTexts:
 
 
 class GithubMessages:
-    GET_REQUEST_ERROR = "Error occurred during accessing github repository {url} : {http_code}"
-    GET_OTHER_ERROR = "Other error during connecting github."
+    GET_REQUEST_ERROR = "Error occurred during accessing GitHub repository {url} : {http_code}"
+    GET_OTHER_ERROR = "Other error occurred during connecting GitHub."
     MISSING_CHART_FILE = "Chart file does not exist in the checked folder."
     GET_MISSING_FILE = "File {url} does not exist."
 
@@ -1019,7 +1019,7 @@ class ModelExportCmdTexts:
     PATH - Indicates the location of the model on the Input or Output network shares. If the 'list' value is given,
            the command displays a list of available export's formats.
 
-    FORMAT - One of the supported formats (see nctl model export formats command). Required, if export of a model is 
+    FORMAT - One of the supported formats (see the nctl model export formats command). Required, if export of a model is 
             executed.
 
     operation-options - Options specific to a chosen format.

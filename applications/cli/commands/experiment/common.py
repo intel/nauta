@@ -564,7 +564,7 @@ def prepare_experiment_environment(experiment_name: str, run_name: str,
         pod_count = get_pod_count(run_folder=run_folder, pack_type=pack_type)
     except Exception as exe:
         delete_environment(run_folder)
-        raise SubmitExperimentError('Problems during creation of environments.') from exe
+        raise SubmitExperimentError('Problems occurred during the creation of environments.') from exe
     log.debug(f'Prepare run {run_name} environment - finish')
     return PrepareExperimentResult(folder_name=run_folder, script_name=local_script_location, pod_count=pod_count)
 
