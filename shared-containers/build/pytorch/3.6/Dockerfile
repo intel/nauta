@@ -7,8 +7,7 @@ RUN source /opt/rh/devtoolset-8/enable && \
     cd cmake-3.* && \
     ./bootstrap --prefix=/usr/local -- -DCMAKE_USE_OPENSSL=ON && \
     make -j$(nproc) && \
-    make install && \
-    cd .. && rm -rf cmake-3*
+    make install
 
 RUN source /opt/rh/devtoolset-8/enable && pip3.6 install --no-binary :all: --no-cache-dir -U pip==18.1
 

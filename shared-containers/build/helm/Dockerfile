@@ -21,8 +21,7 @@ RUN mv /build/helm-2.11.0/* /build/gopath/src/k8s.io/helm && \
     make build build-cross dist VERSION=v2.11.0 GIT_TAG=release2.11.0 && \
     ls -laRh ./bin/* && \
     cp -vR ./bin/* /build-output/helm/ && \
-    cp -vR _dist/* /build-output/helm/ && \
-    rm -rf /build/gopath
+    cp -vR _dist/* /build-output/helm/
 
 WORKDIR /build-output
 

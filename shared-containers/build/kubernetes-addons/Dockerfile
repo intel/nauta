@@ -25,5 +25,4 @@ RUN git clone https://github.com/kubernetes/dns /build/gopath/src/k8s.io/dns && 
     cp -v /build/gopath/src/k8s.io/kubernetes/build/pause/{pause,orphan} /build-output/ && \
     cp ${GOPATH}/bin/linux_amd64/* /build-output/addons/ && \
     cd /build-output && \
-    tar -I pigz -cvf addons.tar.gz addons/ resizer/ pause orphan && \
-    rm -rf /build
+    tar -I pigz -cvf addons.tar.gz addons/ resizer/ pause orphan

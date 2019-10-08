@@ -11,5 +11,4 @@ RUN mkdir -p ${CNI_PLUGINS_GO_PATH} \
     (cd ${CNI_PLUGINS_GO_PATH} && ./build.sh) && \
     cp ${CNI_PLUGINS_GO_PATH}/bin/* /build-output/cni-plugins/ && \
     cd /build-output && \
-    tar -I pigz -cf cni-plugins.tar.gz cni-plugins/ && \
-    rm -rf ${CNI_PLUGINS_GO_PATH}
+    tar -I pigz -cf cni-plugins.tar.gz cni-plugins/

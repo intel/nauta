@@ -18,6 +18,5 @@ RUN tar -xf consul-1.4.4.tar.gz --strip-components=1 -C /build/gopath/src/github
     CONSUL_DEV=1 make && \
     cp -vR /build/gopath/src/github.com/hashicorp/consul/bin/consul /build-output/consul/ && \
     cd /build-output && \
-    tar -I pigz -cf consul.tar.gz consul/ && \
-    rm -rf /build
+    tar -I pigz -cf consul.tar.gz consul/
 

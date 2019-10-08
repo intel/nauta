@@ -29,7 +29,7 @@ RUN yum update -y && \
     yum install -y gcc gcc-c++ patch make libffi-devel openssl-devel rh-ruby23-ruby-devel && \
     yum clean all
 
-RUN source /opt/rh/rh-ruby23/enable && gem install fluentd
+RUN source /opt/rh/rh-ruby23/enable && gem install fluentd --version 1.2.5
 RUN source /opt/rh/rh-ruby23/enable && gem install bundler --version 1.16.2
 RUN source /opt/rh/rh-ruby23/enable &&  bundle config silence_root_warning true
 RUN source /opt/rh/rh-ruby23/enable && bundle install --gemfile=/fluentd/Gemfile --path=/fluentd/vendor/bundle

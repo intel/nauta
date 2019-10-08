@@ -12,5 +12,4 @@ RUN tar -xvf /build/dumb-init-1.2.1.tar.gz && \
 # centos does not provide static libraries:
     sed -i 's/-static//g' Makefile && \
     make build && \
-    cp dumb-init /build-output/dumb-init && \
-    rm -rf /build
+    cp dumb-init /build-output/dumb-init

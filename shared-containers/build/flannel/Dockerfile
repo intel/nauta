@@ -18,5 +18,4 @@ RUN tar -xf flannel-0.11.0.tar.gz --strip-components=1 -C /build/gopath/src/gith
     cp -vR /build/gopath/src/github.com/coreos/flannel/flannel /build-output/flannel/ && \
     cp -vR /build/gopath/src/github.com/coreos/flannel/dist/flanneld /build-output/flannel/ && \
     cd /build-output && \
-    tar -I pigz -cf flannel.tar.gz flannel/ && \
-    rm -rf /build
+    tar -I pigz -cf flannel.tar.gz flannel/

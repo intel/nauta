@@ -19,5 +19,4 @@ RUN tar -xf etcd-v3.3.13.tar.gz --strip-components=1 -C /build/gopath/src/github
     cp -vR /build/gopath/src/github.com/coreos/etcd/bin/etcd /build-output/etcd/ && \
     cp -vR /build/gopath/src/github.com/coreos/etcd/bin/etcdctl /build-output/etcd/ && \
     cd /build-output && \
-    tar -I pigz -cf etcd.tar.gz etcd/ && \
-    rm -rf /build
+    tar -I pigz -cf etcd.tar.gz etcd/

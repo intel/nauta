@@ -19,6 +19,9 @@ COPY --from=dumbinitdata /build-output/dumb-init /dumb-init
 
 RUN chmod +x /bin/dumb-init /usr/bin/dumb-init /dumb-init
 
+RUN mkdir /tmp/openmpi
+ADD openmpi-4.0.1.tar.gz /tmp/openmpi
+
 RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-cache-dir --force-reinstall /tensorflow-${TENSORFLOW_VERSION}-*.whl && \
     ${PIP} install --ignore-installed --no-cache-dir /experiment_metrics-*.tar.gz && \
     yum update -y && \
@@ -26,10 +29,7 @@ RUN source /opt/rh/devtoolset-8/enable && ${PIP} install --no-cache-dir --force-
     yum clean all && \
     git config --global url."https://".insteadOf git:// && \
     mkdir /horovod && \
-    mkdir /tmp/openmpi && \
     cd /tmp/openmpi && \
-    wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.gz && \
-    tar zxf openmpi-4.0.1.tar.gz && \
     cd openmpi-4.0.1 && \
     ./configure --enable-orterun-prefix-by-default && \
     make -j $(nproc) all && \

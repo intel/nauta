@@ -12,8 +12,6 @@ WORKDIR /root/dldt
 RUN git checkout 2018_R5
 RUN mv model-optimizer /root
 
-RUN rm -rf dldt
-
 # OpenVino dependency - onnx - build
 WORKDIR /onnx_build
 

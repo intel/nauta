@@ -18,5 +18,4 @@ WORKDIR ${GOPATH}/src/k8s.io/kubernetes
 RUN make && \
     cp ${GOPATH}/src/k8s.io/kubernetes/_output/local/go/bin/* /build-output/kubernetes/ && \
     cd /build-output && \
-    tar -I pigz -cf kubernetes.tar.gz kubernetes/ && \
-    rm -rf ${GOPATH}/src/k8s.io/kubernetes
+    tar -I pigz -cf kubernetes.tar.gz kubernetes/

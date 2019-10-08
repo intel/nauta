@@ -22,5 +22,4 @@ RUN tar -xf heapster-v1.4.3.tar.gz --strip-components=1 -C /build/gopath/src/k8s
     cp -v heapster /build-output/heapster/ && \
     cp -v eventer  /build-output/heapster/ && \
     cd /build-output && \
-    tar -I pigz -cf heapster.tar.gz heapster/ && \
-    rm -rf /build
+    tar -I pigz -cf heapster.tar.gz heapster/

@@ -1,2 +1,2 @@
 ---
-helm_timeout: 2400
+helm_timeout: 3600

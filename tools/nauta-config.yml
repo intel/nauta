@@ -173,6 +173,9 @@ local_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.2.tar.gz
         dest: horovod-v0.16.4.tar.gz
         checksum: c9aaaef7214598a05e6fe4442e423de54d7a7fcfb2f8dcd85043e1665281eff7
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/openmpi/openmpi-4.0.1.tar.gz
+        dest: openmpi-4.0.1.tar.gz
+        checksum: e55e213fe09a214ab9f2c722acfd8bf7b39bbc1800e4b7a464d38df15e707f59
     required:
       BASE_IMAGE: "shared/run/tensorflow/py3.6"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py3.6/1.14.0"
@@ -188,6 +191,9 @@ local_images:
       - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/horovod/v0.16.4.2.tar.gz
         dest: horovod-v0.16.4.tar.gz
         checksum: c9aaaef7214598a05e6fe4442e423de54d7a7fcfb2f8dcd85043e1665281eff7
+      - src: http://repository.toolbox.nervana.sclab.intel.com/NAUTA/downloads/openmpi/openmpi-4.0.1.tar.gz
+        dest: openmpi-4.0.1.tar.gz
+        checksum: e55e213fe09a214ab9f2c722acfd8bf7b39bbc1800e4b7a464d38df15e707f59
     required:
       BASE_IMAGE: "shared/run/tensorflow/py2.7"
       TENSORFLOW_BUILD_IMAGE: "shared/build/tensorflow/py2.7/1.14.0"

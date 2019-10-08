@@ -12,5 +12,5 @@ RUN yum update -y && yum install -y rpm-build gcc make openssl-devel redhat-lsb-
 ADD node-v8.12.0.tar.gz /build
 
 WORKDIR /build/node-v8.12.0
-RUN ./configure && make -j4 && make install && cd .. && rm -rf node-v8.12.0
+RUN ./configure && make -j4 && make install
 #RUN cp /root/rpmbuild/RPMS/x86_64/* /build-output/
