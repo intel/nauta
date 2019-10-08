@@ -46,7 +46,7 @@ models/
         └── mapping_config.json
 ```
 
-In case of MNIST model convertion with `model export` command, a directory storing one version of the model is created. Due to prediction prerequisite, the model directory structure _must_ meet the following structure requirements:
+In case of MNIST model conversion with `model export` command, a directory storing one version of the model is created. Due to prediction prerequisite, the model directory structure _must_ meet the following structure requirements:
 
 
 ```
@@ -69,16 +69,16 @@ nctl predict launch -n ovmsexample --runtime ovms --model-location /mnt/input/ho
 ```
 
 
-When `nctl predictl list` reports the prediction as running:
+When `nctl predict list` reports the prediction as running (scroll to the right to see the full details):
 
 
 ```
 | Prediction instance   | Parameters   | Submission date        | Start date             | Duration      | Owner    | Status   | Template name             | Template version   |
 |-----------------------+--------------+------------------------+------------------------+---------------+----------+----------+---------------------------+--------------------|
-| ovmsexample           |              | 2019-07-29 03:01:08 PM | 2019-07-29 03:01:12 PM | 0d 0h 26m 13s | mzylowsk | RUNNING  | openvino-inference-stream | 0.1.0              |
+| ovmsexample           |              | 2019-07-29 03:01:08 PM | 2019-07-29 03:01:12 PM | 0d 0h 26m 13s | user1    | RUNNING  | openvino-inference-stream | 0.1.0              |
 ```
 
-Perform stream inference by executing the follwing command:
+Perform stream inference by executing the following command:
 
 ```
 nctl predict stream --name ovmsexample --data input.json
@@ -129,12 +129,12 @@ nctl predict batch -n ovmsbatch -rt ovms --model-location /mnt/input/home/models
 ```
 **Note:** The above command assumes that`.pb` files are stored in the `ovms_inference` directory in the `/input` shared folder.
 
-When a batch prediction reaches the `FINISHED` state (as shown in the example), it displays the results (scroll to the right to see the full details).
+When a batch prediction reaches the `FINISHED` state (as shown in the example), it displays the results (scroll to the right to see the full details). =======
 
 ```
 | Prediction instance         | Parameters   | Submission date        | Start date             | Duration     | Owner    | Status   | Template name            | Template version   |
 |-----------------------------+--------------+------------------------+------------------------+--------------+----------+----------+--------------------------+--------------------|
-| mnist-526-19-07-30-00-34-07 |              | 2019-07-30 12:34:35 AM | 2019-07-30 12:34:45 AM | 0d 0h 0m 17s | mzylowsk | COMPLETE | openvino-inference-batch | 0.1.0              |
+| mnist-526-19-07-30-00-34-07 |              | 2019-07-30 12:34:35 AM | 2019-07-30 12:34:45 AM | 0d 0h 0m 17s | user1   | COMPLETE | openvino-inference-batch | 0.1.0              |
 ```
 
 To understand these results of the `/output` mount point, refer to [Working with Datasets](working_with_datasets.md#mounting-and-accessing-folders).

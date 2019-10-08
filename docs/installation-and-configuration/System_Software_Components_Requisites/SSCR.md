@@ -44,7 +44,7 @@ Nauta software components are optimized for AI containers containing Nauta-optim
 
 ## Next Steps: Installer System Requirements
 
-* [Installer System Requirements](../Installer_System_Requirements/ISR.md)
+* [Nauta Installer System Requirements](../Installer_System_Requirements/ISR.md)
 
 ----------------------
 

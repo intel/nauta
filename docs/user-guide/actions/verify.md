@@ -1,10 +1,10 @@
 # verify Command
 
-Use the `verify` command to verify that the proper Nauta version is installed. 
+Use the `verify` command to check whether all prerequisites required by nctl are installed and have proper versions. 
 
 ## Synopsis
 
-Checks whether all prerequisites required by `nctl` are installed and have proper versions. Also refer to the [nctl Version Command ](../actions/version.md) for Nauta Version information. 
+Checks whether all prerequisites required by `nctl` are installed and have proper versions. Also refer to the [Version Command ](../actions/version.md) for Nauta Version information. 
 
 ## Syntax
 
@@ -14,7 +14,7 @@ Checks whether all prerequisites required by `nctl` are installed and have prope
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -29,13 +29,13 @@ In the case of any installation issues, the command returns information about th
 
 ```
 This OS is supported.
-draft verified successfully.
 kubectl verified successfully.
-kubectl server verified successfully.
 helm client verified successfully.
+git verified successfully.
 helm server verified successfully.
+kubectl server verified successfully.
+packs resources' correctness verified successfully.
 ```
-
 
 ----------------------
 

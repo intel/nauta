@@ -5,7 +5,7 @@ The section discusses the following main topics:
  - [Uploading Dataset](#uploading-datasets)  
  - [nctl mount Command](#nctl-mount-command)
  - [Mounting and Accessing Folders](#mounting-and-accessing-folders)
- - [Uploading and Using Shared Dataset Example](#uploading-and-using-shared-dataset-example)
+ - [Uploading and Using Dataset Example](#uploading-and-using-dataset-example)
  - [Uploading and Using Shared Dataset](#uploading-and-using-a-shared-dataset)
  - [Uploading During Experiment Submission](#uploading-during-experiment-submission)
  
@@ -13,7 +13,7 @@ The section discusses the following main topics:
 
 Nauta uses NFS to connect to a storage location where each user has folders that have been setup to store experiment input and output data. This option allows the user to upload files and datasets for private use and for sharing. Once uploaded, the files are referenced by the  path.
 
-All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the [Uploading and Using Shared Dataset Example](#uploading-and-using-shared-dataset-example) in this section for information.
+All data in the folders are retained until the user manually removes it from the NFS storage. Refer to the [Uploading and Using Dataset Example](#uploading-and-using-dataset-example) in this section for information.
 
 ## nctl mount Command
 
@@ -70,7 +70,7 @@ The following table shows the access permissions for each mounting folder.
 | output-shared	| /mnt/output/root/public |	read/write |	read/write |
 | input-output-ro | | read |	read |
 
-## Uploading and Using Shared Dataset Example
+## Uploading and Using Dataset Example
 
 The default configuration is to mount local folders to a Nauta user's private input and output storage folders. Execute the the following steps to mount a local folder,`my-input`, to Nauta storage so that input data can be referenced from the storage when performing training.
 
@@ -82,7 +82,7 @@ The default configuration is to mount local folders to a Nauta user's private in
 
     `nctl mount`
 
-3. Enter the mount command that is provided by `nctl mount` using the input as the `NAUTA-FOLDER`and `my-input` folder or `Y:` as the MOUNTPOINT. Examples of mounting the local folder to the Nauta input folder, are:
+3. Enter the `mount` command that is provided by `nctl mount`using the input as the NAUTA-FOLDER and my-input folder as the MOUNTPOINT. Examples of mounting the command:
 
    * **MacOS:** `mount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/input`
    * **Ubuntu:** `sudo mount.cifs -o username=USERNAME,password=PASSWORD,rw,uid=1000 //CLUSTER-URL/input`
@@ -93,7 +93,7 @@ The default configuration is to mount local folders to a Nauta user's private in
     
 5.	Copy a dataset or files to the folder for use in experiments. The files will be located in the Nauta storage until deleted.
 
-6.	Use the MNIST example from [Submitting an Experiment](getting_started.md#submitting-an-experiment), download the MNIST dataset using the following link: THE MNIST DATABASE](http://yann.lecun.com/exdb/mnist)
+6.	Use the MNIST example from [Submitting an Experiment](getting_started.md#submitting-an-experiment), you can download the MNIST dataset using the following link: [THE MNIST DATABASE](http://yann.lecun.com/exdb/mnist)
 
 7.	Create a MNIST folder in the Nauta input folder.
 
@@ -119,7 +119,7 @@ Uploading additional files is an option available for the `submit` command, usin
 
 `-sfl, --script-folder-location`
 
-Where `script-folder-location` is the name of a folder with additional files used by a script; for example, other `.py` files, assets, and so on.
+Where `script-folder-location` is the name of a folder with additional files used by a script. For example, other `.py` files, assets, and so on.
 
 **Syntax:**
 

@@ -1,4 +1,4 @@
-# Inventory File Configuration Tasks
+# Inventory File Tasks
 
 Nauta uses Ansible (refer to [Ansible Overview](https://en.wikipedia.org/wiki/Ansible_(software))) for certain provisioning tasks during installation. You _must_ create (or modify) an Ansible inventory file to match your hardware configuration. Nauta looks for your inventory file at the location defined in the `ENV_INVENTORY` environment variable (refer to the [Installation Process](../Installation_Process/IP.md) for more information).
 
@@ -68,7 +68,7 @@ external_interface | This is used for external network communication. | Yes | st
 
 ## Next Steps: Configuration Tasks
 
-* [Configuring Nauta - Proxies, File System and Network](../Configuration_Tasks_Variables/CTV.md)
+* [Configuration File Tasks (Configuring Nauta - Proxies, File System, and Network)](../Configuration_Tasks_Variables/CTV.md)
 
 ----------------------
 

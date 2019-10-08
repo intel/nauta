@@ -27,16 +27,29 @@ The following _example results_ are shown below (scroll right to see full conten
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
-| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-single |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
-|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                    |
-|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                    |
-| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-single |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
-|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                    |
-|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                    |
+| Name                             | Parameters                     | Metrics                     | Submission date        | Start date             | Duration    | Owner   | Status    | Template name               | Template version   |
+|----------------------------------+--------------------------------+-----------------------------+------------------------+------------------------+-------------+---------+-----------+-----------------------------+--------------------|
+| mnist-sing-209-19-08-26-18-03-43 | mnist_single_node.py           |                             | 2019-08-26 06:05:05 PM |                        |             | user1   | CANCELLED | tf-training-tfjob           | 0.1.0              |
+| multinode                        | mnist_multinode.py             |                             | 2019-08-26 06:06:32 PM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+| multinodes                       | mnist_multinode.py -- data_dir |                             | 2019-09-19 01:38:33 AM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+|                                  | =/mnt/input/root/public/MNIST  |                             |                        |                        |             |         |           |                             |                    |
+| para-range-1                     | mnist_single_node.py lr=0.1 -- |                             | 2019-09-19 01:25:21 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| para-range-2                     | mnist_single_node.py lr=0.2 -- |                             | 2019-09-19 01:25:23 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| para-range-3                     | mnist_single_node.py lr=0.3 -- |                             | 2019-09-19 01:25:23 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| pytorch                          | mnist_multinode.py             |                             | 2019-08-26 06:58:01 PM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+| single                           | mnist_single_node.py           |                             | 2019-08-26 06:05:32 PM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+| single2                          | mnist_single_node.py           | accuracy: 0.96875           | 2019-09-20 05:31:06 PM | 2019-09-20 05:31:14 PM | 0d 0h 1m 6s | user1   | COMPLETE  | tf-training-tfjob           | 0.1.0              |
+|                                  |                                | global_step: 499            |                        |                        |             |         |           |                             |                    |
+|                                  |                                | loss: 0.058229897           |                        |                        |             |         |           |                             |                    |
+|                                  |                                | validation_accuracy: 0.9832 |                        |                        |             |         |           |                             |                    |
+
+
 ```
 
 ### Viewing a Single Experiment's Details
@@ -47,59 +60,61 @@ Use the following command to view a single experiment’s details:
 
 **Syntax:** `nctl experiment view [options] EXPERIMENT-NAME`
 
-**Example:** An example experiment view (the example name used is mnist-tb) is shown below.  
+**Example:** An example experiment view (the example name used is `single`) is shown below.  
 
-`nctl experiment view mnist-tb`
+`nctl experiment view single`
 
-The following _example results_ are shown below (scroll right to see full contents).
+The following _example results_ are shown below (scroll right to see the full contents).
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
-| mnist-tb     | mnist_single_node.py | accuracy: 1.0               | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM | 2019-03-20 05:12:10 PM | user1   | COMPLETE | tf-training-single |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
-|              |                      | loss: 0.035771053           |                        |                        |                        |         |          |                    |
-|              |                      | validation_accuracy: 0.9804 |                        |                        |                        |         |          |                    |
+| Name   | Parameters           | Metrics   | Submission date        | Start date   | Duration   | Owner   | Status   | Template name     | Template version   |
+|--------+----------------------+-----------+------------------------+--------------+------------+---------+----------+-------------------+--------------------|
+| single | mnist_single_node.py |           | 2019-08-26 06:05:32 PM |              |            | user1   | QUEUED   | tf-training-tfjob | 0.1.0              |
+
 
 Pods participating in the execution:
 
-| Name              | Uid             | Pod Conditions        | Container Details                                 |
-|-------------------+-----------------+-----------------------+---------------------------------------------------|
-| mnist-tb-master-0 | ca2ca2c4-4b2a-1 | Initialized: True     | - Name: tensorflow                                |
-|                   | 1e9-9c55-525816 |  reason: PodCompleted | - Status: Terminated, Completed                   |
-|                   | 060100          | Ready: False          | - Volumes:                                        |
-|                   |                 |  reason: PodCompleted |   input-home @ /mnt/input/home                    |
-|                   |                 | PodScheduled: True    |   input-public @ /mnt/input/root                  |
-|                   |                 |                       |   output-home @ /mnt/output/home                  |
-|                   |                 |                       |   output-public @ /mnt/output/root                |
-|                   |                 |                       |   output-home @ /mnt/output/experiment            |
-|                   |                 |                       |   default-token-4k247 @                           |
-|                   |                 |                       |     /var/run/secrets/kubernetes.io/serviceaccount |
-|                   |                 |                       |                                                   |
-|                   |                 |                       | - Resources:                                      |
-|                   |                 |                       |   - Requests:                                     |
-|                   |                 |                       |     cpu: 4750m    memory: 4843948078              |
-|                   |                 |                       |   - Limits:                                       |
-|                   |                 |                       |     cpu: 4750m    memory: 4843948078              |
+| Name            | Uid             | Pod Conditions                   | Container Details                                 |
+|-----------------+-----------------+----------------------------------+---------------------------------------------------|
+| single-master-0 | 55101ad9-c81b-1 | reason: Unschedulable,           | - Name: tensorflow                                |
+|                 | 1e9-a56e-525816 |  message: 1/1 tasks in gang      | - Status: Not created                             |
+|                 | 040500          |   unschedulable: 0/1 nodes are   | - Volumes:                                        |
+|                 |                 |   available, 1 insufficient cpu, |   input-home <ro> @ /mnt/input/home               |
+|                 |                 |   1 insufficient memory.         |   input-public <ro> @ /mnt/input/root             |
+|                 |                 |                                  |   output-home <rw> @ /mnt/output/home             |
+|                 |                 |                                  |   output-public <ro> @ /mnt/output/root           |
+|                 |                 |                                  |   output-public <rw> @ /mnt/output/root/public    |
+|                 |                 |                                  |   input-public <rw> @ /mnt/input/root/public      |
+|                 |                 |                                  |   output-home <rw> @ /mnt/output/experiment       |
+|                 |                 |                                  |   default-token-96ssz <ro> @                      |
+|                 |                 |                                  |     /var/run/secrets/kubernetes.io/serviceaccount |
+|                 |                 |                                  |                                                   |
+|                 |                 |                                  | - Resources:                                      |
+|                 |                 |                                  |   - Requests:                                     |
+|                 |                 |                                  |     cpu: 19000m    memory: 93604421089            |
+|                 |                 |                                  |   - Limits:                                       |
+|                 |                 |                                  |     cpu: 19000m    memory: 93604421089            |
 
 Resources used by pods:
 
-| Resource type    | Total usage        |
-|------------------+--------------------|
-| CPU requests:    | 4750m              |
-| Memory requests: | 4GiB 523MiB 562KiB |
-| CPU limits:      | 4750m              |
-| Memory limits:   | 4GiB 523MiB 562KiB |
+| Resource type    | Total usage         |
+|------------------+---------------------|
+| CPU requests:    | 19000m              |
+| Memory requests: | 87GiB 180MiB 135KiB |
+| CPU limits:      | 19000m              |
+| Memory limits:   | 87GiB 180MiB 135KiB |
+
+Experiment is in QUEUED state due to insufficient number of cpus.
 
 
 ```
 
-The volumes list include the mount mode for each volume (in `<>` brackets), which can be either `ro` (read-only) or `rw` (read-write).
+The volumes list includes the mount mode for each volume (in `<>` brackets), which can be either `ro` (read-only) or `rw` (read-write).
 
 ## Useful References 
 * [Viewing Experiment Logs and Results Data](view_exp_logs.md)
-* [Viewing experiments in TensorBoard](view_exp_logs.md)
+* [Viewing experiments in TensorBoard](view_exp_tensorbd.md)
 * [Viewing Experiment Results from the Nauta Web UI](view_exp_webui.md)
 
 

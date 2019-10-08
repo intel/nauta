@@ -1,6 +1,6 @@
 # Gitea Console Access
 
-Although Nauta's underlying git system should be self-maintainable, there may be some rare case when manual action is required (for example, triggering garbage collection manually, updating SSH keys). To perform these actions, or to monitor Gitea* state, Nauta administrators are able to access Gitea's UI with admin rights using the procedure described below.
+Although Nauta's underlying Git system should be self-maintainable, there may be some rare case when manual action is required (for example, triggering garbage collection manually, updating SSH keys). To perform these actions, or to monitor Gitea state, Nauta administrators are able to access Gitea's UI with admin rights using the procedure described below.
 
 ## Accessing Gitea Console
 
@@ -20,9 +20,9 @@ kubectl port-forward -n nauta services/nauta-gitea-http 3000:3000
 1. Open your web browser and navigate to: `http://localhost:3000`
    You should see Gitea UI login screen.
    
-1. Click the `Sign In` button on the top bar.
+2. Click the `Sign In` button on the top bar.
 
-1. Enter your username and password obtained in step
+3. Enter your username and password obtained in step
    You should see Gitea's dashboard, administration utilities are available at:
    
 `Profile and settings (dropdown menu, top right of the screen) > Site administration`
@@ -31,15 +31,15 @@ kubectl port-forward -n nauta services/nauta-gitea-http 3000:3000
 
 1. Nauta users are experiencing issues with experiments' uploads, with following error message in `nctl` logs:
 
-```bash
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-```
-1. Nauta administrator gets access to Gitea console, by following the procedure described above.
+   ```bash
+   Permission denied (publickey).
+   fatal: Could not read from remote repository.
+   ```
+2. Nauta administrator gets access to Gitea console, by following the procedure described above.
 
-1. Nauta administrator runs `Rewrite '.ssh/authorized_keys' file (for Gitea SSH keys)` on the Gitea admin panel.
+3. Nauta administrator runs `Rewrite '.ssh/authorized_keys' file (for Gitea SSH keys)` on the Gitea admin panel.
 
-1. If `authorized_keys` were the issue, problem should be mitigated
+4. If `authorized_keys` were the issue, the problem should be mitigated.
 
 ----------------------
 

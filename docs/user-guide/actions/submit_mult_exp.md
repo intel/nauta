@@ -21,7 +21,7 @@ nctl experiment submit -–parameter-range lr "{0.1, 0.2, 0.3}"
 examples/mnist_single_node.py -- --data_dir=/mnt/input/root/public/MNIST
 ```
 
-Refer to the [Working with Datasets](working_with_datasets.md) for instructions on uploading the dataset to the `input_shared` folder.
+Refer to [Working with Datasets](working_with_datasets.md) for instructions on uploading the dataset to the `input_shared` folder.
 
 ## Parameter Ranges and Parameter Sets
 
@@ -43,22 +43,31 @@ The following result displays.
 
 ```
 Please confirm that the following experiments should be submitted.
-| Experiment                       | Parameters       |
-|----------------------------------+----------------- |
-| paramenter-range-1  |  mnist_single_node.py         |
-|                     |  lr=0.1                       |
-| paramenter-range-2  |  mnist_single_node.py         |
-|                     |  lr=0.2                       |
-| paramenter-range-3  |  mnist_single_node.py         |
-|                     |  lr=0.3                       |
-
+| Name         | Parameters                              |
+|--------------+-----------------------------------------|
+| para-range-1 | mnist_single_node.py                    |
+|              | lr=0.1                                  |
+|              | --data_dir=/mnt/input/root/public/MNIST |
+| para-range-2 | mnist_single_node.py                    |
+|              | lr=0.2                                  |
+|              | --data_dir=/mnt/input/root/public/MNIST |
+| para-range-3 | mnist_single_node.py                    |
+|              | lr=0.3                                  |
+|              | --data_dir=/mnt/input/root/public/MNIST |
 Do you want to continue? [Y/n]: y
+⠼ Uploading experiment...('git version 2.22.GIT\n', 0, b'git version 2.22.GIT\n')
+| Name         | Parameters                     | Status   | Message   |
+|--------------+--------------------------------+----------+-----------|
+| para-range-1 | mnist_single_node.py lr=0.1 -- | QUEUED   |           |
+|              | data_dir=/mnt/input/root/publi |          |           |
+|              | c/MNIST                        |          |           |
+| para-range-2 | mnist_single_node.py lr=0.2 -- | QUEUED   |           |
+|              | data_dir=/mnt/input/root/publi |          |           |
+|              | c/MNIST                        |          |           |
+| para-range-3 | mnist_single_node.py lr=0.3 -- | QUEUED   |           |
+|              | data_dir=/mnt/input/root/publi |          |           |
+|              | c/MNIST                        |          |           |
 
-| Experiment          | Parameters                       | State   | Message   |
-|---------------------+----------------------------------+---------+-----------|
-| paramenter-range-1  | mnist_single_node.py lr=0.1      | QUEUED  |           |
-| paramenter-range-2  | mnist_single_node.py lr=0.2      | QUEUED  |           |
-| paramenter-range-3  | mnist_single_node.py lr=0.3      | QUEUED  |           |
 ```
 
 **Note:** Your script _must be_ written to process your input data as it is presented, or conversely, your data _must be_ formatted to be processed by your script. No specific data requirements are made by the Nauta software.

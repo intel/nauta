@@ -15,7 +15,7 @@ Execute the following command to remove a user:
 
 Respond to this question to confirm the previous step. 
 
-`Do you want to continue? [y/N]: press y to confirm deletion.`
+`Do you want to continue? [y/N]: Press y to confirm deletion.`
 
 ### Limitations	
 
@@ -33,11 +33,11 @@ Execute the following command to purge a user:
   
 Respond to this question to confirm the previous step. 
 
-`Do you want to continue? [y/N]: press y to confirm deletion.`
+`Do you want to continue? [y/N]: Press y to confirm deletion.`
 
 ### Limitations	
 
-The Nauta `user delete` command may take up to 30 seconds to delete the user. A new user with the same user name _cannot_ be created until after the delete command confirms that the first user with the same name has been deleted. 
+The Nauta `user delete` command may take up a few minutes to delete the user. A new user with the same user name _cannot_ be created until after the delete command confirms that the first user with the same name has been deleted. 
 
 
 ----------------------

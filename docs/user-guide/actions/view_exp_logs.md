@@ -4,7 +4,7 @@ Each experiment generates logs and this information is generated during the run 
 
 Separate from the logs, the results or output of an experiment can be found by mounting the user’s output folder or output-shared folder. A model file should write to the Nauta output folder to save any output files. 
 
-Execute the following command to view logs an experiment's logs.
+Execute following command to view logs from a given experiment where `mnist-tb` is shown in the experiment logs, this indicates the name of the experiment).
 
 **Syntax:** `nctl experiment logs [options] EXPERIMENT-NAME`
 

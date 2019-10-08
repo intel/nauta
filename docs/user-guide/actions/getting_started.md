@@ -19,7 +19,7 @@ The section discusses the following main topics:
 
 ## Verifying Installation
 
-Check the required software packages are available in the terminal by PATH and verify that the correct version is used.
+Check that the required software packages are available in the terminal by PATH and verify that the correct version is used.
 
 ### Proxy Environment Variables 
 
@@ -42,10 +42,11 @@ If any installation issues are found, the command returns information about the 
 ```
 This OS is supported.
 kubectl verified successfully.
-kubectl server verified successfully.
 helm client verified successfully.
-helm server verified successfully.
 git verified successfully.
+helm server verified successfully.
+kubectl server verified successfully.
+packs resources' correctness verified successfully.
 ```
 ## Overview of nctl Commands
 
@@ -63,14 +64,17 @@ To access help for any command, use the `--help` or `-h` parameters. The followi
 
 `nctl --help`
 
+#### Help Command Output
+
 The results are shown below.
 
 ```
 Usage: nctl COMMAND [options] [args]...
 
-  Nauta Client
+    Nauta Client
 
- Displays additional help information when the -h or --help COMMAND is used.
+  Displays additional help information when the -h or --help COMMAND is
+  used.
 
 Options:
   -h, --help  Displays help messaging information.
@@ -82,16 +86,17 @@ Commands:
                    process in the system console until the user stops the
                    process. To run in the background, add '&' at the end of
                    the line.
-  model, mo        Commands used to manage processing, conversion and
-                   packaging of models.
+  model, mo        Manage the processing, conversion, and packaging of models.
   mount, m         Displays a command that can be used to mount a client's
                    folder on their local machine.
   predict, p       Start, stop, and manage prediction jobs and instances.
-  template, tmp    Command for handling templates used by the system.
+  template, tmp    Manage experiment templates used by the system.
   user, u          Create, delete, or list users of the platform. Can only be
                    run by a platform administrator.
-  verify, ver      Verifies whether all required external components contain
-                   the proper versions installed.
+  verify, ver      Verifies if all required external components contain the
+                   proper installed versions.
+  version, v       Displays the version of the installed nctl application.
+
 ```
 
 ## Example Experiments
@@ -102,11 +107,16 @@ The Nauta installation includes sample training scripts and utility scripts, con
 
 The examples folder in the nctl installation contains these following experiment scripts:
 
-* `mnist_single_node.py` - Training of digit classifier in single node setting
-* `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting
-* `mnist_horovod.py` - Training of digit classifier in Horovod
-* `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires mnist_input_data.py file)
-* `mnist_tensorboard.py` - Training of digit classifier which displays summaries in TensorBoard (requires at least 2Gi of memory)
+* `mnist_checker.py` - This a utility script used for the inference process and model verification.
+* `mnist_converter_pb.py` - This a utility script used for the inference process and model verification.
+* `mnist_horovod.py` - Training of digit classifier in Horovod.
+* `mnist_input_data.py` - Functions for downloading and reading mnist data.
+* `mnist_single_node.py` - Training of digit classifier in single node setting.
+* `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting.
+* `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires mnist_input_data.py file).
+* `mnist_tensorboard.py` - Training of digit classifier which displays summaries in TensorBoard (requires at least 2Gi of memory).
+
+Additional example scripts for various neural networks  are included and have been validated on the Nauta platform.
 
 ### Utility Scripts
 
@@ -126,9 +136,9 @@ Launch the training experiments with Nauta using the following:
 
 `nctl experiment submit [options] SCRIPT-LOCATION [-- script-parameters]`
 
-**Where:**
+**Where:** The path and name of the Python script used to perform this experiment.
 
-`-- SCRIPT-LOCATION`: The path and name of the Python script used to perform this experiment.
+`-- SCRIPT-LOCATION` 
 
 ### Example Experiments
 
@@ -138,21 +148,21 @@ To submit the example experiments, use the following:
 
 For single node training (template parameter in this case is optional), use the following: 
 
-`nctl experiment submit -t tf-training-single examples/mnist_single_node.py --name single`
+`nctl experiment submit -t  tf-training-single examples/mnist_single_node.py --name single`
 
 #### Multinode Training
 
 For multinode training, use the following:
 
-`nctl experiment submit -t tf-training-multi examples/mnist_multinode.py --name multinode`
+`nctl experiment submit -t multinode- tf-training-single examples/mnist_multinode.py --name multinode`
 
 #### Horovod Training
 
 For Horovod training, use the following:
 
-`nctl experiment submit -t tf-training-horovod examples/mnist_horovod.py --name horovod `
+`nctl experiment submit -t tf-training-horovod examples/mnist_horovod.py --name horovod`
 
-The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing `nctl template list` command.
+The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing `nctl experiment template-list` command.
 
 **Note:** To run TensorBoard, TensorBoard data _must be_ written to a folder in the directory `/mnt/output/experiment`. This example script satisfies this requirement; however, your scripts _must_ meet the same requirement.
 
@@ -177,12 +187,12 @@ Submitting experiments.
 
 #### Running an Experiment using PyTorch Framework
 
-Nauta provides a separate template with the PyTorch framework, which is named `pytorch`. If you want to run an experiment based on a PyTorch framework, pass the `pytorch` value as the `--template` option when executing the `experiment submit` command.
+Nauta provides a separate template with the PyTorch framework, which is named `pytorch-training`. If you want to run an experiment based on a PyTorch framework, pass the `pytorch-training` value as the `-t / --template` option when executing the `experiment submit` command.
 
  **Example:** 
 
 ```
-nctl experiment submit --name pytorch -t pytorch /examples/pytorch_mnist.py
+nctl experiment submit --name pytorch --template pytorch-training examples/pytorch_mnist.py
 ```
 
 #### Result of this Command
@@ -193,7 +203,7 @@ The previous command runs an experiment using the `pytorch_mnist.py` example del
 Submitting experiments.   
 | Name    | Parameters         | Status   | Message   |
 |---------+--------------------+----------+-----------|
-| pytorch | mnist_multinode.py | QUEUED   |           |
+| pytorch | pytorch_mnist.py   | QUEUED   |           |
 ```
 
 #### Viewing Experiment Status
@@ -206,25 +216,20 @@ Execute this command:
 
 `nctl experiment list --brief`
 
-As shown below, an experiment's status displays. This is an example only. The `--brief` option returns a short version of results as shown.
+As shown below, an experiment's status displays. This is an example only. The `--brief` option returns a short version of results as shown. 
 
 ```
-
-Submitting experiments.
-| Experiment   | Parameters           | State   | Message   |
-|--------------+----------------------+---------+-----------|
-| single       | mnist_single_node.py | QUEUED  |           |
-
-```
-```
-
-| Experiment                          | Submission date        | Owner | State     |
-|--------------+----------------------+---------+----------------------------------|
-| mnist-single-node-tb                | 2019-03-13 04:57:58 PM | user1 |  QUEUED   |
-| mnist-tb                            | 2019-03-13 05:00:39 PM | user1 |  COMPLETE |
-| mnist-tb 2-1                        | 2019-03-13 05:49:59 PM | user1 |  COMPLETE |
-| test-experiment                     | 2019-03-13 06:00:39 PM | user1 |  QUEUED   |
-| single                              | 2019-03-13 01:49:59 PM | user1 |  QUEUED   |
+| Name                             | Submission date        | Owner   | Status    |
+|----------------------------------+------------------------+---------+-----------|
+| mnist-sing-209-19-08-26-18-03-43 | 2019-08-26 06:05:05 PM | user1   | CANCELLED |
+| multinode                        | 2019-08-26 06:06:32 PM | user1   | QUEUED    |
+| multinodes                       | 2019-09-19 01:38:33 AM | user1   | QUEUED    |
+| para-range-1                     | 2019-09-19 01:25:21 AM | user1   | QUEUED    |
+| para-range-2                     | 2019-09-19 01:25:23 AM | user1   | QUEUED    |
+| para-range-3                     | 2019-09-19 01:25:23 AM | user1   | QUEUED    |
+| pytorch                          | 2019-08-26 06:58:01 PM | user1   | QUEUED    |
+| single                           | 2019-08-26 06:05:32 PM | user1   | QUEUED    |
+| single2                          | 2019-09-20 05:31:06 PM | user1   | COMPLETE  |
 
 ```
 ### Monitoring Training
@@ -259,7 +264,7 @@ As shown below, a log displays the example results.
 
 ## Adding Experiment Metrics
 
-Experiments launched in Nauta can output additional kinds of metrics using the _publish function_ from the experiment metrics API. Execute the following command to see an example of metrics published with the single experiment executed in the above example:
+Experiments launched in Nauta can output additional kinds of metrics using the _publish function_ from the experiment metrics API. Execute the following command to see an example of metrics published with the single experiment executed in the above example, and execute the following command:
 
 `nctl experiment list`
 
@@ -267,17 +272,30 @@ As shown, an example experiment list is shown (scroll right to see the full cont
 
 ```
 
-| Experiment   | Parameters           | Metrics                     | Submission date        | Start date             | End date               | Owner   | State    | Template name      |
-|--------------+----------------------+-----------------------------+------------------------+------------------------+------------------------+---------+----------+--------------------|
-| mnist-tb     | mnist_single_node.py |                             | 2019-03-20 05:11:15 PM | 2019-03-20 05:11:20 PM |                        | user1   | RUNNING  | tf-training-single |
-| single       | mnist_single_node.py | accuracy: 0.96875           | 2019-03-20 05:03:12 PM | 2019-03-20 05:04:32 PM | 2019-03-20 05:05:15 PM | user1   | FAILED   | tf-training-single |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
-|              |                      | loss: 0.08342029            |                        |                        |                        |         |          |                    |
-|              |                      | validation_accuracy: 0.9818 |                        |                        |                        |         |          |                    |
-| single2      | mnist_single_node.py | accuracy: 0.953125          | 2019-03-20 05:06:19 PM | 2019-03-20 05:06:24 PM | 2019-03-20 05:07:05 PM | user1   | COMPLETE | tf-training-single |
-|              |                      | global_step: 499            |                        |                        |                        |         |          |                    |
-|              |                      | loss: 0.078533165           |                        |                        |                        |         |          |                    |
-|              |                      | validation_accuracy: 0.9838 |                        |                        |                        |         |          |                    |
+| Name                             | Parameters                     | Metrics                     | Submission date        | Start date             | Duration    | Owner   | Status    | Template name               | Template version   |
+|----------------------------------+--------------------------------+-----------------------------+------------------------+------------------------+-------------+---------+-----------+-----------------------------+--------------------|
+| generate-model                   | mnist_saved_model.py           |                             | 2019-09-30 09:23:28 PM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | /mnt/output/experiment         |                             |                        |                        |             |         |           |                             |                    |
+| mnist-sing-209-19-08-26-18-03-43 | mnist_single_node.py           |                             | 2019-08-26 06:05:05 PM |                        |             | user1   | CANCELLED | tf-training-tfjob           | 0.1.0              |
+| multinode                        | mnist_multinode.py             |                             | 2019-08-26 06:06:32 PM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+| multinodes                       | mnist_multinode.py -- data_dir |                             | 2019-09-19 01:38:33 AM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+|                                  | =/mnt/input/root/public/MNIST  |                             |                        |                        |             |         |           |                             |                    |
+| para-range-1                     | mnist_single_node.py lr=0.1 -- |                             | 2019-09-19 01:25:21 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| para-range-2                     | mnist_single_node.py lr=0.2 -- |                             | 2019-09-19 01:25:23 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| para-range-3                     | mnist_single_node.py lr=0.3 -- |                             | 2019-09-19 01:25:23 AM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+|                                  | data_dir=/mnt/input/root/publi |                             |                        |                        |             |         |           |                             |                    |
+|                                  | c/MNIST                        |                             |                        |                        |             |         |           |                             |                    |
+| pytorch                          | mnist_multinode.py             |                             | 2019-08-26 06:58:01 PM |                        |             | user1   | QUEUED    | multinode-tf-training-tfjob | 0.1.0              |
+| pytorch2                         | pytorch_mnist.py               |                             | 2019-09-30 11:15:12 PM |                        |             | user1   | QUEUED    | pytorch                     | 0.0.1              |
+| single                           | mnist_single_node.py           |                             | 2019-08-26 06:05:32 PM |                        |             | user1   | QUEUED    | tf-training-tfjob           | 0.1.0              |
+| single2                          | mnist_single_node.py           | accuracy: 0.96875           | 2019-09-20 05:31:06 PM | 2019-09-20 05:31:14 PM | 0d 0h 1m 6s | user1   | COMPLETE  | tf-training-tfjob           | 0.1.0              |
+|                                  |                                | global_step: 499            |                        |                        |             |         |           |                             |                    |
+|                                  |                                | loss: 0.058229897           |                        |                        |             |         |           |                             |                    |
+|                                  |                                | validation_accuracy: 0.9832 |                        |                        |             |         |           |                             |                    |
 
 ```
 
@@ -289,7 +307,7 @@ To add metrics to an experiment, you need to edit the experiment script to use t
 
    `from experiment_metrics.api import publish`
 
-2.	To add a metric, publish `dict key` and the string value.  Using the validation accuracy metric as an example, the metric is published in the `mnist_single_node.py` example
+2.	To add a metric, publish `dict key` and the string value.  Using the validation accuracy metric as an example, the metric is published in the `mnist_single_node.py` example.
 
     `publish({"validation_accuracy": str(validation_accuracy_val)})`
   
@@ -307,16 +325,17 @@ Storing at the same time two (or more) metrics with the same key from two differ
 
 ### Method 1  
 
-The key of a certain metric should also contain a node identificator from which this metric derives. To create an identificator, use one of the following:
+The key of a certain metric should also contain a node identifier from which this metric derives. To create an identifier, use one of the following:
 
    * For horovod multinode training jobs, result of the `rank()` function provided by the `horovod` package can be used
-    as a node's identificator.  
+    as a node's identifier.  
     
-   * For `tfjob` multinode training jobs, you can take all necessary info from the `TF_CONFIG` environment variable. An example piece of a code creating such identificator, is:
+   * For `tfjob` multinode training jobs, you can take all necessary info from the `TF_CONFIG` environment variable. An example piece of a code creating such identifier, is:
     
- ### Node Identificator Example
+ ### Node Identifier Example
 
     ```
+    
     tf_config = os.environ.get('TF_CONFIG')
     if not tf_config:
         raise RuntimeError('TF_CONFIG not set!')
@@ -325,7 +344,8 @@ The key of a certain metric should also contain a node identificator from which 
 
     job_name = tf_config_json.get('task', {}).get('type')
     task_index = tf_config_json.get('task', {}).get('index')
-    # final node identificator `node_id = '-'.join(job_name,task_index)
+    # final node identifier `node_id = '-'.join(job_name,task_index)
+    
     ```
 
 ### Method 2
@@ -335,49 +355,49 @@ Only one node should store metrics. Use the following to decide which node shoul
 * For `horovod` multinode training jobs, the horovod python library provides the `rank()` function that returns a number
 of a current worker. _Master_ is marked with the number `0`, so only a pod with this number should store logs.
 
-* For `tfjob` multinode training jobs, as there is _no_ dedicated master node. Therefore, a user should choose which worker should be responsible for storing metrics. The identificator of a current worker can be obtained, as described in _[Method 1](#method-1)_. Furthermore, a user should choose an identificator and store the logs, but only from a node that has this chosen ID. 
+* For `tfjob` multinode training jobs, as there is _no_ dedicated master node. Therefore, a user should choose which worker should be responsible for storing metrics. The identifier of a current worker can be obtained, as described in _[Method 1](#method-1)_. Furthermore, a user should choose an identifier and store the logs, but only from a node that has this chosen ID. 
    
 ## Viewing Experiment Results from the Web UI
 
-The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, enter the following command at the command prompt:
+The web UI lets you explore the experiments you have submitted. To view your experiments at the web UI, execute the following command at the command prompt:
 
 `nctl launch webui`
 
-**Note:** If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by `nctl` command.
-
-An example Web UI screen is shown below.
+The following screen displays (this is an example only).
 
 ![](images/web_ui.png) 
 
-The web UI shows the six columns. Each of these column headings are clickable. Click that column heading to re-sort the listing of experiments based on that column heading, ascending or descending order:
+**Note:** If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by `nctl` command.
+
+### Web UI Columns 
 
 * **Name:** The left-most column lists the experiments by name.
 * **Status:** This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date:** This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date:** This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Duration:** This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
-* **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (Inference) with this model.
+* **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. 
 
-You can perform the tasks discussed below at the web UI.
+**Note:** You can perform the tasks discussed below at the Nauta web UI.
 
 ### Expand Experiment Details
 
 Click the _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
-This screen is divided into two frames: left-side and right-side frames. 
+This screen is divided into left and right-side frames. 
 
-### Left-most Frame
+### Left-side Frame
 
-The left-side frame of the experiment shows the resources and submission date and time (as shown in the figure below).
+The left-side frame of the experiment details window shows Resources and Submission Date (as shown in the figure below).
 
-* **Resources** Assigned to that experiment, specifically the assigned pods and their status and container information including the CPU and memory resources assigned.
+* **Resources** assigned to that experiment, specifically the assigned pods and their status and container information including the CPU and memory resources assigned.
 
-* The **Submission Date** and time.
+* Displays the **Submission Date** and time.
 
 ![Image](images/UI_Experiment_Details_1.png)
  
 ### Right-side Frame
  
-The right-side frame of the experiment details windows shows (as shown in the figure below).
+The right-side frame of the experiment details window shows Start Date, End Date, Total Duration, Parameters, and Output (as shown in the figure below).
 
 * **Start Date:** The day and time this experiment was launched. 
 * **End date:** The day and time this experiment was launched. 
@@ -389,23 +409,34 @@ The right-side frame of the experiment details windows shows (as shown in the fi
 
 ### Searching on Experiments
 
-In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, not just the experiment name or parameters. 
+In the **Search** field at the far right of the UI ![](images/search_lense.png), enter a string of alphanumeric characters to match the experiment name or other parameters (such as user), and list only those matching experiments. This Search function lets the user search fields in the entire list, _not_ just the experiment name or parameters. 
 
-### Adding/Deleting Columns
+## Adding and Deleting Columns
+
+### ADD/DELETE COLUMNS Button
 
 Click **ADD/DELETE COLUMNS** to open a dialogue. Here, the columns currently in use are listed first with 
 their check box checked. Scroll down to see more, available columns listed next, unchecked. 
 
-Click to check and uncheck and select the column headings you prefer. Optional column headings include parameters such as Pods, End Date, Owner, Template, Time in Queue, and so on.
+### Check/Uncheck Column Headings
+
+Click to check and uncheck and select the column headings you prefer. Optional column headings include parameters, such as Pods, End Date, Owner, Template, Time in Queue, and so on.
+
+### Column Heading Metrics
 
 Column headings also include metrics that have been setup using the Metrics API, for a given experiment, and you 
-can select to show those metrics in this display as well. Column additions and deletions you make are retained between logins.
+can select to show those metrics in this display as well.
 
-Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information.
+### Column Additions and Deletions
+
+Column additions and deletions you make are retained between logins. 
 
 ## Launching Kubernetes Dashboard
 
-Click the **Hamburger Menu** ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. Click **Resources Dashboard** to open the Kubernetes resources dashboard. Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
+1. Click the **Hamburger Menu** ![](images/hamburger_menu.png) at the far left of the UI to open a left frame. 
+2. Click **Resources Dashboard** to open the Kubernetes resources dashboard. 
+
+   **Note:** Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md).
 
 ## Launching TensorBoard
 
@@ -413,19 +444,19 @@ Generally, every file that the training script outputs to `/mnt/output/experimen
 
 Use the following command to launch TensorBoard and to view graphs of this model's results. Refer to [Working with Datasets](working_with_datasets.md) for more information.
 
-When training scripts output Tensorflow summaries to `/mnt/output/experiment`, they can be automatically picked up by the Tensorboard instance launched with command:
+When training scripts output TensorFlow summaries to `/mnt/output/experiment`, they can be automatically picked up by the Tensorboard instance launched with this command:
 
 **Syntax:** 
 
 `nctl launch tensorboard [options] EXPERIMENT-NAME`
 
-Execute this command:
+Execute the following command:
 
 `nctl launch tensorboard single`
 
 **Note:** If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, use the URL provided by nctl.
 
-The following message displays.
+The following message displays the example port number.
 
 ```
 Please wait for Tensorboard to run... 
@@ -440,7 +471,7 @@ The following figure shows the browser display of TensorBoard dashboard with the
  
 ## Inference
 
-To perform inference testing (using predict batch command in this example) you need to:
+To perform inference testing (using predict batch command in this example), you need to:
 
 1.	Prepare the data for model input.
 
@@ -464,7 +495,7 @@ Creates the `/tmp/mnist_test/conversion_out` folder. Fill it with 100 `protobuf`
 
 ### Trained Model
 
-Servable models (as with other training artifacts) can be saved by a training script. As previously mentioned, to access these you have to use the command provided by the `nctl mount` command and mount output storage locally. All the example scripts save servable models servable models in their model's subdirectory. To use models like this for inference, mount the input storage too because models have to be accessible from inside of the cluster. 
+Servable models (as with other training artifacts) can be saved by a training script. As previously mentioned, to access these you have to use the command provided by the `nctl mount` command and mount output storage locally. All the example scripts save servable models servable models in their model's subdirectory. To use models like this for inference mount the `input` storage too, because models have to be accessible from inside of the cluster. 
 
 For the single experiment example, execute these commands:
 
@@ -485,7 +516,7 @@ saved_model.pb  variables
 /mnt/input/single/00001/variables:
 variables.data-00000-of-00001  variables.index
 ```
-### Running Prediction Instance
+### Running a Prediction Instance
 
 The following provides a brief example of running inference using the batch command. For more information, refer to [Evaluating Experiments with Inference Testing](inference_testing.md).
 
@@ -500,7 +531,7 @@ cp /tmp/mnist_test/conversion_out/* /mnt/input/data
 To create a prediction instance, execute these commands.
 
 ```
-nctl predict batch -m ~/mnt/input/home/single -d /mnt/input/home/data --model-name mnist --name single-predict
+nctl predict batch -m /mnt/input/home/single -d /mnt/input/home/data --model-name mnist --name single-predict
 ```
 
 The following are the example results of this command: 
@@ -523,7 +554,7 @@ After the prediction instance completes (can be checked using the `predict list`
 
 In the example, it contains 100 `protobuf` responses. These can be validated using `mnist_checker.py`. 
 
-Running the following command locally will display the error rate calculated for this model and this sample of the test set:<br>
+Running the following command locally will display the error rate calculated for this model and this sample of the test set.<br>
 
 `python examples/mnist_checker.py --input_dir /mnt/output/single-predict`
 
@@ -545,7 +576,7 @@ Use the following steps to mount the output folder and view TensorBoard data fil
       
 
 4.	Navigate to the mounted location. 
-       * **macOS/Ubuntu only:** Navigate to my_output_folder
+       * **macOS/Ubuntu only:** Navigate to the `my_output_folder`.
 
 5.	See the saved event file by navigating to `mnist-single-node/tensorboard.` 
 
@@ -555,15 +586,13 @@ Use the following steps to mount the output folder and view TensorBoard data fil
        * **macOS:** `umount output my_output_folder`
        * **Ubuntu:** `sudo umount my_output_folder`
         
-To unmount previously mounted Nauta input storage from a local folder/machine refer to [Unmounting Experiment Input to Storage](unmount.md) for more information.
-
-For more information on mounting, refer to [Working with Datasets](working_with_datasets.md). To unmount previously mounted Nauta input storage from a local folder/machine refer to [Unmounting Experiment Input to Storage](unmount.md) for more information).
+For more information on mounting, refer to [Working with Datasets](working_with_datasets.md). 
 
 ## Removing Experiments
 
 An experiment that has been completed and is no longer needed can be removed from the experiment list using the `cancel`  command and its `--purge` option. 
 
-* If the `--purge` option _is not_ set in the `cancel` command, the experiment will only change status to CANCELLED. 
+* If the `--purge` option _is not_ set in the `cancel` command, the experiment will only change status to `CANCELLED`. 
 
 * If the `--purge` option is set in the `cancel` command, experiment objects and logs will be irreversibly removed (the experiment’s artifacts will remain in the Nauta storage output folder).
 

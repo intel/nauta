@@ -8,15 +8,15 @@ This section discusses the following main topics:
 
 ### Pack Definition 
 
-The packs are located in the _nctl_config_ folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs.
+The packs are located in the `nctl_config` folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs.
 
-The default pack used by  `nctl_ client is _tf-training-single`. The pack consist of the parts:
+The default pack used by  `nctl_ client is _tf-training-tfjob`. The pack consist of:
 
 * Docker image specification _Dockerfile_
 
 * Helm deployment _charts_ folder
 
-All the pack parameters that can be controlled by _nctl_ are defined in `charts/values.yml` file.
+All the pack parameters that can be controlled by `nctl` are defined in `charts/values.yml` file.
 
 The example `values.yaml` file (shown below) is taken from `tf-training-multi` pack:
 
@@ -118,7 +118,7 @@ _nctl_ is using by default following resource limits and requests for each built
 | tf-training-single | 38 | 38 | 120Gi | 120Gi | - |
 | tf-training-single-py2 | 38 | 38 | 120Gi | 120Gi | - |
 
-It is recommended to keep requests and limits on the same values. Also requested limits never should be bigger than resources available on node.
+It is recommended to keep requests and limits on the same values. Also requested limits should never exceed the resources available on the node.
 
 **Note:** You can use `cpu` and `memory` pack parameters when you want to change both requests and limits using the following command:
 ```

@@ -74,7 +74,7 @@ Successful execution of this command produces the following output:
 
 **Note:** The name of the operation is just an example, your naming may differ from the example.
 
-The duration of the export operation depends on a chosen format. To check the status of the operation use the following command:
+The duration of the export operation depends on a chosen format. To check the status of the operation, use the following command:
 
 `nctl model status`
 
@@ -82,7 +82,7 @@ This command returns a list of export operations with their statuses. If an expo
 is `Succeeded`. When this occurs, an exported model can be found in the `output/openvino_1` shared folder. 
 This folder contains the following files: `saved_model.bin`, `saved_model.mapping` and `saved_model.xml`. 
 
-If export the operation issues occur, details of those issues can be found in the logs from an export. To review the logs and issues, use the following command:
+If you export the operation and issues occur, details of those issues can be found in the logs from an export. To review the logs and issues, use the following command:
 
 `nctl model logs openvino_1`
 

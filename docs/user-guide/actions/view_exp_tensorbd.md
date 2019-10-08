@@ -45,18 +45,19 @@ This command will launch a local browser. If the command was run with the `--no-
 
 You can also launch TensorBoard and with the `nctl experiment view` command:
 
-`nctl experiment view -tensorboard <experiment-name>`
+`nctl experiment view --tensorboard <experiment-name>`
 
-This command exposes a TensorBoard instance with data from the named experiment shown above.
+**Note:** This command exposes a TensorBoard instance with data from the named experiment shown above.
 
 # MNIST Example
 
-You can try out TensorBoard with MNIST classifier `mnist_tensorboard.py` from python examples. You can find it in `examples` folder. Run:
+You can try out TensorBoard with MNIST classifier `mnist_tensorboard.py` from Python examples in the `examples` folder. Run:
+
 ```
-nctl experiment submit -p cpu 1 -p memory 2Gi examples/mnist_tensorboard.py -n tb-example
+nctl experiment submit -p cpu 1 -p memory 8Gi examples/mnist_tensorboard.py -n tb-example
 nctl exp view -tb tb-example
 ```
-Note that `mnist_tensorboard.py` requires at least 2Gi of memory.
+**Note:** `mnist_tensorboard.py` requires at least 8Gi of memory.
 
 ----------------------
 

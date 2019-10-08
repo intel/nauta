@@ -1,6 +1,6 @@
 # Target Host Requirements
 
-For the _Target host_, install Nauta **on bare metal only** with Red Hat Enterprise Linux 7.5 (this can be preinstalled).
+For the _Target host_, install Nauta **on bare metal only** with Red Hat Enterprise Linux 7.6 (this can be preinstalled).
 
 - Configured access to the master host over SSH.
   - This is configured access from your _Installer Machine to your Target Host (master)._
@@ -13,9 +13,9 @@ This section discusses the following main topics:
 - [Valid Repositories](#valid-repositories)  
 - [Repositories List](#repositories-list)
 
-## Red Hat Enterprise Linux
+## Red Hat Enterprise Linux 7.6
 
-Red Hat Enterprise Linux 7.5 is required, as well as the following required packages: 
+Red Hat Enterprise Linux 7.6 is required, as well as the following required packages: 
 
   - byacc
   - cifs-utils
@@ -63,7 +63,7 @@ If the operating system is installed and configured with a valid repository that
 
 Use the following command to check your repository list: `yum repolist all`
 
-A list of **required** enabled repositories for RHEL 7.5, is:
+A list of **required** enabled repositories for RHEL 7.6, is:
 
 - Extra Packages for Enterprise Linux 7 - x86_64
 - Red Hat Enterprise Linux 7 Server - x86_64
@@ -71,7 +71,7 @@ A list of **required** enabled repositories for RHEL 7.5, is:
 - Red Hat Enterprise Linux 7 Server (Optional) - x86_64
 - Red Hat Enterprise Linux 7 Server (Supplementary) - x86_64
 
-A list of **required** enabled repositories for Centos 7.5, is:
+A list of **required** enabled repositories for Centos 7.6, is:
 
 - CentOS-7 - Base
 - CentOS-7 - Extras
@@ -80,7 +80,7 @@ A list of **required** enabled repositories for Centos 7.5, is:
 
 ## Next Steps: Preparing for the Nauta Installation
 
-* [Inventory File Configuration Tasks](../Inventory_Tasks/IT.md)
+* [Inventory File Tasks](../Inventory_Tasks/IT.md)
 
 ----------------------
 ## Return to Start of Document

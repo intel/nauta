@@ -1,4 +1,4 @@
-# Batch Inference Example
+# TensorFlow Serving Batch Inference Example
 
 For information about the stream inference testing, refer to [Stream Inference](streaming_inference.md).
 
@@ -29,31 +29,31 @@ Below are the general steps required to run batch inference on Nauta.
 
 ## MNIST Example
 
-You _must_ preprocess MNIST data for feeding the batch inference. You can generate example data executing the following steps:
+You _must_ preprocess MNIST data for feeding the batch inference. You can generate example data by executing the following steps:
 
 ## MNIST Data Preprocessing
 
-1. Create venv by executing the following command:
+1.  Execute the following command to create venv:
 
-   ```
-   python3 -m venv .venv
-   ```
+    ```
+    python3 -m venv .venv
+    ```
 
-1. Install the required dependency in venv:
+2. Install the required dependency in venv:
 
    ```
    source .venv/bin/activate
    pip install tensorflow-serving-api
    ```
    
-1. Create a directory with two subdirectories named input and output.
+3. Create a directory with two subdirectories named input and output.
 
-1. Run the `mnist_converter_pb.py` (from nauta/applications/cli/example-python/package_examples) using just-generated venv:
+4. Run the `mnist_converter_pb.py` (from nauta/applications/cli/example-python/package_examples) using just-generated venv:
 
    ```
    python mnist_converter_pb.py
    ```
-   Results of conversion are stored in `conversion_out` directory under `work_dir` parameter. The default is: `/tmp/mnist_test/conversion_out`. Copy them to your input directory.
+   The results of conversion are stored in `conversion_out` directory under `work_dir` parameter. The default is: `/tmp/mnist_test/conversion_out`. Copy them to your input directory.
 
 ### Parameters of mnist_converter_pb.py
 
@@ -65,32 +65,45 @@ You _must_ preprocess MNIST data for feeding the batch inference. You can genera
 
 1. Run `nctl mount`.
 
-2. Use the command printed by nctl mount. Replace <NAUTA_FOLDER> with 'input' and <MOUNTPOINT> with your input directory.
+2. Use the command printed by `nctl mount`. Replace **<NAUTA_FOLDER>** with _input_ and <MOUNTPOINT> with your input directory.
 
-3. Use the same command, but this time replace <NAUTA_FOLDER> with 'output' and <MOUNTPOINT> with your output directory.
+3. Use the same command, but this time replace **<NAUTA_FOLDER>** with _output_ and <MOUNTPOINT> with your output directory.
 
-4. If you mounted wrong directories, use `sudo umount [name of the mounted directory]`. You can run `mount` to check which directories have been mounted.
+4. If you mounted the wrong directories, use the `sudo umount [name of the mounted directory]`. You can run `mount` to check which directories have been mounted.
 
-5. Deactivate and delete python virtual environment. Run:
+5. Deactivate and delete python virtual environment. 
+
+6. Execute the following commmand:
+
 ```
 deactivate
 rm -rf .venv/
 ```
 
-6. Create model with a script `mnist_saved_model.py` to your input directory. Run(scroll right to see the full contents):
-```
-nctl experiment submit mnist_saved_model.py -sfl [name of the directory where you store nauta]/nauta/applications/cli/example-python/package_examples -n [experiment name of your choice, eg. mn-model] -- --training_iteration=5 --model_version=1 /mnt/output/home/[mn-model - or a name you chose before]
-```
-You can try out different numbers of iterations.
-Copy the directory with the name of your experiment from output folder to the input.
+7. Create a model with the script `mnist_saved_model.py` to your input directory. 
 
-7. Execute the following command (scroll right to see the full contents):
+8. Execute the following commmand:
+
+```
+nctl experiment submit mnist_saved_model.py -sfl /nauta/applications/cli/examples --name mn-model  -- --training_iteration=5 --model_version=1 --export_dir /mnt/output/home/mn-model
+```
+*  **Notes:** 
+
+    * Where you see `--name`, this indicates the experiment name of your choice. This example uses mn-model.
+    
+    * The `-sfl/--script-folder-location` must include the name of the directory where Nauta examples are stored, including   `mnist_saved_model.py`.
+
+* You can try out a number different  of iterations. 
+
+9. Copy the directory with the name of your experiment from output folder to the input.
+
+10. Execute the following command:
 
   ```
-nctl predict batch --model-location /mnt/input/home/mn-model --data /mnt/input/home/conversion_out --model-name mnist -n check
+nctl predict batch --model-location /mnt/input/home/predict-model --data /mnt/input/home/conversion_out --model-name mnist --name batch-predict
   ```
 
-8. If you want to see the predictions in human-readable form, use the script below:
+11. Use the script below to see predictions in a human-readable form:
 ```
 import os
 from tensorflow_serving.apis import predict_pb2

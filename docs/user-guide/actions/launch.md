@@ -26,7 +26,7 @@ None.
  | Name | Required | Description | 
  |:--- |:--- |:--- |
  |`--no-launch` | No | Run this command without a web browser starting; only proxy tunnel is created.
- |`-p, --port INTEGER RANGE` | No | If given, the application will be exposed on a local machine under [port] port.|
+ |`-pn, --port-number INTEGER RANGE` | No | If given, the application will be exposed on a local machine under [port] port.|
  |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
@@ -54,13 +54,11 @@ Press Ctrl-C key to close a port forwarding process...
 
 ### Synopsis
 
-The `tensorboard` subcommand launches the TensorBoard web user interface front end with credentials, with the indicated experiment loaded. 
+Use the `tensorboard` subcommand to launch the TensorBoard web user interface front-end with credentials, with the indicated experiment loaded. 
 
 **Note:** If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by this command.
 
 ### Syntax
-
-Format of the command is as follows:
 
 `nctl launch tensorboard [options] EXPERIMENT-NAME`
 
@@ -71,7 +69,7 @@ Format of the command is as follows:
 |`EXPERIMENT-NAME` | Yes | Experiment name
 
 A user can pass one or more names of experiments separated with spaces. If an experiment that should
-be displayed in TensorBoard belongs to a current user, the user has to give only its name. If this experiment
+be displayed in TensorBoard belongs to a current user, the user has to give only the name. If this experiment
 is owned by another user, the name of an experiment should be preceded with a name of this second user
 in the following format: `username/experiment-name`
 
@@ -81,7 +79,7 @@ in the following format: `username/experiment-name`
  |:--- |:--- |:--- |
  |`--no-launch` | No | To create tunnel without launching web browser. |
  |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which TensorBoard service client will be started. |
- |`-p, --port INTEGER RANGE` <br> | No | Port on which service will be exposed locally. |
+ |`-pn, --port-number INTEGER RANGE` <br> | No | Port on which service will be exposed locally. |
  |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |

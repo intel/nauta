@@ -1,6 +1,6 @@
 # Evaluating Experiments with Inference Testing
 
-Nauta provides you with the ability to test your trained model using TensorFlow Serving and OpenVino Model Server (OVMS).  OVMS is an OpenVino serving component intended to provide hosting for the OpenVino inference runtime.
+Nauta provides you with the ability to test your trained model using TensorFlow Serving and OpenVINO Model Server (OVMS).  OVMS is an OpenVINO serving component intended to provide hosting for the OpenVINO inference runtime.
 
 For guidance on using _Inference Testing_ to evaluate an experiment, refer to the topics shown below.
 

@@ -19,9 +19,12 @@ Displays a list of model export operations with their statuses, dates of start a
 
 ### Options
 
- | Name | Required | Description | 
- |:--- |:--- |:--- |
- |`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account. |
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
  
 
 ### Returns
@@ -54,26 +57,38 @@ Exports an existing model located in the `PATH` folder to a given `FORMAT` with 
 ### Syntax
  
  `nctl model export PATH/formats FORMAT [-- operation options]`
+  
+ ### Options
+
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-u, --username` | No | Name of a user to whom viewed operations belongs. If not given, only models of a current user are taken into account. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
  
 ### Arguments
  
  | Name | Required | Description |
  |:--- |:--- |:--- |
- |`PATH/formats` | Yes | `PATH` - Location of a model that is going to be exported. Models can be stored `only` in shared folders. Furthermore, this command `does not` handle models located in local folders. `formats` - if given, command displays a list of available formats.|
+ |`PATH/formats` | Yes | `PATH` - The location of a model that is going to be exported. Models can be stored `only` in shared folders. Furthermore, this command _does not_ handle models located in local folders. The formats command (if given) displays a list of available formats.|
  |`FORMAT` | No | Format of an exported model. List of available formats can be obtained by executing `export formats` command. Required if `PATH` has been given.|
  |`operation options` | No | String with a list of parameters that are passed to a workflow responsible for exporting a model. All such parameters should be added at the end of the command after `--` string. |
  
 
 ### Returns
  
-Should issues arise, a message (or messages) with a description of their cause (or causes) displays. If an export's operation starts, then the information about that operation and its details displays.
-If `formats` option is given - a list of available export formats with a short description of parameters accepted by those formats displays.
+Should issues occur, a message (or messages) with a description of their cause (or causes) displays. If an export's operation starts, then the related operation information and its details displays.
+If `formats` option is given, a list of available export formats with a short description of parameters accepted by those formats displays.
      
-### Example
+### Example 1
+
+ Wait for Tensorboard to run.
  
- `nctl model export /mnt/input/home/pretrained_model openvino -- --output ArgMax`  Wait for Tensorboard to run.
+ `nctl model export /mnt/input/home/pretrained_model openvino -- --output ArgMax` 
  
- 
+### Output 1
+
 ```
 | Operation     | Start date           | End date   | Owner     | State   |
 |---------------+----------------------+------------+-----------+---------|
@@ -83,9 +98,15 @@ Successfully created export workflow
 
 ```
 
+### Example 2
+
 Exports an existing model located in the `pretrained_model` folder in `input` shared folder.
 
  `nctl model export formats`
+ 
+ ### Output 2
+ 
+ Displays a list of available export formats with a short description of parameters accepted by them.  
  
  ```
 | Name     | Parameters description                                                       |
@@ -96,9 +117,6 @@ Exports an existing model located in the `pretrained_model` folder in `input` sh
 |          | Rest of parameters can be found in a description of OpenVino model optimizer |
 
 ```
-
-Displays a list of available export formats with a short description of parameters accepted by them.  
-
 
 ## logs Subcommand
 
@@ -122,11 +140,11 @@ The `logs` subcommand displays logs from a model export operation. Logs to be di
 |:--- |:--- |:--- |
 |`-sd, --start-date` | No | Retrieve logs produced from this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
 |`-ed, --end-date` | No | retrieve logs produced until this date (format ISO-8061 - yyyy-mm-ddThh:mm:ss).|
-|`-m, --match TEXT` | No |  If given, command searches for logs from operations matching the value of this option. This option cannot be used along with the OPERATION-NAME argument.|
-|`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
-|`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
-|`-fl, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-m, --match TEXT` | No |  If given, this command searches for logs from operations matching the value of this option. This option cannot be used along with the OPERATION-NAME argument.|
+|`-o, --output` | No |  If given, the logs are stored in a file with a name derived from a name of an experiment.|
+|`-pa, --pager` | No | Display the logs in interactive pager. Press *q* to exit the pager.|
+|`-fl, --follow` | No | Specifies if the logs should be streamed. Only logs from a single experiment can be streamed.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

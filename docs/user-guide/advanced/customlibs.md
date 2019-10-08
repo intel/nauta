@@ -10,14 +10,14 @@ This section discusses the following main topics:
 
 ## Installing an Operating System Library
 
-To install an Operating System library or dependency that _is not_ included in standard NAUTA docker image it is required to modify draft pack definition. To install a pip dependency (like NumPy Python or pandas Python), refer to `experiment submit` command documentation.
+To install an Operating System library or dependency that _is not_ included in standard Nauta Docker image it is required to modify the draft pack definition. To install a pip dependency (like NumPy Python or pandas Python), refer to `experiment submit` command documentation.
 
-**Note:** For NumPy Python information, refer to: [NumPy.org](http://www.numpy.org). For pandas Python information, refer to: [Pandas Information](https://pandas.pydata.org/)
+**Note:** For NumPy Python information, refer to: [NumPy.org](http://www.numpy.org). For pandas Python information, refer to: [pandas Information](https://pandas.pydata.org/)
 
 ## Modifying Existing Draft Packs
 
-The draft packs are located in the nctl_config_ folder. Navigate to _.draft/packs_ folder to list existing packs.
-The default pack used by _nctl_ client is _tf-training-single_. Edit the _Dockerfile_ located in selected pack to make necessary changes.
+The draft packs are located in the `nctl_config` folder. Navigate to _.draft/packs_ folder to list existing packs.
+The default pack used by _nctl_ client is _tf-training-tfjob_. Edit the _Dockerfile_ located in selected pack to make necessary changes.
 
 Example _Dockerfile_:
 

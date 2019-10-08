@@ -12,18 +12,18 @@ This section discusses the following main topics:
 
 ## Supported Operating Systems
 
-This release of the Nauta client software has been validated on the following operating systems and versions:
+This release of the Nauta client software has been validated on the following operating systems and versions.
 
 * Ubuntu (16.04, 18.04)
-* RedHat 7.5
+* Red Hat 7.6
 * macOS High Sierra (10.13)
 
 ## Required Software Packages
 
 The following software _must_ be installed on the client system before installing Nauta client:
 
-* kubectl version 1.15.3 or later, refer to: [Install Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
-* git version 1.8.3.1 or later
+* kubectl version 1.15 or later, refer to: [Install Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
+* git version 1.8.3.1 or later. 
 
 ## Installation
 
@@ -31,7 +31,7 @@ Complete the following steps to install the Nauta client software package:
 
 1.	Download and install the _Required Software Package_ above, preferably in the order given.
 
-2. There is no installation utility. Unpack this package and place the unpacked files in any preferred loctation. Take note of the path. 
+2. There _is no_ installation utility. Unpack this package and place the unpacked files in any preferred loctation. Take note of the path. 
 
 3.	Set KUBECONFIG environment variable to the Kubernetes configuration file provided by your Nauta administrator. The `<PATH>` is located wherever your _config_ file is stored.
  
@@ -48,7 +48,6 @@ Should you want to permanently set the variables, you can add the variables to y
 * .bashrc
 * .bash_profile
 
-Alternatively, you may want to set the PATH and KUBECONFIG variables in the  _Environment Variables_ window. This is accessed by opening the Control Panel > System and Security > System > Advanced system settings, and accessing Environment variables. This is an administrator function only.
 
 ----------------------
 

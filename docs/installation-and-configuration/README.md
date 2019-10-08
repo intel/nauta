@@ -44,7 +44,7 @@ This process does the following:
 
 - Installs the Nauta server-side application on your new Kubernetes cluster, and starts the system running.
 
-Completing all of the above takes some time. We are working on streamlining the process. 
+**Note:** Be aware, completing all of the above takes some time.
 
 # Document Flow
 

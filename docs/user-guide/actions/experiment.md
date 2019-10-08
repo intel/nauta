@@ -30,21 +30,21 @@ Use the `submit` subcommand to submit training jobs. Use this command to submit 
  
  | Name | Required | Description | 
  |:--- |:--- |:--- |
- |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files, data, etc. If not given, then its content _will not_ be copied into the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
- |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). List of available templates can be obtained by issuing the `nctl experiment template_list` command. |
+ |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files, data, and so on. If not given, then its content _will not_ be copied into the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
+ |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). List of available templates can be obtained by issuing the `nctl template list` command. |
  |`-n, --name TEXT`| No | Name for this experiment.|
  |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack parameter in format: `key value` or `key.subkey.subkey2 value`. For lists use: `'key "['val1', 'val2']"'` For maps use: `'key "{'a': 'b'}"'`|
- |`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` will start as many experiments as there is a combination of parameters passed in `-pr` options. `[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> <br> Contains values of this parameter that are passed to different instance of experiments. `[definition]` can have two forms: <br> <br> range: `{x...y:step}` This form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> <br> set of values: `{x, y, z}` This form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
- |`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` will launch an experiment with a set of parameters defined in the `[definition]` argument. Optional. Format of the `[definition]` argument is as follows: `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br>  <br> All parameters given in the `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once, `nctl` will start as many experiments as there is occurrences of this parameter in a call. |
- |`-e, --env TEXT` | No | Environment variable passed to training. You can pass as many environmental variables, as desired. Each variable should be in such case passed as a separate -e parameter.|
- |`-r, --requirements PATH` | No | Path to file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
- |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+ |`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` starts as many experiments as there is a combination of parameters passed in `-pr` options Optional`[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> <br> Contains values of this parameter that are passed to different instance of experiments. `[definition]` can have two forms: <br> <br> range: `{x...y:step}` This form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> <br> set of values: `{x, y, z}` This form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
+ |`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` launches an experiment with a set of parameters defined in the `[definition]` argument. Optional. Format of the `[definition]` argument is as follows: `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br>  <br> All parameters given in the `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once, `nctl` will start as many experiments as there is occurrences of this parameter in a call. |
+ |`-e, --env TEXT` | No | This is the environment variable passed to training. You can pass as many environmental variables, as desired. Each variable should be passed as a separate -e parameter.|
+ |`-r, --requirements PATH` | No | This is the path to the file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
+ |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
 
 #### Additional Remarks
  
- For both types of parameters, `-ps` and `-pr` if parameter stated in their definitions
+ For both types of parameters: `-ps` and `-pr`; if, parameter stated in their definitions
  is also given in a `[script_parameters]`argument of the `nctl` command, then values taken from `-ps`
  and `-pr` are passed to a script.   
  
@@ -57,12 +57,12 @@ Use the `submit` subcommand to submit training jobs. Use this command to submit 
  Then the following experiments will be launched:
  
  ``` 
-`param1 = 0.1, param2 = 3, param4 = 5, param6 - not set`
-`param1 = 0.2, param2 = 3, param4 = 5, param6 - not set`
-`param1 = 0.3, param2 = 3, param4 = 5, param6 - not set`
-`param1 = 0.1, param2 = not set, param4 = not set, param6 - 7`
-`param1 = 0.2, param2 = not set, param4 = not set, param6 - 7`
-`param1 = 0.3, param2 = not set, param4 = not set, param6 - 7`
+param1 = 0.1, param2 = 3, param4 = 5, param6 - not set
+param1 = 0.2, param2 = 3, param4 = 5, param6 - not set
+param1 = 0.3, param2 = 3, param4 = 5, param6 - not set`
+param1 = 0.1, param2 = not set, param4 = not set, param6 - 7
+param1 = 0.2, param2 = not set, param4 = not set, param6 - 7
+param1 = 0.3, param2 = not set, param4 = not set, param6 - 7
  ```
  
 ### Returns
@@ -73,9 +73,10 @@ If one or more of experiment _has not been_ submitted successfully, then the com
      
 ### Example
  
- `nctl experiment submit mnist_cnn.py -sfl /data -- --data_dir=/app/data --num_gpus=0`  
+`nctl experiment submit --name para-range --parameter-range lr "{0.1, 0.2, 0.3}" examples/mnist_single_node.py -- --data_dir=/mnt/input/root/public/MNIST`  
  
-Starts a single node training job using `mnist_cnn.py` script located in a folder from which `nctl` command was issued. Content of the `/data` folder is copied into the Docker image (into the `/app` folder, which is a work directory of Docker images created using tf-training pack).
+Starts multiple single node training jobs using `mnist_single_node.py` script located in the examples folder. 
+Each training job uses a different learning rate value.
 
 ## list Subcommand
 
@@ -97,7 +98,7 @@ Use the `list` subcommand to display a list of all experiments with some basic i
 |`-u, --uninitialized` | No | List uninitialized experiments, that is, experiments without resources submitted for creation.|
 |`-c, --count` <br> `INTEGER RANGE` | No | An integer, command displays c last rows.|
 |`-b, --brief` | No | Print short version of the result table. Only 'name', 'submission date', 'owner' and 'state' columns will be printed.|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
 
@@ -151,13 +152,13 @@ Use the `cancel` subcommand to cancel any training chosen based on the provided 
 |`-p, --purge`| No | If given, then all information concerning for identified experiments, completed and currently running, is removed from the system.|
 |`-i, --pod-ids` <br> `TEXT`| No | Comma-separated pods IDs. If given, command matches pods by their IDs and deletes them.|
 |` -s, --pod-status` <br> `TEXT`| No |One of: 'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', or 'UNKNOWN'. If given, the command searches pods by their status and deletes them.|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
 ### Returns
 
-The description of a problem; if any problem occurs. Otherwise, displays the information that training job/jobs was/were cancelled successfully.
+The description of a problem; if, any problem occurs. Otherwise, displays the information that training job/jobs was/were cancelled successfully.
 
 ### Example
 
@@ -189,20 +190,20 @@ Use the `view` subcommand to display basic details of an experiment, such as the
 |:--- |:--- |:--- |
 |`-tb, --tensorboard` | No | If given, the command displays a TensorBoard with an experiment's data. |
 |`-u, --username`<br> `TEXT` | No | Name of the user who submitted this experiment. If not given, then only experiments of a current user are shown. |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
 
 ### Returns
 
-Displays details of an experiment. If `--tb, --tensorboard` option is given then the command returns a link to TensorBoard's instance with data from an experiment.
+Displays details of an experiment. If `-tb, --tensorboard` option is given, then the command returns a link to a TensorBoard's instance with data from an experiment.
 
 ### Example
 
 `nctl experiment view experiment-name-2 -tb`
 
-Displays details of an `experiment-name-2` experiment and exposes `tensorboard` instance with experiment's data to a user.
+Displays details of an `experiment-name-2` experiment and exposes a TensorBoard instance with experiment's data to a user.
 
 
 ## logs Subcommand
@@ -233,8 +234,8 @@ Use the `logs` subcommand to display the logs from experiments. Logs to be displ
 |`-m, --match TEXT` | No |  If given, command searches for logs from experiments matching the value of this option. This option cannot be used along with the NAME argument.|
 |`-o, --output` | No |  If given, logs are stored in a file with a name derived from a name of an experiment.|
 |`-pa, --pager` | No | Display logs in interactive pager. Press *q* to exit the pager.|
-|`-f, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-fl, --follow` | No | Specify if logs should be streamed. Only logs from a single experiment can be streamed.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -265,13 +266,13 @@ Use the `interact` subcommand to launch a local browser with a Jupyter notebook.
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-n, --name TEXT` | No | The name of a Jupyter notebook's session. If a session with a given name already exists, then you are connected to this session. |
-|`-f, --filename TEXT` | No | The file with a notebook that should be opened in Jupyter notebook. |
+|`-fl, --filename TEXT` | No | The file with a notebook that should be opened in Jupyter notebook. |
 |`-p, --pack-param <TEXT TEXT>...`| No | Additional pack parameter in format: 'key value' or 'key.subkey.subkey2 value'.<br> For lists use: 'key "['val1', 'val2']"' <br> For maps use: 'key "{'a': 'b'}"' |
 |`--no-launch`| No | Run this command without a web browser starting, only proxy tunnel is created.|
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
-|` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
+|` -e, --env TEXT` | No | This is the environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
 |` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a Jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

@@ -26,12 +26,6 @@ Execute this command to launch Jupyter:
 
 `nctl experiment interact`
 
-## Storage and Session Data
-
-Files located in the input storage are accessible through Jupyter Notebooks. Only files that are written to `/output/home/` are persistently stored. Therefore, changes made to other files, including model scripts, during the session _will not_ be saved after the session is closed. As a result, it is recommended that you save session data to the `output/<experiment>` folder for future use.
-
-**Note:** Files that are accessible through the Jupyter Notebook are the same folders accessible to the user for experiments.
-
 ## Tunneling
 
 If you are using CLI through remote access, you will need to setup an X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, use the URL provided by nctl. The following result displays.
@@ -52,11 +46,6 @@ An example Jupyter Notebook (shown below) launches in your default web browser.
 
  ![](images/jupyter_dashbd.png)
 
-
-An example active Jupyter Notebook shows a simple experiment plot.
- 
- ![](images/jupyter_plot.png)
- 
 ## Canceling a Jupyter Notebook
 
 In Nauta, running a Jupyter notebook is performed through an interact session. The session remains open and continues to run in your browser until closed Therefore, you _must_ manually cancel the interact session, or it will continue to use/allocate resources.
@@ -67,7 +56,7 @@ In Nauta, running a Jupyter notebook is performed through an interact session. T
 
 2. To cancel a running interact, execute: `nctl experiment cancel [options] [EXPERIMENT-NAME]`
 
-   * `EXPERIMENT-NAME` is the interact name.
+   * `EXPERIMENT-NAME` is the interact session name.
    
    * Use the `--purge` option if you need to remove session from experiment list. For _purge_ information, refer to: [Getting Started, Remove Experiment Section](../actions/getting_started.md). 
    

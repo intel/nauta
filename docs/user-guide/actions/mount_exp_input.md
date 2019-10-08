@@ -2,7 +2,7 @@
 
 To mount a local `folder` to the Nauta storage and use the files when performing training, execute the following steps.
 
-**Note**: The names used below are for example purposes only.
+**Note**: The names used below are for example purposes only. Also, refer to [Mount Options](http://man7.org/linux/man-pages/man8/mount.8.html) for more details. 
 
 **Linux/macOS**
 
@@ -14,7 +14,7 @@ To mount a local `folder` to the Nauta storage and use the files when performing
 
    `nctl mount`
 
-1. Enter `mount_smbfs` or `net use` or `mount.cfis` as appropriate. Be aware, these commands are dependent on the operating system you are using. 
+1. Enter `mount_smbfs` or `mount.cfis` as appropriate. Be aware, these commands are dependent on the operating system you are using. 
 
    **Note:** The MOUNTPOINT is your `my_input` folder. 
 

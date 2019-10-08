@@ -33,9 +33,9 @@ To modify Nauta's Configuration file to define your proxy, network quirks, and f
 
 ## Kernel Upgrade
 
-If you run Linux kernel prior to 4.* version, it is recommended that you upgrade the kernel on all nodes of a cluster before performing a platform installation. 
+If you run Linux kernel prior to 4.x version, it is recommended that you upgrade the kernel on all nodes of a cluster before performing a platform installation. 
 
-Running heavy training jobs on workers with the operating system kernel older than 4.* may lead to hanging the worker node. 
+Running heavy training jobs on workers with the operating system kernel older than 4.x may lead to hanging the worker node. 
 - Refer to [Red Hat Bugzilla – Bug 1507149](https://bugzilla.redhat.com/show_bug.cgi?id=1507149) for more information.
 
 This may occur when a memory limit for a training job is set to a value close to the maximum amount of memory installed on this node. These problems are caused by errors in handling memory limits in older versions of the kernel.
@@ -50,7 +50,7 @@ To install the new kernel refer to [CHAPTER 5. MANUALLY UPGRADING THE KERNEL](ht
 
 ## Nauta Installation
 
-Before installing Nauta, ensure that you have met all the hardware and software requirements.  
+BTo install Nauta, follow these steps.  
 
 ### Nauta Installation Procedure
 
@@ -60,15 +60,15 @@ To install Nauta, follow these steps:
 
 * **ENV_INVENTORY (mandatory):** Inventory file location, for example:
   
-`export ENV_INVENTORY=<absolute path to inventory file>`
+  `export ENV_INVENTORY=<absolute path to inventory file>`
   
 * **ENV_CONFIG (mandatory):** Configuration file location, for example:
 
-`export ENV_CONFIG=<absolute path to config file>`
+  `export ENV_CONFIG=<absolute path to config file>`
    
 2. Run the installation:
 
-`./installer.sh install`
+    `./installer.sh install`
 
 ## Installation Script Options
 
@@ -86,13 +86,13 @@ Nauta is installed on cluster nodes in the following folders: `/opt/nauta`,`/usr
 
 ## Access Files for the kubectl Client
 
-On your _Installer Machine_, the following files are created in the Installation folder. These files are *access files* used to connect to the cluster using kubectl client.
+On your _Installer Machine_, the following files are created in the Installation folder. These files are *access files* used to connect to the cluster using `kubectl` client.
 
-As an output of Kubernetes installation, files are created in the main installation directory:
+As an output of Kubernetes installation, `platform-admin.config` file is created and the installation log is written into the log folder in the main installation directory:
 
 `platform-admin.config - cluster admin config file`
 
-As an output of the Nauta installation, files are created in main installation directory:
+As an output of the Nauta installation, As an output of Kubernetes installation, `platform-admin.config` file is created and the installation log is written into the log folder in the main installation directory:
 
 `nauta-admin.config - NAUTA admin config file`
 
@@ -108,25 +108,25 @@ To upgrade Nauta, do the following:
 
 * **ENV_INVENTORY (mandatory):** Inventory file location, for example:
   
-`export ENV_INVENTORY=<absolute path to inventory file>`
+  `export ENV_INVENTORY=<absolute path to inventory file>`
   
 * **ENV_CONFIG (mandatory):** Configuration file location, for example:
 
-`export ENV_CONFIG=<absolute path to config file>`
+  `export ENV_CONFIG=<absolute path to config file>`
 
-* **NAUTA_KUBECONFIG (mandatory): ** Nauta admin file location, for example:
+* **NAUTA_KUBECONFIG (mandatory):** Nauta admin file location, for example:
 
-`export NAUTA_KUBECONFIG=<absolute path to nauta-admin.config file>`
+  `export NAUTA_KUBECONFIG=<absolute path to nauta-admin.config file>`
    
 2. Call the installer with nauta-upgrade option:
 
-`./installer.sh nauta-upgrade`
+    `./installer.sh nauta-upgrade`
 
 **Note:** It is recommended that you _do not_ use the cluster during an upgrade.
 
 3. After successful execution of platform upgrade you need to also upgrade all users by running:
 
-`nctl user upgrade`
+    `nctl user upgrade`
 
 **Note:** This command can be run only by an administrator.
 
@@ -135,7 +135,7 @@ This completes the Nauta Upgrade Process.
 
 ## Next Steps: User Management Tasks
 
-* [User Management Tasks](../User_Management/UM.md)
+* [User and Account Management](../User_Management/UM.md)
 
 ----------------------
 

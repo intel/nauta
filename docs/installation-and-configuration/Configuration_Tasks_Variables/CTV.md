@@ -67,18 +67,18 @@ dns_servers:
 dns_search_domains:
   - example.com
 
-# This is place to define additional domain names for cluster to allow secure communication
+# This is place to define additional domain names for cluster to allow secure communication.
 dns_names_for_certificate:
   DNS.7: "mycluster1.domain.name"
   DNS.8: "mycluster2.domain.name"
 
-# This is the _Internal_ domain name.
+# This is theInternal domain name.
 domain: nauta
 
-# Internal subdomain for infrastructure
+# Internal subdomain for infrastructure.
 nodes_domain: lab007
 
-# This is the _Internal Subdomain_ for Kubernetes resources.
+# This is the Internal Subdomain for Kubernetes resources.
 k8s_domain: kubernetes
 
 # This is the Network Range for Kubernetes pods.
@@ -338,7 +338,7 @@ features:
 ### Features List (NFS Default Settings)
 
 - **NFS:** default: True
-- **Redsocks:** default: disabled
+- **Redsocks:** default: False
 
 # Redsocks Overview
 
@@ -400,7 +400,7 @@ Default: cni0
 
 # Networking Configuration Example
 
-The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples, it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.5. All interfaces (both external and internal) are Ethernet interfaces. 
+The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples, it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.6. All interfaces (both external and internal) are Ethernet interfaces. 
 
 ![New Users Added](../Z_examples/NN.png)
 

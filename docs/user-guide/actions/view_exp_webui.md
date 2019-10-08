@@ -3,14 +3,14 @@
 
 This section discusses the following main topics: 
 
- - [Nauta Web UI](#nauta-web-ui)
+ - [Viewing Experiment Results at the Web UI ](#viewing-experiment-results-at-the-web-ui)
  - [Expanding Experiment Details](#expanding-experiment-details)
  - [Searching on Experiments](#searching-on-experiments)
  - [Adding and Deleting Columns](#adding-and-deleting-columns)
 
-## Nauta Web UI
+## Viewing Experiment Results at the Web UI 
 
-The web UI lets you explore the experiments you have submitted. To view your experiments contained in the web UI, execute the following command:
+The web UI lets you explore the experiments you have submitted. To view your experiments contained in the web UI, execute the following command at the command prompt:
 
 `nctl launch webui`
 
@@ -18,20 +18,24 @@ The following screen displays (this is an example only).
 
 ![](images/web_ui.png) 
 
+**Note:** If you are using CLI through remote access, you will need to setup a X server for tunneling over SSH with port forwarding or use SSH Proxy command tunneling. After establishing a tunnel from the gateway to your local machine, you can use the URL provided by nctl command. The figure shows an example Web UI screen.
+
+### Web UI Columns
+
 * **Name:** The left-most column lists the experiments by name.
 * **Status:** This column reveals experiment’s current status, one of: `QUEUED, RUNNING, COMPLETE, CANCELLED, FAILED, CREATING`.
 * **Submission Date:** This column gives the submission date in the format: MM/DD/YYYY, hour:min:second AM/PM.
 * **Start Date**: This column shows the experiment start date in the format: MM/DD/YYYY, hour:min:second AM/PM. The Start Date (or time) will always be after the Submission Date (or time).
 * **Duration:** This column shows the duration of execution for this experiment in days, hours, minutes and seconds.
-* **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. Inference means that training is largely complete and you have begun running predictions (inference) with this model.
+* **Type:** Experiment Type can be Training, Jupyter, or Inference. Training indicates that the experiment was launched from the CLI. Jupyter indicates that the experiment was launched using Jupyter Notebook. 
 
-You can perform the tasks discussed below in the Nauta web UI.
+**Note:** You can perform the tasks discussed below in the Nauta web UI.
 
 ## Expanding Experiment Details
 
 Click _listed experiment name_ to see additional details for that experiment. The following details are examples only. 
 
-This screen is divided into left and right side frames.  
+This screen is divided into left and right-side frames.  
 
 ### Left-side Frame
 
@@ -39,7 +43,7 @@ The left-side frame of the experiment details window shows Resources and Submiss
 
 * **Resources** assigned to that experiment, specifically the assigned pods and their status and container information including the CPU and memory resources assigned.
 
-* The **Submission Date** and time.
+* Displays the **Submission Date** and time.
 
 ![Image](images/UI_Experiment_Details_1.png)
  
@@ -77,7 +81,7 @@ can select to show those metrics in this display as well.
 
 ### Column Additions and Deletions
 
-Refer to [Launching TensorBoard to View Experiments](/docs/user-guide/actions/view_exp_tensorbd.md) for more information.
+Column additions and deletions you make are retained between logins. Refer to [Launching TensorBoard to View Experiments](/docs/user-guide/actions/view_exp_tensorbd.md) for more information.
 
 ## Launching Kubernetes Dashboard
 
@@ -85,7 +89,7 @@ Refer to [Launching TensorBoard to View Experiments](/docs/user-guide/actions/vi
 
 1. Click **Resources Dashboard** to open the Kubernetes resources dashboard. 
 
-Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md) for more information.
+**Note:** Refer to [Accessing the Kubernetes Resource Dashboard](accessing_kubernetes.md) for more information.
 
 
 ----------------------

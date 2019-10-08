@@ -10,7 +10,7 @@ Use this command to create, delete, and manage users. The following main topics 
 
 ### Synopsis
 
-The `create` subcommand creates and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by the `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default, this command saves a configuration of a newly created user to a file. The format of this file is compliant with the `kubectl`  format configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
+Use the `create` subcommand to create and initializes a new Nauta user. This command _must be_ executed when `kubectl` used by the `nctl` command entered by a k8s administrator. If this command is executed by someone other than a k8s administrator, it fails. By default, this command saves a configuration of a newly created user to a file. The format of this file is compliant with the `kubectl`  format configuration files. To create a User Account, refer to [Creating a User Account](../actions/create_user.md). 
 
 ### Syntax
 
@@ -20,21 +20,21 @@ The `create` subcommand creates and initializes a new Nauta user. This command _
 
 | Name | Required | Description |
 |:--- |:--- |:--- |
-|`USERNAME` | Yes | Name of a user that will be created. This value _must be_ a valid OS level user. |
+|`USERNAME` | Yes | The name of a user that will be created.  |
 
 ### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-lo, --list-only` | No | If given, the content of the generated user's config file is displayed on the screen only. <br> If not given, the file with configuration is saved on disk.|
-|`-fl, --filename` <br> `TEXT`  | No | Name of file where user's configuration will be stored. If not given, the <br> configuration is stored in the `config.<username>` file.|
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-fl, --filename` <br> `TEXT`  | No | The name of file where user's configuration will be stored. If not given, the <br> configuration is stored in the `config.<username>` file.|
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
 ### Additional Remarks
 
-In case of any errors during saving of a file with a configuration, the command displays the content of the configuration file on the screen, even if `-l` option _was not_ used.  
+In case of any errors during saving of a file with a configuration, the command displays the content of the configuration file on the screen, even if `-lo` option _was not_ used.  
 
 If an administrator creates a user with a name that was used previously by a deleted user, it may happen that 
 the `create` command displays information that the previous user is still being deleted, even if the previous
@@ -52,14 +52,13 @@ A user name _must meet_ the following requirements:
 
 2. Cannot be an empty string.
 
-3. Must conform to Kubernetes naming convention, can contain only lower case alphanumeric 
-characters and "-" and "."
+3. Must conform to Kubernetes naming cconvention, and can only contain lower-case alphanumeric characters and "-" and "."
 
 ### User Name Limitations
 
 If an administrator creates a user with a name that was used previously by a deleted user, the `create`command displays the previous user is still being deleted, even if the previous user _is not_ listed on a list of existing users
 
-In this case, before creating a new user, postpone the operation for a short period (3 minutes) until all the user's objects are removed. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md).
+In this case, before creating a new user, postpone the operation for a short period (at least 3 minutes) until all the user's objects are removed. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md).
 
 ### Example
 
@@ -75,14 +74,6 @@ This creates the user `jdoe`, as shown in the example.
 
 The `delete` subcommand deletes a user with a given name. If the option `-p`, `--purge` was used, it also removes all artifacts related to that removed user, such as the content of user's folders and data of experiments and runs.
 
-Before removing a user, the commands requires a final confirmation. If user chooses `Yes`, the chosen user is deleted.  
-Deletion of a user may take a while to be fully completed. The command requires up to 60 seconds for a complete
-removal of user. 
-
-If after this time a user _has not_ been deleted completely, the command displays information that a
-user is still being deleted. In this case the user _will not_ be listed on a list of existing users, but there is no
-possibility to create a user with the same name until the command completes and the user is deleted.
-
 ### Syntax
 
 `nctl user delete [options] USERNAME`
@@ -93,12 +84,22 @@ possibility to create a user with the same name until the command completes and 
 |:--- |:--- |:--- |
 |`USERNAME` | Yes | The name of a user to be removed from the Nauta user accounts. |
 
+
+### Aditional Remarks
+
+Before removing a user, the commands requires a final confirmation. If user chooses `Yes`, the chosen user is deleted.  
+Deletion of a user may take a while (a few minutes) to be fully completed. 
+
+If after this time a user _has not_ been deleted completely, the command displays information that a
+user is still being deleted. In this case the user _will not_ be listed on a list of existing users, but there is no
+possibility to create a user with the same name until the command completes and the user is deleted.
+
 ### Options
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-p, --purge` | No |  If set, the system also removes all logs generated by the user's experiments. |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
@@ -112,8 +113,6 @@ A message regarding the command's completion. If an issue occurs, a short descri
 
 `nctl user delete jdoe -p`
 
-Removes `jdoe` user with all a user's artifacts.
-
 ### Outcome 
 
 This removes the created jdoe user along with all their artifacts.
@@ -123,7 +122,7 @@ This removes the created jdoe user along with all their artifacts.
 
 ### Synopsis
 
-The `list` subcommand lists  all currently configured users.
+Use the `list` subcommand to list  all currently configured users.
 
 ### Syntax
 
@@ -138,7 +137,7 @@ None.
 | Name | Required | Description | 
 |:--- |:--- |:--- |
 |`-c, --count` <br> `INTEGER RANGE` | No | If given, the command displays c last rows. |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

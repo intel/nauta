@@ -6,7 +6,9 @@ This section discusses the following main topics:
 
 - [Cancelling One or More Experiments](#cancelling-one-or-more-experiments)  
 - [Cancelling All Experiments with a Matching Pod-ID](#cancelling-all-experiments-with-a-matching-pod-id)  
-- [Cancelling All Experiments with a Matching Pod-Status](#cancelling-all-experiments-with-a-matching-pod-status)  
+- [Cancelling All Experiments with a Matching Pod-Status](#cancelling-all-experiments-with-a-matching-pod-status)
+- [Purging an Experiment](#purging-an-experiment)  
+- [Cancelling one more More Experiments Using the force Command](#cancelling-one-more-more-experiments-using-the-force-command)  
 
 ## Cancelling One or More Experiments
 
@@ -35,7 +37,15 @@ The following command will cancel all experiments with a matching pod-status, us
 
 **Note:** Any of the above criteria can be combined. 
 
+## Purging an Experiment
+
 You can also purge all experiment-related information using the `-p` or `--purge` option. For _purge_ information, refer to [Purging](../actions/delete_user.md).
+
+## Cancelling one more More Experiments Using the force Command
+
+To cancel one or more experiments with the force command, execute the following command: 
+
+`nctl experiment cancel -f [options] EXPERIMENT-NAME`
 
 ----------------------
 

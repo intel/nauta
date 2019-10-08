@@ -17,9 +17,9 @@ The user has full control (`list/read/create/terminate`) over their own experime
 
 ## User Name Limitations
 
-Users with the same name _cannot_ be created directly after being removed. This is due to a user's related Kubernetes objects that are deleted asynchronously by Kubernetes and this can take some time. Consider waiting 10 minutes before creating a user with the same name; the same name as the user just deleted.
+Users with the same name _cannot_ be created directly after being removed. This is due to a user's related Kubernetes objects that are deleted asynchronously by Kubernetes and this can take some time. Consider waiting 10 minutes before creating a user with the same name.
 
-In addition, user names are limited to a 32-character maximum and there are no special characters except for hyphens. However, all names _must_ start with a letter, _not_ a number. You can use a hyphen to join user names, for example: john-doe.
+In addition, user names are limited to a 32-character maximum and there are no special characters except for hyphens. However, all names _must_ start with a letter. You can use a hyphen to join user names, for example: john-doe.
 
 ### Create the User
 

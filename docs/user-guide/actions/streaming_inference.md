@@ -1,4 +1,4 @@
-# Streaming Inference Example
+# TensorFlow Serving Streaming Inference Example
 
 This section discusses the following main topics: 
 
@@ -14,15 +14,13 @@ This section discusses the following main topics:
 
 ## Example Flow
 
-A basic task flow is used in this example. 
-
 1. Save a trained TensorFlow Serving compatible model.
 
-1. Send the data for inference in a JSON format, or in binary format using gRPC API.
+2. Send the data for inference in a JSON format, or in binary format using gRPC API.
 
-1. Run the `nctl predict launch` command.
+3. Run the `nctl predict launch` command.
 
-1. Send the inference data using the `nctl predict stream` command, TensorFlow Serving REST API, or TensorFlow Serving gRPC API.
+4. Send the inference data using the `nctl predict stream` command, TensorFlow Serving REST API, or TensorFlow Serving gRPC API.
 
 ## TensorFlow Serving Basic Example
 
@@ -55,7 +53,7 @@ Perform the following steps to use this model for streaming inference:
    c.  Copy the _saved_model_half_plus_two_cpu_ model to the input share folder (scroll right to see full contents):
 
       ```
-      cp -r <directory where you have cloned Tensorflow Serving>/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu <directory where you have  mounted /mnt/input share>`
+      cp -r <directory where you have cloned Tensorflow Serving>/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu <directory where you have  mounted /mnt/input share>
       ```
    d. Run the following command:
    
@@ -133,7 +131,7 @@ Alternatively, the Kubernetes port forwarding mechanism may be used. Create a po
 ```
 kubectl port-forward service/<prediction instance name> :8501
 ```
-Or if you want to start a port forwarding tunnel in the background, do the following:
+Or, if you want to start a port forwarding tunnel in the background, do the following:
 
 ```
 kubectl port-forward service/<prediction instance name> <some local port number>:8501 &
@@ -164,7 +162,7 @@ To access TensorFlow Serving gRPC API of running prediction instance, the Kubern
 ```
 kubectl port-forward service/<prediction instance name> :8500
 ```
-Or if you want to start port forwarding tunnel in background:
+Or, if you want to start port forwarding tunnel in background:
 
 ```
 kubectl port-forward service/<prediction instance name> <some local port number>:8500 &

@@ -10,7 +10,7 @@ Use the `nctl user list` command to display all the current users, as well as al
 
 Administrators _are not_ listed and previously deleted users _are not_ shown. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md). 
 
-Enter the following command:
+Execute the following command:
 
 `nctl user list`
 
