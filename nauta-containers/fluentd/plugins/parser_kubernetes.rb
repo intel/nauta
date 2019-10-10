@@ -36,30 +36,33 @@
 # ---- fluentd.conf ----
 #
 # <source>
-#    type tail
-#    format kubernetes
-#    path ./kubelet.log
-#    read_from_head yes
-#    tag kubelet
+#   @type tail
+#   path ./kubelet.log
+#   read_from_head yes
+#   tag kubelet
+#   <parse>
+#     @type kubernetes
+#   </parse>
 # </source>
 #
 # ----   EOF       ---
 
-require 'fluent/parser'
+require 'fluent/plugin/parser_regexp'
 
 module Fluent
-  class KubernetesParser < Fluent::TextParser::MultilineParser
-    Fluent::Plugin.register_parser("kubernetes", self)
+  module Plugin
+    class KubernetesParser < RegexpParser
+      Fluent::Plugin.register_parser("kubernetes", self)
 
-    CONF_FORMAT_FIRSTLINE = %q{/^\w\d{4}/}
-    CONF_FORMAT1 = %q{/^(?<severity>\w)(?<time>\d{4} [^\s]*)\s+(?<pid>\d+)\s+(?<source>[^ \]]+)\] (?<message>.*)/}
-    CONF_TIME_FORMAT = "%m%d %H:%M:%S.%N"
+      CONF_FORMAT_FIRSTLINE = %q{/^\w\d{4}/}
+      CONF_FORMAT1 = %q{/^(?<severity>\w)(?<time>\d{4} [^\s]*)\s+(?<pid>\d+)\s+(?<source>[^ \]]+)\] (?<message>.*)/m}
+      CONF_TIME_FORMAT = "%m%d %H:%M:%S.%N"
 
-    def configure(conf)
-      conf['format_firstline'] = CONF_FORMAT_FIRSTLINE
-      conf['format1'] = CONF_FORMAT1
-      conf['time_format'] = CONF_TIME_FORMAT
-      super
+      def configure(conf)
+        conf['expression'] = CONF_FORMAT1
+        conf['time_format'] = CONF_TIME_FORMAT
+        super
+      end
     end
   end
 end

@@ -23,13 +23,13 @@ COPY ./conf/kubernetes.conf /fluentd/etc/
 COPY Gemfile* /fluentd/
 
 # Adjusted for CentOS, from:
-#     https://github.com/fluent/fluentd-kubernetes-daemonset/blob/master/docker-image/v0.12/debian-elasticsearch/Dockerfile
+#     https://github.com/fluent/fluentd-kubernetes-daemonset/blob/master/docker-image/v1.3/debian-elasticsearch/Dockerfile
 
 RUN yum update -y && \
     yum install -y gcc gcc-c++ patch make libffi-devel openssl-devel rh-ruby23-ruby-devel && \
     yum clean all
 
-RUN source /opt/rh/rh-ruby23/enable && gem install fluentd --version 1.2.5
+RUN source /opt/rh/rh-ruby23/enable && gem install fluentd --version 1.3.3
 RUN source /opt/rh/rh-ruby23/enable && gem install bundler --version 1.16.2
 RUN source /opt/rh/rh-ruby23/enable &&  bundle config silence_root_warning true
 RUN source /opt/rh/rh-ruby23/enable && bundle install --gemfile=/fluentd/Gemfile --path=/fluentd/vendor/bundle
