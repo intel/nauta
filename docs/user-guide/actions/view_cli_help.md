@@ -49,16 +49,16 @@ You can view command-help for any command and available subcommand(s). The follo
 
 ## Other nctl Commands
 
+* [nctl config](config.md)
 * [nctl experiment](experiment.md)
 * [nctl launch](launch.md)
+* [nctl model](model.md)
 * [nctl mount](mount.md)
 * [nctl predict](predict.md)
+* [nctl template](template.md)
 * [nctl user](user.md)
 * [nctl verify](verify.md)
 * [nctl version](version.md)
-* [nctl config](config.md)
-* [nctl model](model.md)
-
 
 ----------------------
 

@@ -4,8 +4,8 @@ This section provides information related to Nauta-related issues, descriptions,
 
 This section discusses the following main topics: 
 
-- [Jupyter Error 1](#jupyter-error-1-cause)  
-- [Jupyter Error 2](#jupyter-error-2-cause)
+- [Jupyter Error 1](#jupyter-error-1)  
+- [Jupyter Error 2](#jupyter-error-2)
 - [Docker Error](#docker-error)
 - [Removal of Docker Images](#removal-of-docker-images)  
 - [User Management Error](#user-management-error)

@@ -9,11 +9,11 @@ For the _Target host_, install Nauta **on bare metal only** with Red Hat Enterpr
 
 This section discusses the following main topics: 
 
-- [Red Hat Enterprise Linux 7.5](#red-hat-enterprise-linux)  
+- [Red Hat Enterprise Linux 7.6](#red-hat-enterprise-linux)  
 - [Valid Repositories](#valid-repositories)  
 - [Repositories List](#repositories-list)
 
-## Red Hat Enterprise Linux 7.6
+## Red Hat Enterprise Linux
 
 Red Hat Enterprise Linux 7.6 is required, as well as the following required packages: 
 

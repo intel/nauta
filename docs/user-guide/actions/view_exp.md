@@ -3,7 +3,7 @@
 This section discusses the following main topics: 
 
  - [Viewing All Experiments Using the CLI](#viewing-all-experiments-using-the-cli)
- - [Viewing a Single Experiment's Details](#viewing-a-single-experiment-details)
+ - [Viewing a Single Experiments Details](#viewing-a-single-experiments-details)
  - [Useful References](#useful-references)
  
 ## Viewing All Experiments Using the CLI
@@ -52,7 +52,7 @@ The following _example results_ are shown below (scroll right to see full conten
 
 ```
 
-### Viewing a Single Experiment's Details
+### Viewing a Single Experiments Details
 
 The primary purpose of the next command is to provide Kubernetes pod-level information and container information for this experiment. This includes the pod ID, the POD status, information about input and output volumes used in this experiment, and CPU and memory resources requested to perform this experiment.
 

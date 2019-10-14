@@ -3,8 +3,7 @@
 
 Use the Jupyter Notebook to run and display the results of your experiments. This section discusses the following main topics:
 
- - [Launching Jupyter Interactive Notebook](#launching-jupyter-interactive-notebook)
- - [Storage and Session Data](#storage-and-session-data)  
+ - [Launching Jupyter Interactive Notebook Instructions](#launching-jupyter-interactive-notebook-instructions)
  - [Tunneling](#tunneling)
  - [Canceling a Jupyter Notebook](#canceling-a-jupyter-notebook)
 

@@ -5,7 +5,7 @@ A separate system (installer system) is required for installing Nauta.  This sec
 ## Nauta Supported Operating Systems
 
 Nauta supports the following Operating Systems: 
-  * RedHat Enterprise Linux 7.6 or CentOS 7.6
+  * Red Hat Enterprise Linux 7.6 or CentOS 7.6
   * Ubuntu 16.04
    
 ### Red Hat Enterprise Linux 7.6

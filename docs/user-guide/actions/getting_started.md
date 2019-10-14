@@ -111,10 +111,9 @@ The examples folder in the nctl installation contains these following experiment
 * `mnist_converter_pb.py` - This a utility script used for the inference process and model verification.
 * `mnist_horovod.py` - Training of digit classifier in Horovod.
 * `mnist_input_data.py` - Functions for downloading and reading mnist data.
-* `mnist_single_node.py` - Training of digit classifier in single node setting.
+* `mnist_single_node.py` - Training of digit classifier in single node setting  (requires `mnist_inut_data.py` file).
 * `mnist_multinode.py` - Training of digit classifier in distributed TensorFlow setting.
-* `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires mnist_input_data.py file).
-* `mnist_tensorboard.py` - Training of digit classifier which displays summaries in TensorBoard (requires at least 2Gi of memory).
+* `mnist_saved_model.py` - Training of digit classifier with saving the model at the end (requires `mnist_tensorboard.py` file).
 
 Additional example scripts for various neural networks  are included and have been validated on the Nauta platform.
 
@@ -122,9 +121,9 @@ Additional example scripts for various neural networks  are included and have be
 
 The following are the utility scripts used for the inference process and model verification:
 
-`mnist_converter_pb.py` 
+* `mnist_converter_pb.py` 
 
-`mnist_checker.py`
+* `mnist_checker.py`
 
 **Note:** Experiment scripts _must be_ written in Python.  
 

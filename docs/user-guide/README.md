@@ -9,8 +9,7 @@ Templates are available (and customizable) on the platform to take the complexit
 
 The Nauta client software has been validated on the following operating systems and versions:
 
-* kubectl version  1.15 or later, refer to: [Install Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
-* git version 1.8.3.1 or later 
+* Ubuntu (16.04, 18.04)
 * Red Hat 7.6
 * macOS High Sierra (10.13)
 

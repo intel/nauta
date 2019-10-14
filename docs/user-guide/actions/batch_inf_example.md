@@ -17,13 +17,13 @@ Below are the general steps required to run batch inference on Nauta.
 
 1. Acquire the dataset and the trained model.
 
-1. Convert the dataset into _Serialized Protocol Buffers_ (PBs). Refer to [Protocol Buffers](https://developers.google.com/protocol-buffers) for additional PB information.
+2. Convert the dataset into _Serialized Protocol Buffers_ (PBs). Refer to [Protocol Buffers](https://developers.google.com/protocol-buffers) for additional PB information.
 
-1. Mount the Samba shared folder by invoking the `nctl mount`command (see the example for further details).
+3. Mount the Samba shared folder by invoking the `nctl mount`command (see the example for further details).
 
-1. Copy the serialized PBs and the trained model to the just-mounted share folder.
+4. Copy the serialized PBs and the trained model to the just-mounted share folder.
 
-1. Run `nctl predict batch` command.
+5. Run `nctl predict batch` command.
 
 **Note:** Be aware, if the general flow requirements are not met you will not be able to complete the example.
 
@@ -48,7 +48,7 @@ You _must_ preprocess MNIST data for feeding the batch inference. You can genera
    
 3. Create a directory with two subdirectories named input and output.
 
-4. Run the `mnist_converter_pb.py` (from nauta/applications/cli/example-python/package_examples) using just-generated venv:
+4. Run the `mnist_converter_pb.py` (from the installed examples folder) using just-generated venv:
 
    ```
    python mnist_converter_pb.py
@@ -59,7 +59,7 @@ You _must_ preprocess MNIST data for feeding the batch inference. You can genera
 
 * `work_dir` - Location where files related with conversion will be stored. The default is: `/tmp/mnist_tests`.
 
-* `num_tests` - Number of examples to convert.  Te default is: `100`.
+* `num_tests` - Number of examples to convert.  The default is: `100`.
 
 ## Start Prediction
 

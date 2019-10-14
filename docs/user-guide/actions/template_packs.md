@@ -178,7 +178,7 @@ Once a _working_ Helm chart is available, the process of adapting it for use as 
 
 1. Name the Pack.
 
-   The name should be unique _and not_ conflict with any other packs available in the local [packs](#packs) folder. After      naming the pack, create a corresponding directory in the [packs](#packs) folder and populate its [charts](#charts)          subfolder with the contents of the chart. _Do not_ forget to set this pack name also in the chart.yaml file. Otherwise,      the new template _will not_ work.
+   The name should be unique _and not_ conflict with any other packs available in the local packs folder. After naming the pack, create a corresponding directory in the packs folder and populate its [charts](#charts) subfolder with the contents of the chart. _Do not_ forget to set this pack name also in the chart.yaml file. Otherwise, the new template _will not_ work.
 
    Instead of creating a completely new folder from scratch, you can also copy an existing one using the `nctl template copy` command and modify its content according to your needs. 
    
