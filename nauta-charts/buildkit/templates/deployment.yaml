@@ -11,6 +11,7 @@ metadata:
     nauta_release: {{ required "NAUTA Release name is required" .Values.global.nauta }}
     nauta_release_version: {{ required "NAUTA Release version is required" .Values.global.nauta_release }}
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
