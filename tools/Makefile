@@ -58,6 +58,7 @@ export NAUTA_COMMIT := $(shell git rev-parse --short HEAD)
 export BUILD_OPTIONS := $(BUILD_OPTIONS)
 export GLOBAL_WORKSPACE := $(GLOBAL_WORKSPACE)
 export GLOBAL_VIRTUALENV_DIR := $(GLOBAL_VIRTUALENV_DIR)
+export DOCKER_TIMEOUT := 300
 
 release-package: $(RELEASE_PACKAGE)
 release-package: export ENV_SRC := $(RELEASE_PACKAGE)
