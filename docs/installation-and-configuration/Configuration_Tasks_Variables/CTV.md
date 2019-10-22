@@ -178,7 +178,7 @@ k8s_domain: kubernetes
 ```
 
 ### kubernetes_pod_subnet
-- **Description:** This is the Network Range for Kubernetes pods.
+- **Description:** This is the Network Range for Kubernetes pods. Kubernetes, by default, allocates `/24` pod CIDR block per node, so the size of `kubernetes_pod_subnet` must be big enough: e.g. for three node environment you will need at least `/22` CIDR subnet, as it allows to create 4 `/24` blocks within it (see for reference: https://kb.wisc.edu/ns/page.php?id=3493). In case of doubt, use the default mask size of `/16`.
 - **Default value:** 10.3.0.0/16
 
 ```yaml
@@ -186,7 +186,7 @@ kubernetes_pod_subnet: 10.3.0.0/16
 ```
 
 ### kubernetes_svc_subnet
-- **Description:** This is the Network Range for Kubernetes services.
+- **Description:** This is the Network Range for Kubernetes services. Mask size should be the same as in `kubernetes_pod_subnet` parameter.
 - **Default value:** 10.4.0.0/16
 
 ```yaml
