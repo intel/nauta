@@ -9,21 +9,15 @@ WORKDIR /root/dldt
 RUN git checkout 2018_R5
 RUN mv model-optimizer /root
 
-WORKDIR /root
-
-RUN rm -rf dldt
-
 FROM ubuntu:18.04
 
 WORKDIR /root
 
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update && apt-get install -y python3-pip python3-venv libgfortran3
 
 COPY --from=build /root/model-optimizer /root/model-optimizer
 
-WORKDIR /root/model-optimizer/install_prerequisites
-
-RUN ./install_prerequisites_tf.sh
-RUN ./install_prerequisites_onnx.sh
+COPY requirements.txt nauta-requirements.txt
+RUN pip3 install -r nauta-requirements.txt
 
 WORKDIR /root/model-optimizer

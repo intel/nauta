@@ -253,7 +253,7 @@ local_images:
     image: "argoproj/argoexec:v2.2.1"
     method: pull
   nauta/openvino-mo:  #openvino model optimizer
-    version: "1.0.0"
+    version: "1.5.12-dev"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/openvino-mo"

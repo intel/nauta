@@ -34,7 +34,7 @@ spec:
           - name: saved-model-dir-path
           - name: additional-params
       container:
-        image: "{{inputs.parameters.cluster-registry-address}}/nauta/openvino-mo:1.0.0"
+        image: "{{inputs.parameters.cluster-registry-address}}/nauta/openvino-mo:1.5.12-dev"
         command: [bash]
         args: ["-c", "python3 mo.py --saved_model_dir {{inputs.parameters.saved-model-dir-path}} --output_dir /mnt/output/home/{{workflow.name}} {{inputs.parameters.additional-params}}"]
         volumeMounts:
