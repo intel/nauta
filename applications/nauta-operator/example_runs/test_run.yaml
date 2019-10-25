@@ -1,0 +1,21 @@
+---
+apiVersion: aipg.intel.com/v1
+kind: Run
+metadata:
+  annotations:
+    cpu: "1"
+    memory: 1Gi
+  labels:
+    runKind: training
+  name: test-run
+spec:
+  experiment-name: test-run
+  name: test-run
+  parameters:
+    - fake.py
+  pod-count: 1
+  pod-selector:
+    matchLabels:
+      app: tf-training-tfjob
+      release: test-run
+  state: QUEUED

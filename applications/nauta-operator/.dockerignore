@@ -1,0 +1,5 @@
+.python-version
+run_crd.yaml
+pytest.ini
+example_runs/
+.pytest_cache

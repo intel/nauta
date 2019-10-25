@@ -1,0 +1,2 @@
+kubernetes-asyncio==9.0.*
+kopf==0.21
