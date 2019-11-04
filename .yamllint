@@ -2,7 +2,6 @@ extends: default
 
 ignore: |
   /.venv
-  /applications/old_experiment-service/
   /applications/cli/draft/packs/*/charts/
   /applications/nauta-gui/node_modules/
   /k8s-features/charts/

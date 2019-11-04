@@ -48,7 +48,7 @@ local_images:
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/kubectl"
   nauta/gui:
-    version: "1.0.0"
+    version: "1.1.0"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/nauta-gui"
@@ -93,11 +93,11 @@ local_images:
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/redsocks"
-  nauta/experiment-service:
-    version: "1.0.0"
+  nauta/experiment-operator:
+    version: "1.0.1"
     required: {}
     method: build
-    directory: "{{ playbook_dir }}/../../applications/experiment-service"
+    directory: "{{ playbook_dir }}/../../applications/experiment-operator"
   nauta/tensorflow/1.12.0py2/base:
     version: "1.12.0-py2"
     required:
@@ -272,7 +272,7 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-registry-charts/registry"
   nauta:
     gui:
-      version: 0.0.1
+      version: 1.1.0
       path: "{{ playbook_dir }}/../../nauta-charts/gui"
       chart_values:
         image: "{{ image_local_url['nauta/gui'] }}"
@@ -338,13 +338,11 @@ subcharts:
       path: "{{ playbook_dir }}/../../nauta-charts/registry-nginx"
       chart_values:
         image: "{{ image_local_url['nauta/nginx'] }}"
-    experiment-service:
-      version: 1.0.0
-      path: "{{ playbook_dir }}/../../nauta-charts/experiment-service"
+    experiment-operator:
+      version: 1.0.1
+      path: "{{ playbook_dir }}/../../nauta-charts/experiment-operator"
       chart_values:
-        service_image: "{{ image_local_url['nauta/experiment-service'] }}"
-        etcd_image: "{{ image_local_url['nauta/etcd'] }}"
-        etcd_gc_image: "{{ image_local_url['nauta/kubectl'] }}"
+        image: "{{ image_local_url['nauta/experiment-operator'] }}"
     tf:
       version: 0.1.0
       path: "{{ playbook_dir }}/../../nauta-charts/tf"

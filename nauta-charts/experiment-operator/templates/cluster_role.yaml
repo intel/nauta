@@ -1,0 +1,43 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+rules:
+
+  # Framework: knowing which other operators are running (i.e. peering).
+  - apiGroups: [zalando.org]
+    resources: [clusterkopfpeerings]
+    verbs: [list, watch, patch, get]
+  - apiGroups: [apiextensions.k8s.io]
+    resources: [customresourcedefinitions]
+    verbs: [list, get]
+
+  # Application: read-only access for watching cluster-wide.
+  - apiGroups: [zalando.org]
+    resources: [kopfexamples]
+    verbs: [list, watch]
+
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - events
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+  - apiGroups:
+      - aipg.intel.com
+    resources:
+      - runs
+    verbs:
+      - "*"

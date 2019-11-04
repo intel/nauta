@@ -25,7 +25,7 @@ from kubernetes import config, client
 from kubernetes.client.rest import ApiException
 
 
-API_GROUP_NAME = 'aggregator.aipg.intel.com'
+API_GROUP_NAME = 'aipg.intel.com'
 RUN_PLURAL = 'runs'
 RUN_VERSION = 'v1'
 
@@ -66,7 +66,7 @@ def publish(metrics, raise_exception=False):
 
     for i in range(MAX_RETRIES_COUNT):
         try:
-            api.patch_namespaced_custom_object(group='aggregator.aipg.intel.com', namespace=namespace, body=body,
+            api.patch_namespaced_custom_object(group='aipg.intel.com', namespace=namespace, body=body,
                                                plural=RUN_PLURAL, version=RUN_VERSION, name=run_k8s_name)
             break
         except ApiException as e:

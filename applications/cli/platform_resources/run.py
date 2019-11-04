@@ -58,7 +58,7 @@ class RunStatus(Enum):
 
 
 class Run(PlatformResource):
-    api_group_name = 'aggregator.aipg.intel.com'
+    api_group_name = 'aipg.intel.com'
     crd_plural_name = 'runs'
     crd_version = 'v1'
 
@@ -254,5 +254,5 @@ def filter_run_by_excl_state(resource_object_dict: dict, state: Enum = None):
 
 
 def filter_by_run_kinds(resource_object_dict: dict, run_kinds: List[Enum] = None):
-    return any([resource_object_dict['metadata']['labels'].get('runKind') == run_kind.value for run_kind in run_kinds]) \
-        if run_kinds else True
+    return any([resource_object_dict.get('metadata', {}).get('labels', {}).get('runKind')
+                == run_kind.value for run_kind in run_kinds]) if run_kinds else True

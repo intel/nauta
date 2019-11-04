@@ -1,0 +1,3 @@
+dpath==1.4.*
+kubernetes-asyncio==9.0.*
+kopf==0.22rc1

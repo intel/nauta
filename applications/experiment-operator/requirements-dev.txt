@@ -1,0 +1,5 @@
+pytest==5.2.*
+pytest-mock==1.11.*
+pytest-env==0.6.*
+pytest-cov==2.8.*
+asynctest==0.13.*

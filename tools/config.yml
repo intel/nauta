@@ -62,7 +62,7 @@ shared_images:
     directory: "{{ playbook_dir }}/../../shared-containers/build/consul"
     push: False
   shared/build/metrics:
-    version: "0.0.1"
+    version: "2.0.0"
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/cli/experiment_metrics"
