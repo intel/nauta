@@ -19,7 +19,7 @@ In extracted archive, the following appears:
 
 - **Folders**
    - **bin:** binary directory
-   - **docs:** documentation 
+   - **diagnose:** contains script to diagnose system if installer fails
    - **libs:** contains various scripts that are used by the installer
    - **nauta:** Nauta Enterprise applications deployer
    - **platform:** Kubernetes platform deployer
