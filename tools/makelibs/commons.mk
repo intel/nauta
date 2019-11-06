@@ -77,14 +77,13 @@ VERSION:=$(DEFAULT_VERSION_MAJOR).$(DEFAULT_VERSION_MINOR).$(DEFAULT_VERSION_NO)
 
 BUILD_DIR:=$(WORKSPACE_BUILD)/$(VERSION)/$(DEFAULT_NAME)
 
-ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAYBOOK) \
+ANSIBLE_PLAYBOOK_RUN=. $(ACTIVATE); DOCKER_TIMEOUT=300 ANSIBLE_CONFIG=$(ANSIBLE_CFG) $(ANSIBLE_PLAYBOOK) \
                        -i $(LIBS_DIRECTORY)/inventory --force-handlers -e default_ansible_python_interpreter=$(PYTHON) \
                        -e VERSION_NO=$(DEFAULT_VERSION_NO) -e VERSION_MINOR=$(DEFAULT_VERSION_MINOR) \
                        -e VERSION_MAJOR=$(DEFAULT_VERSION_MAJOR) -e VERSION_ID=$(DEFAULT_VERSION_ID) \
                        -e VERSION_SUFFIX=$(DEFAULT_VERSION_SUFFIX) \
                        -e version=$(VERSION) -e user="$(USER)" -e user_id=$(USER_ID) -e build_dir=$(BUILD_DIR) \
                        -e group="$(GROUP)" -e group_id=$(GROUP_ID) -e build_name=$(DEFAULT_NAME) -e NAUTA_COMMIT=$(NAUTA_COMMIT) \
-                       -e DOCKER_TIMEOUT=$(DOCKER_TIMEOUT) \
                        $(PLAYBOOK) -e @$(LIBS_DIRECTORY)/../config.yml
 
 $(REQUIREMENTS_LOCK): $(WORKSPACE)
