@@ -39,14 +39,6 @@ shared_images:
     method: build
     directory: "{{ playbook_dir }}/../../shared-containers/centos/build-go"
     push: False
-  shared/run/tensorflow/py2.7:
-    version: "py2"
-    required: {}
-    method: build
-    directory: "{{ playbook_dir }}/../../shared-containers/build/tf-base/run/2.7"
-    push: False
-    args:
-      PYTHON_VERSION: 2.7
   shared/run/tensorflow/py3.6:
     version: "py3"
     required: {}

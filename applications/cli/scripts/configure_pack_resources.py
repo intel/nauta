@@ -25,8 +25,8 @@ from kubernetes import config, client
 PREFIX_VALUES = {"E": 10 ** 18, "P": 10 ** 15, "T": 10 ** 12, "G": 10 ** 9, "M": 10 ** 6, "K": 10 ** 3}
 PREFIX_I_VALUES = {"Ei": 2 ** 60, "Pi": 2 ** 50, "Ti": 2 ** 40, "Gi": 2 ** 30, "Mi": 2 ** 20, "Ki": 2 ** 10}
 
-HOROVOD_PACKS = {'tf-training-horovod', 'tf-training-horovod-py2'}
-MULTINODE_PACKS = {'tf-training-multi', 'tf-training-multi-py2'}
+HOROVOD_PACKS = {'tf-training-horovod'}
+MULTINODE_PACKS = {'tf-training-multi'}
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

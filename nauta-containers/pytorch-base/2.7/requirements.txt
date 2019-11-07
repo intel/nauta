@@ -1,4 +1,0 @@
-https://download.pytorch.org/whl/cpu/torch-1.0.1-cp27-cp27mu-linux_x86_64.whl
-torchvision==0.2.2.post3
-tensorboardX==1.6
-typing==3.7.4

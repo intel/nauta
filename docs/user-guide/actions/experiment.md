@@ -273,7 +273,7 @@ The interact subcommand launches a local browser with Jupyter notebook. If scrip
 |`--no-launch`| No | Run command without a web browser starting, only proxy tunnel is created.|
 |`-pn, --port-number INTEGER RANGE` | No | Port on which service will be exposed locally.|
 |` -e, --env TEXT` | No | Environment variable passed to Jupyter instance. User can pass as many environmental variables as it is needed. Each variable should be in such case passed as a separate -e parameter.|
-|` -t, --template` <br>`[jupyter,jupyter-py2]` | No | Name of a Jupyter notebook template used to create a deployment. Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2).|
+|` -t, --template` <br>`[jupyter]` | No | Name of a Jupyter notebook template used to create a deployment. Supported template for interact command is: jupyter.|
 |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |

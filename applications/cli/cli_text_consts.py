@@ -521,7 +521,7 @@ class ExperimentInteractCmdTexts:
     HELP_E = "Environment variables passed to Jupyter instance. User can pass as many environmental variables as " \
              " desired. Each variable should be passed as a separate -e paramater."
     HELP_T = "Name of a Jupyter Notebook template used to create a deployment. " \
-             "Supported templates for interact command are: jupyter (python3) and jupyter-py2 (python2)"
+             "Supported template for interact command is: jupyter"
     TOO_MANY_JUPYTERS = "You have {jupyter_number} opened Jupyter notebooks. Do you still want to open another one?"
     INTERACT_ABORT_MSG = "Operation of starting a new Jupyter Notebook was aborted."
 

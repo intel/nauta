@@ -10,14 +10,10 @@ export_images:
     value: "{{ image_local_url['nauta/tensorflow/1.12.0py3/base'] }}"
   - name: horovod
     value: "{{ image_local_url['nauta/horovod/py3'] }}"
-  - name: horovod_py2
-    value: "{{ image_local_url['nauta/horovod/py2'] }}"
   - name: tensorflow_1.12
     value: "{{ image_local_url['nauta/tensorflow/1.12.0py3/base'] }}"
   - name: tensorflow_1.12_py3
     value: "{{ image_local_url['nauta/tensorflow/1.12.0py3/base'] }}"
-  - name: tensorflow_1.12_py2
-    value: "{{ image_local_url['nauta/tensorflow/1.12.0py2/base'] }}"
   - name: activity-proxy
     value: "{{ image_local_url['nauta/activity-proxy'] }}"
   - name: batch-inference
@@ -26,8 +22,6 @@ export_images:
     value: "{{ image_local_url['nauta/tf-serving-sidecar'] }}"
   - name: pytorch
     value: "{{ image_local_url['nauta/pytorch/py3'] }}"
-  - name: pytorch_py2
-    value: "{{ image_local_url['nauta/pytorch/py2'] }}"
   - name: tfjob-multinode-sidecar
     value: "{{ image_local_url['nauta/tfjob-multinode-sidecar'] }}"
   - name: openvino-mo
@@ -98,15 +92,6 @@ local_images:
     required: {}
     method: build
     directory: "{{ playbook_dir }}/../../applications/experiment-operator"
-  nauta/tensorflow/1.12.0py2/base:
-    version: "1.12.0-py2"
-    required:
-      BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      METRICS_IMAGE: "shared/build/metrics"
-    method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/tensorflow/py27"
-    args:
-      TENSORFLOW_VERSION: 1.12.0
   nauta/tensorflow/1.12.0py3/base:
     version: "1.12.0-py3"
     required:
@@ -132,13 +117,6 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/horovod/3.6"
-  nauta/horovod/py2:
-    version: "1.9.0-py2"
-    required:
-      BASE_IMAGE: "shared/run/tensorflow/py2.7"
-      METRICS_IMAGE: "shared/build/metrics"
-    method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/horovod/2.7"
   nauta/nginx:
     version: "1.13.9"
     method: pull
@@ -234,12 +212,6 @@ local_images:
       METRICS_IMAGE: "shared/build/metrics"
     method: build
     directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/3.7"
-  nauta/pytorch/py2:
-    version: "1.0"
-    required:
-      METRICS_IMAGE: "shared/build/metrics"
-    method: build
-    directory: "{{ playbook_dir }}/../../nauta-containers/pytorch-base/2.7"
   nauta/pytorch-operator:
     version: "v0.4.0"
     image: "gcr.io/kubeflow-images-public/pytorch-operator:v0.4.0"

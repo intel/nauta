@@ -68,9 +68,6 @@ _**Where:**_
 ## Provided Template Packs
 
 The Nauta software is shipped with a number of built-in template packs that represent the types of experiments officially supported and validated.
-
-For each of the packs there are two versions provided: one that supports Python 2.7.x user scripts (packs with `-py2` suffix in the name) and one that supports Python 3.6.x user scripts.
-
 All packs are optimized for non-trivial deep learning tasks executed on Intel's two socket Xeon systems, and therefore the default compute configuration is the following:
 
 <table>
@@ -106,16 +103,9 @@ of building a certain version of the Nauta nctl client):
 
 * **tf-training-horovod** - A TensorFlow multi-node training job based on Horovod using Python 3.
 
-* **tf-training-horovod-py2** - A TensorFlow multi-node training job based on Horovod using Python 2.
-
 * **tf-training-multi** - A TensorFlow multi-node training job based on TfJob using Python 3.
 
-* **tf-training-multi-py2** - A TensorFlow multi-node training job based on TfJob using Python 2.
-
 * **tf-training-single** - A TensorFlow single-node training job based on TfJob using Python 3.
-
-* **tf-training-single-py2** - A TensorFlow single-node training job based on TfJob using Python 2.
-
 ## Customizing the Provided Packs
 
 Any customizations to template packs revolve mostly around the `values.yaml` file included in the pack's underlying _Helm_ chart. As mentioned above, this file provides key definitions that are referenced throughout the rest of the _Helm_ chart, and therefore it plays a crucial role in the process of converting the chart's templates into actual

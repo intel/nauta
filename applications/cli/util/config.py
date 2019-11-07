@@ -104,14 +104,11 @@ class NAUTAConfigMap:
     IMAGE_TENSORBOARD_SERVICE_FIELD = 'image.tensorboard_service'
     REGISTRY_FIELD = 'registry'
     PLATFORM_VERSION = 'platform.version'
-    PY2_IMAGE_NAME = 'image.tensorflow_1.12_py2'
     PY3_IMAGE_NAME = 'image.tensorflow_1.12_py3'
-    PY2_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod_py2'
     PY3_HOROVOD_IMAGE_CONFIG_KEY = 'image.horovod'
     MINIMAL_NODE_MEMORY_AMOUNT = 'minimal.node.memory.amount'
     MINIMAL_NODE_CPU_NUMBER = 'minimal.node.cpu.number'
     PY3_PYTORCH_IMAGE_CONFIG_KEY = 'image.pytorch'
-    PY2_PYTORCH_IMAGE_CONFIG_KEY = 'image.pytorch_py2'
     OPENVINOMS_IMAGE_CONFIG_KEY = 'image.openvino-ms'
 
     __shared_state: dict = {}
@@ -128,12 +125,9 @@ class NAUTAConfigMap:
             self.image_tensorboard_service = '{}/{}'.format(config_map_data[self.REGISTRY_FIELD],
                                                             config_map_data[self.IMAGE_TENSORBOARD_SERVICE_FIELD])
             self.platform_version = config_map_data.get(self.PLATFORM_VERSION)
-            self.py2_image_name = config_map_data.get(self.PY2_IMAGE_NAME)
             self.py3_image_name = config_map_data.get(self.PY3_IMAGE_NAME)
-            self.py2_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY2_HOROVOD_IMAGE_CONFIG_KEY)
             self.py3_horovod_image_name = config_map_data.get(NAUTAConfigMap.PY3_HOROVOD_IMAGE_CONFIG_KEY)
             self.minimal_node_memory_amount = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_MEMORY_AMOUNT)
             self.minimal_node_cpu_number = config_map_data.get(NAUTAConfigMap.MINIMAL_NODE_CPU_NUMBER)
-            self.py2_pytorch_image_name = config_map_data.get(NAUTAConfigMap.PY2_PYTORCH_IMAGE_CONFIG_KEY)
             self.py3_pytorch_image_name = config_map_data.get(NAUTAConfigMap.PY3_PYTORCH_IMAGE_CONFIG_KEY)
             self.openvinoms_image_name = config_map_data.get(NAUTAConfigMap.OPENVINOMS_IMAGE_CONFIG_KEY)

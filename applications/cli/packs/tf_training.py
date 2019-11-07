@@ -94,27 +94,18 @@ def modify_dockerfile(experiment_folder: str, experiment_name: str, username: st
                     dockerfile_temp_content = dockerfile_temp_content + f"COPY {FOLDER_DIR_NAME} ."
             elif line.startswith("FROM nauta/tensorflow-py"):
                 nauta_config_map = NAUTAConfigMap()
-                if line.find('-py2') != -1:
-                    tf_image_name = nauta_config_map.py2_image_name
-                else:
-                    tf_image_name = nauta_config_map.py3_image_name
+                tf_image_name = nauta_config_map.py3_image_name
                 tf_image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{tf_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {tf_image_repository}'
 
             elif line.startswith("FROM nauta/horovod"):
                 nauta_config_map = NAUTAConfigMap()
-                if line.find('-py2') != -1:
-                    horovod_image_name = nauta_config_map.py2_horovod_image_name
-                else:
-                    horovod_image_name = nauta_config_map.py3_horovod_image_name
+                horovod_image_name = nauta_config_map.py3_horovod_image_name
                 image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{horovod_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
             elif line.startswith("FROM nauta/pytorch"):
                 nauta_config_map = NAUTAConfigMap()
-                if line.find('-py2') != -1:
-                    pytorch_image_name = nauta_config_map.py2_pytorch_image_name
-                else:
-                    pytorch_image_name = nauta_config_map.py3_pytorch_image_name
+                pytorch_image_name = nauta_config_map.py3_pytorch_image_name
                 image_repository = f'{NAUTA_REGISTRY_ADDRESS}/{pytorch_image_name}'
                 dockerfile_temp_content = dockerfile_temp_content + f'FROM {image_repository}'
             elif line.startswith("FROM nauta/openvino-ms"):
