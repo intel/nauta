@@ -6,7 +6,7 @@ gcp:
 
   external_username: "nauta"
 
-  gateway_type: "n1-standard-4"
+  gateway_type: "n1-highmem-4"
   testnode_type: "n1-standard-2"
   nfs_type: "n1-standard-2"
   nfs_disk_size: "400"
