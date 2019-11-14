@@ -79,6 +79,12 @@ A list of **required** enabled repositories for Centos 7.5, is:
 - CentOS-7 - Updates
 - Extra Packages for Enterprise (epel)
 
+## Data directory
+
+`/data` directory must be created on master node before installation. This directory will contain persistent
+Kubernetes' and Nauta's data. Preferably you should mount a separate disk to this directory - size depends
+on your needs and number of users, 70Gi disk size is a reasonable default for a three node Nauta environment.   
+
 ## Next Steps: Preparing for the Nauta Installation
 
 * [Inventory File Configuration Tasks](../Inventory_Tasks/IT.md)

@@ -14,9 +14,7 @@ This section discusses the following main topics:
 
 Below is an example of Inventory file and shows one Master Node and five Worker nodes. Your configuration may differ from the example shown. However, you can copy and modify the information to create your own Ansible inventory file. 
 
-**Note:** Ansible uses the YAML format. Refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML) for more information (scroll right to see full contents).
-
-```yaml
+```
 [master] 
 master-0 ansible_ssh_host=192.168.100 ansible_ssh_user=root ansible_ssh_pass=YourPassword internal_interface=em2 external_interface=em3 local_data_device=/dev/sdb1
 
@@ -63,7 +61,11 @@ internal_interface | This is used for internal communication between Kubernetes 
 local_data_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_device | This device is used for Nauta internal data and NFS data in case of local NFS. | Yes | string | none | used with master nodes | Path to block device
 local_data_path | This is used as the mountpoint for `local_data_device` | No | string | none | used with master nodes |  Absolute path where data is located in file system
-external_interface | This is used for external network communication. | Yes | string | none | always used for both for master and worker nodes | Interface name
+external_interface | This is used for external network communication, like downloading docker images or datasets from the Internet. | Yes | string | none | always used for both for master and worker nodes | Interface name
+
+Please note that it is recommended to use separate interfaces as values of `internal_interface` and `external_interface`,
+but configuration with single interface acting as both local and external interface will also work.
+If you use separate interfaces for internal/external communication, we recommend `local_interface` to be a SFP+ or fiber network. 
 
 ## Next Steps: Configuration Tasks
 
