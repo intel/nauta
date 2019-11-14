@@ -20,7 +20,7 @@ The mount command by itself displays another command that can be used to mount/u
 
 | Name | Required | Description | 
 |:--- |:--- |:--- |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Ignore (most) confirmation prompts during command execution |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

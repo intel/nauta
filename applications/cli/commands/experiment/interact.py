@@ -102,7 +102,8 @@ def interact(ctx: click.Context, name: str, filename: str, pack_param: List[Tupl
             handle_error(user_msg=Texts.EXP_WITH_THE_SAME_NAME_MUST_BE_PURGED.format(name=name))
             sys.exit(1)
 
-        if not jupyter_experiment and not click.confirm(Texts.CONFIRM_EXPERIMENT_CREATION):
+        if not jupyter_experiment and (not click.get_current_context().obj.force
+                                       and not click.confirm(Texts.CONFIRM_EXPERIMENT_CREATION)):
             sys.exit(0)
 
         if jupyter_experiment:

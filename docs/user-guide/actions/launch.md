@@ -27,7 +27,7 @@ None.
  |:--- |:--- |:--- |
  |`--no-launch` | No | Run this command without a web browser starting; only proxy tunnel is created.
  |`-p, --port INTEGER RANGE` | No | If given, the application will be exposed on a local machine under [port] port.|
- |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+ |`-f, --force`| No | Ignore (most) confirmation prompts during command execution |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
  
@@ -82,7 +82,7 @@ in the following format: `username/experiment-name`
  |`--no-launch` | No | To create tunnel without launching web browser. |
  |`-tscp` <br>` --tensorboard-service-client-port` <br> `INTEGER RANGE`  | No | Local port on which TensorBoard service client will be started. |
  |`-p, --port INTEGER RANGE` <br> | No | Port on which service will be exposed locally. |
- |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+ |`-f, --force`| No | Ignore (most) confirmation prompts during command execution |
  |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
  |`-h, --help` | No | Displays help messaging information. |
  

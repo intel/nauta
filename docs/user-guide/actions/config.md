@@ -22,7 +22,7 @@ Allows you to change the current system's settings concerning maximum and reques
 |:--- |:--- |:--- |
 |`-c, --cpu` | Yes | Number of CPUs available on a cluster's node with the lowest number of CPU. Value should be given in format accepted by k8s, it can be a plain number or a number followed by 'm' suffix.|
 |`-m, --memory` | Yes | This is the amount of a memory available on a cluster's node with the lowest amount of memory. Value should be given in format accepted by k8s: it can be a plain number or a number followed by a one of the following suffixes E, P, T, G, M, K, Ei, Pi, Ti, Gi, Mi, Ki. |
-|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-f, --force`| No | Ignore (most) confirmation prompts during command execution |
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 

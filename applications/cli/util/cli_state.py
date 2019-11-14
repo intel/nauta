@@ -66,7 +66,7 @@ def force_option(f):
 
     return click.option('-f', '--force', is_flag=True, default=False,
                         expose_value=False,
-                        help='Force command execution by ignoring (most) confirmation prompts.',
+                        help='Ignore (most) confirmation prompts during command execution',
                         callback=callback)(f)
 
 
