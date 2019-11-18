@@ -13,6 +13,7 @@
     pull: False
     push: False
     timeout: "{{ docker_timeout }}"
+    nocache: "{{ docker_nocache }}"
     path: "{{ image.directory }}"
     dockerfile: "{{ image.dockerfile | default(image.directory + '/Dockerfile') }}"
     buildargs: "{{ proxy | combine(local_buildargs) }}"
@@ -33,6 +34,7 @@
     pull: False
     push: False
     timeout: "{{ docker_timeout }}"
+    nocache: "{{ docker_nocache }}"
     path: "{{ image.directory }}"
     dockerfile: "{{ image.dockerfile | default(image.directory + '/Dockerfile') }}"
     buildargs: "{{ proxy | combine(local_buildargs) }}"
