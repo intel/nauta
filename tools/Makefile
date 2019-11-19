@@ -7,7 +7,6 @@ include $(CURDIR)/makelibs/commons.mk
 
 PLATFORM_CONFIG:=$(CURDIR)/platform-config.yml
 NAUTA_CONFIG:=$(CURDIR)/nauta-config.yml
-COMPILER_CONFIG:=$(CURDIR)/compiler-config.yml
 RPM_CONFIG:=$(CURDIR)/rpm-config.yml
 SHARED_CONFIG:=$(CURDIR)/shared-config.yml
 BIN_CONFIG:=$(CURDIR)/bin-config.yml
