@@ -22,6 +22,19 @@
     name: "{{ install_packages }}"
     state: latest
 
+- name: "{{ message_label }} Create virtualenv and upgrade pip inside"
+  environment:
+    PIP_CONFIG_FILE: /opt/nauta/pip.ini
+  vars:
+    install_packages:
+      - pip
+  pip:
+    name: "{{ install_packages }}"
+    state: latest
+    virtualenv: /opt/nauta/python
+    virtualenv_site_packages: True
+    virtualenv_python: "{{ ansible_python_interpreter }}"
+
 - name: "{{ message_label }} Install pip apps"
   environment:
     PIP_CONFIG_FILE: /opt/nauta/pip.ini
