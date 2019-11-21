@@ -21,7 +21,7 @@ Execute the following commands from the command line:
 
 - `cd nauta`
 
-**Note:** For full installation information, refer to the Installation Nauta Installation Procedures section of the [Nauta Installation, Configuration, and Administration Guide](/docs/installation-and-configuration/README.md)
+**Note:** For full installation information, refer to the Installation Nauta Installation Procedures section of the [Nauta Installation, Configuration, and Administration Guide](../README.md)
 
 ### Hardware Requirements
 

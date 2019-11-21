@@ -2,7 +2,7 @@
 
 The section discusses how to transform a model from one format to another using the `model export` functionality.
 
- - [Obtaining a model to be exported](#obtaining-a-model-to-be-exported)  
+ - [Obtaining a model to be exported](#obtaining-a-model-for-exporting)  
  - [Checking a list of available exports' formats](#checking-a-list-of-available-exports-formats)
  - [Exporting the model to openvino format](#exporting-the-model-to-openvino-format)
  

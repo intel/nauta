@@ -1,0 +1,4 @@
+sphinx==2.2.1
+sphinx-markdown-tables==0.0.10
+sphinx-rtd-theme==0.4.3
+recommonmark==0.6.0

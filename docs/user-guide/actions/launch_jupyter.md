@@ -19,7 +19,7 @@ Options, include:
 
 * `filename` - File with a notebook that should be opened in Jupyter notebook.
 
-For detailed command syntax information, refer to: [experiment interact Subcommand](experiment.md#interact-Subcommand). 
+For detailed command syntax information, refer to: [experiment interact Subcommand](experiment.md#interact-subcommand). 
 
 Execute this command to launch Jupyter:
 

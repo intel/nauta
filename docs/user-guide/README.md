@@ -13,7 +13,6 @@ The Nauta client software has been validated on the following operating systems 
 * Ubuntu (16.04, 18.04)
 * Red Hat 7.5
 * macOS High Sierra (10.13)
-* Windows 10
 
 # Nauta User Guide
 
@@ -49,8 +48,6 @@ This guide describes how to use Nauta, and the following topics:
 * [Administrator access to Gitea console](advanced/gitea_console.md)
 
 ----------------------
-
-# Terms and Conditions
 
 To read Intel Terms and Conditions check [this](TaC.md) document.
 

@@ -15,7 +15,7 @@ When you create a new user account it creates a _user account configuration file
 
 Before creating user accounts, you need to complete the following steps:
 
-1. Install nctl using the description in the [Nauta User Guide](/docs/user-guide).
+1. Install nctl using the description in the [Nauta User Guide](../../user-guide/README.md).
    
 2. Copy the `nauta-admin.config` file to the machine where `nctl` resides.   
 
@@ -99,7 +99,7 @@ The Nauta `user delete` command may take up to 30 seconds to delete the user. A 
 
 ## Launching the Web UI 
 
-To review the Resources Dashboard, launch the Web UI from the Command Line Interface (CLI). refer to the [Nauta User Guide](../user-guide/) for more information.  
+To review the Resources Dashboard, launch the Web UI from the Command Line Interface (CLI). refer to the [Nauta User Guide](../../user-guide/README.md) for more information.  
 
 Do the following to launch the Web UI:
 
@@ -111,7 +111,7 @@ Do the following to launch the Web UI:
 
    `No data for currently signed user. Click here to load all users data.`
 
-The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates. Refer to the [Nauta User Guide](/docs/user-guide) for detailed Nauta Web UI information.
+The image shows the Nauta Web UI. This UI contains experiment information that can be sorted by name, status, and various dates. Refer to the [Nauta User Guide](../../user-guide/README.md) for detailed Nauta Web UI information.
 
 ![New Users Added](../Z_examples/WEB.PNG)
 

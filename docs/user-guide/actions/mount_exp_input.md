@@ -16,11 +16,7 @@ Perform these steps to mount a local `folder/machine` to Nauta storage and use t
 
 1. **Linux/macOS** For Linux/macOS users, the MOUNTPOINT is the `my_input` folder. 
 
-1. **Windows** For Windows users, choose a drive letter as mount point.
-
 1. **Linux/macOS only**: Navigate to `my_input`
-
-1. **Windows only**: Open an Explorer window and navigate to the `input/home` folder.
 
 1. Copy the input data or files to this folder for use when submitting experiments.
 

@@ -4,14 +4,13 @@ This section provides information related to Nauta-related issues, descriptions,
  
 This section discusses the following main topics: 
 
-- [Jupyter Error 1](#jupyter-error-1)  
-- [Jupyter Error 2](#jupyter-error-2)
+- [Jupyter Error 1](#jupyter-error-1-cause)  
+- [Jupyter Error 2](#jupyter-error-2-cause)
 - [Docker Error](#docker-error)
 - [Removal of Docker Images](#removal-of-docker-images)  
 - [User Management Error](#user-management-error)
 - [Inspecting Draft Logs](#inspecting-draft-logs)
 - [Nauta Connection Error](#nauta-connection-error)
-- [Platform Client for Microsoft Windows](#platform-client-for-microsoft-windows)
 - [DNS Server has Changed or Missed in Installation Step](#dns-server-has-changed-or-missed-in-installation-step)
 - [Insufficient Resources Causes Experiments Failures](#insufficient-resources-causes-experiments-failures)
 - [Experiment Pods Stuck in Terminating State on Node Failure](#experiment-pods-stuck-in-terminating-state-on-node-failure)
@@ -126,13 +125,6 @@ As a result, a connection error can be caused by an incorrect user-config genera
 
 To prevent this, ensure that a valid user-config is used and check the proxy settings. In addition, ensure that the current proxy settings _do not_ block any connection to a local machine.  
 
-## Platform Client for Microsoft Windows
-
-Using standard Microsoft Windows terminals (`cmd.exe`, `power shell`) is enough to interact with platform, but there is a sporadic issue with the output. Some lines can be surrounded with incomprehensible characters, for example:
-
-```
-[K[?25hCannot connect to K8S cluster: Unable to connect to the server: d...
-```
 ### Platform Client for Microsoft Windows Workaround
 
 The recommended shell environment for Windows operating system is bash. For bash-based terminals, this issue _does not_ occur. 

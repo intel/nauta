@@ -8,7 +8,7 @@ This section discusses the following main topics:
 - [Nauta Installation Procedures](#nauta-installation-procedures): Provides the Installation Instructions. 
 - [Document Flow](#document-flow): This is your gateway to the Nauta installation documentation instructions; start here. 
 
-**Note:** For instructions on configuring the Nauta client, refer to the [Nauta User Guide](../user-guide/).
+**Note:** For instructions on configuring the Nauta client, refer to the [Nauta User Guide](../user-guide/README.md).
 
 Nauta is a software suite that provides a multi-user, distributed computing environment for running deep learning model training experiments. Results of experiments can be viewed and monitored using a Command Line Interface (CLI), Web UI and/or TensorBoard. You can use existing data sets, your own data, or downloaded data from online sources, as well as create public or private folders to make collaboration among teams easier. 
 
@@ -56,9 +56,7 @@ Completing all of the above takes some time. We are working on streamlining the 
 
 ## Removing Nauta
 
-Should you ever need to delete/remove Nauta, refer to: [Installation Process](../Installation_Process/IP.md) page for more details. 
-
-# Document Flow
+Should you ever need to delete/remove Nauta, refer to: [Installation Process](./Installation_Process/IP.md) page for more details. 
 
 This guide consists of the following main topics, in order. Start here to move through the correct sequence of events. 
 
@@ -72,8 +70,6 @@ This guide consists of the following main topics, in order. Start here to move t
 * [Installating and Starting Nauta](Installation_Process/IP.md)
 * [User Management](User_Management/UM.md)
 * [Troubleshooting](Troubleshooting/T.md)
-
-# Terms and Conditions
 
 To read Intel Terms and Conditions check [this](TaC.md) document.
 

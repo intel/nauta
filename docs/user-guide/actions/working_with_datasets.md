@@ -6,7 +6,7 @@ The section discusses the following main topics:
  - [nctl mount Command](#nctl-mount-command)
  - [Mounting and Accessing Folders](#mounting-and-accessing-folders)
  - [Uploading and Using Shared Dataset Example](#uploading-and-using-shared-dataset-example)
- - [Uploading and Using Shared Dataset](#uploading-and-using-shared-dataset)
+ - [Uploading and Using Shared Dataset](#uploading-and-using-a-shared-dataset)
  - [Uploading During Experiment Submission](#uploading-during-experiment-submission)
  
 ## Uploading Datasets
@@ -81,12 +81,10 @@ The default configuration is to mount local folders to Nauta the user's private 
 
    * **MacOS:** `mount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/input`
    * **Ubuntu:** `sudo mount.cifs -o username=USERNAME,password=PASSWORD,rw,uid=1000 //CLUSTER-URL/input`
-   * **Windows:** Use Y: drive as mount point `net case Y: \\CLUSTER-URL\input /user:USERNAME PASSWORD`
    
 
 4.	Navigate to the mounted location:
     * **MacOS/Ubuntu only:** Navigate to my-input folder.
-    * **Windows:** Open Explorer Window and navigate to Y: drive.
   
 5.	Copy a dataset or files to the folder for use in experiments. The files will be located in the Nauta storage until deleted.
 

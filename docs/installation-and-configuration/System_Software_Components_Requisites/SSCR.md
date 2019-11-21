@@ -42,7 +42,7 @@ Nauta software components are optimized for AI containers containing Nauta-optim
 
 ## Next Steps: How to Build Nauta
 
-* [Building Nauta](../installation-and-configuration/README.md)
+* [Building Nauta](../README.md)
 
 ----------------------
 

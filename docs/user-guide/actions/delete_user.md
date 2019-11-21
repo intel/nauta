@@ -5,7 +5,7 @@ Only an Administrator can delete user accounts and deleting a user removes that 
 This section discusses the following main topics:
 
 - [Removing a User](#removing-a-user)
-- [Using the Purging Command](#purging)
+- [Using the Purging Command](#purging-process)
 
 ## Removing a User
 

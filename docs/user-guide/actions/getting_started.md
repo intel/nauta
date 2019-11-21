@@ -385,7 +385,7 @@ can select to show those metrics in this display as well.
 
 Column additions and deletions you make are retained between logins.
 
-Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information.
+Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.md) for more information.
 
 ## Launching Kubernetes Dashboard
 
@@ -523,18 +523,15 @@ You can use the following steps to mount the output folder and view TensorBoard 
 
        * **macOS:** `mount_mbfs //'USERNAME:PASSWORD'@CLUSTER-URL/output my_output_folder`
        * **Ubuntu:** `sudo mount.cifs -o username=USERNAME,password=PASSWORD,rw,uid=1000 \ //CLUSTER-URL/output my_output_folder`
-       * **Windows:** Use Y: drive as mount point. `net case Y: \\CLUSTER-URL\output /user:USERNAME PASSWORD`
 
 4.	Navigate to the mounted location. 
        * **MacOS/Ubuntu only:** Navigate to my_output_folder
-       * **Windows only:** Open Explorer Window and navigate to Y: drive.
 
 5.	See the saved event file by navigating to `mnist-single-node/tensorboard.` Example file: `events.out.tfevents.1542752172.mnist-single-node-master-0`
 
 6.	Unmount Nauta Storage using one of the below commands:
        * **macOS:** `umount output my_output_folder`
        * **Ubuntu:** `sudo umount my_output_folder`
-       * **Windows:** `Eject or net use Y: /delete`
        
 To unmount previously mounted Nauta input storage from a local folder/machine refer to [Unmounting Experiment Input to Storage](unmount.md).
 

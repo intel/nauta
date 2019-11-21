@@ -77,7 +77,7 @@ can select to show those metrics in this display as well.
 
 ### Column Additions and Deletions
 
-Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.png) for more information.
+Refer to [Launching TensorBoard to View Experiments](view_exp_tensorbd.md) for more information.
 
 ## Launching Kubernetes Dashboard
 

@@ -36,7 +36,7 @@ In case of any problems, a message describing the cause/causes of the issue disp
 
 ### Example
 
-`nctl config --cpu 10 --memory 1Gi`
+`nctl config --cpu 10 --memory 10Gi`
 
 ### Outcome
 

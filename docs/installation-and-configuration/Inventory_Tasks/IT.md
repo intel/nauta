@@ -6,7 +6,7 @@ Your Nauta cluster will contain one Master node and one or more Worker nodes. Ea
 
 This section discusses the following main topics: 
 
-- [Inventory File Configuration Example](#inventory-file-configuration-example)  
+- [Inventory File Configuration Example](#inventory-configuration-file-example)  
 - [Inventory File Structure](#inventory-file-structure)
 - [Per-node Inventory Variables](#per-node-inventory-variables)
 

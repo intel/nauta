@@ -101,7 +101,7 @@ for i in range(100):
             print(resp.outputs["scores"].float_val)
 ```
 As a result for each sample we will get an array of 10 elements presenting probabilities of each sample being a given digit. First element represents how likely it is that the picture represents "0", the last one stands for "9". The higher the number, the more likely it is that this sample is in fact that digit.
-```angular2
+```
 [0.0156935453414917, 0.06918075680732727, 0.023996423929929733, 0.00025786852347664535, 0.07656218856573105, 0.05128718540072441, 0.1812051236629486, 0.02422264777123928, 0.0640382319688797, 0.49355611205101013]
 ```
 In the example above, the highest value has the element of index 9, so the sample probably represented "9".

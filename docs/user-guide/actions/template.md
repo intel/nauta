@@ -8,13 +8,6 @@ The overall purpose of this command/subcommands is to manage template packs used
  
  
 ## copy Subcommand
- 
- - [Synopsis](#synopsis)
- - [Syntax](#syntax)
- - [Arguments](#arguments)  
- - [Options](#options)
- - [Returns](#returns)
- - [Examples](#examples)  
   
  ### Synopsis
  
@@ -54,13 +47,7 @@ If an error occurs during execution of this command, then the cause of the issue
  of a newly created pack is set to 0.2.0. You will be asked for a description during _making a copy_ of a template pack.
 
 
-## install Subcommand
-
-- [Synopsis](#synopsis_install)
-- [Syntax](#syntax_install)
-- [Arguments](#arguments_install)
-- [Returns](#returns_install)
-- [Example](#example_install)  
+## install Subcommand 
 
 ### <a name="synopsis_install"></a>Synopsis
 
@@ -82,7 +69,7 @@ updates the template to the version residing on a remote repository.
 When an installation/update is successfully completed, a confirmation message displays.
 If an error occurs during execution of this command, then the cause of the issue is displayed.
 
-###  <a name="example_install"> </a> Examples
+###  <a name="example_install"> </a> Example
 
 The following command installs/upgrade template with the `template-name` name.
 

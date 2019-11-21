@@ -9,7 +9,7 @@ access Gitea's UI with admin rights using the procedure described below.
 
 - Get gitea admin credentials:
 ```bash
-$ export KUBECONFIG=path to your admin's KUBECONFIG file
+# export KUBECONFIG=<path to your admin's KUBECONFIG file>
 $ kubectl get secret -n nauta -o jsonpath={.data.name} nauta-gitea-admin-secret | base64 --decode
 nauta-admin
 $ kubectl get secret -n nauta -o jsonpath={.data.password} nauta-gitea-admin-secret | base64 --decode
@@ -27,7 +27,7 @@ and enter username and password obtained in the first step
 
 ## Example situation when running administration tasks manually is useful:
 - Nauta users are experiencing issues with experiments' uploads, with following error message in `nctl` logs:
-```bash
+```
 Permission denied (publickey).
 fatal: Could not read from remote repository.
 ```
