@@ -14,8 +14,8 @@
 - name: Print Nauta commit ID
   debug: var=commit_id.stdout
 
-- name: Get disk usage stats (df -h)
-  shell: df -h
+- name: Get disk usage stats (df -hl)
+  shell: df -hl
   register: df
 
 - name: Print disk usage stats
