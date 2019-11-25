@@ -129,7 +129,7 @@ Launch training experiments with Nauta using the following:
 
 **Where:**
 
-* `-- SCRIPT-LOCATION`: The path and name of the Python script used to perform this experiment.
+* `SCRIPT-LOCATION`: The path and name of the Python script used to perform this experiment.
 
 To submit the example experiments, use the following:
 
@@ -218,7 +218,7 @@ There are four ways to monitor training in Nauta, all which are discussed in the
 
 ### Viewing Experiment Logs 
 
-To view the experiment log, execute the following command.
+To view the experiment logs, execute the following command.
 
 **Syntax**: `nctl experiment logs [options] EXPERIMENT-NAME`
 

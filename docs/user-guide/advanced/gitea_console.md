@@ -32,6 +32,6 @@ Permission denied (publickey).
 fatal: Could not read from remote repository.
 ```
 - Nauta administrator gets access to Gitea console, by following the procedure described above
-- Nauta administrator runs `Rewrite '.ssh/authorized_keys' file (for Gitea SSH keys)` on the Gitea admin panel.
+- Nauta administrator runs `Rewrite '.ssh/authorized_keys' file (for Gitea SSH keys)` on the Gitea admin panel
 - If `authorized_keys` were the issue, problem should be mitigated
 

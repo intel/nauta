@@ -76,16 +76,22 @@ If there are too many images in registry it may negatively impact the submission
       a) Get the list of tags belonging to the chosen image by issuing the following command (it is assumed that port 5000 is exposed locally): `curl http://localhost:5000/v2/<image_name>/tags/list` 
      
       b) For each tag, get a digest related to this tag:  
-     `curl --header "Accept: application/vnd.docker.distribution.manifest.v2+json" http://localhost:5000/v2/<image_name>/manifests/<tag>` 
+     ```
+     curl --header "Accept: application/vnd.docker.distribution.manifest.v2+json" http://localhost:5000/v2/<image_name>/manifests/<tag>
+     ``` 
      
      Digest is returned in a header of a response under the _Docker-Content-Digest_ key
       
       c) Remove the image from the registry by issuing the following command:  
-     `curl -X "DELETE" --header "Accept: application/vnd.docker.distribution.manifest.v2+json" http://localhost:5000/v2/<image_name>/manifests/<digest>`
+     ```
+     curl -X "DELETE" --header "Accept: application/vnd.docker.distribution.manifest.v2+json" http://localhost:5000/v2/<image_name>/manifests/<digest>
+     ```
      
 4) Run Docker Garbage Collector by issuing the following command:
 
-     `kubectl exec -it $(kubectl get --no-headers=true pods -l app=docker-registry -n nauta -o custom-columns=:metadata.name) -n nauta registry garbage-collect /etc/docker/registry/config.yml`
+     ```
+     kubectl exec -it $(kubectl get --no-headers=true pods -l app=docker-registry -n nauta -o custom-columns=:metadata.name) -n nauta registry garbage-collect /etc/docker/registry/config.yml
+     ```
 
 5) Restart system's Docker registry. It can be done by deleting the pod with label: `nauta_app_name=docker-registry` 
 
@@ -155,7 +161,7 @@ Furthermore, an experiment _is not_ rescheduled automatically.
 
 Shown below is an example of such occurrence that is visible using `kubectl` tool:
 
-```
+````
                     user@ubuntu:~$ kubectl get nodes
 NAME                                 STATUS     ROLES    AGE   VERSION
 worker0.node.infra.nauta             NotReady   Worker   7d    v1.10.6
@@ -168,7 +174,7 @@ experiment-master-0                    1/1     Terminating   0          45m
 tensorboard-service-5f48964d54-tr7xf   2/2     Terminating   0          49m
 tensorboard-service-5f48964d54-wsr6q   2/2     Running       0          43m
 tiller-deploy-5c7f4fcb69-vz6gp         1/1     Running       0          49m
-```
+````
 
 ## Experiment's Pods Stuck in Terminating State on Node Failure Workaround
 

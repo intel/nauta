@@ -39,7 +39,7 @@ To make your Nauta build successful, _**you must**_ set your proxies, ensure you
 
 ### Proxy Setting Requirements 
 
-Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost.` 
+Set `http_proxy`, `https_proxy` and `no_proxy` environment variables, if you are behind a proxy. `no_proxy` should include the following: `127.0.0.1` and `localhost`.
 
 If proxy issues occur during the build process, as a workaround it is recommended that you configure a transparent proxy (for example, a Redsocks-based solution).
  

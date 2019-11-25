@@ -10,13 +10,13 @@ This section discusses the following main topics:
 
 The packs are located in the `nctl_config` folder. Navigate to `.draft/packs/https-github.com-Azure-draft/packs` folder to list existing packs. 
 
-The default pack used by `nctl_ client is _tf-training-single`. The pack consists of:
+The default pack used by `nctl_ client` is `tf-training-single`. The pack consists of:
 
 * Docker image specification _Dockerfile_ 
 
 * Helm deployment _charts_ folder
 
-All the pack parameters that can be controlled by _nctl_ are defined in the `charts/values.yml` file.
+All the pack parameters that can be controlled by _nctl_ are defined in the `charts/values.yaml` file.
 
 The example `values.yaml` file (shown below) is taken from `tf-training-multi` pack:
 

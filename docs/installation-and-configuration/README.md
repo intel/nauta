@@ -54,10 +54,6 @@ This process does the following:
 
 Completing all of the above takes some time. We are working on streamlining the process. 
 
-## Removing Nauta
-
-Should you ever need to delete/remove Nauta, refer to: [Installation Process](./Installation_Process/IP.md) page for more details. 
-
 This guide consists of the following main topics, in order. Start here to move through the correct sequence of events. 
 
 * [System Software Components Requisites](System_Software_Components_Requisites/SSCR.md)
