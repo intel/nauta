@@ -91,6 +91,6 @@ gui-unit-tests:
 include toolbox/providers/providers.mk
 include toolbox/support/gateway-users/gateway-users.mk
 
-generate-docs: $(ACTIVATE)
-	@pip install -r docs/sphinx-requirements.txt
-	@(cd docs/ && ./generate_docs.sh)
+generate-docs:
+	@. $(ACTIVATE); pip install -r docs/sphinx-requirements.txt;
+	@. $(ACTIVATE); cd docs/ && ./generate_docs.sh;
