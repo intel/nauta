@@ -9,7 +9,7 @@
     image: "{{ images[name] }}"
   include_tasks: "{{ image.method }}/build.yml"
   with_items: "{{ layer }}"
-  when: not docker_images_remote_exists[name]
+  when: (image.method == "pull") or (not docker_images_remote_exists[name])
   loop_control:
     loop_var: name
 
