@@ -27,8 +27,4 @@ touch .nojekyll
 git add .
 git commit  -m "Documentation update: $(date '+%d %b %y')"
 
-if [[ ! $(git branch -a | grep remotes/origin/gh-pages) ]]; then
-    git push --set-upstream origin gh-pages
-else
-    git push origin gh-pages
-fi
+git push --set-upstream origin gh-pages
