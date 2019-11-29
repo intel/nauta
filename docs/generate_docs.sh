@@ -18,13 +18,11 @@ else
 	git checkout --orphan gh-pages
 fi
 
-if [[ ! $(git status --short) ]]; then
-    echo 'Nothing to commit'
-    exit 0
-fi
-
 touch .nojekyll
-git add .
-git commit  -m "Documentation update: $(date '+%d %b %y')"
+
+if [[ $(git status --short) ]]; then
+    git add .
+    git commit  -m "Documentation update: $(date '+%d %b %y')"
+fi
 
 git push --set-upstream origin gh-pages
