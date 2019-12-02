@@ -27,7 +27,7 @@ Allows you to change the current system's settings concerning maximum and reques
 |`-h, --help` | No | Displays help messaging information. |
 
 **Note:** Number of CPUs shown should be interpreted according to the following article: [Meaning of CPU](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-cpu)
-and the amount of memory given here should be interpreted according to the following acle: 
+and the amount of memory given here should be interpreted according to the following article: 
 [Meaning of Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#meaning-of-memory).
 
 ### Returns
