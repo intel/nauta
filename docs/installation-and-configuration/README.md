@@ -18,6 +18,24 @@ Nauta runs on Kubernetes and Docker for scalability and ease of management. Naut
 
 Nauta is intended to run on a multi-server Kubernetes cluster. To run Nauta, you will need at least one Master node, and one or more Worker nodes. Nauta is a platform for performing Deep Learning training, and requires robust hardware specifications to run with optimal performance. 
 
+## Minimal Memory and Disk Requirements 
+
+Node | Count | CPU  | Memory | Disk
+---    | ---  | --- | ---  | ---
+Master | 1    | 12  | 32Gi | 200Gi
+Worker | 2    | 4   | 8Gi  | 200Gi
+
+**Note:** These requirements are based on our development environments and nctl config command specifications. This configuration has been tested and does function. However, it does indicate that Nauta _might_ work on smaller configurations.
+
+### Example of Production Environment Setup 
+
+Node | Count  | CPU    | Memory   | Disk
+---    | ---  | ---    | ---      | ---
+Master | 1    | 	2x40  | 384Gi	   | 144TB
+Worker | 4    | 	2x40  | 192Gi    | 1TB
+
+**Note:** This is just an example of production environment, which is able to run multiple resource demanding experiments at once.
+
 # Nauta Installation Procedures
 
 To install Nauta in a 'bare metal' (for example, non-cloud) server environment, you will need to:
@@ -53,6 +71,12 @@ This process does the following:
 - Installs the Nauta server-side application on your new Kubernetes cluster, and starts the system running.
 
 Completing all of the above takes some time. We are working on streamlining the process. 
+
+## Removing Nauta
+
+Should you need to delete/remove Nauta, refer to: [Installation Process](./Installation_Process/IP.md) page for more details. 
+
+# Document Flow
 
 This guide consists of the following main topics, in order. Start here to move through the correct sequence of events. 
 

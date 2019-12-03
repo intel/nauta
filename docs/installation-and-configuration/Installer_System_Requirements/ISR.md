@@ -1,25 +1,25 @@
 # Nauta Installer System Requirements 
 
-When installing Nauta, it should be installed on a separate machine (your _Installer machine_), as Nauta requires a separate machine to run the installer. For installation information, refer to the [Installation Process](../Installation_Process/IP.md).
+A separate system (installer system) is required for installing Nauta. This section shows the requirements for that system. For installation information, refer to the [Installation Process](../Installation_Process/IP.md).
 
 ## Nauta Supported Operating Systems
 
 Nauta supports the following Operating Systems: 
-  * RedHat Enterprise Linux 7.5 or CentOS 7.5
+  * Red Hat Enterprise Linux 7.6 or CentOS 7.6
   * Ubuntu 16.04
    
-### Red Hat Enterprise Linux 7.5
+### Red Hat Enterprise Linux 7.6
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
    
-### CentOS 7.5
+### CentOS 7.6
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * sshpass (when password authentication is used)
   * Helm 2.9.1 (the version of a Helm client _must be_ the same as Helm server used by the platform)
@@ -27,7 +27,7 @@ Required on system, software requirements:
 ### Ubuntu 16.04
 
 Required on system, software requirements:
-  * Python 2.7 and /usr/bin/python available
+  * Python 2.7 and `/usr/bin/python` available
   * Python 3.5
   * apt packages installed:
     - python3-pip

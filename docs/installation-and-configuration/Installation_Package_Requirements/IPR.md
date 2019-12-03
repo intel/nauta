@@ -4,7 +4,7 @@
 
 Copy the package to the installer machine, then untar it using the following command:
 
-`nauta-1.0.0-ent-20190513065650.tar.gz -C <destination>`
+`nauta-1.1.0-ent-20191010050128.tar.gz -C <destination>`
 
 **Note:** Refer to [How to Build Nauta, Required Packages ](../How_to_Build_Nauta/HBN.md) section for required package information.
 
@@ -19,11 +19,11 @@ In extracted archive, the following appears:
 
 - **Folders**
    - **bin:** binary directory
-   - **diagnose:** contains script to diagnose system if installer fails
+   - **docs:** documentation
+   - **diagnose:** contains script to diagnose system if installer fails 
    - **libs:** contains various scripts that are used by the installer
    - **nauta:** Nauta Enterprise applications deployer
    - **platform:** Kubernetes platform deployer
-
 
 ### Components Version
 

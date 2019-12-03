@@ -1,11 +1,11 @@
-# Configuration Tasks
+# Configuration File Tasks
 
 This section discusses the following main topics: 
 
 - [Configuration Overview](#configuration-overview)  
-- [Configuration Considerations](#configuration-considerations)   
+- [Configuration Considerations](#configuration-considerations)  
 - [Example Configuration File](#example-configuration-file)  
-- [YAML File Example](#yaml-file-example)
+- [YAML Configuration File Example](#yaml-configuration-file-example)
 - [Default Value of an Empty Dictionary](#default-value-of-an-empty-dictionary)
 - [Deciding to Leave the Proxy Parameter Empty](#deciding-to-leave-the-proxy-parameter-empty)
 - [Docker Log Driver Settings](#docker-log-driver-settings)  
@@ -15,11 +15,11 @@ This section discusses the following main topics:
 
 ## Configuration Overview
 
-Nauta's configuration is specified by a _YAML Configuration file_. Nauta will look for this file at the location defined in the `ENV_CONFIG` environment variable (explained in [Installation Process](../Installation_Process/IP.md) as well as shown example configuration file is also shown below). This configuration file specifies network proxies, DNS server locations, and other Nauta related parameters listed below. For Inventory file information, refer to [Inventory File Example](../Inventory_Tasks/IT.md) for more information. 
+Nauta's configuration is specified by a _YAML Configuration file_. Nauta looks for this file at the location defined in the `ENV_CONFIG` environment variable (explained in the [Installation Process](../Installation_Process/IP.md), and in the example configuration file shown in the example configuration file below). This configuration file specifies network proxies, DNS server locations, and other Nauta related parameters listed below. For Inventory file information, refer to [Inventory File Example](../Inventory_Tasks/IT.md) for more information. 
 
 ### Parameter Color Indicators 
 
-In the examples shown, Green indicates a parameter name, and Blue indicates an example parameter value. 
+In the examples shown, _Green_ indicates a parameter name, and _Blue_ indicates an example parameter value. 
 
 ### Configuration Variables Indicators
 
@@ -29,24 +29,24 @@ Some configuration variables are of the _dictionary_ type, and for these: `{}` i
 
 ### Host Name Considerations
 
-Host names _must_ conform to standard host naming rules and each element of the hostname _must_ be from 1 to 63 characters long. The entire host name, including the dots _must not_ exceed 253 characters long. Valid characters for host and domain names are ASCII(7) letters from a to z (lowercase), the digits from 0 to 9, and a hyphen. Furthermore, _do not_ start a host and domain names with a hyphen. 
+Host names _must_ conform to standard host naming rules and each element of the hostname _must_ be from 1 to 63 characters long. The entire host name, including the dots _must not_ exceed 253 characters long. Valid characters for host and domain names are ASCII(7) letters from a to z (lowercase), the digits from 0 to 9, and a hyphen. Furthermore, **_do not_** start a host and domain names with a **_hyphen_**. 
 
 ### Proxy Value Settings
 
-All parameters present in the configuration file _must_ have values. For example: `proxy:`. Setting the configuration file with no value causes errors.
+All parameters present in the configuration file _must_ have values. Setting the configuration file with no value causes errors, for example, `proxy:`.
 
 ## Example Configuration File 
 
-This is an _example_ file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section after the YAML file example below. For YAML file information, refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML).
+This is an _example_ file, containing dummy values for a few of the supported configuration values. For a complete list, refer to the section after the YAML file example below ([YAML File Example](#yaml-configuration-file-example)). For YAML file information, refer to [YAML Format Overview](https://en.wikipedia.org/wiki/YAML).
 
-1. In the YAML file, the _list of items_ is a sequence of elements starting on a new line with a dash at the beginning. For example, an empty list: []. In an abbreviated form, elements can also be enclosed on a single line.
+1. In the YAML file, the _list of items_ is a sequence of elements starting in a new line with a dash at the beginning. For example, an empty list: []. In an abbreviated form, elements can also be enclosed in a single line.
 
-1.  In the YAML file, a dictionary is a sequence of pairs for the element's _key: value_. It can also be presented with each pair on a new line or abbreviated on a single line. 
+1.  In the YAML file, a dictionary is a sequence of pairs for the element's _key: value_. It can also be presented with each pair in a new line or abbreviated in a single line. 
 
-## YAML File Example
+## YAML Configuration File Example
 
 Below is an example YAML file that provides examples of proxy settings, DNS server settings, Kubernetes, and so on. 
-If you are unsure how to do this, see the example  [Inventory File Example](../Inventory_Tasks/IT.md) and [Configuration File Example](../Configuration_Tasks_Variables/CTV.md) and refer to the [Installation Process](../Installation_Process/IP.md). 
+For detailed instructions on how to complete this, see the example  [Inventory File Example](../Inventory_Tasks/IT.md) and refer to the [Configuration File Example](../Configuration_Tasks_Variables/CTV.md) and refer to the [Installation Process](../Installation_Process/IP.md). 
 
 
 ```yaml
@@ -58,7 +58,6 @@ proxy:
   no_proxy: <localhost, any other addresses>, 10.0.0.1,localhost,.nauta
 
 # This is a list of DNS servers used for resolution: a maximum of three entries.
-
 dns_servers:
   - 8.8.8.8
   - 8.8.4.4
@@ -68,18 +67,18 @@ dns_servers:
 dns_search_domains:
   - example.com
 
-# This is place to define additional domain names for cluster to allow secure communication
+# This is place to define additional domain names for cluster to allow secure communication.
 dns_names_for_certificate:
   DNS.7: "mycluster1.domain.name"
   DNS.8: "mycluster2.domain.name"
 
-# This is the _Internal_ domain name.
+# This is the Internal domain name.
 domain: nauta
 
-# Internal subdomain for infrastructure
+# Internal subdomain for infrastructure.
 nodes_domain: lab007
 
-# This is the _Internal Subdomain_ for Kubernetes resources.
+# This is the Internal Subdomain for Kubernetes resources.
 k8s_domain: kubernetes
 
 # This is the Network Range for Kubernetes pods.
@@ -91,19 +90,19 @@ kubernetes_svc_subnet: 10.4.0.0/16
 
 ## Default Value of an Empty Dictionary
 
-For empty dictionaries, there are 2 defaults:
+For empty dictionaries, there are two defaults:
 
-1. If a parameter _is not_ included in configuration file, the default value will be utilized. 
+1. If a parameter _is not_ included in the configuration file, the default value is utilized. 
 
-2. If a parameter is present in configuration file with a default  value included, it appears as shown below. 
+2. If a parameter is present in the configuration file with a default  value included, it appears as shown below. 
 
 * `proxy: {}` 
 
 ## Deciding to Leave the Proxy Parameter Empty
 
-There may be reasons to leave the proxy parameter set with an empty dictionary and should you decide to do this, it may be for the following reasons: 
+There may be reasons to leave the proxy parameter set with an empty dictionary. Should you decide to do this, it may be for the following reasons: 
 
-* When you _do not_ need a proxy because you _do not_ have one in your network.
+* You _do not_ need a proxy because you _do not_ have one in your network.
 
 * You intentionally _do not_ want to use a proxy to connect your cluster as an external network to keep it isolated from the Internet.
 
@@ -137,8 +136,8 @@ dns_servers:
 
 ### dns_names_for_certificate
 - **Description:** This is a list of DNS names of the cluster.
-Values from this parameter will be acceptable addresses to access cluster in secure way.
-Key values have to be in format `DNS.X` where `X` is number greater than 6 (internally allocated symbolic addresses).
+The values from this parameter use acceptable addresses when accessing a cluster in securely.
+Key values have to be in the format `DNS.X` where `X` is a number greater than 6 (internally allocated symbolic addresses).
 
 - **Default value:** []
 
@@ -160,7 +159,7 @@ domain: nauta
 ```
 
 ### nodes_domain
-- **Description:** Internal subdomain for infrastructure. Full domain for an infrastructure is:
+- **Description:** This is the Internal subdomain for infrastructure. Full domain for an infrastructure is:
 - **Default value:** infra
 
 ```yaml
@@ -170,11 +169,24 @@ nodes_domain: lab007
 **Note:** These IP addresses _should not_ conflict with Internal IP address ranges.
 
 ### k8s_domain
-- **Description:** This is the Internal subdomain for Kubernetes resources. Full domain for infrastructure is: `<k8s_domain>.<domain>`
+- **Description:** This is the Internal subdomain for Kubernetes resources. The full domain for infrastructure is: `<k8s_domain>.<domain>`
 - **Default value:** kubernetes
 
 ```yaml
 k8s_domain: kubernetes
+```
+
+### elasticsearch
+- **Description:** Password and username which will be set for authorized access
+to elasticsearch. Authorized access allows usage of HTTP methods other than GET.
+Changing these parameters is recommended.
+
+- **Default value:** {admin_username: esadmin, admin_password: esadmin}
+
+```yaml
+elasticsearch:
+  admin_username: esadmin
+  admin_password: esadmin
 ```
 
 ### kubernetes_pod_subnet
@@ -193,20 +205,8 @@ kubernetes_pod_subnet: 10.3.0.0/16
 kubernetes_svc_subnet: 10.4.0.0/16
 ```
 
-### elasticsearch
-- **Description:** Password and username which will be set for authorized access
-to elasticsearch. Authorized access allows usage of HTTP methods other than GET.
-Changing these parameters is recommended.
-- **Default value:** {admin_username: esadmin, admin_password: esadmin}
-
-```yaml
-elasticsearch:
-  admin_username: esadmin
-  admin_password: esadmin
-```
-
 ### apiserver_audit_log_maxage
-- **Description:** The maximum age in days for Kubernetes apiserver audit logs.
+- **Description:** This is the maximum age in days for Kubernetes apiserver audit logs.
 - **Default value:** 7
 
 ```yaml
@@ -214,7 +214,7 @@ apiserver_audit_log_maxage: 7
 ```
 
 ### apiserver_audit_log_maxbackup
-- **Description:** The maximum number of log files kept for Kubernetes apiserver audit.
+- **Description:** This is the maximum number of log files kept for Kubernetes apiserver audit.
 - **Default value:** 10
 
 ```yaml
@@ -292,14 +292,14 @@ use_system_enabled_repos: True
 ```
 
 ### input_nfs
-- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used.
+- **Description:** Definition of the input NFS mounts for Samba. By default, internal NFS provisioner is used.
 - **Default value:** {}
 - **Fields**
     - **path:** NFS path to mount
     - **server:** NFS server
 
 ### output_nfs
-- **Description:** Definition of input NFS mounts for Samba. By default, internal NFS provisioner is used. By default, internal NFS provisioner is used. 
+- **Description:** Definition of the input NFS mounts for Samba. By default, internal NFS provisioner is used. By default, internal NFS provisioner is used. 
 - **Default value:** {}
 
 - **Fields**
@@ -351,11 +351,11 @@ features:
 ### Features List (NFS Default Settings)
 
 - **NFS:** default: True
-- **Redsocks:** default: disabled
+- **Redsocks:** default: False
 
 # Redsocks Overview
 
-Redsocks is a tool that allows you to redirect network traffic through a Socket (for example: SOCKS4, SOCKS5 or HTTPs proxy server). Redsocks operates through a proxy server, and as a result it is referred to as a transparent proxy redirector.
+Redsocks is a tool that allows you to redirect network traffic through a socket. For example: SOCKS4, SOCKS5 or HTTPs proxy server. Redsocks operates through a proxy server, and as a result it is referred to as a transparent proxy redirector.
 
 - Refer to [How to transparently use a proxy with any application (Docker) using Iptables and Redsocks](https://medium.com/datadriveninvestor/how-to-transparently-use-a-proxy-with-any-application-docker-using-iptables-and-redsocks-b8301ddc4e1e) for more information. 
 
@@ -363,9 +363,9 @@ Redsocks is a tool that allows you to redirect network traffic through a Socket 
 
 Redsocks configuration is an **optional** part of the installer; however, if you choose this option then configure Redsocks appropriately in your environment/organization.
 
-Redsocks _is not_ enabled during the installation, as the default is set to _False_ (shown in the example below). Therefore, if you want to install Redsocks you _must_ set the feature switch to **True**. 
+Redsocks _is not_ enabled during the installation, as the default is set to _False_ (shown in the example below). Therefore, if you want to install Redsocks, you _must_ set the feature switch to **True**. 
 
-**WARNING:** After the installation should you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks and set the feature switch to True. It _**cannot**_ be changed to False in your configuration file after the initial install. Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
+**WARNING:** After the installation if you decide you want to install Redsocks, you will need to redo the entire installation to include Redsocks, and set the feature switch to True. It _**cannot**_ be changed to False in your configuration file after the initial install. Redsocks and NFS are independent of each other, so use judgment when initially setting these feature switches.
 
 ### How to Enable Features
 
@@ -413,7 +413,7 @@ Default: cni0
 
 # Networking Configuration Example
 
-The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.5. All interfaces (both external and internal) are Ethernet interfaces. 
+The Figure below shows an example Nauta Networking Diagram. While you can build a cluster with 1 machine to run all the examples, it is suggested to utilize at least 4 worker nodes (as shown in the example). The worker nodes should run Red Hat Enterprise Linux 7.6. All interfaces (both external and internal) are Ethernet interfaces. 
 
 ![New Users Added](../Z_examples/NN.png)
 
