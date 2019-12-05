@@ -10,9 +10,9 @@ You can launch TensorBoard from the Nauta web UI or the CLI; both methods are de
 To view the experiment’s results in TensorBoard, TensorBoard data _must be_ written to a 
 folder in the directory `/mnt/output/experiment.`
 
-To launch TensorBoard from the web UI and view results for individual experiments, perform these steps:
+To launch TensorBoard from the web UI and view results for individual experiments, execute these steps:
 
-1. Open the web ui by executing this command:
+1. Open the web UI by executing this command:
 
    `nctl launch webui`
 
@@ -20,7 +20,7 @@ To launch TensorBoard from the web UI and view results for individual experiment
 left of the experiment name.
 
 3. With an experiment selected (checked), the **LAUNCH TENSORBOARD** button becomes active. Click **LAUNCH TENSORBOARD**. 
-TensorBoard is launched with graphs showing the experiment’s results. 
+TensorBoard launches with graphs showing the experiment’s results. 
 
 The following screen displays (this is an example only).
 
@@ -41,28 +41,27 @@ Proxy connection created.
 Press Ctrl-C key to close a port forwarding process...
 ```
 
-This command launches a local browser. If the command was run with the --no-launch option, then you need to copy the returned URL into a web browser. TensorBoard is launched with graphs showing the experiment’s results (as shown above).
+This command will launch a local browser. If the command was run with the `--no-launch` option, then you need to copy the returned URL into a web browser. TensorBoard is launched with graphs showing the experiment’s results (as shown above).
 
 You can also launch TensorBoard and with the `nctl experiment view` command:
 
-`nctl experiment view -tensorboard <experiment-name>`
+`nctl experiment view --tensorboard <experiment-name>`
 
-This command exposes a TensorBoard instance with data from the named experiment as above.
+**Note:** This command exposes a TensorBoard instance with data from the named experiment shown above.
 
 # MNIST Example
 
-You can try out TensorBoard with MNIST classifier `mnist_tensorboard.py` from python examples. You can find it in `examples' folder. Run:
+You can try out TensorBoard with MNIST classifier `mnist_tensorboard.py` from Python examples in the `examples` folder. Run:
+
 ```
-nctl experiment submit -p cpu 1 -p memory 2Gi examples/mnist_tensorboard.py -n tb-example
+nctl experiment submit -p cpu 1 -p memory 8Gi examples/mnist_tensorboard.py -n tb-example
 nctl exp view -tb tb-example
 ```
-Note that `mnist_tensorboard.py` requires at least 2Gi of memory. 
+**Note:** `mnist_tensorboard.py` requires at least 8Gi of memory.
 
 ----------------------
 
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
-

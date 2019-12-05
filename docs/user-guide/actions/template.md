@@ -1,131 +1,154 @@
 # template Command
 
-The overall purpose of this command/subcommands is to manage template packs used by nctl application. This section discusses the following main topics: 
+Use the `template` command to manage the template packs used by nctl application. This main command also includes the following subcommands:
 
  - [copy Subcommand](#copy-subcommand)
  - [install Subcommand](#install-subcommand)  
  - [list Subcommand](#list-subcommand)
- 
- 
+  
 ## copy Subcommand
   
- ### Synopsis
+### Synopsis
  
-Copies a locally existing template pack to a new template pack. Once copied, you can change the description and the version of a newly created template pack, if desired.
+Use the `copy` subcommand to copy a locally existing template pack to a new template pack. Once copied, you can change the description and the version of a newly created template pack, if desired.
  
- ### Syntax
+### Syntax
  
- `nctl template copy [options] SRC_TEMPLATE_NAME DEST_TEMPLATE_NAME `
+`nctl template copy [options] SRC_TEMPLATE_NAME DEST_TEMPLATE_NAME `
+ 
+### Arguments
+ 
+| Name | Required | Description |
+|:--- |:--- |:--- |
+|`SRC_TEMPLATE_NAME` | Yes |  This is the name of a template pack that will be copied. This pack _must be_ available locally. Therefore, if a you want to make a copy of a remote template pack, _you must_ first install it locally using the `template install command`. |
+|`DEST_TEMPLATE_NAME` | Yes | This is the name of the copied template pack. If a template pack with a given name exists, the Nauta application displays the information about it and completes its action. |
+ 
+### Options
+ 
+ Name | Required | Description | 
+:--- |:--- |:--- |
+|`-d, --description TEXT` | No | A description of a newly created template pack. If not given, `nctl` asks for a description during copying of the pack. The maximum length of a description is 255 characters. As a result, if longer text is used, superfluous characters are cut.|
+|`-ve, --version TEXT`| No | The version of a newly created template pack. If not given, the default `0.1.0` value is used as a version. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
  
  
- ### Arguments
+### Returns
  
- | Name | Required | Description |
- |:--- |:--- |:--- |
- |`SRC_TEMPLATE_NAME` | Yes | This is the name of a template pack that will be copied. This pack must be available locally. Therefore, if a you want to make a copy of a remote template pack, you must first install it locally using the `template install command`. |
- |`DEST_TEMPLATE_NAME` | Yes | This is the name of the copied template pack. If a template pack with a given name exists, the Nauta application displays the information about it and completes its action. |
- 
- 
- ### Options
- 
- | Name | Required | Description | 
- |:--- |:--- |:--- |
- |`-d, --description TEXT` | No | Description of a newly created template pack. If not given, `nctl` asks for a descritpion during copying of the pack. The maximum length of a description is 255 characters; however, if the text is longer than this limit, superfluous characters are cut.|
- |`-ve, --version TEXT`| No | Version of a newly created template pack. If not given, the default `0.1.0` value is used as a version. |
- 
- 
- ### Returns
- 
-When a template pack is copied successfully, a confirmation message displays.
-If an error occurs during execution of this command, then the cause of the issue is displayed.
+When a template pack is copied successfully, a confirmation message displays. If an error occurs during execution of this command, the cause of the issue displays.
      
- ### Example
+### Example
  
- `nctl template copy -ve 0.2.0 existing-pack new-pack`  
+`nctl template copy --version 0.2.0 existing-pack new-pack`  
+
+### Additional Remarks
  
- Creates a new template pack named `new-pack` based on a locally available template pack `existing-pack`. The version
- of a newly created pack is set to 0.2.0. You will be asked for a description during _making a copy_ of a template pack.
+Use the subcommand to create a new template pack named `new-pack` based on a locally available template pack `existing-pack`. The version of a newly created pack is set to 0.2.0. You will be asked for a description during _making a copy_ of a template pack.
 
+## install Subcommand
 
-## install Subcommand 
+### Synopsis
 
-### <a name="synopsis_install"></a>Synopsis
+Use the `install` subcommand to install a template pack locally with a given name. If the template pack has been already installed, use this subcommand to update the template to the version residing on a remote repository.  
 
-Installs locally a template pack with a given name. If template pack has been already installed, use of this subcommand
-updates the template to the version residing on a remote repository.  
+### Syntax
 
-### <a name="syntax_install"></a>Syntax
+`nctl template install TEMPLATE_NAME`  
 
-`nctl experiment install TEMPLATE_NAME`  
-
-### <a name="arguments_install"></a>Arguments
+### Arguments
  
- | Name | Required | Description |
- |:--- |:--- |:--- |
- |`TEMPLATE_NAME` | Yes | Name of a template pack which should be installed/updated. |
+| Name | Required | Description |
+|:--- |:--- |:--- |
+|`TEMPLATE_NAME` | Yes | The name of a template pack that should be installed/updated, as required. |
 
-###  <a name="returns_install"> </a> Returns
+### Returns
 
-When an installation/update is successfully completed, a confirmation message displays.
-If an error occurs during execution of this command, then the cause of the issue is displayed.
+When an installation/update is successfully completed, a confirmation message displays. If an error occurs during execution of this command, the cause of the issue displays.
 
-###  <a name="example_install"> </a> Example
-
-The following command installs/upgrade template with the `template-name` name.
+### Example
 
 `nctl template install template-name`
 
+ ### Options
+ 
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
+
+### Additional Remarks
+
+The following command installs/upgrade template with `template-name` name.
+
 ## list Subcommand
 
-- [Synopsis](#synopsis_list)  
-- [Syntax](#syntax_list)
-- [Returns](#returns_list)
-- [Example](#example_list)  
+### Synopsis
 
-### <a name="synopsis_list"></a> Synopsis
+Use the `list` subcommand to list the template packs and display information about the available local packs on a remote repository. 
 
-Lists template packs. It displays information about packs that are available locally and on a remote repository. 
-
-### <a name="syntax_list"> </a> Syntax
+### Syntax
 
 `nctl template list`
 
-#### Additional Remarks
 
-Configuration of the template zoo is stored in the `NAUTA_HOME/config/zoo-repository.config` file. This file 
-contains location of a template zoo repository (under the `model-zoo-address` key). Additionally, it can contain
-a Git access token also (under the `access-token` key). The access token is needed in case when a template zoo repository
-is private and credentials are needed to get access to it. If desired, you can modify both values in case you need to use a different repository with template packs. 
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
 
-### <a name="returns_list"></a>  Returns
+### Additional Remarks
 
-Displays a table with a list of available template packs. Each row contains, besides the name and the description of a template, also 
-versions of remote and local template packs. If one of these versions is empty it indicates that this template pack
-does not have version of this type.
+The configuration of the _template zoo_ is stored in the `NAUTA_HOME/config/zoo-repository.config` file. This file 
+contains location of a template zoo repository (under the `model-zoo-address` key). 
 
-If an error occurs during execution of this command, then the cause of the issue is displayed.
+Additionally, it can contain also a git access token (under the `access-token` key). The access token is needed in case when a template zoo repository is private, and credentials are needed to get access to it. A user can modify both values if needed to use a different repository with template packs. 
+
+### Returns
+
+The table lists the available template packs. Each row contains the name and the description of a template (as well as 
+the versions) of remote and local template packs. If one of these versions is empty, this indicates that this template pack
+_does not_ have this certain version.
 
 
-### <a name="example_list"></a>  Example
+```
 
-`nctl template list`
+| Template name             | Template description                              | Local version   | Remote version   |
+|---------------------------+---------------------------------------------------+-----------------+------------------|
+| jupyter                   | An interactive session based on Jupyter Notebook  | 0.1.0           | 0.1.0            |
+|                           | using Python 3.                                   |                 |                  |
+|                           |                                                   |                 |                  | 
+| openvino-inference-batch  | An OpenVINO model server inference job for batch  | 0.1.0           | 0.1.0            |
+|                           | predictions.                                      |                 |                  |
+|                           |                                                   |                 |                  |  
+| openvino-inference-stream | An OpenVINO model server inference job for        | 0.1.0           | 0.1.0            |
+|                           | streaming predictions on a deployed instance.     |                 |                  |
+|                           |                                                   |                 |                  | 
+| pytorch-training          | A PyTorch multi-node training job using Python 3. | 0.0.1           | 0.0.1            |
+|                           |                                                   |                 |                  | 
+| tf-inference-batch        | A TensorFlow Serving inference job for batch      | 0.1.0           | 0.1.0            |
+|                           | predictions.                                      |                 |                  |
+|                           |                                                   |                 |                  | 
+| tf-inference-stream       | A TensorFlow Serving inference job for streaming  | 0.1.0           | 0.1.0            |
+|                           | predictions on a deployed instance.               |                 |                  |
+|                           |                                                   |                 |                  | 
+| tf-training-horovod       | A TensorFlow multi-node training job based on     | 0.2.2           | 0.2.2            |
+|                           | Horovod using Python 3.                           |                 |                  |
+|                           |                                                   |                 |                  | 
+| tf-training-multi         | A TensorFlow multi-node training job based on     | 0.1.0           | 0.1.0            |
+|                           | TfJob using Python 3.                             |                 |                  |
+|                           |                                                   |                 |                  | 
+| tf-training-single        | A TensorFlow single-node training job based on    | 0.1.0           | 0.1.0            |
+|                           | TfJob using Python 3.                             |                 |                  |
+```
 
-<!-- language: lang-none -->
-
-    | Template name                     | Template description                            | Local version   | Remote version   |
-    |-----------------------------------+-------------------------------------------------+-----------------+------------------|
-    | jupyter                           | Pack with Jupyter Notebook for purpose of       | 0.1.0           | 0.1.0            |
-    |                                   | interactive sessions                            |                 |                  |
-    | jupyter-py2                       | Pack with Jupyter Notebook for purpose of       | 0.1.0           | 0.1.0            |
-    |                                   | interactive sessions                            |                 |                  |
-    | tf-training-horovod               | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
-    | tf-training-horovod-py2           | A Helm chart for deploying Horovod              | 0.2.1           | 0.2.1            |
+**Note:** If an error occurs during execution of this command, the cause of the issue displays.
 
 ----------------------
 
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
-

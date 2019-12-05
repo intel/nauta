@@ -1,20 +1,20 @@
 # View All User Activity
 
-The command `nctl user list` displays all current users and all of their experiments (with status). Furthermore, the command shows the following information:
+Use the `nctl user list` command to display all the current users, as well as all of their experiments (with status). Furthermore, the command displays the following information:
 
   * **Name:** user name
   * **Creation date:** the date this user account was created
   * **Date of last submitted job:** experiment
   * **Number of running jobs:** experiments
-  * **Number of queued jobs:** experiments submitted but not yet running
+  * **Number of queued jobs:** experiments submitted, but not yet running
 
-Administrators _are not_ listed and previously deleted users are not shown. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md). 
+Administrators _are not_ listed and previously deleted users _are not_ shown. To _create_ a user account, refer to [Creating a User Account](../actions/create_user.md) and to _delete_ a user account, refer to [Deleting a User Account](../actions/delete_user.md). 
 
-Enter the following command:
+Execute the following command:
 
 `nctl user list`
 
-Example results are show below (scroll right to see full contents).
+Example results are shown below (scroll right to see the full contents).
 
 ```
 
@@ -31,6 +31,4 @@ Example results are show below (scroll right to see full contents).
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
-

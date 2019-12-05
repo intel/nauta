@@ -1,13 +1,14 @@
-# Unmounting Experiment Input to Storage
+# Unmounting Local Folder from Storage
 
-Perform these steps to unmount previously mounted Nauta storage from a local folder/machine.
+Perform these steps to unmount previously mounted Nauta storage from a local folder.
 
-1. Use the mount command to display the command that should be used to unmount your local folder/machine from your
-Nauta input folder.
+1. Use the [mount command](../actions/mount.md) command to display the command that should be used to unmount your local folder from your Nauta input folder.
 
-   `nctl mount`
+   `nctl mount ls`
 
-2. Execute the unmount using `umount` or `net use` as appropriate. The command is dependent on the operating system.
+2. Execute the unmount using `umount` as appropriate to display the command to unmount your local folder from your Nauta input folder. 
+
+   **Note:** This command is dependent on the operating system.
 
 
 ----------------------
@@ -15,9 +16,7 @@ Nauta input folder.
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
-
 
 
 

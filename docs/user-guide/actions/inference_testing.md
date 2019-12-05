@@ -1,20 +1,23 @@
 # Evaluating Experiments with Inference Testing
 
-For guidance on using inference testing to evaluate an experiment, refer to the topics shown below.
+Nauta provides you with the ability to test your trained model using TensorFlow Serving and OpenVINO Model Server (OVMS).  OVMS is an OpenVINO serving component intended to provide hosting for the OpenVINO inference runtime.
 
-* For `nctl predict` command and its subcommands and parameters, refer to [predict Commands](predict.md).
+For guidance on using _Inference Testing_ to evaluate an experiment, refer to the topics shown below.
 
-* For a demonstration of how to run batch inference, refer to: [Batch Inference Example](batch_inf_example.md).
+- For `nctl predict` command, its subcommands, and parameter information, refer to [predict Commands](predict.md).
 
-* For a demonstration of how to run streaming inference, refer to: [Stream Inference Example](streaming_inference.md).
+For How-to instructions for TensorFlow Serving:
 
-* For running prediction on OpenVINO Model Server, refer to [Inference Example on OpenVINO Model Server](openvino_inf.md)
+- Refer to [Batch Inference Example](batch_inf_example.md) for running batch inference.
+
+- Refer to [Stream Inference Example](streaming_inference.md) for running streaming inference.
+
+To run prediction on OpenVINO Model Server, refer to [Inference Example on OpenVINO Model Server](openvino_inf.md)
 
 ----------------------
 
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
 

@@ -2,8 +2,6 @@
 
 Kubernetes provides a way to manage containerized workloads and services, to manage resources given to a particular experiment and monitor workload statuses and resource consumption. Refer to [Kubernetes Web UI (Dashboard)](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard) for detailed Kubernetes information. 
 
-## Access Kubernetes Resource Dashboard
-
 To access Kubernetes:
 
 1. Click the **Hamburger Menu** ![Image](images/hamburger_menu.png) at the far left of the UI to open a left frame.

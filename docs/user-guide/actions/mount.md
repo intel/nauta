@@ -1,16 +1,14 @@
 # mount Command
 
-The `nctl mount` command displays another command that can be used to either mount or unmount a client's folders on/from a users local machine. See also, [list Subcommand](#list-subcommand-synopsis).
+Use the `mount` command to display the operating system commands for mounting and unmounting Nauta folders. This main command also includes the following subcommand:
 
-This section discusses the following main topics: 
+ - [list Subcommand](#list-subcommand)  
 
- - [mount Command Synopsis](#mount-command)
- - [list Subcommand Synopsis](#list-subcommand-synopsis)  
- - [Additional Remarks](#additional-remarks)
+**Note:** _mount_ is an operating system command so it might be better to continue using `nctl mount` here. The command displays both the mount and unmount commands.
 
-## mount Command 
+### Synopsis
 
-The mount command by itself displays another command that can be used to mount/unmount a client's folders on or from a users local machine. 
+The mount command by itself displays another command that can be used to mount/unmount a client's folders on or from a user's local machine. 
 
 ### Syntax
 
@@ -24,13 +22,16 @@ The mount command by itself displays another command that can be used to mount/u
 |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO, <br>`-vv` for DEBUG |
 |`-h, --help` | No | Displays help messaging information. |
 
+
 ### Returns 
 
-This command returns another command that can be used to mount a client's folders on a users local machine. It also shows what command should be used to unmount client's folder after it is no longer needed. 
+This command returns another command that can be used to mount a client's folders on a user's local machine. It also shows what command should be used to unmount client's folder after it is no longer needed. 
 
-## list Subcommand Synopsis
+## list Subcommand 
 
-Displays a list of Nauta related folders mounted on a user's machine. If run using admin credentials, it displays mounts of all users.
+### Synopsis
+
+Use the `list` subcommand to display a list of Nauta related folders mounted on a user's machine. If run using administrator credentials, it displays the mounts of all users.
 
 ### Syntax
 
@@ -38,19 +39,15 @@ Displays a list of Nauta related folders mounted on a user's machine. If run usi
 
 ### Returns
 
-List of mounted folders. Each row contains additional information (for example, remote and local location) for those mounts. 
-
-**Note:** The data sets displayed by this command depends on operating system used.
+List of mounted folders. Each row contains additional information (for example: remote and local location) concerning those mounts. Set of data displayed by this command depends on the operating system.
 
 ## Additional Remarks
 
 This command displays only those mounts that expose Nauta shares. Other mounted folders _are not_ taken into account.
-
 
 ----------------------
 
 ## Return to Start of Document
 
 * [README](../README.md)
-
 ----------------------
