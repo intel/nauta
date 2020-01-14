@@ -147,19 +147,19 @@ To submit the example experiments, use the following:
 
 For single node training (template parameter in this case is optional), use the following: 
 
-`nctl experiment submit -t  tf-training-single examples/mnist_single_node.py --name single`
+`nctl experiment submit --template  tf-training-single examples/mnist_single_node.py --name single`
 
 #### Multinode Training
 
 For multinode training, use the following:
 
-`nctl experiment submit -t multinode- tf-training-single examples/mnist_multinode.py --name multinode`
+`nctl experiment submit --template tf-training-multi examples/mnist_multinode.py --name multinode`
 
 #### Horovod Training
 
 For Horovod training, use the following:
 
-`nctl experiment submit -t tf-training-horovod examples/mnist_horovod.py --name horovod`
+`nctl experiment submit --template tf-training-horovod examples/mnist_horovod.py --name horovod`
 
 The included example scripts _do not_ require an external data source. The scripts automatically download the MNIST dataset. Templates referenced here have set CPU and Memory requirements. The list of available templates can be obtained by issuing `nctl experiment template-list` command.
 
@@ -169,7 +169,7 @@ The following example shows how to submit a MNIST experiment and write the Tenso
 
 Enter the following command to run this example:
 
-`nctl experiment submit -t tf-training-single examples/mnist_single_node.py --name single`
+`nctl experiment submit --template tf-training-single examples/mnist_single_node.py --name single`
 
 #### Result of this Command
 
