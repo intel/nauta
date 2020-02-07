@@ -23,9 +23,9 @@ pygobject==3.26.1
 pyxdg==0.25
 SecretStorage==2.3.1
 six==1.11.0
-tensorboard==1.13.1
-tensorflow==1.13.1
-tensorflow-estimator==1.13.0
+tensorboard==1.15.2
+tensorflow==1.15.2
+tensorflow-estimator==1.15.2
 termcolor==1.1.0
 typing==3.6.6
 typing-extensions==3.7.2
