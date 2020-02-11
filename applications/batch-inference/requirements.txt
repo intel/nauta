@@ -1,4 +1,4 @@
-tensorflow-serving-api==1.15.2
+tensorflow-serving-api==1.15.0
 kubernetes==6.0.0
 tensorflow==1.15.2
 retry==0.9.2
