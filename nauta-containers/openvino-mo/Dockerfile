@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y python3-pip python3-venv libgfortran3
 COPY --from=build /root/model-optimizer /root/model-optimizer
 
 COPY requirements.txt nauta-requirements.txt
+RUN pip3 install --upgrade pip==20.0.2
 RUN pip3 install -r nauta-requirements.txt
 
 WORKDIR /root/model-optimizer
