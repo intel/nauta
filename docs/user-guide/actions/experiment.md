@@ -14,7 +14,7 @@ Use the `experiment` command to submit and manage experiments. This main command
 
 ### Synopsis
  
-Use the `submit` subcommand to submit training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters). If `-n/--name` parameter is not passed, experiment name will be automatically generated, by deriving from training script's name.
+Use the `submit` subcommand to submit training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters). If `-n/--name` parameter is not passed, experiment name will be automatically generated, by deriving a new, unique name from training script's name.
  
 ### Syntax
  
