@@ -14,34 +14,34 @@ Use the `experiment` command to submit and manage experiments. This main command
 
 ### Synopsis
  
-Use the `submit` subcommand to submit training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters).
+Use the `submit` subcommand to submit training jobs. Use this command to submit single and multi-node training jobs (by passing –t parameter with a name of a multi-node pack), and many jobs at once (by passing –pr/-ps parameters). If `-n/--name` parameter is not passed, experiment name will be automatically generated, by deriving from training script's name.
  
 ### Syntax
  
  `nctl experiment submit [options] SCRIPT-LOCATION [-- script-parameters]`
  
 ### Arguments
- 
- | Name | Required | Description |
- |:--- |:--- |:--- |
- |`SCRIPT-LOCATION` | Yes | Location and name of a Python script with a description of training. |
- |`script-parameters` | No | String with a list of parameters that are passed to a training script. All such parameters should be added at the end of command after "--" string. |
-  
-### Options
- 
- | Name | Required | Description | 
- |:--- |:--- |:--- |
- |`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files, data, and so on. If not given, then its content _will not_ be copied into the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
- |`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). List of available templates can be obtained by issuing the `nctl template list` command. |
- |`-n, --name TEXT`| No | Name for this experiment.|
- |`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack parameter in format: `key value` or `key.subkey.subkey2 value`. For lists use: `'key "['val1', 'val2']"'` For maps use: `'key "{'a': 'b'}"'`|
- |`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` starts as many experiments as there is a combination of parameters passed in `-pr` options Optional`[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> <br> Contains values of this parameter that are passed to different instance of experiments. `[definition]` can have two forms: <br> <br> range: `{x...y:step}` This form says that `nctl` will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> <br> set of values: `{x, y, z}` This form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
- |`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` launches an experiment with a set of parameters defined in the `[definition]` argument. Optional. Format of the `[definition]` argument is as follows: `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br>  <br> All parameters given in the `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once, `nctl` will start as many experiments as there is occurrences of this parameter in a call. |
- |`-e, --env TEXT` | No | This is the environment variable passed to training. You can pass as many environmental variables, as desired. Each variable should be passed as a separate -e parameter.|
- |`-r, --requirements PATH` | No | This is the path to the file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
- |`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
- |`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO <br>`-vv` for DEBUG |
- |`-h, --help` | No | Displays help messaging information. |
+
+| Name | Required | Description |
+|:--- |:--- |:--- |
+|`SCRIPT-LOCATION` | Yes | Location and name of a Python script with a description of training. |
+|`script-parameters` | No | String with a list of parameters that are passed to a training script. All such parameters should be added at the end of command after "--" string. |
+
+## Options
+
+| Name | Required | Description | 
+|:--- |:--- |:--- |
+|`-sfl, --script-folder-location`<br>`[folder_name] PATH` | No |Location and name of a folder with additional files used    by a script, for example: other .py files,data, and so on. If not given, then its content _will not_ be copied into the Docker image created by the `nctl submit` command. `nctl` copies all content, preserving its structure, including subfolder(s). |
+|`-t, --template` <br>`[template_name] TEXT`| No | Name of a template that will be used by `nctl` to create a description of a job to be submitted. If not given, a default template for single node TensorFlow training is used (tf-training). List of available templates can be obtained by issuing the `nctl template list` command. |
+|`-n, --name TEXT`| No | Name for this experiment.|
+|`-p, --pack-param` <br> `<TEXT TEXT>…`| No |Additional pack parameter in format: `key value` or `key.subkey.subkey2 value`. For lists use: `'key "['val1', 'val2']"'`For maps use: `'key "{'a': 'b'}"'`|
+|`-pr, --parameter-range` <br>`TEXT... [definition] <TEXT TEXT>...` | No | If the parameter is given, `nctl` starts as many experiments as there is a combination of parameters passed in `-pr` options Optional`[param_name]` is a name of a parameter that is passed to a training script. `[definition]` <br> <br> Contains values of this parameter that are passed to different instance of experiments. `[definition]` can have two forms: <br> <br> range: `{x...y:step}` This form says that `nctl`will launch a number of experiments equal to a number of values between `x` and `y` (including both values) with step `step`. <br> <br> set of values: `{x, y, z}`This form says that `nctl` will launch number of experiments equal to a number of values given in this definition.|
+|`-ps, --parameter-set` <br>`[definition] TEXT` | No | If this parameter is given, `nctl` launches an experiment with a set of parameters that will be passed to experiment's script. Format of the `[definition]` argument is as follows: `{[param1_name]: [param1_value], [param2_name]: [param2_value], ..., [paramn_name]:[paramn_value]}`. <br>  <br> All parameters given in the `[definition]` argument will be passed to a training script under their names stated in this argument. If `ps` parameter is given more than once, `nctl` will start as many experiments as there is occurrences of this parameter in a call. |
+|`-e, --env TEXT` | No | This is the environment variable passed to training. You can pass as many environmental variables, as desired. Each variable should be passed as a separate -e parameter.|
+|`-r, --requirements PATH` | No | This is the path to the file with experiment's pip requirements. Dependencies listed in this file will be automatically installed using pip. |
+|`-f, --force`| No | Force command execution by ignoring (most) confirmation prompts. |
+|`-v, --verbose`| No | Set verbosity level: <br>`-v` for INFO <br>`-vv` for DEBUG |
+|`-h, --help` | No | Displays help messaging information. |
 
 #### Additional Remarks
  
