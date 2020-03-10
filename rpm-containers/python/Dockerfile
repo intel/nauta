@@ -8,8 +8,7 @@ ENV RPM_VERSION=2.7
 ENV RPM_RELEASE=0
 
 RUN yum update -y && yum install -y python-devel python libffi-devel openssl-devel gcc gcc-c++
-RUN curl "https://bootstrap.pypa.io/get-pip.py" | python
-RUN pip install -U pip==19.0.3 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
+RUN curl "https://bootstrap.pypa.io/get-pip.py" | python && pip install -U pip==19.0.3 virtualenv==16.0.0 setuptools==39.2.0 wheel==0.31.1
 
 ADD ./*.spec ./SPECS/
 
