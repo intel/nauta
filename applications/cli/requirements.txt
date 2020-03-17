@@ -8,7 +8,7 @@ toml==0.9.4
 marshmallow==2.15.2
 marshmallow-enum==1.4
 requests==2.20.0
-psutil==5.4.6
+psutil==5.6.6
 nbformat==4.4.0
 jsonschema==2.6.0
 distro==1.3.0
