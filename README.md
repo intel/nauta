@@ -1,3 +1,6 @@
+# IMPORTANT:
+Intel has decided to stop further development of Nauta and will no longer be supporting the product. We appreciate your involvement with the product.
+
 # Nauta
 
 ![Nauta Diagram](docs/nauta.png)
