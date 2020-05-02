@@ -716,7 +716,7 @@ def analyze_ps_parameters_list(list_of_params: Tuple[str, ...]):
         try:
             param_values = str.strip(param_set, "{}")
             param_values_list = [l.strip() for l in param_values.split(",")]
-            param_tuple = tuple([l.replace(":", "=", 1) for l in param_values_list])
+            param_tuple = tuple(l.replace(":", "=", 1) for l in param_values_list)
             ret_list.append(param_tuple)
         except Exception as e:
             log.exception(error_message)

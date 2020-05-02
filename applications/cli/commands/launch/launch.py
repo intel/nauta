@@ -82,8 +82,8 @@ def tensorboard(ctx: click.Context, no_launch: bool, tensorboard_service_client_
         try:
             tb = tensorboard_service_client.create_tensorboard(requested_runs)
             if tb.invalid_runs:
-                list_of_invalid_runs = ', '.join([f'{item.get("owner")}/{item.get("name")}'
-                                                  for item in tb.invalid_runs])
+                list_of_invalid_runs = ', '.join(f'{item.get("owner")}/{item.get("name")}'
+                                                  for item in tb.invalid_runs)
                 click.echo(Texts.TB_INVALID_RUNS_MSG.format(invalid_runs=list_of_invalid_runs))
         except Exception as exe:
             err_message = Texts.TB_CREATE_ERROR_MSG

@@ -37,10 +37,10 @@ def add_chapters_to_menu(local_chapters, file, menu):
     if len(local_chapters) == 0:
         return
     local_chapters = deque(local_chapters)
-    while len(local_chapters):
+    while local_chapters:
         new_chapter = Chapter(remove_hash(local_chapters.popleft()), file)
         subchapters = list()
-        while len(local_chapters):
+        while local_chapters:
             if local_chapters[0].startswith("##"):
                 subchapters.append(remove_hash(local_chapters.popleft()))
             else:
