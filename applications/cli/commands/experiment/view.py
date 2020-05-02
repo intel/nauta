@@ -326,17 +326,13 @@ def view(ctx: click.Context, experiment_name: str, tensorboard: bool,
                 click.echo()
                 top_cpu_users, top_mem_users = get_highest_usage()
                 click.echo(
-                    Texts.TOP_CPU_CONSUMERS.format(consumers=", ".join([
-                        res.user_name
+                    Texts.TOP_CPU_CONSUMERS.format(consumers=", ".join(res.user_name
                         for res in top_cpu_users[0:3 if len(top_cpu_users) > 2
-                                                 else len(top_cpu_users)]
-                    ])))
+                                                 else len(top_cpu_users)])))
                 click.echo(
-                    Texts.TOP_MEMORY_CONSUMERS.format(consumers=", ".join([
-                        res.user_name
+                    Texts.TOP_MEMORY_CONSUMERS.format(consumers=", ".join(res.user_name
                         for res in top_mem_users[0:3 if len(top_mem_users) > 2
-                                                 else len(top_mem_users)]
-                    ])))
+                                                 else len(top_mem_users)])))
             except Exception:
                 click.echo(Texts.PROBLEMS_WHILE_GATHERING_USAGE_DATA)
                 logger.exception(

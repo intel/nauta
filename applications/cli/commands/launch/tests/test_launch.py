@@ -311,5 +311,5 @@ def test_tensorboard_command_many_experiments_some_nonexisting(mocker, launch_te
     assert launch.sleep.call_count == 0
     assert result.exit_code == 0
     assert Texts.TB_INVALID_RUNS_MSG.format(
-        invalid_runs=", ".join([f'{item.get("owner")}/{item.get("name")}' for item in FAKE_INVALID_RUNS])
+        invalid_runs=", ".join(f'{item.get("owner")}/{item.get("name")}' for item in FAKE_INVALID_RUNS)
     ) in result.output
