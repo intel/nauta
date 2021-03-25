@@ -1,6 +1,6 @@
 click==7.0
 dpath==1.4.2
-pyyaml==4.2b1
+pyyaml==5.4
 tabulate==0.8.2
 elasticsearch==5.5.0
 kubernetes==7.0.1
